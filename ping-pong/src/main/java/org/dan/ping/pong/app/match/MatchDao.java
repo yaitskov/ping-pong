@@ -146,7 +146,9 @@ public class MatchDao {
                 .where(MATCH_SCORE.UID.eq(uid),
                         ENEMY_SCORE.UID.notEqual(uid),
                         MATCHES.STATE.in(Place, Game))
+                .orderBy(MATCHES.STATE.desc(), MATCHES.MID.asc())
                 .fetch()
+
                 .map(r -> MyPendingMatch.builder()
                         .mid(r.get(MATCHES.MID))
                         .state(r.get(MATCHES.STATE))

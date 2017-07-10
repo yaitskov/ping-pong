@@ -16,6 +16,7 @@ angular.module('pingPong', [
     'participantPresence',
     'tournamentCategories',
     'tournamentDetail',
+    'myMatchPlayList',
     'openTournamentList',
     'openTournament',
     'tournamentList'

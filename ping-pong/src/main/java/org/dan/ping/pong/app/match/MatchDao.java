@@ -80,7 +80,7 @@ public class MatchDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<OpenMatch> findOpenMatchesFurJudge(int adminUid) {
+    public List<OpenMatchForJudge> findOpenMatchesFurJudge(int adminUid) {
         return jooq.select(MATCHES.MID, MATCHES.STARTED,
                 TABLES.TABLE_ID, TABLES.LABEL,
                 MATCHES.GID, USERS.UID, USERS.NAME,
@@ -105,7 +105,7 @@ public class MatchDao {
                         MATCHES.STATE.eq(Game))
                 .orderBy(MATCHES.STARTED)
                 .fetch()
-                .map(r -> OpenMatch.builder()
+                .map(r -> OpenMatchForJudge.builder()
                         .mid(r.get(MATCHES.MID))
                         .started(r.get(MATCHES.STARTED).get())
                         .type(r.get(MATCHES.GID).map(gid -> Group).orElse(PlayOff))

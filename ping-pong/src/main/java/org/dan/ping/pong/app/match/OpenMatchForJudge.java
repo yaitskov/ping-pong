@@ -16,7 +16,7 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class OpenMatch {
+public class OpenMatchForJudge {
     private int mid;
     private TableLink table;
     private List<UserLink> participants;

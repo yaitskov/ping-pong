@@ -110,11 +110,11 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
         assertEquals(emptyList(), restGenerator.listOpenMatches());
         restGenerator.beginTournament(tid);
 
-        final List<OpenMatch> adminOpenMatches = restGenerator.listOpenMatches();
+        final List<OpenMatchForJudge> adminOpenMatches = restGenerator.listOpenMatches();
 
         assertEquals(
                 participants.stream().map(TestUserSession::getUid).collect(toSet()),
-                adminOpenMatches.stream().map(OpenMatch::getParticipants)
+                adminOpenMatches.stream().map(OpenMatchForJudge::getParticipants)
                         .flatMap(List::stream)
                         .map(UserLink::getUid)
                         .collect(toSet()));
@@ -172,11 +172,11 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
         restGenerator.beginTournament(tid);
 
         assertEquals(emptyList(), restGenerator.listCompleteMatches(tid));
-        final List<OpenMatch> adminOpenMatches = restGenerator.listOpenMatches();
+        final List<OpenMatchForJudge> adminOpenMatches = restGenerator.listOpenMatches();
 
         assertEquals(
                 participants.stream().limit(2).map(TestUserSession::getUid).collect(toSet()),
-                adminOpenMatches.stream().map(OpenMatch::getParticipants)
+                adminOpenMatches.stream().map(OpenMatchForJudge::getParticipants)
                         .flatMap(List::stream)
                         .map(UserLink::getUid)
                         .collect(toSet()));
@@ -200,7 +200,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 singletonList(adminOpenMatches.get(0).getMid()),
                 completeMatches.stream().map(CompleteMatch::getMid)
                         .collect(toList()));
-        final List<OpenMatch> adminOpenMatches2 = restGenerator.listOpenMatches();
+        final List<OpenMatchForJudge> adminOpenMatches2 = restGenerator.listOpenMatches();
         assertNotEquals(
                 singletonList(adminOpenMatches2.get(0).getMid()),
                 completeMatches.stream().map(CompleteMatch::getMid)

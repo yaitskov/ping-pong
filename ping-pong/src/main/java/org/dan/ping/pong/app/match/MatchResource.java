@@ -63,7 +63,7 @@ public class MatchResource {
     @GET
     @Path(OPEN_MATCHES_FOR_JUDGE)
     @Consumes(APPLICATION_JSON)
-    public List<OpenMatch> findOpenMatchesForJudge(
+    public List<OpenMatchForJudge> findOpenMatchesForJudge(
             @HeaderParam(SESSION) String session) {
         final int uid = authService.userInfoBySession(session).getUid();
         return matchDao.findOpenMatchesFurJudge(uid);

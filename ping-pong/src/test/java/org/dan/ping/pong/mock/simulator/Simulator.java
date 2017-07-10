@@ -19,7 +19,7 @@ import org.dan.ping.pong.app.match.ForTestMatchDao;
 import org.dan.ping.pong.app.match.IdentifiedScore;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchType;
-import org.dan.ping.pong.app.match.OpenMatch;
+import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.TournamentDao;
@@ -124,7 +124,7 @@ public class Simulator {
         final int[] completedMatches = new int[1];
         while (true) {
             completedMatches[0] = 0;
-            final List<OpenMatch> openMatches = matchDao.findOpenMatchesFurJudge(daoGenerator.getAdminUid());
+            final List<OpenMatchForJudge> openMatches = matchDao.findOpenMatchesFurJudge(daoGenerator.getAdminUid());
             assertThat(tableDao.findFreeTables(scenario.getTid()),
                     Matchers.hasSize(scenario.getParams().getTables() - openMatches.size()));
             completeOpenMatches(scenario, completedMatches, openMatches);
@@ -136,7 +136,7 @@ public class Simulator {
                     return false;
                 }
                 throw new IllegalStateException("Scenario stuck at matches "
-                        + openMatches.stream().map(OpenMatch::getMid).collect(toList())
+                        + openMatches.stream().map(OpenMatchForJudge::getMid).collect(toList())
                         + " player pairs "
                         + openMatches.stream()
                         .map(match -> matchToPlayers(scenario, match))
@@ -146,8 +146,8 @@ public class Simulator {
     }
 
     private void completeOpenMatches(TournamentScenario scenario,
-            int[] completedMatches, List<OpenMatch> openMatches) {
-        for (OpenMatch openMatch : openMatches) {
+            int[] completedMatches, List<OpenMatchForJudge> openMatches) {
+        for (OpenMatchForJudge openMatch : openMatches) {
             findGame(scenario, openMatch).ifPresent(game -> {
                 ++completedMatches[0];
                 rest.voidPost(COMPLETE_MATCH, testAdmin,
@@ -171,7 +171,7 @@ public class Simulator {
         }
     }
 
-    private Optional<GameEnd> findGame(TournamentScenario scenario, OpenMatch openMatch) {
+    private Optional<GameEnd> findGame(TournamentScenario scenario, OpenMatchForJudge openMatch) {
         final Set<Player> players = matchToPlayers(scenario, openMatch);
         final Map<Set<Player>, GameEnd> matchMap = openMatch.getType() == MatchType.Group
                 ? scenario.getGroupMatches()
@@ -185,7 +185,7 @@ public class Simulator {
                         + openMatch.getType() + " stage")));
     }
 
-    private Set<Player> matchToPlayers(TournamentScenario scenario, OpenMatch match) {
+    private Set<Player> matchToPlayers(TournamentScenario scenario, OpenMatchForJudge match) {
         return match.getParticipants().stream().map(UserLink::getUid)
                 .map(uid -> ofNullable(scenario.getUidPlayer().get(uid))
                         .orElseThrow(() -> new IllegalStateException("uid "

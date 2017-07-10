@@ -1,0 +1,25 @@
+<div class="container-fluid">
+  <main-menu></main-menu>
+  <div class="alert alert-danger" ng-show="$ctrl.error">
+    {{$ctrl.error}}
+  </div>
+  <ul class="tournaments" ng-show="$ctrl.tournaments">
+    <li ng-repeat="tournament in $ctrl.tournaments"
+        class="thumbnail tournament-list-item clearfix">
+      <a class="pull-left" href="#!/tournaments/{{tournament.tid}}">
+        {{tournament.name}}
+      </a>
+      <span class="pull-right" title="When the tournament begins">
+        {{tournament.opensAt|date : 'MMMM dd yyyy'}}
+      </span>
+    </li>
+  </ul>
+  <div class="alert alert-info" ng-show="!$ctrl.error && $ctrl.tournaments.length == 0">
+    You haven't enlisted yet to any tournament. Have a look at
+    <a href="#!/tournaments">the list</a> of coming tournaments and
+    pick event fitting you.
+  </div>
+  <div class="alert alert-info" ng-show="!$ctrl.error && $ctrl.tournaments === null">
+    Loading ...
+  </div>
+</div>

@@ -11,6 +11,7 @@ angular.module('pingPong', [
     'newPlace',
     'placePicker',
     'myTournamentList',
+    'playInTournamentList',
     'newTournament',
     'myTournament',
     'participantPresence',

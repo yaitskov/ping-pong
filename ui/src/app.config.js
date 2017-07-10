@@ -12,6 +12,9 @@ angular.module('pingPong').
                     when('/watch/tournaments', {
                         template: '<open-tournament-list></open-tournament-list>'
                     }).
+                    when('/play/in/tournaments', {
+                        template: '<play-in-tournament-list></play-in-tournament-list>'
+                    }).
                     when('/my/matches/play', {
                         template: '<my-match-play-list></my-match-play-list>'
                     }).

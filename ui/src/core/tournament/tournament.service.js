@@ -23,6 +23,14 @@ angular.
                                        },
                                        isArray: true
                                    },
+                                   participateIn: {
+                                       url: '/api/tournament/enlisted',
+                                       method: 'GET',
+                                       headers: {
+                                           session: auth.mySession()
+                                       },
+                                       isArray: true
+                                   },
                                    info: {
                                        url: '/api/tournament/:tournamentId',
                                        method: 'GET'

@@ -1,5 +1,6 @@
 package org.dan.ping.pong.mock;
 
+import org.dan.ping.pong.app.table.TestTableDao;
 import org.dan.ping.pong.sys.ctx.DaoCtx;
 import org.dan.ping.pong.sys.db.DbContext;
 import org.dan.ping.pong.sys.sadmin.SysAdminCtx;
@@ -12,6 +13,8 @@ import javax.ws.rs.client.Client;
         SysAdminCtx.class,
         DaoEntityGenerator.class,
         RestEntityGenerator.class,
+        TestTableDao.class,
+        OpenTournamentGenerator.class,
         RestEntityGeneratorWithAdmin.class,
         SysAdminGenerator.class,
         AdminSessionGenerator.class,

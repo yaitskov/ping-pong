@@ -10,7 +10,9 @@ import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.match.MatchResource.COMPLETE_MATCH;
+import static org.dan.ping.pong.app.match.MatchResource.MATCH_WATCH_LIST_OPEN;
 import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.match.MatchType.Group;
 import static org.dan.ping.pong.app.table.TableState.Busy;
 import static org.dan.ping.pong.app.table.TableState.Free;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
@@ -24,8 +26,16 @@ import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_2;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_2_G_8;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
@@ -37,7 +47,10 @@ import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentInfo;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin;
+import org.dan.ping.pong.mock.GeneratedOpenTournament;
 import org.dan.ping.pong.mock.MyLocalRest;
+import org.dan.ping.pong.mock.OpenTournamentGenerator;
+import org.dan.ping.pong.mock.OpenTournamentParams;
 import org.dan.ping.pong.mock.RestEntityGeneratorWithAdmin;
 import org.dan.ping.pong.mock.TestAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
@@ -57,6 +70,7 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.core.GenericType;
 
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = {TestCtx.class, ForTestMatchDao.class,
@@ -160,12 +174,32 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
         assertEquals(emptyList(), restGenerator.listOpenMatches());
     }
 
+    @Inject
+    private OpenTournamentGenerator openTournamentGenerator;
+
     @Test
     public void listOpenMatchesForWatch() {
-        final int pid = daoGenerator.genPlace(1);
-        final int tid = daoGenerator.genTournament(pid);
-        final int cid = daoGenerator.genCategory(tid);
-        daoGenerator.
+        final GeneratedOpenTournament got = openTournamentGenerator.genOpenTour(
+                OpenTournamentParams.builder().build());
+        List<OpenMatchForWatch> result = rest.get(MATCH_WATCH_LIST_OPEN + "/" + got.getTid(),
+                new GenericType<List<OpenMatchForWatch>>() {});
+        assertThat(result, hasItem(allOf(
+                hasProperty("mid", greaterThan(0)),
+                hasProperty("type", is(Group)),
+                hasProperty("score", is(asList(0, 0))),
+                hasProperty("category", allOf(
+                        hasProperty("name", notNullValue()),
+                        hasProperty("cid", is(got.getCid())))),
+                hasProperty("participants", hasItems(
+                        allOf(
+                                hasProperty("name", notNullValue()),
+                                hasProperty("uid", is(got.getSessions().get(1).getUid()))),
+                        allOf(
+                                hasProperty("name", notNullValue()),
+                                hasProperty("uid", is(got.getSessions().get(0).getUid()))))),
+                hasProperty("table",
+                        allOf(hasProperty("label", notNullValue()),
+                                hasProperty("id", is(got.getTableIds().get(0))))))));
     }
 
     @Test

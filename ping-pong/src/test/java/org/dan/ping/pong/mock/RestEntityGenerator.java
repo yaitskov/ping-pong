@@ -7,7 +7,6 @@ import static org.dan.ping.pong.app.match.MatchResource.COMPLETE_MATCHES;
 import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST;
-import static org.dan.ping.pong.mock.Generators.genStr;
 
 import org.dan.ping.pong.app.bid.BidId;
 import org.dan.ping.pong.app.castinglots.DoCastingLots;

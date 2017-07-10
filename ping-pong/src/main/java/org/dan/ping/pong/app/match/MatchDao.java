@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.match;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
+import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
 import static ord.dan.ping.pong.jooq.Tables.MATCH_SCORE;
 import static ord.dan.ping.pong.jooq.Tables.TABLES;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.Bid;
 import ord.dan.ping.pong.jooq.tables.MatchScore;
 import ord.dan.ping.pong.jooq.tables.Users;
+import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.dan.ping.pong.app.table.TableLink;
 import org.dan.ping.pong.app.user.UserLink;
@@ -339,9 +341,10 @@ public class MatchDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<CompleteMatch> findCompleteMatches(Integer tid) {
-        return jooq.select(MATCHES.MID, MATCHES.STARTED,
-                MATCHES.STARTED, MATCHES.ENDED,
-                MATCHES.GID, ENEMY_USER.UID, ENEMY_USER.NAME)
+        return jooq
+                .select(MATCHES.MID, MATCHES.STARTED,
+                        MATCHES.ENDED, MATCHES.GID, ENEMY_USER.UID,
+                        ENEMY_USER.NAME, USERS.UID, USERS.NAME)
                 .from(TOURNAMENT)
                 .innerJoin(MATCHES)
                 .on(TOURNAMENT.TID.eq(MATCHES.TID))
@@ -362,6 +365,57 @@ public class MatchDao {
                         .mid(r.get(MATCHES.MID))
                         .started(r.get(MATCHES.STARTED).get())
                         .ended(r.get(MATCHES.ENDED).get())
+                        .type(r.get(MATCHES.GID) == null ? PlayOff : Group)
+                        .participants(asList(
+                                UserLink.builder()
+                                        .name(r.get(USERS.NAME))
+                                        .uid(r.get(USERS.UID))
+                                        .build(),
+                                UserLink.builder()
+                                        .name(r.get(ENEMY_USER.NAME))
+                                        .uid(r.get(ENEMY_USER.UID))
+                                        .build()))
+                        .build());
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public List<OpenMatchForWatch> findOpenMatchesForWatching(int tid) {
+        return jooq
+                .select(MATCHES.MID, MATCHES.STARTED, CATEGORY.NAME,
+                        MATCHES.CID, TABLES.TABLE_ID, TABLES.LABEL,
+                        MATCHES.GID, ENEMY_USER.UID, ENEMY_USER.NAME,
+                        MATCH_SCORE.SETS_WON, ENEMY_SCORE.SETS_WON,
+                        USERS.UID, USERS.NAME)
+                .from(MATCHES)
+                .innerJoin(MATCH_SCORE)
+                .on(MATCH_SCORE.MID.eq(MATCHES.MID))
+                .innerJoin(ENEMY_SCORE)
+                .on(ENEMY_SCORE.MID.eq(MATCHES.MID))
+                .innerJoin(USERS)
+                .on(MATCH_SCORE.UID.eq(USERS.UID))
+                .innerJoin(ENEMY_USER)
+                .on(ENEMY_SCORE.UID.eq(ENEMY_USER.UID))
+                .innerJoin(CATEGORY)
+                .on(MATCHES.CID.eq(CATEGORY.CID))
+                .innerJoin(TABLES)
+                .on(MATCHES.MID.eq(TABLES.MID.cast(Integer.class)))
+                .where(MATCHES.TID.eq(tid),
+                        MATCHES.STATE.eq(Game),
+                        ENEMY_SCORE.UID.lt(MATCH_SCORE.UID))
+                .orderBy(MATCHES.STARTED)
+                .fetch()
+                .map(r -> OpenMatchForWatch.builder()
+                        .mid(r.get(MATCHES.MID))
+                        .started(r.get(MATCHES.STARTED).get())
+                        .score(asList(r.get(MATCH_SCORE.SETS_WON), r.get(ENEMY_SCORE.SETS_WON)))
+                        .category(CategoryInfo.builder()
+                                .cid(r.get(MATCHES.CID))
+                                .name(r.get(CATEGORY.NAME))
+                                .build())
+                        .table(TableLink.builder()
+                                .id(r.get(TABLES.TABLE_ID))
+                                .label(r.get(TABLES.LABEL))
+                                .build())
                         .type(r.get(MATCHES.GID) == null ? PlayOff : Group)
                         .participants(asList(
                                 UserLink.builder()

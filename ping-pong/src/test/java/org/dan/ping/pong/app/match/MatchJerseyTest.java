@@ -161,6 +161,14 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
     }
 
     @Test
+    public void listOpenMatchesForWatch() {
+        final int pid = daoGenerator.genPlace(1);
+        final int tid = daoGenerator.genTournament(pid);
+        final int cid = daoGenerator.genCategory(tid);
+        daoGenerator.
+    }
+
+    @Test
     public void adminCompleteFirstMatchInGroup() {
         final int placeId = daoGenerator.genPlace(1);
         final int tid = daoGenerator.genTournament(placeId, TournamentProps.builder()

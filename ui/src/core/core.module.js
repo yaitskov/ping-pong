@@ -1,6 +1,7 @@
 'use strict';
 
-angular.module('core', ['core.tournament', 'localStorage', 'core.place']).
+angular.module('core', ['core.tournament', 'core.match',
+                        'localStorage', 'core.place']).
     filter('isEmpty', function () {
         var bar;
         return function (obj) {

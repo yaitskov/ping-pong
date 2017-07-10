@@ -1,0 +1,72 @@
+<main-menu></main-menu>
+<div class="container">
+  <div class="form-group">
+    <label>Tournament</label>
+    <div class="pull-right">{{$ctrl.tournament.name}}</div>
+  </div>
+  <div class="form-group">
+    <label>Scheduled on</label>
+    <div class="pull-left">{{$ctrl.tournament.opensAt|date:"MMMM dd yyyy"}}</div>
+    <label class="pull-left">starts at</label>
+    <div class="pull-left">{{$ctrl.tournament.opensAt|date:"HH:MM"}}</div>
+  </div>
+  <div class="form-group">
+    <label>Location</label>
+    <div><a href="#!/place/{{$ctrl.tournament.place.pid}}">{{$ctrl.tournament.place.name}}</a>
+      {{$ctrl.tournament.place.address.address}}
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Already enlisted</label>
+    <div>{{$ctrl.tournament.alreadyEnlisted}}</div>
+  </div>
+  <div class="form-group">
+    <label>Price</label>
+    <div ng-if="$ctrl.tournament.price">
+      {{$ctrl.tournament.price}}
+    </div>
+    <div ng-if="!$ctrl.tournament.price">
+      For Free!!!
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Available payment methods</label>
+    <div>only in cache</div>
+  </div>
+
+  <div class="form-group" ng-show="!$ctrl.tournament.iamEnlisted">
+    <label>Categories</label>
+    <div class="btn-group" role="group">
+      <label class="btn btn-default" ng-repeat="category in $ctrl.tournament.categories"
+             ng-click="$ctrl.activate($event)">
+        <input type="radio" name="categoryRadio"
+               ng-model="$ctrl.categoryId" ng-value="category.cid"/>
+        {{category.name}}
+      </label>
+    </div>
+  </div>
+  <div class="form-group" ng-show="$ctrl.tournament.iamEnlisted">
+    <label>My category</label>
+    <input type="text" class="form-control" readonly
+           ng-value="$ctrl.categoryName"/>
+  </div>
+  <div class="form-group" ng-show="$ctrl.error">
+    <div class="alert alert-danger">
+      {{$ctrl.error}}
+    </div>
+  </div>
+  <div class="form-group" ng-show="$ctrl.tournament">
+    <button type="button" class="btn btn-primary"
+            ng-click="$ctrl.enlistMe()"
+            ng-show="!$ctrl.tournament.iamEnlisted && !$ctrl.tournament.iamAdmin">Enlist Me</button>
+    <button type="button" class="btn btn-primary"
+            ng-click="$ctrl.resign()"
+            ng-show="$ctrl.tournament.iamEnlisted">Resign</button>
+    <button type="button" class="btn btn-primary"
+            ng-show="$ctrl.tournament.iamAdmin">Enlist Offline Participant</button>
+    <a class="btn btn-primary label-info" role="button" ng-show="$ctrl.tournament.previousTid"
+       href="#!/tournament/drafting/{{$ctrl.tournament.previousTid}}">
+      Previous tournament in the seria
+    </a>
+  </div>
+</div>

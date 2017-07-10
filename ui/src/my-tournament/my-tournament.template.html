@@ -1,0 +1,35 @@
+<main-menu></main-menu>
+<div class="container">
+  <div class="form-group">
+    <label>Tournament</label>
+    <div class="pull-right">{{$ctrl.tournament.name}}</div>
+  </div>
+  <div class="form-group">
+    <label>Totally enlisted</label>
+    <div class="alert alert-info">
+      {{$ctrl.tournament.enlisted}}
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Totally present</label>
+    <div class="alert alert-info">
+      {{$ctrl.tournament.presented}}
+    </div>
+  </div>
+  <div class="form-group" ng-show="$ctrl.error">
+    <div class="alert alert-danger">
+      {{$ctrl.error}}
+    </div>
+  </div>
+  <div class="form-group" ng-show="$ctrl.tournament">
+    <button type="button" class="btn btn-primary"
+            ng-click="$ctrl.beginDrafting()"
+            ng-show="$ctrl.canBeginDrafting()">Draft</button>
+    <button type="button" class="btn btn-primary"
+            ng-click="$ctrl.open()"
+            ng-show="$ctrl.isDrafting()">Open</button>
+    <button type="button" class="btn btn-primary"
+            ng-click="$ctrl.cancel()"
+            ng-show="$ctrl.isNotCanceled()">Cancel</button>
+  </div>
+</div>

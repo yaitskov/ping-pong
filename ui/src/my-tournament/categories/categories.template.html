@@ -1,0 +1,36 @@
+<div class="container-fluid">
+  <main-menu></main-menu>
+  <div class="alert alert-error" ng-show="$ctrl.error">
+    {{$ctrl.error}}
+  </div>
+  <div class="alert alert-info" ng-show="$ctrl.categories === null">
+    Loading..
+  </div>
+  <div class="alert alert-info" ng-show="$ctrl.categories.length == 0">
+    No categories
+  </div>
+  <div class="col-md-10">
+    <ul class="categories">
+      <li class="clearfix">
+        <form class="form-inline">
+          <div class="form-group">
+            <input type="text" placeholder="Group Name"
+                   class="form-control"
+                   ng-model="$ctrl.newCategoryName"/>
+          </div>
+          <button class="btn btn-primary" ng-click="$ctrl.addGroup()">add</button>
+        </form>
+      </li>
+      <li ng-repeat="category in $ctrl.categories" class="clearfix">
+        <form class="form-inline">
+          <div class="form-group">
+            <label>
+              {{category.name}}
+            </label>
+          </div>
+          <button class="btn btn-default" ng-click="$ctrl.removeCategoryByIdx($index)">Remove</button>
+        </form>
+      </li>
+    </ul>
+  </div>
+</div>

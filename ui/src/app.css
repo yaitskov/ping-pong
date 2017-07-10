@@ -1,0 +1,56 @@
+h1 {
+  border-bottom: 1px solid gray;
+  margin-top: 0;
+}
+
+.view-container .dropdown-menu > li > a {
+    line-height: 1.4;
+    padding: 1px 10px;
+}
+
+.view-container .dropdown-menu .divider {
+    margin: 4px 0px;
+}
+
+.view-container .container-fluid {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.view-container .navbar {
+    min-height: 30px;
+}
+
+.view-container .navbar-text {
+    font-size: 17px;
+    line-height: 2;
+}
+
+.view-container .navbar-btn,
+.view-container .navbar-text {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+/* View: Tournament list */
+.tournaments {
+  list-style: none;
+}
+
+.tournaments li {
+
+}
+
+.tournament {
+  background-color: white;
+  display: none;
+  float: left;
+  height: 400px;
+  margin: 0px;
+  padding: 0px;
+  width: 400px;
+}
+
+.tournament:first-child {
+  display: block;
+}

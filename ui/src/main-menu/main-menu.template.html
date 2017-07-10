@@ -1,0 +1,31 @@
+<nav class="navbar navbar-default">
+  <p class="navbar-text pull-left">{{$ctrl.title()}}</p>
+  <div class="pull-right btn-group">
+    <button type="button" class="btn navbar-btn btn-danger dropdown-toggle"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="glyphicon glyphicon-list"></span>
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a href="#!/tournaments">Drafting</a></li>
+      <li><a href="#!/watch/tournaments">Watch Games</a></li>
+      <li role="separator" ng-show="$ctrl.isAuthenticated()" class="divider"></li>
+      <li><a href="#" ng-show="$ctrl.isAuthenticated()">My schedule</a></li>
+      <li><a href="#" ng-show="$ctrl.isAuthenticated()">Participation</a></li>
+      <li role="separator" ng-show="$ctrl.isAdmin()" class="divider"></li>
+      <li><a href="#!/my/tournaments" ng-show="$ctrl.isAuthenticated()">Administration</a></li>
+      <li><a href="#!/my/places" ng-show="$ctrl.isAuthenticated()">My Places</a></li>
+      <li role="separator" class="divider"></li>
+      <li><a href="#!/login" ng-show="!$ctrl.isAuthenticated()">Login</a></li>
+      <li><a href="#!/sign-up" ng-show="!$ctrl.isAuthenticated()">Sign-Up</a></li>
+      <li><a href="#" ng-show="$ctrl.isAuthenticated()"
+             ng-click="$ctrl.logout()">
+          Logout</a>
+      </li>
+      <li role="separator" class="divider" ng-hide="$ctrl.contextMenu() | isEmpty"></li>
+      <li ng-repeat="(path, label) in $ctrl.contextMenu()">
+        <a ng-attr-href="{{path}}">{{label}}</a>
+      </li>
+    </ul>
+  </div>
+</nav>

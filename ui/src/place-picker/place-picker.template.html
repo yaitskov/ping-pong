@@ -1,0 +1,16 @@
+<div class="container-fluid">
+  <main-menu></main-menu>
+  <ul class="places">
+      <li ng-repeat="place in $ctrl.places | filter:$ctrl.query">
+        <button class="btn btn-primary" ng-click="$ctrl.pickThisOne($index)">
+          {{place.name}}
+        </button>
+      </li>
+  </ul>
+  <p class="alert alert-info" ng-show="!$ctrl.places.length">
+    You don't administrate any place.
+  </p>
+  <a class="btn btn-default btn-primary" href="#!/my/new/place">
+    Add place
+  </a>
+</div>

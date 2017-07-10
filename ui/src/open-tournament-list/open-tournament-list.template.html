@@ -1,0 +1,31 @@
+<div class="container-fluid">
+  <main-menu></main-menu>
+  <div class="col-md-10">
+    <ul class="tournaments">
+      <li ng-repeat="tournament in $ctrl.tournaments"
+          class="thumbnail tournament-list-item clearfix">
+        <a class="pull-left well well-sm btn btn-default" href="#!/watch/tournament/{{tournament.tid}}">
+          {{tournament.name}}
+        </a>
+        <span class="well well-sm pull-right" title="Overall matches">
+          {{tournament.gamesOverall}}
+        </span>
+        <span class="well well-sm pull-right" title="Complete matches">
+          {{tournament.gamesComplete}}
+        </span>
+        <span class="pull-right well well-sm" title="Started at">
+          {{tournament.startedAt|date : 'HH:mm:ss'}}
+        </span>
+      </li>
+    </ul>
+    <div class="alert alert-danger" ng-show="$ctrl.error">
+      {{$ctrl.error}}
+    </div>
+    <div class="alert alert-info" ng-show="$ctrl.tournaments.length == 0">
+      There is no open tournaments.
+    </div>
+    <div class="alert alert-info" ng-show="$ctrl.tournaments === null">
+      Loading ...
+    </div>
+  </div>
+</div>

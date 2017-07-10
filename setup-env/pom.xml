@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>setup-env</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>setup-env</name>
+    <parent>
+        <groupId>org.dan.ping.pong</groupId>
+        <artifactId>aggregator</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modules>
+        <module>docker-network</module>
+        <module>docker-containers</module>
+    </modules>
+    <properties>
+        <network.name>${docker.network}</network.name>
+        <network.mysql>ping-pong-mysql</network.mysql>
+        <mysql.port>3306</mysql.port>
+        <mysql.datadir.tmpfs.mount>/var/lib/mysql2:rw,gid=999,uid=999,size=512M,nr_inodes=10k,mode=0700</mysql.datadir.tmpfs.mount>
+    </properties>
+</project>

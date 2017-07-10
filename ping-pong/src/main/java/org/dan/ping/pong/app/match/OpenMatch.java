@@ -1,0 +1,25 @@
+package org.dan.ping.pong.app.match;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.dan.ping.pong.app.table.TableLink;
+import org.dan.ping.pong.app.user.UserLink;
+
+import java.time.Instant;
+import java.util.List;
+
+@Getter
+@Builder
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class OpenMatch {
+    private int mid;
+    private TableLink table;
+    private List<UserLink> participants;
+    private Instant started;
+    private MatchType type;
+}

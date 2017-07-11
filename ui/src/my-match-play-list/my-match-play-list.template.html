@@ -31,7 +31,7 @@
   </table>
   <div class="alert alert-info" ng-show="!$ctrl.error && $ctrl.matches.length == 0">
     <p>You don't any match to play.</p>
-    <p ng-show="$ctrl.newCommer">
+    <p ng-show="!$ctrl.tournament.next && !$ctrl.tournament.previous">
       <a href="#!/tournaments">Find a tournament</a> interesting your
       and enlist!
     </p>

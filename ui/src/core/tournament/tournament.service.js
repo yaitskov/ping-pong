@@ -42,6 +42,13 @@ angular.
                                            session: auth.mySession()
                                        }
                                    },
+                                   myRecent: {
+                                       url: '/api/tournament/my-recent',
+                                       method: 'GET',
+                                       headers: {
+                                           session: auth.mySession()
+                                       }
+                                   },
                                    aDrafting: {
                                        url: '/api/tournament/drafting/:tournamentId',
                                        method: 'GET',

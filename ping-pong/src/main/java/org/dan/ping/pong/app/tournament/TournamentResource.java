@@ -35,7 +35,7 @@ public class TournamentResource {
     public static final String TOURNAMENT_ENLIST = TOURNAMENT + "enlist";
     public static final String TOURNAMENT_RESIGN = TOURNAMENT + "resign";
     public static final String TOURNAMENT_ENLISTED = TOURNAMENT + "enlisted";
-    public static final String MY_RECENT_TOURNAMENT = "/tournament/my-recent/";
+    public static final String MY_RECENT_TOURNAMENT = "/tournament/my-recent";
 
     @Inject
     private TournamentService tournamentService;

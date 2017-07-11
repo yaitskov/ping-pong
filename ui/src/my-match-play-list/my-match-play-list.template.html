@@ -3,6 +3,12 @@
   <div class="alert alert-danger" ng-show="$ctrl.error">
     {{$ctrl.error}}
   </div>
+  <div ng-show="$ctrl.openMatch">
+    <a class="btn btn-default"
+       href="#!/complete/my/match/{{$ctrl.openMatch.mid}}">
+     Complete match with {{$ctrl.openMatch.enemy.name}}
+    </a>
+  </div>
   <table class="table" ng-show="$ctrl.matches.length > 0">
     <thead>
       <tr>

@@ -17,6 +17,13 @@ angular.
                                        headers: {
                                            session: auth.mySession()
                                        }
+                                   },
+                                   scoreMatch: {
+                                       url: '/api/match/participant/score',
+                                       method: 'POST',
+                                       headers: {
+                                           'Content-Type': 'application/json',
+                                           session: auth.mySession()}
                                    }
                                });
                            }

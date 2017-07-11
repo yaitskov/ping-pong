@@ -13,6 +13,19 @@ angular.
                 }
                 return s4() + s4() + s4() + s4() + s4();
             };
+            this.findValByO = function (list, pattern, other) {
+                next:
+                for (var i in list) {
+                    var item = list[i];
+                    for (var k in Object.keys(pattern)) {
+                        if (item[k] !== pattern[k]) {
+                            continue next;
+                        }
+                    }
+                    return item;
+                }
+                return other;
+            };
             this.findValBy = function (list, pattern) {
                 next:
                 for (var i in list) {
@@ -36,6 +49,15 @@ angular.
             };
             this.get = function (key) {
                 return map[key];
+            };
+            this._enemyUidKey = function (myUid, mid) {
+                return 'enemy-of-' + myUid + '-in-mid-' + mid;
+            };
+            this.putEnemyUid = function (myUid, mid, enemyUid) {
+                this.put(this._enemyUidKey(myUid, mid), enemyUid);
+            };
+            this.getEnemyUid = function (myUid, mid) {
+                return this.get(this._enemyUidKey(myUid, mid));
             };
         };
     }]);

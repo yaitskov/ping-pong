@@ -15,6 +15,9 @@ angular.module('pingPong').
                     when('/play/in/tournaments', {
                         template: '<play-in-tournament-list></play-in-tournament-list>'
                     }).
+                    when('/complete/match/my/:matchId', {
+                        template: '<complete-my-match></complete-my-match>'
+                    }).
                     when('/my/matches/play', {
                         template: '<my-match-play-list></my-match-play-list>'
                     }).

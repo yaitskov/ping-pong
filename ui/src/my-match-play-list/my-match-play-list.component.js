@@ -3,10 +3,11 @@
 angular.module('myMatchPlayList').
     component('myMatchPlayList', {
         templateUrl: 'my-match-play-list/my-match-play-list.template.html',
-        controller: ['Match', 'Tournament', 'mainMenu', '$q',
-                     function (Match, Tournament, mainMenu, $q) {
+        controller: ['Match', 'Tournament', 'mainMenu', '$q', 'cutil',
+                     function (Match, Tournament, mainMenu, $q, cutil) {
                          mainMenu.setTitle('Planned matches');
                          this.matches = null;
+                         this.openMatch = null;
                          this.tournament = null;
                          var self = this;
                          self.error = null;
@@ -19,6 +20,7 @@ angular.module('myMatchPlayList').
                                      self.error = null;
                                      console.log("Loaded matches " + matches.length);
                                      self.matches = matches;
+                                     self.openMatch = cutil.findByValO(matches, {state: 'Game'});
                                  },
                                  function (error) {
                                      self.matches = [];

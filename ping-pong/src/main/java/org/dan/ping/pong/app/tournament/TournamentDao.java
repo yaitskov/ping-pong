@@ -312,4 +312,48 @@ public class TournamentDao {
                 .previous(findMyPreviousTournament(now, uid))
                 .build();
     }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public Optional<DatedTournamentDigest> findMyNextJudgeTournament(Instant now, int uid) {
+        return ofNullable(jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
+                .from(TOURNAMENT_ADMIN)
+                .leftJoin(TOURNAMENT).on(TOURNAMENT_ADMIN.TID.eq(TOURNAMENT.TID))
+                .where(TOURNAMENT_ADMIN.UID.eq(uid), TOURNAMENT.OPENS_AT.gt(now))
+                .orderBy(TOURNAMENT.OPENS_AT.asc())
+                .limit(1)
+                .fetchOne())
+                .map(r -> DatedTournamentDigest
+                        .builder()
+                        .tid(r.get(TOURNAMENT.TID))
+                        .name(r.get(TOURNAMENT.NAME))
+                        .opensAt(r.get(TOURNAMENT.OPENS_AT))
+                        .build());
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public Optional<DatedTournamentDigest> findMyPreviousJudgeTournament(Instant now, int uid) {
+        return ofNullable(jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
+                .from(TOURNAMENT_ADMIN)
+                .leftJoin(TOURNAMENT).on(TOURNAMENT_ADMIN.TID.eq(TOURNAMENT.TID))
+                .where(TOURNAMENT_ADMIN.UID.eq(uid),
+                        TOURNAMENT.OPENS_AT.lt(now),
+                        TOURNAMENT.OPENS_AT.gt(now.minus(2, ChronoUnit.DAYS)))
+                .orderBy(TOURNAMENT.OPENS_AT.desc())
+                .limit(1)
+                .fetchOne())
+                .map(r -> DatedTournamentDigest
+                        .builder()
+                        .tid(r.get(TOURNAMENT.TID))
+                        .name(r.get(TOURNAMENT.NAME))
+                        .opensAt(r.get(TOURNAMENT.OPENS_AT))
+                        .build());
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public MyRecentTournaments findMyRecentJudgedTournaments(Instant now, int uid) {
+        return MyRecentTournaments.builder()
+                .next(findMyNextJudgeTournament(now, uid))
+                .previous(findMyPreviousJudgeTournament(now, uid))
+                .build();
+    }
 }

@@ -59,5 +59,11 @@ angular.
             this.getEnemyUid = function (myUid, mid) {
                 return this.get(this._enemyUidKey(myUid, mid));
             };
+            this.putMatchParticipants = function (mid, participants) {
+                this.put('match-participants-' + mid, participants);
+            };
+            this.getMatchParticipants = function (mid, participants) {
+                return this.get('match-participants-' + mid);
+            };
         };
     }]);

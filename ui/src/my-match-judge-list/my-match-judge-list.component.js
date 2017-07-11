@@ -3,14 +3,18 @@
 angular.module('myMatchJudgeList').
     component('myMatchJudgeList', {
         templateUrl: 'my-match-judge-list/my-match-judge-list.template.html',
-        controller: ['Match', 'Tournament', 'mainMenu', '$q',
-                     function (Match, mainMenu, $q) {
+        controller: ['Match', 'Tournament', 'mainMenu', '$q', '$location', 'pageCtx',
+                     function (Match, Tournament, mainMenu, $q, $location, pageCtx) {
                          mainMenu.setTitle('Match Judgement');
                          this.matches = null;
                          this.tournament = null;
+                         this.completeMatch = function (mid, idx) {
+                             pageCtx.putMatchParticipants(mid, this.matches[idx].participants);
+                             $location.path('/complete/match/' + mid);
+                         };
                          var self = this;
                          self.error = null;
-                         $q.all([Tournament.myRecentJudgement({}).$promise,
+                         $q.all([Tournament.myRecentJudgements({}).$promise,
                                  Match.myMatchesNeedToJudge({}).$promise]).
                              then(
                                  function (responses) {

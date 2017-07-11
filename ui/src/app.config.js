@@ -18,6 +18,9 @@ angular.module('pingPong').
                     when('/complete/match/my/:matchId', {
                         template: '<complete-my-match></complete-my-match>'
                     }).
+                    when('/complete/match/:matchId', {
+                        template: '<complete-match></complete-match>'
+                    }).
                     when('/my/matches/play', {
                         template: '<my-match-play-list></my-match-play-list>'
                     }).

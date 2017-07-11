@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -147,5 +148,9 @@ public class AuthService {
         } else {
             log.error("Attempt to issue a sign in link for unknown email {}",  email);
         }
+    }
+
+    public List<EmailAndToken> emailsWithOneTimeSignInToken() {
+        return authDao.emailsWithOneTimeSignInToken();
     }
 }

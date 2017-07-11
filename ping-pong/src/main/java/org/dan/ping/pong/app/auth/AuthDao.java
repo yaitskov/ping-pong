@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -80,5 +81,19 @@ public class AuthDao {
         jooq.insertInto(SESSION_KEY, SESSION_KEY.UID, SESSION_KEY.TOKEN)
                 .values(uid, oneTimeToken)
                 .execute();
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public List<EmailAndToken> emailsWithOneTimeSignInToken() {
+        return jooq.select(USERS.EMAIL, SESSION_KEY.TOKEN)
+                .from(USERS).innerJoin(SESSION_KEY)
+                .on(USERS.UID.eq(SESSION_KEY.UID))
+                .where(USERS.EMAIL.isNotNull())
+                .orderBy(USERS.EMAIL.asc())
+                .fetch()
+                .map(r -> EmailAndToken.builder()
+                        .email(r.get(USERS.EMAIL).get())
+                        .token(r.get(SESSION_KEY.TOKEN))
+                        .build());
     }
 }

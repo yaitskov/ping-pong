@@ -4,6 +4,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -34,5 +36,12 @@ public class AuthResource {
     public void generateSignInLink(String email) {
         log.info("Generate sign-in link for {}", email);
         authService.generateSignInLink(email);
+    }
+
+    @GET
+    @Path("/dev/emails-with-sign-in-token")
+    public List<EmailAndToken> emailsWithOneTimeSignInToken()  {
+        log.info("dev-feature - load sign in tokens");
+        return authService.emailsWithOneTimeSignInToken();
     }
 }

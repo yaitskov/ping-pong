@@ -1,0 +1,21 @@
+<div class="container">
+  <h1>Authentication</h1>
+  <p>Click the link below to authenticate.</p>
+  <div class="alert alert-danger" ng-show="$ctrl.error">
+    {{$ctrl.error}}
+  </div>
+  <div class="alert alert-info" ng-show="!$ctrl.error && $ctrl.emails == null">
+    Loading...
+  </div>
+  <div class="alert alert-info" ng-show="!$ctrl.error && $ctrl.emails.length == 0">
+    There is no account with one time sign in token
+  </div>
+  <ul ng-show="$ctrl.emails">
+    <li ng-repeat="line in $ctrl.emails">
+      <a target="blank"
+         href="/api/anonymous/auth/by-one-time-token/{{line.token}}/{{line.email}}">
+        {{line.email}}
+      </a>
+    </li>
+  </ul>
+</div>

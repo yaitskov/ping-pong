@@ -80,6 +80,12 @@ public class AuthJerseyTest extends AbstractSpringJerseyTest {
                 userSession.getEmail()).get();
         assertEquals(userSession.getUid(), tokenAndUid.getUid());
 
+        myRest().voidPost(AUTH_GENERATE_SIGN_IN_LINK,
+                "no-session", userSession.getEmail());
+
+        assertEquals(tokenAndUid.getToken(), authDao.findUidByEmail(
+                userSession.getEmail()).get().getToken());
+
         final Authenticated authenticated = myRest().get(AUTH_BY_ONE_TIME_TOKEN
                 + tokenAndUid.getToken().get()
                 + "/" + userSession.getEmail(), Authenticated.class);

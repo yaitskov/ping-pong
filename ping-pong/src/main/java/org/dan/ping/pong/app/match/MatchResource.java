@@ -5,6 +5,7 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
+import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.util.time.Clocker;
 
 import java.util.List;
@@ -59,6 +60,12 @@ public class MatchResource {
         log.info("User {} sets scores {} for match {}",
                 uid, score.getScores(), score.getMid());
         matchService.complete(uid, score, clocker.get());
+    }
+
+    @GET
+    @Path("/match/tournament-winners/{tid}")
+    public List<UserLink> findWinners(@PathParam("tid") int tid) {
+        return matchDao.findWinners(tid);
     }
 
     @GET

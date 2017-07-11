@@ -10,6 +10,9 @@ import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT_ADMIN;
 import static ord.dan.ping.pong.jooq.Tables.USERS;
 import static ord.dan.ping.pong.jooq.tables.Matches.MATCHES;
+import static org.dan.ping.pong.app.bid.BidState.Win1;
+import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -428,6 +431,21 @@ public class MatchDao {
                                         .name(r.get(ENEMY_USER.NAME))
                                         .uid(r.get(ENEMY_USER.UID))
                                         .build()))
+                        .build());
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public List<UserLink> findWinners(int tid) {
+        return jooq.select(USERS.NAME, BID.UID)
+                .from(BID)
+                .innerJoin(USERS).on(BID.UID.eq(USERS.UID))
+                .where(BID.TID.eq(tid), BID.STATE.in(Win1, Win2, Win3))
+                .orderBy(BID.STATE.asc())
+                .fetch()
+                .map(r -> UserLink
+                        .builder()
+                        .name(r.get(USERS.NAME))
+                        .uid(r.get(BID.UID))
                         .build());
     }
 }

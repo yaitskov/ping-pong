@@ -18,6 +18,11 @@ angular.
                                            session: auth.mySession()
                                        }
                                    },
+                                   winners: {
+                                       url: '/api/match/tournament-winners/:tournamentId',
+                                       method: 'GET',
+                                       isArray: true
+                                   },
                                    scoreMatch: {
                                        url: '/api/match/participant/score',
                                        method: 'POST',

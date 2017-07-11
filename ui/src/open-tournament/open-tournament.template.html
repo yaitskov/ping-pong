@@ -4,7 +4,34 @@
     <div class="alert alert-danger" ng-show="$ctrl.error">
       {{$ctrl.error}}
     </div>
-    <table class="table table-bordered">
+    <div class="alert alert-info" ng-show="$ctrl.tournament.state == 'Close'">
+      Tournament <b>{{$ctrl.tournament.name}}</b> is complete.
+    </div>
+    <div class="alert alert-info" ng-show="$ctrl.tournament.state == 'Canceled'">
+      Tournament <b>{{$ctrl.tournament.name}}</b> is canceled.
+    </div>
+    <div ng-show="$ctrl.winners.length > 0">
+      <fieldset>
+        <legend>Winners</legend>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <td>Place</td>
+              <td>Participant</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="winner in $ctrl.winners">
+              <td>{{$index + 1}}</td>
+              <td>
+                <a href="#!/participant/{{$ctrl.tid}}/{{winner.uid}}">{{winner.name}}</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </fieldset>
+    </div>
+    <table class="table table-bordered" ng-show="$ctrl.matches.length > 0">
       <thead>
         <tr>
           <td>Table</td>
@@ -40,10 +67,10 @@
         </tr>
       </tbody>
     </table>
-    <div class="alert alert-info" ng-show="$ctrl.matches.length == 0">
+    <div class="alert alert-info" ng-show="!$ctrl.error && $ctrl.matches.length == 0">
       There is no open matches left.
     </div>
-    <div class="alert alert-info" ng-show="$ctrl.matches === null">
+    <div class="alert alert-info" ng-show="!$ctrl.error && $ctrl.matches === null">
       Loading ...
     </div>
   </div>

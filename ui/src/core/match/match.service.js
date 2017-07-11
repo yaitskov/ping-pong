@@ -18,6 +18,14 @@ angular.
                                            session: auth.mySession()
                                        }
                                    },
+                                   myMatchesNeedToJudge: {
+                                       url: '/api/match/judge/list/open',
+                                       method: 'GET',
+                                       isArray: true,
+                                       headers: {
+                                           session: auth.mySession()
+                                       }
+                                   },
                                    winners: {
                                        url: '/api/match/tournament-winners/:tournamentId',
                                        method: 'GET',

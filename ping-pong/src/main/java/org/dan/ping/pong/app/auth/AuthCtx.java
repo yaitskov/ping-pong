@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
+import org.dan.ping.pong.sys.EmailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
@@ -12,6 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 @Import({SecureRandom.class, AuthDao.class,
         SysAdminSignInResource.class,
+        AuthResource.class,
+        EmailService.class,
         CheckSysAdminSessionResource.class,
         HelloResource.class,
         CheckUserSessionResource.class,

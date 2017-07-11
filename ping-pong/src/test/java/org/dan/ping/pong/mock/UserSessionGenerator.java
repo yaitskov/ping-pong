@@ -2,6 +2,7 @@ package org.dan.ping.pong.mock;
 
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
+import org.dan.ping.pong.app.user.UserInfo;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
@@ -19,10 +20,11 @@ public class UserSessionGenerator {
     @Bean(name = USER_SESSION)
     @Scope(SCOPE_PROTOTYPE)
     public TestUserSession generate() {
-        final int userId = daoEntityGenerator.genUser();
+        final UserInfo userInfo = daoEntityGenerator.genUser();
         return TestUserSession.builder()
-                .uid(userId)
-                .session(daoEntityGenerator.genUserSession(userId))
+                .uid(userInfo.getUid())
+                .email(userInfo.getEmail().get())
+                .session(daoEntityGenerator.genUserSession(userInfo.getUid()))
                 .build();
     }
 

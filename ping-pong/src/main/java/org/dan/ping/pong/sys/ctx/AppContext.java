@@ -11,6 +11,7 @@ import org.dan.ping.pong.app.score.MatchScoreCtx;
 import org.dan.ping.pong.app.table.TableCtx;
 import org.dan.ping.pong.app.tournament.TournamentCtx;
 import org.dan.ping.pong.app.user.UserCtx;
+import org.dan.ping.pong.sys.EmailService;
 import org.dan.ping.pong.sys.ctx.jackson.JacksonContext;
 import org.dan.ping.pong.sys.db.DbContext;
 import org.springframework.context.annotation.Import;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         TimeContext.class,
         JacksonContext.class,
         CronContext.class,
+        EmailService.class,
         DbContext.class})
 @EnableTransactionManagement(proxyTargetClass = true)
 public class AppContext {

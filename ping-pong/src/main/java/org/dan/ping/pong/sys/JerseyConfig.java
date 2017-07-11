@@ -4,6 +4,7 @@ package org.dan.ping.pong.sys;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
+import org.dan.ping.pong.app.auth.AuthResource;
 import org.dan.ping.pong.app.auth.SysAdminSignInResource;
 import org.dan.ping.pong.app.bid.BidResource;
 import org.dan.ping.pong.app.castinglots.CastingLotsResource;
@@ -36,7 +37,7 @@ public class JerseyConfig extends ResourceConfig {
                 asList(UserResource.class, SysAdminSignInResource.class,
                         PlaceResource.class, TournamentResource.class,
                         BidResource.class, CategoryResource.class,
-                        MatchResource.class,
+                        MatchResource.class, AuthResource.class,
                         TableResource.class, CastingLotsResource.class)
                         .stream()
                         .map(Class::getPackage)

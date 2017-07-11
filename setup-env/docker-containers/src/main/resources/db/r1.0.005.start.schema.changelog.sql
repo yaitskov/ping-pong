@@ -30,6 +30,12 @@ create table sessions(
     device_info varchar(200),
     foreign key (uid) references users(uid));
 
+create table session_key(
+    token varchar(40) not null primary key,
+    uid int(11) not null,
+    created timestamp(3) default current_timestamp(3),
+    foreign key (uid) references users(uid));
+
 create table place(
     pid int(11) not null auto_increment primary key,
     name varchar(40) not null unique,

@@ -4,6 +4,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 
 import lombok.RequiredArgsConstructor;
 import org.dan.ping.pong.app.tournament.TournamentState;
+import org.dan.ping.pong.app.user.UserInfo;
 
 @RequiredArgsConstructor
 public class DaoEntityGeneratorWithAdmin {
@@ -34,7 +35,7 @@ public class DaoEntityGeneratorWithAdmin {
         return daoEntityGenerator.genCategory(tid);
     }
 
-    public int genUser() {
+    public UserInfo genUser() {
         return daoEntityGenerator.genUser();
     }
 

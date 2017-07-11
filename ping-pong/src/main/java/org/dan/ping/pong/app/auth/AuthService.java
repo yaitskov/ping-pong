@@ -6,15 +6,21 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.dan.ping.pong.app.auth.AuthCtx.SYS_ADMIN_SESSIONS;
 import static org.dan.ping.pong.app.auth.AuthCtx.USER_SESSIONS;
+import static org.dan.ping.pong.app.auth.AuthResource.AUTH_BY_ONE_TIME_TOKEN;
+import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.notAuthorized;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import com.google.common.cache.Cache;
+import com.google.common.collect.ImmutableMap;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
+import org.dan.ping.pong.sys.EmailService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.util.Optional;
@@ -26,6 +32,8 @@ import javax.inject.Named;
 public class AuthService {
     public static final int USER_PART_SESSION_LEN = 20;
     public static final String SESSION = "session";
+    private static final String SIGN_IN_LINK_PARAM = "sign-in-link";
+    private static final String SIGN_IN_LINK_EMAIL_TEMPLATE = "sign-in-link";
 
     @Inject
     private AuthDao authDao;
@@ -101,5 +109,43 @@ public class AuthService {
                     userSessions.put(session, userInfo);
                     return userInfo;
                 });
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public Authenticated authByOneTimeSession(String oneTimeToken, String email) {
+        log.info("Auth attempt by one time toke {} email {}", oneTimeToken, email);
+        final int uid = authDao.generateToken(oneTimeToken, email);
+        log.info("one time token {} mapped => {}", oneTimeToken, uid);
+        final String token = genSession() + genSession();
+        authDao.saveSession(uid, token, "to be define");
+        return Authenticated.builder()
+                .uid(uid)
+                .session(token)
+                .build();
+    }
+
+    @Inject
+    private EmailService emailService;
+
+    @Value("${base.site.url}")
+    private String baseSiteUrl;
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void generateSignInLink(String email) {
+        final Optional<OneTimeSignInToken> tokenAndUid = authDao.findUidByEmail(email);
+        if (tokenAndUid.isPresent()) {
+            final String oneTimeToken = tokenAndUid.get().getToken()
+                    .orElseGet(() -> {
+                        final String newOneTimeToken  = genSession() + genSession();
+                        authDao.saveOneTimeToken(newOneTimeToken, tokenAndUid.get().getUid());
+                        return newOneTimeToken;
+            });
+            emailService.send(email, SIGN_IN_LINK_EMAIL_TEMPLATE,
+                    ImmutableMap.of(SIGN_IN_LINK_PARAM,
+                            baseSiteUrl + AUTH_BY_ONE_TIME_TOKEN + oneTimeToken
+                                    + "/" + email));
+        } else {
+            log.error("Attempt to issue a sign in link for unknown email {}",  email);
+        }
     }
 }

@@ -8,4 +8,5 @@ import lombok.Getter;
 public class TestUserSession implements SessionAware {
     private String session;
     private int uid;
+    private String email;
 }

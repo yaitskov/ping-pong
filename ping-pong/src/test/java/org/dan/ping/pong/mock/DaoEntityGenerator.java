@@ -1,5 +1,7 @@
 package org.dan.ping.pong.mock;
 
+import static org.dan.ping.pong.mock.Generators.genEmail;
+import static org.dan.ping.pong.mock.Generators.genFirstLastName;
 import static org.dan.ping.pong.mock.Generators.genPhone;
 import static org.dan.ping.pong.mock.Generators.genStr;
 import static org.dan.ping.pong.mock.Generators.genTournamentName;
@@ -13,6 +15,7 @@ import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.tournament.CreateTournament;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.user.UserDao;
+import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserRegRequest;
 import org.dan.ping.pong.sys.sadmin.SysAdminDao;
 import org.dan.ping.pong.util.time.Clocker;
@@ -43,21 +46,23 @@ public class DaoEntityGenerator {
     private UserDao userDao;
 
     public int genAdmin(int said) {
-        final int uid = genUser();
+        final int uid = genUser().getUid();
         userDao.promoteToAdmins(said, uid);
         return uid;
     }
 
-    public int genUser() {
-        return userDao.register(UserRegRequest.builder()
-                .name(genStr())
-                .email(Optional.of(genStr() + "@email.com"))
+    public UserInfo genUser() {
+        final UserRegRequest request = UserRegRequest.builder()
+                .name(genFirstLastName())
+                .email(Optional.of(genEmail()))
                 .phone(Optional.of(genPhone()))
-                .build());
-    }
-
-    public String genUserSession() {
-        return genUserSession(genUser());
+                .build();
+        return UserInfo.builder()
+                .uid(userDao.register(request))
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .name(request.getName())
+                .build();
     }
 
     @Inject

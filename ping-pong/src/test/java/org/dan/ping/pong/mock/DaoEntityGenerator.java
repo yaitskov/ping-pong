@@ -97,7 +97,8 @@ public class DaoEntityGenerator {
 
     public int genTournament(int adminId, int placeId, TournamentProps props) {
         final int tid = tournamentDao.create(adminId, CreateTournament.builder()
-                .opensAt(clocker.get().plus(1, ChronoUnit.DAYS))
+                .opensAt(props.getOpensAt()
+                        .orElseGet(() -> clocker.get().plus(1, ChronoUnit.DAYS)))
                 .placeId(placeId)
                 .name(genTournamentName())
                 .previousTid(Optional.empty())

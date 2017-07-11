@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
+import static java.util.Collections.singletonList;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 import static javax.ws.rs.core.Response.Status.Family.familyOf;
@@ -8,11 +9,13 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.DRAFTING;
 import static org.dan.ping.pong.app.tournament.TournamentResource.EDITABLE_TOURNAMENTS;
+import static org.dan.ping.pong.app.tournament.TournamentResource.MY_RECENT_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.RUNNING_TOURNAMENTS;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_CREATE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLISTED;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
+import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
@@ -28,6 +31,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -46,12 +50,14 @@ import org.dan.ping.pong.mock.TournamentProps;
 import org.dan.ping.pong.mock.UserSessionGenerator;
 import org.dan.ping.pong.sys.ctx.TestCtx;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
+import org.dan.ping.pong.util.time.Clocker;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -245,5 +251,43 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final List<OpenTournamentDigest> openAfter = myRest()
                 .get(RUNNING_TOURNAMENTS, new GenericType<List<OpenTournamentDigest>>() {});
         assertThat(openAfter, hasItem(hasProperty("tid", is(tid))));
+    }
+
+    @Inject
+    private TournamentDao tournamentDao;
+
+    @Inject
+    private Clocker clocker;
+
+    @Test
+    public void myRecentTournaments() {
+        final int placeId = daoGenerator.genPlace(1);
+        final Instant previousOpensAt = clocker.get().minus(1, ChronoUnit.DAYS);
+        final int previousTid = daoGenerator.genTournament(placeId,
+                TournamentProps.builder()
+                        .opensAt(Optional.of(previousOpensAt))
+                        .state(Draft).build());
+        final int previousCid = daoGenerator.genCategory(previousTid);
+        final Instant nextOpensAt = clocker.get().plus(3, ChronoUnit.DAYS);
+        final int nextTid = daoGenerator.genTournament(placeId,
+                TournamentProps.builder()
+                        .opensAt(Optional.of(nextOpensAt))
+                        .state(Draft).build());
+        final int nextCid = daoGenerator.genCategory(nextTid);
+        restEntityGenerator.enlistParticipants(myRest(), session,
+                previousTid, previousCid, singletonList(userSession));
+        restEntityGenerator.enlistParticipants(myRest(), session,
+                nextTid, nextCid, singletonList(userSession));
+        tournamentDao.setState(previousTid, Close);
+        final MyRecentTournaments r = myRest().get(MY_RECENT_TOURNAMENT,
+                userSession, MyRecentTournaments.class);
+
+        assertEquals(previousTid, r.getPrevious().get().getTid());
+        assertEquals(previousOpensAt, r.getPrevious().get().getOpensAt());
+        assertThat(r.getPrevious().get().getName(), notNullValue());
+
+        assertEquals(nextTid, r.getNext().get().getTid());
+        assertEquals(nextOpensAt, r.getNext().get().getOpensAt());
+        assertThat(r.getNext().get().getName(), notNullValue());
     }
 }

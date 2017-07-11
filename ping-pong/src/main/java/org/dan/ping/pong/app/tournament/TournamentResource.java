@@ -35,6 +35,7 @@ public class TournamentResource {
     public static final String TOURNAMENT_ENLIST = TOURNAMENT + "enlist";
     public static final String TOURNAMENT_RESIGN = TOURNAMENT + "resign";
     public static final String TOURNAMENT_ENLISTED = TOURNAMENT + "enlisted";
+    public static final String MY_RECENT_TOURNAMENT = "/tournament/my-recent/";
 
     @Inject
     private TournamentService tournamentService;
@@ -143,5 +144,13 @@ public class TournamentResource {
         log.info("Uid {} sets status {} for tid {}", uid,
                 stateUpdate.getState(), stateUpdate.getTid());
         tournamentService.setTournamentStatus(uid, stateUpdate);
+    }
+
+    @GET
+    @Path(MY_RECENT_TOURNAMENT)
+    public MyRecentTournaments findTournamentsCloseToMe(
+            @HeaderParam(SESSION) String session) {
+        final int uid = authService.userInfoBySession(session).getUid();
+        return tournamentService.findMyRecentTournaments(uid);
     }
 }

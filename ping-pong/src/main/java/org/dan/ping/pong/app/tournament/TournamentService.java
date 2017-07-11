@@ -94,4 +94,8 @@ public class TournamentService {
     public List<OpenTournamentDigest> findRunning() {
         return tournamentDao.findRunning();
     }
+
+    public MyRecentTournaments findMyRecentTournaments(int uid) {
+        return tournamentDao.findMyRecentTournaments(clocker.get(), uid);
+    }
 }

@@ -12,8 +12,7 @@
   </div>
   <ul ng-show="$ctrl.emails">
     <li ng-repeat="line in $ctrl.emails">
-      <a target="blank"
-         href="/api/anonymous/auth/by-one-time-token/{{line.token}}/{{line.email}}">
+      <a target="blank" href="/" ng-click="$ctrl.signIn(line.email, line.token)">
         {{line.email}}
       </a>
     </li>

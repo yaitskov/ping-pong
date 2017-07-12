@@ -5,11 +5,9 @@ import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.mock.simulator.GameOutcome.L03;
 import static org.dan.ping.pong.mock.simulator.GameOutcome.L13;
 import static org.dan.ping.pong.mock.simulator.GameOutcome.L23;
-import static org.dan.ping.pong.mock.simulator.GameOutcome.Lose;
 import static org.dan.ping.pong.mock.simulator.GameOutcome.W30;
 import static org.dan.ping.pong.mock.simulator.GameOutcome.W31;
 import static org.dan.ping.pong.mock.simulator.GameOutcome.W32;
-import static org.dan.ping.pong.mock.simulator.GameOutcome.Win;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -37,6 +35,7 @@ public class TournamentScenario {
     private final Map<Player, TestUserSession> playersSessions = new HashMap<>();
     private final Map<Integer, Player> uidPlayer = new HashMap<>();
     private final Map<PlayerCategory, Integer> categoryDbId = new HashMap<>();
+    private final Map<Set<Player>, Pause> pauseOnMatches = new HashMap<>();
     @Setter
     private int tid;
     @Setter
@@ -66,6 +65,11 @@ public class TournamentScenario {
             throw new IllegalStateException("players " + pa + " and "
                     + pb + " are not both in a group or play off");
         }
+        return this;
+    }
+
+    public TournamentScenario pause(Player pa, Player pb, Pause when) {
+        pauseOnMatches.put(new HashSet<>(asList(pa, pb)), when);
         return this;
     }
 

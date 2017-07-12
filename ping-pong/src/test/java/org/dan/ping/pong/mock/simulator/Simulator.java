@@ -148,7 +148,10 @@ public class Simulator {
     private void completeOpenMatches(TournamentScenario scenario,
             int[] completedMatches, List<OpenMatchForJudge> openMatches) {
         for (OpenMatchForJudge openMatch : openMatches) {
-            findGame(scenario, openMatch).ifPresent(game -> {
+            final Set<Player> players = matchToPlayers(scenario, openMatch);
+            findGame(scenario, openMatch, players).ifPresent(game -> {
+                final Pause pause = scenario.getPauseOnMatches().getOrDefault(players, Pause.NonStop);
+                pause.pauseBefore(players);
                 ++completedMatches[0];
                 rest.voidPost(COMPLETE_MATCH, testAdmin,
                         FinalMatchScore.builder()
@@ -167,12 +170,12 @@ public class Simulator {
                                                                 .get(1)).getUid())
                                                 .build()))
                                 .build());
+                pause.pauseAfter(players);
             });
         }
     }
 
-    private Optional<GameEnd> findGame(TournamentScenario scenario, OpenMatchForJudge openMatch) {
-        final Set<Player> players = matchToPlayers(scenario, openMatch);
+    private Optional<GameEnd> findGame(TournamentScenario scenario, OpenMatchForJudge openMatch, Set<Player> players) {
         final Map<Set<Player>, GameEnd> matchMap = openMatch.getType() == MatchType.Group
                 ? scenario.getGroupMatches()
                 : scenario.getPlayOffMatches();

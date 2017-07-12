@@ -1,0 +1,40 @@
+<main-menu></main-menu>
+<div class="container">
+  <form>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" class="form-control"
+             ng-model="$ctrl.email"
+             id="email" placeholder="Email"/>
+      <p class="help-block">
+        Provide an email address used for your account registration.
+        The system will send an email with an one time authentication
+        link, if the address will be valid.
+      </p>
+    </div>
+    <div class="form-group">
+      <button ng-click="$ctrl.signIn()" class="btn btn-default btn-primary">
+        Send Link
+      </button>
+    </div>
+    <div class="form-group">
+      <div class="alert alert-danger" ng-show="$ctrl.error">
+        {{$ctrl.error}}
+      </div>
+      <div class="alert alert-info" ng-show="$ctrl.ok">
+        The email has been sent. Now you can check your mail box for
+        the letter.
+      </div>
+    </div>
+  </form>
+  <details>
+    <summary>Info</summary>
+    <p class="alert alert-info">
+      Here you can gen another session for your account, if it was
+      associated with an email before.  One time sign-in link will be
+      sent to that address. If you haven't provided an email during
+      sing-up, there is no option to retrieve to your account.  Sign-up
+      again and don't forget about the email address this time.
+    </p>
+  </details>
+</div>

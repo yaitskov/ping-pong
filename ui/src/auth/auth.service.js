@@ -17,6 +17,9 @@ angular.
                                  LocalStorage.clearAll();
                                  $location.path('/');
                              };
+                             this.myEmail = function () {
+                                 return LocalStorage.get('myEmail');
+                             };
                              this.mySession = function() {
                                  var value = LocalStorage.get('mySession');
                                  console.log("session is " + value);

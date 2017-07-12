@@ -7,11 +7,10 @@ angular.
         controller: [
             'mainMenu', '$http', 'cutil', 'auth',
             function (mainMenu, $http, cutil, auth) {
-                mainMenu.setTitle('Sing Up');
+                mainMenu.setTitle('Sign Up');
                 var self = this;
                 this.error = null;
                 this.signUp = function () {
-                    console.log("Sign up");
                     $http.post('/api/anonymous/user/register',
                                {name: this.firstName + ' ' + this.lastName,
                                 email: this.email,

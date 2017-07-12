@@ -6,6 +6,7 @@ angular.module('pingPong', [
     'mainMenu',
     'core',
     'signUp',
+    'signIn',
     'placeList',
     'placeDetail',
     'newPlace',

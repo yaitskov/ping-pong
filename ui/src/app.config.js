@@ -57,6 +57,9 @@ angular.module('pingPong').
                     when('/sign-up', {
                         template: '<sign-up></sign-up>'
                     }).
+                    when('/sign-in', {
+                        template: '<sign-in></sign-in>'
+                    }).
                     when('/tournaments/:tournamentId', {
                         template: '<tournament-detail></tournament-detail>'
                     }).

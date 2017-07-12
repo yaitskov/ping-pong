@@ -146,7 +146,7 @@ public class AuthService {
                             baseSiteUrl + AUTH_BY_ONE_TIME_TOKEN + oneTimeToken
                                     + "/" + email));
         } else {
-            log.error("Attempt to issue a sign in link for unknown email {}",  email);
+            log.error("Attempt to issue a sign in link for unknown email {}", email);
         }
     }
 

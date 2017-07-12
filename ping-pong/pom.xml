@@ -628,6 +628,23 @@
     </build>
     <profiles>
         <profile>
+            <id>simulate</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>*Sim.java</include>
+                            </includes>
+                            <!--fork mode is required to enable reading std input -->
+                            <forkMode>never</forkMode>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>run-server</id>
             <build>
                 <plugins>

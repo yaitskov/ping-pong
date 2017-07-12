@@ -7,8 +7,6 @@ import org.dan.ping.pong.sys.sadmin.SysAdminCtx;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
-import javax.ws.rs.client.Client;
-
 @Import({DaoCtx.class,
         SysAdminCtx.class,
         DaoEntityGenerator.class,
@@ -25,10 +23,5 @@ public class GeneratorCtx {
     public DaoEntityGeneratorWithAdmin daoEntityGeneratorWithAdmin(
             TestAdmin testAdmin, DaoEntityGenerator daoEntityGenerator) {
         return new DaoEntityGeneratorWithAdmin(testAdmin, daoEntityGenerator);
-    }
-
-    @Bean
-    public MyLocalRest myLocalRest(Client client) {
-        return new MyLocalRest(client);
     }
 }

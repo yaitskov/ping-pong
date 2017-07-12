@@ -21,7 +21,7 @@ import javax.ws.rs.core.GenericType;
 
 public class RestEntityGenerator {
     @Inject
-    private MyLocalRest rest;
+    private MyRest rest;
 
     @Inject
     private DaoEntityGenerator daoEntityGenerator;

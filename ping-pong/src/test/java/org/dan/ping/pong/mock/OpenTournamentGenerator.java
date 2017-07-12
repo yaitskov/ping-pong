@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 public class OpenTournamentGenerator {
     @Inject
-    private MyLocalRest rest;
+    private MyRest rest;
 
     @Inject
     private DaoEntityGenerator daoEntityGenerator;

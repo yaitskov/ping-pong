@@ -19,7 +19,7 @@ import java.util.Set;
 @Import(CustomEditorConfigurer.class)
 public class PropertiesContext {
     private static final String PING_PONG_PROPERTIES = "ping-pong.properties";
-    private static final int DEFAULT_PROPERTY_PRIORITY = 1;
+    public static final int DEFAULT_PROPERTY_PRIORITY = 1;
 
     @Bean
     public PropertyFileRef defaultProperties() {

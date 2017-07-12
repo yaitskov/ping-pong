@@ -27,7 +27,7 @@ import org.dan.ping.pong.app.tournament.TournamentInfo;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin;
-import org.dan.ping.pong.mock.MyLocalRest;
+import org.dan.ping.pong.mock.MyRest;
 import org.dan.ping.pong.mock.RestEntityGeneratorWithAdmin;
 import org.dan.ping.pong.mock.TestAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
@@ -61,7 +61,7 @@ public class Simulator {
     private MatchDao matchDao;
 
     @Inject
-    private MyLocalRest rest;
+    private MyRest rest;
 
     @Inject
     private ForTestMatchDao testMatchDao;

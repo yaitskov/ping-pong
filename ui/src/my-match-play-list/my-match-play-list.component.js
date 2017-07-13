@@ -20,7 +20,7 @@ angular.module('myMatchPlayList').
                                      self.error = null;
                                      console.log("Loaded matches " + matches.length);
                                      self.matches = matches;
-                                     self.openMatch = cutil.findByValO(matches, {state: 'Game'});
+                                     self.openMatch = cutil.findValByO(matches, {state: 'Game'});
                                      if (self.openMatch) {
                                          pageCtx.putEnemyUid(auth.myUid(), self.openMatch.mid,
                                                              self.openMatch.enemy.uid);

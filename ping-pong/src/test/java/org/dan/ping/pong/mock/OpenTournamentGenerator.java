@@ -3,6 +3,7 @@ package org.dan.ping.pong.mock;
 import org.dan.ping.pong.app.table.TestTableDao;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -28,7 +29,7 @@ public class OpenTournamentGenerator {
     public GeneratedOpenTournament genOpenTour(OpenTournamentParams params) {
         final int pid = daoEntityGenerator.genPlace(testAdmin.getUid(), params.getTables());
         final int tid = daoEntityGenerator.genTournament(testAdmin.getUid(), pid, params.getProps());
-        final int cid = daoEntityGenerator.genCategory(tid);
+        final int cid = daoEntityGenerator.genCategory(UUID.randomUUID().toString(), tid);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(
                 params.getNumberOfParticipants());
         restEntityGenerator.enlistParticipants(rest, testAdmin, tid, cid, participants);

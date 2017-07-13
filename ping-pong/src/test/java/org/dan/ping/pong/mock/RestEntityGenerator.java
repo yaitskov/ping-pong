@@ -16,6 +16,7 @@ import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.GenericType;
@@ -60,7 +61,7 @@ public class RestEntityGenerator {
     public List<TestUserSession> generateGroupsOf(MyRest myRest, TestAdmin adminSession,
             UserSessionGenerator userSessionGenerator,
             int tid, int numberParticipants) {
-        final int cid = daoEntityGenerator.genCategory(tid);
+        final int cid = daoEntityGenerator.genCategory(UUID.randomUUID().toString(), tid);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(numberParticipants);
         enlistParticipants(myRest, adminSession, tid, cid, participants);
         makeGroup(myRest, adminSession, tid);

@@ -28,4 +28,8 @@ public class RestEntityGeneratorWithAdmin {
     public List<CompleteMatch> listCompleteMatches(int tid) {
         return restEntityGenerator.listCompleteMatches(tid);
     }
+
+    public void generateSignInLinks(List<TestUserSession> users) {
+        restEntityGenerator.generateSignInLinks(users);
+    }
 }

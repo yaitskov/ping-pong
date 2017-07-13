@@ -1,5 +1,6 @@
 package org.dan.ping.pong.mock;
 
+import static org.dan.ping.pong.app.auth.AuthResource.AUTH_GENERATE_SIGN_IN_LINK;
 import static org.dan.ping.pong.app.bid.BidResource.BID_PAID;
 import static org.dan.ping.pong.app.bid.BidResource.BID_READY_TO_PLAY;
 import static org.dan.ping.pong.app.castinglots.CastingLotsResource.CASTING_LOTS;
@@ -76,5 +77,10 @@ public class RestEntityGenerator {
 
     public List<CompleteMatch> listCompleteMatches(int tid) {
         return rest.get(COMPLETE_MATCHES + tid, new GenericType<List<CompleteMatch>>(){});
+    }
+
+    public void generateSignInLinks(List<TestUserSession> users) {
+        users.forEach(user
+                -> rest.voidAnonymousPost(AUTH_GENERATE_SIGN_IN_LINK, user.getEmail()));
     }
 }

@@ -32,6 +32,10 @@ public class MyRest {
         assertThat(post(path, session, entity).getStatus(), lessThan(205));
     }
 
+    public <T> void voidAnonymousPost(String path, T entity) {
+        assertThat(post(path, "anonymous", entity).getStatus(), lessThan(205));
+    }
+
     public <T> Response post(String path, String session, T entity) {
         return request().path(path).request(APPLICATION_JSON)
                 .header(SESSION, session)

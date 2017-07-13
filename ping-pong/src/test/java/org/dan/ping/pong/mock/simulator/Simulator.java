@@ -3,10 +3,12 @@ package org.dan.ping.pong.mock.simulator;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.match.MatchResource.COMPLETE_MATCH;
+import static org.dan.ping.pong.app.match.MatchType.Group;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -18,7 +20,6 @@ import org.dan.ping.pong.app.match.ForTestBidDao;
 import org.dan.ping.pong.app.match.ForTestMatchDao;
 import org.dan.ping.pong.app.match.IdentifiedScore;
 import org.dan.ping.pong.app.match.MatchDao;
-import org.dan.ping.pong.app.match.MatchType;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableInfo;
@@ -36,6 +37,7 @@ import org.dan.ping.pong.mock.UserSessionGenerator;
 import org.dan.ping.pong.mock.ValueGenerator;
 import org.hamcrest.Matchers;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -82,10 +84,9 @@ public class Simulator {
         restGenerator.beginTournament(scenario.getTid());
         try {
             final boolean allMatchesComplete = expendAllMatches(scenario);
-            if (allMatchesComplete) {
+            if (allMatchesComplete && !scenario.isIgnoreUnexpectedGames()
+                    && !scenario.getAutoResolution().isPresent()) {
                 validateCompleteTournament(scenario);
-            } else {
-                throw new IllegalArgumentException("not implemented");
             }
         } catch (IllegalStateException|AssertionError e) {
             log.info("Scenario {} failed", scenario);
@@ -154,6 +155,7 @@ public class Simulator {
                 final Pause pause = scenario.getPauseOnMatches().getOrDefault(players, Pause.NonStop);
                 pause.pauseBefore(players);
                 ++completedMatches[0];
+                log.info("Match {}",  game.getOutcome());
                 rest.voidPost(COMPLETE_MATCH, testAdmin,
                         FinalMatchScore.builder()
                                 .mid(openMatch.getMid())
@@ -176,17 +178,29 @@ public class Simulator {
         }
     }
 
-    private Optional<GameEnd> findGame(TournamentScenario scenario, OpenMatchForJudge openMatch, Set<Player> players) {
-        final Map<Set<Player>, GameEnd> matchMap = openMatch.getType() == MatchType.Group
+    private Optional<GameEnd> findGame(TournamentScenario scenario,
+            OpenMatchForJudge openMatch,
+            Set<Player> players) {
+        final Map<Set<Player>, GameEnd> matchMap = openMatch.getType() == Group
                 ? scenario.getGroupMatches()
                 : scenario.getPlayOffMatches();
-        if (matchMap.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(ofNullable(matchMap.remove(players))
-                .orElseThrow(() -> new IllegalStateException("Match between "
+        final GameEnd gameEnd = matchMap.remove(players);
+        if (gameEnd == null) {
+            if (scenario.getAutoResolution().isPresent()) {
+                Iterator<Player> iterator = players.iterator();
+                return Optional.of(GameEnd.game(iterator.next(),
+                        scenario.getAutoResolution().get().choose(players),
+                        iterator.next()));
+            }
+            if (scenario.isIgnoreUnexpectedGames()) {
+                return empty();
+            } else {
+                throw new IllegalStateException("Match between "
                         + players + " is not expected at "
-                        + openMatch.getType() + " stage")));
+                        + openMatch.getType() + " stage");
+            }
+        }
+        return Optional.of(gameEnd);
     }
 
     private Set<Player> matchToPlayers(TournamentScenario scenario, OpenMatchForJudge match) {
@@ -213,11 +227,14 @@ public class Simulator {
                 .state(TournamentState.Draft)
                 .build());
         scenario.setTid(tid);
+        final Collection<Player> players = scenario.getPlayersByCategories().values();
         final Map<Player, TestUserSession> playersSession = scenario.getPlayersSessions();
-        final Iterator<TestUserSession> sessions = userSessionGenerator
-                .generateUserSessions(prefix, playersSession.size())
+        final List<TestUserSession> userSessions = userSessionGenerator
+                .generateUserSessions(prefix, players.size());
+        final Iterator<TestUserSession> sessions = userSessions
                 .iterator();
-        for (Player player : playersSession.keySet()) {
+        restGenerator.generateSignInLinks(userSessions);
+        for (Player player : players) {
             TestUserSession user = sessions.next();
             playersSession.put(player, user);
             scenario.getUidPlayer().put(user.getUid(), player);

@@ -1,7 +1,9 @@
 package org.dan.ping.pong.mock;
 
+import static java.util.stream.Collectors.toList;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
+import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
@@ -11,6 +13,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+@Slf4j
 public class UserSessionGenerator {
     public static final String USER_SESSION = "userSession";
 
@@ -38,8 +41,10 @@ public class UserSessionGenerator {
     public List<TestUserSession> generateUserSessions(String prefix, int n) {
         List<TestUserSession> result = new ArrayList<>(n);
         for (int i = 0; i < n; ++i) {
-            result.add(generate(String.format("%s p%03d", prefix, n)));
+            result.add(generate(String.format("%s p%03d", prefix, i)));
         }
+        log.info("Generated {} users with prefix {}: {}", n, prefix,
+                result.stream().map(TestUserSession::getUid).collect(toList()));
         return result;
     }
 }

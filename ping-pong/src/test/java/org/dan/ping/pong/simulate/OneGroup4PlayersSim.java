@@ -1,5 +1,6 @@
 package org.dan.ping.pong.simulate;
 
+import static org.dan.ping.pong.mock.simulator.AutoResolution.RANDOM;
 import static org.dan.ping.pong.mock.simulator.Pause.BeforeScore;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -31,6 +32,7 @@ public class OneGroup4PlayersSim {
     public void pauseBeforeSecondScore() {
         simulator.simulate(T_1_Q_1_G_2,
                 TournamentScenario.begin()
+                        .autoResolution(RANDOM)
                         .name("pauseBeforeSecondScore")
                         .category(c1, p1, p2, p3, p4)
                         .win(p1, p2)

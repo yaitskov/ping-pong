@@ -46,6 +46,20 @@ public class TournamentScenario {
     @Setter
     private SimulatorParams params;
 
+    private boolean ignoreUnexpectedGames;
+
+    private Optional<AutoResolution> autoResolution = Optional.empty();
+
+    public TournamentScenario autoResolution(AutoResolution resolution) {
+        this.autoResolution = Optional.of(resolution);
+        return this;
+    }
+
+    public TournamentScenario ignoreUnexpectedGames() {
+        this.ignoreUnexpectedGames = true;
+        return this;
+    }
+
     public static TournamentScenario begin() {
         return new TournamentScenario();
     }

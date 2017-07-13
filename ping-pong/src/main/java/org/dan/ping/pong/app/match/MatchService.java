@@ -32,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +43,6 @@ import javax.inject.Inject;
 
 @Slf4j
 public class MatchService {
-    private static final Comparator<List> COMPARATOR
-            = comparingInt((List a) -> a.size()).reversed();
-
     @Inject
     private MatchDao matchDao;
 
@@ -143,7 +139,7 @@ public class MatchService {
         Map<Optional<Integer>, List<GroupMatchInfo>> byWinner = matches.stream()
                 .collect(groupingBy(GroupMatchInfo::getWinnerId, toList()));
         final PriorityQueue<List<GroupMatchInfo>> pq = new PriorityQueue<>(
-                COMPARATOR);
+                GroupMatchListComparator.COMPARATOR);
         pq.addAll(byWinner.values());
         final GroupInfo iGru = groupDao.getById(gid).orElseThrow(
                 () -> internalError("Group " + gid + " disappeared"));

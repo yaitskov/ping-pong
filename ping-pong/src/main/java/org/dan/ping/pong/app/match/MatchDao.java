@@ -270,18 +270,18 @@ public class MatchDao {
         return jooq.select(
                 MATCHES.MID,
                 MATCHES.STATE,
-                DSL.select(MATCH_SCORE.UID)
-                        .from(MATCH_SCORE)
-                        .where(MATCH_SCORE.MID.eq(MATCHES.MID),
-                                MATCH_SCORE.WON.gt(0))
-                        .asField(WINNER_ID))
+                MATCH_SCORE.UID,
+                MATCH_SCORE.WON)
                 .from(MATCHES)
+                .leftJoin(MATCH_SCORE)
+                .on(MATCHES.MID.eq(MATCH_SCORE.MID), MATCH_SCORE.WON.gt(0))
                 .where(MATCHES.GID.eq(Optional.of(gid)))
                 .fetch()
                 .map(r -> GroupMatchInfo.builder()
                         .mid(r.get(MATCHES.MID))
                         .state(r.get(MATCHES.STATE))
-                        .winnerId(ofNullable(r.get(WINNER_ID, Integer.class)))
+                        .setsWon(ofNullable(r.get(MATCH_SCORE.WON)))
+                        .winnerId(ofNullable(r.get(MATCH_SCORE.UID)))
                         .build());
     }
 

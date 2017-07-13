@@ -19,4 +19,6 @@ public class GroupMatchInfo {
     private int mid;
     private MatchState state;
     private Optional<Integer> winnerId;
+    private Optional<Integer> setsWon;
+
 }

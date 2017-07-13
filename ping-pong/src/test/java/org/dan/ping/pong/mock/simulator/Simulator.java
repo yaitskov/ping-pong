@@ -28,10 +28,9 @@ import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentInfo;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.user.UserLink;
-import org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin;
+import org.dan.ping.pong.mock.DaoEntityGenerator;
 import org.dan.ping.pong.mock.MyRest;
 import org.dan.ping.pong.mock.RestEntityGeneratorWithAdmin;
-import org.dan.ping.pong.mock.TestAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.TournamentProps;
 import org.dan.ping.pong.mock.UserSessionGenerator;
@@ -49,14 +48,13 @@ import javax.inject.Inject;
 
 @Slf4j
 public class Simulator {
-    @Inject
-    private TestAdmin testAdmin;
+    private TestUserSession testAdmin;
 
     @Inject
     private RestEntityGeneratorWithAdmin restGenerator;
 
     @Inject
-    private DaoEntityGeneratorWithAdmin daoGenerator;
+    private DaoEntityGenerator daoGenerator;
 
     @Inject
     private UserSessionGenerator userSessionGenerator;
@@ -134,7 +132,8 @@ public class Simulator {
         final int[] completedMatches = new int[1];
         while (true) {
             completedMatches[0] = 0;
-            final List<OpenMatchForJudge> openMatches = matchDao.findOpenMatchesFurJudge(daoGenerator.getAdminUid());
+            final List<OpenMatchForJudge> openMatches = matchDao.findOpenMatchesFurJudge(
+                    testAdmin.getUid());
             assertThat(tableDao.findFreeTables(scenario.getTid()),
                     Matchers.hasSize(scenario.getParams().getTables() - openMatches.size()));
             completeOpenMatches(scenario, completedMatches, openMatches);
@@ -150,7 +149,6 @@ public class Simulator {
                         || !scenario.getPlayOffMatches().isEmpty()) {
                     throw new IllegalStateException("Some of matches are not held");
                 }
-
                 return true;
             } else if (completedMatches[0] == 0) {
                 if (scenario.getPlayOffMatches().isEmpty() && scenario.getGroupMatches().isEmpty()) {
@@ -238,9 +236,12 @@ public class Simulator {
         final String prefix = scenario.getName()
                 .orElseGet(() -> "todo")
                 + " " + valueGenerator.genName(8);
-        final int placeId = daoGenerator.genPlace(prefix, params.getTables());
+        testAdmin = userSessionGenerator.generate(prefix + " admin");
+        restGenerator.generateSignInLinks(singletonList(testAdmin));
+        final int placeId = daoGenerator.genPlace(prefix, testAdmin.getUid(), params.getTables());
         scenario.setPlaceId(placeId);
-        final int tid = daoGenerator.genTournament(prefix, placeId, TournamentProps.builder()
+        final int tid = daoGenerator.genTournament(prefix, testAdmin.getUid(),
+                placeId, TournamentProps.builder()
                 .maxGroupSize(params.getMaxGroupSize())
                 .quitsFromGroup(params.getQuitsFromGroup())
                 .state(TournamentState.Draft)

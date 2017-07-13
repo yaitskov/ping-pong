@@ -1,7 +1,5 @@
 package org.dan.ping.pong.mock;
 
-import static org.dan.ping.pong.mock.Generators.genEmail;
-import static org.dan.ping.pong.mock.Generators.genFirstLastName;
 import static org.dan.ping.pong.mock.Generators.genPhone;
 import static org.dan.ping.pong.mock.Generators.genStr;
 import static org.dan.ping.pong.mock.Generators.genTournamentName;
@@ -17,7 +15,6 @@ import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserRegRequest;
-import org.dan.ping.pong.sys.sadmin.SysAdminDao;
 import org.dan.ping.pong.util.time.Clocker;
 import org.jooq.DSLContext;
 
@@ -27,20 +24,8 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 public class DaoEntityGenerator {
-    public static final String SYS_ADMIN_TEST_PASSWORD = "1";
     @Inject
     private DSLContext jooq;
-
-    @Inject
-    private SysAdminDao sysAdminDao;
-
-    public int genSysAdmin(String login) {
-        return sysAdminDao.create(login, SYS_ADMIN_TEST_PASSWORD, "salt");
-    }
-
-    public int genSysAdmin() {
-        return genSysAdmin(genStr());
-    }
 
     @Inject
     private UserDao userDao;

@@ -1,5 +1,7 @@
 package org.dan.ping.pong.mock;
 
+import static org.dan.ping.pong.mock.Generators.genStr;
+
 import org.dan.ping.pong.app.auth.SysAdmin;
 import org.dan.ping.pong.sys.sadmin.SysAdminDao;
 import org.springframework.context.annotation.Bean;
@@ -7,14 +9,21 @@ import org.springframework.context.annotation.Bean;
 import javax.inject.Inject;
 
 public class SysAdminGenerator {
-    @Inject
-    private DaoEntityGenerator daoEntityGenerator;
+    public static final String SYS_ADMIN_TEST_PASSWORD = "1";
 
     @Inject
     private SysAdminDao sysAdminDao;
 
     @Bean
     public SysAdmin sysAdmin() {
-        return sysAdminDao.getById(daoEntityGenerator.genSysAdmin()).get();
+        return sysAdminDao.getById(genSysAdmin()).get();
+    }
+
+    private int genSysAdmin(String login) {
+        return sysAdminDao.create(login, SYS_ADMIN_TEST_PASSWORD, "salt");
+    }
+
+    private int genSysAdmin() {
+        return genSysAdmin(genStr());
     }
 }

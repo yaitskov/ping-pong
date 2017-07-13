@@ -28,11 +28,11 @@ public class RestEntityGenerator {
     @Inject
     private DaoEntityGenerator daoEntityGenerator;
 
-    public void enlistParticipants(TestAdmin adminSession,
+    public void enlistParticipants(SessionAware adminSession,
             int tid, int cid, List<TestUserSession> participants) {
         enlistParticipants(rest, adminSession, tid, cid, participants);
     }
-    public void enlistParticipants(MyRest myRest, TestAdmin adminSession,
+    public void enlistParticipants(MyRest myRest, SessionAware adminSession,
             int tid, int cid, List<TestUserSession> participants) {
         for (TestUserSession userSession : participants) {
             myRest.voidPost(TOURNAMENT_ENLIST, userSession,
@@ -68,7 +68,7 @@ public class RestEntityGenerator {
         return participants;
     }
 
-    public void beginTournament(TestAdmin testAdmin, int tid) {
+    public void beginTournament(SessionAware testAdmin, int tid) {
         rest.voidPost(BEGIN_TOURNAMENT, testAdmin, tid);
     }
 

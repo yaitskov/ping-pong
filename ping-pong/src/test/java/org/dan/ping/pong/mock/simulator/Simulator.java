@@ -31,6 +31,7 @@ import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.mock.DaoEntityGenerator;
 import org.dan.ping.pong.mock.MyRest;
+import org.dan.ping.pong.mock.RestEntityGenerator;
 import org.dan.ping.pong.mock.RestEntityGeneratorWithAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.TournamentProps;
@@ -52,7 +53,7 @@ public class Simulator {
     private TestUserSession testAdmin;
 
     @Inject
-    private RestEntityGeneratorWithAdmin restGenerator;
+    private RestEntityGenerator restGenerator;
 
     @Inject
     private DaoEntityGenerator daoGenerator;
@@ -81,7 +82,7 @@ public class Simulator {
     public void simulate(SimulatorParams params, TournamentScenario scenario) {
         scenario.setParams(params);
         setupEnvironment(params, scenario);
-        restGenerator.beginTournament(scenario.getTid());
+        restGenerator.beginTournament(testAdmin, scenario.getTid());
         try {
             final boolean allMatchesComplete = expendAllMatches(scenario);
             if (allMatchesComplete && !scenario.isIgnoreUnexpectedGames()
@@ -264,7 +265,7 @@ public class Simulator {
         for (PlayerCategory category : scenario.getCategoryDbId().keySet()) {
             final int catId = daoGenerator.genCategory(prefix, tid);
             scenario.getCategoryDbId().put(category, catId);
-            restGenerator.enlistParticipants(tid,
+            restGenerator.enlistParticipants(testAdmin, tid,
                     catId, scenario.getPlayersByCategories().get(category)
                             .stream().map(player -> scenario.getPlayersSessions().get(player))
                             .collect(toList()));

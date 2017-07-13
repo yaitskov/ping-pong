@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 @Import({SecureRandom.class, AuthDao.class,
         SysAdminSignInResource.class,
+        SecureSessionGenerator.class,
         AuthResource.class,
         EmailService.class,
         CheckSysAdminSessionResource.class,

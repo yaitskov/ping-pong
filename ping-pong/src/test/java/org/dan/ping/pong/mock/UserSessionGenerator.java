@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Scope;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -25,6 +26,10 @@ public class UserSessionGenerator {
 
     @Bean(name = USER_SESSION)
     @Scope(SCOPE_PROTOTYPE)
+    public TestUserSession generate() {
+        return generate(UUID.randomUUID().toString());
+    }
+
     public TestUserSession generate(String name) {
         final UserInfo userInfo = daoEntityGenerator.genUser(name);
         return TestUserSession.builder()
@@ -35,7 +40,7 @@ public class UserSessionGenerator {
     }
 
     public List<TestUserSession> generateUserSessions(int n) {
-        return generateUserSessions(valueGenerator.genName(), n);
+        return generateUserSessions(valueGenerator.genName(20), n);
     }
 
     public List<TestUserSession> generateUserSessions(String prefix, int n) {

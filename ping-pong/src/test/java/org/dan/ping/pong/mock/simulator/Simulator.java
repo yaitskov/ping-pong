@@ -236,7 +236,7 @@ public class Simulator {
 
     private void setupEnvironment(SimulatorParams params, TournamentScenario scenario) {
         final String prefix = scenario.getName()
-                .orElseGet(() -> "todo-extract-method-from-stack")
+                .orElseGet(() -> "todo")
                 + " " + valueGenerator.genName(8);
         final int placeId = daoGenerator.genPlace(prefix, params.getTables());
         scenario.setPlaceId(placeId);

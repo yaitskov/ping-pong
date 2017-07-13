@@ -22,7 +22,6 @@ import org.dan.ping.pong.sys.EmailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +42,7 @@ public class AuthService {
     private UserDao userDao;
 
     @Inject
-    private SecureRandom random;
+    private SessionGenerator sessionGenerator;
 
     @Inject
     @Named(SYS_ADMIN_SESSIONS)
@@ -66,7 +65,7 @@ public class AuthService {
     }
 
     private String genSession() {
-        return encodeHexString(random.generateSeed(10));
+        return sessionGenerator.generate();
     }
 
     @SneakyThrows

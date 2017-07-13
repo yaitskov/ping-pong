@@ -138,7 +138,11 @@ public class Simulator {
             assertThat(tableDao.findFreeTables(scenario.getTid()),
                     Matchers.hasSize(scenario.getParams().getTables() - openMatches.size()));
             completeOpenMatches(scenario, completedMatches, openMatches);
-
+            if (scenario.isIgnoreUnexpectedGames()
+                    && scenario.getGroupMatches().isEmpty()
+                    && scenario.getPlayOffMatches().isEmpty()) {
+                return openMatches.isEmpty();
+            }
             if (openMatches.isEmpty()) {
                 showUnHeldMatches("groups", scenario.getGroupMatches());
                 showUnHeldMatches("playOff", scenario.getPlayOffMatches());

@@ -32,6 +32,7 @@ public class OneGroup4PlayersSim {
     public void pauseBeforeSecondScore() {
         simulator.simulate(T_1_Q_1_G_8,
                 TournamentScenario.begin()
+                        .ignoreUnexpectedGames()
                         .autoResolution(RANDOM)
                         .name("pauseBeforeSecondScore")
                         .category(c1, p1, p2, p3, p4)

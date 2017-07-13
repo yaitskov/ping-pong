@@ -13,6 +13,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.match.FinalMatchScore;
@@ -122,6 +123,13 @@ public class Simulator {
                         .map(TournamentInfo::getState));
     }
 
+    private void showUnHeldMatches(String label, Map<Set<Player>, GameEnd> matches) {
+        if (!matches.isEmpty()) {
+            log.error("Unheld {} matches: {}", label,
+                    Joiner.on(", ").join(matches.keySet()));
+        }
+    }
+
     private boolean expendAllMatches(TournamentScenario scenario) {
         final int[] completedMatches = new int[1];
         while (true) {
@@ -132,6 +140,13 @@ public class Simulator {
             completeOpenMatches(scenario, completedMatches, openMatches);
 
             if (openMatches.isEmpty()) {
+                showUnHeldMatches("groups", scenario.getGroupMatches());
+                showUnHeldMatches("playOff", scenario.getPlayOffMatches());
+                if (!scenario.getGroupMatches().isEmpty()
+                        || !scenario.getPlayOffMatches().isEmpty()) {
+                    throw new IllegalStateException("Some of matches are not held");
+                }
+
                 return true;
             } else if (completedMatches[0] == 0) {
                 if (scenario.getPlayOffMatches().isEmpty() && scenario.getGroupMatches().isEmpty()) {

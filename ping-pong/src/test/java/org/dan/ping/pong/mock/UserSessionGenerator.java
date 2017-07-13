@@ -39,12 +39,15 @@ public class UserSessionGenerator {
     }
 
     public List<TestUserSession> generateUserSessions(String prefix, int n) {
-        List<TestUserSession> result = new ArrayList<>(n);
+        final List<TestUserSession> result = new ArrayList<>(n);
+        final StringBuilder uids = new StringBuilder();
         for (int i = 0; i < n; ++i) {
-            result.add(generate(String.format("%s p%03d", prefix, i)));
+            final TestUserSession session = generate(String.format("%s p%03d", prefix, i));
+            result.add(session);
+            uids.append(" p").append(1 + i).append("/").append(session.getUid());
         }
-        log.info("Generated {} users with prefix {}: {}", n, prefix,
-                result.stream().map(TestUserSession::getUid).collect(toList()));
+        log.info("Generated {} users with prefix [{}]: [{} ]", n, prefix,
+                uids.toString());
         return result;
     }
 }

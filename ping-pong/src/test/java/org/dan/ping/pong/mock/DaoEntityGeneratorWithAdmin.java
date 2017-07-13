@@ -4,7 +4,8 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 
 import lombok.RequiredArgsConstructor;
 import org.dan.ping.pong.app.tournament.TournamentState;
-import org.dan.ping.pong.app.user.UserInfo;
+
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class DaoEntityGeneratorWithAdmin {
@@ -40,14 +41,11 @@ public class DaoEntityGeneratorWithAdmin {
     }
 
     public int genCategory(int tid) {
-        return daoEntityGenerator.genCategory(tid);
+        return daoEntityGenerator.genCategory(UUID.randomUUID().toString(), tid);
     }
 
-    public UserInfo genUser() {
-        return daoEntityGenerator.genUser();
+    public int genCategory(String name, int tid) {
+        return daoEntityGenerator.genCategory(name, tid);
     }
 
-    public String genUserSession(int uid) {
-        return daoEntityGenerator.genUserSession(uid);
-    }
 }

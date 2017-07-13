@@ -134,9 +134,9 @@ public class DaoEntityGenerator {
     @Inject
     private CategoryDao categoryDao;
 
-    public int genCategory(int tid) {
+    public int genCategory(String name, int tid) {
         return categoryDao.create(NewCategory.builder()
-                .name(Generators.genCategoryName())
+                .name(name)
                 .tid(tid)
                 .build());
     }

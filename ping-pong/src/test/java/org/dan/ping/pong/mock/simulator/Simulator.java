@@ -155,7 +155,7 @@ public class Simulator {
                 final Pause pause = scenario.getPauseOnMatches().getOrDefault(players, Pause.NonStop);
                 pause.pauseBefore(players);
                 ++completedMatches[0];
-                log.info("Match {}",  game.getOutcome());
+                log.info("Match id {} outcome {}", openMatch.getMid(), game);
                 rest.voidPost(COMPLETE_MATCH, testAdmin,
                         FinalMatchScore.builder()
                                 .mid(openMatch.getMid())
@@ -218,7 +218,7 @@ public class Simulator {
     private void setupEnvironment(SimulatorParams params, TournamentScenario scenario) {
         final String prefix = scenario.getName()
                 .orElseGet(() -> "todo-extract-method-from-stack")
-                + " " + valueGenerator.genName(10);
+                + " " + valueGenerator.genName(8);
         final int placeId = daoGenerator.genPlace(prefix, params.getTables());
         scenario.setPlaceId(placeId);
         final int tid = daoGenerator.genTournament(prefix, placeId, TournamentProps.builder()
@@ -240,7 +240,7 @@ public class Simulator {
             scenario.getUidPlayer().put(user.getUid(), player);
         }
         for (PlayerCategory category : scenario.getCategoryDbId().keySet()) {
-            final int catId = daoGenerator.genCategory(tid);
+            final int catId = daoGenerator.genCategory(prefix, tid);
             scenario.getCategoryDbId().put(category, catId);
             restGenerator.enlistParticipants(tid,
                     catId, scenario.getPlayersByCategories().get(category)

@@ -7,7 +7,7 @@ import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_2;
+import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class OneGroup4PlayersSim {
     @Test
     @SneakyThrows
     public void pauseBeforeSecondScore() {
-        simulator.simulate(T_1_Q_1_G_2,
+        simulator.simulate(T_1_Q_1_G_8,
                 TournamentScenario.begin()
                         .autoResolution(RANDOM)
                         .name("pauseBeforeSecondScore")

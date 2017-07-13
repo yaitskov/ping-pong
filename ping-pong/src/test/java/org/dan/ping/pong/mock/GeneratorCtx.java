@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Import;
 @Import({DaoCtx.class,
         SysAdminCtx.class,
         DaoEntityGenerator.class,
+        ValueGenerator.class,
         RestEntityGenerator.class,
         TestTableDao.class,
         OpenTournamentGenerator.class,

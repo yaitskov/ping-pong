@@ -17,10 +17,13 @@ public class UserSessionGenerator {
     @Inject
     private DaoEntityGenerator daoEntityGenerator;
 
+    @Inject
+    private ValueGenerator valueGenerator;
+
     @Bean(name = USER_SESSION)
     @Scope(SCOPE_PROTOTYPE)
-    public TestUserSession generate() {
-        final UserInfo userInfo = daoEntityGenerator.genUser();
+    public TestUserSession generate(String name) {
+        final UserInfo userInfo = daoEntityGenerator.genUser(name);
         return TestUserSession.builder()
                 .uid(userInfo.getUid())
                 .email(userInfo.getEmail().get())
@@ -29,9 +32,13 @@ public class UserSessionGenerator {
     }
 
     public List<TestUserSession> generateUserSessions(int n) {
+        return generateUserSessions(valueGenerator.genName(), n);
+    }
+
+    public List<TestUserSession> generateUserSessions(String prefix, int n) {
         List<TestUserSession> result = new ArrayList<>(n);
         for (int i = 0; i < n; ++i) {
-            result.add(generate());
+            result.add(generate(String.format("%s p%03d", prefix, n)));
         }
         return result;
     }

@@ -1,6 +1,7 @@
 package org.dan.ping.pong.mock.simulator;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.mock.simulator.GameOutcome.L03;
 import static org.dan.ping.pong.mock.simulator.GameOutcome.L13;
@@ -21,11 +22,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Getter
 @ToString(of = {"uidPlayer", "categoryDbId", "tid", "placeId", "params"})
 public class TournamentScenario {
+    private Optional<String> name = empty();
     private final Map<Set<Player>, GameEnd> groupMatches = new HashMap<>();
     private final Map<Set<Player>, GameEnd> playOffMatches = new HashMap<>();
     private final Multimap<PlayerCategory, Player> playersByCategories = HashMultimap.create();
@@ -45,6 +48,11 @@ public class TournamentScenario {
 
     public static TournamentScenario begin() {
         return new TournamentScenario();
+    }
+
+    public TournamentScenario name(String namePrefix) {
+        this.name = Optional.of(namePrefix);
+        return this;
     }
 
     private TournamentScenario match(Player pa, GameOutcome outcome, Player pb) {

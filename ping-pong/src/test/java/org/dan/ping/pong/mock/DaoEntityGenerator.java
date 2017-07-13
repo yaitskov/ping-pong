@@ -45,6 +45,9 @@ public class DaoEntityGenerator {
     @Inject
     private UserDao userDao;
 
+    @Inject
+    private ValueGenerator valueGenerator;
+
     public int genAdmin(int said) {
         final int uid = genUser().getUid();
         userDao.promoteToAdmins(said, uid);
@@ -52,10 +55,14 @@ public class DaoEntityGenerator {
     }
 
     public UserInfo genUser() {
+        return genUser(valueGenerator.genName());
+    }
+
+    public UserInfo genUser(String name) {
         final UserRegRequest request = UserRegRequest.builder()
-                .name(genFirstLastName())
-                .email(Optional.of(genEmail()))
-                .phone(Optional.of(genPhone()))
+                .name(name)
+                .email(Optional.of(name.replaceAll("[ \t]", "_") + "@gmail.com"))
+                .phone(Optional.of("+48 799 33 8448"))
                 .build();
         return UserInfo.builder()
                 .uid(userDao.register(request))
@@ -77,10 +84,10 @@ public class DaoEntityGenerator {
     @Inject
     private PlaceDao placeDao;
 
-    public int genPlace(int admin) {
-        return placeDao.createAndGrant(admin, genStr(),
+    public int genPlace(String name, int admin) {
+        return placeDao.createAndGrant(admin, name,
                 PlaceAddress.builder()
-                        .address(genStr())
+                        .address(valueGenerator.genName())
                         .phone(Optional.of(genPhone()))
                         .build());
     }
@@ -88,10 +95,14 @@ public class DaoEntityGenerator {
     @Inject
     private TableDao tableDao;
 
-    public int genPlace(int admin, int tables) {
-        final int placeId = genPlace(admin);
+    public int genPlace(String name, int admin, int tables) {
+        final int placeId = genPlace(name, admin);
         tableDao.createTables(placeId, tables);
         return placeId;
+    }
+
+    public int genPlace(int admin, int tables) {
+        return genPlace(genStr(), admin, tables);
     }
 
     @Inject
@@ -101,11 +112,15 @@ public class DaoEntityGenerator {
     private Clocker clocker;
 
     public int genTournament(int adminId, int placeId, TournamentProps props) {
+        return genTournament(genTournamentName(), adminId, placeId, props);
+    }
+
+    public int genTournament(String name, int adminId, int placeId, TournamentProps props) {
         final int tid = tournamentDao.create(adminId, CreateTournament.builder()
                 .opensAt(props.getOpensAt()
                         .orElseGet(() -> clocker.get().plus(1, ChronoUnit.DAYS)))
                 .placeId(placeId)
-                .name(genTournamentName())
+                .name(name)
                 .previousTid(Optional.empty())
                 .maxGroupSize(props.getMaxGroupSize())
                 .quitsFromGroup(props.getQuitsFromGroup())
@@ -115,7 +130,6 @@ public class DaoEntityGenerator {
         tournamentDao.setState(tid, props.getState());
         return tid;
     }
-
 
     @Inject
     private CategoryDao categoryDao;

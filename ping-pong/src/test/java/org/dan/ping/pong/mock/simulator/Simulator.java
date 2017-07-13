@@ -33,6 +33,7 @@ import org.dan.ping.pong.mock.TestAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.TournamentProps;
 import org.dan.ping.pong.mock.UserSessionGenerator;
+import org.dan.ping.pong.mock.ValueGenerator;
 import org.hamcrest.Matchers;
 
 import java.util.Iterator;
@@ -197,10 +198,16 @@ public class Simulator {
                 .collect(toSet());
     }
 
+    @Inject
+    private ValueGenerator valueGenerator;
+
     private void setupEnvironment(SimulatorParams params, TournamentScenario scenario) {
-        final int placeId = daoGenerator.genPlace(params.getTables());
+        final String prefix = scenario.getName()
+                .orElseGet(() -> "todo-extract-method-from-stack")
+                + " " + valueGenerator.genName(10);
+        final int placeId = daoGenerator.genPlace(prefix, params.getTables());
         scenario.setPlaceId(placeId);
-        final int tid = daoGenerator.genTournament(placeId, TournamentProps.builder()
+        final int tid = daoGenerator.genTournament(prefix, placeId, TournamentProps.builder()
                 .maxGroupSize(params.getMaxGroupSize())
                 .quitsFromGroup(params.getQuitsFromGroup())
                 .state(TournamentState.Draft)
@@ -208,7 +215,7 @@ public class Simulator {
         scenario.setTid(tid);
         final Map<Player, TestUserSession> playersSession = scenario.getPlayersSessions();
         final Iterator<TestUserSession> sessions = userSessionGenerator
-                .generateUserSessions(playersSession.size())
+                .generateUserSessions(prefix, playersSession.size())
                 .iterator();
         for (Player player : playersSession.keySet()) {
             TestUserSession user = sessions.next();

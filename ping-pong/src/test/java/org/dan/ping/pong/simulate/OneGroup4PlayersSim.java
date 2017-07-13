@@ -31,6 +31,7 @@ public class OneGroup4PlayersSim {
     public void pauseBeforeSecondScore() {
         simulator.simulate(T_1_Q_1_G_2,
                 TournamentScenario.begin()
+                        .name("pauseBeforeSecondScore")
                         .category(c1, p1, p2, p3, p4)
                         .win(p1, p2)
                         .pause(p1, p3, BeforeScore)

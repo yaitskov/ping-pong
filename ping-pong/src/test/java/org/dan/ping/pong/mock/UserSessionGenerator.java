@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Scope;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 
@@ -44,14 +45,22 @@ public class UserSessionGenerator {
     }
 
     public List<TestUserSession> generateUserSessions(String prefix, int n) {
-        final List<TestUserSession> result = new ArrayList<>(n);
+        return generateUserSessions(prefix, IntStream.range(1, n + 1)
+                .mapToObj(String::valueOf)
+                .collect(toList()));
+    }
+
+    public List<TestUserSession> generateUserSessions(String prefix,
+            List<String> prefixes) {
+        final List<TestUserSession> result = new ArrayList<>(prefixes.size());
         final StringBuilder uids = new StringBuilder();
-        for (int i = 0; i < n; ++i) {
-            final TestUserSession session = generate(String.format("%s p%03d", prefix, i));
+        for (int i = 0; i < prefixes.size(); ++i) {
+            final TestUserSession session = generate(prefix + prefixes.get(i));
             result.add(session);
-            uids.append(" p").append(1 + i).append("/").append(session.getUid());
+            uids.append(" ").append(prefixes.get(i))
+                    .append("/").append(session.getUid());
         }
-        log.info("Generated {} users with prefix [{}]: [{} ]", n, prefix,
+        log.info("Generated {} users with prefix [{}]: [{} ]", prefixes.size(), prefix,
                 uids.toString());
         return result;
     }

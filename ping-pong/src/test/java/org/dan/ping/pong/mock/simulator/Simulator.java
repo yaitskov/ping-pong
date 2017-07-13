@@ -13,6 +13,7 @@ import static org.dan.ping.pong.app.match.MatchType.Group;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static sun.audio.AudioPlayer.player;
 
 import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,6 @@ import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.mock.DaoEntityGenerator;
 import org.dan.ping.pong.mock.MyRest;
 import org.dan.ping.pong.mock.RestEntityGenerator;
-import org.dan.ping.pong.mock.RestEntityGeneratorWithAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.TournamentProps;
 import org.dan.ping.pong.mock.UserSessionGenerator;
@@ -252,10 +252,13 @@ public class Simulator {
         scenario.setTid(tid);
         final Collection<Player> players = scenario.getPlayersByCategories().values();
         final Map<Player, TestUserSession> playersSession = scenario.getPlayersSessions();
+        final List<String> playerLabels = players.stream()
+                .map(p -> "_p" + p.getNumber())
+                .collect(toList());
         final List<TestUserSession> userSessions = userSessionGenerator
-                .generateUserSessions(prefix, players.size());
-        final Iterator<TestUserSession> sessions = userSessions
-                .iterator();
+                .generateUserSessions(prefix, playerLabels);
+        final Iterator<TestUserSession> sessions = userSessions.iterator();
+        assertEquals(players.size(), userSessions.size());
         restGenerator.generateSignInLinks(userSessions);
         for (Player player : players) {
             TestUserSession user = sessions.next();

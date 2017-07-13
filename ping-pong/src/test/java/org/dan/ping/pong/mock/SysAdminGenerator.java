@@ -23,7 +23,7 @@ public class SysAdminGenerator {
         return sysAdminDao.create(login, SYS_ADMIN_TEST_PASSWORD, "salt");
     }
 
-    private int genSysAdmin() {
+    public int genSysAdmin() {
         return genSysAdmin(genStr());
     }
 }

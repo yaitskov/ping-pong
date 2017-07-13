@@ -6,7 +6,7 @@ import static org.dan.ping.pong.app.auth.AuthResource.AUTH_GENERATE_SIGN_IN_LINK
 import static org.dan.ping.pong.app.auth.CheckSysAdminSessionResource.ANONYMOUS_SYS_ADMIN_CHECK;
 import static org.dan.ping.pong.app.auth.CheckUserSessionResource.AUTH_USER_CHECK_SESSION;
 import static org.dan.ping.pong.app.auth.SysAdminSignInResource.ANONYMOUS_SYS_ADMIN_SIGN_IN;
-import static org.dan.ping.pong.mock.DaoEntityGenerator.SYS_ADMIN_TEST_PASSWORD;
+import static org.dan.ping.pong.mock.SysAdminGenerator.SYS_ADMIN_TEST_PASSWORD;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

@@ -10,9 +10,12 @@ public class AdminSessionGenerator {
     @Inject
     private DaoEntityGenerator daoEntityGenerator;
 
+    @Inject
+    private SysAdminGenerator sysAdminGenerator;
+
     @Bean(name = ADMIN_SESSION)
     public TestAdmin generate() {
-        final int said = daoEntityGenerator.genSysAdmin();
+        final int said = sysAdminGenerator.genSysAdmin();
         final int adminId = daoEntityGenerator.genAdmin(said);
         return TestAdmin.builder()
                 .said(said)

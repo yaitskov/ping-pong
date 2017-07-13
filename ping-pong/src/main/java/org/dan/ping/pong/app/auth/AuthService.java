@@ -152,4 +152,8 @@ public class AuthService {
     public List<EmailAndToken> emailsWithOneTimeSignInToken() {
         return authDao.emailsWithOneTimeSignInToken();
     }
+
+    public void cleanSignInTokenTable() {
+        authDao.cleanSignInTokenTable();
+    }
 }

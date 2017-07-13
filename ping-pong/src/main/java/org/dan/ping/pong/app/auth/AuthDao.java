@@ -96,4 +96,10 @@ public class AuthDao {
                         .token(r.get(SESSION_KEY.TOKEN))
                         .build());
     }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void cleanSignInTokenTable() {
+        jooq.deleteFrom(SESSION_KEY)
+                .execute();
+    }
 }

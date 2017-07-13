@@ -19,6 +19,7 @@ import javax.ws.rs.Produces;
 public class AuthResource {
     public static final String AUTH_BY_ONE_TIME_TOKEN = "/anonymous/auth/by-one-time-token/";
     public static final String AUTH_GENERATE_SIGN_IN_LINK = "/anonymous/auth/generate/sign-in-link";
+    public static final String DEV_CLEAN_SIGN_IN_TOKEN_TABLE = "/dev/clean-sign-in-token-table";
 
     @Inject
     private AuthService authService;
@@ -43,5 +44,12 @@ public class AuthResource {
     public List<EmailAndToken> emailsWithOneTimeSignInToken()  {
         log.info("dev-feature - load sign in tokens");
         return authService.emailsWithOneTimeSignInToken();
+    }
+
+    @POST
+    @Path(DEV_CLEAN_SIGN_IN_TOKEN_TABLE)
+    public void cleanSignInTokenTable()  {
+        log.info("dev-feature - clean sign in token table");
+        authService.cleanSignInTokenTable();
     }
 }

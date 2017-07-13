@@ -7,6 +7,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.dan.ping.pong.app.auth.AuthResource.DEV_CLEAN_SIGN_IN_TOKEN_TABLE;
 import static org.dan.ping.pong.app.match.MatchResource.COMPLETE_MATCH;
 import static org.dan.ping.pong.app.match.MatchType.Group;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
@@ -233,6 +234,7 @@ public class Simulator {
     private ValueGenerator valueGenerator;
 
     private void setupEnvironment(SimulatorParams params, TournamentScenario scenario) {
+        rest.voidAnonymousPost(DEV_CLEAN_SIGN_IN_TOKEN_TABLE, "");
         final String prefix = scenario.getName()
                 .orElseGet(() -> "todo")
                 + " " + valueGenerator.genName(8);

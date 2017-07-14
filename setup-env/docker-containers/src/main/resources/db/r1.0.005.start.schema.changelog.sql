@@ -54,7 +54,7 @@ create table place_admin(
 
 create table tournament(
     tid int(11) not null auto_increment primary key,
-    name varchar(40) not null,
+    name varchar(120) not null,
     opens_at timestamp(3),
     previous_tid int(11) null,
     ticket_price float null,

@@ -44,21 +44,25 @@ public class AuthDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public int generateToken(String oneTimeToken, String email) {
-        final int uid = ofNullable(jooq.select(SESSION_KEY.UID)
+    public NameAndUid generateToken(String oneTimeToken, String email) {
+        final NameAndUid nameAndUid = ofNullable(jooq
+                .select(SESSION_KEY.UID, USERS.NAME)
                 .from(SESSION_KEY)
                 .innerJoin(USERS)
                 .on(SESSION_KEY.UID.eq(USERS.UID))
                 .where(SESSION_KEY.TOKEN.eq(oneTimeToken),
                         USERS.EMAIL.eq(Optional.of(email)))
                 .fetchOne())
-                .map(r -> r.get(SESSION_KEY.UID))
+                .map(r -> NameAndUid.builder()
+                        .name(r.get(USERS.NAME))
+                        .uid(r.get(SESSION_KEY.UID))
+                        .build())
                 .orElseThrow(() -> notAuthorized("Pair or one time token and email doesn't match"));
 
         jooq.deleteFrom(SESSION_KEY)
                 .where(SESSION_KEY.TOKEN.eq(oneTimeToken))
                 .execute();
-        return uid;
+        return nameAndUid;
     }
 
     @Transactional(TRANSACTION_MANAGER)

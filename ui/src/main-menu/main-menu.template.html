@@ -23,6 +23,11 @@
              ng-click="$ctrl.logout()">
           Logout</a>
       </li>
+      <li>
+        <a href="#!/account" ng-show="$ctrl.isAuthenticated()">
+          {{$ctrl.accountName || 'Account'}}
+        </a>
+      </li>
       <li role="separator" class="divider" ng-hide="$ctrl.contextMenu() | isEmpty"></li>
       <li ng-repeat="(path, label) in $ctrl.contextMenu()">
         <a ng-attr-href="{{path}}">{{label}}</a>

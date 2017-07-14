@@ -6,6 +6,7 @@ angular.
         templateUrl: 'main-menu/main-menu.template.html',
         controller: ['auth', 'mainMenu',
                      function (auth, mainMenu) {
+                         this.accountName = auth.myName();
                          this.title = function () {
                              return mainMenu.getTitle();
                          };

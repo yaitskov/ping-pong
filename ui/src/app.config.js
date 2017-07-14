@@ -60,6 +60,12 @@ angular.module('pingPong').
                     when('/sign-in', {
                         template: '<sign-in></sign-in>'
                     }).
+                    when('/do-sign-in/:oneTimeSignInToken/:email', {
+                        template: '<do-sign-in></do-sign-in>'
+                    }).
+                    when('/account', {
+                        template: '<account></account>'
+                    }).
                     when('/tournaments/:tournamentId', {
                         template: '<tournament-detail></tournament-detail>'
                     }).

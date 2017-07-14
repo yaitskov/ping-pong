@@ -7,6 +7,8 @@ angular.module('pingPong', [
     'core',
     'signUp',
     'signIn',
+    'doSignIn',
+    'account',
     'placeList',
     'placeDetail',
     'newPlace',

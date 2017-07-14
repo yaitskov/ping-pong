@@ -25,6 +25,9 @@ angular.
                                  console.log("session is " + value);
                                  return value;
                              };
+                             this.myName = function () {
+                                 return LocalStorage.get('myName');
+                             };
                              this.myUid = function() {
                                  return LocalStorage.get('myUid');
                              };
@@ -33,10 +36,12 @@ angular.
                                  this.returnOnAuth = $location.path();
                                  $location.path('/sign-up');
                              };
-                             this.storeSessionAndUid = function (fullSession, uid) {
+                             this.storeSession = function (fullSession, uid, name, email) {
                                  console.log("Authenticated as " + fullSession);
                                  LocalStorage.store('mySession', fullSession);
                                  LocalStorage.store('myUid', uid);
+                                 LocalStorage.store('myName', name);
+                                 LocalStorage.store('myEmail', email);
                                  if (this.returnOnAuth) {
                                      $location.path(this.returnOnAuth);
                                      this.returnOnAuth = null

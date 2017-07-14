@@ -11,8 +11,9 @@ angular.
                 var self = this;
                 this.error = null;
                 this.signUp = function () {
+                    var userName = this.firstName + ' ' + this.lastName;
                     $http.post('/api/anonymous/user/register',
-                               {name: this.firstName + ' ' + this.lastName,
+                               {name: userName,
                                 email: this.email,
                                 phone: this.phone,
                                 sessionPart: cutil.genUserSessionPart()
@@ -20,7 +21,9 @@ angular.
                                {'Content-Type': 'application/json'}).
                         then(
                             function (okResp) {
-                                auth.storeSessionAndUid(okResp.data.session, okResp.data.uid);
+                                auth.storeSession(okResp.data.session,
+                                                  okResp.data.uid,
+                                                  userName, self.email);
                             },
                             function (badResp) {
                                 self.error = badResp.status;

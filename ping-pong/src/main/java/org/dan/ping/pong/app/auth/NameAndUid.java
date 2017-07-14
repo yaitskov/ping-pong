@@ -1,18 +1,13 @@
 package org.dan.ping.pong.app.auth;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @Builder
 @ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public class Authenticated {
+public class NameAndUid {
     private int uid;
-    private String session;
     private String name;
 }

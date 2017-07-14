@@ -114,12 +114,13 @@ public class AuthService {
     @Transactional(TRANSACTION_MANAGER)
     public Authenticated authByOneTimeSession(String oneTimeToken, String email) {
         log.info("Auth attempt by one time toke {} email {}", oneTimeToken, email);
-        final int uid = authDao.generateToken(oneTimeToken, email);
-        log.info("one time token {} mapped => {}", oneTimeToken, uid);
+        final NameAndUid nameAndUid = authDao.generateToken(oneTimeToken, email);
+        log.info("one time token {} mapped => {}", oneTimeToken, nameAndUid);
         final String token = genSession() + genSession();
-        authDao.saveSession(uid, token, "to be define");
+        authDao.saveSession(nameAndUid.getUid(), token, "to be define");
         return Authenticated.builder()
-                .uid(uid)
+                .uid(nameAndUid.getUid())
+                .name(nameAndUid.getName())
                 .session(token)
                 .build();
     }

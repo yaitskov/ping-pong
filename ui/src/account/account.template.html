@@ -1,0 +1,26 @@
+<main-menu></main-menu>
+<div class="container">
+  <div class="alert alert-danger" ng-show="$ctrl.error">
+    {{$ctrl.error}}
+  </div>
+  <div class="alert alert-info" ng-show="$ctrl.error === null">
+    Loading ...
+  </div>
+  <div>
+    <div>Email</div>
+    <div>{{$ctrl.email}}</div>
+  </div>
+  <div>
+    <div>Name</div>
+    <div>{{$ctrl.name}}</div>
+  </div>
+  <div ng-show="$ctrl.error == 0">
+    <div>
+      <div>Phone</div>
+      <div>{{$ctrl.userData.phone}}</div>
+      <div ng-show="!$ctrl.userData.phone" class="alert alert-info">
+        Not set
+      </div>
+    </div>
+  </div>
+</div>

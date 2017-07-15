@@ -1,16 +1,19 @@
-<div class="container-fluid">
-  <main-menu></main-menu>
-  <div class="col-md-10">
-    <ul class="tournaments">
-      <li ng-repeat="tournament in $ctrl.tournaments | filter:$ctrl.query"
-          class="thumbnail tournament-list-item clearfix">
-        <a class="pull-left" href="#!/tournaments/{{tournament.tid}}">
-          {{tournament.name}}
-        </a>
-        <span class="pull-right" title="When the tournament begins">
-          {{tournament.opensAt|date : 'MMMM dd yyyy'}}
-        </span>
-      </li>
-    </ul>
+<main-menu></main-menu>
+<div class="container-fluid list">
+  <div class="list-item tournament clearfix"
+       ng-repeat="tournament in $ctrl.tournaments">
+    <div class="name pull-left">
+      <a href="#!/tournaments/{{tournament.tid}}">
+        {{tournament.name}}
+      </a>
+    </div>
+    <div class="datetime pull-right">
+      <span class="time">
+        {{tournament.opensAt|date : 'EEE h a'}}
+      </span>
+      <span class="date">
+        {{tournament.opensAt|date : 'MMM d'}}
+      </span>
+    </div>
   </div>
 </div>

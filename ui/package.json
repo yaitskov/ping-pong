@@ -21,6 +21,7 @@
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-sass": "^1.0.0",
     "grunt-dependency-installer": "^0.2.0",
     "grunt-html-build": "^0.7.1",
     "grunt-install-dependencies": "^0.2.0"

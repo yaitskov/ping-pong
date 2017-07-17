@@ -1,3 +1,5 @@
+$base-font-color: black;
+
 /* begin of no side space */
 .view-container .container-fluid {
     padding-left: 0px;
@@ -83,7 +85,7 @@
         padding-left: 2px;
         line-height: 1.6;
         font-size: 18px;
-        color: black;
+        color: $base-font-color;
     }
 
     .list .list-item.tournament span {

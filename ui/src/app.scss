@@ -46,6 +46,10 @@ $infinitPx: 9999px;
 
 /* begin of desktop layout */
 @media all and (max-resolution: 119dpi) {
+    .container {
+        max-width: 800px;
+        padding-top: 15px;
+    }
     .list {
         max-width: 800px;
 
@@ -107,6 +111,10 @@ $infinitPx: 9999px;
         padding: 3px;
     }
 
+    .container {
+        padding-top: 15px;
+    }
+
     .list .list-item:last-child {
         border-bottom: none;
     }
@@ -121,7 +129,7 @@ $infinitPx: 9999px;
         padding-bottom: 5px;
     }
 
-    .list .list-item.tournament .name {
+    .list .list-item.tournament .name a {
         padding-left: 2px;
         line-height: 1.6;
         font-size: 18px;

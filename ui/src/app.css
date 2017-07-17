@@ -34,10 +34,13 @@
     max-width: 800px;
 }
 
+/* begin of debugging and tracing */
 .border {
     border: 1px solid black;
 }
+/* end of debugging and tracing */
 
+/* begin of mobile layout */
 @media all and (min-resolution: 120dpi) {
     /* begin of main menu */
     .view-container .navbar-text {
@@ -68,19 +71,17 @@
 
     .list .list-item {
         padding-top: 10px;
-        padding-bottom: 9px;
-        margin-bottom: 0px;
         border-bottom: 1px solid grey;
-        /*border-radius: 6px;*/
         min-height: 50px;
+    }
+
+    .list .list-item.tournament .name, .list .list-item.tournament .datetime {
+        padding-bottom: 5px;
     }
 
     .list .list-item.tournament .name {
         padding-left: 2px;
-        padding-bottom: 5px;
-    }
-
-    .list .list-item.tournament .name a {
+        line-height: 1.6;
         font-size: 18px;
         color: black;
     }
@@ -105,3 +106,4 @@
 
     /* end of main content view*/
 }
+/* end of mobile layout */

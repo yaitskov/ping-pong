@@ -1,19 +1,26 @@
 <main-menu></main-menu>
 <div class="container-fluid list">
+  <div class="alert alert-info" ng-show="$ctrl.error === null">
+    Loading...
+  </div>
+  <div class="alert alert-danger" ng-show="$ctrl.error">
+    {{$ctrl.error}}
+  </div>
   <div class="list-item tournament clearfix"
+       ng-click="$ctrl.goTo(tournament.tid)"
        ng-repeat="tournament in $ctrl.tournaments">
-    <div class="name pull-left">
-      <a href="#!/tournaments/{{tournament.tid}}">
+    <a class="d-block" href="#!/tournaments/{{tournament.tid}}">
+      <div class="name pull-left">
         {{tournament.name}}
-      </a>
-    </div>
-    <div class="datetime pull-right">
-      <span class="time">
-        {{tournament.opensAt|date : 'EEE h a'}}
-      </span>
-      <span class="date">
-        {{tournament.opensAt|date : 'MMM d'}}
-      </span>
-    </div>
+      </div>
+      <div class="datetime pull-right">
+        <span class="time">
+          {{tournament.opensAt|date : 'EEE h a'}}
+        </span>
+        <span class="date">
+          {{tournament.opensAt|date : 'MMM d'}}
+        </span>
+      </div>
+    </a>
   </div>
 </div>

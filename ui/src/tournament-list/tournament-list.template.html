@@ -1,21 +1,21 @@
 <main-menu></main-menu>
 <div class="container-fluid list">
   <request-status></request-status>
-  <div class="list-item tournament clearfix"
-       ng-click="$ctrl.goTo(tournament.tid)"
-       ng-repeat="tournament in $ctrl.tournaments">
-    <a class="d-block" href="#!/tournaments/{{tournament.tid}}">
-      <div class="name pull-left">
+  <div ng-repeat="tournament in $ctrl.tournaments"
+       clickable="/tournaments/{{tournament.tid}}"
+       class="list-item tournament clearfix stretchOn">
+    <div class="name pull-left">
+      <a class="stretched" href="#!/tournaments/{{tournament.tid}}">
         {{tournament.name}}
-      </div>
-      <div class="datetime pull-right">
-        <span class="time">
-          {{tournament.opensAt|date : 'EEE h a'}}
-        </span>
-        <span class="date">
-          {{tournament.opensAt|date : 'MMM d'}}
-        </span>
-      </div>
-    </a>
+      </a>
+    </div>
+    <div class="datetime pull-right">
+      <span class="time">
+        {{tournament.opensAt|date : 'EEE h a'}}
+      </span>
+      <span class="date">
+        {{tournament.opensAt|date : 'MMM d'}}
+      </span>
+    </div>
   </div>
 </div>

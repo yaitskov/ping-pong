@@ -1,4 +1,6 @@
 $base-font-color: black;
+$active-background-color: #f5f5f5;
+$infinitPx: 9999px;
 
 /* begin of no side space */
 .view-container .container-fluid {
@@ -32,9 +34,36 @@ $base-font-color: black;
 }
 /* end of main menu */
 
-.list {
-    max-width: 800px;
+/* begin of clickable directive */
+.hover {
+    background-color: $active-background-color;
+    cursor: pointer;
 }
+.clicked {
+    background-color: $active-background-color - #151515;
+}
+/* end of clickable directive */
+
+/* begin of desktop layout */
+@media all and (max-resolution: 119dpi) {
+    .list {
+        max-width: 800px;
+
+        .list-item {
+            border-radius: 20px;
+            border: 1px solid $active-background-color;
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            margin-top: 10px;
+
+            .name a {
+                color: $base-font-color;
+
+            }
+        }
+    }
+}
+/* end of desktop layout */
 
 /* begin of debugging and tracing */
 .border {
@@ -55,7 +84,7 @@ $base-font-color: black;
         padding: 10px 20px;
     }
     .view-container a:hover, .view-container a:active {
-        background-color: #f5f5f5; /* highlight touched link */
+        background-color: $active-background-color; /* highlight touched link */
     }
     .view-container .navbar {
         margin-bottom: 0px;

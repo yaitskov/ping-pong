@@ -1,0 +1,12 @@
+<div class="alert alert-info" ng-show="$ctrl.error === null">
+  Loading {{$ctrl.loading}}...
+</div>
+<div  ng-show="$ctrl.error">
+  <div class="alert alert-danger">
+    {{$ctrl.error}}
+  </div>
+  <div class="alert alert-info">
+    If you think that an application error happened. You could file a
+    bug report at <a href="https://github.com/yaitskov/ping-pong/issues">GitHub</a>
+  </div>
+</div>

@@ -1,11 +1,6 @@
 <main-menu></main-menu>
 <div class="container-fluid list">
-  <div class="alert alert-info" ng-show="$ctrl.error === null">
-    Loading...
-  </div>
-  <div class="alert alert-danger" ng-show="$ctrl.error">
-    {{$ctrl.error}}
-  </div>
+  <request-status></request-status>
   <div class="list-item tournament clearfix"
        ng-click="$ctrl.goTo(tournament.tid)"
        ng-repeat="tournament in $ctrl.tournaments">

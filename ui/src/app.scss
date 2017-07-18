@@ -1,6 +1,7 @@
 $base-font-color: black;
 $active-background-color: #f5f5f5;
 $infinitPx: 9999px;
+$base-red-color: red;
 
 /* begin of no side space */
 .view-container .container-fluid {
@@ -44,6 +45,17 @@ $infinitPx: 9999px;
 }
 /* end of clickable directive */
 
+/* begin of open tournament list */
+.open-tournament {
+    min-height: 0px;
+}
+.list-item .completeness {
+    font-size: 14px;
+    width: 57px;
+    color: $base-red-color;
+}
+/* end of open tournament list */
+
 /* begin of desktop layout */
 @media all and (max-resolution: 119dpi) {
     .container {
@@ -62,7 +74,7 @@ $infinitPx: 9999px;
 
             .date {
                 font-size: 14px;
-                color: red;
+                color: $base-red-color;
                 width: 57px;
             }
             .time {
@@ -112,7 +124,7 @@ $infinitPx: 9999px;
     }
     /* end of main menu */
 
-    /* begin of  main content view */
+    /* begin of main content view */
     .container-fluid.list {
         padding: 3px;
     }
@@ -149,7 +161,7 @@ $infinitPx: 9999px;
 
     .list .list-item.tournament .date {
         font-size: 14px;
-        color: red;
+        color: $base-red-color;
         width: 57px;
     }
 
@@ -159,7 +171,6 @@ $infinitPx: 9999px;
         color: grey;
         width: 62px;
     }
-
     /* end of main content view*/
 }
 /* end of mobile layout */

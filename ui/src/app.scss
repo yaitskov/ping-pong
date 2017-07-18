@@ -86,6 +86,12 @@ $infinitPx: 9999px;
 }
 /* end of debugging and tracing */
 
+.request-status {
+    a {
+        text-decoration: underline;
+    }
+}
+
 /* begin of mobile layout */
 @media all and (min-resolution: 120dpi) {
     /* begin of main menu */

@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('signUp', ['mainMenu', 'core']);
+angular.module('signUp', ['mainMenu', 'core', 'core.requestStatus']);

@@ -20,6 +20,10 @@ angular.
                 $rootScope.$broadcast('event.request.failed', response);
             };
 
+            this.validationFailed = function (message) {
+                $rootScope.$broadcast('event.request.validation', message);
+            };
+
             this.complete = function (response) {
                 $rootScope.$broadcast('event.request.complete', response);
             };

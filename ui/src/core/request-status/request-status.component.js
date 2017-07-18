@@ -5,17 +5,27 @@ angular.
     component('requestStatus', {
         templateUrl: 'core/request-status/request-status.template.html',
         controller: [
-            'requestStatus', '$scope',
-            function (requestStatus, $scope) {
+            'requestStatus', '$rootScope', '$anchorScroll', '$timeout',
+            function (requestStatus, $scope, $anchorScroll, $timeout) {
                 this.reset = function () {
                     this.error = null;
                     this.loading = null;
                 };
+                this.scrollToError = function () {
+                    $timeout(function () {
+                        $anchorScroll('errorOutput');
+                    }, 1);
+                };
                 var self = this;
                 self.reset();
                 $scope.$on('event.request.started', function (event, msg) {
-                    self.loading = msg;
                     self.reset();
+                    self.loading = msg || 'Loading';
+                });
+                $scope.$on('event.request.validation', function (event, msg) {
+                    self.reset();
+                    self.error = msg;
+                    self.scrollToError();
                 });
                 $scope.$on('event.request.failed', function (event, response) {
                     self.reset();
@@ -58,8 +68,10 @@ angular.
                                         + JSON.stringify(response.data));
                         }
                     }
+                    self.scrollToError();
                 });
                 $scope.$on('event.request.complete', function (event, response) {
+                    self.reset();
                     self.error = 0;
                 });
             }]});

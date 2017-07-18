@@ -2,6 +2,7 @@
 
 angular.module('core', ['core.tournament', 'core.match',
                         'localStorage', 'core.place',
+                        'core.validate',
                         'core.requestStatus', 'core.ui']).
     filter('isEmpty', function () {
         var bar;

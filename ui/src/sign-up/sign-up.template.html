@@ -1,41 +1,91 @@
 <main-menu></main-menu>
 <div class="container">
-  <form>
-    <div class="form-group" ng-class="{'has-error': $ctrl.errors.firstName}">
+  <form novalidate name="$ctrl.form" ng-submit="$ctrl.signUp()">
+    <div class="form-group" ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.firstName.$dirty) && $ctrl.form.firstName.$invalid}">
       <label for="firstName">First name</label>
       <input type="text" class="form-control"
-             ng-model="$ctrl.account.firstName"
-             id="firstName" placeholder="First name"/>
+             ng-model="$ctrl.firstName"
+             ng-maxlength="20"
+             ng-minlength="2"
+             required
+             name="firstName"
+             id="firstName"
+             placeholder="First name"/>
+      <p class="help-block"
+         ng-show="$ctrl.form.firstName.$error.required">
+        Name is required
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.firstName.$error.minlength || $ctrl.form.firstName.$error.maxlength">
+        Name length must be in range 2 and 20
+      </p>
     </div>
-    <div class="form-group" ng-class="{'has-error': $ctrl.errors.lastName}">
+    <div class="form-group" ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.lastName.$dirty) && $ctrl.form.lastName.$invalid}">
       <label for="lastName">Last name</label>
       <input type="text" class="form-control"
-             ng-model="$ctrl.account.lastName"
+             name="lastName"
+             ng-maxlength="20"
+             ng-minlength="2"
+             required
+             ng-model="$ctrl.lastName"
              id="lastName" placeholder="Last name"/>
+      <p class="help-block"
+         ng-show="$ctrl.form.lastName.$error.required">
+        Name is required
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.lastName.$error.minlength || $ctrl.form.lastName.$error.maxlength">
+        Name length must be in range 2 and 20
+      </p>
     </div>
-    <div class="form-group" ng-class="{'has-error': $ctrl.errors.email}">
+    <div class="form-group"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.email.$dirty) && $ctrl.form.email.$invalid}">
       <label for="email">Email</label>
-      <input type="text" class="form-control"
-             ng-model="$ctrl.account.email"
+      <input type="email" class="form-control"
+             ng-model="$ctrl.email"
+             ng-maxlength="60"
+             validate-email
+             name="email"
              id="email" placeholder="Email"/>
-      <p class="help-block">
+      <p class="help-block"
+         ng-show="$ctrl.form.email.$error.maxlength">
+        Email length must be less than 60
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.email.$error.email">
+        Email format is wrong
+      </p>
+      <p class="help-block" ng-show="$ctrl.form.email.$valid">
         Optional field, but it allows to get access to your accont
         from different devices or recover access in case of session
         is lost or expired. If you want just enlist to the tournament,
         then leave it empty. The email could be bound later.
       </p>
     </div>
-    <div class="form-group" ng-class="{'has-error': $ctrl.errors.phone}">
+    <div class="form-group"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.phone.$dirty) && $ctrl.form.phone.$invalid}">
       <label for="phone">Phone</label>
       <input type="text" class="form-control"
-             ng-model="$ctrl.account.phone"
-             id="phone" placeholder="Phone"/>
-      <p class="help-block">
+             ng-model="$ctrl.phone"
+             ng-maxlength="40"
+             validate-phone
+             name="phone"
+             id="phone"
+             placeholder="Phone"/>
+      <p class="help-block" ng-show="$ctrl.form.phone.$valid">
         Optional field. It could be used for account recovery.
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.phone.$error.maxlength">
+        Email length must be less than 40
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.phone.$error.phone">
+        Phone is in wrong format
       </p>
     </div>
     <div class="form-group">
-      <button ng-click="$ctrl.signUp()" class="btn btn-default btn-primary">Sing Up</button>
+      <button type="submit" class="btn btn-default btn-primary">Sing Up</button>
     </div>
     <div class="form-group">
         <request-status></request-status>

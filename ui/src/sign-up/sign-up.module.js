@@ -1,3 +1,5 @@
 'use strict';
 
-angular.module('signUp', ['mainMenu', 'core', 'core.requestStatus']);
+angular.module('signUp', ['mainMenu', 'core',
+                          'core.requestStatus',
+                          'core.validate']);

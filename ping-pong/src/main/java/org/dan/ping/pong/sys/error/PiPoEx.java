@@ -10,6 +10,8 @@ import lombok.Getter;
 import org.dan.ping.pong.app.tournament.BadStateError;
 import org.dan.ping.pong.app.tournament.State;
 
+import java.util.UUID;
+
 @Getter
 public class PiPoEx extends RuntimeException {
     private final int status;
@@ -34,14 +36,20 @@ public class PiPoEx extends RuntimeException {
     }
 
     public static PiPoEx badRequest(String clientMessage) {
-        return badRequest(clientMessage, null);
+        return badRequest(
+                new Error(UUID.randomUUID().toString(),
+                clientMessage));
+    }
+
+    public static PiPoEx badRequest(Error error) {
+        return badRequest(error, null);
     }
 
     public static PiPoEx badState(State state) {
         return new PiPoEx(BAD_REQUEST_400, BadStateError.of(state), null);
     }
 
-    public static PiPoEx badRequest(String clientMessage, Exception e) {
+    public static PiPoEx badRequest(Object clientMessage, Exception e) {
         return new PiPoEx(BAD_REQUEST_400, clientMessage, e);
     }
 

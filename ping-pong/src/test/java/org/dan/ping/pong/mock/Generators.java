@@ -13,7 +13,7 @@ public class Generators {
     }
 
     public static String genFirstLastName() {
-        return new Faker().name().name();
+        return genStr();
     }
 
     public static String genPlaceLocation() {
@@ -38,7 +38,7 @@ public class Generators {
     }
 
     public static String genPhone() {
-        return new Faker().phoneNumber().cellPhone();
+        return genStr().replaceAll("[^0-9]+", "").substring(0, 10);
     }
 
     public static int genOrder() {

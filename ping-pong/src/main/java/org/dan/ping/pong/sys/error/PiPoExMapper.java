@@ -21,7 +21,9 @@ public class PiPoExMapper implements ExceptionMapper<PiPoEx> {
 
     @Override
     public Response toResponse(PiPoEx e) {
-        final String eid = UUID.randomUUID().toString();
+        final String eid = e.getClientMessage() instanceof Error
+                ? ((Error) e.getClientMessage()).getId()
+                : UUID.randomUUID().toString();
         if (request == null) {
             log.error("Background exception [{}], status: [{}], eid {}",
                     e.getClientMessage(), e.getStatus(), eid, e);
@@ -37,6 +39,10 @@ public class PiPoExMapper implements ExceptionMapper<PiPoEx> {
                     e.getStatus(),
                     e.getClientMessage(),
                     e);
+        }
+        if (e.getClientMessage() instanceof Error) {
+            return status(e.getStatus())
+                    .entity(e.getClientMessage()).build();
         }
         return status(e.getStatus())
                 .entity(new Error(eid, e.getClientMessage()))

@@ -14,7 +14,8 @@ create table users(
     phone varchar(20),
     email varchar(60),
     created timestamp(3) default current_timestamp(3),
-    banned timestamp(3));
+    banned timestamp(3),
+    index `email_idx` (email));
 
 create table admin(
     uid int(11) not null primary key,

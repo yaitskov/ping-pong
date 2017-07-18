@@ -27,12 +27,11 @@ angular.
                                {'Content-Type': 'application/json'}).
                         then(
                             function (okResp) {
+                                requestStatus.complete(okResp);
                                 auth.storeSession(okResp.data.session,
                                                   okResp.data.uid,
                                                   userName, self.email);
                             },
-                            function (badResp) {
-                                self.error = badResp.status;
-                            });
+                            requestStatus.failed);
                 };
             }]});

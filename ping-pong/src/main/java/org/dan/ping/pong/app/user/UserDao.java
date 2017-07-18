@@ -18,7 +18,7 @@ import javax.inject.Inject;
 
 @Slf4j
 public class UserDao {
-    public static final String EMAIL_IS_USED = "emailIsUsed";
+    public static final String EMAIL_IS_USED = "Email is already used";
 
     @Inject
     private DSLContext jooq;

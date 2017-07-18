@@ -35,8 +35,18 @@ angular.
                         self.error = "Session is not valid. Try to logout and login again if your account is bound to an email.";
                     } else if (response.status == 404) {
                         self.error = requestStatus.entity() + " does not exist";
-                    } else if (response.status == 400 && error.data.error == 'BadState') {
-                        self.error = requestStatus.badStatusExplantion();
+                    } else if (response.status == 400) {
+                        if (typeof response.data == 'object') {
+                            if (response.data.error == 'BadState') {
+                                self.error = requestStatus.badStatusExplantion();
+                            } else if (response.data.message) {
+                                self.error = response.data.message;
+                            } else {
+                                self.error = "An application error happened: " + JSON.stringify(response.data);
+                            }
+                        } else {
+                            self.error = "Bad request: " + response.data;
+                        }
                     } else if (response.status == 500) {
                         if (typeof response.data == 'string') {
                             self.error = "An application error happened:\n" + response.data;

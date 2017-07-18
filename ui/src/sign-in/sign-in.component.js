@@ -5,25 +5,27 @@ angular.
     component('signIn', {
         templateUrl: 'sign-in/sign-in.template.html',
         controller: [
-            'mainMenu', '$http', 'auth',
-            function (mainMenu, $http, auth) {
+            'mainMenu', '$http', 'auth', 'requestStatus',
+            function (mainMenu, $http, auth, requestStatus) {
                 mainMenu.setTitle('Sign In');
                 var self = this;
                 this.email = auth.myEmail()
+                this.form = null;
                 this.ok = null;
-                this.error = null;
                 this.signIn = function () {
+                    if (!self.form.$valid) {
+                        return;
+                    }
+                    requestStatus.startLoading("Sending email");
                     this.ok = null;
-                    this.error = null;
                     $http.post('/api/anonymous/auth/generate/sign-in-link',
                                self.email,
                                {'Content-Type': 'application/json'}).
                         then(
                             function (ok) {
                                 self.ok = 1;
+                                requestStatus.complete(ok);
                             },
-                            function (bad) {
-                                self.error = "Failed " + bad.status;
-                            });
+                            requestStatus.failed);
                 };
             }]});

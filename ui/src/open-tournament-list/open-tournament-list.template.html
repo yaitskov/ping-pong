@@ -13,11 +13,12 @@
       </a>
     </div>
     <div class="datetime pull-right">
+      <span class="time" title="Started">
+        {{tournament.startedAt|amTimeAgo}}
+      </span>
+
       <span class="completeness" title="Overall matches">
         {{tournament.gamesComplete}}/{{tournament.gamesOverall}}
-      </span>
-      <span class="time" title="Started at">
-        {{tournament.startedAt|date : 'HH:mm'}}
       </span>
     </div>
   </div>

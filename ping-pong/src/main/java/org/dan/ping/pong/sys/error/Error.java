@@ -2,20 +2,24 @@ package org.dan.ping.pong.sys.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.UUID;
 
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
 @AllArgsConstructor
-public class Error<T> {
+public class Error {
     private String id;
-    private T message;
+    private String message;
 
-    public Error(String id) {
-        this(id, null);
+    public Error(String msg) {
+        this(UUID.randomUUID().toString(), msg);
+    }
+
+    public Error() {
+        this(null);
     }
 }

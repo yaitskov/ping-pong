@@ -7,7 +7,6 @@ import static javax.ws.rs.core.Response.status;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
@@ -21,31 +20,23 @@ public class PiPoExMapper implements ExceptionMapper<PiPoEx> {
 
     @Override
     public Response toResponse(PiPoEx e) {
-        final String eid = e.getClientMessage() instanceof Error
-                ? ((Error) e.getClientMessage()).getId()
-                : UUID.randomUUID().toString();
         if (request == null) {
             log.error("Background exception [{}], status: [{}], eid {}",
-                    e.getClientMessage(), e.getStatus(), eid, e);
+                    e.getClientMessage(), e.getStatus(),
+                    e.getClientMessage().getId(), e);
         } else {
             Map<String, String> headers = newHashMap();
             list(request.getHeaderNames())
                     .forEach(name -> headers.put(name, request.getHeader(name)));
             log.error("Url exception [{}], eid {}, query: [{}], headers: [{}], status: [{}], message: [{}]",
                     request.getRequestURI(),
-                    eid,
+                    e.getClientMessage().getId(),
                     request.getQueryString(),
                     headers,
                     e.getStatus(),
                     e.getClientMessage(),
                     e);
         }
-        if (e.getClientMessage() instanceof Error) {
-            return status(e.getStatus())
-                    .entity(e.getClientMessage()).build();
-        }
-        return status(e.getStatus())
-                .entity(new Error(eid, e.getClientMessage()))
-                .build();
+        return status(e.getStatus()).entity(e.getClientMessage()).build();
     }
 }

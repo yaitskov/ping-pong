@@ -158,7 +158,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final DraftingTournamentInfo adminResult = myRest().get(DRAFTING + tid,
                 session, DraftingTournamentInfo.class);
         assertEquals(0, adminResult.getAlreadyEnlisted());
-        assertFalse(adminResult.isIAmEnlisted());
+        assertFalse(adminResult.getMyCategoryId().isPresent());
         assertTrue(adminResult.isIAmAdmin());
         assertThat(adminResult.getCategories(), hasSize(greaterThan(0)));
 
@@ -171,7 +171,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final DraftingTournamentInfo userResultBefore = myRest().get(DRAFTING + tid,
                 userSession, DraftingTournamentInfo.class);
         assertEquals(0, userResultBefore.getAlreadyEnlisted());
-        assertFalse(userResultBefore.isIAmEnlisted());
+        assertFalse(userResultBefore.getMyCategoryId().isPresent());
         assertFalse(userResultBefore.isIAmAdmin());
 
         myRest().voidPost(TOURNAMENT_ENLIST, userSession,
@@ -183,13 +183,13 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final DraftingTournamentInfo userResultAfter = myRest().get(DRAFTING + tid,
                 userSession, DraftingTournamentInfo.class);
         assertEquals(1, userResultAfter.getAlreadyEnlisted());
-        assertTrue(userResultAfter.isIAmEnlisted());
+        assertTrue(userResultAfter.getMyCategoryId().isPresent());
         assertFalse(userResultAfter.isIAmAdmin());
 
         final DraftingTournamentInfo anonymousResult = myRest().get(DRAFTING + tid,
                 DraftingTournamentInfo.class);
         assertEquals(1, anonymousResult.getAlreadyEnlisted());
-        assertFalse(anonymousResult.isIAmEnlisted());
+        assertFalse(anonymousResult.getMyCategoryId().isPresent());
         assertFalse(anonymousResult.isIAmAdmin());
         assertThat(adminResult.getCategories(), hasSize(greaterThan(0)));
     }
@@ -225,8 +225,8 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
             myRest().get(DRAFTING + tid, DraftingTournamentInfo.class);
             fail();
         } catch (WebApplicationException e) {
-            ErrorBadState error = e.getResponse().readEntity(ErrorBadState.class);
-            assertThat(error.getMessage().getState(), is(Open));
+            BadTournamentState error = e.getResponse().readEntity(BadTournamentState.class);
+            assertThat(error.getState(), is(Open));
         }
     }
 

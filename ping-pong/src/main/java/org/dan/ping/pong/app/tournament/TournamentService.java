@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
-import static org.dan.ping.pong.sys.error.PiPoEx.badState;
+import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import org.dan.ping.pong.app.bid.BidDao;
@@ -29,7 +29,18 @@ public class TournamentService {
 
     @Transactional(TRANSACTION_MANAGER)
     public void enlist(int uid, EnlistTournament enlistment) {
+        final MyTournamentInfo info = tournamentDao.getMyTournamentInfo(enlistment.getTid())
+                 .orElseThrow(() -> notFound("Tournament "
+                         + enlistment.getTid() + " does not exist"));
+        ensureDrafting(info.getState());
         bidDao.enlist(uid, enlistment);
+    }
+
+    private void ensureDrafting(TournamentState state) {
+        if (state != TournamentState.Draft) {
+            throw badRequest(BadStateError.of(state,
+                    "Tournament is not in a valid state"));
+        }
     }
 
     public List<DatedTournamentDigest> findInWithEnlisted(int uid) {
@@ -68,9 +79,7 @@ public class TournamentService {
         final DraftingTournamentInfo result = tournamentDao
                 .getDraftingTournament(tid, participantId)
                 .orElseThrow(() -> notFound("Tournament " + tid + " not found"));
-        if (result.getState() != TournamentState.Draft) {
-            throw badState(result.getState());
-        }
+        ensureDrafting(result.getState());
         result.setCategories(categories);
         return result;
     }

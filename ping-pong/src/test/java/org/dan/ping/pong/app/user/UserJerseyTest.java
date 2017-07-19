@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.sys.ctx.BaseTestContext;
+import org.dan.ping.pong.sys.error.Error;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -67,6 +68,6 @@ public class UserJerseyTest extends AbstractSpringJerseyTest {
         myRest().post(UserResource.USER_REGISTER, entity);
         final Response response = myRest().post(UserResource.USER_REGISTER, entity);
         assertEquals(400, response.getStatus());
-        assertEquals(EMAIL_IS_USED, response.readEntity(StringError.class).getMessage());
+        assertEquals(EMAIL_IS_USED, response.readEntity(Error.class).getMessage());
     }
 }

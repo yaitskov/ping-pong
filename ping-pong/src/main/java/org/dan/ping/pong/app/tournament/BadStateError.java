@@ -1,24 +1,26 @@
 package org.dan.ping.pong.app.tournament;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.sys.error.Error;
 
 @Getter
-@Builder
+@Setter
 @ToString
 @NoArgsConstructor
-@AllArgsConstructor
-public class BadStateError<T extends State> {
-    private Error error;
+public class BadStateError<T extends State> extends Error {
+    private ErrorCode error;
     private T state;
 
-    public static <T extends State> BadStateError of(T activeState) {
-        return BadStateError.builder()
-                .error(Error.BadState)
-                .state(activeState)
-                .build();
+    BadStateError(ErrorCode code, T state, String message) {
+        super(message);
+        this.error = code;
+        this.state = state;
+    }
+
+    public static <T extends State> BadStateError of(T activeState, String message) {
+        return new BadStateError(ErrorCode.BadState, activeState, message);
     }
 }

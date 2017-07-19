@@ -1,6 +1,5 @@
 package org.dan.ping.pong.sys.error;
 
-import static java.util.UUID.randomUUID;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +14,11 @@ import javax.ws.rs.ext.Provider;
 public class JerseyExceptionMapper implements ExceptionMapper<WebApplicationException> {
     @Override
     public Response toResponse(WebApplicationException exception) {
-        final String errorId = randomUUID().toString();
-        log.error("Error: {}", errorId, exception);
+        final Error error = new Error(exception.getMessage());
+        log.error("Error: id {} => msg [{}]",
+                error.getId(), error.getMessage(), exception);
         return Response.status(exception.getResponse().getStatus())
-                .entity(new Error(errorId, exception.getMessage()))
+                .entity(error)
                 .type(APPLICATION_JSON)
                 .build();
     }

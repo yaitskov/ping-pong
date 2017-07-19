@@ -1,6 +1,5 @@
 package org.dan.ping.pong.sys.error;
 
-import static java.util.UUID.randomUUID;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
@@ -15,10 +14,10 @@ import javax.ws.rs.ext.Provider;
 public class DefaultExceptionMapper implements ExceptionMapper<Throwable> {
     @Override
     public Response toResponse(Throwable exception) {
-        final String errorId = randomUUID().toString();
-        log.error("Internal server error: {}", errorId, exception);
+        final Error error = new Error("Internal server error");
+        log.error("Internal server error: {}", error.getId(), exception);
         return Response.status(INTERNAL_SERVER_ERROR)
-                .entity(new Error(errorId))
+                .entity(error)
                 .type(APPLICATION_JSON)
                 .build();
     }

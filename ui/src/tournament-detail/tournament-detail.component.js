@@ -4,77 +4,53 @@ angular.
     module('tournamentDetail').
     component('tournamentDetail', {
         templateUrl: 'tournament-detail/tournament-detail.template.html',
-        controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu', '$http', 'cutil', '$location',
-                     function ($routeParams, Tournament, auth, mainMenu, $http, cutil, $location) {
+        controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu',
+                     '$http', '$location', 'requestStatus', 'cutil',
+                     function ($routeParams, Tournament, auth, mainMenu,
+                               $http,  $location, requestStatus, cutil) {
                          mainMenu.setTitle('Drafting...');
                          var self = this;
-                         self.categoryId = null;
-                         self.categoryName = '';
-                         self.error = null;
+                         self.myCategory = {};
                          self.tournament = null;
+                         this.activate = function (cid) {
+                             self.myCategory.cid = cid;
+                         };
+                         requestStatus.startLoading();
                          Tournament.aDrafting(
                              {tournamentId: $routeParams.tournamentId},
                              function (tournament) {
-                                     console.log("why? " + tournament);
-                                     mainMenu.setTitle('Drafting to ' + tournament.name);
-                                     self.tournament = tournament;
-                                     if (self.tournament.iamEnlisted) {
-                                         self.categoryName = cutil.findValBy(self.tournament.categories,
-                                                                             {cid: self.categoryId}).name;
-                                     }
-                             },
-                             function (bo) {
-                                 if (bo.status == 404) {
-                                     self.error = "Tournament " + $routeParams.tournamentId + " doesn't exist";
-                                 } else if (bo.status == 400) {
-                                     if (bo.data.error == 'BadState') {
-                                         if (bo.data.state == 'Open') {
-                                             self.error = "Tournament already began.";
-                                         } else if (bo.data.state == 'Close') {
-                                             self.error = "Tournament complete.";
-                                         } else if (bo.data.state == 'Replaced') {
-                                             self.error = "Tournament is replaced.";
-                                         } else if (bo.data.state == 'Canceled') {
-                                             self.error = "Tournament is canceled.";
-                                         } else if (bo.data.state == 'Hidden') {
-                                             self.error = "Tournament is not public.";
-                                         } else if (bo.data.state == 'Announce') {
-                                             self.error = "Tournament is just announced and drating is not begun yet.";
-                                         } else {
-                                             self.error = "Unkown state " + bo.data.state;
-                                         }
-                                     } else {
-                                         self.error = "Wrong state";
-                                     }
-                                 } else if (bo.status == 502) {
-                                     self.error = "Server is not available";
-                                 } else {
-                                     self.error = "Failed to get tournament " + $routeParams.tournamentId;
+                                 console.log("why? " + tournament);
+                                 requestStatus.complete();
+                                 mainMenu.setTitle('Drafting to ' + tournament.name);
+                                 self.tournament = tournament;
+                                 if (self.tournament.myCategoryId) {
+                                     self.myCategory = {cid: tournament.myCategoryId,
+                                                        name: cutil.findValBy(self.tournament.categories,
+                                                                              {cid: tournament.myCategoryId}).name}
                                  }
-                             });
+                             },
+                             requestStatus.failed);
                          this.enlistMe = function () {
                              console.log("Enlist Me");
-                             self.error = '';
-                             if (!self.categoryId) {
+                             requestStatus.startLoading('Enlisting', self.tournament);
+                             if (!self.myCategory.cid) {
                                  self.error = "Choose category";
+                                 requestStatus.validationFailed("Category is not chosen. Choose");
                                  return;
                              }
                              if (auth.isAuthenticated()) {
                                  $http.post('/api/tournament/enlist',
                                             {tid: self.tournament.tid,
-                                             categoryId: self.categoryId} ,
+                                             categoryId: self.myCategory.cid} ,
                                             {headers: {session: auth.mySession()}}).
                                      then(
                                          function (okResp) {
-                                             self.tournament.iamEnlisted = true;
-                                             self.categoryName = cutil.findValBy(self.tournament.categories,
-                                                                                 {cid: self.categoryId}).name;
-                                             console.log("enlisted ok " + okResp);
+                                             requestStatus.complete();
+                                             self.tournament.myCategoryId = self.myCategory.cid;
+                                             self.myCategory.name = cutil.findValBy(self.tournament.categories,
+                                                                                    {cid: self.myCategory.cid}).name;
                                          },
-                                         function (badResp) {
-                                             self.error = "" + badResp;
-                                             console.log("failed " + badResp);
-                                         });
+                                         requestStatus.failed);
                              } else {
                                  auth.requireLogin();
                              }
@@ -82,19 +58,16 @@ angular.
 
                          this.resign = function () {
                              console.log("Resign from tournament " + self.tournament.tid);
+                             requestStatus.startLoading('Resigning', self.tournament);
                              $http.post("/api/tournament/resign",
                                         self.tournament.tid,
                                         {headers: {session: auth.mySession()}}).
                                  then(
                                      function (okResp) {
-                                         self.tournament.iamEnlisted = false;
-                                         self.categoryName = null;
-                                         self.categoryId = null;
+                                         self.tournament.myCategoryId = null;
+                                         requestStatus.complete();
                                      },
-                                     function (badResp) {
-                                         self.error = "failed to resign " + badResp;
-                                         console.log("failed to resign " + badResp);
-                                     });
+                                     requestStatus.failed);
                          };
                      }
                     ]

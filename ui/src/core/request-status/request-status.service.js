@@ -12,8 +12,8 @@ angular.
                     this._badStatusExplantion = badStatusMsg;
                 }
             };
-            this.startLoading = function (msg) {
-                $rootScope.$broadcast('event.request.started', msg);
+            this.startLoading = function (msg, meta) {
+                $rootScope.$broadcast('event.request.started', msg, meta);
             };
 
             this.failed = function (response) {

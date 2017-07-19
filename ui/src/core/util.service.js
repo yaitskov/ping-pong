@@ -17,8 +17,9 @@ angular.
                 next:
                 for (var i in list) {
                     var item = list[i];
-                    for (var k in Object.keys(pattern)) {
-                        if (item[k] !== pattern[k]) {
+                    var keys = Object.keys(pattern);
+                    for (var k in keys) {
+                        if (item[keys[k]] !== pattern[keys[k]]) {
                             continue next;
                         }
                     }
@@ -30,8 +31,9 @@ angular.
                 next:
                 for (var i in list) {
                     var item = list[i];
-                    for (var k in Object.keys(pattern)) {
-                        if (item[k] !== pattern[k]) {
+                    var keys = Object.keys(pattern);
+                    for (var k in keys) {
+                        if (item[keys[k]] !== pattern[keys[k]]) {
                             continue next;
                         }
                     }

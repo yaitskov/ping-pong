@@ -108,9 +108,10 @@ public class BidDao {
     public void resign(int uid, Integer tid) {
         log.info("User {} resigned {} from tid {}",
                 uid,
-                jooq.update(BID).set(BID.STATE, BidState.Quit)
-                .where(BID.UID.eq(uid), BID.TID.eq(tid))
-                .execute(),
+                jooq.update(BID)
+                        .set(BID.STATE, BidState.Quit)
+                        .where(BID.UID.eq(uid), BID.TID.eq(tid))
+                        .execute(),
                 tid);
     }
 

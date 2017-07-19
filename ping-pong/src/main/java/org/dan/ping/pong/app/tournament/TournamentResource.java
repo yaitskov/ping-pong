@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.tournament;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
+import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
@@ -70,6 +71,9 @@ public class TournamentResource {
     public void enlist(
             @HeaderParam(SESSION) String session,
             EnlistTournament enlistment) {
+        if (enlistment.getCategoryId() < 1) {
+            throw badRequest("Category is not set");
+        }
         tournamentService.enlist(
                 authService.userInfoBySession(session).getUid(),
                 enlistment);

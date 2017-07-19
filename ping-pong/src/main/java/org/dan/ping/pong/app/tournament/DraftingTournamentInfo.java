@@ -28,7 +28,7 @@ public class DraftingTournamentInfo {
     private Optional<Integer> previousTid = Optional.empty();
     private Optional<Double> ticketPrice = Optional.empty();
     private PlaceLink place;
-    private boolean iAmEnlisted;
+    private Optional<Integer> myCategoryId;
     private boolean iAmAdmin;
     private int alreadyEnlisted;
     private List<CategoryInfo> categories;

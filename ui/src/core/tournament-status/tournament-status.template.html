@@ -1,0 +1,34 @@
+<div ng-switch="$ctrl.tournament.state"
+     class="alert alert-info tournament-status"
+     ng-show="$ctrl.tournament.state">
+  <div ng-switch-when="'Open'">
+    Tournament <b>{{$ctrl.tournament.name}}</b> has been opened,
+    drafting is already complete. Try to find next tournament in the
+    seria, if you want to pariticpate there.
+  </div>
+  <div ng-switch-when="'Close'">
+    Tournament <b>{{$ctrl.tournament.name}}</b> has been completed.
+    Try to find next tournament in the seria, if you want to pariticpate
+    there.
+  </div>
+  <div ng-switch-when="'Replaced'">
+    Tournament <b>{{$ctrl.tournament.name}}</b> has been replaced by
+    another tournament. Try to find next tournament in the seria, if
+    you want to pariticpate there.
+  </div>
+  <div ng-switch-when="'Canceled'">
+    Tournament <b>{{$ctrl.tournament.name}}</b> has been cancelled.
+    Try to find next tournament in the seria, if
+    you want to pariticpate there.
+  </div>
+  <div ng-switch-when="'Hidden'">
+    Tournament <b>{{$ctrl.tournament.name}}</b> is not public.
+  </div>
+  <div ng-switch-when="'Announce'">
+    Tournament <b>{{$ctrl.tournament.name}}</b> is just announced and
+    drafting haven't begun yet.
+  </div>
+  <div ng-switch-default>
+    Tournament is in unknown state <b>{{$ctrl.tournament.state}}</b>.
+  </div>
+</div>

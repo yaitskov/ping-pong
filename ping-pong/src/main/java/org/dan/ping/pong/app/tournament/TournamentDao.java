@@ -6,9 +6,7 @@ import static ord.dan.ping.pong.jooq.Tables.MATCHES;
 import static ord.dan.ping.pong.jooq.Tables.PLACE;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT_ADMIN;
-import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
-import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -189,12 +187,12 @@ public class TournamentDao {
     public Optional<DraftingTournamentInfo> getDraftingTournament(int tid,
             Optional<Integer> participantId) {
         return ofNullable(jooq.select(TOURNAMENT.NAME, TOURNAMENT.OPENS_AT,
-                BID.UID, TOURNAMENT_ADMIN.UID, TOURNAMENT.TICKET_PRICE,
+                BID.CID, TOURNAMENT_ADMIN.UID, TOURNAMENT.TICKET_PRICE,
                 TOURNAMENT.PREVIOUS_TID, PLACE.PID, PLACE.POST_ADDRESS,
                 PLACE.NAME, PLACE.PHONE, TOURNAMENT.STATE,
                 jooq.selectCount().from(BID)
                         .where(BID.TID.eq(TOURNAMENT.TID),
-                                BID.STATE.in(Want, Paid))
+                                BID.STATE.ne(Quit))
                         .asField(ENLISTED))
                 .from(TOURNAMENT)
                 .innerJoin(PLACE).on(TOURNAMENT.PID.eq(PLACE.PID))
@@ -203,6 +201,7 @@ public class TournamentDao {
                         TOURNAMENT_ADMIN.UID.eq(participantId.orElse(0)))
                 .leftJoin(BID)
                 .on(TOURNAMENT.TID.eq(BID.TID),
+                        BID.STATE.ne(Quit),
                         BID.UID.eq(participantId.orElse(0)))
                 .where(TOURNAMENT.TID.eq(tid))
                 .fetchOne())
@@ -221,8 +220,7 @@ public class TournamentDao {
                                         .build())
                                 .pid(r.get(PLACE.PID)).build())
                         .opensAt(r.get(TOURNAMENT.OPENS_AT))
-                        .iAmEnlisted(participantId.isPresent()
-                                && participantId.equals(ofNullable(r.get(BID.UID))))
+                        .myCategoryId(ofNullable(r.get(BID.CID)))
                         .iAmAdmin(participantId.isPresent()
                                 && participantId.equals(ofNullable(r.get(TOURNAMENT_ADMIN.UID))))
                         .build());

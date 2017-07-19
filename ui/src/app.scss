@@ -2,6 +2,10 @@ $base-font-color: black;
 $active-background-color: #f5f5f5;
 $infinitPx: 9999px;
 $base-red-color: red;
+$primary-btn-back-color: #337ab7;
+$primary-btn-font-color: #fff;
+$default-btn-back-color: #e6e6e6;
+$default-btn-font-color: #000;
 
 /* begin of no side space */
 .view-container .container-fluid {
@@ -55,6 +59,34 @@ $base-red-color: red;
     color: $base-red-color;
 }
 /* end of open tournament list */
+
+/* begin of enlist form */
+.enlist-form {
+    .date {
+        padding-right: 10px;
+        color: $base-red-color;
+    }
+    .time {
+        font-size: 12px;
+        color: gray;
+    }
+    .category-label {
+        width: 33%;
+    }
+    .category-value {
+        max-width: 60%;
+        overflow: wrap;
+    }
+    a.category.btn-primary {
+        color: $primary-btn-font-color;
+        background-color: $primary-btn-back-color;
+    }
+    a.category {
+        min-width: 200px;
+        margin-bottom: 3px;
+    }
+}
+/* end of enlist form */
 
 /* begin of desktop layout */
 @media all and (max-resolution: 119dpi) {

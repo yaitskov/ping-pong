@@ -1,5 +1,5 @@
 <main-menu></main-menu>
-<div class="container">
+<div class="container enlist-form">
   <table class="table">
     <tbody>
       <tr>
@@ -52,34 +52,41 @@
     </tbody>
   </table>
 
-  <div class="form-group" ng-show="!$ctrl.tournament.iamEnlisted">
-    <label>Categories</label>
-    <div class="btn-group" role="group">
-      <label class="btn btn-default" ng-repeat="category in $ctrl.tournament.categories"
-             ng-click="$ctrl.activate($event)">
-        <input type="radio" name="categoryRadio"
-               ng-model="$ctrl.categoryId" ng-value="category.cid"/>
-        {{category.name}}
-      </label>
+  <div class="form-group clearfix" ng-show="!$ctrl.tournament.myCategoryId">
+    <div class="pull-left category-label">
+      Categories
+    </div>
+    <div class="pull-left category-value">
+      <div class="row" ng-repeat="category in $ctrl.tournament.categories">
+        <a class="btn btn-default category"
+           ng-click="$ctrl.activate(category.cid)"
+           ng-class="{'btn-primary': category.cid == $ctrl.myCategory.cid}">
+          {{category.name}}
+        </a>
+      </div>
     </div>
   </div>
-  <div class="form-group" ng-show="$ctrl.tournament.iamEnlisted">
-    <label>My category</label>
-    <input type="text" class="form-control" readonly
-           ng-value="$ctrl.categoryName"/>
-  </div>
-  <div class="form-group" ng-show="$ctrl.error">
-    <div class="alert alert-danger">
-      {{$ctrl.error}}
+
+  <div class="form-group clearfix" ng-show="$ctrl.tournament.myCategoryId">
+    <div class="pull-left category-label">
+      My category
+    </div>
+    <div class="pull-left category-value">
+      {{$ctrl.myCategory.name}}
     </div>
   </div>
+
+  <div class="form-group">
+    <request-status></request-status>
+  </div>
+
   <div class="form-group" ng-show="$ctrl.tournament">
     <button type="button" class="btn btn-primary"
             ng-click="$ctrl.enlistMe()"
-            ng-show="!$ctrl.tournament.iamEnlisted && !$ctrl.tournament.iamAdmin">Enlist Me</button>
+            ng-show="!$ctrl.tournament.myCategoryId && !$ctrl.tournament.iamAdmin">Enlist Me</button>
     <button type="button" class="btn btn-primary"
             ng-click="$ctrl.resign()"
-            ng-show="$ctrl.tournament.iamEnlisted">Resign</button>
+            ng-show="$ctrl.tournament.myCategoryId">Resign</button>
     <button type="button" class="btn btn-primary"
             ng-show="$ctrl.tournament.iamAdmin">Enlist Offline Participant</button>
     <a class="btn btn-primary label-info" role="button" ng-show="$ctrl.tournament.previousTid"

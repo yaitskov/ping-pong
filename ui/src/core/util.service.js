@@ -45,12 +45,17 @@ angular.
     }]).
     factory('pageCtx', [function () {
         return new function () {
-            var map = {};
+            var map = sessionStorage;
             this.put = function (key, value) {
-                return map[key] = value;
+                map.setItem(key, JSON.stringify({v: value, d: new Date()}));
             };
             this.get = function (key) {
-                return map[key];
+                var result = map.getItem(key);
+                if (result) {
+                    result = JSON.parse(result);
+                    return result.v;
+                }
+                return null;
             };
             this._enemyUidKey = function (myUid, mid) {
                 return 'enemy-of-' + myUid + '-in-mid-' + mid;

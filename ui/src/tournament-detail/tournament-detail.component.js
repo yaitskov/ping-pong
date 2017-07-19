@@ -5,15 +5,16 @@ angular.
     component('tournamentDetail', {
         templateUrl: 'tournament-detail/tournament-detail.template.html',
         controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu',
-                     '$http', '$location', 'requestStatus', 'cutil',
+                     '$http', '$location', 'requestStatus', 'cutil', 'pageCtx',
                      function ($routeParams, Tournament, auth, mainMenu,
-                               $http,  $location, requestStatus, cutil) {
+                               $http,  $location, requestStatus, cutil, pageCtx) {
                          mainMenu.setTitle('Drafting...');
                          var self = this;
-                         self.myCategory = {};
+                         self.myCategory = pageCtx.get('my-category-' + $routeParams.tournamentId) || {};
                          self.tournament = null;
                          this.activate = function (cid) {
                              self.myCategory.cid = cid;
+                             pageCtx.put('my-category-' + $routeParams.tournamentId, self.myCategory);
                          };
                          requestStatus.startLoading('Loading');
                          Tournament.aDrafting(

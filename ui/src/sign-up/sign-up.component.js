@@ -10,7 +10,6 @@ angular.
                 mainMenu.setTitle('Sign Up');
                 this.form = {};
                 var self = this;
-                requestStatus.setup('Account', 'Email is already used');
                 this.signUp = function (form) {
                     self.form.$setSubmitted();
                     if (!self.form.$valid) {

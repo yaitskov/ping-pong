@@ -6,7 +6,6 @@ angular.module('tournamentList').
         controller: ['Tournament', 'mainMenu', '$location', 'requestStatus',
                      function (Tournament, mainMenu, $location, requestStatus) {
                          mainMenu.setTitle('Drafting');
-                         requestStatus.setup('Tournament');
                          this.tournaments = null;
                          var self = this;
                          requestStatus.startLoading();

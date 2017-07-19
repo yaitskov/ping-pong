@@ -1,38 +1,56 @@
 <main-menu></main-menu>
 <div class="container">
-  <div class="form-group">
-    <label>Tournament</label>
-    <div class="pull-right">{{$ctrl.tournament.name}}</div>
-  </div>
-  <div class="form-group">
-    <label>Scheduled on</label>
-    <div class="pull-left">{{$ctrl.tournament.opensAt|date:"MMMM dd yyyy"}}</div>
-    <label class="pull-left">starts at</label>
-    <div class="pull-left">{{$ctrl.tournament.opensAt|date:"HH:MM"}}</div>
-  </div>
-  <div class="form-group">
-    <label>Location</label>
-    <div><a href="#!/place/{{$ctrl.tournament.place.pid}}">{{$ctrl.tournament.place.name}}</a>
-      {{$ctrl.tournament.place.address.address}}
-    </div>
-  </div>
-  <div class="form-group">
-    <label>Already enlisted</label>
-    <div>{{$ctrl.tournament.alreadyEnlisted}}</div>
-  </div>
-  <div class="form-group">
-    <label>Price</label>
-    <div ng-if="$ctrl.tournament.price">
-      {{$ctrl.tournament.price}}
-    </div>
-    <div ng-if="!$ctrl.tournament.price">
-      For Free!!!
-    </div>
-  </div>
-  <div class="form-group">
-    <label>Available payment methods</label>
-    <div>only in cache</div>
-  </div>
+  <table class="table">
+    <tbody>
+      <tr>
+        <td>Name</td>
+        <td>{{$ctrl.tournament.name}}</td>
+      </tr>
+      <tr>
+        <td>City</td>
+        <td>{{$ctrl.tournament.place.address.address}}</td>
+      </tr>
+      <tr>
+        <td>Place</td>
+        <td>
+          <a href="#!/place/{{$ctrl.tournament.place.pid}}">{{$ctrl.tournament.place.name}}</a>
+        </td>
+      </tr>
+      <tr>
+        <td>Date</td>
+        <td>
+          <span class="date">
+            {{$ctrl.tournament.opensAt|date:"MMM d"}}
+          </span>
+          <span class="time">
+            {{$ctrl.tournament.opensAt|date:"EEE h a Z"}}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="table table-bordered">
+    <tbody>
+      <tr>
+        <td title="Price per participant">Price</td>
+        <td title="How many people are already enlisted">Enlisted</td>
+        <td title="Available payment methods">Payment</td>
+      </tr>
+      <tr>
+        <td>
+          <span ng-if="$ctrl.tournament.price">
+            {{$ctrl.tournament.price}}
+          </span>
+          <span ng-if="!$ctrl.tournament.price">
+            free
+          </span>
+        </td>
+        <td>{{$ctrl.tournament.alreadyEnlisted}}</td>
+        <td>cash</td>
+      </tr>
+    </tbody>
+  </table>
 
   <div class="form-group" ng-show="!$ctrl.tournament.iamEnlisted">
     <label>Categories</label>

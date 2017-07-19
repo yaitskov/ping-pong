@@ -15,11 +15,10 @@ angular.
                          this.activate = function (cid) {
                              self.myCategory.cid = cid;
                          };
-                         requestStatus.startLoading();
+                         requestStatus.startLoading('Loading');
                          Tournament.aDrafting(
                              {tournamentId: $routeParams.tournamentId},
                              function (tournament) {
-                                 console.log("why? " + tournament);
                                  requestStatus.complete();
                                  mainMenu.setTitle('Drafting to ' + tournament.name);
                                  self.tournament = tournament;
@@ -29,7 +28,9 @@ angular.
                                                                               {cid: tournament.myCategoryId}).name}
                                  }
                              },
-                             requestStatus.failed);
+                             function (r) {
+                                 requestStatus.failed(r, {tid: $routeParams.tournamentId});
+                             });
                          this.enlistMe = function () {
                              console.log("Enlist Me");
                              requestStatus.startLoading('Enlisting', self.tournament);

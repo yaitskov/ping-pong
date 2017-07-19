@@ -37,9 +37,7 @@ angular.
                         self.error = requestStatus.entity() + " does not exist";
                     } else if (response.status == 400) {
                         if (typeof response.data == 'object') {
-                            if (response.data.error == 'BadState') {
-                                self.error = requestStatus.badStatusExplantion();
-                            } else if (response.data.message) {
+                            if (response.data.message) {
                                 self.error = response.data.message;
                             } else {
                                 self.error = "An application error happened: " + JSON.stringify(response.data);

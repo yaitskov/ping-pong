@@ -10,6 +10,7 @@ angular.
                                pageCtx, requestStatus, $scope) {
                          mainMenu.setTitle('Match Scoring');
                          this.match = null;
+                         this.rated = null;
                          this.outcome = "win";
                          this.score = "0";
                          var self = this;
@@ -31,6 +32,7 @@ angular.
                                  {mid: $routeParams.matchId,
                                   scores: findScores()},
                                  function (okResp) {
+                                     self.rated = 1;
                                      requestStatus.complete();
                                      var ctx = {ticked: 0};
                                      requestStatus.startLoading(

@@ -49,8 +49,12 @@
       <request-status></request-status>
     </div>
     <div class="form-group top-buffer">
-      <button class="btn btn-primary" ng-click="$ctrl.scoreMatch()">Complete Match</button>
-      <button class="btn btn-default" back-button>Back</button>
+      <button class="btn btn-primary"
+              ng-show="!$ctrl.rated"
+              ng-click="$ctrl.scoreMatch()">Complete Match</button>
+      <button class="btn btn-default"
+              ng-class="{'btn-primary': $ctrl.rated}"
+              back-button>Back</button>
     </div>
   </div>
 </form>

@@ -1,6 +1,18 @@
 'use strict';
 
 angular.module('core.ui', ['ngResource']).
+    directive('backButton', function () {
+        return {
+            restrict: 'A',
+            link: function (scope, element, attr) {
+                element.bind('click', goBack);
+
+                function goBack() {
+                    history.back();
+                }
+            }
+        };
+    }).
     directive('clickable', ['$location', function ($location) {
         return {
             scope: {},

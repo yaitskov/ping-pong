@@ -132,8 +132,8 @@ public class MatchDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<MyPendingMatch> findPendingMatches(int uid) {
-        return jooq.select(MATCHES.MID, TABLES.TABLE_ID, TABLES.LABEL,
-                MATCHES.GID, ENEMY_USER.UID, ENEMY_USER.NAME,
+        return jooq.select(MATCHES.MID, MATCHES.TID, TABLES.TABLE_ID,
+                TABLES.LABEL, MATCHES.GID, ENEMY_USER.UID, ENEMY_USER.NAME,
                 MATCHES.STATE)
                 .from(MATCH_SCORE)
                 .innerJoin(MATCHES)
@@ -149,10 +149,11 @@ public class MatchDao {
                 .where(MATCH_SCORE.UID.eq(uid),
                         ENEMY_SCORE.UID.notEqual(uid),
                         MATCHES.STATE.in(Place, Game))
-                .orderBy(MATCHES.STATE.desc(), MATCHES.MID.asc())
+                .orderBy(MATCHES.STATE.asc(), MATCHES.MID.asc())
                 .fetch()
 
                 .map(r -> MyPendingMatch.builder()
+                        .tid(r.get(MATCHES.TID))
                         .mid(r.get(MATCHES.MID))
                         .state(r.get(MATCHES.STATE))
                         .matchType(r.get(MATCHES.GID) == null ? PlayOff : Group)

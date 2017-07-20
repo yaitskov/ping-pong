@@ -18,6 +18,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MyPendingMatch {
+    private int tid;
     private int mid;
     private MatchState state;
     private Optional<UserLink> enemy;

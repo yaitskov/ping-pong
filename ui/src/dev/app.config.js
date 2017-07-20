@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('devPingPong').
-    .config(['$httpProvider', function($httpProvider) {
+    config(['$httpProvider', function($httpProvider) {
         if (!$httpProvider.defaults.headers.get) {
             $httpProvider.defaults.headers.get = {};
         }

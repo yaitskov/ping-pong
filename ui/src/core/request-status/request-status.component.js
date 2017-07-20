@@ -31,7 +31,7 @@ angular.
                     self.reset();
                     if (response.status == 502) {
                         self.error = "Server is not available";
-                    } else if (response.stutus == 401) {
+                    } else if (response.status == 401) {
                         self.error = "Session is not valid. Try to logout and login again if your account is bound to an email.";
                     } else if (response.status == 404) {
                         self.error = requestStatus.entity() + " does not exist";

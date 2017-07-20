@@ -14,7 +14,9 @@ angular.
                 return value;
             };
             this.clearAll = function () {
-                localStorage.clear();
+                while (localStorage.length >= 0) {
+                    localStorage.removeItem(localStorage.key(0));
+                }
             };
         };
     }]);

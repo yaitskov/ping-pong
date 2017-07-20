@@ -2,7 +2,7 @@
 
 angular.module('core.validate').
     directive('validateEmail', function() {
-        var emailRegexp = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
+        var emailRegexp = /^[_A-Za-z0-9]+(\.[_A-Za-z0-9]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*(\.[A-Za-z]{2,4})$/;
 
         return {
             require: 'ngModel',

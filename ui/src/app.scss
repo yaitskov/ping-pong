@@ -134,6 +134,10 @@ $default-btn-font-color: #000;
     text-decoration: underline !important;
 }
 
+.match-scoring .btn {
+    min-width: 200px;
+}
+
 /* begin of mobile layout */
 @media all and (min-resolution: 120dpi) {
     /* begin of main menu */
@@ -202,5 +206,12 @@ $default-btn-font-color: #000;
         width: 62px;
     }
     /* end of main content view*/
+
+    .wrap-long {
+        white-space: pre-wrap;
+        line-height: 1;
+        padding-top: 0px;
+        padding-bottom: 0px;
+    }
 }
 /* end of mobile layout */

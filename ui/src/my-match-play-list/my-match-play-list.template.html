@@ -2,7 +2,7 @@
 <div class="container">
   <request-status></request-status>
   <div ng-show="$ctrl.openMatch" class="form-group">
-    <a class="btn btn-default"
+    <a class="btn btn-primary wrap-long"
        href="#!/complete/my/match/{{$ctrl.openMatch.mid}}">
       Complete match with {{$ctrl.openMatch.enemy.name}}
     </a>
@@ -40,13 +40,13 @@
       and enlist!
     </p>
     <p ng-show="$ctrl.tournament.next">
-      You are enlisted to <a href="#!/tournament/{{$ctrl.tournament.next.tid}}">
+      You are enlisted to <a href="#!/tournaments/{{$ctrl.tournament.next.tid}}">
         {{$ctrl.tournament.next.name}}
       </a> tournament, which begins at {{$ctrl.tournament.next.opensAt
       | date: 'MMM d EEE h a Z'}}.
     </p>
     <p ng-show="$ctrl.tournament.previous">
-      You complete the battle in <a href="#!/tournament/{{$ctrl.tournament.previous.tid}}">
+      You complete the battle in <a href="#!/tournaments/{{$ctrl.tournament.previous.tid}}">
         {{$ctrl.tournament.previous.name}}</a> tournament.
     </p>
   </div>

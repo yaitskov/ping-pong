@@ -33,6 +33,16 @@ angular.
                         self.error = "Server is not available";
                     } else if (response.status == 401) {
                         self.error = "Session is not valid. Try to logout and login again if your account is bound to an email.";
+                    } else if (response.status == 403) {
+                        if (typeof response.data == 'object') {
+                            if (response.data.message) {
+                                self.error = "Not enough permissions: " + response.data.message;
+                            } else {
+                                self.error = "An application error happened: " + JSON.stringify(response.data);
+                            }
+                        } else {
+                            self.error = "Bad request: " + response.data;
+                        }
                     } else if (response.status == 404) {
                         self.error = requestStatus.entity() + " does not exist";
                     } else if (response.status == 400) {

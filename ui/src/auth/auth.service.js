@@ -2,8 +2,8 @@
 
 angular.
     module('auth').
-    factory('auth', ['LocalStorage', '$location', '$http',
-                     function (LocalStorage, $location, $http) {
+    factory('auth', ['LocalStorage', '$location',
+                     function (LocalStorage, $location) {
                          function auth() {
                              this.returnOnAuth = null;
                              this.isAuthenticated = function () {
@@ -48,20 +48,6 @@ angular.
                                  } else {
                                      $location.path('/');
                                  }
-                             };
-                             this.sendLoginLink = function (email, ack, nack) {
-                                 console.log("Request auth link for email " + email);
-                                 $http.post('/api/anonymous/auth/send-auth-link',
-                                            {'email': email},
-                                            {'Content-Type': 'application/json'}).
-                                     then(
-                                         function (response) {
-                                             ack(response);
-                                         },
-                                         function (response) {
-                                             console.log("Failed to send link for " + email);
-                                             nack(response);
-                                         });
                              };
                          }
                          return new auth();

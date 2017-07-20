@@ -1,10 +1,32 @@
 'use strict';
 
 angular.module('pingPong').
+    config(['$httpProvider', function($httpProvider) {
+        if (!$httpProvider.defaults.headers.get) {
+            $httpProvider.defaults.headers.get = {};
+        }
+        $httpProvider.defaults.headers.get['Cache-Control'] = 'no-cache';
+        $httpProvider.defaults.headers.get['Pragma'] = 'no-cache';
+        $httpProvider.interceptors.push('injectingSessionInterceptor');
+    }]).
+    service('injectingSessionInterceptor', ['auth', function (auth) {
+        var ser = this;
+        ser.request = function (config) {
+            var session = auth.mySession();
+            if (session) {
+                if (config.headers.session) {
+                    config.headers.session = session;
+                }
+            } else if (config.headers.session) {
+                // prevent sending request
+                console.log("Error session is missing");
+            }
+            return config;
+        };
+    }]).
     config(['$locationProvider', '$routeProvider',
             function config($locationProvider, $routeProvider) {
                 $locationProvider.hashPrefix('!');
-
                 $routeProvider.
                     when('/tournaments', {
                         template: '<tournament-list></tournament-list>'

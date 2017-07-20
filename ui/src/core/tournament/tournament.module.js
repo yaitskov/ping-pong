@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('core.tournament', ['ngResource', 'auth']);
+angular.module('core.tournament', ['ngResource']);

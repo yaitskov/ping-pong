@@ -3,6 +3,7 @@
 angular.module('myTournamentList').
     component('myTournamentList', {
         templateUrl: 'my-tournament-list/my-tournament-list.template.html',
+        cache: false,
         controller: ['Tournament', 'mainMenu',
                      function (Tournament, mainMenu) {
                          console.log("init my tournament list");

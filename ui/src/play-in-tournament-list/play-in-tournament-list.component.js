@@ -3,6 +3,7 @@
 angular.module('playInTournamentList').
     component('playInTournamentList', {
         templateUrl: 'play-in-tournament-list/play-in-tournament-list.template.html',
+        cache: false,
         controller: ['Tournament', 'mainMenu',
                      function (Tournament, mainMenu) {
                          mainMenu.setTitle('Coming tournaments where I am enlisted');

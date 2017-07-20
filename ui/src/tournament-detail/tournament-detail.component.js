@@ -4,6 +4,7 @@ angular.
     module('tournamentDetail').
     component('tournamentDetail', {
         templateUrl: 'tournament-detail/tournament-detail.template.html',
+        cache: false,
         controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu',
                      '$http', '$location', 'requestStatus', 'cutil', 'pageCtx',
                      function ($routeParams, Tournament, auth, mainMenu,

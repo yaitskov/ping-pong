@@ -4,22 +4,22 @@ angular.
     module('placeDetail').
     component('placeDetail', {
         templateUrl: 'place-detail/place-detail.template.html',
-        controller: ['mainMenu', 'Place', '$routeParams', 'pageCtx',
-                     function (mainMenu, Place, $routeParams, pageCtx) {
+        controller: ['mainMenu', 'Place', '$routeParams', 'requestStatus', 'pageCtx', 'auth',
+                     function (mainMenu, Place, $routeParams, requestStatus, pageCtx, auth) {
                          mainMenu.setTitle('Place');
-                         mainMenu.setContextMenu({'#!/tournament/new': 'Add Tournament'});
                          pageCtx.put('place', {pid: $routeParams.placeId});
                          this.place = {};
                          var self = this;
-                         self.error = null;
-                         this.updatePlace = function () {
-                             console.log("implement place update");
-                         };
+                         requestStatus.startLoading();
                          Place.aPlace({placeId: $routeParams.placeId},
                                       function (place) {
+                                          requestStatus.complete();
                                           self.place = place;
                                           pageCtx.put('place', place);
                                           mainMenu.setTitle('Place ' + place.name);
-                                          mainMenu.setContextMenu({'#!/tournament/new': 'Add Tournament'});
-                                      });
+                                          if (auth.isAuthenticated()) {
+                                              mainMenu.setContextMenu({'#!/tournament/new': 'Add Tournament'});
+                                          }
+                                      },
+                                      requestStatus.failed);
                      }]});

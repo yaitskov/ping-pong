@@ -1,36 +1,38 @@
 <main-menu></main-menu>
-<form>
-  <div class="container-fluid">
-    <div class="form-group">
-      <label for="name">Name</label>
-      <input type="text" id="name" class="form-control"
-             placeholder="Name" ng-model="$ctrl.place.name"/>
-    </div>
-    <div class="form-group">
-      <label for="postAddress">Post Address</label>
-      <input type="text" id="postAddress" class="form-control"
-             placeholder="Post Address"
-             ng-model="$ctrl.place.address.address"/>
-    </div>
-    <div class="form-group">
-      <label for="phone">Phone</label>
-      <input type="text" id="phone" class="form-control"
-             placeholder="Phone"
-             ng-model="$ctrl.place.address.phone"/>
-    </div>
-    <div class="form-group">
-      <label for="email">Contact Email</label>
-      <input type="text" id="email" class="form-control"
-             placeholder="Contact email"
-             ng-model="$ctrl.place.address.email"/>
-    </div>
-    <div class="form-group" ng-show="$ctrl.error">
-      <p class="alert alert-danger">
-        {{$ctrl.error}}
-      </p>
-    </div>
-    <div class="form-group">
-      <button ng-click="$ctrl.updatePlace()">Update</button>
-    </div>
-  </div>
-</form>
+<div class="container">
+  <request-status></request-status>
+  <table class="table" ng-show="$ctrl.place">
+    <tr>
+      <td>
+        Name
+      </td>
+      <td>
+        {{$ctrl.place.name}}
+      </td>
+    </tr>
+    <tr ng-show="$ctrl.place.address.address">
+      <td>
+        Postal Address
+      </td>
+      <td>
+        {{$ctrl.place.address.address}}
+      </td>
+    </tr>
+    <tr ng-show="$ctrl.place.address.phone">
+      <td>
+        Phone
+      </td>
+      <td>
+        {{$ctrl.place.address.phone}}
+      </td>
+    </tr>
+    <tr ng-show="$ctrl.place.address.email">
+      <td>
+        Contact Email
+      </td>
+      <td>
+        {{$ctrl.place.address.email}}
+      </td>
+    </tr>
+  </table>
+</div>

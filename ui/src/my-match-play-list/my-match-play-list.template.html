@@ -1,12 +1,10 @@
-<div class="container-fluid">
-  <main-menu></main-menu>
-  <div class="alert alert-danger" ng-show="$ctrl.error">
-    {{$ctrl.error}}
-  </div>
+<main-menu></main-menu>
+<div class="container">
+  <request-status></request-status>
   <div ng-show="$ctrl.openMatch">
     <a class="btn btn-default"
        href="#!/complete/my/match/{{$ctrl.openMatch.mid}}">
-     Complete match with {{$ctrl.openMatch.enemy.name}}
+      Complete match with {{$ctrl.openMatch.enemy.name}}
     </a>
   </div>
   <table class="table" ng-show="$ctrl.matches.length > 0">
@@ -36,7 +34,7 @@
     </tbody>
   </table>
   <div class="alert alert-info" ng-show="!$ctrl.error && $ctrl.matches.length == 0">
-    <p>You don't any match to play.</p>
+    <p>You don't have any match to play.</p>
     <p ng-show="!$ctrl.tournament.next && !$ctrl.tournament.previous">
       <a href="#!/tournaments">Find a tournament</a> interesting your
       and enlist!
@@ -45,14 +43,11 @@
       You are enlisted to <a href="#!/tournament/{{$ctrl.tournament.next.tid}}">
         {{$ctrl.tournament.next.name}}
       </a> tournament, which begins at {{$ctrl.tournament.next.opensAt
-      | date: 'MMMM dd yyyy HH:mm'}}.
+      | date: 'MMM d EEE h a Z'}}.
     </p>
     <p ng-show="$ctrl.tournament.previous">
       You complete the battle in <a href="#!/tournament/{{$ctrl.tournament.previous.tid}}">
         {{$ctrl.tournament.previous.name}}</a> tournament.
     </p>
-  </div>
-  <div class="alert alert-info" ng-show="!$ctrl.error && $ctrl.matches === null">
-    Loading ...
   </div>
 </div>

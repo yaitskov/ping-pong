@@ -130,10 +130,8 @@ $default-btn-font-color: #000;
 }
 /* end of debugging and tracing */
 
-.request-status {
-    a {
-        text-decoration: underline;
-    }
+.alert-info a {
+    text-decoration: underline !important;
 }
 
 /* begin of mobile layout */

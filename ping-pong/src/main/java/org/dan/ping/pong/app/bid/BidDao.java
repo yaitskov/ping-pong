@@ -45,6 +45,7 @@ public class BidDao {
         }
     }
 
+    @Transactional(TRANSACTION_MANAGER)
     public void setBidState(int tid, int uid, BidState expected, BidState state) {
         setBidState(BidId.builder().tid(tid).uid(uid).build(),
                 singletonList(expected), state);

@@ -40,6 +40,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.dan.ping.pong.JerseySpringTest;
+import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin;
@@ -259,6 +261,9 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     private Clocker clocker;
 
+    @Inject
+    private BidDao bidDao;
+
     @Test
     public void myRecentTournaments() {
         final int placeId = daoGenerator.genPlace(1);
@@ -279,6 +284,8 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         restEntityGenerator.enlistParticipants(myRest(), session,
                 nextTid, nextCid, singletonList(userSession));
         tournamentDao.setState(previousTid, Close);
+        bidDao.setBidState(previousTid, userSession.getUid(),
+                BidState.Here, BidState.Lost);
         final MyRecentTournaments r = myRest().get(MY_RECENT_TOURNAMENT,
                 userSession, MyRecentTournaments.class);
 

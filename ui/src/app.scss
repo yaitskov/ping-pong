@@ -135,7 +135,30 @@ $default-btn-font-color: #000;
 }
 
 .match-scoring .btn {
-    min-width: 200px;
+    min-width: 150px;
+}
+
+.top-buffer {
+    padding-top: 20px !important;
+}
+
+.active .circle {
+    opacity: 1;
+}
+
+.btn .circle {
+    margin-right: 10px;
+}
+
+.circle {
+    width: 10px;
+    opacity: 0;
+    height: 10px;
+    display: inline-block;
+    background: white;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
 }
 
 /* begin of mobile layout */
@@ -148,7 +171,7 @@ $default-btn-font-color: #000;
         font-size: 24px;
     }
     .view-container .dropdown-menu > li > a {
-        padding: 10px 20px;
+        padding: 5px 10px;
     }
     .view-container a:hover, .view-container a:active {
         background-color: $active-background-color; /* highlight touched link */
@@ -208,10 +231,7 @@ $default-btn-font-color: #000;
     /* end of main content view*/
 
     .wrap-long {
-        white-space: pre-wrap;
-        line-height: 1;
-        padding-top: 0px;
-        padding-bottom: 0px;
+        white-space: initial !important;
     }
 }
 /* end of mobile layout */

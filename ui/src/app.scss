@@ -121,6 +121,10 @@ $default-btn-font-color: #000;
             }
         }
     }
+
+    .table-number {
+        padding-left: 22px !important;
+    }
 }
 /* end of desktop layout */
 
@@ -165,6 +169,10 @@ $default-btn-font-color: #000;
     tbody tr td:first-child {
         font-weight: bold;
     }
+}
+
+td.match-state-description.text-danger {
+    font-weight: bold;
 }
 
 /* begin of mobile layout */

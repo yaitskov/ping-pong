@@ -10,24 +10,39 @@
   <table class="table" ng-show="$ctrl.matches.length > 0">
     <thead>
       <tr>
-        <td>
+        <td title="Description of possible states in a match.">
           <a href="#!/match/state/description">State</a>
         </td>
-        <td>Match</td>
-        <td>Table</td>
-        <td>Enemy</td>
+        <td title="Match type. It could be a game in a group or play off.">
+          Match
+        </td>
+        <td title="Table number where the match should be held or dash if it's not known yet.">
+          Table
+        </td>
+        <td title="Your opponent in a game.">
+          Contestant
+        </td>
       </tr>
     </thead>
     <tbody>
       <tr ng-repeat="match in $ctrl.matches">
-        <td>{{match.state}}</td>
-        <td>{{match.matchType}}</td>
-        <td>
-          <a href="#!/place/tables/{{match.table.id}}">
+        <td class="match-state-description"
+            title="Match state. Start playing once it become the Game."
+            ng-class="{'text-danger': match.state == 'Game'}">
+          {{match.state}}
+        </td>
+        <td title="Match type. It could be a game in a group or play off.">
+          {{match.matchType}}
+        </td>
+        <td class="table-number">
+          <a href="#!/place/tables/{{match.table.id}}"
+             title="Table number where the match should be held or dash if it's not known yet."
+             ng-show="match.table.id">
             {{match.table.label}}
           </a>
+          <span title="No free table" ng-show="!match.table.id">-</span>
         </td>
-        <td>
+        <td title="Your opponent in a game.">
           <a href="#!/participant/{{match.tid}}/{{match.enemy.uid}}">
             {{match.enemy.name}}
           </a>

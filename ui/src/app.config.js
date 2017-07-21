@@ -46,6 +46,9 @@ angular.module('pingPong').
                     when('/my/matches/play', {
                         template: '<my-match-play-list></my-match-play-list>'
                     }).
+                    when('/match/state/description', {
+                        template: '<match-state-description></match-state-description>'
+                    }).
                     when('/my/matches/judgement', {
                         template: '<my-match-judge-list></my-match-judge-list>'
                     }).

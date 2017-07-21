@@ -161,6 +161,12 @@ $default-btn-font-color: #000;
     border-radius: 5px;
 }
 
+.match-state-description {
+    tbody tr td:first-child {
+        font-weight: bold;
+    }
+}
+
 /* begin of mobile layout */
 @media all and (min-resolution: 120dpi) {
     /* begin of main menu */

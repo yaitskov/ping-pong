@@ -4,12 +4,12 @@ angular.
     module('completeMyMatch').
     component('completeMyMatch', {
         templateUrl: 'complete-my-match/complete-my-match.template.html',
-        controller: ['auth', 'mainMenu', 'Match', '$routeParams', '$interval',
-                     'pageCtx', 'requestStatus', '$scope',
-                     function (auth, mainMenu, Match, $routeParams, $interval,
-                               pageCtx, requestStatus, $scope) {
+        controller: ['auth', 'mainMenu', 'Match', '$routeParams',
+                     'pageCtx', 'requestStatus', '$scope', 'countDown',
+                     function (auth, mainMenu, Match, $routeParams,
+                               pageCtx, requestStatus, $scope, countDown) {
                          mainMenu.setTitle('Match Scoring');
-                         this.match = null;
+                         this.match = pageCtx.get('last-scoring-match') || {};
                          this.rated = null;
                          this.outcome = "win";
                          this.score = "0";
@@ -26,6 +26,18 @@ angular.
                                  return scores(self.score | 0, 3);
                              }
                          }
+                         this.showFinalMessage = function () {
+                             countDown.seconds(
+                                 $scope, 30,
+                                 function (left) {
+                                     requestStatus.startLoading(
+                                         "The match is scored and complete. Auto redirect back in "
+                                             + left + " seconds");
+                                 },
+                                 function () {
+                                     window.history.back();
+                                 });
+                         };
                          this.scoreMatch = function () {
                              requestStatus.startLoading('Scoring');
                              Match.scoreMatch(
@@ -34,22 +46,7 @@ angular.
                                  function (okResp) {
                                      self.rated = 1;
                                      requestStatus.complete();
-                                     var ctx = {ticked: 0};
-                                     requestStatus.startLoading(
-                                         "Result is accepted. Redirect back in 30 seconds");
-                                     ctx.timer = $interval(function (counter) {
-                                         if (counter > 30) {
-                                             $interval.cancel(ctx.timer);
-                                             window.history.back();
-                                         } else {
-                                             requestStatus.startLoading(
-                                                 "Result is accepted. Redirect back in "
-                                                    + (30 - counter) + " seconds");
-                                         }
-                                     }, 1000, 0);
-                                     $scope.$on('$destroy', function() {
-                                         $interval.cancel(ctx.timer);
-                                     });
+                                     self.showFinalMessage();
                                  },
                                  requestStatus.failed);
                          };

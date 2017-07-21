@@ -138,8 +138,13 @@ $default-btn-font-color: #000;
     text-decoration: underline !important;
 }
 
-.match-scoring .btn {
-    min-width: 150px;
+.match-scoring {
+    .btn {
+        min-width: 150px;
+    }
+    .form-group label {
+        font-weight: normal;
+    }
 }
 
 .top-buffer {

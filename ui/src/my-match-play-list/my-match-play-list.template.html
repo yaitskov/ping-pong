@@ -2,8 +2,7 @@
 <div class="container">
   <request-status></request-status>
   <div ng-show="$ctrl.openMatch" class="form-group">
-    <a class="btn btn-primary wrap-long"
-       href="#!/complete/my/match/{{$ctrl.openMatch.mid}}">
+    <a class="btn btn-primary wrap-long" ng-click="$ctrl.matchScoring()">
       Complete match with {{$ctrl.openMatch.enemy.name}}
     </a>
   </div>

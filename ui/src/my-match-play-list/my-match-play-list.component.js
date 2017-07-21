@@ -3,13 +3,19 @@
 angular.module('myMatchPlayList').
     component('myMatchPlayList', {
         templateUrl: 'my-match-play-list/my-match-play-list.template.html',
-        controller: ['Match', 'Tournament', 'mainMenu', '$q', 'cutil', 'pageCtx', 'auth', 'requestStatus',
-                     function (Match, Tournament, mainMenu, $q, cutil, pageCtx, auth, requestStatus) {
+        controller: ['Match', 'Tournament', 'mainMenu', '$q', 'cutil',
+                     'pageCtx', 'auth', 'requestStatus', '$location',
+                     function (Match, Tournament, mainMenu, $q, cutil,
+                               pageCtx, auth, requestStatus, $location) {
                          mainMenu.setTitle('My matches to be played');
                          this.matches = null;
                          this.openMatch = null;
                          this.tournament = null;
                          var self = this;
+                         this.matchScoring = function () {
+                             pageCtx.put('last-scoring-match', self.openMatch);
+                             $location.path("/complete/my/match/" + self.openMatch.mid);
+                         };
                          requestStatus.startLoading();
                          $q.all([Tournament.myRecent({}).$promise,
                                  Match.myMatchesNeedToPlay({}).$promise]).

@@ -43,6 +43,26 @@ angular.
             };
         };
     }]).
+    factory('countDown', ['$interval', function ($interval) {
+        return new function () {
+            var self = this;
+            this.seconds = function ($scope, duration, tickCb, endCb) {
+                tickCb(duration);
+                var ctx = {};
+                ctx.timer = $interval(function (counter) {
+                    if (counter > duration) {
+                        $interval.cancel(ctx.timer);
+                        endCb();
+                    } else {
+                        tickCb(duration - counter);
+                    }
+                }, 1000, 0);
+                $scope.$on('$destroy', function () {
+                    $interval.cancel(ctx.timer);
+                });
+            };
+        };
+    }]).
     factory('pageCtx', [function () {
         return new function () {
             var map = sessionStorage;

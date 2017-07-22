@@ -49,20 +49,38 @@
       </tr>
     </tbody>
   </table>
-  <div class="alert alert-info" ng-show="!$ctrl.error && $ctrl.matches.length == 0">
-    <p>You don't have any match to play.</p>
-    <p ng-show="!$ctrl.tournament.next && !$ctrl.tournament.previous">
-      <a href="#!/tournaments">Find a tournament</a> interesting your
-      and enlist!
+  <div class="alert alert-info" ng-show="$ctrl.matches.length == 0">
+    <p ng-show="$ctrl.tournament.current.length == 0">
+      Right now you don't participate in any tournament.
+      <a href="#!/tournaments">Find a drafting tournament</a>
+      interesting your and enlist!
     </p>
+    <p ng-show="$ctrl.tournament.current.length">
+      Right now you participate in
+      <a ng-repeat="tournament in $ctrl.tournament.current"
+         href="#!/watch/tournament/{{tournament.tid}}">
+        <span ng-show="$index > 0">, </span>{{tournament.name}}
+      </a>
+      <span ng-show="$ctrl.tournament.current.length == 1">
+        tournament,
+      </span>
+      <span ng-show="$ctrl.tournament.current.length > 1">
+        tournaments,
+      </span>
+      but there is no any match to play. You played all
+      group matches and other participants don't. So wait for update
+      on you schedule.</p>
+    </div>
     <p ng-show="$ctrl.tournament.next">
-      You are enlisted to <a href="#!/tournaments/{{$ctrl.tournament.next.tid}}">
+      The closest tournament, you have enlisted,
+        is <a href="#!/tournaments/{{$ctrl.tournament.next.tid}}">
         {{$ctrl.tournament.next.name}}
-      </a> tournament, which begins at {{$ctrl.tournament.next.opensAt
-      | date: 'MMM d EEE h a Z'}}.
+      </a>, which begins at {{$ctrl.tournament.next.opensAt | date:
+      'MMM d EEE h a Z'}}.
     </p>
     <p ng-show="$ctrl.tournament.previous">
-      You complete the battle in <a href="#!/tournaments/{{$ctrl.tournament.previous.tid}}">
+      The latest tournament, you've been,
+        is <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
         {{$ctrl.tournament.previous.name}}</a> tournament.
     </p>
   </div>

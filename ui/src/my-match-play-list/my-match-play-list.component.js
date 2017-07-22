@@ -11,6 +11,7 @@ angular.module('myMatchPlayList').
                          this.matches = null;
                          this.openMatch = null;
                          this.tournament = null;
+                         this.previouslyScored = pageCtx.get('last-scoring-match') || {};
                          var self = this;
                          this.matchScoring = function () {
                              pageCtx.put('last-scoring-match', self.openMatch);

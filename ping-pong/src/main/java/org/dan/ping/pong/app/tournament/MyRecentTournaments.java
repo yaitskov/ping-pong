@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.Optional;
 
 @Getter
@@ -15,5 +16,6 @@ import java.util.Optional;
 @AllArgsConstructor
 public class MyRecentTournaments {
     private Optional<DatedTournamentDigest> next;
+    private List<DatedTournamentDigest> current;
     private Optional<DatedTournamentDigest> previous;
 }

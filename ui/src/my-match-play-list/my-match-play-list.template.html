@@ -58,6 +58,10 @@
       Complete match with {{$ctrl.openMatch.enemy.name}}
     </a>
   </div>
+  <div ng-show="!$ctrl.openMatch && $ctrl.matches.length > 0"
+       class="form-group alert alert-info">
+    Wait for a free table.
+  </div>
   <table class="table" ng-show="$ctrl.matches.length > 0">
     <thead>
       <tr>

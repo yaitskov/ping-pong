@@ -4,47 +4,33 @@ angular.
     module('openTournament').
     component('openTournament', {
         templateUrl: 'open-tournament/open-tournament.template.html',
-        controller: ['Match', 'Tournament', 'mainMenu', '$routeParams', '$timeout', '$q',
-                     function (Match, Tournament, mainMenu, $routeParams, $timeout, $q) {
+        controller: ['Match', 'Tournament', 'mainMenu', '$routeParams',
+                     '$timeout', '$q', 'requestStatus',
+                     function (Match, Tournament, mainMenu, $routeParams,
+                               $timeout, $q, requestStatus) {
                          mainMenu.setTitle('Incomplete games of the tournament');
                          var self = this;
-                         self.error = null;
                          self.matches = null;
                          self.winners = null;
                          self.tournament = null;
                          self.tid = $routeParams.tournamentId;
                          var params = {tournamentId: $routeParams.tournamentId};
                          self.load = function () {
+                             requestStatus.startLoading();
                              $q.all([
                                  Match.listOpenForWatch(params).$promise,
                                  Match.winners(params).$promise,
                                  Tournament.aMine(params).$promise
                              ]).then(
                                  function (responses) {
-                                     self.error = null;
+                                     requestStatus.complete();
                                      self.matches = responses[0];
                                      self.winners = responses[1];
                                      self.tournament = responses[2];
                                      mainMenu.setTitle('Matches of ' + self.tournament.name);
                                      $timeout(self.load, 60 * 1000);
                                  },
-                                 function (error) {
-                                     if (error.status == 502) {
-                                         self.error = "Server is not available";
-                                     } else if (error.status == 400) {
-                                         self.error = "Tournament is complete";
-                                     } else if (error.status == 500) {
-                                         if (typeof error.data == 'string') {
-                                             self.error = "Server error" + (error.data.indexOf('<') < 0 ? '' : ' ' + error.data);
-                                         } else if (typeof error.data == 'object') {
-                                             self.error = "Server error: " + error.data;
-                                         } else {
-                                             self.error = "Server error";
-                                         }
-                                     } else {
-                                         self.error = "Failed to load tournaments";
-                                     }
-                                 });
+                                 requestStatus.failed);
                          };
                          self.load();
                      }

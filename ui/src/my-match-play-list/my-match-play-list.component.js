@@ -17,12 +17,22 @@ angular.module('myMatchPlayList').
                              pageCtx.put('last-scoring-match', self.openMatch);
                              $location.path("/complete/my/match/" + self.openMatch.mid);
                          };
+                         this.iSawMyOutcomeInTournament = function () {
+                             pageCtx.put('last-scoring-match', {});
+                             self.previouslyScored = {};
+                         };
+                         this.checkTournamentEnd = function () {
+                             self.previouslyScored.ended = (
+                                 self.previouslyScored.tid
+                                     && self.previouslyScored.tid == self.tournament.previous.tid);
+                         };
                          requestStatus.startLoading();
                          $q.all([Tournament.myRecent({}).$promise,
                                  Match.myMatchesNeedToPlay({}).$promise]).
                              then(
                                  function (responses) {
                                      self.tournament = responses[0];
+                                     self.checkTournamentEnd();
                                      var matches = responses[1];
                                      requestStatus.complete();
                                      console.log("Loaded matches " + matches.length);

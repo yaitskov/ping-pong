@@ -138,6 +138,10 @@ $default-btn-font-color: #000;
     text-decoration: underline !important;
 }
 
+.alert-info a.btn {
+   text-decoration: none !important;
+}
+
 .match-scoring {
     .btn {
         min-width: 150px;

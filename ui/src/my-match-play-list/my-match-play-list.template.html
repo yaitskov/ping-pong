@@ -1,6 +1,58 @@
 <main-menu></main-menu>
 <div class="container">
   <request-status></request-status>
+  <div ng-show="$ctrl.previouslyScored.ended">
+    <div class="alert alert-info" ng-switch="$ctrl.tournament.previous.outcome">
+      <div ng-switch-when="Win1">
+        Congratulations! You are the champion of the
+          tournament <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
+          {{$ctrl.tournament.previous.name}}</a>. Follow the previous link to
+          see ratings.
+      </div>
+      <div ng-switch-when="Win2">
+        Congratulations! You won 2rd place in the
+          tournament <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
+          {{$ctrl.tournament.previous.name}}</a>. Follow the previous link to
+          see ratings.
+      </div>
+      <div ng-switch-when="Win3">
+        Congratulations! You won 3rd place in the
+          tournament <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
+          {{$ctrl.tournament.previous.name}}</a>. Follow the previous link to
+          see ratings.
+      </div>
+      <div ng-switch-when="Lost">
+        You've lost the
+          tournament <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
+          {{$ctrl.tournament.previous.name}}</a>. Follow the previous link to
+          see ratings.
+      </div>
+      <div ng-switch-when="Quit">
+        You have resign from further participation in the tournament
+        <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
+          {{$ctrl.tournament.previous.name}}</a>.
+      </div>
+      <div ng-switch-when="Expl">
+        You have been expelled from the
+          tournament <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
+          {{$ctrl.tournament.previous.name}}</a>. Next time obey the rules.
+      </div>
+      <div ng-switch-default>
+        Unsupported player state
+        {{$ctrl.tournament.previous.outcome}}. Report about this bug.
+      </div>
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary"
+              ng-click="$ctrl.iSawMyOutcomeInTournament()">
+        Ok, I see
+      </button>
+      <a class="btn btn-default"
+         href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
+        Watch Ratings
+      </a>
+    </div>
+  </div>
   <div ng-show="$ctrl.openMatch" class="form-group">
     <a class="btn btn-primary wrap-long" ng-click="$ctrl.matchScoring()">
       Complete match with {{$ctrl.openMatch.enemy.name}}
@@ -49,39 +101,41 @@
       </tr>
     </tbody>
   </table>
-  <div class="alert alert-info" ng-show="$ctrl.matches.length == 0">
-    <p ng-show="$ctrl.tournament.current.length == 0">
-      Right now you don't participate in any tournament.
-      <a href="#!/tournaments">Find a drafting tournament</a>
-      interesting your and enlist!
-    </p>
-    <p ng-show="$ctrl.tournament.current.length">
-      Right now you participate in
-      <a ng-repeat="tournament in $ctrl.tournament.current"
-         href="#!/watch/tournament/{{tournament.tid}}">
-        <span ng-show="$index > 0">, </span>{{tournament.name}}
-      </a>
-      <span ng-show="$ctrl.tournament.current.length == 1">
-        tournament,
-      </span>
-      <span ng-show="$ctrl.tournament.current.length > 1">
-        tournaments,
-      </span>
-      but there is no any match to play. You played all
-      group matches and other participants don't. So wait for update
-      on you schedule.</p>
+  <div ng-show="!$ctrl.previouslyScored.ended && $ctrl.matches.length == 0">
+    <div class="alert alert-info">
+      <p ng-show="!$ctrl.tournament.current">
+        Right now you don't participate in any tournament.
+        <a href="#!/tournaments">Find a drafting tournament</a>
+        interesting your and enlist!
+      </p>
+      <p ng-show="$ctrl.tournament.current.length">
+        Right now you participate in
+        <a ng-repeat="tournament in $ctrl.tournament.current"
+           href="#!/watch/tournament/{{tournament.tid}}">
+          <span ng-show="$index > 0">, </span>{{tournament.name}}
+        </a>
+        <span ng-show="$ctrl.tournament.current.length == 1">
+          tournament,
+        </span>
+        <span ng-show="$ctrl.tournament.current.length > 1">
+          tournaments,
+        </span>
+        but there is no any match to play. You played all
+        group matches and other participants don't. So wait for update
+        on you schedule.
+      </p>
     </div>
-    <p ng-show="$ctrl.tournament.next">
+    <div class="alert alert-info" ng-show="$ctrl.tournament.next">
       The closest tournament, you have enlisted,
-        is <a href="#!/tournaments/{{$ctrl.tournament.next.tid}}">
+      is <a href="#!/tournaments/{{$ctrl.tournament.next.tid}}">
         {{$ctrl.tournament.next.name}}
       </a>, which begins at {{$ctrl.tournament.next.opensAt | date:
       'MMM d EEE h a Z'}}.
-    </p>
-    <p ng-show="$ctrl.tournament.previous">
+    </div>
+    <div class="alert alert-info" ng-show="$ctrl.tournament.previous">
       The latest tournament, you've been,
-        is <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
+      is <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
         {{$ctrl.tournament.previous.name}}</a> tournament.
-    </p>
+    </div>
   </div>
 </div>

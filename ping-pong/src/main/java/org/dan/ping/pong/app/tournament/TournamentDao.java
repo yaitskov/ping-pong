@@ -303,21 +303,20 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<DatedTournamentDigest> findMyPreviousTournament(Instant now, int uid) {
-        return ofNullable(jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
+    public Optional<CompleteTournamentDigest> findMyPreviousTournament(Instant now, int uid) {
+        return ofNullable(jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, BID.STATE)
                 .from(BID)
                 .innerJoin(TOURNAMENT).on(BID.TID.eq(TOURNAMENT.TID))
                 .where(BID.UID.eq(uid),
-                        BID.STATE.in(Win1, Win2, Win3, Expl, Lost, Quit),
-                        TOURNAMENT.OPENS_AT.gt(now.minus(DAYS_TO_SHOW_PAST_TOURNAMENT, DAYS)))
+                        BID.STATE.in(Win1, Win2, Win3, Expl, Lost, Quit))
                 .orderBy(TOURNAMENT.OPENS_AT.desc())
                 .limit(1)
                 .fetchOne())
-                .map(r -> DatedTournamentDigest
+                .map(r -> CompleteTournamentDigest
                         .builder()
                         .tid(r.get(TOURNAMENT.TID))
                         .name(r.get(TOURNAMENT.NAME))
-                        .opensAt(r.get(TOURNAMENT.OPENS_AT))
+                        .outcome(r.get(BID.STATE))
                         .build());
     }
 
@@ -397,8 +396,8 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public MyRecentTournaments findMyRecentJudgedTournaments(Instant now, int uid) {
-        return MyRecentTournaments.builder()
+    public MyRecentJudgedTournaments findMyRecentJudgedTournaments(Instant now, int uid) {
+        return MyRecentJudgedTournaments.builder()
                 .next(findMyNextJudgeTournament(uid))
                 .current(findCurrentJudgeTournaments(uid))
                 .previous(findMyPreviousJudgeTournament(now, uid))

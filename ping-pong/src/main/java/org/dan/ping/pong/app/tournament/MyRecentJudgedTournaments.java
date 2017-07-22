@@ -14,8 +14,8 @@ import java.util.Optional;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class MyRecentTournaments {
+public class MyRecentJudgedTournaments {
     private Optional<DatedTournamentDigest> next;
     private List<DatedTournamentDigest> current;
-    private Optional<CompleteTournamentDigest> previous;
+    private Optional<DatedTournamentDigest> previous;
 }

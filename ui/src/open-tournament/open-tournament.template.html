@@ -1,5 +1,5 @@
 <main-menu></main-menu>
-<div class="container">
+<div class="container open-tournament">
   <request-status></request-status>
   <div ng-show="$ctrl.tournament.state == 'Close'">
     <div class="alert alert-info" >
@@ -20,16 +20,15 @@
   <div ng-show="$ctrl.winners.length > 0">
     <fieldset>
       <legend>Winners</legend>
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <td>Position</td>
-            <td>Participant</td>
-          </tr>
-        </thead>
+      <table class="table">
         <tbody>
           <tr ng-repeat="winner in $ctrl.winners">
-            <td>{{$index + 1}}</td>
+            <td>
+              <span class="medal"
+                    ng-class="{'gold': !$index, 'silver': $index == 1, 'bronze': $index == 2}">
+                {{$index + 1}}
+              </span>
+            </td>
             <td>
               <a href="#!/participant/{{$ctrl.tid}}/{{winner.uid}}">{{winner.name}}</a>
             </td>

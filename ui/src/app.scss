@@ -6,6 +6,7 @@ $primary-btn-back-color: #337ab7;
 $primary-btn-font-color: #fff;
 $default-btn-back-color: #e6e6e6;
 $default-btn-font-color: #000;
+$medial-size: 32px;
 
 /* begin of no side space */
 .view-container .container-fluid {
@@ -52,7 +53,47 @@ $default-btn-font-color: #000;
 /* begin of open tournament list */
 .open-tournament {
     min-height: 0px;
+
+    legend {
+        margin-bottom: 5px;
+        font-size: 16px;
+        border-bottom: none;
+    }
+
+    fieldset table tbody tr td:first-child {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    fieldset table tr td {
+        border-top: none;
+        padding: 1px;
+        vertical-align: middle;
+    }
+
+
+
+    .gold {
+        background-color: rgb(201, 137, 16);
+    }
+    .silver {
+        background-color: rgb(168, 168, 168);
+    }
+    .bronze {
+        background-color: rgb(150, 90, 56);
+    }
+
+    .medal {
+        color: black;
+        width: $medial-size;
+        height: $medial-size;
+        display: inline-block;
+        -moz-border-radius: $medial-size / 2;
+        -webkit-border-radius: $medial-size / 2;
+        border-radius: $medial-size / 2;
+    }
 }
+
 .list-item .completeness {
     font-size: 14px;
     width: 57px;

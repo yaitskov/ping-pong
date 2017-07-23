@@ -9,6 +9,13 @@ angular.module('openTournamentList').
                          var self = this;
                          self.tournaments = null;
                          requestStatus.startLoading();
+                         this.percent = function (tournament) {
+                             if (!tournament.gamesOverall) {
+                                 return '-';
+                             }
+                             var ratio = tournament.gamesComplete / tournament.gamesOverall;
+                             return Math.round(ratio * 100.0) + '%';
+                         };
                          Tournament.running(
                              {},
                              function (tournaments) {

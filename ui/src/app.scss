@@ -297,5 +297,19 @@ td.match-state-description.text-danger {
     .wrap-long {
         white-space: initial !important;
     }
+
+
+    .list-item {
+        .completeness {
+            width: 42px;
+            text-align: right;
+
+        }
+        .datetime .time {
+            width: 80px !important;
+            text-align: right;
+        }
+    }
+
 }
 /* end of mobile layout */

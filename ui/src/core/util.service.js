@@ -63,6 +63,18 @@ angular.
             };
         };
     }]).
+    factory('refresher', ['$interval', function ($interval) {
+        return new function () {
+            var self = this;
+            this.seconds = function ($scope, period, tickCb) {
+                tickCb();
+                var timer = $interval(tickCb, period);
+                $scope.$on('$destroy', function () {
+                    $interval.cancel(timer);
+                });
+            };
+        };
+    }]).
     factory('pageCtx', [function () {
         return new function () {
             var map = sessionStorage;

@@ -5,9 +5,9 @@ angular.
     component('openTournament', {
         templateUrl: 'open-tournament/open-tournament.template.html',
         controller: ['Match', 'Tournament', 'mainMenu', '$routeParams',
-                     '$timeout', '$q', 'requestStatus',
+                     'refresher', '$q', 'requestStatus', '$scope',
                      function (Match, Tournament, mainMenu, $routeParams,
-                               $timeout, $q, requestStatus) {
+                               refresher, $q, requestStatus, $scope) {
                          mainMenu.setTitle('Incomplete games of the tournament');
                          var self = this;
                          self.matches = null;
@@ -15,7 +15,7 @@ angular.
                          self.tournament = null;
                          self.tid = $routeParams.tournamentId;
                          var params = {tournamentId: $routeParams.tournamentId};
-                         self.load = function () {
+                         refresher.seconds($scope, 60 * 1000, function () {
                              requestStatus.startLoading();
                              $q.all([
                                  Match.listOpenForWatch(params).$promise,
@@ -28,11 +28,9 @@ angular.
                                      self.winners = responses[1];
                                      self.tournament = responses[2];
                                      mainMenu.setTitle('Matches of ' + self.tournament.name);
-                                     $timeout(self.load, 60 * 1000);
                                  },
                                  requestStatus.failed);
-                         };
-                         self.load();
+                         });
                      }
                     ]
         });

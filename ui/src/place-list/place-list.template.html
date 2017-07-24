@@ -1,16 +1,19 @@
-<div class="container-fluid">
-  <main-menu></main-menu>
+<main-menu></main-menu>
+<div class="container">
+  <request-state></request-state>
+  <div class="form-group">
+    <a class="btn btn-default btn-primary" href="#!/my/new/place">
+      Add place
+    </a>
+  </div>
   <ul class="places">
-      <li ng-repeat="place in $ctrl.places | filter:$ctrl.query">
-        <a href="#!/place/{{place.pid}}">
-          {{place.name}}
-        </a>
-      </li>
+    <li ng-repeat="place in $ctrl.places">
+      <a href="#!/place/{{place.pid}}">
+        {{place.name}}
+      </a>
+    </li>
   </ul>
-  <p class="alert alert-info" ng-show="!$ctrl.places.length">
+  <p class="alert alert-info" ng-show="$ctrl.places.length == 0">
     You don't administrate any place.
   </p>
-  <a class="btn btn-default btn-primary" href="#!/my/new/place">
-    Add place
-  </a>
 </div>

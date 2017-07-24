@@ -1,6 +1,22 @@
 <main-menu></main-menu>
 <div class="container-fluid admin-judgement">
   <request-status></request-status>
+  <div ng-show="$ctrl.previouslyScoredEnded">
+    <div class="alert alert-info">
+      Tournament <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
+          {{$ctrl.tournament.previous.name}}</a> is complete.
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary"
+              ng-click="$ctrl.iSawTournamentEnd()">
+        Ok, I see
+      </button>
+      <a class="btn btn-default"
+         href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
+        Watch Ratings
+      </a>
+    </div>
+  </div>
   <div class="form-group tables" ng-show="$ctrl.matches.length > 0">
     <button class="btn btn-primary"
             ng-repeat="match in $ctrl.matches | orderBy : 'table.label'"
@@ -43,21 +59,36 @@
       </tr>
     </tbody>
   </table>
-  <div class="alert alert-info" ng-show="$ctrl.matches.length == 0">
-    <p>You don't have any match to judge.</p>
-    <p ng-show="!$ctrl.tournament.next && !$ctrl.tournament.previous">
-      <a href="#!/tournaments">Find a tournament</a> interesting for you
-      and submit an enquiry to administrator.
-    </p>
-    <p ng-show="$ctrl.tournament.next">
-      Next tournament, you judge, is <a href="#!/tournament/{{$ctrl.tournament.next.tid}}">
-        {{$ctrl.tournament.next.name}}
-      </a> tournament, which begins at {{$ctrl.tournament.next.opensAt
-      | date: 'MMMM dd yyyy HH:mm'}}.
-    </p>
-    <p ng-show="$ctrl.tournament.previous">
-      Tournment <a href="#!/tournament/{{$ctrl.tournament.previous.tid}}">
-        {{$ctrl.tournament.previous.name}}</a> is complete.
-    </p>
+  <div ng-show="$ctrl.previouslyScoredEnded && $ctrl.matches.length == 0">
+    <div class="alert alert-info">
+      <p ng-show="!$ctrl.tournament.current">
+        You don't have any match to judge.
+        <a href="#!/tournament/new">Add tournament.</a>
+      </p>
+      <p ng-show="$ctrl.tournament.current.length">
+        Rigth now you judge:
+        <a ng-repeat="tournament in $ctrl.tournament.current"
+           href="#!/watch/tournament/{{tournament.tid}}">
+          <span ng-show="$index > 0">, </span>{{tournament.name}}
+        </a>
+        <span ng-show="$ctrl.tournament.current.length == 1">
+          tournament,
+        </span>
+        <span ng-show="$ctrl.tournament.current.length > 1">
+          tournaments,
+        </span>
+        but there is no any match to judge.
+      </p>
+      <p ng-show="$ctrl.tournament.next">
+        Next tournament, you judge, is <a href="#!/tournament/{{$ctrl.tournament.next.tid}}">
+          {{$ctrl.tournament.next.name}}
+        </a> tournament, which begins at {{$ctrl.tournament.next.opensAt
+        | date: 'MMM d EEE h a Z'}}.
+      </p>
+      <p ng-show="$ctrl.tournament.previous">
+        Latest
+          tournment <a href="#!/tournament/{{$ctrl.tournament.previous.tid}}">
+          {{$ctrl.tournament.previous.name}}</a> is complete.
+      </p>
   </div>
 </div>

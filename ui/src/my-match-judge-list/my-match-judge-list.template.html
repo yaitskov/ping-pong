@@ -4,7 +4,6 @@
   <table class="table" ng-show="$ctrl.matches.length > 0">
     <thead>
       <tr>
-        <td class="state-cell">State</td>
         <td class="match-cell">Match</td>
         <td>Table</td>
         <td>Opponents</td>
@@ -13,8 +12,7 @@
     </thead>
     <tbody>
       <tr ng-repeat="match in $ctrl.matches | orderBy : 'table.id'">
-        <td class="state-cell">{{match.state}}</td>
-        <td class="match-cell">{{match.matchType}}</td>
+        <td class="match-cell">{{match.type}}</td>
         <td>
           <a href="#!/place/tables/{{match.table.id}}">
             <span class="glyphicon glyphicon-map-marker"></span>
@@ -24,7 +22,7 @@
         <td class="participant-names">
           <a ng-repeat="participant in match.participants"
              class="btn btn-default"
-             href="#!/participant/{{$ctrl.tournamentId}}/{{participant.uid}}">
+             href="#!/participant/{{match.tid}}/{{participant.uid}}">
             {{participant.name}}
           </a>
         </td>

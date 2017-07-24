@@ -89,7 +89,7 @@ public class MatchDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<OpenMatchForJudge> findOpenMatchesFurJudge(int adminUid) {
-        return jooq.select(MATCHES.MID, MATCHES.STARTED,
+        return jooq.select(MATCHES.MID, MATCHES.TID, MATCHES.STARTED,
                 TABLES.TABLE_ID, TABLES.LABEL,
                 MATCHES.GID, USERS.UID, USERS.NAME,
                 ENEMY_USER.UID, ENEMY_USER.NAME)
@@ -115,6 +115,7 @@ public class MatchDao {
                 .fetch()
                 .map(r -> OpenMatchForJudge.builder()
                         .mid(r.get(MATCHES.MID))
+                        .tid(r.get(MATCHES.TID))
                         .started(r.get(MATCHES.STARTED).get())
                         .type(r.get(MATCHES.GID).map(gid -> Group).orElse(PlayOff))
                         .table(TableLink.builder()

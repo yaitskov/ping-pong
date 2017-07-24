@@ -18,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class OpenMatchForJudge {
     private int mid;
+    private int tid;
     private TableLink table;
     private List<UserLink> participants;
     private Instant started;

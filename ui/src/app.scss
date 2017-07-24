@@ -183,7 +183,9 @@ $success-bg-color: #dff0d8;
         table tbody tr td {
             border-top: none;
         }
-
+        table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
         table tbody tr {
             td {
                 font-size: 16px;

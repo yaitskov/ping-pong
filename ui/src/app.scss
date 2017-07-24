@@ -365,9 +365,9 @@ td.match-state-description.text-danger {
             a:first-child {
                 background-color: $info-bg-color;
             }
-            a:last-child {
-                margin-bottom: 4px;
-            }
+            /* a:last-child { */
+            /*     margin-bottom: 4px; */
+            /* } */
         }
 
         table thead tr td {
@@ -379,7 +379,7 @@ td.match-state-description.text-danger {
             font-size: 18px;
         }
         .badge:first-child {
-            margin-bottom: 75%;
+            margin-bottom: 4px;
             background-color: $info-bg-color;
         }
 
@@ -402,12 +402,12 @@ td.match-state-description.text-danger {
 
         table tbody tr td:last-child {
             font-size: 14px;
-            div {
-                padding-bottom: 4px;
-            }
-            div:first-child {
-                padding-top: 14px;
-            }
+            /* div { */
+            /*     padding-bottom: 4px; */
+            /* } */
+            /* div:first-child { */
+            /*     padding-top: 14px; */
+            /* } */
             div:last-child {
                 white-space: nowrap;
                 text-overflow: ellipsis;

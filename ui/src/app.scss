@@ -7,6 +7,8 @@ $primary-btn-font-color: #fff;
 $default-btn-back-color: #e6e6e6;
 $default-btn-font-color: #000;
 $medial-size: 32px;
+$info-bg-color: #d9edf7;
+$success-bg-color: #dff0d8;
 
 /* begin of no side space */
 .view-container .container-fluid {
@@ -166,6 +168,47 @@ $medial-size: 32px;
     .table-number {
         padding-left: 22px !important;
     }
+
+    .open-tournament {
+        .participant-names {
+            a {
+                background-color: $success-bg-color;
+                border: none;
+            }
+            a:first-child {
+                background-color: $info-bg-color;
+            }
+        }
+
+        table tbody tr:first-child td {
+            border-top: none;
+        }
+
+        table tbody tr {
+            td {
+                font-size: 16px;
+                vertical-align: middle;
+                .badge {
+                    font-size: inherit;
+                    color: #333;
+                    background-color: $success-bg-color;
+                }
+                .badge:first-child {
+                    background-color: $info-bg-color;
+                }
+                .glyphicon {
+                    font-size: 22px;
+                }
+            }
+            td > span, td > a {
+                margin-right: 5px;
+            }
+            td:last-child div {
+                float: left;
+                padding-right: 22px;
+            }
+        }
+    }
 }
 /* end of desktop layout */
 
@@ -298,7 +341,6 @@ td.match-state-description.text-danger {
         white-space: initial !important;
     }
 
-
     .list-item {
         .completeness {
             width: 42px;
@@ -311,5 +353,57 @@ td.match-state-description.text-danger {
         }
     }
 
+    .open-tournament {
+        .participant-names {
+            a {
+                white-space: initial;
+                background-color: $success-bg-color;
+                border: none;
+            }
+            a:first-child {
+                background-color: $info-bg-color;
+            }
+        }
+
+        table thead tr td {
+            vertical-align: middle;
+        }
+        .badge {
+            background-color: $success-bg-color;
+            color: #333;
+            font-size: 18px;
+        }
+        .badge:first-child {
+            margin-bottom: 75%;
+            background-color: $info-bg-color;
+        }
+
+        table tbody tr td:nth-child(2) {
+            vertical-align: middle;
+        }
+        table tbody tr:first-child td {
+            border-top: none;
+        }
+        table tbody tr td:first-child {
+            padding: 0px;
+            a {
+                margin-top: 4px;
+            }
+        }
+
+        table tbody tr td:last-child {
+            font-size: 14px;
+            div {
+                padding-bottom: 4px;
+            }
+            div:last-child {
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                width: 100px;
+                display: block;
+                overflow: hidden;
+            }
+        }
+    }
 }
 /* end of mobile layout */

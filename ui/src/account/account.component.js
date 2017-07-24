@@ -5,8 +5,8 @@ angular.
     component('account', {
         templateUrl: 'account/account.template.html',
         controller: [
-            'mainMenu', '$http', 'cutil', 'auth',
-            function (mainMenu, $http, cutil, auth) {
+            'mainMenu', '$http', 'cutil', 'auth', 'requestStatus',
+            function (mainMenu, $http, cutil, auth, requestStatus) {
                 mainMenu.setTitle('Account Details');
                 var self = this;
                 this.uid = auth.myUid();
@@ -14,15 +14,23 @@ angular.
                 this.name = auth.myName();
                 this.email = auth.myEmail();
                 this.userData = null;
-                this.error = null;
+                this.logoutWithoutEmail = false;
+                requestStatus.startLoading();
+                this.logout = function () {
+                    if (self.email) {
+                        self.lostAccessToAccount();
+                    } else {
+                        self.logoutWithoutEmail = true;
+                    }
+                };
+                this.lostAccessToAccount = function () {
+                    auth.logout();
+                };
                 $http.get('/api/anonymous/user/info/by/session/' + auth.mySession()).
                     then(
                         function (ok) {
-                            self.error = 0;
+                            requestStatus.complete();
                             self.userData = ok.data;
                         },
-                        function (bad) {
-                            self.error = "Failed with status " + bad.status;
-                        });
-
+                        requestStatus.failed);
             }]});

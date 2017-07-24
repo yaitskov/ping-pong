@@ -19,10 +19,6 @@
       <li role="separator" class="divider"></li>
       <li><a href="#!/sign-in" ng-show="!$ctrl.isAuthenticated()">Login</a></li>
       <li><a href="#!/sign-up" ng-show="!$ctrl.isAuthenticated()">Sign-Up</a></li>
-      <li><a href="#" ng-show="$ctrl.isAuthenticated()"
-             ng-click="$ctrl.logout()">
-          Logout</a>
-      </li>
       <li>
         <a href="#!/account" ng-show="$ctrl.isAuthenticated()" class="wrap-long">
           {{$ctrl.accountName || 'Account'}}

@@ -1,26 +1,49 @@
 <main-menu></main-menu>
 <div class="container">
-  <div class="alert alert-danger" ng-show="$ctrl.error">
-    {{$ctrl.error}}
+  <request-status></request-status>
+  <div class="form-group">
+    <button class="btn btn-primary" ng-click="$ctrl.logout()">
+      Logout
+    </button>
+    <a href="#!/account/profile/edit" class="btn btn-primary">
+      Edit
+    </a>
   </div>
-  <div class="alert alert-info" ng-show="$ctrl.error === null">
-    Loading ...
+  <div class="form-group" ng-show="$ctrl.logoutWithoutEmail">
+    <div class="alert alert-danger">
+      Your account doesn't have an email bound to it. If you logout
+      right now, you will invalidate account forever! To logout from
+      this device and keep account - setup an email first.
+    </div>
+  </div>
+  <div class="form-group" ng-show="$ctrl.logoutWithoutEmail">
+    <button class="btn btn-danger" ng-click="$ctrl.lostAccessToAccount()">
+      Terminate account
+    </button>
+    <a href="#!/account/profile/edit" class="btn btn-primary">
+      Set an email
+    </a>
   </div>
   <div>
     <div>Email</div>
-    <div>{{$ctrl.email}}</div>
+    <div ng-show="$ctrl.email">
+      {{$ctrl.email}}
+    </div>
+    <div class="alert alert-warning" ng-show="!$ctrl.email">
+      An email is not set. It's required to login from other devices
+      or to recover current session. Follow the
+      link <a href="#!/account/profile/edit">to set an email</a>
+    </div>
   </div>
   <div>
     <div>Name</div>
     <div>{{$ctrl.name}}</div>
   </div>
-  <div ng-show="$ctrl.error == 0">
-    <div>
-      <div>Phone</div>
-      <div>{{$ctrl.userData.phone}}</div>
-      <div ng-show="!$ctrl.userData.phone" class="alert alert-info">
-        Not set
-      </div>
+  <div>
+    <div>Phone</div>
+    <div>{{$ctrl.userData.phone}}</div>
+    <div ng-show="!$ctrl.userData.phone" class="alert alert-info">
+      Not set
     </div>
   </div>
 </div>

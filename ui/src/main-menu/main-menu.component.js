@@ -16,9 +16,6 @@ angular.
                          this.isAdmin = function () {
                              return auth.isAdmin();
                          };
-                         this.logout = function () {
-                             auth.logout();
-                         };
                          this.contextMenu = function () {
                              return mainMenu.getContextMenu();
                          };

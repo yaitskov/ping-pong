@@ -1,45 +1,44 @@
-<div class="container-fluid">
-  <main-menu></main-menu>
-  <div class="alert alert-danger" ng-show="$ctrl.error">
-    {{$ctrl.error}}
-  </div>
+<main-menu></main-menu>
+<div class="container-fluid admin-judgement">
+  <request-status></request-status>
   <table class="table" ng-show="$ctrl.matches.length > 0">
     <thead>
       <tr>
-        <td>State</td>
-        <td>Match</td>
+        <td class="state-cell">State</td>
+        <td class="match-cell">Match</td>
         <td>Table</td>
-        <td>Participants</td>
-        <td>Complete</td>
+        <td>Opponents</td>
+        <td>Score</td>
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="match in $ctrl.matches">
-        <td>{{match.state}}</td>
-        <td>{{match.matchType}}</td>
+      <tr ng-repeat="match in $ctrl.matches | orderBy : 'table.id'">
+        <td class="state-cell">{{match.state}}</td>
+        <td class="match-cell">{{match.matchType}}</td>
         <td>
           <a href="#!/place/tables/{{match.table.id}}">
-            {{match.table.label}}
+            <span class="glyphicon glyphicon-map-marker"></span>
+            T{{match.table.label}}
           </a>
         </td>
-        <td>
-          <a ng-repeat="participant in match"
+        <td class="participant-names">
+          <a ng-repeat="participant in match.participants"
              class="btn btn-default"
              href="#!/participant/{{$ctrl.tournamentId}}/{{participant.uid}}">
             {{participant.name}}
           </a>
         </td>
         <td>
-          <a class="btn btn-default"
+          <a class="btn btn-primary"
              ng-click="$ctrl.completeMatch(match.mid)">
-            Complete
+            Score
           </a>
         </td>
       </tr>
     </tbody>
   </table>
-  <div class="alert alert-info" ng-show="!$ctrl.error && $ctrl.matches.length == 0">
-    <p>You don't any match to judge.</p>
+  <div class="alert alert-info" ng-show="$ctrl.matches.length == 0">
+    <p>You don't have any match to judge.</p>
     <p ng-show="!$ctrl.tournament.next && !$ctrl.tournament.previous">
       <a href="#!/tournaments">Find a tournament</a> interesting for you
       and submit an enquiry to administrator.
@@ -54,8 +53,5 @@
       Tournment <a href="#!/tournament/{{$ctrl.tournament.previous.tid}}">
         {{$ctrl.tournament.previous.name}}</a> is complete.
     </p>
-  </div>
-  <div class="alert alert-info" ng-show="!$ctrl.error && $ctrl.matches === null">
-    Loading ...
   </div>
 </div>

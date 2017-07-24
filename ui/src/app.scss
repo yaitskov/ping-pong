@@ -211,6 +211,14 @@ $success-bg-color: #dff0d8;
             }
         }
     }
+
+    .container-fluid.open-tournament {
+        max-width: 900px;
+    }
+
+    .container-fluid.admin-judgement {
+        max-width: 800px;
+    }
 }
 /* end of desktop layout */
 
@@ -417,5 +425,26 @@ td.match-state-description.text-danger {
             }
         }
     }
+
+    /* begin of admin-judgement */
+    .admin-judgement {
+        .state-cell, .match-cell {
+            display: none;
+        }
+        table tbody tr td {
+            vertical-align: middle;
+        }
+        .participant-names {
+            a {
+                white-space: initial;
+                background-color: $success-bg-color;
+                border: none;
+            }
+            a:first-child {
+                background-color: $info-bg-color;
+            }
+        }
+    }
+    /* end of admin-judgement */
 }
 /* end of mobile layout */

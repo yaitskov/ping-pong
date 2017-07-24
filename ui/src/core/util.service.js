@@ -101,7 +101,7 @@ angular.
             this.putMatchParticipants = function (mid, participants) {
                 this.put('match-participants-' + mid, participants);
             };
-            this.getMatchParticipants = function (mid, participants) {
+            this.getMatchParticipants = function (mid) {
                 return this.get('match-participants-' + mid);
             };
         };

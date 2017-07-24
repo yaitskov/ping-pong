@@ -1,50 +1,26 @@
 <main-menu></main-menu>
 <form>
-  <div class="container-fluid">
+  <div class="container">
     <div class="form-group">
-      <fieldset>
-        <legend>Choose the winner in the match</legend>
-        <div class="btn-group" data-toggle="buttons">
-          <label class="btn btn-primary"
-                 ng-repeat="participant in $ctrl.participants">
-            <input type="radio" autocomplete="off"
-                   ng-value="participant.uid" name="winner"
-                   ng-model="$ctrl.winnerUid" />
-            {{pariticipant.name}}
-          </label>
-        </div>
-      </fieldset>
+      <label>Score the match between
+        {{$ctrl.participants[0].name}}
+        and {{$ctrl.participants[1].name}}
+      </label>
+    </div>
+    <div class="form-group alert alert-info" ng-show="$ctrl.scores.length < 2">
+      Pick score for participant
+      <a href="#!/participant/{{$ctrl.tournament.tid}}/$ctrl.participants[$ctrl.scores.length].uid">
+        {{$ctrl.participants[$ctrl.scores.length].name}}
+      </a>
     </div>
     <div class="form-group">
-      <label>Score</label>
-      <div class="btn-group" data-toggle="buttons">
-        <label class="btn btn-primary active">
-          <input type="radio" autocomplete="off"
-                 value="0" name="score"
-                 ng-model="$ctrl.score"/>
-          3:0
-        </label>
-        <label class="btn btn-primary">
-          <input type="radio" autocomplete="off"
-                 value="1" name="score"
-                 ng-model="$ctrl.score"/>
-          3:1
-        </label>
-        <label class="btn btn-primary">
-          <input type="radio" autocomplete="off"
-                 value="1" name="score"
-                 ng-model="$ctrl.score"/>
-          3:2
-        </label>
-      </div>
-    </div>
-    <div class="form-group" ng-show="$ctrl.error">
-      <p class="alert alert-danger">
-        {{$ctrl.error}}
-      </p>
+      <round-picker model="$ctrl.scores"></round-picker>
     </div>
     <div class="form-group">
-      <button ng-click="$ctrl.scoreMatch()">Complete Match</button>
+      <request-status></request-status>
+    </div>
+    <div class="form-group" ng-show="$ctrl.scores.length == 2">
+      <button ng-click="$ctrl.scoreMatch()">Score & Complete Match</button>
     </div>
   </div>
 </form>

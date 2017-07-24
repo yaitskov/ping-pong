@@ -11,17 +11,19 @@ angular.module('myMatchJudgeList').
                          var self = this;
                          this.previouslyScoredEnded = null;
                          this.checkTournamentEnd = function () {
-                             self.previouslyScored = (
-                                 pageCtx.get('last-admin-scoring-match-id')
-                                     && pageCtx.get('last-admin-scoring-match-id') == self.tournament.previous.tid);
+                             self.previouslyScoredEnded = (
+                                 pageCtx.get('last-admin-scoring-tournament-id')
+                                     && self.tournament
+                                     && self.tournament.previous
+                                     && pageCtx.get('last-admin-scoring-tournament-id') == self.tournament.previous.tid);
                          };
                          this.completeMatch = function (mid, idx) {
-                             pageCtx.put('last-admin-scoring-match-id', this.matches[idx].tid);
+                             pageCtx.put('last-admin-scoring-tournament-id', this.matches[idx].tid);
                              pageCtx.putMatchParticipants(mid, this.matches[idx].participants);
                              $location.path('/complete/match/' + mid);
                          };
                          self.iSawTournamentEnd = function () {
-                             pageCtx.put('last-admin-scoring-match-id', null);
+                             pageCtx.put('last-admin-scoring-tournament-id', null);
                              self.previouslyScored = null;
                          };
                          requestStatus.startLoading();

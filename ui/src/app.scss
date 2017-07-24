@@ -180,7 +180,7 @@ $success-bg-color: #dff0d8;
             }
         }
 
-        table tbody tr:first-child td {
+        table tbody tr td {
             border-top: none;
         }
 
@@ -363,6 +363,9 @@ td.match-state-description.text-danger {
             a:first-child {
                 background-color: $info-bg-color;
             }
+            a:last-child {
+                margin-bottom: 4px;
+            }
         }
 
         table thead tr td {
@@ -378,10 +381,14 @@ td.match-state-description.text-danger {
             background-color: $info-bg-color;
         }
 
+        table tbody tr:nth-child(even) {
+            background-color: #fbfbfb;
+        }
         table tbody tr td:nth-child(2) {
             vertical-align: middle;
         }
-        table tbody tr:first-child td {
+
+        table tbody tr td {
             border-top: none;
         }
         table tbody tr td:first-child {
@@ -395,6 +402,9 @@ td.match-state-description.text-danger {
             font-size: 14px;
             div {
                 padding-bottom: 4px;
+            }
+            div:first-child {
+                padding-top: 14px;
             }
             div:last-child {
                 white-space: nowrap;

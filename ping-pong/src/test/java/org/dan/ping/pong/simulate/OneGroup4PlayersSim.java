@@ -6,8 +6,11 @@ import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
+import static org.dan.ping.pong.mock.simulator.Player.p5;
+import static org.dan.ping.pong.mock.simulator.Player.p6;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
+import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_3_Q_1_G_8;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -39,5 +42,15 @@ public class OneGroup4PlayersSim {
                         .win(p1, p2)
                         .pause(p1, p3, BeforeScore)
                         .win(p1, p3));
+    }
+
+    @Test
+    @SneakyThrows
+    public void schedule3ConcurrentGames() {
+        simulator.simulate(T_3_Q_1_G_8,
+                TournamentScenario.begin()
+                        .ignoreUnexpectedGames()
+                        .name("sched 3 con games")
+                        .category(c1, p1, p2, p3, p4, p5, p6));
     }
 }

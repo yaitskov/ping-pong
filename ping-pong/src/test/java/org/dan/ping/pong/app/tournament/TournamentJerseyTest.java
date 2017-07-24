@@ -290,7 +290,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                 userSession, MyRecentTournaments.class);
 
         assertEquals(previousTid, r.getPrevious().get().getTid());
-        assertEquals(previousOpensAt, r.getPrevious().get().getOpensAt());
+        assertEquals(BidState.Lost, r.getPrevious().get().getOutcome());
         assertThat(r.getPrevious().get().getName(), notNullValue());
 
         assertEquals(nextTid, r.getNext().get().getTid());

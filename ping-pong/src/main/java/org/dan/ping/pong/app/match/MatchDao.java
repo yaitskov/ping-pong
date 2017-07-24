@@ -22,6 +22,7 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Group;
 import static org.dan.ping.pong.app.match.MatchType.PlayOff;
+import static org.jooq.impl.DSL.firstValue;
 
 import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
@@ -34,13 +35,16 @@ import org.dan.ping.pong.app.table.TableLink;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.impl.DSL;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -171,6 +175,7 @@ public class MatchDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<PendingMatchInfo> selectForScheduling(int size, int tid) {
+        final Set<Integer> metUids = new HashSet<>();
         return jooq
                 .select(MATCHES.MID, MATCHES.CID, MATCHES.GID,
                         BID.UID, UID_2)
@@ -182,17 +187,22 @@ public class MatchDao {
                 .innerJoin(BID_2).on(MS_2.UID.eq(BID_2.UID),
                         MS_2.CID.eq(BID_2.CID))
                 .where(MATCHES.TID.eq(tid), MATCHES.STATE.eq(Place),
-                        MS_2.UID.ne(MATCH_SCORE.UID),
+                        MS_2.UID.lt(MATCH_SCORE.UID),
                         BID.STATE.eq(Wait), BID_2.STATE.eq(Wait))
                 .orderBy(MATCHES.PRIORITY, MATCHES.MID)
-                .limit(size)
                 .fetch()
+                .stream()
+                .filter(r -> !metUids.contains(r.get(BID.UID))
+                        && metUids.add(r.get(UID_2))
+                        && metUids.add(r.get(BID.UID)))
+                .limit(size)
                 .map(r -> PendingMatchInfo.builder()
                         .mid(r.get(MATCHES.MID))
                         .gid(r.get(MATCHES.GID))
                         .cid(r.get(MATCHES.CID))
                         .uids(asList(r.get(BID.UID), r.get(UID_2)))
-                        .build() );
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Transactional(TRANSACTION_MANAGER)

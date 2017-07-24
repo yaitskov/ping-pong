@@ -22,6 +22,12 @@ public class SimulatorParams {
             .maxGroupSize(8)
             .build();
 
+    public static final SimulatorParams T_3_Q_1_G_8 = SimulatorParams.builder()
+            .tables(3)
+            .quitsFromGroup(1)
+            .maxGroupSize(8)
+            .build();
+
     public static final SimulatorParams T_1_Q_1_G_2 = SimulatorParams.builder()
             .tables(1)
             .quitsFromGroup(1)

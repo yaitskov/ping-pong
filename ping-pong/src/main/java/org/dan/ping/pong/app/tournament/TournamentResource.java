@@ -161,7 +161,7 @@ public class TournamentResource {
 
     @GET
     @Path(MY_RECENT_TOURNAMENT_JUDGEMENT)
-    public MyRecentTournaments findMyRecentJudgedTournaments(
+    public MyRecentJudgedTournaments findMyRecentJudgedTournaments(
             @HeaderParam(SESSION) String session) {
         final int uid = authService.userInfoBySession(session).getUid();
         return tournamentService.findMyRecentJudgedTournaments(uid);

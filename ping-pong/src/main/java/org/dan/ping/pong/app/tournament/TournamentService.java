@@ -108,7 +108,7 @@ public class TournamentService {
         return tournamentDao.findMyRecentTournaments(clocker.get(), uid);
     }
 
-    public MyRecentTournaments findMyRecentJudgedTournaments(int uid) {
+    public MyRecentJudgedTournaments findMyRecentJudgedTournaments(int uid) {
         return tournamentDao.findMyRecentJudgedTournaments(clocker.get(), uid);
     }
 }

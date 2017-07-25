@@ -1,50 +1,95 @@
 <main-menu></main-menu>
-<form>
-  <div class="container-fluid">
-    <div class="form-group">
+<div class="container new-tournament">
+  <form novalidate name="$ctrl.form" ng-submit="$ctrl.showTournamentParameters()">
+    <div class="form-group"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.name.$dirty) && $ctrl.form.name.$invalid}">
       <label for="name">Name</label>
-      <input type="text" id="name" class="form-control"
-             ng-required="true"
-             placeholder="Name" ng-model="$ctrl.tournament.name"/>
-    </div>
-    <div class="form-group">
-      <label for="startDate">Start Date</label>
-      <input ng-flatpickr  id="startDate" class="form-control"
-             fp-opts="$ctrl.dateOpts"
-             placeholder="Start Date"
-             ng-model="$ctrl.tournament.opensAt"/>
-    </div>
-    <div class="form-group">
-      <label for="ticketPrice">Ticket price</label>
-      <input type="text" id="tickePrice" class="form-control"
-             ng-model="$ctrl.tournament.ticketPrice"/>
-    </div>
-    <div class="form-group">
-      <label for="place">Place</label>
-      <button id="place" class="form-control btn btn-default"
-              ng-click="$ctrl.choosePlace()">
-          {{$ctrl.place.name || 'choose'}}
-      </button>
-    </div>
-    <div class="form-group">
-      <label for="quitGroup">Quit Group</label>
-      <input type="number" id="quitGroup" class="form-control"
-             placeholder="How many people quit group"
-             ng-model="$ctrl.tournament.quitsFromGroup"/>
-    </div>
-    <div class="form-group">
-      <label for="maxGroupSize">Max group size</label>
-      <input type="number" id="maxGroupSize" class="form-control"
-             placeholder="Maximum number of participants in a group"
-             ng-model="$ctrl.tournament.maxGroupSize"/>
-    </div>
-    <div class="form-group" ng-show="$ctrl.error">
-      <p class="alert alert-danger">
-        {{$ctrl.error}}
+      <input type="text" class="form-control"
+             ng-model="$ctrl.tournament.name"
+             ng-maxlength="120"
+             required
+             name="name"
+             id="name"
+             placeholder="Name" />
+      <p class="help-block" ng-show="$ctrl.form.name.$error.required">
+        Name is required
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.name.$error.minlength || $ctrl.form.name.$error.maxlength">
+        Name length must be less than 120 letters
       </p>
     </div>
     <div class="form-group">
-      <button ng-click="$ctrl.createTournament()">Create</button>
+      <div class="pull-left"
+           ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.openDate.$dirty) && $ctrl.form.openDate.$invalid}">
+        <label for="openDate">Start Date</label>
+        <input ng-flatpickr
+               class="form-control  date-picker"
+               ng-model="$ctrl.tournament.openDate"
+               fp-opts="$ctrl.dateOpts"
+               placeholder="Click to pick open date"
+               name="openDate"
+               required
+               id="openDate" />
+        <p class="help-block" ng-show="$ctrl.form.openDate.$error.required">
+          Date is required
+        </p>
+      </div>
+      <div class="pull-left"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.startTime.$dirty) && $ctrl.form.startTime.$invalid}">
+        <label for="startTime">Local Time (tz)</label>
+        <input class="form-control time-picker"
+               ng-model="$ctrl.tournament.startTime"
+               name="startTime"
+               required
+               id="startTime"
+               placeholder="Choose start time"/>
+        <p class="help-block" ng-show="$ctrl.form.startTime.$error.required">
+          Time is required
+        </p>
+      </div>
+      <div style="clear: both"></div>
     </div>
-  </div>
-</form>
+    <div class="form-group"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.price.$dirty) && $ctrl.form.price.$invalid}">
+      <label for="ticketPrice">Ticket price</label>
+      <input type="text" class="form-control"
+             ng-model="$ctrl.tournament.ticketPrice"
+             ng-maxlength="6"
+             validate-price
+             name="price"
+             id="tickePrice"/>
+      <p class="help-block"
+         ng-show="$ctrl.form.price.$error.minlength || $ctrl.form.price.$error.maxlength">
+        Price length must be less than 6 letters
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.price.$error.price">
+        Price should a positive number.
+      </p>
+    </div>
+    <div class="form-group"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.place.$dirty) && $ctrl.form.place.$invalid}">
+      <label for="place">Place</label>
+      <a id="place" class="form-control btn btn-default"
+              ng-click="$ctrl.choosePlace()">
+        {{$ctrl.place.name || 'Choose a place'}}
+      </a>
+      <input type="hidden"
+             ng-model="$ctrl.tournament.placeId"
+             required
+             name="place"
+             id="place"/>
+      <p class="help-block" ng-show="$ctrl.form.place.$error.required">
+        Place is required
+      </p>
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary" type="submit">Next</button>
+      <button class="btn btn-danger" back-button>Cancel</button>
+    </div>
+    <div class="form-group">
+      <request-status></request-status>
+    </div>
+  </form>
+</div>

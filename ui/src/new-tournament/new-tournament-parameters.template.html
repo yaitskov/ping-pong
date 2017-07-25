@@ -1,0 +1,47 @@
+<main-menu></main-menu>
+<div class="container">
+  <div class="alert alert-info" ng-show="$ctrl.published">
+    Thanks, tournament
+    <a href="#!/tournament/bla/{{$ctrl.tournament.tid}}">{{$ctrl.tournament.name}}</a>
+    has been published and the draft is open for it.
+  </div>
+  <form novalidate name="$ctrl.form" ng-submit="$ctrl.createTournament()" ng-show="!$ctrl.published">
+    <div class="form-group">
+      <label for="quitsFromGroup">Quits from a group</label>
+      <input type="text" class="form-control"
+             ng-model="$ctrl.tournament.quitesFromGroup"
+             required name="quitsFromGroup" id="quitsFromGroup" />
+      <p class="help-block">
+        How many players quits from a group and continue participate
+        in play-off tournament stage.
+      </p>
+    </div>
+    <div class="form-group">
+      <label for="maxGroupSize">Max group size</label>
+      <input type="text" class="form-control"
+             ng-model="$ctrl.tournament.maxGroupSize"
+             required name="maxGroupSize" id="maxGroupSize" />
+      <p class="help-block">
+        Maximum number of players, which could be in a group.
+      </p>
+    </div>
+    <div class="form-group">
+      <label for="matchScore">Match score</label>
+      <input type="text" class="form-control"
+             ng-model="$ctrl.tournament.matchScore"
+             required name="matchScore" id="matchScore"/>
+      <p class="help-block">
+        Determines how many sets an opponent should take, to win the
+        match.
+      </p>
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary" type="submit">Create & Open Draft</button>
+      <button class="btn btn-default" back-button>Back</button>
+      <a href="#!/tournaments" class="btn btn-danger">Cancel</a>
+    </div>
+    <div class="form-group">
+      <request-status></request-status>
+    </div>
+  </form>
+</div>

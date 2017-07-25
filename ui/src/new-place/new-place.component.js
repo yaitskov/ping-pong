@@ -4,14 +4,17 @@ angular.
     module('newPlace').
     component('newPlace', {
         templateUrl: 'new-place/new-place.template.html',
-        controller: ['auth', 'mainMenu', '$http', '$location',
-                     function (auth, mainMenu, $http, $location) {
+        controller: ['auth', 'mainMenu', '$http', '$location', 'requestStatus',
+                     function (auth, mainMenu, $http, $location, requestStatus) {
                          mainMenu.setTitle('New Place');
                          this.place = {};
                          var self = this;
-                         self.error = null;
                          this.createPlace = function () {
-                             console.log("create place");
+                             self.form.$setSubmitted();
+                             if (!self.form.$valid) {
+                                 return;
+                             }
+                             requestStatus.startLoading('Creating');
                              $http.post('/api/place/create',
                                         self.place,
                                         {headers: {'Content-Type': 'application/json',
@@ -19,11 +22,9 @@ angular.
                                         }).
                                  then(
                                      function (okResp) {
-                                         console.log("place created: " + okResp.data);
+                                         requestStatus.complete();
                                          window.history.back();
                                      },
-                                     function (badResp) {
-                                         self.error = "" + badResp;
-                                     });
+                                     requestStatus.failed);
                          };
                      }]});

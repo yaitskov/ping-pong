@@ -1,36 +1,92 @@
 <main-menu></main-menu>
-<form>
-  <div class="container-fluid">
-    <div class="form-group">
+<div class="container">
+  <form novalidate name="$ctrl.form" ng-submit="$ctrl.createPlace()">
+    <div class="form-group"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.name.$dirty) && $ctrl.form.name.$invalid}">
       <label for="name">Name</label>
-      <input type="text" id="name" class="form-control"
-             placeholder="Name" ng-model="$ctrl.place.name"/>
+      <input type="text" class="form-control"
+             ng-model="$ctrl.place.name"
+             ng-maxlength="40"
+             required
+             name="name"
+             id="name"
+             placeholder="Name" />
+      <p class="help-block" ng-show="$ctrl.form.name.$error.required">
+        Name is required
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.name.$error.minlength || $ctrl.form.name.$error.maxlength">
+        Name length must be less than 40 letters
+      </p>
     </div>
-    <div class="form-group">
+    <div class="form-group"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.address.$dirty) && $ctrl.form.address.$invalid}">
       <label for="postAddress">Post Address</label>
-      <input type="text" id="postAddress" class="form-control"
-             placeholder="Post Address"
-             ng-model="$ctrl.place.address.address"/>
+      <input type="text" class="form-control"
+             ng-model="$ctrl.place.address.address"
+             ng-maxlength="200"
+             required
+             name="address"
+             id="postAddress"
+             placeholder="Post Address"/>
+      <p class="help-block" ng-show="$ctrl.form.address.$error.required">
+        Name is required
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.address.$error.minlength || $ctrl.form.address.$error.maxlength">
+        Name length must be less than 200 letters
+      </p>
     </div>
-    <div class="form-group">
+    <div class="form-group"
+          ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.phone.$dirty) && $ctrl.form.phone.$invalid}">
       <label for="phone">Phone</label>
-      <input type="text" id="phone" class="form-control"
-             placeholder="Phone"
-             ng-model="$ctrl.place.address.phone"/>
+      <input type="text"  class="form-control"
+             ng-model="$ctrl.place.address.phone"
+             ng-maxlength="40"
+             validate-phone
+             name="phone"
+             id="phone"
+             placeholder="Phone"/>
+      <p class="help-block" ng-show="$ctrl.form.phone.$valid">
+        Optional field. It could be used for account recovery.
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.phone.$error.maxlength">
+        Phone length must be less than 40
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.phone.$error.phone">
+        Phone is in wrong format
+      </p>
     </div>
-    <div class="form-group">
+    <div class="form-group"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.email.$dirty) && $ctrl.form.email.$invalid}">
       <label for="email">Contact Email</label>
-      <input type="text" id="email" class="form-control"
-             placeholder="Contact email"
-             ng-model="$ctrl.place.address.email"/>
-    </div>
-    <div class="form-group" ng-show="$ctrl.error">
-      <p class="alert alert-danger">
-        {{$ctrl.error}}
+      <input type="email" class="form-control"
+             ng-model="$ctrl.place.address.email"
+             ng-maxlength="40"
+             validate-email
+             name="email"
+             id="email" placeholder="Contact email"/>
+      <p class="help-block"
+         ng-show="$ctrl.form.email.$error.maxlength">
+        Email length must be less than 40
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.email.$error.email">
+        Email format is wrong
+      </p>
+      <p class="help-block" ng-show="$ctrl.form.email.$valid">
+        Optional field.
       </p>
     </div>
     <div class="form-group">
-      <button ng-click="$ctrl.createPlace()">Create</button>
+      <button class="btn btn-primary" type="submit">
+        Create Place
+      </button>
     </div>
-  </div>
-</form>
+    <div class="form-group">
+      <request-status></request-status>
+    </div>
+  </form>
+</div>

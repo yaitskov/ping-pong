@@ -15,7 +15,21 @@ angular.
                 this.email = auth.myEmail();
                 this.userData = null;
                 this.logoutWithoutEmail = false;
+                this.signInEmailSent = false;
                 requestStatus.startLoading();
+                this.generateSignInLink = function () {
+                    requestStatus.startLoading("Sending email");
+                    self.signInEmailSent = false;
+                    $http.post('/api/anonymous/auth/generate/sign-in-link',
+                               self.email,
+                               {'Content-Type': 'application/json'}).
+                        then(
+                            function (ok) {
+                                self.signInEmailSent = true;
+                                requestStatus.complete(ok);
+                            },
+                            requestStatus.failed);
+                };
                 this.logout = function () {
                     if (self.email) {
                         self.lostAccessToAccount();

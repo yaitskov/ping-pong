@@ -2,12 +2,23 @@
 <div class="container">
   <request-status></request-status>
   <div class="form-group">
-    <button class="btn btn-primary" ng-click="$ctrl.logout()">
+    <button class="btn btn-primary"
+            ng-click="$ctrl.logout()">
       Logout
+    </button>
+    <button class="btn btn-primary"
+            ng-show="$ctrl.email"
+            ng-click="$ctrl.generateSignInLink()">
+      Generate sign-in link
     </button>
     <a href="#!/account/profile/edit" class="btn btn-primary">
       Edit
     </a>
+  </div>
+  <div class="form-group" ng-show="$ctrl.signInEmailSent">
+    <div class="alert alert-info">
+      Sign-in link has been generated and mailed to you.
+    </div>
   </div>
   <div class="form-group" ng-show="$ctrl.logoutWithoutEmail">
     <div class="alert alert-danger">

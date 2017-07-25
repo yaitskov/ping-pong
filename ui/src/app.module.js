@@ -2,7 +2,6 @@
 
 angular.module('pingPong', [
     'ngRoute',
-    'angular-flatpickr',
     'mainMenu',
     'core',
     'signUp',

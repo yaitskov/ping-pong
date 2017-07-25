@@ -23,50 +23,45 @@
       <div class="pull-left"
            ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.openDate.$dirty) && $ctrl.form.openDate.$invalid}">
         <label for="openDate">Start Date</label>
-        <input ng-flatpickr
-               class="form-control  date-picker"
-               ng-model="$ctrl.tournament.openDate"
-               fp-opts="$ctrl.dateOpts"
-               placeholder="Click to pick open date"
-               name="openDate"
-               required
-               id="openDate" />
+        <div class="date-picker">
+          <input ng-flatpickr
+                 class="form-control pull-left"
+                 ng-model="$ctrl.tournament.openDate"
+                 fp-opts="$ctrl.dateOpts"
+                 fp-on-setup="$ctrl.dataPickerUi"
+                 placeholder="Click to pick open date"
+                 name="openDate"
+                 required
+                 id="openDate" />
+          <span class="input-group-addon" ng-click="$ctrl.dataPickerUi.fpItem.open()">
+            <span class="glyphicon glyphicon-calendar"></span>
+          </span>
+        </div>
         <p class="help-block" ng-show="$ctrl.form.openDate.$error.required">
           Date is required
         </p>
       </div>
-      <div class="pull-left"
-         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.startTime.$dirty) && $ctrl.form.startTime.$invalid}">
+      <div class="pull-left input-group clockpicker" clock-picker
+           data-placement="right" data-align="top" data-autoclose="true"
+           ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.startTime.$dirty) && $ctrl.form.startTime.$invalid}">
         <label for="startTime">Local Time (tz)</label>
+        <div>
         <input class="form-control time-picker"
                ng-model="$ctrl.tournament.startTime"
                name="startTime"
                required
+               readonly
                id="startTime"
                placeholder="Choose start time"/>
+        <span class="input-group-addon">
+          <span class="glyphicon glyphicon-time"></span>
+        </span>
+        </div>
         <p class="help-block" ng-show="$ctrl.form.startTime.$error.required">
           Time is required
         </p>
       </div>
       <div style="clear: both"></div>
-    </div>
-    <div class="form-group"
-         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.price.$dirty) && $ctrl.form.price.$invalid}">
-      <label for="ticketPrice">Ticket price</label>
-      <input type="text" class="form-control"
-             ng-model="$ctrl.tournament.ticketPrice"
-             ng-maxlength="6"
-             validate-price
-             name="price"
-             id="tickePrice"/>
-      <p class="help-block"
-         ng-show="$ctrl.form.price.$error.minlength || $ctrl.form.price.$error.maxlength">
-        Price length must be less than 6 letters
-      </p>
-      <p class="help-block"
-         ng-show="$ctrl.form.price.$error.price">
-        Price should a positive number.
-      </p>
     </div>
     <div class="form-group"
          ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.place.$dirty) && $ctrl.form.place.$invalid}">
@@ -82,6 +77,27 @@
              id="place"/>
       <p class="help-block" ng-show="$ctrl.form.place.$error.required">
         Place is required
+      </p>
+    </div>
+    <div class="form-group"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.price.$dirty) && $ctrl.form.price.$invalid}">
+      <label for="ticketPrice">Ticket price</label>
+      <input type="text" class="form-control"
+             ng-model="$ctrl.tournament.ticketPrice"
+             ng-maxlength="6"
+             validate-price
+             name="price"
+             id="tickePrice"/>
+      <p class="help-block" ng-show="$ctrl.form.price.$valid">
+        Participant's ticket price is optinal. Empty means for free.
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.price.$error.minlength || $ctrl.form.price.$error.maxlength">
+        Price length must be less than 6 letters
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.price.$error.price">
+        Price should a positive number.
       </p>
     </div>
     <div class="form-group">

@@ -13,6 +13,34 @@ angular.module('core.ui', ['ngResource']).
             }
         };
     }).
+    directive('clockPicker', ['$timeout', function ($timeout) {
+        return {
+            restrict: 'A',
+            link: function (scope, element, attr) {
+                var e = element.clockpicker({twelvehour: true});
+                $(e).data('clockpicker').amOrPm = ' AM';
+            }
+        };
+    }]).
+    directive('ngFlatpickr', [function() {
+        return {
+            require: 'ngModel',
+            restrict : 'A',
+            scope : {
+                fpOpts : '&',
+                fpOnSetup : '&'
+            },
+            link : function(scope, element, attrs, ngModel) {
+                var vp = new FlatpickrInstance(element[0], scope.fpOpts());
+                if (scope.fpOnSetup) {
+                    scope.fpOnSetup().fpItem = vp;
+                }
+                element.on('$destroy',function(){
+                    vp.destroy();
+                });
+            }
+        };
+    }]).
     directive('clickable', ['$location', function ($location) {
         return {
             scope: {},

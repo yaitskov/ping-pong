@@ -261,11 +261,12 @@ $success-bg-color: #dff0d8;
     /* begin of new tournament */
     .new-tournament {
         .date-picker {
-            width: 200px;
+            width: 219px;
+            input { width: 169px; }
             margin-right: 15px;
         }
         .time-picker {
-            width: 150px;
+            width: 136px;
         }
     }
     /* end of new tournament */
@@ -274,6 +275,21 @@ $success-bg-color: #dff0d8;
         margin-left: 8px;
         margin-bottom: 0px;
     }
+
+    .input-group-addon {
+        padding: 8px 12px;
+        width: 45px;
+        display: inline-block;
+    }
+
+    /* begin of flickr calendar */
+    .flatpickr-next-month, .flatpickr-prev-month {
+        border: 1px solid #eee;
+        width: 55px;
+        padding-top: 6px;
+        font-weight: bold;
+    }
+    /* end of flickr calendar */
 }
 /* end of desktop layout */
 

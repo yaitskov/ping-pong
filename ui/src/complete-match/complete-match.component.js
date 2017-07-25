@@ -8,24 +8,32 @@ angular.
                      function (mainMenu, Match, $routeParams, pageCtx, requestStatus, $scope) {
                          mainMenu.setTitle('Match Scoring');
                          this.participants = pageCtx.getMatchParticipants($routeParams.matchId);
-                         this.rated = 1;
-                         this.scores = [];
+                         this.rated = 0;
+                         this.possibleScores = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                         this.scores = [-1, -1];
                          var self = this;
+                         this.pick = function (idx, score) {
+                             self.scores[idx] = score;
+                         };
                          function findScores() {
                              var result = [];
                              for (var i in self.participants) {
-                                 result.append({uid: self.participants[i].uid,
-                                                score: self.scores[i]});
+                                 result.push({uid: self.participants[i].uid,
+                                              score: self.scores[i]});
                              }
                              return result;
                          }
                          this.scoreMatch = function () {
-                             requestStatus.startLoading();
-                             if (!self.scores.length != 2) {
-                                 requestStatus.validationFailed("Not all participants have been score.");
+                             requestStatus.startLoading("Documenting the score");
+                             if (self.scores[0] < 0 || self.scores[1] < 0) {
+                                 requestStatus.validationFailed("Not all participants have been scored");
                                  return;
                              }
-                             Match.scoreMyMatch(
+                             if (self.scores[0] == self.scores[1]) {
+                                 requestStatus.validationFailed("Participants cannot have same scores");
+                                 return;
+                             }
+                             Match.scoreMatch(
                                  {mid: $routeParams.matchId,
                                   scores: findScores()},
                                  function (okResp) {

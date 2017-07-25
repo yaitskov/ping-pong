@@ -248,6 +248,15 @@ $success-bg-color: #dff0d8;
         }
     }
     /* end of admin-judge */
+
+    /* begin match-score */
+    .admin-score {
+        a.score {
+            margin-left: 5px;
+            margin-bottom: 5px;
+        }
+    }
+    /* end match-score */
 }
 /* end of desktop layout */
 
@@ -486,5 +495,17 @@ td.match-state-description.text-danger {
         }
     }
     /* end of admin-judgement */
+
+    /* begin of match-score */
+    .admin-score {
+        a.score {
+            margin-left: 5px !important;
+            margin-bottom: 5px !important;
+        }
+        a.score:hover {
+            background-color: #204d74 !important;
+        }
+    }
+    /* end of match-score */
 }
 /* end of mobile layout */

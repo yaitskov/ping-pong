@@ -58,6 +58,9 @@ angular.module('pingPong').
                     when('/tournament/new', {
                         template: '<new-tournament></new-tournament>'
                     }).
+                    when('/tournament/new/parameters', {
+                        template: '<new-tournament-parameters></new-tournament-parameters>'
+                    }).
                     when('/my/new/place', {
                         template: '<new-place></new-place>'
                     }).

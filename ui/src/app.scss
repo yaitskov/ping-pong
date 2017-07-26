@@ -290,6 +290,18 @@ $success-bg-color: #dff0d8;
         font-weight: bold;
     }
     /* end of flickr calendar */
+
+    /* begin of clock */
+    .clockpicker-span-am-pm {
+        padding-left: 10px;
+    }
+    .clockpicker-am-pm-block {
+        .clockpicker-button.btn-primary {
+            background-color: $primary-btn-back-color !important;
+            color: $primary-btn-font-color !important;
+        }
+    }
+    /* end of clock */
 }
 /* end of desktop layout */
 
@@ -540,5 +552,50 @@ td.match-state-description.text-danger {
         }
     }
     /* end of match-score */
+
+        /* begin of new tournament */
+    .new-tournament {
+        .date-picker {
+            width: 160px;
+            input { width: 110px; }
+            margin-right: 15px;
+        }
+        .time-picker {
+            width: 85px;
+        }
+    }
+    /* end of new tournament */
+
+    .help-block {
+        margin-left: 8px;
+        margin-bottom: 0px;
+    }
+
+    .input-group-addon {
+        padding: 8px 10px;
+        width: 40px;
+        display: inline-block;
+    }
+
+    /* begin of flickr calendar */
+    .flatpickr-next-month, .flatpickr-prev-month {
+        border: 1px solid #eee;
+        width: 55px;
+        padding-top: 6px;
+        font-weight: bold;
+    }
+    /* end of flickr calendar */
+
+    /* begin of clock */
+    .clockpicker-span-am-pm {
+        padding-left: 10px;
+    }
+    .clockpicker-am-pm-block {
+        .clockpicker-button.btn-primary {
+            background-color: $primary-btn-back-color !important;
+            color: $primary-btn-font-color !important;
+        }
+    }
+    /* end of clock */
 }
 /* end of mobile layout */

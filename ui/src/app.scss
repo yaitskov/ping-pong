@@ -308,6 +308,10 @@ $success-bg-color: #dff0d8;
         padding: 0px;
     }
 
+    .request-status .refresh-btn {
+        font-size: 13px;
+        margin-right: 10px;
+    }
 }
 /* end of desktop layout */
 
@@ -613,6 +617,11 @@ td.match-state-description.text-danger {
         .alert-danger {
             margin-bottom: 10px;
         }
+    }
+
+    .request-status .refresh-btn {
+        font-size: 13px;
+        margin-right: 10px;
     }
 }
 /* end of mobile layout */

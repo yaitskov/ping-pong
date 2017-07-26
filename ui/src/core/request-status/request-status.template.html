@@ -5,6 +5,9 @@
   <div id="errorOutput">
     <div ng-show="$ctrl.error">
       <div  class="alert alert-danger">
+        <a class="btn btn-primary refresh-btn" ng-click="$ctrl.refresh()">
+          <span class="glyphicon glyphicon-refresh"</span>
+        </a>
         {{$ctrl.error}}
       </div>
       <div class="alert alert-info ">

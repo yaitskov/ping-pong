@@ -5,12 +5,15 @@ angular.
     component('requestStatus', {
         templateUrl: 'core/request-status/request-status.template.html',
         controller: [
-            'requestStatus', '$rootScope', '$anchorScroll', '$timeout',
-            function (requestStatus, $scope, $anchorScroll, $timeout) {
+            'requestStatus', '$rootScope', '$anchorScroll', '$timeout', '$route',
+            function (requestStatus, $scope, $anchorScroll, $timeout, $route) {
                 this.reset = function () {
                     this.error = null;
                     this.loading = null;
                 };
+                this.refresh = function () {
+                    $route.reload();
+                }
                 this.scrollToError = function () {
                     $timeout(function () {
                         $anchorScroll('errorOutput');

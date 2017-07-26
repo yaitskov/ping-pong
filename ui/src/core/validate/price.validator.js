@@ -2,7 +2,7 @@
 
 angular.module('core.validate').
     directive('validatePrice', function() {
-        var priceRegexp = /^[1-9][0-1]*([.][0-9]{2})?$/;
+        var priceRegexp = /^[1-9][0-9]*([.][0-9]{2})?$/;
         return {
             require: 'ngModel',
             restrict: 'A',

@@ -33,6 +33,7 @@ angular.module('core.ui', ['ngResource']).
             link: function (scope, element, attr) {
                 var ctx = {};
                 ctx.e = element.clockpicker({twelvehour: true,
+                                             vibrate: false,
                                              placement: 'bottom',
                                              afterShow: function () {
                                                  var val = $(ctx.e).data('clockpicker').input.val();

@@ -29,7 +29,8 @@ angular.
                              }
                              requestStatus.startLoading('Publishing');
                              var req = angular.copy(self.tournament);
-                             req.opensAt =  $moment(req.openDate + " " + req.startTime).utc().format("Y-MM-DDTHH:mm:ss.SSS") + "Z";
+                             req.opensAt =  $moment(req.openDate + " " + req.startTime, 'Y-MM-DD HH:mm A').
+                                 utc().format("Y-MM-DDTHH:mm:ss.SSS") + "Z";
                              delete req.openDate;
                              delete req.startTime;
                              $http.post('/api/tournament/create',

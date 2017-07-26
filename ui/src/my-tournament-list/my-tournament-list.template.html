@@ -1,20 +1,29 @@
-<div class="container-fluid">
-  <main-menu></main-menu>
-  <ul class="tournaments" ng-show="$ctrl.tournaments">
-    <li ng-repeat="tournament in $ctrl.tournaments | filter:$ctrl.query"
-        class="thumbnail tournament-list-item clearfix">
-      <a class="pull-left" href="#!/my/tournament/{{tournament.tid}}">
+<main-menu></main-menu>
+<div class="container" ng-show="$ctrl.tournaments.length == 0">
+  <div class="alert alert-info" >
+    You haven't created a tournament.
+  </div>
+  <div class="form-group">
+    <a class="btn btn-primary" href="#!/tournament/new">Add Tournament</a>
+  </div>
+</div>
+<div class="container-fluid list">
+  <request-status></request-status>
+  <div ng-repeat="tournament in $ctrl.tournaments"
+       clickable="/my/tournament/{{tournament.tid}}"
+       class="list-item tournament clearfix">
+    <div class="name pull-left">
+      <a href="#!/my/tournament/{{tournament.tid}}">
         {{tournament.name}}
       </a>
-      <span class="pull-right" title="When the tournament begins">
-        {{tournament.opensAt|date : 'MMMM dd yyyy'}}
+    </div>
+    <div class="datetime pull-right">
+      <span class="time">
+        {{tournament.opensAt|date : 'EEE h a'}}
       </span>
-    </li>
-  </ul>
-  <div class="alert alert-info" ng-show="$ctrl.tournaments.length == 0">
-    You don't administrate any tournament.
-  </div>
-  <div class="alert alert-info" ng-show="$ctrl.tournaments === null">
-    Loading ...
+      <span class="date">
+        {{tournament.opensAt|date : 'MMM d'}}
+      </span>
+    </div>
   </div>
 </div>

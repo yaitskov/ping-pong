@@ -35,6 +35,7 @@ angular.module('core.ui', ['ngResource']).
                 ctx.e = element.clockpicker({twelvehour: true,
                                              vibrate: false,
                                              placement: 'bottom',
+                                             align: 'right',
                                              afterShow: function () {
                                                  var val = $(ctx.e).data('clockpicker').input.val();
                                                  if (val && val.indexOf("PM") > 0) {

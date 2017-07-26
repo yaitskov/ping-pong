@@ -13,6 +13,20 @@ angular.module('core.ui', ['ngResource']).
             }
         };
     }).
+    directive('defaultButtonType', ['$timeout', function ($timeout) {
+        return {
+            restrict: 'A',
+            link: function (scope, element, attr) {
+                $timeout(function () {
+                    element.find('button').each(function (idx) {
+                        if (!$(this).attr('type')) {
+                            $(this).attr('type', 'button');
+                        }
+                    });
+                }, 0);
+            }
+        };
+    }]).
     directive('clockPicker', ['$timeout', '$q', function ($timeout, $q) {
         return {
             restrict: 'A',

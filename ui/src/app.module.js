@@ -2,6 +2,7 @@
 
 angular.module('pingPong', [
     'ngRoute',
+    'nk.touchspin',
     'mainMenu',
     'core',
     'signUp',

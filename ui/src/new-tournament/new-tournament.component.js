@@ -9,6 +9,7 @@ angular.
                          mainMenu.setTitle('New Tournament');
                          this.tournament = pageCtx.get('newTournament') || {quitsFromGroup: 2,
                                                                             maxGroupSize: 8,
+                                                                            ticketPrice: 30,
                                                                             matchScore: 3};
                          var self = this;
                          this.dataPickerUi = {};

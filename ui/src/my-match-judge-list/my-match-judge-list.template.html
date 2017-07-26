@@ -1,7 +1,7 @@
 <main-menu></main-menu>
 <div class="container-fluid admin-judgement">
   <request-status></request-status>
-  <div ng-show="$ctrl.previouslyScoredEnded">
+  <div class="container" ng-show="$ctrl.previouslyScoredEnded">
     <div class="alert alert-info">
       Tournament <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
           {{$ctrl.tournament.previous.name}}</a> is complete.
@@ -59,7 +59,7 @@
       </tr>
     </tbody>
   </table>
-  <div ng-show="$ctrl.previouslyScoredEnded && $ctrl.matches.length == 0">
+  <div class="container" ng-show="!$ctrl.previouslyScoredEnded && $ctrl.matches.length == 0">
     <div class="alert alert-info">
       <p ng-show="!$ctrl.tournament.current">
         You don't have any match to judge.

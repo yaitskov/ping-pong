@@ -110,6 +110,7 @@ public class DaoEntityGenerator {
                 .maxGroupSize(props.getMaxGroupSize())
                 .quitsFromGroup(props.getQuitsFromGroup())
                 .ticketPrice(Optional.empty())
+                .matchScore(props.getMatchScore())
                 .thirdPlaceMatch(0)
                 .build());
         tournamentDao.setState(tid, props.getState());

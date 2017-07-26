@@ -14,11 +14,13 @@ import java.util.Optional;
 public class TournamentProps {
     private int maxGroupSize;
     private int quitsFromGroup;
+    private int matchScore;
     private TournamentState state;
     private Optional<Instant> opensAt;
 
     public static class TournamentPropsBuilder {
         private int quitsFromGroup = 2;
+        private int matchScore = 3;
         private TournamentState state = TournamentState.Draft;
         private int maxGroupSize = 8;
         private Optional<Instant> opensAt = Optional.empty();

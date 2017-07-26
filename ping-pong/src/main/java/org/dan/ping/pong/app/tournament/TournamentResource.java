@@ -52,6 +52,9 @@ public class TournamentResource {
     public int create(
             @HeaderParam(SESSION) String session,
             CreateTournament newTournament) {
+        if (newTournament.getMatchScore() <= 0) {
+            throw badRequest("Match Score is not positive");
+        }
         return tournamentService.create(
                 authService.userInfoBySession(session).getUid(),
                 newTournament);

@@ -71,6 +71,7 @@ public class TournamentDao {
                 TOURNAMENT.TICKET_PRICE,
                 TOURNAMENT.THIRD_PLACE_MATCH,
                 TOURNAMENT.NAME,
+                TOURNAMENT.MATCH_SCORE,
                 TOURNAMENT.MAX_GROUP_SIZE)
                 .values(Hidden,
                         newTournament.getOpensAt(),
@@ -80,6 +81,7 @@ public class TournamentDao {
                         newTournament.getTicketPrice(),
                         newTournament.getThirdPlaceMatch(),
                         newTournament.getName(),
+                        newTournament.getMatchScore(),
                         newTournament.getMaxGroupSize())
                 .returning(TOURNAMENT.TID)
                 .fetchOne()

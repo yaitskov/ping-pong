@@ -302,6 +302,12 @@ $success-bg-color: #dff0d8;
         }
     }
     /* end of clock */
+
+    .container .container.request-status {
+        margin: 0px;
+        padding: 0px;
+    }
+
 }
 /* end of desktop layout */
 
@@ -597,5 +603,16 @@ td.match-state-description.text-danger {
         }
     }
     /* end of clock */
+
+    .container .container.request-status {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    .request-status {
+        .alert-danger {
+            margin-bottom: 10px;
+        }
+    }
 }
 /* end of mobile layout */

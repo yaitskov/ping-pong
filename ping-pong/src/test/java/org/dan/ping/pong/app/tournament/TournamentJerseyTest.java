@@ -101,6 +101,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                         .quitsFromGroup(2)
                         .ticketPrice(Optional.empty())
                         .thirdPlaceMatch(0)
+                        .matchScore(3)
                         .build(), APPLICATION_JSON));
         final int tid = response.readEntity(Integer.class);
 

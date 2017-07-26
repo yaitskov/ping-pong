@@ -1,14 +1,16 @@
-<div class="alert alert-info" ng-show="$ctrl.loading">
-  {{$ctrl.loading}} ...
-</div>
-<div id="errorOutput">
-  <div ng-show="$ctrl.error" class="request-status">
-    <div  class="alert alert-danger">
-      {{$ctrl.error}}
-    </div>
-    <div class="alert alert-info ">
-      If you think that an application error happened. You could file a
-      bug report at <a href="https://github.com/yaitskov/ping-pong/issues">GitHub</a>
+<div class="container request-status" ng-show="$ctrl.loading || $ctrl.error">
+  <div class="alert alert-info" ng-show="$ctrl.loading">
+    {{$ctrl.loading}} ...
+  </div>
+  <div id="errorOutput">
+    <div ng-show="$ctrl.error">
+      <div  class="alert alert-danger">
+        {{$ctrl.error}}
+      </div>
+      <div class="alert alert-info ">
+        If you think that an application error happened. You could file a
+        bug report at <a href="https://github.com/yaitskov/ping-pong/issues">GitHub</a>
+      </div>
     </div>
   </div>
 </div>

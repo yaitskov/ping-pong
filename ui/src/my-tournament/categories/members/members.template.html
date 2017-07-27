@@ -1,0 +1,25 @@
+<main-menu></main-menu>
+<div class="container admin-category-members">
+  <request-status></request-status>
+  <div class="form-group">
+    <a class="btn btn-primary" back-button>
+      Back
+    </a>
+  </div>
+  <div class="form-group" ng-show="$ctrl.members.length == 0">
+    <div class="alert alert-info" >
+      Category does not have members.
+    </div>
+  </div>
+  <div class="form-group" ng-show="$ctrl.members.length > 0">
+    <table class="table">
+      <tr ng-repeat="member in $ctrl.members | orderBy : 'name'">
+        <td>
+          <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{member.uid}}">
+            {{member.name}}
+          </a>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

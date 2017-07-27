@@ -22,6 +22,7 @@ angular.module('pingPong', [
     'completeMyMatch',
     'completeMatch',
     'participantPresence',
+    'categoryMemberList',
     'tournamentCategories',
     'tournamentDetail',
     'myMatchPlayList',

@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.jooq.exception.DataAccessException;
-import sun.misc.CEFormatException;
 
 import java.util.List;
 
@@ -33,6 +32,12 @@ public class CategoryResource {
     @Path(CATEGORY + "find/by/tid/{tid}")
     public List<CategoryInfo> findByTid(@PathParam("tid") int tid) {
         return categoryDao.listCategoriesByTid(tid);
+    }
+
+    @GET
+    @Path(CATEGORY + "find/members/{cid}")
+    public List<UserInfo> findMembers(@PathParam("cid") int cid) {
+        return categoryDao.listCategoryMembers(cid);
     }
 
     @Inject

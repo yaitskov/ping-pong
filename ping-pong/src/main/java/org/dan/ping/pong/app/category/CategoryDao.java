@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.category;
 
+import static ord.dan.ping.pong.jooq.Tables.USERS;
 import static ord.dan.ping.pong.jooq.tables.Bid.BID;
 import static ord.dan.ping.pong.jooq.tables.Category.CATEGORY;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -7,6 +8,7 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.tournament.EnlistedCategory;
+import org.dan.ping.pong.app.user.UserInfo;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +42,20 @@ public class CategoryDao {
                 .map(r -> CategoryInfo.builder()
                         .cid(r.get(CATEGORY.CID))
                         .name(r.get(CATEGORY.NAME))
+                        .build());
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public List<UserInfo> listCategoryMembers(int cid) {
+        return jooq.select(BID.UID, USERS.NAME)
+                .from(BID)
+                .innerJoin(USERS)
+                .on(BID.UID.eq(USERS.UID))
+                .where(BID.CID.eq(cid))
+                .fetch()
+                .map(r -> UserInfo.builder()
+                        .uid(r.get(BID.UID))
+                        .name(r.get(USERS.NAME))
                         .build());
     }
 

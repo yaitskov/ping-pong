@@ -1,5 +1,5 @@
 <main-menu></main-menu>
-<div class="container">
+<div class="container admin-categories">
   <request-status></request-status>
   <div class="form-group">
     <a class="btn btn-primary"
@@ -22,14 +22,14 @@
           class="form-inline">
       <div class="form-group"
            ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.name.$dirty) && $ctrl.form.name.$invalid}">
-        <div>
+        <div class="clearfix">
           <input type="text" placeholder="Category Name"
-                 class="form-control"
+                 class="form-control pull-left"
                  ng-maxlength="100"
                  required
                  name="name"
                  ng-model="$ctrl.newCategoryName"/>
-          <button class="btn btn-primary" type="submit">
+          <button class="btn btn-primary pull-left" type="submit">
             <span class="glyphicon glyphicon-plus-sign"></span>
           </button>
         </div>

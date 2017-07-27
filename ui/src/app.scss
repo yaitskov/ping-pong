@@ -695,5 +695,18 @@ td.match-state-description.text-danger {
         }
     }
     /* end of participant presence for mobile */
+
+    /* begin of categories for mobile */
+    .admin-categories {
+        input {
+            width: 80%;
+            margin-right: 8px;
+        }
+
+        table tr td {
+            vertical-align: middle;
+        }
+    }
+    /* end of categories for mobile */
 }
 /* end of mobile layout */

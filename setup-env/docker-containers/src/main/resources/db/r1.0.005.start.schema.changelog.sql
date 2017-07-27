@@ -85,13 +85,20 @@ create table category(
     name varchar(100) not null);
 
 create table bid(
-    uid int(11) not null references users(uid),
-    tid int(11) not null references tournament(tid),
-    cid int(11) not null references category(cid),
+    uid int(11) not null,
+    tid int(11) not null,
+    cid int(11) not null,
     gid int(11) null,
     created timestamp(3) default current_timestamp(3),
     state char(4) not null,
     primary key (uid, tid));
+
+alter table bid add constraint bid_uid_idx
+                   foreign key (uid) references users(uid);
+alter table bid add constraint bid_tid_idx
+                   foreign key (tid) references tournament(tid);
+alter table bid add constraint bid_cid_idx
+                   foreign key (cid) references category(cid);
 
 create table groups(
     gid int(11) not null auto_increment primary key,

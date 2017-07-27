@@ -2,10 +2,12 @@ package org.dan.ping.pong.app.category;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
+import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.user.UserInfo;
+import org.jooq.exception.DataAccessException;
 import sun.misc.CEFormatException;
 
 import java.util.List;
@@ -53,6 +55,10 @@ public class CategoryResource {
             @PathParam("cid") int cid) {
         final UserInfo user = authService.userInfoBySession(session);
         // check perms
-        categoryDao.delete(cid);
+        try {
+            categoryDao.delete(cid);
+        } catch (DataAccessException e) {
+            throw badRequest("Category with enlisted participants cannot deleted", e);
+        }
     }
 }

@@ -39,6 +39,12 @@ public class PiPoEx extends RuntimeException {
                 clientMessage));
     }
 
+    public static PiPoEx badRequest(String clientMessage, Exception e) {
+        return badRequest(
+                new Error(UUID.randomUUID().toString(),
+                        clientMessage), e);
+    }
+
     public static PiPoEx badRequest(Error error) {
         return badRequest(error, null);
     }

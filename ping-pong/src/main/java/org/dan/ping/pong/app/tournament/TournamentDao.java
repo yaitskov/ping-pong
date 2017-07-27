@@ -260,6 +260,8 @@ public class TournamentDao {
                         .where(BID.TID.eq(tid), BID.STATE.ne(Quit))
                         .asField(ENLISTED))
                 .from(TOURNAMENT)
+                .innerJoin(PLACE)
+                .on(TOURNAMENT.PID.eq(PLACE.PID))
                 .where(TOURNAMENT.TID.eq(tid))
                 .fetchOne())
                 .map(r -> MyTournamentInfo.builder()

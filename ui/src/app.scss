@@ -329,6 +329,18 @@ $success-bg-color: #dff0d8;
             vertical-align: middle;
         }
     }
+
+    .my-tournament-admin {
+        table tr td:first-child {
+            width: 30%;
+        }
+        .form-group .btn-group {
+            a {
+                /* height: 35px; */
+                margin-right: 4px;
+            }
+        }
+    }
 }
 /* end of desktop layout */
 

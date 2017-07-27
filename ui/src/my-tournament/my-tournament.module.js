@@ -1,5 +1,6 @@
 'use strict';
 
 angular.module('myTournament', [
-    'ngRoute', 'core.tournament', 'mainMenu', 'auth'
+    'ngRoute', 'core.tournament', 'mainMenu',
+    'auth', 'core.requestStatus'
 ]);

@@ -1,35 +1,86 @@
 <main-menu></main-menu>
-<div class="container">
+<request-status></request-status>
+<div class="container my-tournament-admin">
   <div class="form-group">
-    <label>Tournament</label>
-    <div class="pull-right">{{$ctrl.tournament.name}}</div>
-  </div>
-  <div class="form-group">
-    <label>Totally enlisted</label>
-    <div class="alert alert-info">
-      {{$ctrl.tournament.enlisted}}
+    <div class="btn-group">
+      <a class="btn btn-success"
+         ng-click="$ctrl.open()"
+         ng-show="$ctrl.isDrafting()"
+         title="Split participants into groups and open tournament">
+        <span class="glyphicon glyphicon-play-circle"></span>
+      </a>
+      <a class="btn btn-default"
+         title="Previous Tournament in the seria"
+         href="#!/my/tournament/{{$ctrl.tournament.previousTid}}"
+         ng-show="$ctrl.tournament.previousTid">
+        <span class="glyphicon glyphicon-circle-arrow-left"></span>
+      </a>
+      <a class="btn btn-default"
+         title="Edit tournament"
+         href="#!/my/tournament/edit/{{$ctrl.tournament.tid}}">
+        <span class="glyphicon glyphicon-edit"></span>
+      </a>
+      <a class="btn btn-default"
+         title="Configure tournament parameters"
+         href="#!/my/tournament/parameters/{{$ctrl.tournament.tid}}">
+        <span class="glyphicon glyphicon-cog"></span>
+      </a>
+      <a class="btn btn-danger"
+         ng-click="$ctrl.cancel()"
+         ng-show="$ctrl.isNotCanceled()"
+         title="Stop and cancel tournament">
+        <span class="glyphicon glyphicon-stop"></span>
+      </a>
+      <a class="btn btn-primary"
+         title="Announce and Open Draft"
+         ng-click="$ctrl.beginDrafting()"
+         ng-show="$ctrl.canBeginDrafting()">
+        <span class="glyphicon glyphicon-globe"></span>
+      </a>
     </div>
   </div>
   <div class="form-group">
-    <label>Totally present</label>
-    <div class="alert alert-info">
-      {{$ctrl.tournament.presented}}
-    </div>
-  </div>
-  <div class="form-group" ng-show="$ctrl.error">
-    <div class="alert alert-danger">
-      {{$ctrl.error}}
-    </div>
-  </div>
-  <div class="form-group" ng-show="$ctrl.tournament">
-    <button type="button" class="btn btn-primary"
-            ng-click="$ctrl.beginDrafting()"
-            ng-show="$ctrl.canBeginDrafting()">Draft</button>
-    <button type="button" class="btn btn-primary"
-            ng-click="$ctrl.open()"
-            ng-show="$ctrl.isDrafting()">Open</button>
-    <button type="button" class="btn btn-primary"
-            ng-click="$ctrl.cancel()"
-            ng-show="$ctrl.isNotCanceled()">Cancel</button>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>Name</td>
+          <td>{{$ctrl.tournament.name}}</td>
+        </tr>
+        <tr>
+          <td>State</td>
+          <td>{{$ctrl.tournament.state}}</td>
+        </tr>
+        <tr>
+          <td>Place</td>
+          <td>
+            <a href="#!/place/{{$ctrl.tournament.place.pid}}">
+              {{$ctrl.tournament.place.name}}
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td>Date</td>
+          <td>
+            {{$ctrl.tournament.opensAt|date : 'MMM d EEE h a Z' }}
+          </td>
+        </tr>
+        <tr>
+          <td>Categories</td>
+          <td>
+            <a href="#!/my/tournament/categories/{{$ctrl.tournament.tid}}">
+              {{$ctrl.tournament.categories}}
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td>Enlisted</td>
+          <td>
+            <a href="#!/my/tournament/presence/{{$ctrl.tournament.tid}}">
+              {{$ctrl.tournament.enlisted}}
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>

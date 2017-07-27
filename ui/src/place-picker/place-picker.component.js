@@ -3,8 +3,8 @@
 angular.module('placePicker').
     component('placePicker', {
         templateUrl: 'place-picker/place-picker.template.html',
-        controller: ['placePicker', 'mainMenu', '$scope',
-                     function (placePicker, mainMenu) {
+        controller: ['placePicker', 'mainMenu', 'requestStatus',
+                     function (placePicker, mainMenu, requestStatus) {
                          mainMenu.setTitle('Choose place');
                          mainMenu.setContextMenu({'#!/my/new/place': 'Add Place'});
                          this.places = [];
@@ -12,7 +12,13 @@ angular.module('placePicker').
                          this.pickThisOne = function (i) {
                              placePicker.setChosen(self.places[i]);
                          }
-                         placePicker.getList(function (l) { self.places = l; });
+                         requestStatus.startLoading();
+                         placePicker.getList(
+                             function (l) {
+                                 requestStatus.complete();
+                                 self.places = l;
+                             },
+                             requestStatus.failed);
                      }
                     ]
     });

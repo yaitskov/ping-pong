@@ -5,8 +5,8 @@ angular.module('placePicker').
         return new function () {
             console.log("reload places2");
             this.chosenPlace = null;
-            this.getList = function (cb) {
-                Place.myPlaces({}, cb);
+            this.getList = function (cb, failed) {
+                Place.myPlaces({}, cb, failed);
             };
             this.pickFrom = function () {
                 $location.path('/pick/place');

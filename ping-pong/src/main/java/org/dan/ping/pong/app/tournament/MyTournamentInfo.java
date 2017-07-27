@@ -4,6 +4,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.place.PlaceLink;
+
+import java.time.Instant;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -12,7 +16,11 @@ import lombok.ToString;
 public class MyTournamentInfo {
     private int tid;
     private String name;
-    private int quitesFromGroup;
-    private int maxGroupSize;
     private TournamentState state;
+    private PlaceLink place;
+    private Optional<Double> price;
+    private Instant opensAt;
+    private int categories;
+    private int enlisted;
+    private Optional<Integer> previousTid = Optional.empty();
 }

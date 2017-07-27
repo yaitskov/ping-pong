@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.tournament;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
+import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
 import static ord.dan.ping.pong.jooq.Tables.MATCHES;
 import static ord.dan.ping.pong.jooq.Tables.PLACE;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
@@ -57,6 +58,7 @@ public class TournamentDao {
     private static final String GAMES = "games";
     private static final String GAMES_COMPLETE = "gamesComplete";
     private static final int DAYS_TO_SHOW_PAST_TOURNAMENT = 30;
+    private static final String CATEGORIES = "categories";
 
     @Inject
     private DSLContext jooq;
@@ -246,19 +248,32 @@ public class TournamentDao {
     }
 
     public Optional<MyTournamentInfo> getMyTournamentInfo(int tid) {
-        return ofNullable(jooq.select(TOURNAMENT.QUITS_FROM_GROUP,
-                TOURNAMENT.STATE, TOURNAMENT.MAX_GROUP_SIZE, TOURNAMENT.NAME)
+        return ofNullable(jooq.select(TOURNAMENT.NAME,
+                TOURNAMENT.STATE, TOURNAMENT.PID, PLACE.NAME,
+                TOURNAMENT.OPENS_AT, TOURNAMENT.TICKET_PRICE,
+                TOURNAMENT.PREVIOUS_TID,
+                DSL.selectCount().from(CATEGORY)
+                        .where(CATEGORY.TID.eq(tid))
+                        .asField(CATEGORIES),
+                DSL.selectCount()
+                        .from(BID)
+                        .where(BID.TID.eq(tid), BID.STATE.ne(Quit))
+                        .asField(ENLISTED))
                 .from(TOURNAMENT)
                 .where(TOURNAMENT.TID.eq(tid))
                 .fetchOne())
                 .map(r -> MyTournamentInfo.builder()
                         .tid(tid)
                         .name(r.get(TOURNAMENT.NAME))
+                        .place(PlaceLink.builder()
+                                .name(r.get(PLACE.NAME))
+                                .pid(r.get(TOURNAMENT.PID))
+                                .build())
                         .state(r.get(TOURNAMENT.STATE))
-                        .maxGroupSize(r.get(TOURNAMENT.MAX_GROUP_SIZE))
-                        .quitesFromGroup(r.get(TOURNAMENT.QUITS_FROM_GROUP))
+                        .price(r.get(TOURNAMENT.TICKET_PRICE))
+                        .opensAt(r.get(TOURNAMENT.OPENS_AT))
+                        .previousTid(r.get(TOURNAMENT.PREVIOUS_TID))
                         .build());
-
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)

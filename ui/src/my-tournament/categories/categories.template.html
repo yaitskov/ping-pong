@@ -1,36 +1,59 @@
-<div class="container-fluid">
-  <main-menu></main-menu>
-  <div class="alert alert-error" ng-show="$ctrl.error">
-    {{$ctrl.error}}
+<main-menu></main-menu>
+<div class="container">
+  <request-status></request-status>
+  <div class="form-group">
+    <a class="btn btn-primary"
+       ng-show="$ctrl.tournament.state == 'Announce' || $ctrl.tournament.state == 'Hidden'"
+       ng-click="$ctrl.beginDraft()">
+      Begin Draft
+    </a>
+    <a class="btn btn-default" href="#!/my/tournament/{{$ctrl.tournament.tid}}">
+      View tournament
+    </a>
   </div>
-  <div class="alert alert-info" ng-show="$ctrl.categories === null">
-    Loading..
+  <div class="form-group" ng-show="$ctrl.categories.length == 0">
+    <div class="alert alert-info" >
+      No categories
+    </div>
   </div>
-  <div class="alert alert-info" ng-show="$ctrl.categories.length == 0">
-    No categories
+  <div class="form-group">
+    <form novalidate name="$ctrl.form"
+          ng-submit="$ctrl.addGroup()"
+          class="form-inline">
+      <div class="form-group"
+           ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.name.$dirty) && $ctrl.form.name.$invalid}">
+        <div>
+          <input type="text" placeholder="Category Name"
+                 class="form-control"
+                 ng-maxlength="100"
+                 required
+                 name="name"
+                 ng-model="$ctrl.newCategoryName"/>
+          <button class="btn btn-primary" type="submit">add</button>
+        </div>
+        <p class="help-block"
+           ng-show="$ctrl.form.name.$error.minlength || $ctrl.form.name.$error.maxlength">
+          Name length must be less than 100 letters
+        </p>
+      </div>
+    </form>
   </div>
-  <div class="col-md-10">
-    <ul class="categories">
-      <li class="clearfix">
-        <form class="form-inline">
-          <div class="form-group">
-            <input type="text" placeholder="Group Name"
-                   class="form-control"
-                   ng-model="$ctrl.newCategoryName"/>
-          </div>
-          <button class="btn btn-primary" ng-click="$ctrl.addGroup()">add</button>
-        </form>
-      </li>
-      <li ng-repeat="category in $ctrl.categories" class="clearfix">
-        <form class="form-inline">
-          <div class="form-group">
-            <label>
-              {{category.name}}
-            </label>
-          </div>
-          <button class="btn btn-default" ng-click="$ctrl.removeCategoryByIdx($index)">Remove</button>
-        </form>
-      </li>
-    </ul>
+
+  <div class="form-group" ng-show="$ctrl.categories">
+    <table class="table categories">
+      <tr ng-repeat="category in $ctrl.categories">
+        <td>
+          <a class="btn btn-danger" title="Remove category if it's empty"
+             ng-click="$ctrl.removeCategoryByIdx($index)">
+            <span class="glyphicon glyphicon-remove-circle"></span>
+          </a>
+        </td>
+        <td>
+          <a href="#!/tournament/category/bids">
+            {{category.name}}
+          </a>
+        </td>
+      </tr>
+    </table>
   </div>
 </div>

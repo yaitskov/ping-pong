@@ -11,6 +11,9 @@ angular.
                                                                             maxGroupSize: 8,
                                                                             ticketPrice: 30,
                                                                             matchScore: 3};
+                         if (this.tournament.tid) {
+                             delete this.tournament.tid;
+                         }
                          var self = this;
                          this.dataPickerUi = {};
                          this.dateOpts = {enableTime: false,

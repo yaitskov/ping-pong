@@ -4,8 +4,8 @@ angular.
     module('myTournament').
     component('myTournament', {
         templateUrl: 'my-tournament/my-tournament.template.html',
-        controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu', '$http',
-                     function ($routeParams, Tournament, auth, mainMenu, $http) {
+        controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu', '$http', 'pageCtx',
+                     function ($routeParams, Tournament, auth, mainMenu, $http, pageCtx) {
                          mainMenu.setTitle('My tournament...');
                          var ctxMenu = {};
                          ctxMenu['#!/my/tournament/presence/' + $routeParams.tournamentId] = 'Check Presence';
@@ -19,6 +19,10 @@ angular.
                                  mainMenu.setTitle('Administration of ' + tournament.name);
                                  mainMenu.setContextMenu(ctxMenu);
                                  self.tournament = tournament;
+                                 pageCtx.put('tournamentInfoForCategories',
+                                             {tid: self.tournament.tid,
+                                              name: self.tournament.name,
+                                              state: self.tournament.state});
                              });
                          this.canBeginDrafting = function () {
                              return self.tournament && (self.tournament.state == 'Hidden'

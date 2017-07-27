@@ -312,6 +312,23 @@ $success-bg-color: #dff0d8;
         font-size: 13px;
         margin-right: 10px;
     }
+
+    .categories {
+        tr td:first-child {
+            width: 10%;
+        }
+        tr td:nth-child(2) {
+            a {
+                font-size: 18px;
+            }
+        }
+        tr td {
+            a.btn {
+                padding: 2px 8px;
+            }
+            vertical-align: middle;
+        }
+    }
 }
 /* end of desktop layout */
 

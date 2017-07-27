@@ -43,6 +43,10 @@ angular.
                                          self.tournament.tid = okResp.data;
                                          self.published = self.tournament.tid;
                                          pageCtx.put('newTournament', self.tournament);
+                                         pageCtx.put('tournamentInfoForCategories',
+                                                     {tid: self.tournament.tid,
+                                                      name: self.tournament.name,
+                                                      state: 'Hidden'});
                                          requestStatus.complete();
                                      },
                                      requestStatus.failed);

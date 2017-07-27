@@ -1,10 +1,10 @@
 <main-menu></main-menu>
 <request-status></request-status>
-<div class="container">
+<div class="container participant-presence">
   <div class="alert alert-info" ng-show="$ctrl.enlisted.length == 0">
     Nobody has enlisted yet.
   </div>
-  <table class="table table-bordered" ng-show="$ctrl.enlisted">
+  <table class="table" ng-show="$ctrl.enlisted">
     <thead>
       <tr>
         <td>
@@ -16,11 +16,12 @@
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="participant in $ctrl.enlisted ">
+      <tr ng-repeat="participant in $ctrl.enlisted | orderBy : 'user.name' ">
         <td>
           <div class="btn-group">
             <a class="btn btn-danger"
                ng-click="$ctrl.expel($index)"
+               ng-show="$ctrl.canExpel($index)"
                title="Expel participant">
               <span class="glyphicon glyphicon-remove"></span>
             </a>

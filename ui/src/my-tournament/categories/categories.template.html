@@ -29,7 +29,9 @@
                  required
                  name="name"
                  ng-model="$ctrl.newCategoryName"/>
-          <button class="btn btn-primary" type="submit">add</button>
+          <button class="btn btn-primary" type="submit">
+            <span class="glyphicon glyphicon-plus-sign"></span>
+          </button>
         </div>
         <p class="help-block"
            ng-show="$ctrl.form.name.$error.minlength || $ctrl.form.name.$error.maxlength">

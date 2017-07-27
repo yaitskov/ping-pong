@@ -11,6 +11,10 @@ angular.module('participantPresence').
                          mainMenu.setContextMenu(ctxMenu);
                          this.enlisted = null;
                          var self = this;
+                         this.canExpel = function (idx) {
+                             var state = this.enlisted[idx].state;
+                             return state != 'Expl' && state != 'Quit';
+                         };
                          this.flipParticipant = function (idx) {
                              console.log("check participant " + idx);
                              var participant = self.enlisted[idx];

@@ -3,8 +3,8 @@
 angular.module('participantPresence').
     component('participantPresence', {
         templateUrl: 'participant-presence/participant-presence.template.html',
-        controller: ['$http', 'mainMenu', '$routeParams', 'auth',
-                     function ($http, mainMenu, $routeParams, auth) {
+        controller: ['$http', 'mainMenu', '$routeParams', 'auth', 'requestStatus',
+                     function ($http, mainMenu, $routeParams, auth, requestStatus) {
                          mainMenu.setTitle('Checking presence of participants');
                          var ctxMenu = {};
                          ctxMenu['#!/my/tournament/' + $routeParams.tournamentId] = 'Tournament';
@@ -42,16 +42,15 @@ angular.module('participantPresence').
                                          });
                              }
                          };
+                         requestStatus.startLoading();
                          $http.get('/api/bid/enlisted-to-be-checked/' + $routeParams.tournamentId,
                                    {headers: {session: auth.mySession()}}).
                              then(
                                  function (okResp) {
                                      self.enlisted = okResp.data;
-                                     console.log("enlisted");
+                                     requestStatus.complete();
                                  },
-                                 function (badResp) {
-                                     console.log("failed get enlisted");
-                                 });
+                                 requestStatus.failed);
 
                      }
                     ]

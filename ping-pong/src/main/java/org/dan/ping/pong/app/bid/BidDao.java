@@ -3,10 +3,9 @@ package org.dan.ping.pong.app.bid;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
+import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
 import static ord.dan.ping.pong.jooq.Tables.USERS;
-import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
-import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
@@ -15,6 +14,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
@@ -129,12 +129,19 @@ public class BidDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<ParticipantState> findEnlisted(int tid) {
-        return jooq.select(BID.UID, USERS.NAME, BID.STATE).from(BID)
-                .innerJoin(USERS).on(BID.UID.eq(USERS.UID))
-                .where(BID.TID.eq(tid),
-                        BID.STATE.in(Want, Paid, Here))
+        return jooq.select(BID.UID, USERS.NAME, BID.STATE, CATEGORY.NAME, CATEGORY.CID)
+                .from(BID)
+                .innerJoin(USERS)
+                .on(BID.UID.eq(USERS.UID))
+                .innerJoin(CATEGORY)
+                .on(BID.CID.eq(CATEGORY.CID))
+                .where(BID.TID.eq(tid))
                 .fetch()
                 .map(r -> ParticipantState.builder()
+                        .category(CategoryInfo.builder()
+                                .cid(r.get(CATEGORY.CID))
+                                .name(CATEGORY.getName())
+                                .build())
                         .user(UserLink.builder()
                                 .name(r.get(USERS.NAME))
                                 .uid(r.get(BID.UID))

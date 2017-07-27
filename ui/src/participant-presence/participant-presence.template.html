@@ -1,19 +1,58 @@
-<div class="container-fluid">
-  <main-menu></main-menu>
-  <ul ng-show="$ctrl.enlisted">
-    <li ng-repeat="participant in $ctrl.enlisted">
-      <span>{{participant.user.name}}</span>
-      <a class="btn"
-         ng-class="{true: 'btn-primary', false: 'btn-danger'}[participant.state == 'Here']"
-         ng-click="$ctrl.flipParticipant($index)">
-        {{participant.state == 'Here' && 'is ready to play' || 'is not ready'}}
-      </a>
-    </li>
-  </ul>
+<main-menu></main-menu>
+<request-status></request-status>
+<div class="container">
   <div class="alert alert-info" ng-show="$ctrl.enlisted.length == 0">
     Nobody has enlisted yet.
   </div>
-  <div class="alert alert-info" ng-show="$ctrl.enlisted === null">
-    Loading ...
-  </div>
+  <table class="table table-bordered" ng-show="$ctrl.enlisted">
+    <thead>
+      <tr>
+        <td>
+          <!-- Operation -->
+        </td>
+        <td>Name</td>
+        <td>State</td>
+        <td>Category</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="participant in $ctrl.enlisted ">
+        <td>
+          <div class="btn-group">
+            <a class="btn btn-danger"
+               ng-click="$ctrl.expel($index)"
+               title="Expel participant">
+              <span class="glyphicon glyphicon-remove"></span>
+            </a>
+            <a class="btn btn-primary"
+               ng-click="$ctrl.markAsPaied($index)"
+               title="Mark that participant paid">
+              <span class="glyphicon glyphicon-credit-card"></span>
+            </a>
+            <a class="btn btn-primary"
+               ng-click="$ctrl.participantIsHere($index)"
+               title="Mark that participant is here">
+              <span class="glyphicon glyphicon-ok"></span>
+            </a>
+            <a class="btn btn-primary"
+               ng-click="$ctrl.resetToWant($index)"
+               title="Reset to state - want to participate">
+              <span class="glyphicon glyphicon-repeat"></span>
+            </a>
+          </div>
+        </td>
+        <td>
+          <a href="#!/participant/{{participant.user.uid}}">
+            {{participant.user.name}}
+          </a>
+        </td>
+        <td>
+          {{participant.state}}
+        </td>
+        <td>
+          {{participant.category.name}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>

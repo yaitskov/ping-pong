@@ -20,6 +20,14 @@ angular.
                                         headers: {
                                             session: 1
                                         }
+                                    },
+                                    setState: {
+                                        url: '/api/bid/set-state',
+                                        method: 'POST',
+                                        cache: false,
+                                        headers: {
+                                            session: 1
+                                        }
                                     }
                                 });
                             }

@@ -5,7 +5,6 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
-import org.dan.ping.pong.app.user.UserLink;
 
 import java.util.List;
 
@@ -65,6 +64,13 @@ public class BidResource {
     @Consumes(APPLICATION_JSON)
     public void setCategory(@HeaderParam(SESSION) String session, SetCategory setCategory) {
         bidService.setCategory(setCategory);
+    }
+
+    @POST
+    @Path("/bid/set-state")
+    @Consumes(APPLICATION_JSON)
+    public void setStatus(@HeaderParam(SESSION) String session, SetBidState setState) {
+        bidService.setBidState(setState);
     }
 
     @GET

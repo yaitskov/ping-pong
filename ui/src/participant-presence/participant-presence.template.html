@@ -26,17 +26,20 @@
               <span class="glyphicon glyphicon-remove"></span>
             </a>
             <a class="btn btn-primary"
-               ng-click="$ctrl.markAsPaied($index)"
+               ng-click="$ctrl.markAsPaid($index)"
+               ng-show="$ctrl.canPay($index)"
                title="Mark that participant paid">
               <span class="glyphicon glyphicon-credit-card"></span>
             </a>
             <a class="btn btn-primary"
                ng-click="$ctrl.participantIsHere($index)"
+               ng-show="$ctrl.canCheck($index)"
                title="Mark that participant is here">
               <span class="glyphicon glyphicon-ok"></span>
             </a>
             <a class="btn btn-primary"
                ng-click="$ctrl.resetToWant($index)"
+               ng-show="$ctrl.canReset($index)"
                title="Reset to state - want to participate">
               <span class="glyphicon glyphicon-repeat"></span>
             </a>

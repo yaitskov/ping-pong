@@ -46,4 +46,10 @@ public class BidService {
     public void setCategory(SetCategory setCategory) {
         bidDao.setCategory(setCategory);
     }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void setBidState(SetBidState setState) {
+        bidDao.setBidState(setState.getTid(), setState.getUid(),
+                setState.getExpected(), setState.getTarget());
+    }
 }

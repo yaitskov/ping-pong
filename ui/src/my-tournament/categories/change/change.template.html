@@ -1,0 +1,19 @@
+<main-menu></main-menu>
+<div class="container">
+  <request-status></request-status>
+  <div class="form-group" ng-show="$ctrl.categories.length == 0">
+    <div class="alert alert-info" >
+      No categories
+    </div>
+  </div>
+  <div class="form-group" ng-show="$ctrl.categories">
+    <ul>
+      <li ng-repeat="category in $ctrl.categories">
+          <a title="Pick"
+             ng-click="$ctrl.assignCategory(category.cid)">
+            {{category.name}}
+          </a>
+      </li>
+    </ul>
+  </div>
+</div>

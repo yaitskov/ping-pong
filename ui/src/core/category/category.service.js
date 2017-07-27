@@ -13,6 +13,15 @@ angular.
                                          session: 1
                                      },
                                      isArray: true
+                                 },
+                                 ofTournament: {
+                                     url: '/api/category/find/by/tid/:tournamentId',
+                                     method: 'GET',
+                                     cache: false,
+                                     headers: {
+                                         session: 1
+                                     },
+                                     isArray: true
                                  }
                              });
                          }

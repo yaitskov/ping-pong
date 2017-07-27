@@ -531,6 +531,11 @@
                                 </forcedType>
                                 <forcedType>
                                     <name>Instant</name>
+                                    <expression>.*bid\.(created)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Instant</name>
                                     <expression>.*tournament\.(opens_at)</expression>
                                     <types>.*</types>
                                 </forcedType>

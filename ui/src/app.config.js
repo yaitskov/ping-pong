@@ -52,6 +52,9 @@ angular.module('pingPong').
                     when('/my/tournament/:tournamentId/category/:categoryId/members', {
                         template: '<category-member-list></category-member-list>'
                     }).
+                    when('/my/tournament/:tournamentId/change-category/:participantId', {
+                        template: '<change-category></change-category>'
+                    }).
                     when('/my/matches/judgement', {
                         template: '<my-match-judge-list></my-match-judge-list>'
                     }).
@@ -75,6 +78,9 @@ angular.module('pingPong').
                     }).
                     when('/my/tournament/presence/:tournamentId', {
                         template: '<participant-presence></participant-presence>'
+                    }).
+                    when('/my/tournament/:tournamentId/participant/:userId', {
+                        template: '<participant></participant>'
                     }).
                     when('/my/tournament/categories/:tournamentId', {
                         template: '<tournament-categories></tournament-categories>'

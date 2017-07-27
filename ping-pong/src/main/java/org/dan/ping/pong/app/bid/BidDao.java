@@ -140,7 +140,7 @@ public class BidDao {
                 .map(r -> ParticipantState.builder()
                         .category(CategoryInfo.builder()
                                 .cid(r.get(CATEGORY.CID))
-                                .name(CATEGORY.getName())
+                                .name(r.get(CATEGORY.NAME))
                                 .build())
                         .user(UserLink.builder()
                                 .name(r.get(USERS.NAME))
@@ -148,5 +148,37 @@ public class BidDao {
                                 .build())
                         .state(r.get(BID.STATE))
                         .build());
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public Optional<DatedParticipantState> getParticipantInfo(int tid, int uid) {
+        return ofNullable(jooq.select(BID.UID, USERS.NAME, BID.STATE,
+                BID.CREATED, CATEGORY.NAME, CATEGORY.CID)
+                .from(BID)
+                .innerJoin(USERS)
+                .on(BID.UID.eq(USERS.UID))
+                .innerJoin(CATEGORY)
+                .on(BID.CID.eq(CATEGORY.CID))
+                .where(BID.TID.eq(tid), BID.UID.eq(uid))
+                .fetchOne())
+                .map(r -> DatedParticipantState.builder()
+                        .category(CategoryInfo.builder()
+                                .cid(r.get(CATEGORY.CID))
+                                .name(r.get(CATEGORY.NAME))
+                                .build())
+                        .enlistedAt(r.get(BID.CREATED))
+                        .user(UserLink.builder()
+                                .name(r.get(USERS.NAME))
+                                .uid(r.get(BID.UID))
+                                .build())
+                        .state(r.get(BID.STATE))
+                        .build());
+    }
+
+    public void setCategory(SetCategory setCategory) {
+        jooq.update(BID).set(BID.CID, setCategory.getCid())
+                .where(BID.TID.eq(setCategory.getTid()),
+                        BID.UID.eq(setCategory.getUid()))
+                .execute();
     }
 }

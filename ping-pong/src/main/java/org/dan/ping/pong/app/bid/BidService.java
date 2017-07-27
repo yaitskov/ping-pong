@@ -6,6 +6,7 @@ import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
+import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +32,18 @@ public class BidService {
         return bidDao.findEnlisted(tid);
     }
 
+    public DatedParticipantState getParticipantState(int tid, int uid) {
+        return bidDao.getParticipantInfo(tid, uid)
+                .orElseThrow(() -> notFound("Participant has not been found"));
+    }
+
     @Transactional(TRANSACTION_MANAGER)
     public void disappeared(BidId bidId) {
         bidDao.setBidState(bidId, asList(Here, Paid), Want);
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void setCategory(SetCategory setCategory) {
+        bidDao.setCategory(setCategory);
     }
 }

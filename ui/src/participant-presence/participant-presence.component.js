@@ -8,6 +8,7 @@ angular.module('participantPresence').
                          mainMenu.setTitle('Checking presence of participants');
                          var ctxMenu = {};
                          ctxMenu['#!/my/tournament/' + $routeParams.tournamentId] = 'Tournament';
+                         this.tournamentId = $routeParams.tournamentId;
                          mainMenu.setContextMenu(ctxMenu);
                          this.enlisted = null;
                          var self = this;

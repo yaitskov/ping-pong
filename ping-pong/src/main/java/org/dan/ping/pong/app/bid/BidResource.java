@@ -60,11 +60,27 @@ public class BidResource {
         bidService.disappeared(bidId);
     }
 
+    @POST
+    @Path("/bid/set-category")
+    @Consumes(APPLICATION_JSON)
+    public void setCategory(@HeaderParam(SESSION) String session, SetCategory setCategory) {
+        bidService.setCategory(setCategory);
+    }
+
     @GET
     @Path("/bid/enlisted-to-be-checked/{tid}")
     public List<ParticipantState> enlistedToBeChecked(
             @HeaderParam(SESSION) String session,
             @PathParam("tid") int tid) {
         return bidService.findEnlisted(tid);
+    }
+
+    @GET
+    @Path("/bid/state/{tid}/{uid}")
+    public DatedParticipantState getParticipantState(
+            @HeaderParam(SESSION) String session,
+            @PathParam("tid") int tid,
+            @PathParam("uid") int uid) {
+        return bidService.getParticipantState(tid, uid);
     }
 }

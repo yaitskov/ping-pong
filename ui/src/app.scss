@@ -50,6 +50,11 @@ $success-bg-color: #dff0d8;
 .clicked {
     background-color: $active-background-color - #151515;
 }
+
+ul li a {
+    cursor: pointer;
+}
+
 /* end of clickable directive */
 
 /* begin of open tournament list */

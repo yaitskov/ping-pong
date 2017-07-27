@@ -267,6 +267,8 @@ public class TournamentDao {
                 .map(r -> MyTournamentInfo.builder()
                         .tid(tid)
                         .name(r.get(TOURNAMENT.NAME))
+                        .enlisted(r.get(ENLISTED, Integer.class))
+                        .categories(r.get(CATEGORIES, Integer.class))
                         .place(PlaceLink.builder()
                                 .name(r.get(PLACE.NAME))
                                 .pid(r.get(TOURNAMENT.PID))

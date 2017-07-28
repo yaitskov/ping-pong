@@ -80,14 +80,14 @@
         but there is no any match to judge.
       </p>
       <p ng-show="$ctrl.tournament.next">
-        Next tournament, you judge, is <a href="#!/tournament/{{$ctrl.tournament.next.tid}}">
+        Next tournament, you judge, is <a href="#!/my/tournament/{{$ctrl.tournament.next.tid}}">
           {{$ctrl.tournament.next.name}}
         </a> tournament, which begins at {{$ctrl.tournament.next.opensAt
         | date: 'MMM d EEE h a Z'}}.
       </p>
       <p ng-show="$ctrl.tournament.previous">
         Latest
-          tournment <a href="#!/tournament/{{$ctrl.tournament.previous.tid}}">
+          tournment <a href="#!/my/tournament/{{$ctrl.tournament.previous.tid}}">
           {{$ctrl.tournament.previous.name}}</a> is complete.
       </p>
   </div>

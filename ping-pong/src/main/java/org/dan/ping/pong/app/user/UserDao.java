@@ -26,9 +26,11 @@ public class UserDao {
     @Transactional(transactionManager = TRANSACTION_MANAGER)
     public int register(UserRegRequest regRequest) throws PiPoEx {
         final int uid = jooq
-                .insertInto(USERS, USERS.NAME, USERS.PHONE, USERS.EMAIL)
+                .insertInto(USERS, USERS.NAME, USERS.PHONE,
+                        USERS.EMAIL, USERS.TYPE)
                 .values(regRequest.getName(),
-                        regRequest.getPhone(), regRequest.getEmail())
+                        regRequest.getPhone(), regRequest.getEmail(),
+                        regRequest.getUserType())
                 .returning(USERS.UID)
                 .fetchOne()
                 .getValue(USERS.UID);

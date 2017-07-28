@@ -15,6 +15,7 @@ import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserRegRequest;
+import org.dan.ping.pong.app.user.UserType;
 import org.dan.ping.pong.util.time.Clocker;
 import org.jooq.DSLContext;
 
@@ -48,12 +49,14 @@ public class DaoEntityGenerator {
                 .name(name)
                 .email(Optional.of(name.replaceAll("[ \t]", "_") + "@gmail.com"))
                 .phone(Optional.of("+48 799 33 8448"))
+                .userType(UserType.User)
                 .build();
         return UserInfo.builder()
                 .uid(userDao.register(request))
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .name(request.getName())
+                .userType(request.getUserType())
                 .build();
     }
 

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Optional;
 
@@ -16,4 +17,6 @@ public class UserRegRequest {
     private Optional<String> email;
     private Optional<String> phone;
     private String sessionPart;
+    @Setter
+    private UserType userType;
 }

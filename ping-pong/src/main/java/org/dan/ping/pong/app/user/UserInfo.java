@@ -14,4 +14,5 @@ public class UserInfo {
     private final int uid;
     private Optional<String> phone;
     private Optional<String> email;
+    private UserType userType;
 }

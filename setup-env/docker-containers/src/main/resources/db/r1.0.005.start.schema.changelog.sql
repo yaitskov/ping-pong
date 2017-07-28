@@ -11,6 +11,7 @@ create table sys_admin(
 create table users(
     uid int(11) not null auto_increment primary key,
     name varchar(40) not null,
+    type varchar(5) not null,
     phone varchar(20),
     email varchar(60),
     created timestamp(3) default current_timestamp(3),

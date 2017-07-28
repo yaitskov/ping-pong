@@ -498,6 +498,11 @@
                                     <binding>org.dan.ping.pong.app.table.TableStateConverter</binding>
                                 </customType>
                                 <customType>
+                                    <name>UserType</name>
+                                    <type>org.dan.ping.pong.app.user.UserType</type>
+                                    <binding>org.dan.ping.pong.app.user.UserTypeConverter</binding>
+                                </customType>
+                                <customType>
                                     <name>BidState</name>
                                     <type>org.dan.ping.pong.app.bid.BidState</type>
                                     <binding>org.dan.ping.pong.app.bid.BidStateConverter</binding>
@@ -512,6 +517,11 @@
                                 <forcedType>
                                     <name>OptionalString</name>
                                     <expression>.*users\.(email|phone)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>UserType</name>
+                                    <expression>.*users\.(type)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

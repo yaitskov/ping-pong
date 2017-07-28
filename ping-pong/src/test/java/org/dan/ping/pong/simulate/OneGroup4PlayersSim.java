@@ -53,6 +53,7 @@ public class OneGroup4PlayersSim {
                         .ignoreUnexpectedGames()
                         .name("justEnlist")
                         .category(c1, p1, p2, p3, p4)
+                        .doNotBegin()
                         .presence(EnlistMode.Enlist, p1, p2, p3, p4));
     }
 

@@ -13,7 +13,6 @@ import static org.dan.ping.pong.app.match.MatchType.Group;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static sun.audio.AudioPlayer.player;
 
 import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
@@ -39,14 +38,12 @@ import org.dan.ping.pong.mock.UserSessionGenerator;
 import org.dan.ping.pong.mock.ValueGenerator;
 import org.hamcrest.Matchers;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -85,6 +82,9 @@ public class Simulator {
     public void simulate(SimulatorParams params, TournamentScenario scenario) {
         scenario.setParams(params);
         setupEnvironment(params, scenario);
+        if (!scenario.isBegin()) {
+            return;
+        }
         restGenerator.beginTournament(testAdmin, scenario.getTid());
         try {
             final boolean allMatchesComplete = expendAllMatches(scenario);

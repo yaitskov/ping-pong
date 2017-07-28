@@ -41,6 +41,7 @@ public class TournamentScenario {
     private final Map<Set<Player>, Pause> pauseOnMatches = new HashMap<>();
     private final Map<Player, EnlistMode> playerPresence = new HashMap<>();
 
+    private boolean begin = true;
     @Setter
     private int tid;
     @Setter
@@ -159,6 +160,11 @@ public class TournamentScenario {
 
     public TournamentScenario presence(EnlistMode mode, Player... players) {
         asList(players).forEach(player -> playerPresence.put(player, mode));
+        return this;
+    }
+
+    public TournamentScenario doNotBegin() {
+        begin = false;
         return this;
     }
 }

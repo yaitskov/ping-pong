@@ -17,11 +17,13 @@
       </a>
       <a class="btn btn-default"
          title="Edit tournament"
+         ng-show="$ctrl.canEdit()"
          href="#!/my/tournament/edit/{{$ctrl.tournament.tid}}">
         <span class="glyphicon glyphicon-edit"></span>
       </a>
       <a class="btn btn-default"
          title="Configure tournament parameters"
+         ng-show="$ctrl.canConfigureParams()"
          href="#!/my/tournament/parameters/{{$ctrl.tournament.tid}}">
         <span class="glyphicon glyphicon-cog"></span>
       </a>

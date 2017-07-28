@@ -33,6 +33,16 @@ angular.
                          this.isDrafting = function () {
                              return self.tournament && self.tournament.state == 'Draft';
                          };
+                         this.canEdit = function () {
+                             return self.tournament && (self.tournament.state == 'Hidden'
+                                                        || self.tournament.state == 'Draft'
+                                                        || self.tournament.state == 'Announce');
+                         }
+                         this.canConfigureParams = function () {
+                             return self.tournament && (self.tournament.state == 'Hidden'
+                                                        || self.tournament.state == 'Draft'
+                                                        || self.tournament.state == 'Announce');
+                         };
                          this.beginDrafting = function () {
                              requestStatus.startLoading();
                              $http.post('/api/tournament/state',

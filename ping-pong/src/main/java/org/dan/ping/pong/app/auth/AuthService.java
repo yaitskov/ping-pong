@@ -122,6 +122,7 @@ public class AuthService {
                 .uid(nameAndUid.getUid())
                 .name(nameAndUid.getName())
                 .session(token)
+                .type(nameAndUid.getType())
                 .build();
     }
 

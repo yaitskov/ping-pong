@@ -29,7 +29,7 @@ angular.
                                 requestStatus.complete(okResp);
                                 auth.storeSession(okResp.data.session,
                                                   okResp.data.uid,
-                                                  userName, self.email);
+                                                  userName, self.email, 'User');
                             },
                             requestStatus.failed);
                 };

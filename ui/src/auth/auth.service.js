@@ -13,6 +13,9 @@ angular.
                                  return !!LocalStorage.get('admin') ||
                                      !!LocalStorage.get('adminOfTournaments');
                              };
+                             this.userType = function () {
+                                 return LocalStorage.get('myType') || 'User';
+                             };
                              this.logout = function () {
                                  LocalStorage.clearAll();
                                  $location.path('/');
@@ -36,12 +39,13 @@ angular.
                                  this.returnOnAuth = $location.path();
                                  $location.path('/sign-up');
                              };
-                             this.storeSession = function (fullSession, uid, name, email) {
+                             this.storeSession = function (fullSession, uid, name, email, type) {
                                  console.log("Authenticated as " + fullSession);
                                  LocalStorage.store('mySession', fullSession);
                                  LocalStorage.store('myUid', uid);
                                  LocalStorage.store('myName', name);
                                  LocalStorage.store('myEmail', email);
+                                 LocalStorage.store('myType', type);
                                  if (this.returnOnAuth) {
                                      $location.path(this.returnOnAuth);
                                      this.returnOnAuth = null

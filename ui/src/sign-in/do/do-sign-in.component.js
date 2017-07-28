@@ -19,7 +19,8 @@ angular.
                             auth.storeSession(resp.data.session,
                                               resp.data.uid,
                                               resp.data.name,
-                                              $routeParams.email);
+                                              $routeParams.email,
+                                              resp.data.type);
                             $location.path('/');
                         },
                         function (bad) {

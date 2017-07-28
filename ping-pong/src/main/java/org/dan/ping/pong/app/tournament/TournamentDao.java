@@ -424,4 +424,15 @@ public class TournamentDao {
                 .previous(findMyPreviousJudgeTournament(now, uid))
                 .build();
     }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void update(TournamentUpdate update) {
+        jooq.update(TOURNAMENT)
+                .set(TOURNAMENT.TICKET_PRICE, update.getPrice())
+                .set(TOURNAMENT.PID, update.getPlaceId())
+                .set(TOURNAMENT.NAME, update.getName())
+                .set(TOURNAMENT.OPENS_AT, update.getOpensAt())
+                .where(TOURNAMENT.TID.eq(update.getTid()))
+                .execute();
+    }
 }

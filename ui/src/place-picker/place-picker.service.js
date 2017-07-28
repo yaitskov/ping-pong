@@ -15,6 +15,9 @@ angular.module('placePicker').
                 this.chosenPlace = place;
                 window.history.back();
             }
+            this.reset = function () {
+                self.chosenPlace = null;
+            };
             this.getChosenPlace = function () {
                 return this.chosenPlace;
             };

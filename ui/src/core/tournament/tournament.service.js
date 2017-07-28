@@ -71,6 +71,13 @@ angular.
                                        headers: {
                                            session: 1
                                        }
+                                   },
+                                   update: {
+                                       url: '/api/tournament/update',
+                                       method: 'POST',
+                                       headers: {
+                                           session: 1
+                                       }
                                    }
                                });
                            }

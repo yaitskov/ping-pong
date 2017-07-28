@@ -1,9 +1,15 @@
 package org.dan.ping.pong.app.tournament;
 
+import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
+import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
+import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
+import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
+import static org.dan.ping.pong.sys.error.PiPoEx.notAuthorized;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
+import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
@@ -19,6 +25,7 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 public class TournamentService {
+    private static final ImmutableSet<TournamentState> EDITABLE_STATES = ImmutableSet.of(Hidden, Announce, Draft);
     @Inject
     private TournamentDao tournamentDao;
 
@@ -110,5 +117,20 @@ public class TournamentService {
 
     public MyRecentJudgedTournaments findMyRecentJudgedTournaments(int uid) {
         return tournamentDao.findMyRecentJudgedTournaments(clocker.get(), uid);
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void update(int uid, TournamentUpdate update) {
+        if (tournamentDao.isAdminOf(uid, update.getTid())) {
+            final TournamentState state = tournamentDao.getById(update.getTid())
+                    .orElseThrow(() -> notFound("Tournament does not exist"))
+                    .getState();
+            if (!EDITABLE_STATES.contains(state)) {
+                throw badRequest("Tournament could be modified until it's open");
+            }
+            tournamentDao.update(update);
+        } else {
+            throw forbidden("No write access to the tournament");
+        }
     }
 }

@@ -4,8 +4,8 @@ angular.
     module('myTournament').
     component('myTournament', {
         templateUrl: 'my-tournament/my-tournament.template.html',
-        controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu', '$http', 'pageCtx', 'requestStatus',
-                     function ($routeParams, Tournament, auth, mainMenu, $http, pageCtx, requestStatus) {
+        controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu', '$http', 'pageCtx', 'requestStatus', '$location',
+                     function ($routeParams, Tournament, auth, mainMenu, $http, pageCtx, requestStatus, $location) {
                          mainMenu.setTitle('My tournament ...');
                          var ctxMenu = {};
                          ctxMenu['#!/my/tournament/presence/' + $routeParams.tournamentId] = 'Check Presence';
@@ -65,6 +65,7 @@ angular.
                                      function (okResp) {
                                          self.tournament.state = 'Open';
                                          requestStatus.complete();
+                                         $location.path("/my/matches/judgement");
                                      },
                                      requestStatus.failed);
                          };

@@ -345,6 +345,9 @@ ul li a {
                 margin-right: 4px;
             }
         }
+        .icon-image {
+            width: 18px;
+        }
     }
 
     .participant-presence {
@@ -713,5 +716,11 @@ td.match-state-description.text-danger {
         }
     }
     /* end of categories for mobile */
+
+    .my-tournament-admin {
+        .icon-image {
+            width: 18px;
+        }
+    }
 }
 /* end of mobile layout */

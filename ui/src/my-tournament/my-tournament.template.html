@@ -9,6 +9,12 @@
          title="Split participants into groups and open tournament">
         <span class="glyphicon glyphicon-play-circle"></span>
       </a>
+      <a class="btn btn-primary"
+         href="#!/my/matches/judgement"
+         ng-show="$ctrl.tournament.state == 'Open'"
+         title="Judge and score open matches in the tournament">
+        <img src="/img/whistle.png" class="icon-image"/>
+      </a>
       <a class="btn btn-default"
          title="Previous Tournament in the seria"
          href="#!/my/tournament/{{$ctrl.tournament.previousTid}}"

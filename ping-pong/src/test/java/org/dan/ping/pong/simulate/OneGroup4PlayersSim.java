@@ -9,6 +9,7 @@ import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.Player.p5;
 import static org.dan.ping.pong.mock.simulator.Player.p6;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
+import static org.dan.ping.pong.mock.simulator.PlayerCategory.c2;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_3_Q_1_G_8;
 
@@ -55,6 +56,20 @@ public class OneGroup4PlayersSim {
                         .category(c1, p1, p2, p3, p4)
                         .doNotBegin()
                         .presence(EnlistMode.Enlist, p1, p2, p3, p4));
+    }
+
+    @Test
+    @SneakyThrows
+    public void justEnlist2Categories3To1() {
+        simulator.simulate(T_1_Q_1_G_8,
+                TournamentScenario.begin()
+                        .ignoreUnexpectedGames()
+                        .name("justEnlist2Categories3To1")
+                        .category(c1, p1, p2, p3)
+                        .category(c2, p4)
+                        .doNotBegin()
+                        .presence(EnlistMode.Enlist, p4)
+                        .presence(EnlistMode.Pay, p1, p2, p3));
     }
 
     @Test

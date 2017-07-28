@@ -12,6 +12,7 @@ angular.
                          ctxMenu['#!/my/tournament/categories/' + $routeParams.tournamentId] = 'Categories';
                          var self = this;
                          self.tournament = null;
+                         self.wantRemove = false;
                          requestStatus.startLoading();
                          Tournament.aMine(
                              {tournamentId: $routeParams.tournamentId},
@@ -75,6 +76,10 @@ angular.
                                                          || self.tournament.state == 'Replaced');
                          };
                          this.cancel = function () {
+                             this.wantRemove = true;
+                         }
+                         this.confirmCancel = function () {
+                             this.wantRemove = false;
                              requestStatus.startLoading('Cancelation of the tournament');
                              $http.post("/api/tournament/cancel",
                                         self.tournament.tid,

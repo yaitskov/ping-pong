@@ -47,6 +47,18 @@
       </a>
     </div>
   </div>
+  <div class="form-group" ng-show="$ctrl.wantRemove">
+    <div class="alert alert-danger">
+      Confirm that you want to terminate/cancel tournament. You can
+      reopen tournament later, but players should replay matches from
+      the begging.
+    </div>
+  </div>
+  <div class="form-group" ng-show="$ctrl.wantRemove">
+    <a class="btn btn-danger" ng-click="$ctrl.confirmCancel()">
+      Confirm
+    </a>
+  </div>
   <div class="form-group">
     <table class="table">
       <tbody>

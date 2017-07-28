@@ -67,6 +67,10 @@ public class CastingLotsService {
         log.info("Casting log tournament {}", tid);
         final List<TournamentBid> readyBids = castingLotsDao.findBidsReadyToPlay(tid);
         groupByCategories(readyBids).forEach((cid, bids) -> {
+            if (bids.size() < 2) {
+                throw badRequest("There is a category with 1 participant."
+                        + " Expel him/her or move into another category.");
+            }
             final double bidsInCategory = bids.size();
             final int groups = max(1, (int) ceil(bidsInCategory / maxGroupSize));
             final int groupSize = (int) ceil(bidsInCategory / groups);

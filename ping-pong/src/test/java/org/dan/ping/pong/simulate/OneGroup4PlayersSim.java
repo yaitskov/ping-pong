@@ -69,7 +69,7 @@ public class OneGroup4PlayersSim {
                         .category(c2, p4)
                         .doNotBegin()
                         .presence(EnlistMode.Enlist, p4)
-                        .presence(EnlistMode.Pay, p1, p2, p3));
+                        .presence(EnlistMode.Pass, p1, p2, p3));
     }
 
     @Test

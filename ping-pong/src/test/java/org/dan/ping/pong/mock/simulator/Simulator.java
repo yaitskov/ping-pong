@@ -39,12 +39,15 @@ import org.dan.ping.pong.mock.UserSessionGenerator;
 import org.dan.ping.pong.mock.ValueGenerator;
 import org.hamcrest.Matchers;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -268,7 +271,12 @@ public class Simulator {
         for (PlayerCategory category : scenario.getCategoryDbId().keySet()) {
             final int catId = daoGenerator.genCategory(prefix, tid);
             scenario.getCategoryDbId().put(category, catId);
-            restGenerator.enlistParticipants(testAdmin, tid,
+            Map<TestUserSession, EnlistMode> m = scenario.getPlayerPresence().keySet()
+                    .stream().collect(Collectors.toMap(
+                            player -> scenario.getPlayersSessions().get(player),
+                            player -> scenario.getPlayerPresence().get(player)));
+            restGenerator.enlistParticipants(rest, testAdmin,
+                    m, tid,
                     catId, scenario.getPlayersByCategories().get(category)
                             .stream().map(player -> scenario.getPlayersSessions().get(player))
                             .collect(toList()));

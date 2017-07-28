@@ -14,6 +14,7 @@ import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_3_Q_1_G_8;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.mock.simulator.EnlistMode;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.junit.Test;
@@ -42,6 +43,17 @@ public class OneGroup4PlayersSim {
                         .win(p1, p2)
                         .pause(p1, p3, BeforeScore)
                         .win(p1, p3));
+    }
+
+    @Test
+    @SneakyThrows
+    public void justEnlist() {
+        simulator.simulate(T_1_Q_1_G_8,
+                TournamentScenario.begin()
+                        .ignoreUnexpectedGames()
+                        .name("justEnlist")
+                        .category(c1, p1, p2, p3, p4)
+                        .presence(EnlistMode.Enlist, p1, p2, p3, p4));
     }
 
     @Test

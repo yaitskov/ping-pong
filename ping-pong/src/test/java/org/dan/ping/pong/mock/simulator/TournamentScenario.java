@@ -39,6 +39,8 @@ public class TournamentScenario {
     private final Map<Integer, Player> uidPlayer = new HashMap<>();
     private final Map<PlayerCategory, Integer> categoryDbId = new HashMap<>();
     private final Map<Set<Player>, Pause> pauseOnMatches = new HashMap<>();
+    private final Map<Player, EnlistMode> playerPresence = new HashMap<>();
+
     @Setter
     private int tid;
     @Setter
@@ -152,6 +154,11 @@ public class TournamentScenario {
                             throw new IllegalStateException("player "
                                     + p + " is at category " + oldCat);
                         }));
+        return this;
+    }
+
+    public TournamentScenario presence(EnlistMode mode, Player... players) {
+        asList(players).forEach(player -> playerPresence.put(player, mode));
         return this;
     }
 }

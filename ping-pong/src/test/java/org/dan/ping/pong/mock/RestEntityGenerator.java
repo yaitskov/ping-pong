@@ -1,5 +1,6 @@
 package org.dan.ping.pong.mock;
 
+import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.auth.AuthResource.AUTH_GENERATE_SIGN_IN_LINK;
 import static org.dan.ping.pong.app.bid.BidResource.BID_PAID;
 import static org.dan.ping.pong.app.bid.BidResource.BID_READY_TO_PLAY;
@@ -14,8 +15,10 @@ import org.dan.ping.pong.app.castinglots.DoCastingLots;
 import org.dan.ping.pong.app.match.CompleteMatch;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
+import org.dan.ping.pong.mock.simulator.EnlistMode;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -50,6 +53,35 @@ public class RestEntityGenerator {
                             .tid(tid)
                             .uid(userSession.getUid())
                             .build());
+        }
+    }
+
+    public void enlistParticipants(MyRest myRest, SessionAware adminSession,
+            Map<TestUserSession, EnlistMode> enlistModes,
+            int tid, int cid, List<TestUserSession> participants) {
+        for (TestUserSession userSession : participants) {
+            EnlistMode enlistMode = ofNullable(enlistModes.get(userSession)).orElse(EnlistMode.Pass);
+            if (enlistMode.compareTo(EnlistMode.Enlist) >= 0) {
+                myRest.voidPost(TOURNAMENT_ENLIST, userSession,
+                        EnlistTournament.builder()
+                                .tid(tid)
+                                .categoryId(cid)
+                                .build());
+            }
+            if (enlistMode.compareTo(EnlistMode.Pay) >= 0) {
+                myRest.voidPost(BID_PAID, adminSession,
+                        BidId.builder()
+                                .tid(tid)
+                                .uid(userSession.getUid())
+                                .build());
+            }
+            if (enlistMode.compareTo(EnlistMode.Pass) >= 0) {
+                myRest.voidPost(BID_READY_TO_PLAY, adminSession,
+                        BidId.builder()
+                                .tid(tid)
+                                .uid(userSession.getUid())
+                                .build());
+            }
         }
     }
 

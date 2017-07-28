@@ -47,4 +47,8 @@ public class TableService {
         }
         return tablesToAllocate;
     }
+
+    public void freeTables(int tid) {
+        tableDao.freeTablesByTid(tid);
+    }
 }

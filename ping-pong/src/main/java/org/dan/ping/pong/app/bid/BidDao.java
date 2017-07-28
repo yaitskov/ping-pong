@@ -7,6 +7,7 @@ import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
 import static ord.dan.ping.pong.jooq.Tables.USERS;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
+import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -110,7 +111,7 @@ public class BidDao {
         log.info("User {} resigned {} from tid {}",
                 uid,
                 jooq.update(BID)
-                        .set(BID.STATE, BidState.Quit)
+                        .set(BID.STATE, Quit)
                         .where(BID.UID.eq(uid), BID.TID.eq(tid))
                         .execute(),
                 tid);
@@ -179,6 +180,13 @@ public class BidDao {
         jooq.update(BID).set(BID.CID, setCategory.getCid())
                 .where(BID.TID.eq(setCategory.getTid()),
                         BID.UID.eq(setCategory.getUid()))
+                .execute();
+    }
+
+    public void resetStateByTid(int tid) {
+        jooq.update(BID)
+                .set(BID.STATE, BidState.Want)
+                .where(BID.TID.eq(tid), BID.STATE.ne(Quit))
                 .execute();
     }
 }

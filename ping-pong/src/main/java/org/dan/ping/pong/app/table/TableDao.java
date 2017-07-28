@@ -12,6 +12,7 @@ import static org.dan.ping.pong.app.table.TableState.Free;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -101,5 +102,16 @@ public class TableDao {
                         TABLES.STATE.in(Busy, Free))
                 .fetchOne()
                 .value1() > 0;
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void freeTablesByTid(int tid) {
+        jooq.update(TABLES)
+                .set(TABLES.MID, empty())
+                .set(TABLES.STATE, Free)
+                .where(TABLES.PID.eq(DSL.select(TOURNAMENT.PID)
+                        .from(TOURNAMENT)
+                        .where(TOURNAMENT.TID.eq(tid))))
+                .execute();
     }
 }

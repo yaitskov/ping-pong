@@ -1,12 +1,12 @@
 package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
+import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
-import static org.dan.ping.pong.sys.error.PiPoEx.notAuthorized;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import com.google.common.collect.ImmutableSet;
@@ -15,6 +15,7 @@ import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryInfo;
+import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.transaction.annotation.Transactional;
@@ -169,6 +170,21 @@ public class TournamentService {
         }
         if (parameters.getMaxGroupSize() <= parameters.getQuitsGroup()) {
             throw badRequest("Max group size is less than quits from group");
+        }
+    }
+
+    @Inject
+    private MatchDao matchDao;
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void cancel(int uid, int tid) {
+        if (tournamentDao.isAdminOf(uid, tid)) {
+            tournamentDao.setState(tid, Canceled);
+            matchDao.deleteAllByTid(tid);
+            bidDao.resetStateByTid(tid);
+            tableService.freeTables(tid);
+        } else {
+            throw forbidden("No write access to the tournament");
         }
     }
 }

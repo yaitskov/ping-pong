@@ -45,6 +45,12 @@
          ng-show="$ctrl.canBeginDrafting()">
         <span class="glyphicon glyphicon-globe"></span>
       </a>
+      <a class="btn btn-primary"
+         title="Restart canceled tournament from scratch"
+         ng-click="$ctrl.restart()"
+         ng-show="$ctrl.tournament.state == 'Canceled'">
+        <span class="glyphicon glyphicon-repeat"></span>
+      </a>
     </div>
   </div>
   <div class="form-group" ng-show="$ctrl.wantRemove">

@@ -1,6 +1,6 @@
 <main-menu></main-menu>
-<div class="container-fluid open-tournament">
-  <request-status></request-status>
+<div class="container open-tournament"
+     ng-show="$ctrl.tournament.state == 'Close' || $ctrl.tournament.state == 'Canceled' || $ctrl.tournament.state == 'Open' && $ctrl.matches.length == 0">
   <div ng-show="$ctrl.tournament.state == 'Close'">
     <div class="alert alert-info" >
       Tournament <a href="#!/tournament/result/{{$ctrl.tournament.tid}}">
@@ -17,6 +17,9 @@
        ng-show="$ctrl.tournament.state == 'Open' && $ctrl.matches.length == 0">
     There is no matches left to play.
   </div>
+</div>
+<div class="container-fluid open-tournament">
+  <request-status></request-status>
   <div ng-show="$ctrl.winners.length > 0">
     <fieldset>
       <legend>Winners</legend>

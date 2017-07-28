@@ -40,6 +40,13 @@ angular.
                                        method: 'GET',
                                        cache: false
                                    },
+                                   state: {
+                                       url: '/api/tournament/state',
+                                       method: 'POST',
+                                       headers: {
+                                           session: 1
+                                       }
+                                   },
                                    parameters: {
                                        url: '/api/tournament/params/:tournamentId',
                                        method: 'GET',

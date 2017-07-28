@@ -78,6 +78,18 @@ angular.
                          this.cancel = function () {
                              this.wantRemove = true;
                          }
+                         this.restart = function () {
+                             requestStatus.startLoading("Reseting");
+                             Tournament.state(
+                                 {tid: self.tournament.tid,
+                                  state: 'Draft'
+                                 },
+                                 function (ok) {
+                                     requestStatus.complete();
+                                     self.tournament.state = 'Draft';
+                                 },
+                                 requestStatus.failed);
+                         }
                          this.confirmCancel = function () {
                              this.wantRemove = false;
                              requestStatus.startLoading('Cancelation of the tournament');

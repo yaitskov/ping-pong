@@ -459,4 +459,14 @@ public class MatchDao {
                         .uid(r.get(BID.UID))
                         .build());
     }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void deleteAllByTid(int tid) {
+        jooq.deleteFrom(MATCH_SCORE)
+                .where(MATCH_SCORE.TID.eq(tid))
+                .execute();
+        jooq.deleteFrom(MATCHES)
+                .where(MATCHES.TID.eq(tid))
+                .execute();
+    }
 }

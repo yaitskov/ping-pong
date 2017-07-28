@@ -27,6 +27,7 @@ public class TournamentResource {
     public static final String RUNNING_TOURNAMENTS = TOURNAMENT + "running";
     private static final String TOURNAMENT_STATE = TOURNAMENT + "state";
     public static final String BEGIN_TOURNAMENT = TOURNAMENT + "begin";
+    public static final String CANCEL_TOURNAMENT = TOURNAMENT + "cancel";
     public static final String DRAFTING = TOURNAMENT + "drafting/";
     private static final String DRAFTING_PARAM = "drafting";
     public static final String DRAFTING_INFO = DRAFTING + "{" + DRAFTING_PARAM + "}";
@@ -172,6 +173,14 @@ public class TournamentResource {
         int uid = authService.userInfoBySession(session).getUid();
         log.info("Uid {} begins tid {}", uid, tid);
         tournamentService.begin(tid);
+    }
+
+    @POST
+    @Path(CANCEL_TOURNAMENT)
+    @Consumes(APPLICATION_JSON)
+    public void cancelTournament(@HeaderParam(SESSION) String session, int tid) {
+        final int uid = authService.userInfoBySession(session).getUid();
+        tournamentService.cancel(uid, tid);
     }
 
     @POST

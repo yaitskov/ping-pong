@@ -55,6 +55,9 @@ angular.module('pingPong').
                     when('/my/tournament/edit/:tournamentId', {
                         template: '<tournament-edit></tournament-edit>'
                     }).
+                    when('/my/tournament/parameters/:tournamentId', {
+                        template: '<tournament-parameters></tournament-parameters>'
+                    }).
                     when('/my/tournament/:tournamentId/change-category/:participantId', {
                         template: '<change-category></change-category>'
                     }).

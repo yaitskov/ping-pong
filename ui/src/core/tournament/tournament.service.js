@@ -40,6 +40,18 @@ angular.
                                        method: 'GET',
                                        cache: false
                                    },
+                                   parameters: {
+                                       url: '/api/tournament/params/:tournamentId',
+                                       method: 'GET',
+                                       cache: false
+                                   },
+                                   updateParams: {
+                                       url: '/api/tournament/params/:tournamentId',
+                                       method: 'POST',
+                                       headers: {
+                                           session: 1
+                                       }
+                                   },
                                    aMine: {
                                        url: '/api/tournament/mine/:tournamentId',
                                        method: 'GET',

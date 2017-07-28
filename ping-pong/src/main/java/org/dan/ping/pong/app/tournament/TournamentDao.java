@@ -435,4 +435,30 @@ public class TournamentDao {
                 .where(TOURNAMENT.TID.eq(update.getTid()))
                 .execute();
     }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public Optional<TournamentParameters> getTournamentParams(int tid) {
+        return ofNullable(jooq
+                .select(TOURNAMENT.MAX_GROUP_SIZE, TOURNAMENT.MATCH_SCORE,
+                        TOURNAMENT.QUITS_FROM_GROUP)
+                .from(TOURNAMENT)
+                .where(TOURNAMENT.TID.eq(tid))
+                .fetchOne())
+                .map(r -> TournamentParameters
+                        .builder()
+                        .matchScore(r.get(TOURNAMENT.MATCH_SCORE))
+                        .quitsGroup(r.get(TOURNAMENT.QUITS_FROM_GROUP))
+                        .maxGroupSize(r.get(TOURNAMENT.MAX_GROUP_SIZE))
+                        .build());
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void updateParams(TournamentParameters parameters) {
+        jooq.update(TOURNAMENT)
+                .set(TOURNAMENT.MAX_GROUP_SIZE, parameters.getMaxGroupSize())
+                .set(TOURNAMENT.MATCH_SCORE, parameters.getMatchScore())
+                .set(TOURNAMENT.QUITS_FROM_GROUP, parameters.getQuitsGroup())
+                .where(TOURNAMENT.TID.eq(parameters.getTid()))
+                .execute();
+    }
 }

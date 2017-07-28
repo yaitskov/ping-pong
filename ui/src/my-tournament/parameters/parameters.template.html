@@ -1,0 +1,47 @@
+<main-menu></main-menu>
+<div class="container">
+  <div class="form-group">
+    <a class="btn btn-default"
+       href="#!/my/tournament/{{$ctrl.tournament.tid}}">
+      View tournament
+    </a>
+  </div>
+  <form novalidate name="$ctrl.form"
+        ng-submit="$ctrl.update()"
+        default-button-type
+        ng-show="!$ctrl.published">
+    <div class="form-group">
+      <label for="quitsGroup">Quits from a group</label>
+      <div touch-spin options="$ctrl.options.quitsGroup"
+           ng-model="$ctrl.tournament.quitsGroup"></div>
+      <p class="help-block">
+        How many players quits from a group and continue participate
+        in play-off tournament stage.
+      </p>
+    </div>
+    <div class="form-group">
+      <label for="maxGroupSize">Max group size</label>
+      <div touch-spin options="$ctrl.options.maxGroupSize"
+           ng-model="$ctrl.tournament.maxGroupSize"></div>
+      <p class="help-block">
+        Maximum number of players, which could be in a group.
+      </p>
+    </div>
+    <div class="form-group">
+      <label for="matchScore">Match score</label>
+      <div touch-spin options="$ctrl.options.matchScore"
+           ng-model="$ctrl.tournament.matchScore"></div>
+      <p class="help-block">
+        Determines how many sets an opponent should take, to win the
+        match.
+      </p>
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary" type="submit">Update</button>
+      <a class="btn btn-danger" back-button>Cancel</a>
+    </div>
+    <div class="form-group">
+      <request-status></request-status>
+    </div>
+  </form>
+</div>

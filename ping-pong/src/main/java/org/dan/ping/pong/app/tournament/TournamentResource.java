@@ -31,6 +31,8 @@ public class TournamentResource {
     private static final String DRAFTING_PARAM = "drafting";
     public static final String DRAFTING_INFO = DRAFTING + "{" + DRAFTING_PARAM + "}";
     public static final String MY_TOURNAMENT = TOURNAMENT + "mine/{tid}";
+    public static final String TOURNAMENT_PARAMS = TOURNAMENT + "params";
+    public static final String GET_TOURNAMENT_PARAMS = TOURNAMENT_PARAMS + "/{tid}";
     public static final String EDITABLE_TOURNAMENTS = TOURNAMENT + "editable/by/me";
     public static final String TOURNAMENT_CREATE = TOURNAMENT + "create";
     public static final String TOURNAMENT_ENLIST = TOURNAMENT + "enlist";
@@ -144,6 +146,23 @@ public class TournamentResource {
     @Consumes(APPLICATION_JSON)
     public MyTournamentInfo getMyTournamentInfo(@PathParam("tid") int tid) {
         return tournamentService.getMyTournamentInfo(tid);
+    }
+
+    @GET
+    @Path(GET_TOURNAMENT_PARAMS)
+    @Consumes(APPLICATION_JSON)
+    public TournamentParameters getTournamentParams(@PathParam("tid") int tid) {
+        return tournamentService.getTournamentParams(tid);
+    }
+
+    @POST
+    @Path(TOURNAMENT_PARAMS)
+    @Consumes(APPLICATION_JSON)
+    public void updateTournamentParams(
+            @HeaderParam(SESSION) String session,
+            TournamentParameters parameters) {
+        int uid = authService.userInfoBySession(session).getUid();
+        tournamentService.updateTournamentParams(uid, parameters);
     }
 
     @POST

@@ -26,6 +26,8 @@ import javax.inject.Inject;
 
 public class TournamentService {
     private static final ImmutableSet<TournamentState> EDITABLE_STATES = ImmutableSet.of(Hidden, Announce, Draft);
+    private static final ImmutableSet<TournamentState> CONFIGURABLE_STATES = EDITABLE_STATES;
+
     @Inject
     private TournamentDao tournamentDao;
 
@@ -131,6 +133,42 @@ public class TournamentService {
             tournamentDao.update(update);
         } else {
             throw forbidden("No write access to the tournament");
+        }
+    }
+
+    public TournamentParameters getTournamentParams(int tid) {
+        return tournamentDao.getTournamentParams(tid)
+                .orElseThrow(() -> notFound("Tournament does not exist"));
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void updateTournamentParams(int uid, TournamentParameters parameters) {
+        validate(parameters);
+        if (tournamentDao.isAdminOf(uid, parameters.getTid())) {
+            final TournamentState state = tournamentDao.getById(parameters.getTid())
+                    .orElseThrow(() -> notFound("Tournament does not exist"))
+                    .getState();
+            if (!CONFIGURABLE_STATES.contains(state)) {
+                throw badRequest("Tournament could be modified until it's open");
+            }
+            tournamentDao.updateParams(parameters);
+        } else {
+            throw forbidden("No write access to the tournament");
+        }
+    }
+
+    private void validate(TournamentParameters parameters) {
+        if (parameters.getMatchScore() < 1) {
+            throw badRequest("Match score is less than 1");
+        }
+        if (parameters.getQuitsGroup() < 1) {
+            throw badRequest("Quits from group is less than 1");
+        }
+        if (parameters.getMaxGroupSize() < 2 || parameters.getMaxGroupSize() > 20) {
+            throw badRequest("Max group size is out of range");
+        }
+        if (parameters.getMaxGroupSize() <= parameters.getQuitsGroup()) {
+            throw badRequest("Max group size is less than quits from group");
         }
     }
 }

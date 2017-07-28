@@ -17,6 +17,7 @@ angular.module('pingPong', [
     'playInTournamentList',
     'newTournament',
     'tournamentEdit',
+    'tournamentParameters',
     'newTournamentParameters',
     'myTournament',
     'matchStateDescription',

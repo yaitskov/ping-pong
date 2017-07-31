@@ -52,4 +52,13 @@ public class PlaceResource {
         return placeDao.getPlaceById(pid)
                 .orElseThrow(() -> notFound("Place " + pid + " doesn't exist"));
     }
+
+    @POST
+    @Path("/place/update")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public void update(@HeaderParam(SESSION) String session, PlaceLink place) {
+        final int uid = authService.userInfoBySession(session).getUid();
+        placeDao.update(uid, place);
+    }
 }

@@ -13,6 +13,7 @@ angular.module('pingPong', [
     'placeList',
     'placeDetail',
     'myPlace',
+    'myPlaceEdit',
     'newPlace',
     'placePicker',
     'myTournamentList',

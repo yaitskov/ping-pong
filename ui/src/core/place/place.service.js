@@ -8,9 +8,16 @@ angular.module('core.place').
                                   url: '/api/places',
                                   method: 'GET',
                                   headers: {
-                                      session: auth.mySession()
+                                      session: 1
                                   },
                                   isArray: true
+                              },
+                              change: {
+                                  url: '/api/place/update',
+                                  method: 'POST',
+                                  headers: {
+                                      session: 1
+                                  }
                               },
                               aPlace: {
                                   url: '/api/place/:placeId',

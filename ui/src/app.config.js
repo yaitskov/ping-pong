@@ -82,6 +82,9 @@ angular.module('pingPong').
                     when('/my-place/:placeId', {
                         template: '<my-place></my-place>'
                     }).
+                    when('/my-place/edit/:placeId', {
+                        template: '<my-place-edit></my-place-edit>'
+                    }).
                     when('/pick/place', {
                         template: '<place-picker></place-picker>'
                     }).

@@ -85,4 +85,16 @@ public class PlaceDao {
                                 .build())
                         .build());
     }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void update(int uid, PlaceLink place) {
+        log.info("User {} updates place {}", uid, place.getPid());
+        jooq.update(PLACE)
+                .set(PLACE.NAME, place.getName())
+                .set(PLACE.EMAIL, place.getAddress().getEmail())
+                .set(PLACE.POST_ADDRESS, place.getAddress().getAddress())
+                .set(PLACE.PHONE, place.getAddress().getPhone())
+                .where(PLACE.PID.eq(place.getPid()))
+                .execute();
+    }
 }

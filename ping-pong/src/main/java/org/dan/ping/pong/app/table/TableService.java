@@ -51,4 +51,16 @@ public class TableService {
     public void freeTables(int tid) {
         tableDao.freeTablesByTid(tid);
     }
+
+    public List<TableStatedLink> findByPlaceId(int placeId) {
+        return tableDao.findByPlaceId(placeId);
+    }
+
+    public void setStatus(SetTableState update) {
+        tableDao.setStatus(update);
+    }
+
+    public void create(CreateTables create) {
+        tableDao.createTables(create.getPlaceId(), create.getQuantity());
+    }
 }

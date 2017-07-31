@@ -1,0 +1,49 @@
+<main-menu></main-menu>
+<div class="container admin-tables">
+  <request-status></request-status>
+  <div class="alert alert-info" ng-show="$ctrl.tables.length == 0">
+    Place has no tables
+  </div>
+  <div class="form-group">
+    <a class="btn btn-default" back-button>Back</a>
+  </div>
+  <div class="form-group">
+    <form novalidate name="$ctrl.form"
+          ng-submit="$ctrl.addTables()"
+          default-button-type
+          class="form-inline">
+      <div class="form-group"
+           ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.tables.$dirty) && $ctrl.form.tables.$invalid}">
+        <div touch-spin options="$ctrl.newTablesOptions"
+             class="pull-left"
+             ng-model="$ctrl.newTables"></div>
+        <button class="btn btn-primary pull-left" type="submit">
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+  <div class="form-group">
+    <table class="table">
+      <tr>
+        <td>Label</td>
+        <td>State</td>
+        <td></td>
+      </tr>
+      <tr ng-repeat="table in $ctrl.tables | orderBy : $ctrl.sortLabelInt">
+        <td>
+          {{table.label}}
+        </td>
+        <td>
+          {{table.state}}
+        </td>
+        <td>
+          <a class="btn btn-danger"
+             ng-show="table.state == 'Free'"
+             ng-click="$ctrl.removeTable($index)">
+            <span class="glyphicon glyphicon-trash"></span>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

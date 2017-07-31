@@ -4,6 +4,14 @@ angular.module('core.place').
     factory('Place', ['$resource', 'auth',
                       function ($resource, auth) {
                           return $resource('/api/places', {}, {
+                              tables: {
+                                  url: '/api/tables/by-place/:placeId',
+                                  method: 'GET',
+                                  headers: {
+                                      session: 1
+                                  },
+                                  isArray: true
+                              },
                               myPlaces: {
                                   url: '/api/places',
                                   method: 'GET',

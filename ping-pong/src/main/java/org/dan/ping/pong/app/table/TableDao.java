@@ -5,13 +5,16 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static ord.dan.ping.pong.jooq.tables.Tables.TABLES;
+import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.app.table.TableState.Busy;
 import static org.dan.ping.pong.app.table.TableState.Free;
 
 import lombok.extern.slf4j.Slf4j;
+import ord.dan.ping.pong.jooq.Tables;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
 import org.jooq.impl.DSL;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,12 +33,20 @@ public class TableDao {
     @Transactional(TRANSACTION_MANAGER)
     public void createTables(int pid, int numberOfNewTables) {
         log.info("Add {} tables to place {}", numberOfNewTables, pid);
-        final int tablesPresented = jooq.selectCount()
+        final Record1<String> record = jooq.select(TABLES.LABEL)
                 .from(TABLES)
-                .where(TABLES.PID.eq(pid))
-                .fetchOne().value1();
+                .where(TABLES.PID.eq(pid),
+                        TABLES.LABEL.likeRegex("^[0-9]+$"))
+                .orderBy(TABLES.LABEL.length().desc(), TABLES.LABEL.desc())
+                .limit(1)
+                .fetchOne();
+
+        int highestTableLabel = 0;
+        if (record != null) {
+            highestTableLabel = Integer.parseInt(record.value1()) + 1;
+        }
         log.info("Added {}", asList(jooq.batch(
-                IntStream.range(tablesPresented, numberOfNewTables + tablesPresented)
+                IntStream.range(highestTableLabel, numberOfNewTables + highestTableLabel)
                         .mapToObj(String::valueOf)
                         .map(label -> jooq.insertInto(TABLES, TABLES.PID,
                                 TABLES.STATE, TABLES.LABEL)
@@ -113,5 +124,30 @@ public class TableDao {
                         .from(TOURNAMENT)
                         .where(TOURNAMENT.TID.eq(tid))))
                 .execute();
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public List<TableStatedLink> findByPlaceId(int placeId) {
+        return jooq.select(TABLES.TABLE_ID, TABLES.LABEL, TABLES.STATE)
+                .from(TABLES)
+                .where(Tables.TABLES.PID.eq(placeId))
+                .fetch()
+                .map(r -> TableStatedLink
+                        .builder()
+                        .label(r.get(TABLES.LABEL))
+                        .id(r.get(TABLES.TABLE_ID))
+                        .state(r.get(TABLES.STATE))
+                        .build());
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void setStatus(SetTableState update) {
+        if (jooq.update(TABLES)
+                .set(TABLES.STATE, update.getTarget())
+                .where(TABLES.TABLE_ID.eq(update.getTableId()),
+                        TABLES.STATE.eq(update.getExpected()))
+                .execute() == 0) {
+            throw badRequest("Table state changed");
+        }
     }
 }

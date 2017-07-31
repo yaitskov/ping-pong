@@ -1,11 +1,13 @@
 <main-menu></main-menu>
-<div class="container-fluid list">
-  <request-status></request-status>
+<div class="container">
   <div class="alert alert-info" ng-show="$ctrl.tournaments.length == 0">
     You haven't enlisted yet to any tournament. Have a look at
     <a href="#!/tournaments">the list</a> of coming tournaments and
     pick an event fitting you.
   </div>
+</div>
+<div class="container-fluid list">
+  <request-status></request-status>
   <div ng-repeat="tournament in $ctrl.tournaments"
        clickable="/tournaments/{{tournament.tid}}"
        class="list-item tournament open-tournament clearfix">

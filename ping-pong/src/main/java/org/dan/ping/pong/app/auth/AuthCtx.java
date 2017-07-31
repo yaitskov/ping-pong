@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
         AuthService.class})
 public class AuthCtx {
     static final String SYS_ADMIN_SESSIONS = "sys_admin_sessions";
-    static final String USER_SESSIONS = "user_sessions";
+    public static final String USER_SESSIONS = "user_sessions";
 
     @Bean(name = SYS_ADMIN_SESSIONS)
     public Cache<String, String> sysAdminSessions() {

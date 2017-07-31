@@ -35,16 +35,20 @@ public class UserDao {
                 .returning(USERS.UID)
                 .fetchOne()
                 .getValue(USERS.UID);
-        if (regRequest.getEmail().isPresent()) {
+        validateEmailUnique(regRequest.getEmail());
+        return uid;
+    }
+
+    private void validateEmailUnique(Optional<String> email) {
+        if (email.isPresent()) {
             final int matches = jooq.selectCount().from(USERS)
-                    .where(USERS.EMAIL.eq(regRequest.getEmail()))
+                    .where(USERS.EMAIL.eq(email))
                     .fetchOne()
                     .value1();
             if (matches > 1) {
                 throw badRequest(EMAIL_IS_USED);
             }
         }
-        return uid;
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
@@ -88,5 +92,20 @@ public class UserDao {
                 .set(USERS.WANT_ADMIN, Optional.of(now))
                 .where(USERS.UID.eq(uid))
                 .execute();
+    }
+
+    @Transactional(transactionManager = TRANSACTION_MANAGER)
+    public void update(UserInfo userInfo, UserProfileUpdate update) {
+        jooq.update(USERS)
+                .set(USERS.EMAIL, update.getEmail())
+                .set(USERS.PHONE, update.getPhone())
+                .set(USERS.NAME, update.getName())
+                .where(USERS.UID.eq(userInfo.getUid()))
+                .execute();
+        if (!update.getEmail().equals(userInfo.getEmail())) {
+            validateEmailUnique(update.getEmail());
+            log.info("User {} changed email from {} to {}",
+                    userInfo.getUid(), userInfo.getEmail(), update.getEmail());
+        }
     }
 }

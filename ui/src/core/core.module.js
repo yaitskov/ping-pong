@@ -2,7 +2,7 @@
 
 angular.module('core', ['core.tournament', 'core.match',
                         'localStorage', 'core.place',
-                        'core.participant',
+                        'core.participant', 'core.user',
                         'core.validate', 'core.category',
                         'core.requestStatus', 'core.ui']).
     filter('isEmpty', function () {

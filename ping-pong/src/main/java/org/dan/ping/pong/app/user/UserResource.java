@@ -1,14 +1,17 @@
 package org.dan.ping.pong.app.user;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.dan.ping.pong.app.auth.AuthCtx.USER_SESSIONS;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.app.user.UserType.User;
 
+import com.google.common.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.util.time.Clocker;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.jws.soap.SOAPBinding;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -67,5 +70,27 @@ public class UserResource {
         }
         log.info("User {} requested admin access", userInfo.getUid());
         userDao.requestAdminAccess(userInfo.getUid(), clocker.get());
+    }
+
+    @Inject
+    @Named(USER_SESSIONS)
+    private Cache<String, UserInfo> userSessions;
+
+    @POST
+    @Path("/user/profile/update")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public void registerUser(
+            UserProfileUpdate update,
+            @HeaderParam(SESSION) String session) {
+        final UserInfo userInfo = authService.userInfoBySession(session);
+        userDao.update(userInfo, update);
+        userSessions.asMap()
+                .forEach((s, data) -> {
+                    if (data.getEmail().equals(userInfo.getEmail())) {
+                        log.info("Invalidate session {} in cache", s);
+                        userSessions.invalidate(s);
+                    }
+                });
     }
 }

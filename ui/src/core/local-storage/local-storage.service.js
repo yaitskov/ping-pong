@@ -16,6 +16,9 @@ angular.
                     localStorage.removeItem(localStorage.key(0));
                 }
             };
+            this.drop = function (key) {
+                localStorage.removeItem(key);
+            }
             this.allKeys = function () {
                 var result = [];
                 for (var i = 0; i < localStorage.length; ++i) {

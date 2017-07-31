@@ -9,6 +9,7 @@ angular.module('pingPong', [
     'signIn',
     'doSignIn',
     'account',
+    'accountEdit',
     'placeList',
     'placeDetail',
     'newPlace',

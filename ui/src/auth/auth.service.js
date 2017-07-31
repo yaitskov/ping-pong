@@ -39,6 +39,14 @@ angular.
                                  this.returnOnAuth = $location.path();
                                  $location.path('/sign-up');
                              };
+                             this.updateAccount = function (accountInfo) {
+                                 if (accountInfo.email) {
+                                     LocalStorage.store('myEmail', accountInfo.email);
+                                 } else {
+                                     LocalStorage.drop('myEmail');
+                                 }
+                                 LocalStorage.store('myName', accountInfo.name);
+                             }
                              this.storeSession = function (fullSession, uid, name, email, type) {
                                  console.log("Authenticated as " + fullSession);
                                  LocalStorage.store('mySession', fullSession);

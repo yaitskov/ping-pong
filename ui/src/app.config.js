@@ -109,6 +109,9 @@ angular.module('pingPong').
                     when('/account', {
                         template: '<account></account>'
                     }).
+                    when('/account/profile/edit', {
+                        template: '<account-edit></account-edit>'
+                    }).
                     when('/tournaments/:tournamentId', {
                         template: '<tournament-detail></tournament-detail>'
                     }).

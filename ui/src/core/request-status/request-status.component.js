@@ -47,7 +47,15 @@ angular.
                             self.error = "Bad request: " + response.data;
                         }
                     } else if (response.status == 404) {
-                        self.error = requestStatus.entity() + " does not exist";
+                        if (typeof response.data == 'object') {
+                            if (response.data.message) {
+                                self.error = response.data.message;
+                            } else {
+                                self.error = "Entity not found: " + JSON.stringify(response.data);
+                            }
+                        } else {
+                            self.error = "API method doesn't exist: " + response.data;
+                        }
                     } else if (response.status == 400) {
                         if (typeof response.data == 'object') {
                             if (response.data.message) {

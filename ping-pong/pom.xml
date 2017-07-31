@@ -520,6 +520,11 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>OptionalInstant</name>
+                                    <expression>.*users\.want_admin</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
                                     <name>UserType</name>
                                     <expression>.*users\.(type)</expression>
                                     <types>.*</types>

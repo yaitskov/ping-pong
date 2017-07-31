@@ -14,6 +14,10 @@
     <a href="#!/account/profile/edit" class="btn btn-primary">
       Edit
     </a>
+    <a ng-click="$ctrl.requestAdminPermissions()"
+       ng-show="$ctrl.email && !$ctrl.isAdmin" class="btn btn-default">
+      Request Admin permissions
+    </a>
   </div>
   <div class="form-group" ng-show="$ctrl.signInEmailSent">
     <div class="alert alert-info">

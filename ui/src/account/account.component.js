@@ -5,18 +5,32 @@ angular.
     component('account', {
         templateUrl: 'account/account.template.html',
         controller: [
-            'mainMenu', '$http', 'cutil', 'auth', 'requestStatus',
-            function (mainMenu, $http, cutil, auth, requestStatus) {
+            'mainMenu', '$http', 'cutil', 'auth', 'requestStatus', 'pageCtx',
+            function (mainMenu, $http, cutil, auth, requestStatus, pageCtx) {
                 mainMenu.setTitle('Account Details');
                 var self = this;
                 this.uid = auth.myUid();
                 this.session = auth.mySession();
                 this.name = auth.myName();
                 this.email = auth.myEmail();
+                this.isAdmin = auth.isAdmin();
+                this.adminAccessRequested = pageCtx.get('amdin-access-requested');
                 this.userData = null;
                 this.logoutWithoutEmail = false;
                 this.signInEmailSent = false;
                 requestStatus.startLoading();
+                this.requestAdminPermissions = function () {
+                    requestStatus.startLoading("Requesting admin access");
+                    $http.post('/api/user/request-admin-access',
+                               {}, {session: 1})
+                        .then(
+                            function (ok) {
+                                pageCtx.put('amdin-access-requested', 1);
+                                self.adminAccessRequested = 1;
+                                requestStatus.complete();
+                            },
+                            requestStatus.failed);
+                };
                 this.generateSignInLink = function () {
                     requestStatus.startLoading("Sending email");
                     self.signInEmailSent = false;

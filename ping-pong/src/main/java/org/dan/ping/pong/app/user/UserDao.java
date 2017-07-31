@@ -12,6 +12,7 @@ import org.dan.ping.pong.sys.error.PiPoEx;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -78,6 +79,14 @@ public class UserDao {
         jooq.insertInto(ADMIN, ADMIN.UID, ADMIN.SAID)
                 .values(uid, said)
                 .onDuplicateKeyIgnore()
+                .execute();
+    }
+
+    @Transactional(transactionManager = TRANSACTION_MANAGER)
+    public void requestAdminAccess(int uid, Instant now) {
+        jooq.update(USERS)
+                .set(USERS.WANT_ADMIN, Optional.of(now))
+                .where(USERS.UID.eq(uid))
                 .execute();
     }
 }

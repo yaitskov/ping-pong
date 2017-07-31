@@ -13,6 +13,7 @@ create table users(
     name varchar(40) not null,
     type varchar(5) not null,
     phone varchar(20),
+    want_admin timestamp(3),
     email varchar(60),
     created timestamp(3) default current_timestamp(3),
     banned timestamp(3),

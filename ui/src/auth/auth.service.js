@@ -44,7 +44,9 @@ angular.
                                  LocalStorage.store('mySession', fullSession);
                                  LocalStorage.store('myUid', uid);
                                  LocalStorage.store('myName', name);
-                                 LocalStorage.store('myEmail', email);
+                                 if (email) {
+                                     LocalStorage.store('myEmail', email);
+                                 }
                                  LocalStorage.store('myType', type);
                                  if (this.returnOnAuth) {
                                      $location.path(this.returnOnAuth);

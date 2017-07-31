@@ -8,7 +8,7 @@ angular.
                      function (mainMenu, Place, $routeParams, requestStatus, pageCtx, auth) {
                          mainMenu.setTitle('My place');
                          pageCtx.put('place', {pid: $routeParams.placeId});
-                         this.place = {};
+                         this.place = null;
                          var self = this;
                          requestStatus.startLoading();
                          Place.aPlace({placeId: $routeParams.placeId},

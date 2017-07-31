@@ -48,7 +48,7 @@ public class PlaceResource {
     @GET
     @Path("/place/{pid}")
     @Produces(APPLICATION_JSON)
-    public PlaceLink getPlaceById(@PathParam("pid") int pid) {
+    public PlaceInfoCountTables getPlaceById(@PathParam("pid") int pid) {
         return placeDao.getPlaceById(pid)
                 .orElseThrow(() -> notFound("Place " + pid + " doesn't exist"));
     }

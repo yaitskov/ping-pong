@@ -39,26 +39,43 @@
       Set an email
     </a>
   </div>
-  <div>
-    <div>Email</div>
-    <div ng-show="$ctrl.email">
-      {{$ctrl.email}}
-    </div>
-    <div class="alert alert-warning" ng-show="!$ctrl.email">
-      An email is not set. It's required to login from other devices
-      or to recover current session. Follow the
-      link <a href="#!/account/profile/edit">to set an email</a>
-    </div>
-  </div>
-  <div>
-    <div>Name</div>
-    <div>{{$ctrl.name}}</div>
-  </div>
-  <div>
-    <div>Phone</div>
-    <div>{{$ctrl.userData.phone}}</div>
-    <div ng-show="!$ctrl.userData.phone" class="alert alert-info">
-      Not set
-    </div>
+  <div class="form-group">
+    <table class="table">
+      <tr>
+        <td>Email</td>
+        <td>
+          <div ng-show="$ctrl.email">
+            {{$ctrl.email}}
+          </div>
+          <div class="alert alert-warning" ng-show="!$ctrl.email">
+            <p>
+              An email is not set. It's required to login from other devices
+              or to recover current session.
+            </p>
+            <p>
+              Follow the
+              link <a href="#!/account/profile/edit">to set an email</a>
+            </p>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Name</td>
+        <td>{{$ctrl.name}}</td>
+      </tr>
+      <tr>
+        <td>Phone</td>
+        <td>
+          <div>{{$ctrl.userData.phone}}</div>
+          <div ng-show="!$ctrl.userData.phone" class="alert alert-info">
+            Not set
+          </div>
+        </td>
+      </tr>
+      <tr ng-show="$ctrl.isAdmin">
+        <td>User type</td>
+        <td>Admin</td>
+      </tr>
+    </table>
   </div>
 </div>

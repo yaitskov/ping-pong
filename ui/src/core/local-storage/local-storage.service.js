@@ -16,5 +16,21 @@ angular.
                     localStorage.removeItem(localStorage.key(0));
                 }
             };
+            this.allKeys = function () {
+                var result = [];
+                for (var i = 0; i < localStorage.length; ++i) {
+                    result.push(localStorage.key(i));
+                }
+                return result;
+            };
+            this.asMap = function () {
+                var keys = this.allKeys();
+                var result = {};
+                for (var i in keys) {
+                    result[keys[i]] = this.get(keys[i]);
+                }
+                return result;
+            };
+
         };
     }]);

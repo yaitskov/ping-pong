@@ -14,7 +14,7 @@ angular.
                              return auth.isAuthenticated();
                          };
                          this.isAdmin = function () {
-                             return auth.isAdmin();
+                             return auth.userType() == 'Admin' || auth.userType() == 'Super';
                          };
                          this.contextMenu = function () {
                              return mainMenu.getContextMenu();

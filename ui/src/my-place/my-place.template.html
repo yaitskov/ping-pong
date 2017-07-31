@@ -1,0 +1,43 @@
+<main-menu></main-menu>
+<div class="container">
+  <request-status></request-status>
+  <div class="form-group">
+    <a class="btn btn-primary" href="#!/my-place/edit/{{$ctrl.place.pid}}">Edit</a>
+    <a class="btn btn-default" href="#!/tournament/new">Add Tournament</a>
+    <a class="btn btn-default" back-button>Back</a>
+  </div>
+  <table class="table" ng-show="$ctrl.place">
+    <tr>
+      <td>
+        Name
+      </td>
+      <td>
+        {{$ctrl.place.name}}
+      </td>
+    </tr>
+    <tr ng-show="$ctrl.place.address.address">
+      <td>
+        Postal Address
+      </td>
+      <td>
+        {{$ctrl.place.address.address}}
+      </td>
+    </tr>
+    <tr ng-show="$ctrl.place.address.phone">
+      <td>
+        Phone
+      </td>
+      <td>
+        {{$ctrl.place.address.phone}}
+      </td>
+    </tr>
+    <tr ng-show="$ctrl.place.address.email">
+      <td>
+        Contact Email
+      </td>
+      <td>
+        {{$ctrl.place.address.email}}
+      </td>
+    </tr>
+  </table>
+</div>

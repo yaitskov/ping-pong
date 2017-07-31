@@ -7,26 +7,74 @@
       <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
-      <li><a href="#!/tournaments">Drafting</a></li>
-      <li><a href="#!/watch/tournaments">Watch Games</a></li>
+      <li>
+        <a href="#!/tournaments">
+          <span class="glyphicon glyphicon-pencil"></span>
+          Drafting
+        </a>
+      </li>
+      <li>
+        <a href="#!/watch/tournaments">
+          <span class="glyphicon glyphicon-eye-open"></span>
+          Watch Games
+        </a>
+      </li>
       <li role="separator" ng-show="$ctrl.isAuthenticated()" class="divider"></li>
-      <li><a href="#!/my/matches/play" ng-show="$ctrl.isAuthenticated()">My Schedule</a></li>
-      <li><a href="#!/play/in/tournaments" ng-show="$ctrl.isAuthenticated()">Participation</a></li>
+      <li>
+        <a href="#!/my/matches/play" ng-show="$ctrl.isAuthenticated()">
+          <span class="glyphicon glyphicon-calendar"></span>
+          My Schedule
+        </a>
+      </li>
+      <li>
+        <a href="#!/play/in/tournaments" ng-show="$ctrl.isAuthenticated()">
+          <span class="glyphicon glyphicon-th-list"></span>
+          Participation
+        </a>
+      </li>
       <li role="separator" ng-show="$ctrl.isAdmin()" class="divider"></li>
-      <li><a href="#!/my/tournaments" ng-show="$ctrl.isAdmin()">Administration</a></li>
-      <li><a href="#!/my/matches/judgement" ng-show="$ctrl.isAdmin()">My Judgement</a></li>
-      <li><a href="#!/my/places" ng-show="$ctrl.isAdmin()">My Places</a></li>
+      <li>
+        <a href="#!/my/tournaments" ng-show="$ctrl.isAdmin()">
+          <span class="glyphicon glyphicon-thumbs-down"></span>
+          Administration
+        </a>
+      </li>
+      <li>
+        <a href="#!/my/matches/judgement" ng-show="$ctrl.isAdmin()">
+          <span class="glyphicon glyphicon-bullhorn"></span>
+          My Judgement
+        </a>
+      </li>
+      <li>
+        <a href="#!/my/places" ng-show="$ctrl.isAdmin()">
+          <span class="glyphicon glyphicon-map-marker"></span>
+          My Places
+        </a>
+      </li>
       <li role="separator" class="divider"></li>
-      <li><a href="#!/sign-in" ng-show="!$ctrl.isAuthenticated()">Login</a></li>
-      <li><a href="#!/sign-up" ng-show="!$ctrl.isAuthenticated()">Sign-Up</a></li>
+      <li>
+        <a href="#!/sign-in" ng-show="!$ctrl.isAuthenticated()">
+          <span class="glyphicon glyphicon-log-in"></span>
+          Login
+        </a>
+      </li>
+      <li>
+        <a href="#!/sign-up" ng-show="!$ctrl.isAuthenticated()">
+          <span class="glyphicon glyphicon-log-in"></span>
+          Sign-Up
+        </a>
+      </li>
       <li>
         <a href="#!/account" ng-show="$ctrl.isAuthenticated()" class="wrap-long">
+          <span class="glyphicon glyphicon-user"></span>
           {{$ctrl.accountName || 'Account'}}
         </a>
       </li>
       <li role="separator" class="divider" ng-hide="$ctrl.contextMenu() | isEmpty"></li>
       <li ng-repeat="(path, label) in $ctrl.contextMenu()">
-        <a ng-attr-href="{{path}}">{{label}}</a>
+        <a ng-attr-href="{{path}}">
+          {{label}}
+        </a>
       </li>
     </ul>
   </div>

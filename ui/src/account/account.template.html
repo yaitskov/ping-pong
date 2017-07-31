@@ -15,7 +15,8 @@
       Edit
     </a>
     <a ng-click="$ctrl.requestAdminPermissions()"
-       ng-show="$ctrl.email && !$ctrl.isAdmin" class="btn btn-default">
+       ng-show="$ctrl.email && !$ctrl.adminAccessRequested && !$ctrl.isAdmin"
+       class="btn btn-default">
       Request Admin permissions
     </a>
   </div>

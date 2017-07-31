@@ -60,12 +60,14 @@ public class UserDao {
                 .map(r -> UserInfo.builder().uid(uid)
                         .name(r.getValue(USERS.NAME))
                         .email(r.getValue(USERS.EMAIL))
-                        .phone(r.getValue(USERS.PHONE)).build());
+                        .phone(r.getValue(USERS.PHONE))
+                        .userType(r.getValue(USERS.TYPE))
+                        .build());
     }
 
     @Transactional(transactionManager = TRANSACTION_MANAGER)
     public Optional<UserInfo> getUserBySession(String token) {
-        return ofNullable(jooq.select(USERS.UID, USERS.NAME, USERS.PHONE, USERS.EMAIL)
+        return ofNullable(jooq.select(USERS.UID, USERS.NAME, USERS.PHONE, USERS.EMAIL, USERS.TYPE)
                 .from(SESSIONS).innerJoin(USERS)
                 .on(SESSIONS.UID.eq(USERS.UID))
                 .where(SESSIONS.TOKEN.eq(token))
@@ -74,6 +76,7 @@ public class UserDao {
                         .name(r.getValue(USERS.NAME))
                         .email(r.getValue(USERS.EMAIL))
                         .phone(r.getValue(USERS.PHONE))
+                        .userType(r.getValue(USERS.TYPE))
                         .build());
     }
 

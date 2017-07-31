@@ -22,7 +22,10 @@ angular.
                 this.requestAdminPermissions = function () {
                     requestStatus.startLoading("Requesting admin access");
                     $http.post('/api/user/request-admin-access',
-                               {}, {session: 1})
+                               {},
+                               {
+                                   headers: {session: auth.mySession()}
+                               })
                         .then(
                             function (ok) {
                                 pageCtx.put('amdin-access-requested', 1);

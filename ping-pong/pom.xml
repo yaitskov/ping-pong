@@ -32,6 +32,7 @@
         <mysql.port>3307</mysql.port>
         <sandbox.env.prop.file>docker-env.properties</sandbox.env.prop.file>
         <simulationProfile>false</simulationProfile>
+        <sure.fire.version>2.20</sure.fire.version>
     </properties>
 
     <dependencies>
@@ -405,6 +406,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>${sure.fire.version}</version>
                 <configuration>
                     <forkMode>never</forkMode>
                 </configuration>
@@ -672,6 +674,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${sure.fire.version}</version>
                         <configuration>
                             <includes>
                                 <include>*Sim.java</include>

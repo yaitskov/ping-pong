@@ -41,15 +41,15 @@ public class DaoEntityGenerator {
     }
 
     public UserInfo genUser() {
-        return genUser(valueGenerator.genName());
+        return genUser(valueGenerator.genName(), UserType.User);
     }
 
-    public UserInfo genUser(String name) {
+    public UserInfo genUser(String name, UserType user) {
         final UserRegRequest request = UserRegRequest.builder()
                 .name(name)
                 .email(Optional.of(name.replaceAll("[ \t]", "_") + "@gmail.com"))
                 .phone(Optional.of("+48 799 33 8448"))
-                .userType(UserType.User)
+                .userType(user)
                 .build();
         return UserInfo.builder()
                 .uid(userDao.register(request))

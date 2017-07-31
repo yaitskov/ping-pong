@@ -29,6 +29,7 @@ import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentInfo;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.user.UserLink;
+import org.dan.ping.pong.app.user.UserType;
 import org.dan.ping.pong.mock.DaoEntityGenerator;
 import org.dan.ping.pong.mock.MyRest;
 import org.dan.ping.pong.mock.RestEntityGenerator;
@@ -242,7 +243,7 @@ public class Simulator {
         final String prefix = scenario.getName()
                 .orElseGet(() -> "todo")
                 + " " + valueGenerator.genName(8);
-        testAdmin = userSessionGenerator.generate(prefix + " admin");
+        testAdmin = userSessionGenerator.generate(prefix + " admin", UserType.Admin);
         restGenerator.generateSignInLinks(singletonList(testAdmin));
         final int placeId = daoGenerator.genPlace(prefix, testAdmin.getUid(), params.getTables());
         scenario.setPlaceId(placeId);

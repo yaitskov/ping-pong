@@ -5,6 +5,7 @@ import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROT
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.user.UserInfo;
+import org.dan.ping.pong.app.user.UserType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
@@ -28,11 +29,11 @@ public class UserSessionGenerator {
     @Bean(name = USER_SESSION)
     @Scope(SCOPE_PROTOTYPE)
     public TestUserSession generate() {
-        return generate(UUID.randomUUID().toString());
+        return generate(UUID.randomUUID().toString(), UserType.User);
     }
 
-    public TestUserSession generate(String name) {
-        final UserInfo userInfo = daoEntityGenerator.genUser(name);
+    public TestUserSession generate(String name, UserType user) {
+        final UserInfo userInfo = daoEntityGenerator.genUser(name, user);
         return TestUserSession.builder()
                 .uid(userInfo.getUid())
                 .email(userInfo.getEmail().get())
@@ -55,7 +56,7 @@ public class UserSessionGenerator {
         final List<TestUserSession> result = new ArrayList<>(prefixes.size());
         final StringBuilder uids = new StringBuilder();
         for (int i = 0; i < prefixes.size(); ++i) {
-            final TestUserSession session = generate(prefix + prefixes.get(i));
+            final TestUserSession session = generate(prefix + prefixes.get(i), UserType.User);
             result.add(session);
             uids.append(" ").append(prefixes.get(i))
                     .append("/").append(session.getUid());

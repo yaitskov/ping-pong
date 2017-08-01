@@ -187,4 +187,8 @@ public class TournamentService {
             throw forbidden("No write access to the tournament");
         }
     }
+
+    public List<TournamentResultEntry> tournamentResult(int tid, int cid) {
+        return tournamentDao.tournamentResult(tid, cid);
+    }
 }

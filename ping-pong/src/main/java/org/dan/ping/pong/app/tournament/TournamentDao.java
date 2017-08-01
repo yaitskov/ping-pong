@@ -5,9 +5,11 @@ import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
 import static ord.dan.ping.pong.jooq.Tables.MATCHES;
+import static ord.dan.ping.pong.jooq.Tables.MATCH_SCORE;
 import static ord.dan.ping.pong.jooq.Tables.PLACE;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT_ADMIN;
+import static ord.dan.ping.pong.jooq.Tables.USERS;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
@@ -33,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceLink;
+import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectField;
@@ -41,7 +44,11 @@ import org.jooq.impl.DSL;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -59,6 +66,8 @@ public class TournamentDao {
     private static final String GAMES_COMPLETE = "gamesComplete";
     private static final int DAYS_TO_SHOW_PAST_TOURNAMENT = 30;
     private static final String CATEGORIES = "categories";
+    private static final String WON_MATCHES = "wonMatches";
+    private static final String SCORE = "score";
 
     @Inject
     private DSLContext jooq;
@@ -461,5 +470,55 @@ public class TournamentDao {
                 .set(TOURNAMENT.QUITS_FROM_GROUP, parameters.getQuitsGroup())
                 .where(TOURNAMENT.TID.eq(parameters.getTid()))
                 .execute();
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public List<TournamentResultEntry> tournamentResult(int tid, int cid) {
+        Map<Integer, TournamentResultEntry> allMap = new HashMap<>();
+        Map<Integer, TournamentResultEntry> groupMap = new HashMap<>();
+        jooq
+                .select(USERS.NAME, USERS.UID, BID.STATE,
+                        MATCHES.GID, MATCH_SCORE.WON, MATCH_SCORE.SETS_WON)
+                .from(BID)
+                .innerJoin(USERS).on(BID.UID.eq(USERS.UID))
+                .innerJoin(MATCH_SCORE).on(
+                        MATCH_SCORE.TID.eq(BID.TID),
+                        MATCH_SCORE.UID.eq(BID.UID))
+                .innerJoin(MATCHES)
+                .on(MATCH_SCORE.MID.eq(MATCHES.MID))
+                .where(BID.TID.eq(tid), BID.CID.eq(cid))
+                .forEach(r -> {
+                    final int uid = r.get(USERS.UID);
+                    final int won = r.get(MATCH_SCORE.WON);
+                    final int score = r.get(MATCH_SCORE.SETS_WON);
+                    Optional<Integer> ogid = r.get(MATCHES.GID);
+                    TournamentResultEntry tre = allMap.get(uid);
+                    if (tre == null) {
+                        allMap.put(uid, tre = TournamentResultEntry.builder().user(UserLink
+                                .builder()
+                                .name(r.get(USERS.NAME))
+                                .uid(uid)
+                                .build())
+                                .state(r.get(BID.STATE))
+                                .wonMatches(won > 0 ? 1 : 0)
+                                .score(score)
+                                .build());
+                    } else {
+                        if (won > 0) {
+                            tre.setWonMatches(tre.getWonMatches() + 1);
+                        }
+                        tre.setScore(tre.getScore() + score);
+                    }
+                    if (ogid.isPresent()) {
+                        groupMap.put(uid, tre);
+                    }
+                });
+        allMap.keySet().removeAll(groupMap.keySet());
+        List<TournamentResultEntry> playOff = new ArrayList<>(allMap.values());
+        Collections.sort(playOff);
+        List<TournamentResultEntry> group = new ArrayList<>(groupMap.values());
+        Collections.sort(group);
+        playOff.addAll(group);
+        return playOff;
     }
 }

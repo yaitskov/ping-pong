@@ -9,8 +9,8 @@ public enum BidState {
     Wait, // wait for place or enemy
     Rest, // temporary not available due timeout
     Lost, // lost tournament battle in a group or playoff game
+    Expl, // disqualified out of tournament due rule breaking, etc...
     Win1, // won 1st place
     Win2, // won 2nd place
-    Win3, // won 3rd place
-    Expl  // disqualified out of tournament due rule breaking, etc...
+    Win3 // won 3rd place
 }

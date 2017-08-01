@@ -209,4 +209,12 @@ public class TournamentResource {
         final int uid = authService.userInfoBySession(session).getUid();
         return tournamentService.findMyRecentJudgedTournaments(uid);
     }
+
+    @GET
+    @Path("/tournament/result/{tid}/category/{cid}")
+    public List<TournamentResultEntry> tournamentResult(
+            @PathParam("tid") int tid,
+            @PathParam("cid") int cid) {
+        return tournamentService.tournamentResult(tid, cid);
+    }
 }

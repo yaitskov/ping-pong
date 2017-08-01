@@ -446,6 +446,7 @@ public class TournamentDao {
                 .fetchOne())
                 .map(r -> TournamentParameters
                         .builder()
+                        .tid(tid)
                         .matchScore(r.get(TOURNAMENT.MATCH_SCORE))
                         .quitsGroup(r.get(TOURNAMENT.QUITS_FROM_GROUP))
                         .maxGroupSize(r.get(TOURNAMENT.MAX_GROUP_SIZE))

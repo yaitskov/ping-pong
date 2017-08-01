@@ -106,14 +106,11 @@ public class OneGroup4PlayersSim {
                 .champions(c1, p1, p2));
     }
 
-    @Test
+    @Test(expected = AssertionError.class)
     public void quits2Of2() {
         simulator.simulate(T_1_Q_2_G_8, TournamentScenario.begin()
-                .name("quits2Of3")
-                .category(c1, p1, p2)
-                .w31(p1, p2)
-                .quitsGroup(p1, p2)
-                .w31(p1, p2)
-                .champions(c1, p1, p2));
+                .ignoreUnexpectedGames()
+                .name("quits2Of2")
+                .category(c1, p1, p2));
     }
 }

@@ -6,6 +6,7 @@ import static java.lang.Math.max;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
+import static org.dan.ping.pong.sys.error.PiPoEx.notAuthorized;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
@@ -79,6 +80,9 @@ public class CastingLotsService {
             for (int gi = 0; gi < groups; ++gi) {
                 final int gid = groupDao.createGroup(tid, cid, "Group " + (1 + gi), quits, gi);
                 List<TournamentBid> groupBids = SetUtil.firstN(groupSize, bidIterator);
+                if (groupBids.size() <= quits) {
+                    throw badRequest("Category should have more participants than quits from a group");
+                }
                 basePlayOffPriority = Math.max(
                         castingLotsDao.generateGroupMatches(gid, groupBids, tid),
                         basePlayOffPriority);

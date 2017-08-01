@@ -40,7 +40,6 @@ angular.
                                      requestStatus.complete();
                                      self.rated = 1;
                                      requestStatus.startLoading("Match is scored");
-                                     pageCtx.put('last-admin-scoring-tournament-id', $routeParams.matchId);
                                  },
                                  function (error) {
                                      requestStatus.failed(error);

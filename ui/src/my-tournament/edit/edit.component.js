@@ -9,7 +9,12 @@ angular.
                      function (auth, mainMenu, $http, $location, placePicker,
                                pageCtx, $scope, Tournament, requestStatus, $routeParams, moment) {
                          mainMenu.setTitle('Tournament Modification');
-                         this.tournament = Object.assign({}, pageCtx.get('editableTournament') || {});
+                         var changes = pageCtx.get('editableTournament');
+                         if (changes && $routeParams.tournamentId != changes.tid) {
+                             changes = {}
+                             pageCtx.put('editableTournament', changes);
+                         }
+                         this.tournament = Object.assign({}, changes || {});
                          var self = this;
                          this.dataPickerUi = {};
                          this.place = {};

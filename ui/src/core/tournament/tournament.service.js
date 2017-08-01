@@ -27,7 +27,7 @@ angular.
                                        isArray: true
                                    },
                                    result: {
-                                       url: '/api/tournament/result/:tournamentId',
+                                       url: '/api/tournament/result/:tournamentId/category/:categoryId',
                                        method: 'GET',
                                        cache: false,
                                        headers: {

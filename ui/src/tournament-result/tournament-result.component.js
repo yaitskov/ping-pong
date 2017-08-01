@@ -11,12 +11,14 @@ angular.
                          self.matches = null;
                          self.winners = null;
                          self.tournament = null;
+                         self.currentCid = null;
                          self.tid = $routeParams.tournamentId;
                          var params = {tournamentId: $routeParams.tournamentId};
                          this.pickCategory = function (cid) {
                              requestStatus.startLoading("Loading participants");
                              Tournament.result(
-                                 {tournamentId: $routeParams.tournamentId},
+                                 {tournamentId: $routeParams.tournamentId,
+                                  categoryId: cid},
                                  function (participants) {
                                      requestStatus.complete();
                                      self.participants = participants;
@@ -29,9 +31,10 @@ angular.
                              function (tournament) {
                                  requestStatus.complete();
                                  self.tournament = tournament;
-                                 tournament.tid = {tournamentId: $routeParams.tournamentId};
+                                 tournament.tid = $routeParams.tournamentId;
                                  for (var i in tournament.categories) {
                                      var category = tournament.categories[i];
+                                     self.currentCid = category.cid;
                                      self.pickCategory(category.cid);
                                      break;
                                  }

@@ -81,4 +81,14 @@ public class OneGroup4PlayersSim {
                         .name("sched 3 con games")
                         .category(c1, p1, p2, p3, p4, p5, p6));
     }
+
+    @Test
+    @SneakyThrows
+    public void justBeginTournamentOf2() {
+        simulator.simulate(T_1_Q_1_G_8,
+                TournamentScenario.begin()
+                        .ignoreUnexpectedGames()
+                        .name("justBeginTournamentOf2")
+                        .category(c1, p1, p2));
+    }
 }

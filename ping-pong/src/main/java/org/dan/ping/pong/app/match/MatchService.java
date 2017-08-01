@@ -165,7 +165,12 @@ public class MatchService {
                 : forward(0, iTour.getQuitesFromGroup());
         final Set<Integer> winnerIds = new HashSet<>();
         for (int i : matchIndexes) {
-            final int winnerId = pq.poll().get(0).getWinnerId().get();
+            List<GroupMatchInfo> wonMatches = pq.poll();
+            if (wonMatches == null) {
+                log.error("Not enough winners in group {}; idx = {}", gid, i);
+                break;
+            }
+            final int winnerId = wonMatches.get(0).getWinnerId().get();
             winnerIds.add(winnerId);
             log.info("uid {} quits out of gid {}", winnerId, gid);
             matchDao.goPlayOff(winnerId,

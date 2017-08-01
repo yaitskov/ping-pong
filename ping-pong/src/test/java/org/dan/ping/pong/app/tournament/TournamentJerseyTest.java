@@ -111,9 +111,9 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                 .get(DigestList.class);
 
         assertThat(digest, hasItem(allOf(
-                        hasProperty("tid", is(tid)),
-                        hasProperty("name", is(name)),
-                        hasProperty("opensAt", is(opensAt)))));
+                hasProperty("tid", is(tid)),
+                hasProperty("name", is(name)),
+                hasProperty("opensAt", is(opensAt)))));
     }
 
     @Inject
@@ -202,9 +202,9 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final int tid = daoGenerator.genTournament(
                 daoGenerator.genPlace(0), Draft);
         myRest().voidPost(TOURNAMENT_ENLIST, userSession, EnlistTournament.builder()
-                                .tid(tid)
-                                .categoryId(daoGenerator.genCategory(tid))
-                                .build());
+                .tid(tid)
+                .categoryId(daoGenerator.genCategory(tid))
+                .build());
         final List<DatedTournamentDigest> digests = myRest().get(TOURNAMENT_ENLISTED,
                 userSession, DigestList.class);
         assertThat(digests, hasItem(hasProperty("tid", is(tid))));

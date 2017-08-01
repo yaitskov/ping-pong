@@ -11,6 +11,7 @@ import static org.dan.ping.pong.mock.simulator.Player.p6;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c2;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
+import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_2_G_8;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_3_Q_1_G_8;
 
 import lombok.SneakyThrows;
@@ -90,5 +91,29 @@ public class OneGroup4PlayersSim {
                         .ignoreUnexpectedGames()
                         .name("justBeginTournamentOf2")
                         .category(c1, p1, p2));
+    }
+
+    @Test
+    public void quits2Of3() {
+        simulator.simulate(T_1_Q_2_G_8, TournamentScenario.begin()
+                .name("quits2Of3")
+                .category(c1, p1, p2, p3)
+                .w31(p1, p2)
+                .w30(p1, p3)
+                .w32(p2, p3)
+                .quitsGroup(p1, p2)
+                .w31(p1, p2)
+                .champions(c1, p1, p2));
+    }
+
+    @Test
+    public void quits2Of2() {
+        simulator.simulate(T_1_Q_2_G_8, TournamentScenario.begin()
+                .name("quits2Of3")
+                .category(c1, p1, p2)
+                .w31(p1, p2)
+                .quitsGroup(p1, p2)
+                .w31(p1, p2)
+                .champions(c1, p1, p2));
     }
 }

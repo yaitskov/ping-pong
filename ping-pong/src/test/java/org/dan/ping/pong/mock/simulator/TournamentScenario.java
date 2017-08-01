@@ -34,7 +34,7 @@ public class TournamentScenario {
     private final Multimap<PlayerCategory, Player> playersByCategories = HashMultimap.create();
     private final Map<Player, PlayerCategory> playersCategory = new HashMap<>();
     private final Set<Player> playOffPlayers = new HashSet<>();
-    private final List<Player> champions = new ArrayList<>();
+    private final Map<PlayerCategory, List<Player>> champions = new HashMap<>();
     private final Map<Player, TestUserSession> playersSessions = new HashMap<>();
     private final Map<Integer, Player> uidPlayer = new HashMap<>();
     private final Map<PlayerCategory, Integer> categoryDbId = new HashMap<>();
@@ -135,9 +135,9 @@ public class TournamentScenario {
         return this;
     }
 
-    public TournamentScenario champions(Player... ps) {
-        champions.addAll(asList(ps));
-        champions.forEach(player -> {
+    public TournamentScenario champions(PlayerCategory category, Player... ps) {
+        champions.put(category, asList(ps));
+        asList(ps).forEach(player -> {
             if (!playOffPlayers.contains(player)) {
                 throw new IllegalStateException("Player "
                         + player + " did not quit group");

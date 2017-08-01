@@ -282,7 +282,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .lose(p4, p3)
                         .quitsGroup(p1, p3)
                         .win(p1, p3)
-                        .champions(p1, p3));
+                        .champions(c1, p1, p3));
     }
 
     @Test
@@ -292,7 +292,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .category(c1, p1, p2)
                         .win(p1, p2)
                         .quitsGroup(p1)
-                        .champions(p1));
+                        .champions(c1, p1));
     }
 
     @Test
@@ -305,7 +305,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .lose(p2, p3)
                         .quitsGroup(p1, p3)
                         .lose(p1, p3)
-                        .champions(p3, p1));
+                        .champions(c1, p3, p1));
     }
 
     @Test
@@ -321,7 +321,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .win(p3, p2) // p3 1 wins
                         .quitsGroup(p1, p4)
                         .lose(p4, p1)
-                        .champions(p1, p4));
+                        .champions(c1, p1, p4));
     }
 
     /**

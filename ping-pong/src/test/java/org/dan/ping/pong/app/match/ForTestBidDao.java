@@ -17,10 +17,11 @@ public class ForTestBidDao {
     private DSLContext jooq;
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<Integer> findByTidAndState(int tid, BidState state) {
+    public List<Integer> findByTidAndState(int tid, int cid, List<BidState> state) {
         return jooq.select(BID.UID)
                 .from(BID)
-                .where(BID.TID.eq(tid), BID.STATE.eq(state))
+                .where(BID.TID.eq(tid), BID.CID.eq(cid), BID.STATE.in(state))
+                .orderBy(BID.STATE)
                 .fetch()
                 .map(Record1::value1);
     }

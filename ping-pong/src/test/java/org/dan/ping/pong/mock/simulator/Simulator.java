@@ -109,19 +109,22 @@ public class Simulator {
                         .filter(Optional::isPresent)
                         .collect(toList()));
         List<BidState> bidStates = asList(BidState.Win1, BidState.Win2, BidState.Win3);
-        for (int i = 0; i < scenario.getChampions().size(); ++i) {
-            assertEquals(singletonList(scenario.getChampions().get(i)),
-                    forTestBidDao.findByTidAndState(scenario.getTid(), bidStates.get(i))
+        for (PlayerCategory playerCategory : scenario.getChampions().keySet()) {
+            final int cid = scenario.getCategoryDbId().get(playerCategory);
+            assertEquals(scenario.getChampions().get(playerCategory),
+                    forTestBidDao.findByTidAndState(scenario.getTid(),
+                            cid,
+                            bidStates)
                             .stream().map(uid -> scenario.getUidPlayer().get(uid))
                             .collect(toList()));
+            assertEquals(
+                    scenario.getPlayersSessions().keySet().stream()
+                            .filter(player -> !scenario.getChampions().get(playerCategory).contains(player))
+                            .collect(toSet()),
+                    forTestBidDao.findByTidAndState(scenario.getTid(), cid, singletonList(BidState.Lost))
+                            .stream().map(uid -> scenario.getUidPlayer().get(uid))
+                            .collect(toSet()));
         }
-        assertEquals(
-                scenario.getPlayersSessions().keySet().stream()
-                        .filter(player -> !scenario.getChampions().contains(player))
-                        .collect(toSet()),
-                forTestBidDao.findByTidAndState(scenario.getTid(), BidState.Lost)
-                        .stream().map(uid -> scenario.getUidPlayer().get(uid))
-                        .collect(toSet()));
         assertEquals(Optional.of(Close),
                 tournamentDao.getById(scenario.getTid())
                         .map(TournamentInfo::getState));

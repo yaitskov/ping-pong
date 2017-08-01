@@ -120,6 +120,7 @@ public class Simulator {
             assertEquals(
                     scenario.getPlayersSessions().keySet().stream()
                             .filter(player -> !scenario.getChampions().get(playerCategory).contains(player))
+                            .filter(player -> scenario.getPlayersCategory().get(player).equals(playerCategory))
                             .collect(toSet()),
                     forTestBidDao.findByTidAndState(scenario.getTid(), cid, singletonList(BidState.Lost))
                             .stream().map(uid -> scenario.getUidPlayer().get(uid))

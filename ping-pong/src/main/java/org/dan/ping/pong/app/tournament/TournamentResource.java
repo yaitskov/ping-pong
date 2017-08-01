@@ -217,4 +217,10 @@ public class TournamentResource {
             @PathParam("cid") int cid) {
         return tournamentService.tournamentResult(tid, cid);
     }
+
+    @GET
+    @Path("/tournament/complete/{tid}")
+    public TournamentComplete completeInfo(@PathParam("tid") int tid) {
+        return tournamentService.completeInfo(tid);
+    }
 }

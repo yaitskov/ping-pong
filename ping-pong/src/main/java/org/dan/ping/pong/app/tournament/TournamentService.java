@@ -191,4 +191,12 @@ public class TournamentService {
     public List<TournamentResultEntry> tournamentResult(int tid, int cid) {
         return tournamentDao.tournamentResult(tid, cid);
     }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public TournamentComplete completeInfo(int tid) {
+        TournamentComplete result = tournamentDao.completeInfo(tid)
+                .orElseThrow(() -> notFound("Tournament has been not found"));
+        result.setCategories(categoryDao.listCategoriesByTid(tid));
+        return result;
+    }
 }

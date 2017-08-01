@@ -26,6 +26,15 @@ angular.
                                        },
                                        isArray: true
                                    },
+                                   result: {
+                                       url: '/api/tournament/result/:tournamentId',
+                                       method: 'GET',
+                                       cache: false,
+                                       headers: {
+                                           session: 1
+                                       },
+                                       isArray: true
+                                   },
                                    participateIn: {
                                        url: '/api/tournament/enlisted',
                                        method: 'GET',
@@ -58,6 +67,11 @@ angular.
                                        headers: {
                                            session: 1
                                        }
+                                   },
+                                   aComplete: {
+                                       url: '/api/tournament/complete/:tournamentId',
+                                       method: 'GET',
+                                       cache: false
                                    },
                                    aMine: {
                                        url: '/api/tournament/mine/:tournamentId',

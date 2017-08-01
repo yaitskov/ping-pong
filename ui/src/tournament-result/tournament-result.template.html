@@ -1,0 +1,53 @@
+<main-menu></main-menu>
+<div class="container">
+  <request-status></request-status>
+  <div class="alert alert-success"
+       ng-show="$ctrl.tournament.state == 'Close'">
+    Tournament {{$ctrl.tournament.name}} is complete.
+  </div>
+  <div class="alert alert-info"
+       ng-show="$ctrl.tournament.state == 'Open'">
+    Tournament {{$ctrl.tournament.name}} is in progress.
+  </div>
+ <div class="alert alert-info"
+       ng-show="$ctrl.tournament.state == 'Draft' || $ctrl.tournament.state == 'Announce'">
+    Tournament {{$ctrl.tournament.name}} is not started yet.
+  </div>
+  <div class="form-group" ng-show="$ctrl.tournament">
+    <label>Categories</label>
+    <div class="btn-group">
+      <a ng-click="$ctrl.pickCategory(category.cid)"
+         class="btn"
+         ng-repeat="category in $ctrl.tournament.categories | orderBy : 'name'"
+         ng-class="{'btn-default': $ctrl.currentCid != category.cid, 'btn-primary': $ctrl.currentCid == category.cid}">
+        {{category.name}}
+      </a>
+    </div>
+  </div>
+  <table class="table" ng-show="$ctrl.participants">
+    <thead>
+      <tr>
+        <td>#</td>
+        <td>Participant</td>
+        <td title="count of won matches">Matches</td>
+        <td title="cumulative score across all matches">Score</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="participant in $ctrl.participants">
+        <td>{{$index}}</td>
+        <td title="Opponents participating in the match">
+          <a href="#!/participant/{{$ctrl.tournament.tid}}/{{participant.user.uid}}">
+            {{participant.user.name}}
+          </a>
+        </td>
+        <td>
+          {{participant.wonMatches}}
+        </td>
+        <td>
+          {{participant.score}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

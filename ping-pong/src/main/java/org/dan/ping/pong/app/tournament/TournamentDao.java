@@ -521,4 +521,18 @@ public class TournamentDao {
         playOff.addAll(group);
         return playOff;
     }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public Optional<TournamentComplete> completeInfo(int tid) {
+        return ofNullable(jooq.select(TOURNAMENT.NAME, TOURNAMENT.STATE)
+                .from(TOURNAMENT)
+                .where(TOURNAMENT.TID.eq(tid))
+                .fetchOne())
+                .map(r -> TournamentComplete
+                        .builder()
+                        .state(r.get(TOURNAMENT.STATE))
+                        .name(r.get(TOURNAMENT.NAME))
+                        .build());
+
+    }
 }

@@ -274,7 +274,7 @@ public class Simulator {
             scenario.getUidPlayer().put(user.getUid(), player);
         }
         for (PlayerCategory category : scenario.getCategoryDbId().keySet()) {
-            final int catId = daoGenerator.genCategory(prefix, tid);
+            final int catId = daoGenerator.genCategory(prefix + " " + category, tid);
             scenario.getCategoryDbId().put(category, catId);
             Map<TestUserSession, EnlistMode> m = scenario.getPlayerPresence().keySet()
                     .stream().collect(Collectors.toMap(

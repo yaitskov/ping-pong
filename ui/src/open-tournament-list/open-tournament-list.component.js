@@ -17,7 +17,7 @@ angular.module('openTournamentList').
                              return Math.round(ratio * 100.0) + '%';
                          };
                          Tournament.running(
-                             {},
+                             {a: 3},
                              function (tournaments) {
                                  self.tournaments = tournaments;
                                  requestStatus.complete();

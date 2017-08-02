@@ -8,6 +8,7 @@
   <request-status></request-status>
   <div ng-repeat="tournament in $ctrl.tournaments"
        clickable="/watch/tournament/{{tournament.tid}}"
+       ng-class="{'complete': tournament.state == 'Close'}"
        class="list-item tournament open-tournament clearfix">
     <div class="name pull-left">
       <a href="#!/watch/tournament/{{tournament.tid}}">
@@ -15,11 +16,15 @@
       </a>
     </div>
     <div class="datetime pull-right">
-      <span class="time" title="Started">
+      <span class="time" title="Started" ng-show="tournament.state == 'Open'">
         {{tournament.startedAt|amTimeAgo}}
       </span>
 
-      <span class="completeness" title="Overall matches">
+      <span class="ended" ng-show="tournament.state == 'Close'">
+        complete
+      </span>
+
+      <span class="completeness" ng-show="tournament.state == 'Open'" title="Overall matches">
         {{$ctrl.percent(tournament)}}
       </span>
     </div>

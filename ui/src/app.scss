@@ -134,6 +134,7 @@ ul li a {
         margin-bottom: 3px;
     }
 }
+
 /* end of enlist form */
 
 /* begin of desktop layout */
@@ -141,6 +142,9 @@ ul li a {
     .container {
         max-width: 800px;
         padding-top: 15px;
+    }
+    .open-tournament.complete {
+        background-color: #999 !important;
     }
     .list {
         max-width: 800px;

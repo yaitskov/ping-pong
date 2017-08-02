@@ -12,7 +12,7 @@ angular.
                                        isArray: true
                                    },
                                    running: {
-                                       url: '/api/tournament/running',
+                                       url: '/api/tournament/running/:alsoCompleteInDays',
                                        method: 'GET',
                                        cache: false,
                                        isArray: true

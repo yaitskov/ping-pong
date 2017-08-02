@@ -16,11 +16,13 @@ angular.
                          var params = {tournamentId: $routeParams.tournamentId};
                          this.pickCategory = function (cid) {
                              requestStatus.startLoading("Loading participants");
+                             self.currentCid = cid;
                              Tournament.result(
                                  {tournamentId: $routeParams.tournamentId,
                                   categoryId: cid},
                                  function (participants) {
                                      requestStatus.complete();
+                                     self.currentCid = cid;
                                      self.participants = participants;
                                  },
                                  requestStatus.failed);
@@ -34,7 +36,6 @@ angular.
                                  tournament.tid = $routeParams.tournamentId;
                                  for (var i in tournament.categories) {
                                      var category = tournament.categories[i];
-                                     self.currentCid = category.cid;
                                      self.pickCategory(category.cid);
                                      break;
                                  }

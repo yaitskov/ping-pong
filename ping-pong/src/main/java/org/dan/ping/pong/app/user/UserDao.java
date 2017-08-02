@@ -53,7 +53,7 @@ public class UserDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public Optional<UserInfo> getUserByUid(int uid) {
-        return ofNullable(jooq.select(USERS.NAME, USERS.PHONE, USERS.EMAIL)
+        return ofNullable(jooq.select(USERS.NAME, USERS.PHONE, USERS.EMAIL, USERS.TYPE)
                 .from(USERS)
                 .where(USERS.UID.eq(uid))
                 .fetchOne())

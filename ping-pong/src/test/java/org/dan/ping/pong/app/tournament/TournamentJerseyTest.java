@@ -239,8 +239,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void runningTournaments() {
         final int placeId = daoGenerator.genPlace(1);
-        final int tid = daoGenerator.genTournament(placeId,
-                TournamentProps.builder().state(Draft).build());
+        final int tid = daoGenerator.genTournament(placeId, Draft, 1);
         final int cid = daoGenerator.genCategory(tid);
 
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);

@@ -4,8 +4,8 @@ import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.match.MatchResource.MY_PENDING_MATCHES;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Group;
-import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
+import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -14,18 +14,18 @@ import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidCtx;
 import org.dan.ping.pong.app.group.GroupCtx;
 import org.dan.ping.pong.app.match.MatchCtx;
+import org.dan.ping.pong.app.match.MyPendingMatch;
 import org.dan.ping.pong.app.score.MatchScoreCtx;
 import org.dan.ping.pong.app.table.TableCtx;
-import org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin;
-import org.dan.ping.pong.sys.ctx.BaseTestContext;
-import org.dan.ping.pong.app.match.MyPendingMatch;
+import org.dan.ping.pong.app.tournament.TournamentCtx;
 import org.dan.ping.pong.app.user.UserLink;
+import org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin;
 import org.dan.ping.pong.mock.RestEntityGenerator;
 import org.dan.ping.pong.mock.TestAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.UserSessionGenerator;
+import org.dan.ping.pong.sys.ctx.BaseTestContext;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
-import org.dan.ping.pong.app.tournament.TournamentCtx;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
@@ -65,7 +65,7 @@ public class CastingLotsJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void makeGroupsOf2Bids() {
         final int placeId = daoGenerator.genPlace(0);
-        final int tid = daoGenerator.genTournament(placeId, Draft);
+        final int tid = daoGenerator.genTournament(placeId, Draft, 1);
         final List<TestUserSession> participants =  restEntityGenerator.generateGroupsOf(
                 myRest(), adminSession, userSessionGenerator, tid, 2);
         final Set<Integer> participantIds = participants.stream()

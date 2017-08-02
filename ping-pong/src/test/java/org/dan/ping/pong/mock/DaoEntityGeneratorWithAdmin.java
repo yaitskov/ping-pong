@@ -24,6 +24,12 @@ public class DaoEntityGeneratorWithAdmin {
         return genTournament(placeId, TournamentProps.builder().state(state).build());
     }
 
+    public int genTournament(int placeId, TournamentState state, int quits) {
+        return genTournament(placeId, TournamentProps.builder()
+                .state(state).quitsFromGroup(quits)
+                .build());
+    }
+
     public int genTournament(int placeId, TournamentProps props) {
         return daoEntityGenerator.genTournament(testAdmin.getUid(), placeId, props);
     }

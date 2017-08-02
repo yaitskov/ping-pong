@@ -53,7 +53,7 @@ public class TableJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void locateOneGameOnOneTable() {
         final int placeId = daoGenerator.genPlace(1);
-        final int tid = daoGenerator.genTournament(placeId, Draft);
+        final int tid = daoGenerator.genTournament(placeId, Draft, 1);
         final int cid = daoGenerator.genCategory(tid);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
         restEntityGenerator.enlistParticipants(myRest(), adminSession, tid, cid, participants);
@@ -71,7 +71,7 @@ public class TableJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void locateOneGameWithoutTables() {
         final int placeId = daoGenerator.genPlace(0);
-        final int tid = daoGenerator.genTournament(placeId, Draft);
+        final int tid = daoGenerator.genTournament(placeId, Draft, 1);
         final int cid = daoGenerator.genCategory(tid);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
         restEntityGenerator.enlistParticipants(myRest(), adminSession, tid, cid, participants);

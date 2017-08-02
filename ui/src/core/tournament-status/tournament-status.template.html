@@ -2,7 +2,9 @@
      ng-show="$ctrl.tournament.state"
      class="alert alert-info tournament-status">
   <div ng-switch-when="Open">
-    Tournament <b>{{$ctrl.tournament.name}}</b> has been opened,
+    <a href="#!/watch/tournament/{{$ctrl.tournament.tid}}">Tournament
+      <b>{{$ctrl.tournament.name}}</b>
+    </a> has been opened,
     drafting is already complete. Try to find next tournament in the
     seria, if you want to pariticpate there.
   </div>

@@ -8,7 +8,7 @@ angular.
             this.reset = function () {
                 this.tournament = {};
             };
-            this.meta = {};
+            this.meta = null;
             var self = this;
             self.reset();
             $rootScope.$on('event.request.started', function (event, msg, meta) {
@@ -20,7 +20,10 @@ angular.
                 if (response.status == 400 &&
                     typeof response.data == 'object' &&
                     response.data.error == 'BadState') {
-                    self.tournament = {tid: self.meta.tid || meta.tid,
+                    if (meta) {
+                        self.meta = meta;
+                    }
+                    self.tournament = {tid: self.meta.tid,
                                        name: self.meta.name,
                                        state: response.data.state};
                 }

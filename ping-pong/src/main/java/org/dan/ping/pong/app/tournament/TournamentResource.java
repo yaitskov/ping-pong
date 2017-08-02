@@ -66,10 +66,19 @@ public class TournamentResource {
 
     @GET
     @Path(EDITABLE_TOURNAMENTS)
-    public List<DatedTournamentDigest> findTournamentsIamJudgeging(
+    public List<TournamentDigest> findTournamentsIamJudging(
             @HeaderParam(SESSION) String session) {
-        return tournamentDao.findWritableForAdmin(
-                authService.userInfoBySession(session).getUid());
+        return findTournamentsIamJudging(session, 0);
+    }
+
+    @GET
+    @Path(EDITABLE_TOURNAMENTS + "/{days}")
+    public List<TournamentDigest> findTournamentsIamJudging(
+            @HeaderParam(SESSION) String session,
+            @PathParam("days") int days) {
+        return tournamentService.findWritableForAdmin(
+                authService.userInfoBySession(session).getUid(),
+                days);
     }
 
     @POST

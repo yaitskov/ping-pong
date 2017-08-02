@@ -107,13 +107,21 @@ public class TournamentDao {
     }
 
     @Transactional(transactionManager = TRANSACTION_MANAGER)
-    public List<DatedTournamentDigest> findWritableForAdmin(int uid) {
-        return selectDatedDigest()
+    public List<TournamentDigest> findWritableForAdmin(int uid, Instant after) {
+        return jooq.select(TOURNAMENT.NAME, TOURNAMENT.OPENS_AT, TOURNAMENT.TID, TOURNAMENT.STATE)
+                .from(TOURNAMENT)
                 .innerJoin(TOURNAMENT_ADMIN)
                 .on(TOURNAMENT.TID.eq(TOURNAMENT_ADMIN.TID))
-                .where(TOURNAMENT_ADMIN.UID.eq(uid))
+                .where(TOURNAMENT_ADMIN.UID.eq(uid),
+                        TOURNAMENT.STATE.in(Hidden, Announce, Draft, Open)
+                                .or(TOURNAMENT.OPENS_AT.ge(after)))
                 .fetch()
-                .map(this::mapToDatedDigest);
+                .map(r -> TournamentDigest.builder()
+                        .tid(r.get(TOURNAMENT.TID))
+                        .name(r.get(TOURNAMENT.NAME))
+                        .opensAt(r.get(TOURNAMENT.OPENS_AT))
+                        .state(r.get(TOURNAMENT.STATE))
+                        .build());
     }
 
     private <T extends Record> DatedTournamentDigest mapToDatedDigest(T r) {

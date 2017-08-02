@@ -202,4 +202,10 @@ public class TournamentService {
         result.setCategories(categoryDao.listCategoriesByTid(tid));
         return result;
     }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public List<TournamentDigest> findWritableForAdmin(int uid, int days) {
+        return tournamentDao.findWritableForAdmin(uid,
+                clocker.get().minus(days, ChronoUnit.DAYS));
+    }
 }

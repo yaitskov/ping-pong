@@ -9,6 +9,12 @@ angular.module('openTournamentList').
                          var self = this;
                          self.tournaments = null;
                          requestStatus.startLoading();
+                         this.viewUrl = function (tournament) {
+                             if (tournament.state == 'Open') {
+                                 return '/watch/tournament/' + tournament.tid;
+                             }
+                             return '/tournament/result/' + tournament.tid;
+                         }
                          this.percent = function (tournament) {
                              if (!tournament.gamesOverall) {
                                  return '-';
@@ -17,7 +23,7 @@ angular.module('openTournamentList').
                              return Math.round(ratio * 100.0) + '%';
                          };
                          Tournament.running(
-                             {a: 3},
+                             {alsoCompleteInDays: 3},
                              function (tournaments) {
                                  self.tournaments = tournaments;
                                  requestStatus.complete();

@@ -7,11 +7,11 @@
 <div class="container-fluid list">
   <request-status></request-status>
   <div ng-repeat="tournament in $ctrl.tournaments"
-       clickable="/watch/tournament/{{tournament.tid}}"
+       clickable="{{$ctrl.viewUrl(tournament)}}"
        ng-class="{'complete': tournament.state == 'Close'}"
        class="list-item tournament open-tournament clearfix">
     <div class="name pull-left">
-      <a href="#!/watch/tournament/{{tournament.tid}}">
+      <a href="#!{{$ctrl.viewUrl(tournament)}}">
           {{tournament.name}}
       </a>
     </div>

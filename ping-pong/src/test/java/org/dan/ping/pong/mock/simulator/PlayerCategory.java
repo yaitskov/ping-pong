@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 public class PlayerCategory {
     public static final PlayerCategory c1 = category(1);
     public static final PlayerCategory c2 = category(2);
+    public static final PlayerCategory c3 = category(3);
+    public static final PlayerCategory c4 = category(4);
 
     private final int number;
 

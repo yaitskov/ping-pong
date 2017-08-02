@@ -128,7 +128,14 @@ public class TournamentResource {
     @Path(RUNNING_TOURNAMENTS)
     @Consumes(APPLICATION_JSON)
     public List<OpenTournamentDigest> findRunning() {
-        return tournamentService.findRunning();
+        return findRunning(0);
+    }
+
+    @GET
+    @Path(RUNNING_TOURNAMENTS + "/{days}")
+    @Consumes(APPLICATION_JSON)
+    public List<OpenTournamentDigest> findRunning(@PathParam("days") int days) {
+        return tournamentService.findRunning(days);
     }
 
     @GET

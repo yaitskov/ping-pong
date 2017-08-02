@@ -20,6 +20,7 @@ import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,8 +111,9 @@ public class TournamentService {
         tournamentDao.setState(stateUpdate.getTid(), stateUpdate.getState());
     }
 
-    public List<OpenTournamentDigest> findRunning() {
-        return tournamentDao.findRunning();
+    public List<OpenTournamentDigest> findRunning(int completeInLastDays) {
+        return tournamentDao.findRunning(
+                clocker.get().minus(completeInLastDays, ChronoUnit.DAYS));
     }
 
     public MyRecentTournaments findMyRecentTournaments(int uid) {

@@ -290,8 +290,10 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<OpenTournamentDigest> findRunning() {
-        return jooq.select(TOURNAMENT.TID, TOURNAMENT.OPENS_AT, TOURNAMENT.NAME,
+    public List<OpenTournamentDigest> findRunning(Instant includeClosedAfter) {
+        return jooq
+                .select(TOURNAMENT.TID, TOURNAMENT.OPENS_AT,
+                        TOURNAMENT.NAME, TOURNAMENT.STATE,
                 DSL.selectCount().from(BID)
                         .where(BID.TID.eq(TOURNAMENT.TID))
                         .asField(PARTICIPANTS),
@@ -301,13 +303,16 @@ public class TournamentDao {
                         MATCHES.STATE.eq(MatchState.Over))
                         .asField(GAMES_COMPLETE))
                 .from(TOURNAMENT)
-                .where(TOURNAMENT.STATE.eq(Open))
+                .where(TOURNAMENT.STATE.eq(Open)
+                        .or(TOURNAMENT.STATE.eq(Close)
+                                .and(TOURNAMENT.OPENS_AT.ge(includeClosedAfter))))
                 .orderBy(TOURNAMENT.OPENS_AT)
                 .fetch()
                 .map(r -> OpenTournamentDigest.builder()
                         .tid(r.get(TOURNAMENT.TID))
                         .name(r.get(TOURNAMENT.NAME))
                         .startedAt(r.get(TOURNAMENT.OPENS_AT))
+                        .state(r.get(TOURNAMENT.STATE))
                         .pariticipants(r.get(PARTICIPANTS, Integer.class))
                         .gamesOverall(r.get(GAMES, Integer.class))
                         .gamesComplete(r.get(GAMES_COMPLETE, Integer.class))

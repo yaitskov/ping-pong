@@ -20,4 +20,5 @@ public class OpenTournamentDigest {
     private int gamesOverall;
     private Instant startedAt;
     private int pariticipants;
+    private TournamentState state;
 }

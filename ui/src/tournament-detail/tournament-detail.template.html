@@ -81,13 +81,29 @@
     <tournament-status></tournament-status>
   </div>
 
+  <div class="form-group" ng-show="$ctrl.showQuitConfirm">
+    <div class="alert alert-danger">
+      Tournament is open. You are participate.
+      If you resign right now, there is no way back!
+    </div>
+    <a class="btn btn-danger" ng-click="$ctrl.resign()">
+      Resign
+    </a>
+    <a class="btn btn-primary" ng-click="$ctrl.showQuitConfirm = false">
+      Cancel
+    </a>
+  </div>
+
   <div class="form-group" ng-show="$ctrl.tournament">
     <button type="button" class="btn btn-primary"
             ng-click="$ctrl.enlistMe()"
             ng-show="!$ctrl.tournament.myCategoryId && !$ctrl.tournament.iamAdmin">Enlist Me</button>
     <button type="button" class="btn btn-primary"
             ng-click="$ctrl.resign()"
-            ng-show="$ctrl.tournament.myCategoryId">Resign</button>
+            ng-show="$ctrl.tournament.myCategoryId && $ctrl.tournament.state == 'Draft'">Resign</button>
+    <button type="button" class="btn btn-danger"
+            ng-click="$ctrl.quit()"
+            ng-show="$ctrl.tournament.myCategoryId && $ctrl.tournament.state == 'Open' && !$ctrl.showQuitConfirm">Quit</button>
     <button type="button" class="btn btn-primary"
             ng-show="$ctrl.tournament.iamAdmin">Enlist Offline Participant</button>
     <a class="btn btn-primary label-info" role="button" ng-show="$ctrl.tournament.previousTid"
@@ -96,7 +112,7 @@
     </a>
   </div>
 
-  <div class="form-group" ng-show="$ctrl.tournament.myCategoryId">
+  <div class="form-group" ng-show="$ctrl.tournament.myCategoryId && $ctrl.tournament.state == 'Draft'">
     <p>Thanks, you are enlisted to the tournament <b>{{$ctrl.tournament.name}}</b>.
       It will start {{$ctrl.tournament.opensAt | amTimeAgo}}.
       <a href="#!/my/matches/play">Here</a> is information about

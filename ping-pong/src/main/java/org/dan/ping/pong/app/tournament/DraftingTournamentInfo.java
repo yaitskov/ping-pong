@@ -1,6 +1,5 @@
 package org.dan.ping.pong.app.tournament;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +31,5 @@ public class DraftingTournamentInfo {
     private boolean iAmAdmin;
     private int alreadyEnlisted;
     private List<CategoryInfo> categories;
-    @JsonIgnore
     private TournamentState state;
 }

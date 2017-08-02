@@ -13,6 +13,7 @@ angular.
                          var self = this;
                          self.myCategory = pageCtx.get('my-category-' + $routeParams.tournamentId) || {};
                          self.tournament = null;
+                         self.showQuitConfirm = false;
                          this.activate = function (cid) {
                              self.myCategory.cid = cid;
                              pageCtx.put('my-category-' + $routeParams.tournamentId, self.myCategory);
@@ -33,6 +34,9 @@ angular.
                              function (r) {
                                  requestStatus.failed(r, {tid: $routeParams.tournamentId});
                              });
+                         this.quit = function () {
+                             self.showQuitConfirm = true;
+                         };
                          this.enlistMe = function () {
                              console.log("Enlist Me");
                              requestStatus.startLoading('Enlisting', self.tournament);

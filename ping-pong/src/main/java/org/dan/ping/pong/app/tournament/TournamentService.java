@@ -48,7 +48,7 @@ public class TournamentService {
     }
 
     private void ensureDrafting(TournamentState state) {
-        if (state != TournamentState.Draft) {
+        if (state != TournamentState.Draft && state != TournamentState.Open) {
             throw badRequest(BadStateError.of(state,
                     "Tournament is not in a valid state"));
         }

@@ -10,8 +10,14 @@ angular.module('playInTournamentList').
                          this.tournaments = null;
                          var self = this;
                          requestStatus.startLoading();
+                         this.viewUrl = function (tournament) {
+                             if (tournament.state == 'Close') {
+                                 return '/tournament/result/' + tournament.tid;
+                             }
+                             return '/tournaments/' + tournament.tid;
+                         }
                          Tournament.participateIn(
-                             {},
+                             {completeAfterDays: 3},
                              function (tournaments) {
                                  requestStatus.complete();
                                  self.tournaments = tournaments;

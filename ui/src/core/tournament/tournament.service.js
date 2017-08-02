@@ -36,7 +36,7 @@ angular.
                                        isArray: true
                                    },
                                    participateIn: {
-                                       url: '/api/tournament/enlisted',
+                                       url: '/api/tournament/enlisted/:completeAfterDays',
                                        method: 'GET',
                                        cache: false,
                                        headers: {

@@ -7,10 +7,11 @@
     <a class="btn btn-primary" href="#!/tournament/new">Add Tournament</a>
   </div>
 </div>
-<div class="container-fluid list">
+<div class="container-fluid list judge">
   <request-status></request-status>
   <div ng-repeat="tournament in $ctrl.tournaments"
        clickable="/my/tournament/{{tournament.tid}}"
+       ng-class="{'complete': tournament.state == 'Close'}"
        class="list-item tournament clearfix">
     <div class="name pull-left">
       <a href="#!/my/tournament/{{tournament.tid}}">
@@ -18,11 +19,14 @@
       </a>
     </div>
     <div class="datetime pull-right">
-      <span class="time">
+      <span class="time" ng-show="tournament.state != 'Close'">
         {{tournament.opensAt|date : 'EEE h a'}}
       </span>
-      <span class="date">
+      <span class="date" ng-show="tournament.state != 'Close'">
         {{tournament.opensAt|date : 'MMM d'}}
+      </span>
+      <span ng-show="tournament.state == 'Close'">
+        complete
       </span>
     </div>
   </div>

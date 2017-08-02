@@ -54,8 +54,9 @@ public class TournamentService {
         }
     }
 
-    public List<DatedTournamentDigest> findInWithEnlisted(int uid) {
-        return tournamentDao.findEnlistedIn(uid);
+    public List<TournamentDigest> findInWithEnlisted(int uid, int days) {
+        return tournamentDao.findEnlistedIn(uid,
+                clocker.get().minus(days, ChronoUnit.DAYS));
     }
 
     public List<DatedTournamentDigest> findDrafting() {

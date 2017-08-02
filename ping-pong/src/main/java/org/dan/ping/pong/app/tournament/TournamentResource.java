@@ -66,7 +66,7 @@ public class TournamentResource {
 
     @GET
     @Path(EDITABLE_TOURNAMENTS)
-    public List<DatedTournamentDigest> get(
+    public List<DatedTournamentDigest> findTournamentsIamJudgeging(
             @HeaderParam(SESSION) String session) {
         return tournamentDao.findWritableForAdmin(
                 authService.userInfoBySession(session).getUid());
@@ -111,10 +111,19 @@ public class TournamentResource {
     @GET
     @Path(TOURNAMENT_ENLISTED)
     @Consumes(APPLICATION_JSON)
-    public List<DatedTournamentDigest> findTournamentsAmGoingTo(
+    public List<TournamentDigest> findTournamentsAmGoingTo(
             @HeaderParam(SESSION) String session) {
+        return findTournamentsAmGoingTo(session, 0);
+    }
+
+    @GET
+    @Path(TOURNAMENT_ENLISTED + "/{days}")
+    @Consumes(APPLICATION_JSON)
+    public List<TournamentDigest> findTournamentsAmGoingTo(
+            @HeaderParam(SESSION) String session,
+            @PathParam("days") int days) {
         return tournamentService.findInWithEnlisted(
-                authService.userInfoBySession(session).getUid());
+                authService.userInfoBySession(session).getUid(), days);
     }
 
     @GET

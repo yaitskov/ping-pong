@@ -125,13 +125,21 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<DatedTournamentDigest> findEnlistedIn(int uid) {
-        return selectDatedDigest()
+    public List<TournamentDigest> findEnlistedIn(int uid, Instant before) {
+        return jooq.select(TOURNAMENT.NAME, TOURNAMENT.OPENS_AT, TOURNAMENT.TID, TOURNAMENT.STATE)
+                .from(TOURNAMENT)
                 .innerJoin(BID)
                 .on(TOURNAMENT.TID.eq(BID.TID))
-                .where(BID.UID.eq(uid), BID.STATE.ne(Quit))
+                .where(BID.UID.eq(uid), BID.STATE.ne(Quit),
+                        TOURNAMENT.STATE.in(Announce, Draft, Open)
+                                .or(TOURNAMENT.OPENS_AT.ge(before)))
                 .fetch()
-                .map(this::mapToDatedDigest);
+                .map(r -> TournamentDigest.builder()
+                        .tid(r.get(TOURNAMENT.TID))
+                        .name(r.get(TOURNAMENT.NAME))
+                        .opensAt(r.get(TOURNAMENT.OPENS_AT))
+                        .state(r.get(TOURNAMENT.STATE))
+                        .build());
     }
 
     private SelectJoinStep<Record> selectDatedDigest() {

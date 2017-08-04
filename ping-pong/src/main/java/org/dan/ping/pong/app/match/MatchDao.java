@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
@@ -13,6 +14,7 @@ import static ord.dan.ping.pong.jooq.tables.Matches.MATCHES;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
+import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -22,7 +24,6 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Group;
 import static org.dan.ping.pong.app.match.MatchType.PlayOff;
-import static org.jooq.impl.DSL.firstValue;
 
 import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +33,14 @@ import ord.dan.ping.pong.jooq.tables.Users;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.dan.ping.pong.app.table.TableLink;
+import org.dan.ping.pong.app.tournament.PlayOffMatchForResign;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
 import org.jooq.Field;
-import org.jooq.impl.DSL;
+import org.jooq.Record3;
+import org.jooq.Record4;
+import org.jooq.Record5;
+import org.jooq.Record6;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -58,7 +63,6 @@ public class MatchDao {
     private static final MatchScore MS_2 = MATCH_SCORE.as("ms2");
     private static final Bid BID_2 = BID.as("bid2");
     private static final Field<Integer> UID_2 = BID_2.UID.as("uid2");
-    private static final String WINNER_ID = "winnerId";
     @Inject
     private DSLContext jooq;
 
@@ -330,6 +334,31 @@ public class MatchDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
+    public void assignMatchForWinner(int tid, int mid, int uid) {
+        final Record4 x = jooq
+                .select(MATCH_SCORE.UID, MATCHES.CID, MATCH_SCORE.WON, MATCHES.WIN_MID)
+                .from(MATCHES)
+                .leftJoin(MATCH_SCORE)
+                .on(MATCHES.MID.eq(MATCH_SCORE.MID))
+                .where(MATCHES.MID.eq(mid))
+                .fetchOne();
+        final int cid = x.get(MATCHES.CID);
+        final Integer waitingOpponent = x.get(MATCH_SCORE.UID);
+        final Optional<Integer> winMid = x.get(MATCHES.WIN_MID);
+        if (waitingOpponent == null) {
+            matchScoreDao.createScore(mid, uid, cid, tid);
+        } else if (x.get(MATCH_SCORE.WON) < 0) {
+            // lost
+            matchScoreDao.createScore(mid, uid, cid, tid, 1, 0);
+            winMid.ifPresent(wmid -> {
+                assignMatchForWinner(tid, uid, wmid);
+            });
+        } else {
+            changeStatus(mid, Place);
+        }
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
     public void assignMatchForWinner(int winnerUid, MatchInfo matchInfo) {
         final int mid = matchInfo.getWinnerMid().get();
         final Optional<Integer> enemyUid = matchScoreDao.findEnemy(mid, winnerUid);
@@ -468,5 +497,135 @@ public class MatchDao {
         jooq.deleteFrom(MATCHES)
                 .where(MATCHES.TID.eq(tid))
                 .execute();
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void complete(int uid, GroupMatchForResign match, Instant now) {
+        List<Integer> result = Ints.asList(jooq.batch(
+                    jooq.update(MATCHES)
+                            .set(MATCHES.STATE, MatchState.Over)
+                            .set(MATCHES.ENDED, Optional.of(now))
+                            .where(MATCHES.MID.eq(match.getMid()),
+                                    MATCHES.STATE.in(Game, Place)),
+                    jooq.update(MATCH_SCORE)
+                            .set(MATCH_SCORE.UPDATED, Optional.of(now))
+                            .set(MATCH_SCORE.WON, -1)
+                            .set(MATCH_SCORE.SETS_WON, 0)
+                            .where(MATCH_SCORE.UID.eq(uid),
+                                    MATCH_SCORE.MID.eq(match.getMid())),
+                    jooq.update(MATCH_SCORE)
+                            .set(MATCH_SCORE.UPDATED, Optional.of(now))
+                            .set(MATCH_SCORE.WON, 1)
+                            .set(MATCH_SCORE.SETS_WON, 0)
+                            .where(MATCH_SCORE.UID.eq(match.getOpponentUid()),
+                                    MATCH_SCORE.MID.eq(match.getMid())))
+                    .execute());
+        if (match.getState() == Draft) {
+            if (!result.equals(asList(1, 1, 0))) {
+                throw internalError("Wrong update pattern " + result);
+            }
+        } else if (match.getState() == Game || match.getState() == Place) {
+            if (!result.equals(asList(1, 1, 1))) {
+                throw internalError("Wrong update pattern " + result);
+            }
+        } else {
+            throw internalError("Unexpected");
+        }
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public List<GroupMatchForResign> groupMatchesOfParticipant(int uid, int tid) {
+        return jooq
+                .select(MATCHES.MID, MATCHES.STATE, MATCHES.GID, ENEMY_SCORE.UID)
+                .from(MATCH_SCORE)
+                .innerJoin(MATCHES).on(MATCH_SCORE.MID.eq(MATCHES.MID))
+                .innerJoin(ENEMY_SCORE).on(ENEMY_SCORE.MID.eq(MATCHES.MID))
+                .where(MATCH_SCORE.TID.eq(tid), MATCH_SCORE.UID.eq(uid),
+                        ENEMY_SCORE.UID.ne(uid), MATCHES.GID.isNotNull())
+                .fetch()
+                .map(r -> GroupMatchForResign
+                        .builder()
+                        .mid(r.get(MATCHES.MID))
+                        .gid(r.get(MATCHES.GID).get())
+                        .opponentUid(r.get(ENEMY_SCORE.UID))
+                        .state(r.get(MATCHES.STATE))
+                        .build());
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public Optional<PlayOffMatchForResign> playOffMatchForResign(int uid, int tid) {
+        return ofNullable(jooq
+                .select(MATCHES.STATE, MATCHES.MID, MATCHES.WIN_MID, MATCHES.LOSE_MID)
+                .from(MATCH_SCORE)
+                .innerJoin(MATCHES).on(MATCH_SCORE.MID.eq(MATCHES.MID),
+                        ENEMY_SCORE.UID.ne(uid))
+                .leftJoin(ENEMY_SCORE).on(MATCHES.MID.eq(ENEMY_SCORE.MID))
+                .where(MATCH_SCORE.UID.eq(uid), MATCH_SCORE.TID.eq(tid),
+                        MATCHES.STATE.in(Game, Place, Draft))
+                .fetchOne())
+                .map(r -> PlayOffMatchForResign.builder()
+                        .winMatch(r.get(MATCHES.WIN_MID))
+                        .lostMatch(r.get(MATCHES.LOSE_MID))
+                        .mid(r.get(MATCHES.MID))
+                        .state(r.get(MATCHES.STATE))
+                        .build());
+    }
+
+    public void complete(int uid, Optional<Integer> opponentUid, int mid) {
+        jooq.update(MATCH_SCORE)
+                .set(MATCH_SCORE.WON, -1)
+                .set(MATCH_SCORE.SETS_WON, 0)
+                .where(MATCH_SCORE.MID.eq(mid), MATCH_SCORE.UID.eq(uid))
+                .execute();
+        jooq.update(MATCHES)
+                .set(MATCHES.STATE, Over)
+                .where(MATCHES.MID.eq(mid))
+                .execute();
+        opponentUid.ifPresent((u) -> {
+            jooq.update(MATCH_SCORE)
+                    .set(MATCH_SCORE.WON, 1)
+                    .set(MATCH_SCORE.SETS_WON, 0)
+                    .where(MATCH_SCORE.MID.eq(mid), MATCH_SCORE.UID.eq(u))
+                    .execute();
+        });
+    }
+
+    public void resignFromMatchForLoser(int tid, int loserUid, int match) {
+        final Record6 x = jooq
+                .select(MATCH_SCORE.UID, MATCHES.STATE,
+                        MATCHES.CID, MATCH_SCORE.WON,
+                        MATCHES.WIN_MID, MATCHES.LOSE_MID)
+                .from(MATCHES)
+                .leftJoin(MATCH_SCORE)
+                .on(MATCHES.MID.eq(MATCH_SCORE.MID))
+                .where(MATCHES.MID.eq(match))
+                .fetchOne();
+
+        final int cid = x.get(MATCHES.CID);
+        final Integer waitingOpponent = x.get(MATCH_SCORE.UID);
+        final Optional<Integer> winMid = x.get(MATCHES.WIN_MID);
+        final Optional<Integer> loseMid = x.get(MATCHES.LOSE_MID);
+
+        if (waitingOpponent == null) {
+            complete(loserUid, empty(), match);
+            loseMid.ifPresent(lmid -> {
+                resignFromMatchForLoser(tid, loserUid, lmid);
+            });
+        } else if (x.get(MATCH_SCORE.WON) < 0) {
+            // opponent resigned first so loser wins here
+            // but fails on the next stage
+            matchScoreDao.createScore(match, loserUid, cid, tid, 1, 0);
+            winMid.ifPresent(wmid -> {
+                resignFromMatchForLoser(tid, loserUid, wmid);
+            });
+        } else {
+            complete(loserUid, Optional.of(waitingOpponent), match);
+            loseMid.ifPresent(lmid -> {
+                resignFromMatchForLoser(tid, loserUid, lmid);
+            });
+            winMid.ifPresent(wmid -> {
+                assignMatchForWinner(tid, wmid, waitingOpponent);
+            });
+        }
     }
 }

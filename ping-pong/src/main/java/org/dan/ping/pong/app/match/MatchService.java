@@ -1,9 +1,12 @@
 package org.dan.ping.pong.app.match;
 
+import static java.util.Arrays.asList;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.dan.ping.pong.app.bid.BidState.Rest;
+import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -21,10 +24,13 @@ import static org.dan.ping.pong.util.collection.Enumerator.forward;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.bid.BidId;
+import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableService;
+import org.dan.ping.pong.app.tournament.PlayOffMatchForResign;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentInfo;
 import org.dan.ping.pong.util.time.Clocker;
@@ -70,14 +76,35 @@ public class MatchService {
         matchDao.complete(clocker.get(), score);
         tableDao.freeTable(score.getMid());
 
-        boolean schedule = true;
         if (matchInfo.getGid().isPresent()) {
-            tryToCompleteGroup(matchInfo.getGid().get(), matchInfo);
+            tryToCompleteGroup(matchInfo.getGid().get(),
+                    matchInfo.getTid(), matchInfo.getParticipantIds());
         } else {
-             schedule = completePlayOffMatch(matchInfo, score);
+            completePlayOffMatch(matchInfo, score);
         }
-        if (schedule) {
-            tableService.scheduleFreeTables(matchInfo.getTid(), now);
+        tableService.scheduleFreeTables(matchInfo.getTid(), now);
+    }
+
+    public boolean completePlayOffMatch(int uid, int tid, BidState target, PlayOffMatchForResign match) {
+        matchDao.complete(uid, match.getOpponentId(), match.getMid());
+        bidDao.setBidState(BidId.builder().tid(tid).uid(uid).build(),
+                asList(Play, Rest, Wait), target);
+        if (match.getWinMatch().isPresent()) {
+            if (match.getOpponentId().isPresent()) {
+                matchDao.assignMatchForWinner(tid, match.getWinMatch().get(), match.getOpponentId().get());
+                if (match.getState() == Game) {
+                    bidDao.setBidState(tid, match.getOpponentId().get(), Play, Wait);
+                }
+            } else {
+                // should be covered in other place where the opponent is detected
+            }
+
+            if (match.getLostMatch().isPresent()) {
+                matchDao.resignFromMatchForLoser(tid, uid, match.getLostMatch().get());
+            }
+            return true;
+        } else {
+            return endOfTournamentCategory(tid);
         }
     }
 
@@ -112,30 +139,28 @@ public class MatchService {
     @Inject
     private GroupDao groupDao;
 
-    private void tryToCompleteGroup(Integer gid, MatchInfo matchInfo) {
+    public void tryToCompleteGroup(Integer gid, int tid, List<Integer> uids) {
+        uids.forEach(bid -> bidDao.setBidState(tid, bid, Play, Wait));
+
         final List<GroupMatchInfo> matches = matchDao.findMatchesInGroup(gid);
         final long completedMatches = matches.stream()
                 .map(GroupMatchInfo::getState)
                 .filter(Over::equals)
                 .count();
-        matchInfo.getParticipantIds().forEach(bid ->
-                bidDao.setBidState(matchInfo.getTid(), bid, Play, Wait));
         if (completedMatches < matches.size()) {
             log.debug("Matches {} left to play in the group {}",
                     matches.size() - completedMatches, gid);
             return;
         }
-        final Set<Integer> winnerIds = completeGroup(gid, matchInfo, matches);
-        bidDao.setStatesAfterGroup(gid, matchInfo.getTid(), winnerIds);
+        final Set<Integer> winnerIds = completeGroup(gid, tid, matches);
+        bidDao.setStatesAfterGroup(gid, tid, winnerIds);
     }
 
-    private Set<Integer> completeGroup(Integer gid, MatchInfo matchInfo,
+    private Set<Integer> completeGroup(Integer gid, int tid,
             List<GroupMatchInfo> matches) {
-        log.info("Pick bids for playoff from gid {} in tid {} ",
-                gid, matchInfo.getTid());
-        final TournamentInfo iTour = tournamentDao.getById(matchInfo.getTid())
-                .orElseThrow(() -> internalError("tid "
-                        + matchInfo.getTid() + " disappeared"));
+        log.info("Pick bids for playoff from gid {} in tid {}", gid, tid);
+        final TournamentInfo iTour = tournamentDao.getById(tid)
+                .orElseThrow(() -> internalError("tid " + tid + " disappeared"));
         Map<Optional<Integer>, List<GroupMatchInfo>> byWinner = matches.stream()
                 .collect(groupingBy(GroupMatchInfo::getWinnerId, toList()));
         final PriorityQueue<List<GroupMatchInfo>> pq = new PriorityQueue<>(
@@ -146,7 +171,7 @@ public class MatchService {
         final int playOffMatchOffset = iGru.getOrdNumber() / 2
                 * iTour.getQuitesFromGroup();
         final List<PlayOffMatchInfo> playOffMatches = matchDao.findPlayOffMatches(
-                matchInfo.getTid(), iGru.getCid());
+                tid, iGru.getCid());
         if (playOffMatches.isEmpty()) {
             if (iTour.getQuitesFromGroup() == 1 && iGru.getOrdNumber() == 0) {
                 final int winnerId = pq.poll().get(0).getWinnerId().get();

@@ -6,6 +6,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
+import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.user.UserInfo;
 
 import java.util.List;
@@ -111,10 +112,9 @@ public class TournamentResource {
     @Consumes(APPLICATION_JSON)
     public void resign(
             @HeaderParam(SESSION) String session,
-            Integer tid) {
-        tournamentService.resign(
-                authService.userInfoBySession(session).getUid(),
-                tid);
+            int tid) {
+        final int uid = authService.userInfoBySession(session).getUid();
+        tournamentService.resign(uid, tid, BidState.Quit);
     }
 
     @GET

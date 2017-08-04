@@ -5,6 +5,7 @@ import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
 import static ord.dan.ping.pong.jooq.Tables.USERS;
+import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
@@ -79,6 +80,7 @@ public class BidDao {
         return jooq.update(BID)
                 .set(BID.STATE, Lost)
                 .where(BID.TID.eq(tid),
+                        BID.STATE.notIn(Quit, Lost, Expl),
                         BID.GID.eq(Optional.of(gid)),
                         BID.UID.notIn(winnerIds))
                 .execute();
@@ -107,11 +109,11 @@ public class BidDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void resign(int uid, Integer tid) {
-        log.info("User {} resigned {} from tid {}",
+    public void resign(int uid, Integer tid, BidState targetState) {
+        log.info("User {} leaves {} from tid {}",
                 uid,
                 jooq.update(BID)
-                        .set(BID.STATE, Quit)
+                        .set(BID.STATE, targetState)
                         .where(BID.UID.eq(uid), BID.TID.eq(tid))
                         .execute(),
                 tid);

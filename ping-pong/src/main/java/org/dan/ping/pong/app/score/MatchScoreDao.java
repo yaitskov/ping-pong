@@ -16,12 +16,16 @@ public class MatchScoreDao {
     @Inject
     private DSLContext jooq;
 
-    @Transactional(TRANSACTION_MANAGER)
     public void createScore(int mid, int uid, int cid, int tid) {
+        createScore(mid, uid, cid, tid, 0, 0);
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void createScore(int mid, int uid, int cid, int tid, int won, int score) {
         jooq.insertInto(MATCH_SCORE, MATCH_SCORE.MID, MATCH_SCORE.UID,
                 MATCH_SCORE.CID, MATCH_SCORE.TID,
                 MATCH_SCORE.WON, MATCH_SCORE.SETS_WON)
-                .values(mid, uid, cid, tid, 0, 0)
+                .values(mid, uid, cid, tid, won, score)
                 .execute();
     }
 
@@ -48,5 +52,14 @@ public class MatchScoreDao {
                         .won(r.get(MATCH_SCORE.WON))
                         .uid(uid)
                         .build());
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void setScore(int mid, int uid, int won, int score) {
+        jooq.update(MATCH_SCORE)
+                .set(MATCH_SCORE.WON, won)
+                .set(MATCH_SCORE.SETS_WON, score)
+                .where(MATCH_SCORE.MID.eq(mid), MATCH_SCORE.UID.eq(uid))
+                .execute();
     }
 }

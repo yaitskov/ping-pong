@@ -133,6 +133,7 @@ public class TournamentService {
             case Announce:
             case Draft:
                 bidDao.resign(uid, tid, targetState);
+                break;
             default:
                 throw internalError("State " + state + " is not supported");
         }
@@ -158,6 +159,9 @@ public class TournamentService {
             case Paid:
             case Here:
                 bidDao.setBidState(tid, uid, state, targetState);
+                break;
+            default:
+                throw internalError("Unknown state " + state);
         }
     }
 

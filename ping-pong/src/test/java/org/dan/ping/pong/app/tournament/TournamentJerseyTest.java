@@ -74,7 +74,7 @@ import javax.ws.rs.core.Response;
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = TestCtx.class)
 public class TournamentJerseyTest extends AbstractSpringJerseyTest {
-    static class DigestList extends ArrayList<DatedTournamentDigest> {}
+    static class DigestList extends ArrayList<TournamentDigest> {}
 
     @Inject
     @Named(ADMIN_SESSION)
@@ -105,7 +105,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                         .build(), APPLICATION_JSON));
         final int tid = response.readEntity(Integer.class);
 
-        final List<DatedTournamentDigest> digest = request().path(EDITABLE_TOURNAMENTS)
+        final List<TournamentDigest> digest = request().path(EDITABLE_TOURNAMENTS)
                 .request(APPLICATION_JSON)
                 .header(SESSION, session.getSession())
                 .get(DigestList.class);
@@ -134,7 +134,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                                 .build(), APPLICATION_JSON))
                         .getStatus());
 
-        final List<DatedTournamentDigest> digests = request()
+        final List<TournamentDigest> digests = request()
                 .path(TOURNAMENT_ENLISTED)
                 .request(APPLICATION_JSON)
                 .header(SESSION, userSession.getSession())
@@ -205,7 +205,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                 .tid(tid)
                 .categoryId(daoGenerator.genCategory(tid))
                 .build());
-        final List<DatedTournamentDigest> digests = myRest().get(TOURNAMENT_ENLISTED,
+        final List<TournamentDigest> digests = myRest().get(TOURNAMENT_ENLISTED,
                 userSession, DigestList.class);
         assertThat(digests, hasItem(hasProperty("tid", is(tid))));
         myRest().voidPost(TOURNAMENT_RESIGN, userSession, tid);
@@ -224,12 +224,15 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void draftingBadState() {
         final int tid = daoGenerator.genTournament(daoGenerator.genPlace(0), Open);
+        assertThat(myRest().get(DRAFTING + tid, DraftingTournamentInfo.class),
+                hasProperty("state", is(Open)));
+        tournamentDao.setState(tid, Close);
         try {
             myRest().get(DRAFTING + tid, DraftingTournamentInfo.class);
             fail();
         } catch (WebApplicationException e) {
             BadTournamentState error = e.getResponse().readEntity(BadTournamentState.class);
-            assertThat(error.getState(), is(Open));
+            assertThat(error.getState(), is(Close));
         }
     }
 

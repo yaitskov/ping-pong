@@ -114,7 +114,7 @@ public class TournamentResource {
             @HeaderParam(SESSION) String session,
             int tid) {
         final int uid = authService.userInfoBySession(session).getUid();
-        tournamentService.resign(uid, tid, BidState.Quit);
+        tournamentService.leaveTournament(uid, tid, BidState.Quit);
     }
 
     @GET

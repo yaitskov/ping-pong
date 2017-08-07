@@ -116,7 +116,7 @@ public class TournamentService {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void resign(int uid, int tid, BidState targetState) {
+    public void leaveTournament(int uid, int tid, BidState targetState) {
         log.info("User {} leaves tournament {} as {}", uid, tid, targetState);
         final TournamentInfo tinfo = tournamentDao.getById(tid)
                 .orElseThrow(() -> notFound("Tournament {} not found"));

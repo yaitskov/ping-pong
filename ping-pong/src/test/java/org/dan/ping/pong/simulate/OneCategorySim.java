@@ -1,7 +1,7 @@
 package org.dan.ping.pong.simulate;
 
 import static org.dan.ping.pong.mock.simulator.AutoResolution.RANDOM;
-import static org.dan.ping.pong.mock.simulator.Pause.BeforeScore;
+import static org.dan.ping.pong.mock.simulator.Hook.BeforeScore;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;

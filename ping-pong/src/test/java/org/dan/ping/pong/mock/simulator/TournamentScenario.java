@@ -17,7 +17,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.mock.TestUserSession;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +37,7 @@ public class TournamentScenario {
     private final Map<Player, TestUserSession> playersSessions = new HashMap<>();
     private final Map<Integer, Player> uidPlayer = new HashMap<>();
     private final Map<PlayerCategory, Integer> categoryDbId = new HashMap<>();
-    private final Map<Set<Player>, Pause> pauseOnMatches = new HashMap<>();
+    private final Map<Set<Player>, PlayHook> hooksOnMatches = new HashMap<>();
     private final Map<Player, EnlistMode> playerPresence = new HashMap<>();
 
     private boolean begin = true;
@@ -93,8 +92,16 @@ public class TournamentScenario {
         return this;
     }
 
-    public TournamentScenario pause(Player pa, Player pb, Pause when) {
-        pauseOnMatches.put(new HashSet<>(asList(pa, pb)), when);
+    public TournamentScenario pause(Player pa, Player pb, Hook when) {
+        return pause(pa, pb,
+                PlayHook.builder()
+                        .type(when)
+                        .callback((scenario, players) -> Hook.pause(when, players))
+                        .build());
+    }
+
+    public TournamentScenario pause(Player pa, Player pb, PlayHook when) {
+        hooksOnMatches.put(new HashSet<>(asList(pa, pb)), when);
         return this;
     }
 

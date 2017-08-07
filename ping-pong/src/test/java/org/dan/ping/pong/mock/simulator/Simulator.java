@@ -179,10 +179,26 @@ public class Simulator {
         for (OpenMatchForJudge openMatch : openMatches) {
             final Set<Player> players = matchToPlayers(scenario, openMatch);
             findGame(scenario, openMatch, players).ifPresent(game -> {
-                final Pause pause = scenario.getPauseOnMatches().getOrDefault(players, Pause.NonStop);
-                pause.pauseBefore(players);
+                final PlayHook hook = scenario.getHooksOnMatches().getOrDefault(players,
+                        PlayHook.builder()
+                                .type(Hook.NonStop)
+                                .callback((a, b) -> HookDecision.Score)
+                                .build());
+                final HookDecision hookDecision = hook.pauseBefore(scenario, players);
                 ++completedMatches[0];
                 log.info("Match id {} outcome {}", openMatch.getMid(), game);
+                completeMatch(scenario, openMatch, game, hookDecision);
+                hook.pauseAfter(scenario, players);
+            });
+        }
+    }
+
+    private void completeMatch(TournamentScenario scenario, OpenMatchForJudge openMatch,
+            GameEnd game, HookDecision hookDecision) {
+        switch (hookDecision) {
+            case Skip:
+                break;
+            case Score:
                 rest.voidPost(COMPLETE_MATCH, testAdmin,
                         FinalMatchScore.builder()
                                 .mid(openMatch.getMid())
@@ -200,8 +216,9 @@ public class Simulator {
                                                                 .get(1)).getUid())
                                                 .build()))
                                 .build());
-                pause.pauseAfter(players);
-            });
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown decision " + hookDecision);
         }
     }
 

@@ -1,6 +1,5 @@
 package org.dan.ping.pong.simulate;
 
-import static org.dan.ping.pong.mock.simulator.Pause.BeforeScore;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -13,8 +12,6 @@ import static org.dan.ping.pong.mock.simulator.Player.p9;
 import static org.dan.ping.pong.mock.simulator.Player.pa;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c2;
-import static org.dan.ping.pong.mock.simulator.PlayerCategory.c3;
-import static org.dan.ping.pong.mock.simulator.PlayerCategory.c4;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_2;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
 

@@ -57,7 +57,7 @@ import javax.inject.Inject;
 
 @Slf4j
 public class MatchDao {
-    private static final MatchScore ENEMY_SCORE = MATCH_SCORE.as("enemy");
+    static final MatchScore ENEMY_SCORE = MATCH_SCORE.as("enemy");
     private static final Users ENEMY_USER = USERS.as("enemy_user");
     private static final int FIRST_PLAY_OFF_MATCH_LEVEL = 0;
     private static final MatchScore MS_2 = MATCH_SCORE.as("ms2");

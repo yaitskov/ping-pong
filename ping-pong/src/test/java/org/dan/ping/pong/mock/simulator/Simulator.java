@@ -8,6 +8,9 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.auth.AuthResource.DEV_CLEAN_SIGN_IN_TOKEN_TABLE;
+import static org.dan.ping.pong.app.bid.BidState.Expl;
+import static org.dan.ping.pong.app.bid.BidState.Lost;
+import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.match.MatchResource.COMPLETE_MATCH;
 import static org.dan.ping.pong.app.match.MatchType.Group;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
@@ -94,7 +97,7 @@ public class Simulator {
                 validateCompleteTournament(scenario);
             }
         } catch (IllegalStateException|AssertionError e) {
-            log.info("Scenario {} failed", scenario);
+            log.info("Scenario {} failed", scenario, e);
             throw e;
         }
     }
@@ -122,7 +125,7 @@ public class Simulator {
                             .filter(player -> !scenario.getChampions().get(playerCategory).contains(player))
                             .filter(player -> scenario.getPlayersCategory().get(player).equals(playerCategory))
                             .collect(toSet()),
-                    forTestBidDao.findByTidAndState(scenario.getTid(), cid, singletonList(BidState.Lost))
+                    forTestBidDao.findByTidAndState(scenario.getTid(), cid, asList(Lost, Quit, Expl))
                             .stream().map(uid -> scenario.getUidPlayer().get(uid))
                             .collect(toSet()));
         }
@@ -184,11 +187,14 @@ public class Simulator {
                                 .type(Hook.NonStop)
                                 .callback((a, b) -> HookDecision.Score)
                                 .build());
-                final HookDecision hookDecision = hook.pauseBefore(scenario, players);
+                final MatchMetaInfo matchMetaInfo = MatchMetaInfo.builder()
+                        .openMatch(openMatch)
+                        .players(players).build();
+                final HookDecision hookDecision = hook.pauseBefore(scenario, matchMetaInfo);
                 ++completedMatches[0];
                 log.info("Match id {} outcome {}", openMatch.getMid(), game);
                 completeMatch(scenario, openMatch, game, hookDecision);
-                hook.pauseAfter(scenario, players);
+                hook.pauseAfter(scenario, matchMetaInfo);
             });
         }
     }

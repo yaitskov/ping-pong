@@ -1,19 +1,26 @@
 package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.app.bid.BidState.Quit;
+import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Skip;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.match.ForTestMatchDao;
 import org.dan.ping.pong.app.match.MatchDao;
+import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.mock.simulator.Hook;
-import org.dan.ping.pong.mock.simulator.HookDecision;
 import org.dan.ping.pong.mock.simulator.PlayHook;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
@@ -55,26 +62,45 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     private MatchDao matchDao;
 
+    @Inject
+    private ForTestMatchDao forTestMatchDao;
+
     @Test
     public void resignInGroupMiddle() {
         final TournamentScenario scenario = TournamentScenario.begin()
-                .ignoreUnexpectedGames()
                 .name("resignInGroupMiddle")
                 .category(c1, p1, p2, p3)
-                .w30(p1, p2)
+                .w31(p1, p2)
+                .w30(p2, p3)
+                .quitsGroup(p2)
                 .pause(p1, p2, PlayHook.builder()
                         .type(Hook.BeforeScore)
-                        .callback((s, players) -> {
-                            final int uid = s.getPlayersSessions().get(p1).getUid();
-                            tournamentService.leaveTournament(uid, s.getTid(), Quit);
-                            assertEquals(Optional.of(Quit), bidDao.getState(s.getTid(), uid));
+                        .callback((s, metaInfo) -> {
+                            final int uid1 = s.getPlayersSessions().get(p1).getUid();
+                            tournamentService.leaveTournament(uid1, s.getTid(), Quit);
+                            assertEquals(Optional.of(Quit), bidDao.getState(s.getTid(), uid1));
+                            assertEquals(Optional.of(Over), matchDao.getById(metaInfo.getOpenMatch().getMid())
+                                    .map(MatchInfo::getState));
 
-                            // assertEquals(Optional.of(Quit), matchDao.getById(s.getTid(), uid));
+                            final int uid3 = s.getPlayersSessions().get(p3).getUid();
+                            assertThat(forTestMatchDao.findByParticipants(s.getTid(), uid1, uid3),
+                                    allOf(
+                                            hasProperty("state", is(Over)),
+                                            hasProperty("scores",
+                                                    allOf(
+                                                            hasItem(allOf(
+                                                                    hasProperty("uid", is(uid3)),
+                                                                    hasProperty("won", is(1)),
+                                                                    hasProperty("score", is(0)))),
+                                                            hasItem(allOf(
+                                                                    hasProperty("uid", is(uid1)),
+                                                                    hasProperty("won", is(-1)),
+                                                                    hasProperty("score", is(0))))))));
                             return Skip;
                         })
-                        .build());
+                        .build())
+                .champions(c1, p2);
 
         simulator.simulate(T_1_Q_1_G_8, scenario);
-
     }
 }

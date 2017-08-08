@@ -42,7 +42,6 @@ import org.dan.ping.pong.mock.UserSessionGenerator;
 import org.dan.ping.pong.mock.ValueGenerator;
 import org.hamcrest.Matchers;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;

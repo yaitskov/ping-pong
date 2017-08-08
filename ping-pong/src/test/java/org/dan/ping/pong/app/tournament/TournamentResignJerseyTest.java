@@ -17,11 +17,15 @@ import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_2;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import com.google.common.collect.ImmutableSet;
 import lombok.RequiredArgsConstructor;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
@@ -42,6 +46,7 @@ import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -270,4 +275,32 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
 
         simulator.simulate(T_1_Q_1_G_2, scenario);
     }
+
+    @Test
+    public void resignFromPassivePlayOffMatch() {
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .name("resignFromPassive")
+                .category(c1, p1, p2, p3, p4, p5, p6, p7, p8)
+                .w30(p1, p2)
+                .w30(p3, p4)
+                .w30(p5, p6)
+                .w30(p7, p8)
+                .quitsGroup(p1, p3, p5, p7)
+                .w32(p5, p7)
+                .w32(p3, p5)
+                .champions(c1, p3, p5)
+                .pause(p5, p6, PlayHook.builder()
+                        .type(Hook.BeforeScore)
+                        .callback((s, meta) -> {
+                            assertThat(s.getGroupMatches().keySet(),
+                                    allOf(not(hasItem(ImmutableSet.of(p1, p2))),
+                                            not(hasItem(ImmutableSet.of(p3, p4)))));
+                            final int uid1 = s.getPlayersSessions().get(p1).getUid();
+                            tournamentService.leaveTournament(uid1, s.getTid(), Quit);
+                            return Score;
+                        })
+                        .build());
+        simulator.simulate(T_1_Q_1_G_2, scenario);
+    }
+    // resign too many from group so left participants is less than quits from group
 }

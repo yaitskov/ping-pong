@@ -176,6 +176,7 @@ public class TournamentService {
         final Map<Integer, GroupMatchForResign> completeMy = new HashMap<>();
         final Map<Integer, GroupMatchForResign> incompleteMy = new HashMap<>();
         int gid = groupMatches(list, completeMy, incompleteMy);
+        log.info("activeParticipantLeave uid {} incomplete {}", uid, incompleteMy.size());
         if (incompleteMy.isEmpty()) {
             leaveFromPlayOff(uid, tid, now, target);
         } else {

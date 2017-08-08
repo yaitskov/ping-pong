@@ -36,9 +36,6 @@ import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import javax.inject.Inject;
 

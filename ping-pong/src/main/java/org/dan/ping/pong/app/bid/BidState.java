@@ -4,7 +4,9 @@ public enum BidState {
     Want, // User is willing to participate in the tournament
     Paid, // once he paid for the ticket
     Here, // passed check right before the tournament
-    Quit, // resigned during or before tournament on a free will
+    Quit {
+
+    }, // resigned during or before tournament on a free will
     Play, // participates right now in a match
     Wait, // wait for place or enemy
     Rest, // temporary not available due timeout

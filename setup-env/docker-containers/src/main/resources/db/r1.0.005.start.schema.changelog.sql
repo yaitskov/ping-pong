@@ -116,6 +116,7 @@ create table matches(
     gid int(11) null references groups(gid),
     tid int(11) not null references tournament(tid),
     cid int(11) not null references category(cid),
+    type char(4) not null,
     started timestamp(3) null,
     ended timestamp(3) null,
     win_mid int(11) null references matches(mid),

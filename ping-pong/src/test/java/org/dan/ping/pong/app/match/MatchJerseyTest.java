@@ -12,7 +12,7 @@ import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.match.MatchResource.COMPLETE_MATCH;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_WATCH_LIST_OPEN;
 import static org.dan.ping.pong.app.match.MatchState.Over;
-import static org.dan.ping.pong.app.match.MatchType.Group;
+import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.table.TableState.Busy;
 import static org.dan.ping.pong.app.table.TableState.Free;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
@@ -185,7 +185,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 new GenericType<List<OpenMatchForWatch>>() {});
         assertThat(result, hasItem(allOf(
                 hasProperty("mid", greaterThan(0)),
-                hasProperty("type", is(Group)),
+                hasProperty("type", is(Grup)),
                 hasProperty("score", is(asList(0, 0))),
                 hasProperty("category", allOf(
                         hasProperty("name", notNullValue()),

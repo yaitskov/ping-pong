@@ -5,6 +5,7 @@ import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Rest;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
@@ -33,7 +34,6 @@ import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.tournament.PlayOffMatchForResign;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentInfo;
-import org.dan.ping.pong.util.Integers;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,7 +89,8 @@ public class MatchService {
     public boolean completePlayOffMatch(int uid, int tid, BidState target, PlayOffMatchForResign match) {
         matchDao.complete(uid, match.getOpponentId(), match.getMid());
         bidDao.setBidState(BidId.builder().tid(tid).uid(uid).build(),
-                asList(Play, Rest, Wait), target);
+                asList(Play, Rest, Wait),
+                match.getType().getLoserState(target));
         if (match.getWinMatch().isPresent()) {
             if (match.getOpponentId().isPresent()) {
                 matchDao.assignMatchForWinner(tid, match.getWinMatch().get(), match.getOpponentId().get());
@@ -105,6 +106,11 @@ public class MatchService {
             }
             return true;
         } else {
+            match.getOpponentId().ifPresent(opId -> {
+                bidDao.setBidState(BidId.builder().uid(opId).tid(tid).build(),
+                        asList(Play, Rest, Wait),
+                        match.getType().getWinnerState());
+            });
             return endOfTournamentCategory(tid);
         }
     }

@@ -7,7 +7,9 @@ import static org.dan.ping.pong.mock.simulator.HookDecision.Skip;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
+import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
+import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_2;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -190,5 +192,27 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .champions(c1, p2);
 
         simulator.simulate(T_1_Q_1_G_8, scenario);
+    }
+
+    @Test
+    public void resignFromActiveMatchForGold() {
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .name("resignFromActiveGold")
+                .category(c1, p1, p2, p3, p4)
+                .w30(p1, p2)
+                .w32(p3, p4)
+                .quitsGroup(p1, p3)
+                .w32(p1, p3)
+                .champions(c1, p3, p1)
+                .pause(p1, p3, PlayHook.builder()
+                        .type(Hook.BeforeScore)
+                        .callback((s, meta) -> {
+                            final int uid1 = s.getPlayersSessions().get(p1).getUid();
+                            tournamentService.leaveTournament(uid1, s.getTid(), Quit);
+                            return Skip;
+                        })
+                        .build());
+
+        simulator.simulate(T_1_Q_1_G_2, scenario);
     }
 }

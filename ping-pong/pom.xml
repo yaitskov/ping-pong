@@ -485,6 +485,11 @@
                                     <binding>org.dan.ping.pong.sys.db.converters.OptionalInstantConverter</binding>
                                 </customType>
                                 <customType>
+                                    <name>MatchType</name>
+                                    <type>org.dan.ping.pong.app.match.MatchType</type>
+                                    <binding>org.dan.ping.pong.app.match.MatchTypeConverter</binding>
+                                </customType>
+                                <customType>
                                     <name>MatchState</name>
                                     <type>org.dan.ping.pong.app.match.MatchState</type>
                                     <binding>org.dan.ping.pong.app.match.MatchStateConverter</binding>
@@ -594,6 +599,11 @@
                                 <forcedType>
                                     <name>OptionalInteger</name>
                                     <expression>.*matches\.(win_mid|lose_mid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>MatchType</name>
+                                    <expression>.*matches\.(type)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

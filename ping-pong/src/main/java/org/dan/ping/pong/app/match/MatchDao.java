@@ -22,8 +22,8 @@ import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
-import static org.dan.ping.pong.app.match.MatchType.Group;
-import static org.dan.ping.pong.app.match.MatchType.PlayOff;
+import static org.dan.ping.pong.app.match.MatchType.Grup;
+import static org.dan.ping.pong.app.match.MatchType.POff;
 
 import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
@@ -37,9 +37,7 @@ import org.dan.ping.pong.app.tournament.PlayOffMatchForResign;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
 import org.jooq.Field;
-import org.jooq.Record3;
 import org.jooq.Record4;
-import org.jooq.Record5;
 import org.jooq.Record6;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,8 +69,8 @@ public class MatchDao {
         log.info("Create a match in group {} of tournament {}", gid, tid);
         return jooq.insertInto(MATCHES, MATCHES.TID,
                 MATCHES.GID, MATCHES.CID,
-                MATCHES.STATE, MATCHES.PRIORITY)
-                .values(tid, Optional.of(gid), cid, Place, priorityGroup)
+                MATCHES.STATE, MATCHES.PRIORITY, MATCHES.TYPE)
+                .values(tid, Optional.of(gid), cid, Place, priorityGroup, Grup)
                 .returning()
                 .fetchOne()
                 .getMid();
@@ -81,11 +79,11 @@ public class MatchDao {
     @Transactional(TRANSACTION_MANAGER)
     public int createPlayOffMatch(int tid, Integer cid,
             Optional<Integer> winMid, Optional<Integer> loseMid,
-            int priority, int level) {
+            int priority, int level, MatchType type) {
         return jooq.insertInto(MATCHES, MATCHES.TID, MATCHES.CID,
                 MATCHES.PRIORITY, MATCHES.STATE,
-                MATCHES.WIN_MID, MATCHES.LOSE_MID, MATCHES.LEVEL)
-                .values(tid, cid, priority, Draft, winMid, loseMid, level)
+                MATCHES.WIN_MID, MATCHES.LOSE_MID, MATCHES.LEVEL, MATCHES.TYPE)
+                .values(tid, cid, priority, Draft, winMid, loseMid, level, type)
                 .returning()
                 .fetchOne()
                 .getMid();
@@ -95,7 +93,7 @@ public class MatchDao {
     public List<OpenMatchForJudge> findOpenMatchesFurJudge(int adminUid) {
         return jooq.select(MATCHES.MID, MATCHES.TID, MATCHES.STARTED,
                 TABLES.TABLE_ID, TABLES.LABEL,
-                MATCHES.GID, USERS.UID, USERS.NAME,
+                MATCHES.TYPE, USERS.UID, USERS.NAME,
                 ENEMY_USER.UID, ENEMY_USER.NAME)
                 .from(TOURNAMENT_ADMIN)
                 .innerJoin(TOURNAMENT)
@@ -121,7 +119,7 @@ public class MatchDao {
                         .mid(r.get(MATCHES.MID))
                         .tid(r.get(MATCHES.TID))
                         .started(r.get(MATCHES.STARTED).get())
-                        .type(r.get(MATCHES.GID).map(gid -> Group).orElse(PlayOff))
+                        .type(r.get(MATCHES.TYPE))
                         .table(TableLink.builder()
                                 .id(r.get(TABLES.TABLE_ID))
                                 .label(r.get(TABLES.LABEL))
@@ -141,7 +139,7 @@ public class MatchDao {
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<MyPendingMatch> findPendingMatches(int uid) {
         return jooq.select(MATCHES.MID, MATCHES.TID, TABLES.TABLE_ID,
-                TABLES.LABEL, MATCHES.GID, ENEMY_USER.UID, ENEMY_USER.NAME,
+                TABLES.LABEL, MATCHES.TYPE, ENEMY_USER.UID, ENEMY_USER.NAME,
                 MATCHES.STATE)
                 .from(MATCH_SCORE)
                 .innerJoin(MATCHES)
@@ -164,7 +162,7 @@ public class MatchDao {
                         .tid(r.get(MATCHES.TID))
                         .mid(r.get(MATCHES.MID))
                         .state(r.get(MATCHES.STATE))
-                        .matchType(r.get(MATCHES.GID) == null ? PlayOff : Group)
+                        .matchType(r.get(MATCHES.TYPE))
                         .table(ofNullable(r.get(TABLES.TABLE_ID))
                                 .map(tableId -> TableLink.builder()
                                         .id(tableId)
@@ -387,8 +385,8 @@ public class MatchDao {
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<CompleteMatch> findCompleteMatches(Integer tid) {
         return jooq
-                .select(MATCHES.MID, MATCHES.STARTED,
-                        MATCHES.ENDED, MATCHES.GID, ENEMY_USER.UID,
+                .select(MATCHES.MID, MATCHES.STARTED, MATCHES.TYPE,
+                        MATCHES.ENDED, ENEMY_USER.UID,
                         ENEMY_USER.NAME, USERS.UID, USERS.NAME)
                 .from(TOURNAMENT)
                 .innerJoin(MATCHES)
@@ -410,7 +408,7 @@ public class MatchDao {
                         .mid(r.get(MATCHES.MID))
                         .started(r.get(MATCHES.STARTED).get())
                         .ended(r.get(MATCHES.ENDED).get())
-                        .type(r.get(MATCHES.GID) == null ? PlayOff : Group)
+                        .type(r.get(MATCHES.TYPE))
                         .participants(asList(
                                 UserLink.builder()
                                         .name(r.get(USERS.NAME))
@@ -428,7 +426,7 @@ public class MatchDao {
         return jooq
                 .select(MATCHES.MID, MATCHES.STARTED, CATEGORY.NAME,
                         MATCHES.CID, TABLES.TABLE_ID, TABLES.LABEL,
-                        MATCHES.GID, ENEMY_USER.UID, ENEMY_USER.NAME,
+                        MATCHES.TYPE, ENEMY_USER.UID, ENEMY_USER.NAME,
                         MATCH_SCORE.SETS_WON, ENEMY_SCORE.SETS_WON,
                         USERS.UID, USERS.NAME)
                 .from(MATCHES)
@@ -461,7 +459,7 @@ public class MatchDao {
                                 .id(r.get(TABLES.TABLE_ID))
                                 .label(r.get(TABLES.LABEL))
                                 .build())
-                        .type(r.get(MATCHES.GID) == null ? PlayOff : Group)
+                        .type(r.get(MATCHES.TYPE))
                         .participants(asList(
                                 UserLink.builder()
                                         .name(r.get(USERS.NAME))
@@ -555,7 +553,8 @@ public class MatchDao {
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public Optional<PlayOffMatchForResign> playOffMatchForResign(int uid, int tid) {
         return ofNullable(jooq
-                .select(MATCHES.STATE, MATCHES.MID, MATCHES.WIN_MID, MATCHES.LOSE_MID)
+                .select(MATCHES.STATE, MATCHES.MID, MATCHES.WIN_MID,
+                        MATCHES.LOSE_MID, ENEMY_SCORE.UID, MATCHES.TYPE)
                 .from(MATCH_SCORE)
                 .innerJoin(MATCHES).on(MATCH_SCORE.MID.eq(MATCHES.MID))
                 .leftJoin(ENEMY_SCORE).on(
@@ -569,6 +568,7 @@ public class MatchDao {
                         .lostMatch(r.get(MATCHES.LOSE_MID))
                         .mid(r.get(MATCHES.MID))
                         .state(r.get(MATCHES.STATE))
+                        .type(r.get(MATCHES.TYPE))
                         .opponentId(ofNullable(r.get(ENEMY_SCORE.UID)))
                         .build());
     }

@@ -3,7 +3,7 @@ package org.dan.ping.pong.app.castinglots;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.match.MatchResource.MY_PENDING_MATCHES;
 import static org.dan.ping.pong.app.match.MatchState.Place;
-import static org.dan.ping.pong.app.match.MatchType.Group;
+import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
 import static org.hamcrest.Matchers.is;
@@ -76,7 +76,7 @@ public class CastingLotsJerseyTest extends AbstractSpringJerseyTest {
             assertThat(matches.stream().map(MyPendingMatch::getState).collect(toSet()),
                     is(ImmutableSet.of(Place)));
             assertThat(matches.stream().map(MyPendingMatch::getMatchType).collect(toSet()),
-                    is(ImmutableSet.of(Group)));
+                    is(ImmutableSet.of(Grup)));
             assertThat(matches.stream().map(MyPendingMatch::getEnemy)
                             .filter(Optional::isPresent)
                             .map(Optional::get)

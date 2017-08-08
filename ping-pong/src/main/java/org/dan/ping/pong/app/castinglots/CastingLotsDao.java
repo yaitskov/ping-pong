@@ -6,6 +6,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static org.dan.ping.pong.app.bid.BidState.Here;
+import static org.dan.ping.pong.app.match.MatchType.Gold;
+import static org.dan.ping.pong.app.match.MatchType.POff;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
@@ -77,7 +79,7 @@ public class CastingLotsDao {
         final int levels = (int) (log(playOffStartPositions) / log(2)) - 1;
         final int lowestPriority = basePlayOffPriority + levels;
         final int firstPlaceMid = matchDao.createPlayOffMatch(tid, cid, empty(), empty(),
-                lowestPriority, levels);
+                lowestPriority, levels, Gold);
         CastingLotsDao.log.info("First place match {} of tournament {} in category {}",
                 firstPlaceMid, tid, cid);
         generateTree(levels, firstPlaceMid, tid, cid, lowestPriority - 1);
@@ -88,7 +90,7 @@ public class CastingLotsDao {
         if (level <= 0) {
             return;
         }
-        int mid = matchDao.createPlayOffMatch(tid, cid, of(parentMid), empty(), priority, level);
+        int mid = matchDao.createPlayOffMatch(tid, cid, of(parentMid), empty(), priority, level, POff);
         generateTree(level - 1, mid, tid, cid, priority - 1);
     }
 }

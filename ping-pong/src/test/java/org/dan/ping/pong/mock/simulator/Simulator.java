@@ -12,7 +12,7 @@ import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.match.MatchResource.COMPLETE_MATCH;
-import static org.dan.ping.pong.app.match.MatchType.Group;
+import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -231,7 +231,7 @@ public class Simulator {
     private Optional<GameEnd> findGame(TournamentScenario scenario,
             OpenMatchForJudge openMatch,
             Set<Player> players) {
-        final Map<Set<Player>, GameEnd> matchMap = openMatch.getType() == Group
+        final Map<Set<Player>, GameEnd> matchMap = openMatch.getType() == Grup
                 ? scenario.getGroupMatches()
                 : scenario.getPlayOffMatches();
         final GameEnd gameEnd = matchMap.remove(players);

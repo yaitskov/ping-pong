@@ -171,4 +171,27 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
 
         simulator.simulate(T_1_Q_1_G_8, scenario);
     }
+
+    @Test
+    public void resignAfterAllOwnGroupGamesWinsCountFirst() {
+        final ResignAfter2 resignAfter2  = new ResignAfter2(2, p1);
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .name("quitAfterAllOwnGroupL")
+                .category(c1, p1, p2, p3)
+                .w30(p1, p2)
+                .w32(p2, p3)
+                .w32(p1, p3)
+                .quitsGroup(p2)
+                .pause(p1, p2, PlayHook.builder()
+                        .type(Hook.AfterScore)
+                        .callback(resignAfter2)
+                        .build())
+                .pause(p1, p3, PlayHook.builder()
+                        .type(Hook.AfterScore)
+                        .callback(resignAfter2)
+                        .build())
+                .champions(c1, p2);
+
+        simulator.simulate(T_1_Q_1_G_8, scenario);
+    }
 }

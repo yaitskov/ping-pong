@@ -557,9 +557,10 @@ public class MatchDao {
         return ofNullable(jooq
                 .select(MATCHES.STATE, MATCHES.MID, MATCHES.WIN_MID, MATCHES.LOSE_MID)
                 .from(MATCH_SCORE)
-                .innerJoin(MATCHES).on(MATCH_SCORE.MID.eq(MATCHES.MID),
+                .innerJoin(MATCHES).on(MATCH_SCORE.MID.eq(MATCHES.MID))
+                .leftJoin(ENEMY_SCORE).on(
+                        MATCHES.MID.eq(ENEMY_SCORE.MID),
                         ENEMY_SCORE.UID.ne(uid))
-                .leftJoin(ENEMY_SCORE).on(MATCHES.MID.eq(ENEMY_SCORE.MID))
                 .where(MATCH_SCORE.UID.eq(uid), MATCH_SCORE.TID.eq(tid),
                         MATCHES.STATE.in(Game, Place, Draft))
                 .fetchOne())
@@ -568,6 +569,7 @@ public class MatchDao {
                         .lostMatch(r.get(MATCHES.LOSE_MID))
                         .mid(r.get(MATCHES.MID))
                         .state(r.get(MATCHES.STATE))
+                        .opponentId(ofNullable(r.get(ENEMY_SCORE.UID)))
                         .build());
     }
 

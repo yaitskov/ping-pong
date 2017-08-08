@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.mock.simulator.HookDecision.Score;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Skip;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -33,6 +34,7 @@ import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
@@ -126,4 +128,40 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                                                 hasProperty("score", is(0))))))));
         return Skip;
     }
+
+    @Test
+    public void resignAfterAllOwnGroupGames() {
+        final AtomicInteger counter = new AtomicInteger();
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .name("quitAfterAllOwnGroup")
+                .category(c1, p1, p2, p3)
+                .w30(p1, p2)
+                .w32(p2, p3)
+                .w30(p1, p3)
+                .quitsGroup(p2)
+                .pause(p1, p2, PlayHook.builder()
+                        .type(Hook.AfterScore)
+                        .callback((s, metaInfo) -> {
+                            if (counter.incrementAndGet() == 2) {
+                                final int uid1 = s.getPlayersSessions().get(p1).getUid();
+                                tournamentService.leaveTournament(uid1, s.getTid(), Quit);
+                            }
+                            return Score;
+                        })
+                        .build())
+                .pause(p1, p3, PlayHook.builder()
+                        .type(Hook.AfterScore)
+                        .callback((s, metaInfo) -> {
+                            if (counter.incrementAndGet() == 2) {
+                                final int uid1 = s.getPlayersSessions().get(p1).getUid();
+                                tournamentService.leaveTournament(uid1, s.getTid(), Quit);
+                            }
+                            return Score;
+                        })
+                        .build())
+                .champions(c1, p2);
+
+        simulator.simulate(T_1_Q_1_G_8, scenario);
+    }
+
 }

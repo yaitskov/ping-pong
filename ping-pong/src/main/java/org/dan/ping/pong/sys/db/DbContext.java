@@ -51,9 +51,10 @@ public class DbContext {
 
     @Bean(name = TRANSACTION_MANAGER)
     public DataSourceTransactionManager txManager(
+            @Value("${db.tx.timeout.seconds}") int timeoutSeconds,
             @Named(DATA_SOURCE) DataSource dataSource) {
         DataSourceTransactionManager result = new DataSourceTransactionManager(dataSource);
-        result.setDefaultTimeout(200);
+        result.setDefaultTimeout(timeoutSeconds);
         return result;
     }
 

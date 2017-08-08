@@ -3,8 +3,6 @@ package org.dan.ping.pong.mock.simulator;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.Set;
-
 @Getter
 @Builder
 public class PlayHook {

@@ -16,12 +16,14 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 
+import lombok.RequiredArgsConstructor;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.match.ForTestMatchDao;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.mock.simulator.Hook;
+import org.dan.ping.pong.mock.simulator.HookCallback;
 import org.dan.ping.pong.mock.simulator.HookDecision;
 import org.dan.ping.pong.mock.simulator.MatchMetaInfo;
 import org.dan.ping.pong.mock.simulator.PlayHook;
@@ -35,6 +37,8 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -129,9 +133,25 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
         return Skip;
     }
 
+    @RequiredArgsConstructor
+    private class ResignAfter2 implements HookCallback {
+        private final int resignAfter;
+        private final Player player;
+        private int counter;
+
+        @Override
+        public HookDecision apply(TournamentScenario s, MatchMetaInfo metaInfo) {
+            if (++counter == resignAfter) {
+                final int uid1 = s.getPlayersSessions().get(player).getUid();
+                tournamentService.leaveTournament(uid1, s.getTid(), Quit);
+            }
+            return Score;
+        }
+    }
+
     @Test
     public void resignAfterAllOwnGroupGames() {
-        final AtomicInteger counter = new AtomicInteger();
+        final ResignAfter2 resignAfter2  = new ResignAfter2(2, p1);
         final TournamentScenario scenario = TournamentScenario.begin()
                 .name("quitAfterAllOwnGroup")
                 .category(c1, p1, p2, p3)
@@ -141,27 +161,14 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .quitsGroup(p2)
                 .pause(p1, p2, PlayHook.builder()
                         .type(Hook.AfterScore)
-                        .callback((s, metaInfo) -> {
-                            if (counter.incrementAndGet() == 2) {
-                                final int uid1 = s.getPlayersSessions().get(p1).getUid();
-                                tournamentService.leaveTournament(uid1, s.getTid(), Quit);
-                            }
-                            return Score;
-                        })
+                        .callback(resignAfter2)
                         .build())
                 .pause(p1, p3, PlayHook.builder()
                         .type(Hook.AfterScore)
-                        .callback((s, metaInfo) -> {
-                            if (counter.incrementAndGet() == 2) {
-                                final int uid1 = s.getPlayersSessions().get(p1).getUid();
-                                tournamentService.leaveTournament(uid1, s.getTid(), Quit);
-                            }
-                            return Score;
-                        })
+                        .callback(resignAfter2)
                         .build())
                 .champions(c1, p2);
 
         simulator.simulate(T_1_Q_1_G_8, scenario);
     }
-
 }

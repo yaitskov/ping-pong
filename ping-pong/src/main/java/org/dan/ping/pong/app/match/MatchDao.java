@@ -14,7 +14,6 @@ import static ord.dan.ping.pong.jooq.tables.Matches.MATCHES;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
-import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -23,7 +22,6 @@ import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
-import static org.dan.ping.pong.app.match.MatchType.POff;
 
 import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +55,7 @@ import javax.inject.Inject;
 public class MatchDao {
     static final MatchScore ENEMY_SCORE = MATCH_SCORE.as("enemy");
     private static final Users ENEMY_USER = USERS.as("enemy_user");
-    private static final int FIRST_PLAY_OFF_MATCH_LEVEL = 0;
+    public static final int FIRST_PLAY_OFF_MATCH_LEVEL = 1;
     private static final MatchScore MS_2 = MATCH_SCORE.as("ms2");
     private static final Bid BID_2 = BID.as("bid2");
     private static final Field<Integer> UID_2 = BID_2.UID.as("uid2");
@@ -352,6 +350,7 @@ public class MatchDao {
                 assignMatchForWinner(tid, uid, wmid);
             });
         } else {
+            matchScoreDao.createScore(mid, uid, cid, tid, 0, 0);
             changeStatus(mid, Place);
         }
     }

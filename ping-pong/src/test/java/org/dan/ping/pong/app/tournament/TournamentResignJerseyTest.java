@@ -8,6 +8,10 @@ import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
+import static org.dan.ping.pong.mock.simulator.Player.p5;
+import static org.dan.ping.pong.mock.simulator.Player.p6;
+import static org.dan.ping.pong.mock.simulator.Player.p7;
+import static org.dan.ping.pong.mock.simulator.Player.p8;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_2;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
@@ -204,6 +208,32 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .quitsGroup(p1, p3)
                 .w32(p1, p3)
                 .champions(c1, p3, p1)
+                .pause(p1, p3, PlayHook.builder()
+                        .type(Hook.BeforeScore)
+                        .callback((s, meta) -> {
+                            final int uid1 = s.getPlayersSessions().get(p1).getUid();
+                            tournamentService.leaveTournament(uid1, s.getTid(), Quit);
+                            return Skip;
+                        })
+                        .build());
+
+        simulator.simulate(T_1_Q_1_G_2, scenario);
+    }
+
+    @Test
+    public void resignFromActiveFirstPlayOffMatch() {
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .name("resignFromActiveFirst")
+                .category(c1, p1, p2, p3, p4, p5, p6, p7, p8)
+                .w30(p1, p2)
+                .w30(p3, p4)
+                .w30(p5, p6)
+                .w30(p7, p8)
+                .quitsGroup(p1, p3, p5, p7)
+                .w32(p1, p3)
+                .w32(p5, p7)
+                .w32(p3, p5)
+                .champions(c1, p3, p5)
                 .pause(p1, p3, PlayHook.builder()
                         .type(Hook.BeforeScore)
                         .callback((s, meta) -> {

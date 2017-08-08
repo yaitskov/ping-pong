@@ -3,9 +3,9 @@ package org.dan.ping.pong.app.castinglots;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.log;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static org.dan.ping.pong.app.bid.BidState.Here;
+import static org.dan.ping.pong.app.match.MatchType.Brnz;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
 import static org.dan.ping.pong.app.match.MatchType.POff;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -18,6 +18,7 @@ import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -76,21 +77,27 @@ public class CastingLotsDao {
             checkArgument(playOffStartPositions > 0, "not enough groups %s", playOffStartPositions);
             checkArgument(playOffStartPositions % 2 == 0, "odd number groups %s", playOffStartPositions);
         }
-        final int levels = (int) (log(playOffStartPositions) / log(2)) - 1;
+        final int levels = (int) (log(playOffStartPositions) / log(2));
         final int lowestPriority = basePlayOffPriority + levels;
-        final int firstPlaceMid = matchDao.createPlayOffMatch(tid, cid, empty(), empty(),
-                lowestPriority, levels, Gold);
-        CastingLotsDao.log.info("First place match {} of tournament {} in category {}",
-                firstPlaceMid, tid, cid);
-        generateTree(levels, firstPlaceMid, tid, cid, lowestPriority - 1);
-        return firstPlaceMid;
+        return generateTree(levels, empty(), tid, cid, lowestPriority, TypeChain.of(Gold, POff), empty()).get();
     }
 
-    public void generateTree(int level, int parentMid, int tid, int cid, int priority) {
-        if (level <= 0) {
-            return;
+    public Optional<Integer> generateTree(int level, Optional<Integer> parentMid,
+            int tid, int cid, int priority, TypeChain types, Optional<Integer> loserMid) {
+        if (level < MatchDao.FIRST_PLAY_OFF_MATCH_LEVEL) {
+            return empty();
         }
-        int mid = matchDao.createPlayOffMatch(tid, cid, of(parentMid), empty(), priority, level, POff);
-        generateTree(level - 1, mid, tid, cid, priority - 1);
+        final Optional<Integer> mid = Optional.of(matchDao.createPlayOffMatch(
+                tid, cid, parentMid, loserMid, priority, level, types.getType()));
+        log.info("Play off match {}:{} of tournament {} in category {}",
+                types.getType(), mid, tid, cid);
+        Optional<Integer> midBronze = empty();
+//        if (types.getType() == Gold) {
+//             midBronze = Optional.of(matchDao.createPlayOffMatch(
+//                    tid, cid, parentMid, empty(), priority, level, Brnz));
+//        }
+        generateTree(level - 1, mid, tid, cid, priority - 1, types.next(), midBronze);
+        generateTree(level - 1, mid, tid, cid, priority - 1, types.next(), midBronze);
+        return mid;
     }
 }

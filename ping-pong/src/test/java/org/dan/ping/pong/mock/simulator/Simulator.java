@@ -160,7 +160,9 @@ public class Simulator {
                 showUnHeldMatches("playOff", scenario.getPlayOffMatches());
                 if (!scenario.getGroupMatches().isEmpty()
                         || !scenario.getPlayOffMatches().isEmpty()) {
-                    throw new IllegalStateException("Some of matches are not held");
+                    throw new IllegalStateException("Some of matches are not held: left in group "
+                            + scenario.getGroupMatches().keySet()
+                            + " and in play off " + scenario.getPlayOffMatches().keySet());
                 }
                 return true;
             } else if (completedMatches[0] == 0) {

@@ -78,12 +78,14 @@ public class TournamentScenario {
         if (!playOffPlayers.contains(pa) && !playOffPlayers.contains(pb)) {
             if (groupMatches.putIfAbsent(new HashSet<>(match.getParticipants()), match) != null) {
                 throw new IllegalStateException("Multiple matches between " +
-                        "the same participants are not supported");
+                        "the same participants are not supported. Check "
+                        + pa + " and " + pb);
             }
         } else if (playOffPlayers.contains(pa) && playOffPlayers.contains(pb)) {
              if (playOffMatches.putIfAbsent(new HashSet<>(match.getParticipants()), match) != null) {
                  throw new IllegalStateException("Multiple matches between " +
-                         "the same participants are not supported");
+                         "the same participants are not supported. Check "
+                         + pa + " and " + pb);
              };
         } else {
             throw new IllegalStateException("players " + pa + " and "

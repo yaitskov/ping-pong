@@ -283,7 +283,8 @@ public class Simulator {
                 .state(TournamentState.Draft)
                 .build());
         scenario.setTid(tid);
-        final Collection<Player> players = scenario.getPlayersByCategories().values();
+        final List<Player> players = scenario.getPlayersByCategories().values()
+                .stream().sorted().collect(toList());
         final Map<Player, TestUserSession> playersSession = scenario.getPlayersSessions();
         final List<String> playerLabels = players.stream()
                 .map(p -> "_p" + p.getNumber())

@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class Player {
+public class Player implements Comparable<Player> {
     public static final Player p1 = p(1);
     public static final Player p2 = p(2);
     public static final Player p3 = p(3);
@@ -30,5 +30,10 @@ public class Player {
     @Override
     public String toString() {
         return String.format("p(%d)", number);
+    }
+
+    @Override
+    public int compareTo(Player o) {
+        return Integer.compare(number, o.number);
     }
 }

@@ -5,8 +5,8 @@ import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Rest;
+import static org.dan.ping.pong.app.match.MatchState.Auto;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
@@ -83,7 +83,17 @@ public class MatchService {
         } else {
             completePlayOffMatch(matchInfo, score);
         }
+        autoCompletePlayOffHalfMatches(matchInfo.getTid());
         tableService.scheduleFreeTables(matchInfo.getTid(), now);
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void autoCompletePlayOffHalfMatches(int tid) {
+        log.info("Auto complete matches in tid {}", tid);
+        final List<OneOpponentMatch> matches = matchDao.findMatchesForAutoComplete(tid);
+        for (OneOpponentMatch match : matches) {
+            matchDao.autoCompleteWinner(tid, match);
+        }
     }
 
     public boolean completePlayOffMatch(int uid, int tid, BidState target, PlayOffMatchForResign match) {
@@ -98,6 +108,7 @@ public class MatchService {
                     bidDao.setBidState(tid, match.getOpponentId().get(), Play, Wait);
                 }
             } else {
+                //matchDao.changeStatus(match.getWinMatch().get(), Auto);
                 // should be covered in other place where the opponent is detected
             }
 

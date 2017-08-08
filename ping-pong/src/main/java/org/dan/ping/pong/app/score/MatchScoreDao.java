@@ -4,6 +4,8 @@ import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.tables.MatchScore.MATCH_SCORE;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
+import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.sys.error.PiPoEx;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+@Slf4j
 public class MatchScoreDao {
     @Inject
     private DSLContext jooq;
@@ -22,6 +25,7 @@ public class MatchScoreDao {
 
     @Transactional(TRANSACTION_MANAGER)
     public void createScore(int mid, int uid, int cid, int tid, int won, int score) {
+        log.info("create score for min {} uid {}", mid, uid);
         jooq.insertInto(MATCH_SCORE, MATCH_SCORE.MID, MATCH_SCORE.UID,
                 MATCH_SCORE.CID, MATCH_SCORE.TID,
                 MATCH_SCORE.WON, MATCH_SCORE.SETS_WON)
@@ -56,10 +60,13 @@ public class MatchScoreDao {
 
     @Transactional(TRANSACTION_MANAGER)
     public void setScore(int mid, int uid, int won, int score) {
-        jooq.update(MATCH_SCORE)
+        if (jooq.update(MATCH_SCORE)
                 .set(MATCH_SCORE.WON, won)
                 .set(MATCH_SCORE.SETS_WON, score)
                 .where(MATCH_SCORE.MID.eq(mid), MATCH_SCORE.UID.eq(uid))
-                .execute();
+                .execute() == 0) {
+            throw PiPoEx.internalError("match " + mid + " with uid "
+                    + uid + " is not update");
+        };
     }
 }

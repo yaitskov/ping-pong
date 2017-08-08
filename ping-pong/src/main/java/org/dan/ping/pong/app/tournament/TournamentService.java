@@ -188,6 +188,7 @@ public class TournamentService {
             }
             bidDao.resign(uid, tid, target);
             matchService.tryToCompleteGroup(gid, tid, emptyList());
+            matchService.autoCompletePlayOffHalfMatches(tid);
             tableService.scheduleFreeTables(tid, now);
         }
     }
@@ -200,6 +201,7 @@ public class TournamentService {
                 tableDao.freeTable(playOffMatch.get().getMid());
             }
             if (schedule) {
+                matchService.autoCompletePlayOffHalfMatches(tid);
                 tableService.scheduleFreeTables(tid, now);
             }
         } else { // play off is not begun yet

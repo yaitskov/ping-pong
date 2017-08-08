@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.table;
 
-import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
+import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;

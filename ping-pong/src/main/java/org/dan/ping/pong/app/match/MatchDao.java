@@ -14,6 +14,7 @@ import static ord.dan.ping.pong.jooq.tables.Matches.MATCHES;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
+import static org.dan.ping.pong.app.match.MatchState.Auto;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -28,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.Bid;
 import ord.dan.ping.pong.jooq.tables.MatchScore;
 import ord.dan.ping.pong.jooq.tables.Users;
+import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.dan.ping.pong.app.table.TableLink;
@@ -299,21 +301,22 @@ public class MatchDao {
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<PlayOffMatchInfo> findPlayOffMatches(int tid, int cid) {
         return jooq
-                .select(MATCHES.MID, MATCH_SCORE.UID.count())
+                .select(MATCHES.MID, MATCHES.STATE, MATCH_SCORE.UID.count())
                 .from(MATCHES).leftJoin(MATCH_SCORE)
                 .on(MATCHES.MID.eq(MATCH_SCORE.MID))
                 .where(MATCHES.TID.eq(tid),
                         MATCHES.CID.eq(cid),
                         MATCHES.GID.isNull(),
                         MATCHES.LEVEL.eq(FIRST_PLAY_OFF_MATCH_LEVEL))
-                .groupBy(MATCHES.MID)
+                .groupBy(MATCHES.MID, MATCHES.STATE)
                 .orderBy(MATCHES.MID)
                 .fetch()
                 .map(r -> PlayOffMatchInfo.builder()
                         .mid(r.get(MATCHES.MID))
                         .cid(cid)
                         .tid(tid)
-                        .drafted(r.get(1, MATCH_SCORE.UID.getType())).build());
+                        .state(r.get(MATCHES.STATE))
+                        .drafted(r.get(2, MATCH_SCORE.UID.getType())).build());
     }
 
     @Inject
@@ -323,10 +326,21 @@ public class MatchDao {
     public void goPlayOff(int winnerId, PlayOffMatchInfo playOffMatch) {
         matchScoreDao.createScore(playOffMatch.getMid(), winnerId,
                 playOffMatch.getCid(), playOffMatch.getTid());
-        if (playOffMatch.getDrafted() == 1) {
+        if (playOffMatch.getDrafted() == 1 && playOffMatch.getState() == Draft) {
             changeStatus(playOffMatch.getMid(), MatchState.Place);
         }
         playOffMatch.incrementDrafted();
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void autoCompleteWinner(int tid, OneOpponentMatch match) {
+        log.info("auto complete match {} for uid {} in tid {}",
+                match.getMid(), match.getUid(), tid);
+        matchScoreDao.setScore(match.getMid(), match.getUid(), 1, 0);
+        changeStatus(match.getMid(), Over);
+        match.getWinnerMid().ifPresent(wmid -> {
+            assignMatchForWinner(tid, wmid, match.getUid());
+        });
     }
 
     @Transactional(TRANSACTION_MANAGER)
@@ -342,14 +356,19 @@ public class MatchDao {
         final Integer waitingOpponent = x.get(MATCH_SCORE.UID);
         final Optional<Integer> winMid = x.get(MATCHES.WIN_MID);
         if (waitingOpponent == null) {
+            log.info("assign for win. no opponent in mid {} for uid {}", mid, uid);
             matchScoreDao.createScore(mid, uid, cid, tid);
         } else if (x.get(MATCH_SCORE.WON) < 0) {
+            log.info("assign for win. no opponent {} gave up first mid {} for uid {}",
+                    waitingOpponent, mid, uid);
             // lost
             matchScoreDao.createScore(mid, uid, cid, tid, 1, 0);
             winMid.ifPresent(wmid -> {
                 assignMatchForWinner(tid, uid, wmid);
             });
         } else {
+            log.info("assign for win. opponent {} waits for mid {} for uid {}",
+                    waitingOpponent, mid, uid);
             matchScoreDao.createScore(mid, uid, cid, tid, 0, 0);
             changeStatus(mid, Place);
         }
@@ -357,6 +376,8 @@ public class MatchDao {
 
     @Transactional(TRANSACTION_MANAGER)
     public void assignMatchForWinner(int winnerUid, MatchInfo matchInfo) {
+        log.info("play off assign for wid {} mid {}",
+                winnerUid, matchInfo.getMid());
         final int mid = matchInfo.getWinnerMid().get();
         final Optional<Integer> enemyUid = matchScoreDao.findEnemy(mid, winnerUid);
         matchScoreDao.createScore(mid,
@@ -573,13 +594,15 @@ public class MatchDao {
     }
 
     public void complete(int uid, Optional<Integer> opponentUid, int mid) {
+        log.info("Uid {} lose to {} in mid {} due leaving",
+                uid, opponentUid, mid);
         jooq.update(MATCH_SCORE)
                 .set(MATCH_SCORE.WON, -1)
                 .set(MATCH_SCORE.SETS_WON, 0)
                 .where(MATCH_SCORE.MID.eq(mid), MATCH_SCORE.UID.eq(uid))
                 .execute();
         jooq.update(MATCHES)
-                .set(MATCHES.STATE, Over)
+                .set(MATCHES.STATE, opponentUid.isPresent() ? Over : Auto)
                 .where(MATCHES.MID.eq(mid))
                 .execute();
         opponentUid.ifPresent((u) -> {
@@ -628,5 +651,21 @@ public class MatchDao {
                 assignMatchForWinner(tid, wmid, waitingOpponent);
             });
         }
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public List<OneOpponentMatch> findMatchesForAutoComplete(int tid) {
+        return jooq.select()
+                .from(MATCHES)
+                .innerJoin(MATCH_SCORE).on(MATCH_SCORE.MID.eq(MATCHES.MID))
+                .innerJoin(BID).on(BID.UID.eq(MATCH_SCORE.UID))
+                .where(BID.TID.eq(tid), BID.STATE.eq(Wait),
+                        MATCHES.STATE.eq(Auto))
+                .fetch()
+                .map(r -> OneOpponentMatch.builder()
+                        .uid(r.get(BID.UID))
+                        .winnerMid(r.get(MATCHES.WIN_MID))
+                        .mid(r.get(MATCHES.MID))
+                        .build());
     }
 }

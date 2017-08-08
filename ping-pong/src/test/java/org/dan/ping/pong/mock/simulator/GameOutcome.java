@@ -2,7 +2,6 @@ package org.dan.ping.pong.mock.simulator;
 
 import static java.util.Arrays.asList;
 
-import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;

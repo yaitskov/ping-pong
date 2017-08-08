@@ -21,7 +21,10 @@ import org.dan.ping.pong.app.match.ForTestMatchDao;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.mock.simulator.Hook;
+import org.dan.ping.pong.mock.simulator.HookDecision;
+import org.dan.ping.pong.mock.simulator.MatchMetaInfo;
 import org.dan.ping.pong.mock.simulator.PlayHook;
+import org.dan.ping.pong.mock.simulator.Player;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
@@ -75,32 +78,52 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .quitsGroup(p2)
                 .pause(p1, p2, PlayHook.builder()
                         .type(Hook.BeforeScore)
-                        .callback((s, metaInfo) -> {
-                            final int uid1 = s.getPlayersSessions().get(p1).getUid();
-                            tournamentService.leaveTournament(uid1, s.getTid(), Quit);
-                            assertEquals(Optional.of(Quit), bidDao.getState(s.getTid(), uid1));
-                            assertEquals(Optional.of(Over), matchDao.getById(metaInfo.getOpenMatch().getMid())
-                                    .map(MatchInfo::getState));
-
-                            final int uid3 = s.getPlayersSessions().get(p3).getUid();
-                            assertThat(forTestMatchDao.findByParticipants(s.getTid(), uid1, uid3),
-                                    allOf(
-                                            hasProperty("state", is(Over)),
-                                            hasProperty("scores",
-                                                    allOf(
-                                                            hasItem(allOf(
-                                                                    hasProperty("uid", is(uid3)),
-                                                                    hasProperty("won", is(1)),
-                                                                    hasProperty("score", is(0)))),
-                                                            hasItem(allOf(
-                                                                    hasProperty("uid", is(uid1)),
-                                                                    hasProperty("won", is(-1)),
-                                                                    hasProperty("score", is(0))))))));
-                            return Skip;
-                        })
+                        .callback((s, metaInfo) -> checkQuit(s, metaInfo, p1, p3))
                         .build())
                 .champions(c1, p2);
 
         simulator.simulate(T_1_Q_1_G_8, scenario);
+    }
+
+    @Test
+    public void resignInLastGroupGame() {
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .name("resignInLastGroupGame")
+                .category(c1, p1, p2, p3)
+                .w30(p1, p2)
+                .w32(p2, p3)
+                .w30(p1, p3)
+                .quitsGroup(p2)
+                .pause(p1, p3, PlayHook.builder()
+                        .type(Hook.BeforeScore)
+                        .callback((s, metaInfo) -> checkQuit(s, metaInfo, p1, p3))
+                        .build())
+                .champions(c1, p2);
+
+        simulator.simulate(T_1_Q_1_G_8, scenario);
+    }
+
+    private HookDecision checkQuit(TournamentScenario s, MatchMetaInfo metaInfo, Player p1, Player p3) {
+        final int uid1 = s.getPlayersSessions().get(p1).getUid();
+        tournamentService.leaveTournament(uid1, s.getTid(), Quit);
+        assertEquals(Optional.of(Quit), bidDao.getState(s.getTid(), uid1));
+        assertEquals(Optional.of(Over), matchDao.getById(metaInfo.getOpenMatch().getMid())
+                .map(MatchInfo::getState));
+
+        final int uid3 = s.getPlayersSessions().get(p3).getUid();
+        assertThat(forTestMatchDao.findByParticipants(s.getTid(), uid1, uid3),
+                allOf(
+                        hasProperty("state", is(Over)),
+                        hasProperty("scores",
+                                allOf(
+                                        hasItem(allOf(
+                                                hasProperty("uid", is(uid3)),
+                                                hasProperty("won", is(1)),
+                                                hasProperty("score", is(0)))),
+                                        hasItem(allOf(
+                                                hasProperty("uid", is(uid1)),
+                                                hasProperty("won", is(-1)),
+                                                hasProperty("score", is(0))))))));
+        return Skip;
     }
 }

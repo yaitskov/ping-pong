@@ -33,6 +33,7 @@ import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.tournament.PlayOffMatchForResign;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentInfo;
+import org.dan.ping.pong.util.Integers;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -140,8 +141,6 @@ public class MatchService {
     private GroupDao groupDao;
 
     public void tryToCompleteGroup(Integer gid, int tid, List<Integer> uids) {
-        uids.forEach(bid -> bidDao.setBidState(tid, bid, Play, Wait));
-
         final List<GroupMatchInfo> matches = matchDao.findMatchesInGroup(gid);
         final long completedMatches = matches.stream()
                 .map(GroupMatchInfo::getState)
@@ -150,18 +149,22 @@ public class MatchService {
         if (completedMatches < matches.size()) {
             log.debug("Matches {} left to play in the group {}",
                     matches.size() - completedMatches, gid);
+            uids.forEach(bid -> bidDao.setBidState(tid, bid, Play, Wait));
             return;
         }
-        final Set<Integer> winnerIds = completeGroup(gid, tid, matches);
+        final List<Integer> left = bidDao.findLeft(tid, Optional.of(gid));
+        uids.forEach(bid -> bidDao.setBidState(tid, bid, Play, Wait));
+        final Set<Integer> winnerIds = completeGroup(gid, tid, matches, left);
         bidDao.setStatesAfterGroup(gid, tid, winnerIds);
     }
 
     private Set<Integer> completeGroup(Integer gid, int tid,
-            List<GroupMatchInfo> matches) {
+            List<GroupMatchInfo> matches, List<Integer> left) {
         log.info("Pick bids for playoff from gid {} in tid {}", gid, tid);
         final TournamentInfo iTour = tournamentDao.getById(tid)
                 .orElseThrow(() -> internalError("tid " + tid + " disappeared"));
         Map<Optional<Integer>, List<GroupMatchInfo>> byWinner = matches.stream()
+                .filter(matchInfo -> !left.contains(matchInfo.getWinnerId().get()))
                 .collect(groupingBy(GroupMatchInfo::getWinnerId, toList()));
         final PriorityQueue<List<GroupMatchInfo>> pq = new PriorityQueue<>(
                 GroupMatchListComparator.COMPARATOR);

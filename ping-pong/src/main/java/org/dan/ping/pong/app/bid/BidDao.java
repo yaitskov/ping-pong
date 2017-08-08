@@ -191,4 +191,15 @@ public class BidDao {
                 .where(BID.TID.eq(tid), BID.STATE.ne(Quit))
                 .execute();
     }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public List<Integer> findLeft(int tid, Optional<Integer> gid) {
+        return jooq.select(BID.UID)
+                .from(BID)
+                .where(BID.TID.eq(tid),
+                        BID.GID.eq(gid),
+                        BID.STATE.in(Quit, Expl, Lost))
+                .fetch()
+                .map(Record1::value1);
+    }
 }

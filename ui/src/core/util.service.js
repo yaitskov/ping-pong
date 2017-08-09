@@ -27,6 +27,14 @@ angular.
                 }
                 return other;
             };
+            this.has = function (item, set) {
+                for (var i in set) {
+                    if (set[i] == item) {
+                        return true;
+                    }
+                }
+                return false;
+            }
             this.findValBy = function (list, pattern) {
                 next:
                 for (var i in list) {

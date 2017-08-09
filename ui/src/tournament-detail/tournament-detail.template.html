@@ -67,12 +67,19 @@
     </div>
   </div>
 
-  <div class="form-group clearfix" ng-show="$ctrl.tournament.myCategoryId">
+  <div class="form-group clearfix" ng-show="$ctrl.showMyCategory()">
     <div class="pull-left category-label">
       My category
     </div>
     <div class="pull-left category-value">
       {{$ctrl.myCategory.name}}
+    </div>
+  </div>
+
+  <div class="form-group clearfix" ng-show="$ctrl.tournament.bidState == 'Expl'">
+    <div class="alert alert-danger">
+      Sorry to say, but you have been expelled from this tournament.
+      Ask administrator for clarification.
     </div>
   </div>
 
@@ -97,25 +104,31 @@
   <div class="form-group" ng-show="$ctrl.tournament">
     <button type="button" class="btn btn-primary"
             ng-click="$ctrl.enlistMe()"
-            ng-show="!$ctrl.tournament.myCategoryId && !$ctrl.tournament.iamAdmin">Enlist Me</button>
+            ng-show="$ctrl.canEnlist()">Enlist Me</button>
     <button type="button" class="btn btn-primary"
             ng-click="$ctrl.resign()"
-            ng-show="$ctrl.tournament.myCategoryId && $ctrl.tournament.state == 'Draft'">Resign</button>
+            ng-show="$ctrl.canResignFutureTournament()">Resign</button>
     <button type="button" class="btn btn-danger"
-            ng-click="$ctrl.quit()"
-            ng-show="$ctrl.tournament.myCategoryId && $ctrl.tournament.state == 'Open' && !$ctrl.showQuitConfirm">Quit</button>
+            ng-click="$ctrl.ensureResign()"
+            ng-show="canResignActiveTournament()">Resign</button>
     <button type="button" class="btn btn-primary"
-            ng-show="$ctrl.tournament.iamAdmin">Enlist Offline Participant</button>
+            ng-show="$ctrl.canEnlistOfflineParticipant()">Enlist Offline Participant</button>
     <a class="btn btn-primary label-info" role="button" ng-show="$ctrl.tournament.previousTid"
        href="#!/tournament/drafting/{{$ctrl.tournament.previousTid}}">
       Previous tournament in the seria
     </a>
   </div>
 
-  <div class="form-group" ng-show="$ctrl.tournament.myCategoryId && $ctrl.tournament.state == 'Draft'">
+  <div class="form-group" ng-show="$ctrl.tournament.bidState == 'Want'">
     <p>Thanks, you are enlisted to the tournament <b>{{$ctrl.tournament.name}}</b>.
       It will start {{$ctrl.tournament.opensAt | amTimeAgo}}.
       <a href="#!/my/matches/play">Here</a> is information about
+      matches, you need to play in the tournament.
+    </p>
+  </div>
+  <div class="form-group" ng-show="$ctrl.showScheduleLink()">
+    <p>
+      <a href="#!/my/matches/play">Here</a> it is information about
       matches, you need to play in the tournament.
     </p>
   </div>

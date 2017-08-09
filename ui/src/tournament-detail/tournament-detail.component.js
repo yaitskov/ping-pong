@@ -19,6 +19,36 @@ angular.
                              pageCtx.put('my-category-' + $routeParams.tournamentId, self.myCategory);
                          };
                          requestStatus.startLoading('Loading');
+                         this.showScheduleLink = function () {
+                             return self.tournament &&
+                                 cutil.has(self.tournament.bidState, ['Paid', 'Here', 'Play']);
+                         };
+                         this.canResignFutureTournament = function () {
+                             return self.tournament &&
+                                 cutil.has(self.tournament.bidState,
+                                           ['Want', 'Paid', 'Here']);
+                         };
+                         this.canResignActiveTournament = function () {
+                             return self.tournament &&
+                                 !self.showQuitConfirm &&
+                                 cutil.has(self.tournament.bidState,
+                                           ['Play', 'Wait', 'Rest']);
+                         };
+                         this.showMyCategory = function () {
+                             return self.tournament &&
+                                 cutil.has(self.tournament.bidState, ['Want', 'Paid', 'Here', 'Play', 'Wait', 'Rest']);
+                         };
+                         this.canEnlist = function () {
+                             return self.tournament &&
+                                 (!self.tournament.bidState || self.tournament.bidState == 'Quit') &&
+                                 self.tournament.state == 'Draft' &&
+                                 !self.tournament.iamAdmin;
+                         };
+                         this.canEnlistOfflineParticipant = function () {
+                             return self.tournament &&
+                                 self.tournament.state == 'Draft' &&
+                                 self.tournament.iamAdmin;
+                         };
                          Tournament.aDrafting(
                              {tournamentId: $routeParams.tournamentId},
                              function (tournament) {
@@ -34,7 +64,7 @@ angular.
                              function (r) {
                                  requestStatus.failed(r, {tid: $routeParams.tournamentId});
                              });
-                         this.quit = function () {
+                         this.ensureResign = function () {
                              self.showQuitConfirm = true;
                          };
                          this.enlistMe = function () {

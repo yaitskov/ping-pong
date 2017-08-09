@@ -6,6 +6,8 @@ import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 import static javax.ws.rs.core.Response.Status.Family.familyOf;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
+import static org.dan.ping.pong.app.bid.BidState.Quit;
+import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.DRAFTING;
 import static org.dan.ping.pong.app.tournament.TournamentResource.EDITABLE_TOURNAMENTS;
@@ -35,6 +37,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -160,8 +163,8 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
         final DraftingTournamentInfo adminResult = myRest().get(DRAFTING + tid,
                 session, DraftingTournamentInfo.class);
-        assertEquals(0, adminResult.getAlreadyEnlisted());
-        assertFalse(adminResult.getMyCategoryId().isPresent());
+        assertEquals(Optional.empty(), adminResult.getMyCategoryId());
+        assertEquals(Optional.empty(), adminResult.getBidState());
         assertTrue(adminResult.isIAmAdmin());
         assertThat(adminResult.getCategories(), hasSize(greaterThan(0)));
 
@@ -173,8 +176,8 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
         final DraftingTournamentInfo userResultBefore = myRest().get(DRAFTING + tid,
                 userSession, DraftingTournamentInfo.class);
-        assertEquals(0, userResultBefore.getAlreadyEnlisted());
-        assertFalse(userResultBefore.getMyCategoryId().isPresent());
+        assertEquals(Optional.empty(), userResultBefore.getMyCategoryId());
+        assertEquals(Optional.empty(), userResultBefore.getBidState());
         assertFalse(userResultBefore.isIAmAdmin());
 
         myRest().voidPost(TOURNAMENT_ENLIST, userSession,
@@ -185,15 +188,15 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
         final DraftingTournamentInfo userResultAfter = myRest().get(DRAFTING + tid,
                 userSession, DraftingTournamentInfo.class);
-        assertEquals(1, userResultAfter.getAlreadyEnlisted());
-        assertTrue(userResultAfter.getMyCategoryId().isPresent());
+        assertEquals(Optional.of(cid),  userResultAfter.getMyCategoryId());
+        assertEquals(Optional.of(Want), userResultAfter.getBidState());
         assertFalse(userResultAfter.isIAmAdmin());
 
         final DraftingTournamentInfo anonymousResult = myRest().get(DRAFTING + tid,
                 DraftingTournamentInfo.class);
-        assertEquals(1, anonymousResult.getAlreadyEnlisted());
-        assertFalse(anonymousResult.getMyCategoryId().isPresent());
+        assertEquals(Optional.empty(), anonymousResult.getMyCategoryId());
         assertFalse(anonymousResult.isIAmAdmin());
+        assertEquals(Optional.empty(), anonymousResult.getBidState());
         assertThat(adminResult.getCategories(), hasSize(greaterThan(0)));
     }
 
@@ -201,9 +204,10 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     public void resign() {
         final int tid = daoGenerator.genTournament(
                 daoGenerator.genPlace(0), Draft);
+        final int cid1 = daoGenerator.genCategory(tid);
         myRest().voidPost(TOURNAMENT_ENLIST, userSession, EnlistTournament.builder()
                 .tid(tid)
-                .categoryId(daoGenerator.genCategory(tid))
+                .categoryId(cid1)
                 .build());
         final List<TournamentDigest> digests = myRest().get(TOURNAMENT_ENLISTED,
                 userSession, DigestList.class);
@@ -212,6 +216,12 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         assertThat(myRest().get(TOURNAMENT_ENLISTED,
                 userSession, DigestList.class),
                 not(hasItem(hasProperty("tid", is(tid)))));
+
+        final DraftingTournamentInfo afterResign = myRest().get(DRAFTING + tid,
+                userSession, DraftingTournamentInfo.class);
+        assertEquals(Optional.of(cid1),  afterResign.getMyCategoryId());
+        assertEquals(Optional.of(Quit), afterResign.getBidState());
+
         myRest().voidPost(TOURNAMENT_ENLIST, userSession, EnlistTournament.builder()
                 .tid(tid)
                 .categoryId(daoGenerator.genCategory(tid))

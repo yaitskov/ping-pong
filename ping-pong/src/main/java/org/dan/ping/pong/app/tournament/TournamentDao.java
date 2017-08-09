@@ -66,8 +66,6 @@ public class TournamentDao {
     private static final String GAMES_COMPLETE = "gamesComplete";
     private static final int DAYS_TO_SHOW_PAST_TOURNAMENT = 30;
     private static final String CATEGORIES = "categories";
-    private static final String WON_MATCHES = "wonMatches";
-    private static final String SCORE = "score";
 
     @Inject
     private DSLContext jooq;
@@ -235,11 +233,7 @@ public class TournamentDao {
         return ofNullable(jooq.select(TOURNAMENT.NAME, TOURNAMENT.OPENS_AT,
                 BID.CID, TOURNAMENT_ADMIN.UID, TOURNAMENT.TICKET_PRICE,
                 TOURNAMENT.PREVIOUS_TID, PLACE.PID, PLACE.POST_ADDRESS,
-                PLACE.NAME, PLACE.PHONE, TOURNAMENT.STATE,
-                jooq.selectCount().from(BID)
-                        .where(BID.TID.eq(TOURNAMENT.TID),
-                                BID.STATE.ne(Quit))
-                        .asField(ENLISTED))
+                PLACE.NAME, PLACE.PHONE, TOURNAMENT.STATE, BID.STATE)
                 .from(TOURNAMENT)
                 .innerJoin(PLACE).on(TOURNAMENT.PID.eq(PLACE.PID))
                 .leftJoin(TOURNAMENT_ADMIN)
@@ -247,7 +241,6 @@ public class TournamentDao {
                         TOURNAMENT_ADMIN.UID.eq(participantId.orElse(0)))
                 .leftJoin(BID)
                 .on(TOURNAMENT.TID.eq(BID.TID),
-                        BID.STATE.ne(Quit),
                         BID.UID.eq(participantId.orElse(0)))
                 .where(TOURNAMENT.TID.eq(tid))
                 .fetchOne())
@@ -257,7 +250,7 @@ public class TournamentDao {
                         .state(r.get(TOURNAMENT.STATE))
                         .ticketPrice(r.get(TOURNAMENT.TICKET_PRICE))
                         .previousTid(r.get(TOURNAMENT.PREVIOUS_TID))
-                        .alreadyEnlisted(r.get(ENLISTED, Integer.class))
+                        .bidState(ofNullable(r.get(BID.STATE)))
                         .place(PlaceLink.builder()
                                 .name(r.get(PLACE.NAME))
                                 .address(PlaceAddress.builder()

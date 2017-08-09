@@ -303,4 +303,5 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
         simulator.simulate(T_1_Q_1_G_2, scenario);
     }
     // resign too many from group so left participants is less than quits from group
+    // chain resign a b => b resigns but a c (resigned earlier) so => a goes to next level with d automatically
 }

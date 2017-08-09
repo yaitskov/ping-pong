@@ -5,6 +5,8 @@ import static java.lang.Math.log;
 import static java.util.Optional.empty;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static org.dan.ping.pong.app.bid.BidState.Here;
+import static org.dan.ping.pong.app.bid.BidState.Paid;
+import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.match.MatchType.Brnz;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
 import static org.dan.ping.pong.app.match.MatchType.POff;
@@ -12,6 +14,7 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.TournamentBid;
+import org.dan.ping.pong.app.bid.TournamentGroupingBid;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.jooq.DSLContext;
@@ -28,14 +31,15 @@ public class CastingLotsDao {
     private DSLContext jooq;
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<TournamentBid> findBidsReadyToPlay(int tid) {
-        return jooq.select(BID.UID, BID.CID).from(BID)
-                .where(BID.TID.eq(tid), BID.STATE.eq(Here))
+    public List<TournamentGroupingBid> findBidsReadyToPlay(int tid) {
+        return jooq.select(BID.UID, BID.CID, BID.STATE).from(BID)
+                .where(BID.TID.eq(tid), BID.STATE.in(Want, Paid, Here))
                 .orderBy(BID.UID)
                 .fetch()
-                .map(r -> TournamentBid
+                .map(r -> TournamentGroupingBid
                         .builder()
                         .uid(r.get(BID.UID))
+                        .state(r.get(BID.STATE))
                         .cid(r.get(BID.CID))
                         .build());
     }
@@ -47,13 +51,13 @@ public class CastingLotsDao {
     private MatchScoreDao matchScoreDao;
 
     @Transactional(TRANSACTION_MANAGER)
-    public int generateGroupMatches(int gid, List<TournamentBid> groupBids, int tid) {
+    public int generateGroupMatches(int gid, List<TournamentGroupingBid> groupBids, int tid) {
         CastingLotsDao.log.info("Generate matches for group {} in tournament {}", gid, tid);
         int priorityGroup = 0;
         for (int i = 0; i < groupBids.size(); ++i) {
-            final TournamentBid bid1 = groupBids.get(i);
+            final TournamentGroupingBid bid1 = groupBids.get(i);
             for (int j = i + 1; j < groupBids.size(); ++j) {
-                final TournamentBid bid2 = groupBids.get(j);
+                final TournamentGroupingBid bid2 = groupBids.get(j);
                 final int mid = matchDao.createGroupMatch(tid,
                         gid, bid1.getCid(), ++priorityGroup);
                 matchScoreDao.createScore(mid, bid1.getUid(), bid1.getCid(), tid);

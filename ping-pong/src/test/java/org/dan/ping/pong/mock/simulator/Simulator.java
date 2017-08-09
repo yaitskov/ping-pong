@@ -272,6 +272,7 @@ public class Simulator {
                 .orElseGet(() -> "todo")
                 + " " + valueGenerator.genName(8);
         testAdmin = userSessionGenerator.generate(prefix + " admin", UserType.Admin);
+        scenario.setTestAdmin(testAdmin);
         restGenerator.generateSignInLinks(singletonList(testAdmin));
         final int placeId = daoGenerator.genPlace(prefix, testAdmin.getUid(), params.getTables());
         scenario.setPlaceId(placeId);

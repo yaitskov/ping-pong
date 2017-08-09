@@ -13,6 +13,7 @@ import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -65,7 +66,7 @@ public class UserDao {
                         .build());
     }
 
-    @Transactional(transactionManager = TRANSACTION_MANAGER)
+    @Transactional(TRANSACTION_MANAGER)
     public Optional<UserInfo> getUserBySession(String token) {
         return ofNullable(jooq.select(USERS.UID, USERS.NAME, USERS.PHONE, USERS.EMAIL, USERS.TYPE)
                 .from(SESSIONS).innerJoin(USERS)
@@ -80,7 +81,7 @@ public class UserDao {
                         .build());
     }
 
-    @Transactional(transactionManager = TRANSACTION_MANAGER)
+    @Transactional(TRANSACTION_MANAGER)
     public void promoteToAdmins(int said, int uid) {
         log.info("Sys admin {} promoted user {} to admins", said, uid);
         jooq.insertInto(ADMIN, ADMIN.UID, ADMIN.SAID)
@@ -89,7 +90,7 @@ public class UserDao {
                 .execute();
     }
 
-    @Transactional(transactionManager = TRANSACTION_MANAGER)
+    @Transactional(TRANSACTION_MANAGER)
     public void requestAdminAccess(int uid, Instant now) {
         jooq.update(USERS)
                 .set(USERS.WANT_ADMIN, Optional.of(now))
@@ -97,7 +98,7 @@ public class UserDao {
                 .execute();
     }
 
-    @Transactional(transactionManager = TRANSACTION_MANAGER)
+    @Transactional(TRANSACTION_MANAGER)
     public void update(UserInfo userInfo, UserProfileUpdate update) {
         jooq.update(USERS)
                 .set(USERS.EMAIL, update.getEmail())
@@ -110,5 +111,17 @@ public class UserDao {
             log.info("User {} changed email from {} to {}",
                     userInfo.getUid(), userInfo.getEmail(), update.getEmail());
         }
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public List<UserLink> loadNamesById(List<Integer> uids) {
+        return jooq.select(USERS.NAME, USERS.UID)
+                .from(USERS)
+                .where(USERS.UID.in(uids))
+                .fetch()
+                .map(r -> UserLink.builder()
+                        .uid(r.get(USERS.UID))
+                        .name(r.get(USERS.NAME))
+                        .build());
     }
 }

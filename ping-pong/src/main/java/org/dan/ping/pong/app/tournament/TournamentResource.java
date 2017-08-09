@@ -243,7 +243,11 @@ public class TournamentResource {
     public void beginTournament(@HeaderParam(SESSION) String session, int tid) {
         int uid = authService.userInfoBySession(session).getUid();
         log.info("Uid {} begins tid {}", uid, tid);
-        tournamentService.begin(tid);
+        if (tournamentDao.isAdminOf(uid, tid)) {
+            tournamentService.begin(tid);
+        } else {
+            throw forbidden("You are not an administrator");
+        }
     }
 
     @POST

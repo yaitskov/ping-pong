@@ -86,12 +86,12 @@ public class BidDao {
                 .execute();
     }
 
-    public void setGroupForUids(int gid, int tid, List<TournamentBid> groupBids) {
+    public void setGroupForUids(int gid, int tid, List<TournamentGroupingBid> groupBids) {
         if (groupBids.size() != jooq.update(BID)
                 .set(BID.GID, Optional.of(gid))
                 .where(BID.TID.eq(tid),
                         BID.UID.in(groupBids.stream()
-                                .map(TournamentBid::getUid)
+                                .map(TournamentGroupingBid::getUid)
                                 .collect(Collectors.toList())))
                 .execute()) {
             throw internalError("Not all bids got group " + gid);

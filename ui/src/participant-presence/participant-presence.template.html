@@ -25,26 +25,26 @@
         <td>
           <div class="btn-group">
             <a class="btn btn-danger"
-               ng-click="$ctrl.expel($index)"
-               ng-show="$ctrl.canExpel($index)"
+               ng-click="$ctrl.expel(participant)"
+               ng-show="$ctrl.canExpel(participant)"
                title="Expel participant">
               <span class="glyphicon glyphicon-remove"></span>
             </a>
             <a class="btn btn-primary"
-               ng-click="$ctrl.markAsPaid($index)"
-               ng-show="$ctrl.canPay($index)"
+               ng-click="$ctrl.markAsPaid(participant)"
+               ng-show="$ctrl.canPay(participant)"
                title="Mark that participant paid">
               <span class="glyphicon glyphicon-credit-card"></span>
             </a>
             <a class="btn btn-primary"
-               ng-click="$ctrl.participantIsHere($index)"
-               ng-show="$ctrl.canCheck($index)"
+               ng-click="$ctrl.participantIsHere(participant)"
+               ng-show="$ctrl.canCheck(participant)"
                title="Mark that participant is here">
               <span class="glyphicon glyphicon-ok"></span>
             </a>
             <a class="btn btn-primary"
-               ng-click="$ctrl.resetToWant($index)"
-               ng-show="$ctrl.canReset($index)"
+               ng-click="$ctrl.resetToWant(participant)"
+               ng-show="$ctrl.canReset(participant)"
                title="Reset to state - want to participate">
               <span class="glyphicon glyphicon-repeat"></span>
             </a>

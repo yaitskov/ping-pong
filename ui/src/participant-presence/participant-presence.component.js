@@ -12,8 +12,7 @@ angular.module('participantPresence').
                          mainMenu.setContextMenu(ctxMenu);
                          this.enlisted = null;
                          var self = this;
-                         this.expel = function (idx) {
-                             var enlisted = self.enlisted[idx];
+                         this.expel = function (enlisted) {
                              requestStatus.startLoading('Expelling');
                              Tournament.expel(
                                  {uid: enlisted.user.uid, tid: self.tournamentId},
@@ -23,55 +22,55 @@ angular.module('participantPresence').
                                  },
                                  requestStatus.failed);
                          }
-                         this.canExpel = function (idx) {
-                             var state = this.enlisted[idx].state;
+                         this.canExpel = function (participant) {
+                             var state = participant.state;
                              return state != 'Expl' && state != 'Quit';
                          };
-                         this.canReset = function (idx) {
-                             return self.enlisted[idx].state != 'Want';
+                         this.canReset = function (participant) {
+                             return participant.state != 'Want';
                          };
-                         this.canCheck = function (idx) {
-                             return self.enlisted[idx].state == 'Paid';
+                         this.canCheck = function (participant) {
+                             return participant.state == 'Paid';
                          };
-                         this.canPay = function (idx) {
-                             return self.enlisted[idx].state == 'Want';
+                         this.canPay = function (participant) {
+                             return participant.state == 'Want';
                          };
-                         this.markAsPaid = function (idx) {
+                         this.markAsPaid = function (participant) {
                              requestStatus.startLoading("Paying");
                              Participant.setState(
-                                 {uid: self.enlisted[idx].user.uid,
+                                 {uid: participant.user.uid,
                                   tid: $routeParams.tournamentId,
                                   expected: 'Want',
                                   target: 'Paid'},
                                  function (ok) {
                                      requestStatus.complete();
-                                     self.enlisted[idx].state = 'Paid';
+                                     participant.state = 'Paid';
                                  },
                                  requestStatus.failed);
                          };
-                         this.participantIsHere= function (idx) {
+                         this.participantIsHere= function (participant) {
                              requestStatus.startLoading("Marking participant presence");
                              Participant.setState(
-                                 {uid: self.enlisted[idx].user.uid,
+                                 {uid: participant.user.uid,
                                   tid: $routeParams.tournamentId,
                                   expected: 'Paid',
                                   target: 'Here'},
                                  function (ok) {
                                      requestStatus.complete();
-                                     self.enlisted[idx].state = 'Here';
+                                     participant.state = 'Here';
                                  },
                                  requestStatus.failed);
                          };
-                         this.resetToWant = function (idx) {
+                         this.resetToWant = function (participant) {
                              requestStatus.startLoading("Reseting participant");
                              Participant.setState(
-                                 {uid: self.enlisted[idx].user.uid,
+                                 {uid: participant.user.uid,
                                   tid: $routeParams.tournamentId,
-                                  expected: self.enlisted[idx].state,
+                                  expected: participant.state,
                                   target: 'Want'},
                                  function (ok) {
                                      requestStatus.complete();
-                                     self.enlisted[idx].state = 'Want';
+                                     participant.state = 'Want';
                                  },
                                  requestStatus.failed);
                          };

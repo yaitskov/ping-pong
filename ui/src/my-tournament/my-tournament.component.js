@@ -57,7 +57,6 @@ angular.
                                      requestStatus.failed);
                          };
                          this.open = function () {
-                             console.log("Begin drafting for " + self.tournament.tid);
                              requestStatus.startLoading('Starting the tournament');
                              $http.post('/api/tournament/begin',
                                         self.tournament.tid,
@@ -68,7 +67,9 @@ angular.
                                          requestStatus.complete();
                                          $location.path("/my/matches/judgement");
                                      },
-                                     requestStatus.failed);
+                                     function (error) {
+                                         requestStatus.failed(error);
+                                     });
                          };
                          this.isNotCanceled = function () {
                              return self.tournament && !(self.tournament.state == 'Close'

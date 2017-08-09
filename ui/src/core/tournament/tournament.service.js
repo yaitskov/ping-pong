@@ -49,6 +49,15 @@ angular.
                                        method: 'GET',
                                        cache: false
                                    },
+                                   enlistOffline: {
+                                       url: '/api/tournament/enlist-offline',
+                                       method: 'POST',
+                                       isArray: false,
+                                       responseType: 'text',
+                                       headers: {
+                                           session: 1
+                                       }
+                                   },
                                    state: {
                                        url: '/api/tournament/state',
                                        method: 'POST',

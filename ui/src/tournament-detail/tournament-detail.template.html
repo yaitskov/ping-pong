@@ -111,8 +111,6 @@
     <button type="button" class="btn btn-danger"
             ng-click="$ctrl.ensureResign()"
             ng-show="canResignActiveTournament()">Resign</button>
-    <button type="button" class="btn btn-primary"
-            ng-show="$ctrl.canEnlistOfflineParticipant()">Enlist Offline Participant</button>
     <a class="btn btn-primary label-info" role="button" ng-show="$ctrl.tournament.previousTid"
        href="#!/tournament/drafting/{{$ctrl.tournament.previousTid}}">
       Previous tournament in the seria

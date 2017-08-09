@@ -6,8 +6,10 @@ import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 import static javax.ws.rs.core.Response.Status.Family.familyOf;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
+import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Want;
+import static org.dan.ping.pong.app.category.CategoryResource.CATEGORY_MEMBERS;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.DRAFTING;
 import static org.dan.ping.pong.app.tournament.TournamentResource.EDITABLE_TOURNAMENTS;
@@ -16,10 +18,12 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.RUNNING_TOURNA
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_CREATE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLISTED;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST_OFFLINE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
+import static org.dan.ping.pong.app.user.UserType.User;
 import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
 import static org.dan.ping.pong.mock.Generators.genFutureTime;
 import static org.dan.ping.pong.mock.Generators.genPhone;
@@ -47,6 +51,7 @@ import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
+import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin;
 import org.dan.ping.pong.mock.RestEntityGenerator;
 import org.dan.ping.pong.mock.TestAdmin;
@@ -66,6 +71,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -309,5 +315,29 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         assertEquals(nextTid, r.getNext().get().getTid());
         assertEquals(nextOpensAt, r.getNext().get().getOpensAt());
         assertThat(r.getNext().get().getName(), notNullValue());
+    }
+
+    static class UserInfoList extends ArrayList<UserInfo> {};
+
+    @Test
+    public void enlistOffline() {
+        final int tid = daoGenerator.genTournament(
+                daoGenerator.genPlace(0), Draft);
+        final int cid = daoGenerator.genCategory(tid);
+        final String name = UUID.randomUUID().toString();
+        final int uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, session.getSession(),
+                EnlistOffline.builder()
+                        .tid(tid)
+                        .cid(cid)
+                        .bidState(Here)
+                        .name(name)
+                        .build())
+                .readEntity(Integer.class);
+        final List<UserInfo> digests = myRest().get(CATEGORY_MEMBERS + cid, UserInfoList.class);
+        assertThat(digests,
+                hasItem(allOf(
+                        hasProperty("name", is(name)),
+                        hasProperty("userType", is(User)),
+                        hasProperty("uid", is(uid)))));
     }
 }

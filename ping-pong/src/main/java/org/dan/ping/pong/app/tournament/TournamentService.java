@@ -1,6 +1,10 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.util.Collections.emptyList;
+import static org.dan.ping.pong.app.bid.BidState.Here;
+import static org.dan.ping.pong.app.bid.BidState.Paid;
+import static org.dan.ping.pong.app.bid.BidState.Wait;
+import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
@@ -26,6 +30,8 @@ import org.dan.ping.pong.app.match.GroupMatchForResign;
 import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableService;
+import org.dan.ping.pong.app.user.UserDao;
+import org.dan.ping.pong.app.user.UserRegRequest;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -326,5 +332,30 @@ public class TournamentService {
     public List<TournamentDigest> findWritableForAdmin(int uid, int days) {
         return tournamentDao.findWritableForAdmin(uid,
                 clocker.get().minus(days, ChronoUnit.DAYS));
+    }
+
+    @Inject
+    private UserDao userDao;
+
+    @Transactional(TRANSACTION_MANAGER)
+    public int enlistOffline(EnlistOffline enlistment) {
+        final MyTournamentInfo myTournamentInfo = getMyTournamentInfo(enlistment.getTid());
+        if (myTournamentInfo.getState() != Draft) {
+            throw badRequest("Tournament is not in Draft but "
+                    + myTournamentInfo.getState());
+        }
+        final int participantUid = userDao.register(UserRegRequest.builder()
+                .name(enlistment.getName())
+
+                .build());
+        enlist(participantUid,
+                EnlistTournament.builder()
+                        .categoryId(enlistment.getCid())
+                        .tid(enlistment.getTid())
+                        .build());
+        if (enlistment.getBidState() == Here || enlistment.getBidState() == Paid) {
+            bidDao.setBidState(enlistment.getTid(), participantUid, Want, enlistment.getBidState());
+        }
+        return participantUid;
     }
 }

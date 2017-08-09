@@ -47,7 +47,7 @@ public class CategoryDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<UserInfo> listCategoryMembers(int cid) {
-        return jooq.select(BID.UID, USERS.NAME)
+        return jooq.select(BID.UID, USERS.NAME, USERS.TYPE, USERS.PHONE, USERS.EMAIL)
                 .from(BID)
                 .innerJoin(USERS)
                 .on(BID.UID.eq(USERS.UID))
@@ -56,6 +56,9 @@ public class CategoryDao {
                 .map(r -> UserInfo.builder()
                         .uid(r.get(BID.UID))
                         .name(r.get(USERS.NAME))
+                        .userType(r.get(USERS.TYPE))
+                        .phone(r.get(USERS.PHONE))
+                        .email(r.get(USERS.EMAIL))
                         .build());
     }
 

@@ -130,6 +130,9 @@ angular.module('pingPong').
                     when('/my/tournament/:tournamentId', {
                         template: '<my-tournament></my-tournament>'
                     }).
+                    when('/tournament/enlist/offline/:tournamentId', {
+                        template: '<enlist-offline></enlist-offline>'
+                    }).
                     otherwise('/tournaments');
             }
            ]);

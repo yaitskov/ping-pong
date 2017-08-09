@@ -1,14 +1,19 @@
 package org.dan.ping.pong.app.tournament;
 
+import static java.util.Arrays.asList;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
+import static org.dan.ping.pong.app.bid.BidState.Here;
+import static org.dan.ping.pong.app.bid.BidState.Paid;
+import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
-import static org.dan.ping.pong.sys.error.PiPoEx.notAuthorized;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
+import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 
 import java.util.List;
@@ -40,6 +45,7 @@ public class TournamentResource {
     public static final String EDITABLE_TOURNAMENTS = TOURNAMENT + "editable/by/me";
     public static final String TOURNAMENT_CREATE = TOURNAMENT + "create";
     public static final String TOURNAMENT_ENLIST = TOURNAMENT + "enlist";
+    public static final String TOURNAMENT_ENLIST_OFFLINE = TOURNAMENT + "enlist-offline";
     public static final String TOURNAMENT_RESIGN = TOURNAMENT + "resign";
     public static final String TOURNAMENT_EXPEL = TOURNAMENT + "expel";
     public static final String TOURNAMENT_UPDATE = TOURNAMENT + "update";
@@ -97,6 +103,27 @@ public class TournamentResource {
         tournamentService.enlist(
                 authService.userInfoBySession(session).getUid(),
                 enlistment);
+    }
+
+    @POST
+    @Path(TOURNAMENT_ENLIST_OFFLINE)
+    @Consumes(APPLICATION_JSON)
+    public int enlistOffline(
+            @HeaderParam(SESSION) String session,
+            EnlistOffline enlistment) {
+        if (enlistment.getCid() < 1) {
+            throw badRequest("Category id is missing");
+        }
+        if (!asList(Want, Paid, Here).contains(enlistment.getBidState())) {
+            throw badRequest("Bid state could be " + asList(Want, Paid, Here));
+        }
+        final int adminUid = authService.userInfoBySession(session).getUid();
+        if (tournamentDao.isAdminOf(adminUid, enlistment.getTid())) {
+            return tournamentService.enlistOffline(enlistment);
+        } else {
+            throw forbidden("You are not administrator of tournament "
+                    + enlistment.getTid());
+        }
     }
 
     @POST

@@ -21,6 +21,7 @@ angular.module('pingPong', [
     'playInTournamentList',
     'newTournament',
     'tournamentEdit',
+    'enlistOffline',
     'tournamentParameters',
     'newTournamentParameters',
     'myTournament',

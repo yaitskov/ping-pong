@@ -44,11 +44,6 @@ angular.
                                  self.tournament.state == 'Draft' &&
                                  !self.tournament.iamAdmin;
                          };
-                         this.canEnlistOfflineParticipant = function () {
-                             return self.tournament &&
-                                 self.tournament.state == 'Draft' &&
-                                 self.tournament.iamAdmin;
-                         };
                          Tournament.aDrafting(
                              {tournamentId: $routeParams.tournamentId},
                              function (tournament) {

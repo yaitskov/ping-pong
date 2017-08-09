@@ -19,4 +19,10 @@ public class UserRegRequest {
     private String sessionPart;
     @Setter
     private UserType userType;
+
+    public static class UserRegRequestBuilder {
+        Optional<String> email = Optional.empty();
+        Optional<String> phone = Optional.empty();
+        UserType userType = UserType.User;
+    }
 }

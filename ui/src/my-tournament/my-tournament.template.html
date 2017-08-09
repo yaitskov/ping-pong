@@ -57,6 +57,12 @@
          ng-show="$ctrl.tournament.state == 'Canceled'">
         <span class="glyphicon glyphicon-repeat"></span>
       </a>
+      <a class="btn btn-primary"
+         title="Add offline participant, who does not have internet and a good phone"
+         href="#!/tournament/enlist/offline/{{$ctrl.tournament.tid}}"
+         ng-show="$ctrl.tournament.state == 'Draft'">
+        <span class="glyphicon glyphicon-plus-sign"></span>
+      </a>
     </div>
   </div>
   <div class="form-group" ng-show="$ctrl.wantRemove">

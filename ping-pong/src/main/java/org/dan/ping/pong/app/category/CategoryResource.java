@@ -25,6 +25,8 @@ import javax.ws.rs.Produces;
 @Produces(APPLICATION_JSON)
 public class CategoryResource {
     private static final String CATEGORY = "/category/";
+    public static final String CATEGORY_MEMBERS = CATEGORY + "find/members/";
+
     @Inject
     private CategoryDao categoryDao;
 
@@ -35,7 +37,7 @@ public class CategoryResource {
     }
 
     @GET
-    @Path(CATEGORY + "find/members/{cid}")
+    @Path(CATEGORY_MEMBERS + "{cid}")
     public List<UserInfo> findMembers(@PathParam("cid") int cid) {
         return categoryDao.listCategoryMembers(cid);
     }

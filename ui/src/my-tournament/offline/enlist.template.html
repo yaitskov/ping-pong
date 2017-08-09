@@ -1,0 +1,95 @@
+<main-menu></main-menu>
+<div class="container enlist-form">
+  <div class="form-group clearfix" ng-show="$ctrl.categories">
+    <div class="pull-left category-label">
+      Categories
+    </div>
+    <div class="pull-left category-value">
+      <div class="row" ng-repeat="category in $ctrl.categories">
+        <a class="btn btn-default category"
+           ng-click="$ctrl.activate(category.cid)"
+           ng-class="{'btn-primary': category.cid == $ctrl.categoryId}">
+          {{category.name}}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <form novalidate name="$ctrl.form" ng-submit="$ctrl.enlist('Here')">
+    <div class="form-group" ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.firstName.$dirty) && $ctrl.form.firstName.$invalid}">
+      <label for="firstName">First name</label>
+      <input type="text" class="form-control"
+             ng-model="$ctrl.firstName"
+             ng-maxlength="20"
+             ng-minlength="2"
+             required
+             name="firstName"
+             id="firstName"
+             placeholder="First name"/>
+      <p class="help-block"
+         ng-show="$ctrl.form.firstName.$error.required">
+        Name is required
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.firstName.$error.minlength || $ctrl.form.firstName.$error.maxlength">
+        Name length must be in range 2 and 20
+      </p>
+    </div>
+    <div class="form-group" ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.lastName.$dirty) && $ctrl.form.lastName.$invalid}">
+      <label for="lastName">Last name</label>
+      <input type="text" class="form-control"
+             name="lastName"
+             ng-maxlength="20"
+             ng-minlength="2"
+             required
+             ng-model="$ctrl.lastName"
+             id="lastName" placeholder="Last name"/>
+      <p class="help-block"
+         ng-show="$ctrl.form.lastName.$error.required">
+        Name is required
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.lastName.$error.minlength || $ctrl.form.lastName.$error.maxlength">
+        Name length must be in range 2 and 20
+      </p>
+    </div>
+    <div class="form-group">
+      <a title="Enlist participant, mark him as paid and ready to participate"
+         ng-click="$ctrl.enlist('Here')"
+         class="btn btn-primary">
+        Ready to Play
+      </a>
+      <a title="Just enlist participant"
+         ng-click="$ctrl.enlist('Want')"
+         class="btn btn-default">
+        Just Enlist
+      </a>
+      <a title="Return to tournament control panel"
+         back-button
+         class="btn btn-default">
+        Back
+      </a>
+      <button ng-show="false" type="submit">submit on enter</button>
+    </div>
+  </form>
+
+  <div class="form-group">
+    <request-status></request-status>
+  </div>
+
+  <div class="form-group" ng-show="$ctrl.enlisted.length">
+    <table class="table">
+      <tr>
+        <td>Right now enlisted</td>
+        <td>{{$ctrl.enlisted.length}}</td>
+      </tr>
+      <tr ng-repeat="enlisted in $ctrl.enlisted">
+        <td colspan="2">
+          <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{enlisted.uid}}">
+            {{enlisted.name}}
+          </a>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

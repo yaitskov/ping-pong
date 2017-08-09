@@ -64,17 +64,14 @@ angular.
                          };
 
                          this.resign = function () {
-                             console.log("Resign from tournament " + self.tournament.tid);
                              requestStatus.startLoading('Resigning', self.tournament);
-                             $http.post("/api/tournament/resign",
-                                        self.tournament.tid,
-                                        {headers: {session: auth.mySession()}}).
-                                 then(
-                                     function (okResp) {
-                                         self.tournament.myCategoryId = null;
-                                         requestStatus.complete();
-                                     },
-                                     requestStatus.failed);
+                             Tournament.resign(
+                                 self.tournament.tid,
+                                 function () {
+                                     self.tournament.myCategoryId = null;
+                                     requestStatus.complete();
+                                 },
+                                 requestStatus.failed);
                          };
                      }
                     ]

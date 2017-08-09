@@ -3,8 +3,8 @@
 angular.module('participantPresence').
     component('participantPresence', {
         templateUrl: 'participant-presence/participant-presence.template.html',
-        controller: ['$http', 'mainMenu', '$routeParams', 'auth', 'requestStatus', 'Participant',
-                     function ($http, mainMenu, $routeParams, auth, requestStatus, Participant) {
+        controller: ['$http', 'mainMenu', '$routeParams', 'auth', 'requestStatus', 'Participant', 'Tournament',
+                     function ($http, mainMenu, $routeParams, auth, requestStatus, Participant, Tournament) {
                          mainMenu.setTitle('Management of participants');
                          var ctxMenu = {};
                          ctxMenu['#!/my/tournament/' + $routeParams.tournamentId] = 'Tournament';
@@ -12,6 +12,17 @@ angular.module('participantPresence').
                          mainMenu.setContextMenu(ctxMenu);
                          this.enlisted = null;
                          var self = this;
+                         this.expel = function (idx) {
+                             var enlisted = self.enlisted[idx];
+                             requestStatus.startLoading('Expelling');
+                             Tournament.expel(
+                                 {uid: enlisted.user.uid, tid: self.tournamentId},
+                                 function (ok) {
+                                     requestStatus.complete();
+                                     enlisted.state = 'Expl';
+                                 },
+                                 requestStatus.failed);
+                         }
                          this.canExpel = function (idx) {
                              var state = this.enlisted[idx].state;
                              return state != 'Expl' && state != 'Quit';

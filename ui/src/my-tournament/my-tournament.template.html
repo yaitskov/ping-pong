@@ -65,6 +65,34 @@
       </a>
     </div>
   </div>
+  <div ng-show="$ctrl.errorHasUncheckedUsers.length > 0">
+    <div class="form-group">
+      <div class="alert alert-danger">
+        Tournament has {{$ctrl.errorHasUncheckedUsers.length}}
+        enlisted, but unchecked participants. To begin the tournament
+        you need to expel all of them or mark as participanting.
+      </div>
+    </div>
+    <div class="form-group">
+      <a class="btn btn-danger" ng-click="$ctrl.expelAndOpenTournament()">
+        Expel listed below &amp; open
+      </a>
+      <a class="btn btn-default" ng-click="$ctrl.cancelExpelAll()">
+        Cancel
+      </a>
+    </div>
+    <div class="form-group">
+      <table class="table table-bordered">
+        <tr ng-repeat="participant in $ctrl.errorHasUncheckedUsers | orderBy : 'name'">
+          <td>
+            <a href="#!/my/tournament/{{$ctrl.tournament.tid}}/participant/{{participant.uid}}">
+              {{participant.name}}
+            </a>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
   <div class="form-group" ng-show="$ctrl.wantRemove">
     <div class="alert alert-danger">
       Confirm that you want to terminate/cancel tournament. You can

@@ -13,6 +13,7 @@ angular.
                          var self = this;
                          self.tournament = null;
                          self.wantRemove = false;
+                         self.errorHasUncheckedUsers = null;
                          requestStatus.startLoading();
                          Tournament.aMine(
                              {tournamentId: $routeParams.tournamentId},
@@ -56,6 +57,26 @@ angular.
                                      },
                                      requestStatus.failed);
                          };
+                         this.expelAndOpenTournament = function () {
+                             if (!self.errorHasUncheckedUsers || !self.errorHasUncheckedUsers.length) {
+                                 requestStatus.complete();
+                                 self.errorHasUncheckedUsers = null;
+                                 self.open();
+                                 return;
+                             }
+                             var participant = self.errorHasUncheckedUsers.shift();
+                             requestStatus.startLoading('Expelling ' + participant.name + '...');
+                             Tournament.expel(
+                                 {tid: self.tournament.tid,
+                                  uid: participant.uid},
+                                 function (ok) {
+                                     self.expelAndOpenTournament();
+                                 },
+                                 requestStatus.failed);
+                         };
+                         this.cancelExpelAll = function () {
+                             self.errorHasUncheckedUsers = null;
+                         };
                          this.open = function () {
                              requestStatus.startLoading('Starting the tournament');
                              $http.post('/api/tournament/begin',
@@ -68,6 +89,9 @@ angular.
                                          $location.path("/my/matches/judgement");
                                      },
                                      function (error) {
+                                         if (error.data.error == 'uncheckedUsers') {
+                                             self.errorHasUncheckedUsers = error.data.users;
+                                         }
                                          requestStatus.failed(error);
                                      });
                          };

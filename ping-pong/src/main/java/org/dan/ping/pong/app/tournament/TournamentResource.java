@@ -3,6 +3,8 @@ package org.dan.ping.pong.app.tournament;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
+import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
+import static org.dan.ping.pong.sys.error.PiPoEx.notAuthorized;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
@@ -39,6 +41,7 @@ public class TournamentResource {
     public static final String TOURNAMENT_CREATE = TOURNAMENT + "create";
     public static final String TOURNAMENT_ENLIST = TOURNAMENT + "enlist";
     public static final String TOURNAMENT_RESIGN = TOURNAMENT + "resign";
+    public static final String TOURNAMENT_EXPEL = TOURNAMENT + "expel";
     public static final String TOURNAMENT_UPDATE = TOURNAMENT + "update";
     public static final String TOURNAMENT_ENLISTED = TOURNAMENT + "enlisted";
     public static final String MY_RECENT_TOURNAMENT = "/tournament/my-recent";
@@ -115,6 +118,22 @@ public class TournamentResource {
             int tid) {
         final int uid = authService.userInfoBySession(session).getUid();
         tournamentService.leaveTournament(uid, tid, BidState.Quit);
+    }
+
+    @POST
+    @Path(TOURNAMENT_EXPEL)
+    @Consumes(APPLICATION_JSON)
+    public void expel(
+            @HeaderParam(SESSION) String session,
+            ExpelParticipant expelParticipant) {
+        final int uid = authService.userInfoBySession(session).getUid();
+        if (tournamentDao.isAdminOf(uid, expelParticipant.getTid())) {
+            tournamentService.leaveTournament(expelParticipant.getUid(),
+                    expelParticipant.getTid(), BidState.Expl);
+        } else {
+            throw forbidden("You are not administrator of tournament "
+                    + expelParticipant.getTid());
+        }
     }
 
     @GET

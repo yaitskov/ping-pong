@@ -9,7 +9,11 @@ angular.
                          mainMenu.setTitle('Match Scoring');
                          this.participants = pageCtx.getMatchParticipants($routeParams.matchId);
                          this.rated = 0;
-                         this.possibleScores = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                         var maxScore = pageCtx.get('match-max-score-' + $routeParams.matchId);
+                         this.possibleScores = [];
+                         for (var i =0 ; i <= maxScore; ++i) {
+                             this.possibleScores.push(i);
+                         }
                          this.scores = [-1, -1];
                          var self = this;
                          this.pick = function (idx, score) {

@@ -19,6 +19,7 @@ angular.module('myMatchJudgeList').
                          };
                          this.completeMatch = function (mid, idx) {
                              pageCtx.put('last-admin-scoring-tournament-id', this.matches[idx].tid);
+                             pageCtx.put('match-max-score-' + mid, this.matches[idx].matchScore);
                              pageCtx.putMatchParticipants(mid, this.matches[idx].participants);
                              $location.path('/complete/match/' + mid);
                          };

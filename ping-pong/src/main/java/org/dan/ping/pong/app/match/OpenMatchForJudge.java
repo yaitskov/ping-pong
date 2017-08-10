@@ -22,5 +22,6 @@ public class OpenMatchForJudge {
     private TableLink table;
     private List<UserLink> participants;
     private Instant started;
+    private int matchScore;
     private MatchType type;
 }

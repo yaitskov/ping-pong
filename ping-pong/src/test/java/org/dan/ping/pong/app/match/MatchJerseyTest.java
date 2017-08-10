@@ -75,6 +75,7 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
 
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = {TestCtx.class, ForTestMatchDao.class,
@@ -350,6 +351,40 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                                                             .uid(s.getPlayersSessions().get(p2).getUid())
                                                             .build()))
                                             .build());
+                            return HookDecision.Skip;
+                        })
+                        .build())
+                .champions(c1, p1)
+                .ignoreUnexpectedGames();
+
+        simulator.simulate(T_1_Q_1_G_8, scenario);
+    }
+
+    @Test
+    public void rejectDifferentScore() {
+        TournamentScenario scenario = TournamentScenario.begin()
+                .category(c1, p1, p2)
+                .w31(p1, p2)
+                .quitsGroup(p1)
+                .pause(p1, p2, PlayHook.builder()
+                        .type(Hook.AfterScore)
+                        .callback((s, meta) -> {
+                            final Response re = myRest().post(COMPLETE_MATCH, adminSession,
+                                    FinalMatchScore.builder()
+                                            .mid(meta.getOpenMatch().getMid())
+                                            .scores(asList(
+                                                    IdentifiedScore.builder()
+                                                            .score(3)
+                                                            .uid(s.getPlayersSessions().get(p1).getUid())
+                                                            .build(),
+                                                    IdentifiedScore.builder()
+                                                            .score(2)
+                                                            .uid(s.getPlayersSessions().get(p2).getUid())
+                                                            .build()))
+                                            .build());
+                            assertEquals(400, re.getStatus());
+                            assertEquals("Match is already scored",
+                                    re.readEntity(MatchScoredError.class).getMessage());
                             return HookDecision.Skip;
                         })
                         .build())

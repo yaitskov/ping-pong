@@ -16,4 +16,5 @@ public class TournamentParameters {
     private int matchScore;
     private int maxGroupSize;
     private int quitsGroup;
+    private int thirdPlaceMatch;
 }

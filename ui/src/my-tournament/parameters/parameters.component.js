@@ -16,6 +16,9 @@ angular.
                              matchScore: {min: 1, max: 100}
                          };
                          var self = this;
+                         this.setThirdPlaceMatch = function (v) {
+                             self.tournament.thirdPlaceMatch = v;
+                         };
                          this.update = function () {
                              self.form.$setSubmitted();
                              if (!self.form.$valid) {
@@ -26,7 +29,8 @@ angular.
                                  {tid: $routeParams.tournamentId,
                                   quitsGroup: self.tournament.quitsGroup,
                                   maxGroupSize: self.tournament.maxGroupSize,
-                                  matchScore: self.tournament.matchScore
+                                  matchScore: self.tournament.matchScore,
+                                  thirdPlaceMatch: self.tournament.thirdPlaceMatch
                                  },
                                  function (ok) {
                                      requestStatus.complete();

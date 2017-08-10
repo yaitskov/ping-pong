@@ -37,6 +37,19 @@
       </p>
     </div>
     <div class="form-group">
+      <label for="thirdPlaceMatch" class="toggle-option">Match for 3rd place</label>
+      <a class="btn btn-default"
+         ng-click="$ctrl.setThirdPlaceMatch(1)"
+         ng-class="{'btn-primary': $ctrl.tournament.thirdPlaceMatch == 1}">
+        yes
+      </a>
+      <a class="btn btn-default"
+         ng-click="$ctrl.setThirdPlaceMatch(0)"
+         ng-class="{'btn-danger': $ctrl.tournament.thirdPlaceMatch == 0}">
+        no
+      </a>
+    </div>
+    <div class="form-group">
       <button class="btn btn-primary" type="submit">Update</button>
       <a class="btn btn-danger" back-button>Cancel</a>
     </div>

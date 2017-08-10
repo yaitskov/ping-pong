@@ -463,7 +463,7 @@ public class TournamentDao {
     public Optional<TournamentParameters> getTournamentParams(int tid) {
         return ofNullable(jooq
                 .select(TOURNAMENT.MAX_GROUP_SIZE, TOURNAMENT.MATCH_SCORE,
-                        TOURNAMENT.QUITS_FROM_GROUP)
+                        TOURNAMENT.QUITS_FROM_GROUP, TOURNAMENT.THIRD_PLACE_MATCH)
                 .from(TOURNAMENT)
                 .where(TOURNAMENT.TID.eq(tid))
                 .fetchOne())
@@ -473,6 +473,7 @@ public class TournamentDao {
                         .matchScore(r.get(TOURNAMENT.MATCH_SCORE))
                         .quitsGroup(r.get(TOURNAMENT.QUITS_FROM_GROUP))
                         .maxGroupSize(r.get(TOURNAMENT.MAX_GROUP_SIZE))
+                        .thirdPlaceMatch(r.get(TOURNAMENT.THIRD_PLACE_MATCH))
                         .build());
     }
 
@@ -482,6 +483,7 @@ public class TournamentDao {
                 .set(TOURNAMENT.MAX_GROUP_SIZE, parameters.getMaxGroupSize())
                 .set(TOURNAMENT.MATCH_SCORE, parameters.getMatchScore())
                 .set(TOURNAMENT.QUITS_FROM_GROUP, parameters.getQuitsGroup())
+                .set(TOURNAMENT.THIRD_PLACE_MATCH, parameters.getThirdPlaceMatch())
                 .where(TOURNAMENT.TID.eq(parameters.getTid()))
                 .execute();
     }

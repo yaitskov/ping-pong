@@ -38,6 +38,10 @@ angular.
                                  requestStatus.validationFailed("Participants cannot have same scores");
                                  return;
                              }
+                             if (self.scores[0] < maxScore && self.scores[1] < maxScore) {
+                                 requestStatus.validationFailed("Match continues until " + maxScore);
+                                 return;
+                             }
                              Match.scoreMatch(
                                  {mid: $routeParams.matchId,
                                   scores: findScores()},
@@ -46,8 +50,6 @@ angular.
                                      self.rated = 1;
                                      requestStatus.startLoading("Match is scored");
                                  },
-                                 function (error) {
-                                     requestStatus.failed(error);
-                                 });
+                                 requestStatus.failed);
                          };
                      }]});

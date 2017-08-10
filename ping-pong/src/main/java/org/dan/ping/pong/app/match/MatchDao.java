@@ -143,8 +143,9 @@ public class MatchDao {
     public List<MyPendingMatch> findPendingMatches(int uid) {
         return jooq.select(MATCHES.MID, MATCHES.TID, TABLES.TABLE_ID,
                 TABLES.LABEL, MATCHES.TYPE, ENEMY_USER.UID, ENEMY_USER.NAME,
-                MATCHES.STATE)
+                MATCHES.STATE, TOURNAMENT.MATCH_SCORE)
                 .from(MATCH_SCORE)
+                .innerJoin(TOURNAMENT).on(TOURNAMENT.TID.eq(MATCH_SCORE.TID))
                 .innerJoin(MATCHES)
                 .on(MATCH_SCORE.MID.eq(MATCHES.MID))
                 .leftJoin(ENEMY_SCORE)
@@ -164,6 +165,7 @@ public class MatchDao {
                 .map(r -> MyPendingMatch.builder()
                         .tid(r.get(MATCHES.TID))
                         .mid(r.get(MATCHES.MID))
+                        .matchScore(r.get(TOURNAMENT.MATCH_SCORE))
                         .state(r.get(MATCHES.STATE))
                         .matchType(r.get(MATCHES.TYPE))
                         .table(ofNullable(r.get(TABLES.TABLE_ID))

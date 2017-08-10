@@ -259,10 +259,11 @@ ul li a {
     /* end of admin-judge */
 
     /* begin match-score */
-    .admin-score {
+    .admin-score, .match-scoring {
         a.score {
             margin-left: 5px;
             margin-bottom: 5px;
+            min-width: auto;
         }
     }
     /* end match-score */

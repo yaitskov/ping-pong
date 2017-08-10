@@ -5,48 +5,43 @@ angular.
     component('completeMyMatch', {
         templateUrl: 'complete-my-match/complete-my-match.template.html',
         controller: ['auth', 'mainMenu', 'Match', '$routeParams',
-                     'pageCtx', 'requestStatus', '$scope', 'countDown',
+                     'pageCtx', 'requestStatus', '$scope',
                      function (auth, mainMenu, Match, $routeParams,
-                               pageCtx, requestStatus, $scope, countDown) {
+                               pageCtx, requestStatus, $scope) {
                          mainMenu.setTitle('Match Scoring');
                          this.match = pageCtx.get('last-scoring-match') || {};
-                         this.rated = null;
-                         this.outcome = "win";
-                         this.score = "0";
+                         var maxScore = pageCtx.get('match-max-score-' + $routeParams.matchId);
                          var self = this;
-                         function scores (myScore, enemyScore) {
-                             return [{uid: auth.myUid(), score: myScore},
-                                     {uid: pageCtx.getEnemyUid(auth.myUid(), $routeParams.matchId),
-                                      score: enemyScore}];
+                         this.possibleScores = [];
+                         for (var i =0 ; i <= maxScore; ++i) {
+                             this.possibleScores.push(i);
                          }
-                         function findScores() {
-                             if (self.outcome == 'win') {
-                                 return scores(3, self.score | 0);
-                             } else {
-                                 return scores(self.score | 0, 3);
-                             }
-                         }
-                         this.showFinalMessage = function () {
-                             countDown.seconds(
-                                 $scope, 30,
-                                 function (left) {
-                                     requestStatus.startLoading(
-                                         "The match is scored and complete. Auto redirect back in "
-                                             + left + " seconds");
-                                 },
-                                 function () {
-                                     window.history.back();
-                                 });
+                         this.scores = [-1, -1];
+                         this.pick = function (idx, score) {
+                             self.scores[idx] = score;
                          };
                          this.scoreMatch = function () {
                              requestStatus.startLoading('Scoring');
+                             if (self.scores[0] < 0 || self.scores[1] < 0) {
+                                 requestStatus.validationFailed("Not all participants have been scored");
+                                 return;
+                             }
+                             if (self.scores[0] == self.scores[1]) {
+                                 requestStatus.validationFailed("Participants cannot have same scores");
+                                 return;
+                             }
+                             if (self.scores[0] < maxScore && self.scores[1] < maxScore) {
+                                 requestStatus.validationFailed("Match continues until " + maxScore);
+                                 return;
+                             }
                              Match.scoreMatch(
                                  {mid: $routeParams.matchId,
-                                  scores: findScores()},
+                                  scores: [{uid: auth.myUid(), score: self.scores[0]},
+                                           {uid: pageCtx.getEnemyUid(auth.myUid(), $routeParams.matchId),
+                                            score: self.scores[1]}]},
                                  function (okResp) {
-                                     self.rated = 1;
                                      requestStatus.complete();
-                                     self.showFinalMessage();
+                                     window.history.back();
                                  },
                                  requestStatus.failed);
                          };

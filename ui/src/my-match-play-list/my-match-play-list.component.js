@@ -15,6 +15,7 @@ angular.module('myMatchPlayList').
                          var self = this;
                          this.matchScoring = function () {
                              pageCtx.put('last-scoring-match', self.openMatch);
+                             pageCtx.put('match-max-score-' + self.openMatch.mid, self.openMatch.matchScore);
                              $location.path("/complete/my/match/" + self.openMatch.mid);
                          };
                          this.iSawMyOutcomeInTournament = function () {
@@ -23,8 +24,10 @@ angular.module('myMatchPlayList').
                          };
                          this.checkTournamentEnd = function () {
                              self.previouslyScored.ended = (
-                                 self.previouslyScored.tid
-                                     && self.previouslyScored.tid == self.tournament.previous.tid);
+                                 self.previouslyScored.tid &&
+                                     self.tournament &&
+                                     self.tournament.previous &&
+                                     self.previouslyScored.tid == self.tournament.previous.tid);
                          };
                          requestStatus.startLoading();
                          $q.all([Tournament.myRecent({}).$promise,

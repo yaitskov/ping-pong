@@ -2,65 +2,43 @@
 <form>
   <div class="container match-scoring">
     <div class="form-group">
-      <label>Choose the out come of <b>{{$ctrl.match.matchType}}</b> match
+      <label>Choose your score in the <b>{{$ctrl.match.matchType}}</b> match
       with
         <a href="#!/participant/{{$ctrl.match.tid}}/{{$ctrl.match.enemy.uid}}">
           {{$ctrl.match.enemy.name}}
         </a>
         for you.
       </label>
-    </div>
-    <div class="form-group">
-      <div class="btn-group" data-toggle="buttons">
-        <label class="btn btn-primary active">
-          <input type="radio" autocomplete="off"
-                 value="win" name="outcome"
-                 ng-model="$ctrl.outcome"/>
-          <span class="circle"/> I Won!
-        </label>
-        <label class="btn btn-primary btn-danger">
-          <input type="radio" autocomplete="off"
-                 value="lost" name="outcome"
-                 ng-model="$ctrl.outcome"/>
-          <span class="circle"/> I Lost!
-        </label>
+      <div>
+        <a class="btn btn-default score"
+           ng-repeat="score in $ctrl.possibleScores"
+           ng-click="$ctrl.pick(0, score)"
+           ng-class="{'btn-primary': score == $ctrl.scores[0]}">
+          {{score}}
+        </a>
       </div>
     </div>
     <div class="form-group">
-      <label>Choose the score</label>
-    </div>
-    <div class="form-group">
-      <div class="btn-group" data-toggle="buttons">
-        <label class="btn btn-success active">
-          <input type="radio" autocomplete="off"
-                 value="0" name="score"
-                 ng-model="$ctrl.score"/>
-          <span class="circle"/> 3:0
-        </label>
-        <label class="btn btn-info">
-          <input type="radio" autocomplete="off"
-                 value="1" name="score"
-                 ng-model="$ctrl.score"/>
-          <span class="circle"/> 3:1
-        </label>
-        <label class="btn btn-warning">
-          <input type="radio" autocomplete="off"
-                 value="1" name="score"
-                 ng-model="$ctrl.score"/>
-          <span class="circle"/> 3:2
-        </label>
+      <label>Choose opponent's score</label>
+      <div>
+        <a class="btn btn-default score"
+           ng-repeat="score in $ctrl.possibleScores"
+           ng-click="$ctrl.pick(1, score)"
+           ng-class="{'btn-primary': score == $ctrl.scores[1]}">
+          {{score}}
+        </a>
       </div>
     </div>
     <div class="form-group">
-      <request-status></request-status>
-    </div>
-    <div class="form-group top-buffer">
       <button class="btn btn-primary"
               ng-show="!$ctrl.rated"
               ng-click="$ctrl.scoreMatch()">Complete Match</button>
       <button class="btn btn-default"
               ng-class="{'btn-primary': $ctrl.rated}"
               back-button>Back</button>
+    </div>
+    <div class="form-group">
+      <request-status></request-status>
     </div>
   </div>
 </form>

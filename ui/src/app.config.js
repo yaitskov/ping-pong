@@ -9,6 +9,11 @@ angular.module('pingPong').
         $httpProvider.defaults.headers.get['Pragma'] = 'no-cache';
         $httpProvider.interceptors.push('injectingSessionInterceptor');
     }]).
+    run(['$rootScope', function ($rootScope) {
+        $rootScope.$on('$locationChangeStart', function (event) {
+            jQuery(".modal-backdrop").remove();
+        });
+    }]).
     service('injectingSessionInterceptor', ['auth', function (auth) {
         var ser = this;
         ser.request = function (config) {

@@ -11,7 +11,12 @@ angular.module('participantPresence').
                          this.tournamentId = $routeParams.tournamentId;
                          mainMenu.setContextMenu(ctxMenu);
                          this.enlisted = null;
+                         this.toBeExpelled = null;
                          var self = this;
+                         this.confirmExpel = function (enlisted) {
+                             self.toBeExpelled = enlisted;
+                             jQuery('#confirmParticipantExpel').modal('show');
+                         }
                          this.expel = function (enlisted) {
                              requestStatus.startLoading('Expelling');
                              Tournament.expel(

@@ -4,10 +4,10 @@
     <div class="form-group">
       <label>
         Between
-        <a href="#!/participant/{{$ctrl.tournament.tid}}/$ctrl.participants[0].uid">
+        <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{$ctrl.participants[0].uid}}">
           {{$ctrl.participants[0].name}}
         </a> and
-        <a href="#!/participant/{{$ctrl.tournament.tid}}/$ctrl.participants[1].uid">
+        <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{$ctrl.participants[1].uid}}">
           {{$ctrl.participants[1].name}}
         </a>
       </label>
@@ -15,7 +15,7 @@
     <div class="form-group">
       <label>
         Score of
-        <a href="#!/participant/{{$ctrl.tournament.tid}}/$ctrl.participants[0].uid">
+        <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{$ctrl.participants[0].uid}}">
           {{$ctrl.participants[0].name}}
         </a>
       </label>
@@ -30,7 +30,7 @@
     </div>
     <div class="form-group">
       <label>Score of
-        <a href="#!/participant/{{$ctrl.tournament.tid}}/$ctrl.participants[1].uid">
+        <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{$ctrl.participants[1].uid}}">
           {{$ctrl.participants[1].name}}
         </a>
       </label>

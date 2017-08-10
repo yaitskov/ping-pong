@@ -8,6 +8,7 @@ angular.
                      function (mainMenu, Match, $routeParams, pageCtx, requestStatus, $scope) {
                          mainMenu.setTitle('Match Scoring');
                          this.participants = pageCtx.getMatchParticipants($routeParams.matchId);
+                         this.tournamentId = pageCtx.get('last-admin-scoring-tournament-id');
                          this.rated = 0;
                          var maxScore = pageCtx.get('match-max-score-' + $routeParams.matchId);
                          this.possibleScores = [];

@@ -11,9 +11,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
-import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidState;
-import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 
 import java.util.List;

@@ -10,6 +10,7 @@ angular.
                          this.tournament = pageCtx.get('newTournament') || {quitsFromGroup: 2,
                                                                             maxGroupSize: 8,
                                                                             ticketPrice: 30,
+                                                                            thirdPlaceMatch: 1,
                                                                             matchScore: 3};
                          if (this.tournament.tid) {
                              delete this.tournament.tid;
@@ -21,7 +22,11 @@ angular.
                                           dateFormat: 'Y-m-d',
                                           minDate: new Date()};
                          this.place = placePicker.getChosenPlace() || pageCtx.get('place') || {};
-                         self.tournament.placeId = self.place.pid;
+                         if (self.place.pid) {
+                             self.tournament.placeId = self.place.pid;
+                             self.tournament.placeName = self.place.name;
+                             pageCtx.put('newTournament', self.tournament);
+                         }
                          $scope.$watch('$ctrl.tournament.startTime', function (oldValue, newValue) {
                              // space hack
                              if (self.tournament.startTime) {

@@ -68,7 +68,7 @@
       <label for="place">Place</label>
       <a id="place" class="form-control btn btn-default"
               ng-click="$ctrl.choosePlace()">
-        {{$ctrl.place.name || 'Choose a place'}}
+        {{$ctrl.tournament.placeName || 'Choose a place'}}
       </a>
       <input type="hidden"
              ng-model="$ctrl.tournament.placeId"

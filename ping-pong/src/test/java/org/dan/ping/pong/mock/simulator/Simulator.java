@@ -278,10 +278,11 @@ public class Simulator {
         scenario.setPlaceId(placeId);
         final int tid = daoGenerator.genTournament(prefix, testAdmin.getUid(),
                 placeId, TournamentProps.builder()
-                .maxGroupSize(params.getMaxGroupSize())
-                .quitsFromGroup(params.getQuitsFromGroup())
-                .state(TournamentState.Draft)
-                .build());
+                        .maxGroupSize(params.getMaxGroupSize())
+                        .quitsFromGroup(params.getQuitsFromGroup())
+                        .state(TournamentState.Draft)
+                        .thirdPlace(params.isThirdPlace())
+                        .build());
         scenario.setTid(tid);
         final List<Player> players = scenario.getPlayersByCategories().values()
                 .stream().sorted().collect(toList());

@@ -56,8 +56,7 @@ public class CastingLotsService {
                     + " is not in draft state but "
                     + tournamentInfo.getState());
         }
-        makeGroups(tid, tournamentInfo.getMaxGroupSize(),
-                tournamentInfo.getQuitesFromGroup());
+        makeGroups(tournamentInfo);
         tournamentDao.setState(tid, TournamentState.Open);
     }
 
@@ -67,10 +66,12 @@ public class CastingLotsService {
     @Inject
     private GroupDao groupDao;
 
-    private void makeGroups(int tid, int maxGroupSize, int quits) {
+    private void makeGroups(TournamentInfo tournamentInfo) {
+        final int tid = tournamentInfo.getTid();
+        final int quits = tournamentInfo.getQuitesFromGroup();
         checkArgument(quits > 0,
                 "how much people quits group is wrong");
-        log.info("Casting log tournament {}", tid);
+        log.info("Casting log tournament {}", tournamentInfo.getTid());
         final List<TournamentGroupingBid> readyBids = castingLotsDao.findBidsReadyToPlay(tid);
         checkAllThatAllHere(readyBids);
         groupByCategories(readyBids).forEach((cid, bids) -> {
@@ -79,7 +80,8 @@ public class CastingLotsService {
                         + " Expel him/her or move into another category.");
             }
             final double bidsInCategory = bids.size();
-            final int groups = max(1, (int) ceil(bidsInCategory / maxGroupSize));
+            final int groups = max(1, (int) ceil(bidsInCategory
+                    / tournamentInfo.getMaxGroupSize()));
             final int groupSize = (int) ceil(bidsInCategory / groups);
             Iterator<TournamentGroupingBid> bidIterator = bids.iterator();
             int basePlayOffPriority = 0;
@@ -94,7 +96,7 @@ public class CastingLotsService {
                         basePlayOffPriority);
                 bidDao.setGroupForUids(gid, tid, groupBids);
             }
-            castingLotsDao.generatePlayOffMatches(tid, cid, groups * quits,
+            castingLotsDao.generatePlayOffMatches(tournamentInfo, cid, groups * quits,
                     basePlayOffPriority + 1);
         });
         log.info("Casting lots for tid {} is complete", tid);

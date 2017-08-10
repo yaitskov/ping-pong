@@ -13,5 +13,6 @@ public class TournamentInfo {
     private int tid;
     private int quitesFromGroup;
     private int maxGroupSize;
+    private int thirdPlaceMath;
     private TournamentState state;
 }

@@ -228,7 +228,7 @@ public class MatchDao {
         final MatchInfo[] result = new MatchInfo[1];
         jooq.select(MATCHES.TID, MATCHES.STATE, MATCHES.GID,
                 MATCHES.CID, MATCHES.LOSE_MID, MATCHES.WIN_MID,
-                MATCH_SCORE.UID, MATCH_SCORE.SETS_WON)
+                MATCH_SCORE.UID, MATCH_SCORE.SETS_WON, MATCHES.TYPE)
                 .from(MATCHES)
                 .leftJoin(MATCH_SCORE)
                 .on(MATCHES.MID.eq(MATCH_SCORE.MID))
@@ -240,6 +240,7 @@ public class MatchDao {
                         .gid(r.get(MATCHES.GID))
                         .mid(mid)
                         .cid(r.get(MATCHES.CID))
+                        .type(r.get(MATCHES.TYPE))
                         .state(r.get(MATCHES.STATE))
                         .tid(r.get(MATCHES.TID))
                         .winnerMid(r.get(MATCHES.WIN_MID))
@@ -380,16 +381,13 @@ public class MatchDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void assignMatchForWinner(int winnerUid, MatchInfo matchInfo) {
-        log.info("play off assign for wid {} mid {}",
-                winnerUid, matchInfo.getMid());
-        final int mid = matchInfo.getWinnerMid().get();
-        final Optional<Integer> enemyUid = matchScoreDao.findEnemy(mid, winnerUid);
-        matchScoreDao.createScore(mid,
-                winnerUid, matchInfo.getCid(), matchInfo.getTid());
+    public void assignForMatch(int uid, int cid, int mid, int tid) {
+        log.info("play off assign for wid {} mid {}", uid, mid);
+        final Optional<Integer> enemyUid = matchScoreDao.findEnemy(mid, uid);
+        matchScoreDao.createScore(mid, uid, cid, tid);
         if (enemyUid.isPresent()) {
             log.info("Uid {} will play against uid {} in mid {}",
-                    winnerUid, enemyUid.get(), mid);
+                    uid, enemyUid.get(), mid);
             changeStatus(mid, Place);
         }
     }

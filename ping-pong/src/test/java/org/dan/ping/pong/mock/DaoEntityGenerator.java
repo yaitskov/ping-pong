@@ -114,7 +114,7 @@ public class DaoEntityGenerator {
                 .quitsFromGroup(props.getQuitsFromGroup())
                 .ticketPrice(Optional.empty())
                 .matchScore(props.getMatchScore())
-                .thirdPlaceMatch(0)
+                .thirdPlaceMatch(props.isThirdPlace() ? 1 : 0)
                 .build());
         tournamentDao.setState(tid, props.getState());
         return tid;

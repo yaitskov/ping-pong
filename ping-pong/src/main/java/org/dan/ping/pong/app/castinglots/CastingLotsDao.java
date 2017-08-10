@@ -17,6 +17,7 @@ import org.dan.ping.pong.app.bid.TournamentBid;
 import org.dan.ping.pong.app.bid.TournamentGroupingBid;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.score.MatchScoreDao;
+import org.dan.ping.pong.app.tournament.TournamentInfo;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,8 +71,9 @@ public class CastingLotsDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public int generatePlayOffMatches(int tid, Integer cid,
+    public int generatePlayOffMatches(TournamentInfo tinfo, Integer cid,
             int playOffStartPositions, int basePlayOffPriority) {
+        final int tid = tinfo.getTid();
         CastingLotsDao.log.info("Generate play off matches for {} groups in tournament {}",
                 playOffStartPositions, tid);
         if (playOffStartPositions == 1) {
@@ -83,25 +85,13 @@ public class CastingLotsDao {
         }
         final int levels = (int) (log(playOffStartPositions) / log(2));
         final int lowestPriority = basePlayOffPriority + levels;
-        return generateTree(levels, empty(), tid, cid, lowestPriority, TypeChain.of(Gold, POff), empty()).get();
-    }
-
-    public Optional<Integer> generateTree(int level, Optional<Integer> parentMid,
-            int tid, int cid, int priority, TypeChain types, Optional<Integer> loserMid) {
-        if (level < MatchDao.FIRST_PLAY_OFF_MATCH_LEVEL) {
-            return empty();
-        }
-        final Optional<Integer> mid = Optional.of(matchDao.createPlayOffMatch(
-                tid, cid, parentMid, loserMid, priority, level, types.getType()));
-        log.info("Play off match {}:{} of tournament {} in category {}",
-                types.getType(), mid, tid, cid);
-        Optional<Integer> midBronze = empty();
-//        if (types.getType() == Gold) {
-//             midBronze = Optional.of(matchDao.createPlayOffMatch(
-//                    tid, cid, parentMid, empty(), priority, level, Brnz));
-//        }
-        generateTree(level - 1, mid, tid, cid, priority - 1, types.next(), midBronze);
-        generateTree(level - 1, mid, tid, cid, priority - 1, types.next(), midBronze);
-        return mid;
+        return PlayOffGenerator.builder()
+                .tid(tid)
+                .cid(cid)
+                .thirdPlaceMatch(tinfo.getThirdPlaceMath() > 0)
+                .matchDao(matchDao)
+                .build()
+                .generateTree(levels, empty(), lowestPriority,
+                        TypeChain.of(Gold, POff), empty()).get();
     }
 }

@@ -17,6 +17,7 @@ public class TournamentProps {
     private int matchScore;
     private TournamentState state;
     private Optional<Instant> opensAt;
+    private boolean thirdPlace;
 
     public static class TournamentPropsBuilder {
         private int quitsFromGroup = 2;

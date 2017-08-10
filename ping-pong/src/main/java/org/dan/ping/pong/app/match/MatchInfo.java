@@ -19,6 +19,7 @@ public class MatchInfo {
     private int mid;
     private int tid;
     private int cid;
+    private MatchType type;
     private Optional<Integer> gid;
     private MatchState state;
     private Optional<Integer> loserMid;

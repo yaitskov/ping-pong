@@ -172,13 +172,15 @@ public class TournamentDao {
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public Optional<TournamentInfo> lockById(int tid) {
         return ofNullable(jooq.select(TOURNAMENT.QUITS_FROM_GROUP,
-                TOURNAMENT.STATE, TOURNAMENT.MAX_GROUP_SIZE)
+                TOURNAMENT.STATE, TOURNAMENT.MAX_GROUP_SIZE,
+                TOURNAMENT.THIRD_PLACE_MATCH)
                 .from(TOURNAMENT)
                 .where(TOURNAMENT.TID.eq(tid))
                 .forUpdate().fetchOne())
                 .map(r -> TournamentInfo.builder()
                         .tid(tid)
                         .state(r.get(TOURNAMENT.STATE))
+                        .thirdPlaceMath(r.get(TOURNAMENT.THIRD_PLACE_MATCH))
                         .maxGroupSize(r.get(TOURNAMENT.MAX_GROUP_SIZE))
                         .quitesFromGroup(r.get(TOURNAMENT.QUITS_FROM_GROUP))
                         .build());

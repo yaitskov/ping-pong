@@ -12,6 +12,7 @@ import static org.dan.ping.pong.app.bid.BidState.Rest;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -129,7 +130,7 @@ public class MatchService {
         }
     }
 
-    private boolean completePlayOffMatch(MatchInfo matchInfo, FinalMatchScore score) {
+    private void completePlayOffMatch(MatchInfo matchInfo, FinalMatchScore score) {
         final int winnerId = score.getScores().stream()
                 .max(comparingInt(IdentifiedScore::getScore))
                 .orElseThrow(() -> internalError("no scores"))
@@ -137,14 +138,38 @@ public class MatchService {
         if (matchInfo.getWinnerMid().isPresent()) {
             matchInfo.getParticipantIdScore().keySet().forEach(bid ->
                     bidDao.setBidState(matchInfo.getTid(), bid, Play,
-                            winnerId == bid ? Wait : Lost));
-            matchDao.assignMatchForWinner(winnerId, matchInfo);
-            return true;
+                            winnerId == bid || matchInfo.getLoserMid().isPresent()
+                                    ? Wait
+                                    : Lost));
+            matchDao.assignForMatch(winnerId, matchInfo.getCid(),
+                    matchInfo.getWinnerMid().get(), matchInfo.getTid());
+
+            matchInfo.getLoserMid().ifPresent(lmid -> {
+                final int loserUid = score.getScores().stream()
+                        .filter(s -> s.getUid() != winnerId)
+                        .map(IdentifiedScore::getUid)
+                        .findFirst()
+                        .orElseThrow(() -> internalError("No loser in match"));
+                matchDao.assignMatchForWinner(matchInfo.getTid(), lmid, loserUid);
+            });
         } else {
-            matchInfo.getParticipantIdScore().keySet().forEach(bid ->
-                    bidDao.setBidState(matchInfo.getTid(), bid, Play,
-                            winnerId == bid ? Win1 : Win2));
-            return endOfTournamentCategory(matchInfo.getTid());
+            switch (matchInfo.getType()) {
+                case Gold:
+                    matchInfo.getParticipantIdScore().keySet().forEach(bid ->
+                            bidDao.setBidState(matchInfo.getTid(), bid, Play,
+                                    winnerId == bid ? Win1 : Win2));
+                    break;
+                case Brnz:
+                    matchInfo.getParticipantIdScore().keySet().forEach(bid ->
+                            bidDao.setBidState(matchInfo.getTid(), bid, Play,
+                                    winnerId == bid ? Win3 : Lost));
+                    break;
+                default:
+                    throw internalError("Match type "
+                            + matchInfo.getType()
+                            + " is not terminal");
+            }
+            endOfTournamentCategory(matchInfo.getTid());
         }
     }
 

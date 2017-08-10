@@ -4,21 +4,21 @@ import static java.util.Arrays.asList;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.dan.ping.pong.app.bid.BidState.Lost;
+import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Rest;
-import static org.dan.ping.pong.app.match.MatchState.Auto;
+import static org.dan.ping.pong.app.bid.BidState.Wait;
+import static org.dan.ping.pong.app.bid.BidState.Win1;
+import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.match.MatchState.Game;
+import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
-import static org.dan.ping.pong.app.bid.BidState.Lost;
-import static org.dan.ping.pong.app.bid.BidState.Play;
-import static org.dan.ping.pong.app.bid.BidState.Wait;
-import static org.dan.ping.pong.app.bid.BidState.Win1;
-import static org.dan.ping.pong.app.bid.BidState.Win2;
-import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
-import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.util.Integers.odd;
 import static org.dan.ping.pong.util.collection.Enumerator.backward;
 import static org.dan.ping.pong.util.collection.Enumerator.forward;
@@ -73,13 +73,16 @@ public class MatchService {
         final MatchInfo matchInfo = matchDao.getById(score.getMid())
                 .orElseThrow(() -> notFound("Match "
                         + score.getMid() + " doesn't exist"));
-        checkPermissions(uid, matchInfo, score);
+        if (checkPermissions(uid, matchInfo, score)) {
+            log.info("Match mid {} is already scored with the same result", score.getMid());
+            return;
+        }
         matchDao.complete(clocker.get(), score);
         tableDao.freeTable(score.getMid());
 
         if (matchInfo.getGid().isPresent()) {
             tryToCompleteGroup(matchInfo.getGid().get(),
-                    matchInfo.getTid(), matchInfo.getParticipantIds());
+                    matchInfo.getTid(), matchInfo.getParticipantIdScore().keySet());
         } else {
             completePlayOffMatch(matchInfo, score);
         }
@@ -132,13 +135,13 @@ public class MatchService {
                 .orElseThrow(() -> internalError("no scores"))
                 .getUid();
         if (matchInfo.getWinnerMid().isPresent()) {
-            matchInfo.getParticipantIds().forEach(bid ->
+            matchInfo.getParticipantIdScore().keySet().forEach(bid ->
                     bidDao.setBidState(matchInfo.getTid(), bid, Play,
                             winnerId == bid ? Wait : Lost));
             matchDao.assignMatchForWinner(winnerId, matchInfo);
             return true;
         } else {
-            matchInfo.getParticipantIds().forEach(bid ->
+            matchInfo.getParticipantIdScore().keySet().forEach(bid ->
                     bidDao.setBidState(matchInfo.getTid(), bid, Play,
                             winnerId == bid ? Win1 : Win2));
             return endOfTournamentCategory(matchInfo.getTid());
@@ -157,7 +160,7 @@ public class MatchService {
     @Inject
     private GroupDao groupDao;
 
-    public void tryToCompleteGroup(Integer gid, int tid, List<Integer> uids) {
+    public void tryToCompleteGroup(Integer gid, int tid, Set<Integer> uids) {
         final List<GroupMatchInfo> matches = matchDao.findMatchesInGroup(gid);
         final long completedMatches = matches.stream()
                 .map(GroupMatchInfo::getState)
@@ -225,12 +228,19 @@ public class MatchService {
         return winnerIds;
     }
 
-    private void checkPermissions(int senderUid, MatchInfo matchInfo,
-            FinalMatchScore score) {
+    private boolean checkPermissions(int senderUid, MatchInfo matchInfo, FinalMatchScore score) {
+        if (matchInfo.getState() == Over) {
+            final Map<Integer, Integer> scoreMap = score.getScores().stream()
+                    .collect(toMap(IdentifiedScore::getUid, IdentifiedScore::getScore));
+            if (scoreMap.equals(matchInfo.getParticipantIdScore())) {
+                return true;
+            }
+            throw badRequest(new MatchScoredError());
+        }
+
         final Set<Integer> scoreUids = score.getScores().stream()
                 .map(IdentifiedScore::getUid).collect(toSet());
-        final Set<Integer> participantIds = new HashSet<>(
-                matchInfo.getParticipantIds());
+        final Set<Integer> participantIds = matchInfo.getParticipantIdScore().keySet();
         if (!participantIds.equals(scoreUids)) {
             throw badRequest("Some of participants don't play match "
                     + matchInfo.getMid());
@@ -241,8 +251,6 @@ public class MatchService {
                     + " neither admin of the tournament"
                     + " nor a participant of the match");
         }
-        if (matchInfo.getState() == Over && participantIds.contains(senderUid)) {
-            throw forbidden("User cannot overwrite admin's result");
-        }
+        return false;
     }
 }

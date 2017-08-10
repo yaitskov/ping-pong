@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
@@ -194,7 +195,7 @@ public class TournamentService {
                 }
             }
             bidDao.resign(uid, tid, target);
-            matchService.tryToCompleteGroup(gid, tid, emptyList());
+            matchService.tryToCompleteGroup(gid, tid, emptySet());
             matchService.autoCompletePlayOffHalfMatches(tid);
             tableService.scheduleFreeTables(tid, now);
         }

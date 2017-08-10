@@ -32,6 +32,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -56,6 +57,9 @@ import org.dan.ping.pong.mock.TestAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.TournamentProps;
 import org.dan.ping.pong.mock.UserSessionGenerator;
+import org.dan.ping.pong.mock.simulator.Hook;
+import org.dan.ping.pong.mock.simulator.HookDecision;
+import org.dan.ping.pong.mock.simulator.PlayHook;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.sys.ctx.TestCtx;
@@ -322,6 +326,37 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .quitsGroup(p1, p4)
                         .lose(p4, p1)
                         .champions(c1, p1, p4));
+    }
+
+    @Test
+    public void acceptScoreIfItTheSame() {
+        TournamentScenario scenario = TournamentScenario.begin()
+                .category(c1, p1, p2)
+                .w31(p1, p2)
+                .quitsGroup(p1)
+                .pause(p1, p2, PlayHook.builder()
+                        .type(Hook.AfterScore)
+                        .callback((s, meta) -> {
+                            myRest().voidPost(COMPLETE_MATCH, adminSession,
+                                    FinalMatchScore.builder()
+                                            .mid(meta.getOpenMatch().getMid())
+                                            .scores(asList(
+                                                    IdentifiedScore.builder()
+                                                            .score(3)
+                                                            .uid(s.getPlayersSessions().get(p1).getUid())
+                                                            .build(),
+                                                    IdentifiedScore.builder()
+                                                            .score(1)
+                                                            .uid(s.getPlayersSessions().get(p2).getUid())
+                                                            .build()))
+                                            .build());
+                            return HookDecision.Skip;
+                        })
+                        .build())
+                .champions(c1, p1)
+                .ignoreUnexpectedGames();
+
+        simulator.simulate(T_1_Q_1_G_8, scenario);
     }
 
     /**

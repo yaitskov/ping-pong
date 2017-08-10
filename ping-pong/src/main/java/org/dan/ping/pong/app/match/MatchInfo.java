@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Getter
@@ -22,5 +23,5 @@ public class MatchInfo {
     private MatchState state;
     private Optional<Integer> loserMid;
     private Optional<Integer> winnerMid;
-    private List<Integer> participantIds;
+    private Map<Integer, Integer> participantIdScore;
 }

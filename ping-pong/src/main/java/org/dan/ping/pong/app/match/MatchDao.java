@@ -43,9 +43,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -219,17 +221,17 @@ public class MatchDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public Optional<MatchInfo> getById(int mid) {
-        final List<Integer> participantIds = new ArrayList<>(2);
+        final Map<Integer, Integer> participantIdScore = new HashMap<>();
         final MatchInfo[] result = new MatchInfo[1];
         jooq.select(MATCHES.TID, MATCHES.STATE, MATCHES.GID,
                 MATCHES.CID, MATCHES.LOSE_MID, MATCHES.WIN_MID,
-                MATCH_SCORE.UID)
+                MATCH_SCORE.UID, MATCH_SCORE.SETS_WON)
                 .from(MATCHES)
                 .leftJoin(MATCH_SCORE)
                 .on(MATCHES.MID.eq(MATCH_SCORE.MID))
                 .where(MATCHES.MID.eq(mid))
                 .fetch().forEach(r -> {
-            participantIds.add(r.get(MATCH_SCORE.UID));
+            participantIdScore.put(r.get(MATCH_SCORE.UID), r.get(MATCH_SCORE.SETS_WON));
             if (result[0] == null) {
                 result[0] = MatchInfo.builder()
                         .gid(r.get(MATCHES.GID))
@@ -239,7 +241,7 @@ public class MatchDao {
                         .tid(r.get(MATCHES.TID))
                         .winnerMid(r.get(MATCHES.WIN_MID))
                         .loserMid(r.get(MATCHES.LOSE_MID))
-                        .participantIds(participantIds)
+                        .participantIdScore(participantIdScore)
                         .build();
             }
         });

@@ -22,7 +22,6 @@ import javax.ws.rs.Produces;
 @Path("/")
 @Produces(APPLICATION_JSON)
 public class CityResource {
-    private static final String CITY_ID = "cityId";
     public static final String CITY_LIST = "/city/list/";
     public static final String CITY_CREATE = "/city/create";
 

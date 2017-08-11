@@ -13,6 +13,14 @@ angular.module('core.ui', ['ngResource']).
             }
         };
     }).
+    directive('autofocus', function () {
+        return {
+            restrict: 'A',
+            link: function (scope, element) {
+                element[0].focus();
+            }
+        };
+    }).
     directive('defaultButtonType', ['$timeout', function ($timeout) {
         return {
             restrict: 'A',

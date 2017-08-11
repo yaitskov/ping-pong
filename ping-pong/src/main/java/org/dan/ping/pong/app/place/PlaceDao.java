@@ -1,14 +1,15 @@
 package org.dan.ping.pong.app.place;
 
 import static java.util.stream.Collectors.toList;
+import static ord.dan.ping.pong.jooq.Tables.CITY;
 import static ord.dan.ping.pong.jooq.Tables.PLACE;
 import static ord.dan.ping.pong.jooq.Tables.PLACE_ADMIN;
 import static ord.dan.ping.pong.jooq.tables.Tables.TABLES;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.city.CityLink;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -26,9 +27,11 @@ public class PlaceDao {
 
     @Transactional(TRANSACTION_MANAGER)
     public int create(String name, PlaceAddress address) {
-        return jooq.insertInto(PLACE, PLACE.NAME, PLACE.POST_ADDRESS,
-                PLACE.PHONE, PLACE.EMAIL)
-                .values(name, address.getAddress(), address.getPhone(),
+        return jooq.insertInto(PLACE, PLACE.NAME, PLACE.CITY_ID,
+                PLACE.POST_ADDRESS, PLACE.PHONE, PLACE.EMAIL)
+                .values(name, address.getCity().getId(),
+                        address.getAddress(),
+                        address.getPhone(),
                         address.getEmail())
                 .returning(PLACE.PID)
                 .fetchOne()
@@ -47,8 +50,13 @@ public class PlaceDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<PlaceLink> findEditableByUid(int uid) {
-        return jooq.select(PLACE.PID, PLACE.NAME, PLACE.POST_ADDRESS)
-                .from(PLACE).innerJoin(PLACE_ADMIN)
+        return jooq
+                .select(PLACE.PID, PLACE.NAME,
+                        PLACE.POST_ADDRESS,
+                        PLACE.CITY_ID, CITY.NAME)
+                .from(PLACE)
+                .innerJoin(CITY).on(PLACE.CITY_ID.eq(PLACE.CITY_ID))
+                .innerJoin(PLACE_ADMIN)
                 .on(PLACE.PID.eq(PLACE_ADMIN.PID))
                 .where(PLACE_ADMIN.UID.eq(uid).and(PLACE_ADMIN.TYPE.in(AUTHOR)))
                 .stream()
@@ -56,6 +64,10 @@ public class PlaceDao {
                         .name(r.getValue(PLACE.NAME))
                         .pid(r.getValue(PLACE.PID))
                         .address(PlaceAddress.builder()
+                                .city(CityLink.builder()
+                                        .id(r.get(PLACE.CITY_ID))
+                                        .name(r.get(CITY.NAME))
+                                        .build())
                                 .address(r.getValue(PLACE.POST_ADDRESS))
                                 .build())
                         .build())
@@ -67,9 +79,10 @@ public class PlaceDao {
         return Optional.ofNullable(
                 jooq
                         .select(PLACE.PID, PLACE.NAME, PLACE.POST_ADDRESS,
-                                PLACE.PHONE, PLACE.EMAIL,
+                                PLACE.PHONE, PLACE.EMAIL, PLACE.CITY_ID, CITY.NAME,
                                 TABLES.TABLE_ID.count().as(TBL_COUNT))
                         .from(PLACE)
+                        .innerJoin(CITY).on(PLACE.CITY_ID.eq(PLACE.CITY_ID))
                         .leftJoin(TABLES)
                         .on(PLACE.PID.eq(TABLES.PID))
                         .where(PLACE.PID.eq(pid))
@@ -80,6 +93,10 @@ public class PlaceDao {
                         .tables(r.getValue(TBL_COUNT, TABLES.TABLE_ID.getType()))
                         .address(PlaceAddress.builder()
                                 .address(r.getValue(PLACE.POST_ADDRESS))
+                                .city(CityLink.builder()
+                                        .id(r.get(PLACE.CITY_ID))
+                                        .name(r.get(CITY.NAME))
+                                        .build())
                                 .phone(r.get(PLACE.PHONE))
                                 .email(r.get(PLACE.EMAIL))
                                 .build())
@@ -94,6 +111,7 @@ public class PlaceDao {
                 .set(PLACE.EMAIL, place.getAddress().getEmail())
                 .set(PLACE.POST_ADDRESS, place.getAddress().getAddress())
                 .set(PLACE.PHONE, place.getAddress().getPhone())
+                .set(PLACE.CITY_ID, place.getAddress().getCity().getId())
                 .where(PLACE.PID.eq(place.getPid()))
                 .execute();
     }

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dan.ping.pong.app.city.CityLink;
 
 import java.util.Optional;
 
@@ -16,7 +17,7 @@ import java.util.Optional;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PlaceAddress {
     private Optional<Gps> gps;
-    private String city;
+    private CityLink city;
     private String address;
     private Optional<String> email;
     private Optional<String> phone;

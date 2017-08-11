@@ -274,7 +274,9 @@ public class Simulator {
         testAdmin = userSessionGenerator.generate(prefix + " admin", UserType.Admin);
         scenario.setTestAdmin(testAdmin);
         restGenerator.generateSignInLinks(singletonList(testAdmin));
-        final int placeId = daoGenerator.genPlace(prefix, testAdmin.getUid(), params.getTables());
+        final int countryId = daoGenerator.genCountry(prefix, testAdmin.getUid());
+        final int cityId = daoGenerator.genCity(countryId, prefix, testAdmin.getUid());
+        final int placeId = daoGenerator.genPlace(cityId, prefix, testAdmin.getUid(), params.getTables());
         scenario.setPlaceId(placeId);
         final int tid = daoGenerator.genTournament(prefix, testAdmin.getUid(),
                 placeId, TournamentProps.builder()

@@ -48,6 +48,7 @@ import static org.junit.Assert.fail;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.user.UserInfo;
@@ -158,9 +159,11 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final String placeName = genPlaceName();
         final String address = genPlaceLocation();
         final String phone = genPhone();
+        final int cityId = daoGenerator.genCity();
         final int placeId = placeDao.createAndGrant(session.getUid(), placeName,
                 PlaceAddress.builder()
                         .address(address)
+                        .city(CityLink.builder().id(cityId).build())
                         .phone(Optional.of(phone))
                         .build());
         final int tid = daoGenerator.genTournament(placeId);

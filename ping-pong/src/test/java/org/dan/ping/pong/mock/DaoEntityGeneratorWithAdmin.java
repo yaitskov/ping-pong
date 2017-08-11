@@ -1,6 +1,7 @@
 package org.dan.ping.pong.mock;
 
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
+import static org.dan.ping.pong.mock.Generators.genStr;
 
 import lombok.RequiredArgsConstructor;
 import org.dan.ping.pong.app.tournament.TournamentState;
@@ -42,10 +43,6 @@ public class DaoEntityGeneratorWithAdmin {
         return daoEntityGenerator.genPlace(testAdmin.getUid(), tables);
     }
 
-    public int genPlace(String name, int tables) {
-        return daoEntityGenerator.genPlace(name, testAdmin.getUid(), tables);
-    }
-
     public int genCategory(int tid) {
         return daoEntityGenerator.genCategory(UUID.randomUUID().toString(), tid);
     }
@@ -54,4 +51,7 @@ public class DaoEntityGeneratorWithAdmin {
         return daoEntityGenerator.genCategory(name, tid);
     }
 
+    public int genCity() {
+        return daoEntityGenerator.genCity(genStr(), testAdmin.getUid());
+    }
 }

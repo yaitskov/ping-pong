@@ -7,6 +7,11 @@ import static org.dan.ping.pong.mock.Generators.genTournamentName;
 import org.dan.ping.pong.app.auth.AuthDao;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.NewCategory;
+import org.dan.ping.pong.app.city.CityDao;
+import org.dan.ping.pong.app.city.CityLink;
+import org.dan.ping.pong.app.city.NewCity;
+import org.dan.ping.pong.app.country.CountryDao;
+import org.dan.ping.pong.app.country.NewCountry;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.table.TableDao;
@@ -70,11 +75,30 @@ public class DaoEntityGenerator {
     }
 
     @Inject
+    private CountryDao countryDao;
+
+    public int genCountry(String name, int admin) {
+        return countryDao.create(admin, NewCountry.builder().name(name).build());
+    }
+
+    @Inject
+    private CityDao cityDao;
+
+    public int genCity(String name, int admin) {
+        return genCity(genCountry(name, admin), name, admin);
+    }
+
+    public int genCity(int countryId, String name, int admin) {
+        return cityDao.create(admin, NewCity.builder().countryId(countryId).name(name).build());
+    }
+
+    @Inject
     private PlaceDao placeDao;
 
-    public int genPlace(String name, int admin) {
+    public int genPlace(int cityId, String name, int admin) {
         return placeDao.createAndGrant(admin, name,
                 PlaceAddress.builder()
+                        .city(CityLink.builder().id(cityId).build())
                         .address(valueGenerator.genName())
                         .phone(Optional.of(genPhone()))
                         .build());
@@ -83,14 +107,15 @@ public class DaoEntityGenerator {
     @Inject
     private TableDao tableDao;
 
-    public int genPlace(String name, int admin, int tables) {
-        final int placeId = genPlace(name, admin);
+    public int genPlace(int cityId, String name, int admin, int tables) {
+        final int placeId = genPlace(cityId, name, admin);
         tableDao.createTables(placeId, tables);
         return placeId;
     }
 
     public int genPlace(int admin, int tables) {
-        return genPlace(genStr(), admin, tables);
+        return genPlace(genCity(genCountry(genStr(), admin), genStr(), admin),
+                genStr(), admin, tables);
     }
 
     @Inject

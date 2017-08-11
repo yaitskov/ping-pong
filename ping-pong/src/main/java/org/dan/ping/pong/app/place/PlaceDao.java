@@ -55,7 +55,7 @@ public class PlaceDao {
                         PLACE.POST_ADDRESS,
                         PLACE.CITY_ID, CITY.NAME)
                 .from(PLACE)
-                .innerJoin(CITY).on(PLACE.CITY_ID.eq(PLACE.CITY_ID))
+                .innerJoin(CITY).on(PLACE.CITY_ID.eq(CITY.CITY_ID))
                 .innerJoin(PLACE_ADMIN)
                 .on(PLACE.PID.eq(PLACE_ADMIN.PID))
                 .where(PLACE_ADMIN.UID.eq(uid).and(PLACE_ADMIN.TYPE.in(AUTHOR)))
@@ -82,7 +82,7 @@ public class PlaceDao {
                                 PLACE.PHONE, PLACE.EMAIL, PLACE.CITY_ID, CITY.NAME,
                                 TABLES.TABLE_ID.count().as(TBL_COUNT))
                         .from(PLACE)
-                        .innerJoin(CITY).on(PLACE.CITY_ID.eq(PLACE.CITY_ID))
+                        .innerJoin(CITY).on(PLACE.CITY_ID.eq(CITY.CITY_ID))
                         .leftJoin(TABLES)
                         .on(PLACE.PID.eq(TABLES.PID))
                         .where(PLACE.PID.eq(pid))

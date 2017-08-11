@@ -6,12 +6,15 @@ import static ord.dan.ping.pong.jooq.Tables.PLACE;
 import static ord.dan.ping.pong.jooq.Tables.PLACE_ADMIN;
 import static ord.dan.ping.pong.jooq.tables.Tables.TABLES;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
+import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.city.CityLink;
 import org.jooq.DSLContext;
+import org.jooq.exception.DataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,15 +30,24 @@ public class PlaceDao {
 
     @Transactional(TRANSACTION_MANAGER)
     public int create(String name, PlaceAddress address) {
-        return jooq.insertInto(PLACE, PLACE.NAME, PLACE.CITY_ID,
-                PLACE.POST_ADDRESS, PLACE.PHONE, PLACE.EMAIL)
-                .values(name, address.getCity().getId(),
-                        address.getAddress(),
-                        address.getPhone(),
-                        address.getEmail())
-                .returning(PLACE.PID)
-                .fetchOne()
-                .get(PLACE.PID);
+        try {
+            return jooq.insertInto(PLACE, PLACE.NAME, PLACE.CITY_ID,
+                    PLACE.POST_ADDRESS, PLACE.PHONE, PLACE.EMAIL)
+                    .values(name, address.getCity().getId(),
+                            address.getAddress(),
+                            address.getPhone(),
+                            address.getEmail())
+                    .returning(PLACE.PID)
+                    .fetchOne()
+                    .get(PLACE.PID);
+        } catch (DataAccessException e) {
+            if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
+                if (e.getCause().getMessage().contains("Duplicate entry")) {
+                    throw badRequest("Place with such name is already exist");
+                }
+            }
+            throw e;
+        }
     }
 
     @Transactional(TRANSACTION_MANAGER)

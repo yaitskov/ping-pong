@@ -9,7 +9,6 @@ angular.
                          mainMenu.setTitle('Match Scoring');
                          this.participants = pageCtx.getMatchParticipants($routeParams.matchId);
                          this.tournamentId = pageCtx.get('last-admin-scoring-tournament-id');
-                         this.rated = 0;
                          var maxScore = pageCtx.get('match-max-score-' + $routeParams.matchId);
                          this.possibleScores = [];
                          for (var i =0 ; i <= maxScore; ++i) {
@@ -47,8 +46,7 @@ angular.
                                   scores: findScores()},
                                  function (okResp) {
                                      requestStatus.complete();
-                                     self.rated = 1;
-                                     requestStatus.startLoading("Match is scored");
+                                     window.history.back();
                                  },
                                  requestStatus.failed);
                          };

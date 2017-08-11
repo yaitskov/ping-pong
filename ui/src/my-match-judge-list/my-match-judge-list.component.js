@@ -25,7 +25,7 @@ angular.module('myMatchJudgeList').
                          };
                          self.iSawTournamentEnd = function () {
                              pageCtx.put('last-admin-scoring-tournament-id', null);
-                             self.previouslyScored = null;
+                             self.previouslyScoredEnded = null;
                          };
                          requestStatus.startLoading();
                          $q.all([Tournament.myRecentJudgements({}).$promise,

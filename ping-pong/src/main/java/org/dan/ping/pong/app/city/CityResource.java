@@ -1,7 +1,8 @@
-package org.dan.ping.pong.app.country;
+package org.dan.ping.pong.app.city;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
+import static org.dan.ping.pong.app.country.CountryResource.COUNTRY_ID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
@@ -14,35 +15,37 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 @Slf4j
 @Path("/")
 @Produces(APPLICATION_JSON)
-public class CountryResource {
-    public static final String COUNTRY_ID = "countryId";
-    public static final String COUNTRY_LIST = "/country/list";
-    public static final String COUNTRY_CREATE = "/country/create";
+public class CityResource {
+    private static final String CITY_ID = "cityId";
+    public static final String CITY_LIST = "/city/list/";
+    public static final String CITY_CREATE = "/city/create";
 
     @Inject
     private AuthService authService;
     @Inject
-    private CountryService countryService;
+    private CityService cityService;
 
     @GET
-    @Path(COUNTRY_LIST)
+    @Path(CITY_LIST + "{" + COUNTRY_ID + "}")
     @Consumes(APPLICATION_JSON)
-    public List<CountryLink> list() {
-        return countryService.list();
+    public List<CityLink> listByCountry(
+            @PathParam(COUNTRY_ID) int countryId) {
+        return cityService.listByCountry(countryId);
     }
 
     @POST
-    @Path(COUNTRY_CREATE)
+    @Path(CITY_CREATE)
     @Produces(APPLICATION_JSON)
     public int create(
             @HeaderParam(SESSION) String session,
-            NewCountry newCountry) {
+            NewCity newCity) {
         final int uid = authService.userInfoBySession(session).getUid();
-        return countryService.create(uid, newCountry);
+        return cityService.create(uid, newCity);
     }
 }

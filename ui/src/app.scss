@@ -143,6 +143,11 @@ ul li a {
         max-width: 800px;
         padding-top: 15px;
     }
+
+    .modal-dialog .modal-body .container {
+        width: initial;
+    }
+
     .open-tournament.complete, .list.judge .complete {
         background-color: #999 !important;
     }

@@ -6,9 +6,9 @@ angular.
         templateUrl: 'my-tournament/offline/enlist.template.html',
         cache: false,
         controller: ['$routeParams', 'Tournament', 'mainMenu',
-                     'requestStatus', 'Participant', '$http', 'auth',
+                     'requestStatus', 'Participant', '$http', 'auth', 'pageCtx',
                      function ($routeParams, Tournament, mainMenu,
-                               requestStatus, Participant, $http, auth) {
+                               requestStatus, Participant, $http, auth, pageCtx) {
                          mainMenu.setTitle('Offline enlist');
                          var self = this;
                          self.categoryId = null;
@@ -23,12 +23,26 @@ angular.
                                  requestStatus.complete();
                                  mainMenu.setTitle('Offline enlist to ' + tournament.name);
                                  self.categories = tournament.categories;
+                                 var wasCategoryId = pageCtx.get('offline-category-' + $routeParams.tournamentId);
                                  for (var i in tournament.categories) {
-                                     self.categoryId = tournament.categories[i].cid;
-                                     break;
+                                     if (!wasCategoryId || wasCategoryId == tournament.categories[i].cid) {
+                                         self.categoryId = tournament.categories[i].cid;
+                                         break;
+                                     }
+                                 }
+                                 if (!self.categoryId) {
+                                     for (var i in tournament.categories) {
+                                         self.categoryId = tournament.categories[i].cid;
+                                         break;
+                                     }
                                  }
                              },
                              requestStatus.failed);
+
+                         this.activate = function (cid) {
+                             self.categoryId = cid;
+                             pageCtx.put('offline-category-' + $routeParams.tournamentId, self.categoryId);
+                         };
 
                          this.enlist = function (bidState) {
                              self.form.$setSubmitted();

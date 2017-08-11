@@ -11,10 +11,12 @@ angular.module('myTournamentList').
                          mainMenu.setContextMenu({'#!/tournament/new': 'Add Tournament'});
                          this.tournaments = null;
                          var self = this;
-                         Tournament.administered({}, function (tournaments) {
-                             console.log("Loaded tournaments " + tournaments.length);
-                             self.tournaments = tournaments;
-                         });
+                         Tournament.administered(
+                             {completeInDays: 30},
+                             function (tournaments) {
+                                 console.log("Loaded tournaments " + tournaments.length);
+                                 self.tournaments = tournaments;
+                             });
                      }
                     ]
         });

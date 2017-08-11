@@ -18,7 +18,7 @@ angular.
                                        isArray: true
                                    },
                                    administered: {
-                                       url: '/api/tournament/editable/by/me',
+                                       url: '/api/tournament/editable/by/me/:completeInDays',
                                        method: 'GET',
                                        cache: false,
                                        headers: {

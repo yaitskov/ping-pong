@@ -1,0 +1,33 @@
+package org.dan.ping.pong.sys.error;
+
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jooq.exception.DataAccessException;
+
+import java.sql.SQLIntegrityConstraintViolationException;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+
+@Slf4j
+@Provider
+@RequiredArgsConstructor
+public class JooqExceptionMapper implements ExceptionMapper<DataAccessException> {
+    private final ExceptionMapper forward;
+
+    @Override
+    public Response toResponse(DataAccessException exception) {
+        if (exception.getCause() instanceof SQLIntegrityConstraintViolationException) {
+            if (exception.getCause().getMessage().contains("Duplicate entry")) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new Error(":entity is already exist"))
+                        .type(APPLICATION_JSON)
+                        .build();
+            }
+        }
+        return forward.toResponse(exception);
+    }
+}

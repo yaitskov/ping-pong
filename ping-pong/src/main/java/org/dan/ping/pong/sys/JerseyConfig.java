@@ -12,6 +12,7 @@ import org.dan.ping.pong.app.category.CategoryResource;
 import org.dan.ping.pong.app.city.CityResource;
 import org.dan.ping.pong.app.country.CountryResource;
 import org.dan.ping.pong.sys.error.JerseyExceptionMapper;
+import org.dan.ping.pong.sys.error.JooqExceptionMapper;
 import org.dan.ping.pong.sys.error.PiPoExMapper;
 import org.dan.ping.pong.sys.ctx.jackson.ObjectMapperContextResolver;
 import org.dan.ping.pong.sys.error.DefaultExceptionMapper;
@@ -25,6 +26,7 @@ import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.ext.ExceptionMapper;
 
 @ApplicationPath("/")
 public class JerseyConfig extends ResourceConfig {
@@ -34,7 +36,9 @@ public class JerseyConfig extends ResourceConfig {
         register(new JacksonFeature());
         register(new PiPoExMapper());
         register(new JerseyExceptionMapper());
-        register(new DefaultExceptionMapper());
+        final ExceptionMapper defaultMapper = new DefaultExceptionMapper();
+        register(new JooqExceptionMapper(defaultMapper));
+        register(defaultMapper);
         packages(false,
                 asList(UserResource.class, SysAdminSignInResource.class,
                         PlaceResource.class, TournamentResource.class,

@@ -19,6 +19,22 @@ create table users(
     banned timestamp(3),
     index `email_idx` (email));
 
+create table country (
+    country_id int(11) not null auto_increment primary key,
+    name varchar(80) not null unique,
+    created timestamp(3) default current_timestamp(3),
+    author_id int(11) not null,
+    foreign key (author_id) references users(uid));
+
+create table city (
+    city_id int(11) not null auto_increment primary key,
+    country_id int(11) not null,
+    name varchar(90) not null unique,
+    created timestamp(3) default current_timestamp(3),
+    author_id int(11) not null,
+    foreign key (country_id) references country(country_id),
+    foreign key (author_id) references users(uid));
+
 create table admin(
     uid int(11) not null primary key,
     said int(11) not null,
@@ -44,9 +60,11 @@ create table place(
     name varchar(40) not null unique,
     created timestamp(3) default current_timestamp(3),
     gps varchar(40) null,
+    city_id int(11) not null,
     post_address varchar(200) not null,
     phone varchar(40),
-    email varchar(40));
+    email varchar(40),
+    foreign key (city_id) references city(city_id));
 
 create table place_admin(
     uid int(11) not null references admin(uid),

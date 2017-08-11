@@ -10,7 +10,7 @@ import org.dan.ping.pong.app.tournament.TournamentCtx;
 import org.springframework.context.annotation.Import;
 
 @Import({BaseTestContext.class,
-        TournamentCtx.class, BidCtx.class,CastingLotsCtx.class,
+        TournamentCtx.class, BidCtx.class, CastingLotsCtx.class,
         MatchCtx.class, MatchScoreCtx.class, TableCtx.class,
         GroupCtx.class})
 public class TestCtx {

@@ -4,6 +4,7 @@ import org.dan.ping.pong.app.auth.AuthCtx;
 import org.dan.ping.pong.app.bid.BidCtx;
 import org.dan.ping.pong.app.castinglots.CastingLotsCtx;
 import org.dan.ping.pong.app.category.CategoryCtx;
+import org.dan.ping.pong.app.country.CountryCtx;
 import org.dan.ping.pong.app.group.GroupCtx;
 import org.dan.ping.pong.app.match.MatchCtx;
 import org.dan.ping.pong.app.place.PlaceCtx;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         GroupCtx.class,
         BidCtx.class,
         TableCtx.class,
+        CountryCtx.class,
         TournamentCtx.class,
         CastingLotsCtx.class,
         MatchCtx.class,

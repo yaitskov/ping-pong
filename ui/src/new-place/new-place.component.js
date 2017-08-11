@@ -5,20 +5,24 @@ angular.
     component('newPlace', {
         templateUrl: 'new-place/new-place.template.html',
         controller: ['auth', 'mainMenu', '$http', '$location', 'requestStatus',
-                     'City', 'Country', 'LocalStorage', '$timeout',
+                     'City', 'Country', 'LocalStorage', '$timeout', 'pageCtx',
                      function (auth, mainMenu, $http, $location, requestStatus,
-                               City, Country, LocalStorage, $timeout) {
+                               City, Country, LocalStorage, $timeout, pageCtx) {
                          mainMenu.setTitle('New Place');
                          this.form = {};
                          this.cityForm = {};
                          this.countryForm = {};
-                         this.place = {address: {city: {id: null}}};
+                         this.place = pageCtx.get('new-place') || {address: {city: {id: null}}};
                          var self = this;
                          this.countryId = LocalStorage.get('myCountryId');
                          this.countries = null;
                          this.cities = [];
                          this.cityName = null;
                          this.countryName = null;
+                         this.safeBack = function () {
+                             pageCtx.put('new-place', this.place);
+                             window.history.back();
+                         };
                          this.countryChange = function () {
                              if (self.countryId == 'addNewCountry') {
                                  self.cities = [];
@@ -101,6 +105,7 @@ angular.
                                         }).
                                  then(
                                      function (okResp) {
+                                         pageCtx.put('new-place', self.place);
                                          requestStatus.complete();
                                          window.history.back();
                                      },

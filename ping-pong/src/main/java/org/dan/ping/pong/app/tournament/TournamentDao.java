@@ -4,6 +4,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
+import static ord.dan.ping.pong.jooq.Tables.CITY;
 import static ord.dan.ping.pong.jooq.Tables.MATCHES;
 import static ord.dan.ping.pong.jooq.Tables.MATCH_SCORE;
 import static ord.dan.ping.pong.jooq.Tables.PLACE;
@@ -32,6 +33,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Replaced;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceLink;
@@ -235,9 +237,11 @@ public class TournamentDao {
         return ofNullable(jooq.select(TOURNAMENT.NAME, TOURNAMENT.OPENS_AT,
                 BID.CID, TOURNAMENT_ADMIN.UID, TOURNAMENT.TICKET_PRICE,
                 TOURNAMENT.PREVIOUS_TID, PLACE.PID, PLACE.POST_ADDRESS,
+                PLACE.CITY_ID, CITY.NAME,
                 PLACE.NAME, PLACE.PHONE, TOURNAMENT.STATE, BID.STATE)
                 .from(TOURNAMENT)
                 .innerJoin(PLACE).on(TOURNAMENT.PID.eq(PLACE.PID))
+                .innerJoin(CITY).on(CITY.CITY_ID.eq(PLACE.CITY_ID))
                 .leftJoin(TOURNAMENT_ADMIN)
                 .on(TOURNAMENT.TID.eq(TOURNAMENT_ADMIN.TID),
                         TOURNAMENT_ADMIN.UID.eq(participantId.orElse(0)))
@@ -257,6 +261,10 @@ public class TournamentDao {
                                 .name(r.get(PLACE.NAME))
                                 .address(PlaceAddress.builder()
                                         .address(r.get(PLACE.POST_ADDRESS))
+                                        .city(CityLink.builder()
+                                                .id(r.get(PLACE.CITY_ID))
+                                                .name(r.get(CITY.NAME))
+                                                .build())
                                         .phone(r.get(PLACE.PHONE))
                                         .build())
                                 .pid(r.get(PLACE.PID)).build())

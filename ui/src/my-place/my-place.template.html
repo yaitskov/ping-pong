@@ -15,6 +15,14 @@
         {{$ctrl.place.name}}
       </td>
     </tr>
+    <tr ng-show="$ctrl.place.address.city">
+      <td>
+        City
+      </td>
+      <td>
+        {{$ctrl.place.address.city.name}}
+      </td>
+    </tr>
     <tr ng-show="$ctrl.place.address.address">
       <td>
         Postal Address

@@ -111,6 +111,7 @@ create table bid(
     cid int(11) not null,
     gid int(11) null,
     created timestamp(3) default current_timestamp(3),
+    updated timestamp(3) null,
     state char(4) not null,
     primary key (uid, tid));
 

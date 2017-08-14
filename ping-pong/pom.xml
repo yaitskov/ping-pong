@@ -557,6 +557,11 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>OptionalInstant</name>
+                                    <expression>.*bid\.(updated)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
                                     <name>Instant</name>
                                     <expression>.*tournament\.(opens_at)</expression>
                                     <types>.*</types>

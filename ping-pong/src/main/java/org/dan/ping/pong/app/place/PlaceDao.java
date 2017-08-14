@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.place;
 
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static ord.dan.ping.pong.jooq.Tables.CITY;
 import static ord.dan.ping.pong.jooq.Tables.PLACE;
@@ -9,8 +10,10 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import lombok.extern.slf4j.Slf4j;
+import ord.dan.ping.pong.jooq.tables.records.PlaceRecord;
 import org.dan.ping.pong.app.city.CityLink;
 import org.jooq.DSLContext;
+import org.jooq.UpdateSetMoreStep;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,7 +92,7 @@ public class PlaceDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public Optional<PlaceInfoCountTables> getPlaceById(int pid) {
-        return Optional.ofNullable(
+        return ofNullable(
                 jooq
                         .select(PLACE.PID, PLACE.NAME, PLACE.POST_ADDRESS,
                                 PLACE.PHONE, PLACE.EMAIL, PLACE.CITY_ID, CITY.NAME,
@@ -122,13 +125,14 @@ public class PlaceDao {
     @Transactional(TRANSACTION_MANAGER)
     public void update(int uid, PlaceLink place) {
         log.info("User {} updates place {}", uid, place.getPid());
-        jooq.update(PLACE)
+        final UpdateSetMoreStep<PlaceRecord> request = jooq.update(PLACE)
                 .set(PLACE.NAME, place.getName())
                 .set(PLACE.EMAIL, place.getAddress().getEmail())
                 .set(PLACE.POST_ADDRESS, place.getAddress().getAddress())
-                .set(PLACE.PHONE, place.getAddress().getPhone())
-                .set(PLACE.CITY_ID, place.getAddress().getCity().getId())
-                .where(PLACE.PID.eq(place.getPid()))
+                .set(PLACE.PHONE, place.getAddress().getPhone());
+        ofNullable(place.getAddress().getCity())
+                .ifPresent(city -> request.set(PLACE.CITY_ID, city.getId()));
+        request.where(PLACE.PID.eq(place.getPid()))
                 .execute();
     }
 }

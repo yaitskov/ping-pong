@@ -12,10 +12,26 @@
     </tr>
     <tr ng-show="$ctrl.place.address.address">
       <td>
+        City
+      </td>
+      <td>
+        {{$ctrl.place.address.city.name}}
+      </td>
+    </tr>
+    <tr ng-show="$ctrl.place.address.address">
+      <td>
         Postal Address
       </td>
       <td>
         {{$ctrl.place.address.address}}
+      </td>
+    </tr>
+    <tr ng-show="$ctrl.place.tables">
+      <td>
+        Tables avaiable
+      </td>
+      <td>
+        {{$ctrl.place.tables}}
       </td>
     </tr>
     <tr ng-show="$ctrl.place.address.phone">

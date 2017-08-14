@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.city.CityLink;
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -92,7 +93,10 @@ public class PlaceDao {
                 jooq
                         .select(PLACE.PID, PLACE.NAME, PLACE.POST_ADDRESS,
                                 PLACE.PHONE, PLACE.EMAIL, PLACE.CITY_ID, CITY.NAME,
-                                TABLES.TABLE_ID.count().as(TBL_COUNT))
+                                DSL.selectCount()
+                                        .from(TABLES)
+                                        .where(TABLES.PID.eq(PLACE.PID))
+                                        .asField(TBL_COUNT))
                         .from(PLACE)
                         .innerJoin(CITY).on(PLACE.CITY_ID.eq(CITY.CITY_ID))
                         .leftJoin(TABLES)

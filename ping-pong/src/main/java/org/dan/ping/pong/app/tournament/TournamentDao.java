@@ -453,8 +453,8 @@ public class TournamentDao {
                 .leftJoin(TOURNAMENT).on(TOURNAMENT_ADMIN.TID.eq(TOURNAMENT.TID))
                 .where(TOURNAMENT_ADMIN.UID.eq(uid),
                         TOURNAMENT.STATE.in(Close, Canceled, Replaced),
-                        TOURNAMENT.OPENS_AT.gt(now.minus(DAYS_TO_SHOW_PAST_TOURNAMENT, DAYS)))
-                .orderBy(TOURNAMENT.OPENS_AT.desc())
+                        TOURNAMENT.COMPLETE_AT.gt(Optional.of(now.minus(DAYS_TO_SHOW_PAST_TOURNAMENT, DAYS))))
+                .orderBy(TOURNAMENT.COMPLETE_AT.desc())
                 .limit(1)
                 .fetchOne())
                 .map(r -> DatedTournamentDigest

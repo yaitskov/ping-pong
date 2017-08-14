@@ -141,7 +141,7 @@ public class DaoEntityGenerator {
                 .matchScore(props.getMatchScore())
                 .thirdPlaceMatch(props.isThirdPlace() ? 1 : 0)
                 .build());
-        tournamentDao.setState(tid, props.getState());
+        tournamentDao.setState(tid, props.getState(), clocker.get());
         return tid;
     }
 

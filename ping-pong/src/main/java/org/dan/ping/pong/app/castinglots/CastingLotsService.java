@@ -24,7 +24,6 @@ import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.util.collection.SetUtil;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;

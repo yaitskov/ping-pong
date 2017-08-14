@@ -31,8 +31,11 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.app.tournament.TournamentState.Replaced;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
+import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
+import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
+import ord.dan.ping.pong.jooq.tables.records.TournamentRecord;
 import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.place.PlaceAddress;
@@ -42,6 +45,7 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectField;
 import org.jooq.SelectJoinStep;
+import org.jooq.UpdateSetMoreStep;
 import org.jooq.impl.DSL;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -163,12 +167,27 @@ public class TournamentDao {
                 .map(this::mapToDatedDigest);
     }
 
-    @Transactional(TRANSACTION_MANAGER)
     public void setState(int tid, TournamentState state) {
+        setState(tid, state, null);
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void setState(int tid, TournamentState state, Instant now) {
         log.info("Switch tournament {} into {} state.", tid, state);
-        jooq.update(TOURNAMENT).set(TOURNAMENT.STATE, state)
-                .where(TOURNAMENT.TID.eq(tid))
-                .execute();
+        final UpdateSetMoreStep<TournamentRecord> request = jooq.update(TOURNAMENT)
+                .set(TOURNAMENT.STATE, state);
+        switch (state) {
+            case Close:
+            case Canceled:
+            case Replaced:
+                request.set(TOURNAMENT.COMPLETE_AT, Optional.of(now));
+                break;
+            default:
+                throw internalError("Unsupported state " + state);
+        }
+        if (request.where(TOURNAMENT.TID.eq(tid)).execute() == 0) {
+            throw badRequest("Stale state");
+        }
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
@@ -214,7 +233,7 @@ public class TournamentDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public boolean tryToCompleteTournament(int tid) {
+    public boolean tryToCompleteTournament(int tid, Instant now) {
         final int categoriesLeft = jooq.selectCount()
                 .from(MATCHES)
                 .where(MATCHES.TID.eq(tid),
@@ -223,10 +242,7 @@ public class TournamentDao {
                 .value1();
         if (categoriesLeft == 0) {
             log.info("All matches of tid {} are complete", tid);
-            return jooq.update(TOURNAMENT)
-                    .set(TOURNAMENT.STATE, TournamentState.Close)
-                    .where(TOURNAMENT.TID.eq(tid))
-                    .execute() > 0;
+            setState(tid, TournamentState.Close, now);
         }
         return false;
     }

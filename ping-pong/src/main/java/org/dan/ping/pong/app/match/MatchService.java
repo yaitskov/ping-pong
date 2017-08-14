@@ -175,7 +175,7 @@ public class MatchService {
 
     private boolean endOfTournamentCategory(int tid) {
         log.info("Tid {} complete in cid {}", tid);
-        if (tournamentDao.tryToCompleteTournament(tid)) {
+        if (tournamentDao.tryToCompleteTournament(tid, clocker.get())) {
             log.info("Tid {} is fully complete", tid);
             return false;
         }

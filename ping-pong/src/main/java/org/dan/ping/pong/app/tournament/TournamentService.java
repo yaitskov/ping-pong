@@ -235,7 +235,7 @@ public class TournamentService {
     @Transactional(TRANSACTION_MANAGER)
     public void setTournamentStatus(int uid, SetTournamentState stateUpdate) {
         // check permissions
-        tournamentDao.setState(stateUpdate.getTid(), stateUpdate.getState());
+        tournamentDao.setState(stateUpdate.getTid(), stateUpdate.getState(), clocker.get());
     }
 
     public List<OpenTournamentDigest> findRunning(int completeInLastDays) {
@@ -308,7 +308,7 @@ public class TournamentService {
     @Transactional(TRANSACTION_MANAGER)
     public void cancel(int uid, int tid) {
         if (tournamentDao.isAdminOf(uid, tid)) {
-            tournamentDao.setState(tid, Canceled);
+            tournamentDao.setState(tid, Canceled, clocker.get());
             matchDao.deleteAllByTid(tid);
             bidDao.resetStateByTid(tid);
             tableService.freeTables(tid);

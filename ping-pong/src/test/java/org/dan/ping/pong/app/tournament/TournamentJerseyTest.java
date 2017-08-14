@@ -244,7 +244,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final int tid = daoGenerator.genTournament(daoGenerator.genPlace(0), Open);
         assertThat(myRest().get(DRAFTING + tid, DraftingTournamentInfo.class),
                 hasProperty("state", is(Open)));
-        tournamentDao.setState(tid, Close);
+        tournamentDao.setState(tid, Close, clocker.get());
         try {
             myRest().get(DRAFTING + tid, DraftingTournamentInfo.class);
             fail();
@@ -304,7 +304,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                 previousTid, previousCid, singletonList(userSession));
         restEntityGenerator.enlistParticipants(myRest(), session,
                 nextTid, nextCid, singletonList(userSession));
-        tournamentDao.setState(previousTid, Close);
+        tournamentDao.setState(previousTid, Close, clocker.get());
         bidDao.setBidState(previousTid, userSession.getUid(),
                 BidState.Here, BidState.Lost);
         final MyRecentTournaments r = myRest().get(MY_RECENT_TOURNAMENT,

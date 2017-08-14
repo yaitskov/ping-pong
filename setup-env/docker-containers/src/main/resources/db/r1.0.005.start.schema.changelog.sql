@@ -81,6 +81,7 @@ create table tournament(
     ticket_price float null,
     state varchar(10) not null, -- hidden, announce, draft, open, close, canceled
     created timestamp(3) default current_timestamp(3),
+    complete_at timestamp(3) null,
     quits_from_group int(11) not null,
     third_place_match int(11) not null,
     match_score int(11) not null,

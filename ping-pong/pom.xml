@@ -582,6 +582,11 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>OptionalInstant</name>
+                                    <expression>.*tournament\.(complete_at)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
                                     <name>OptionalInteger</name>
                                     <expression>.*tournament\.(previous_tid)</expression>
                                     <types>.*</types>

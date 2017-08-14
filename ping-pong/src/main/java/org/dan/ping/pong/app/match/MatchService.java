@@ -104,12 +104,12 @@ public class MatchService {
         matchDao.complete(uid, match.getOpponentId(), match.getMid());
         bidDao.setBidState(BidId.builder().tid(tid).uid(uid).build(),
                 asList(Play, Rest, Wait),
-                match.getType().getLoserState(target));
+                match.getType().getLoserState(target), clocker.get());
         if (match.getWinMatch().isPresent()) {
             if (match.getOpponentId().isPresent()) {
                 matchDao.assignMatchForWinner(tid, match.getWinMatch().get(), match.getOpponentId().get());
                 if (match.getState() == Game) {
-                    bidDao.setBidState(tid, match.getOpponentId().get(), Play, Wait);
+                    bidDao.setBidState(tid, match.getOpponentId().get(), Play, Wait, clocker.get());
                 }
             } else {
                 //matchDao.changeStatus(match.getWinMatch().get(), Auto);
@@ -124,7 +124,7 @@ public class MatchService {
             match.getOpponentId().ifPresent(opId -> {
                 bidDao.setBidState(BidId.builder().uid(opId).tid(tid).build(),
                         asList(Play, Rest, Wait),
-                        match.getType().getWinnerState());
+                        match.getType().getWinnerState(), clocker.get());
             });
             return endOfTournamentCategory(tid);
         }
@@ -140,7 +140,7 @@ public class MatchService {
                     bidDao.setBidState(matchInfo.getTid(), bid, Play,
                             winnerId == bid || matchInfo.getLoserMid().isPresent()
                                     ? Wait
-                                    : Lost));
+                                    : Lost, clocker.get()));
             matchDao.assignForMatch(winnerId, matchInfo.getCid(),
                     matchInfo.getWinnerMid().get(), matchInfo.getTid());
 
@@ -157,12 +157,12 @@ public class MatchService {
                 case Gold:
                     matchInfo.getParticipantIdScore().keySet().forEach(bid ->
                             bidDao.setBidState(matchInfo.getTid(), bid, Play,
-                                    winnerId == bid ? Win1 : Win2));
+                                    winnerId == bid ? Win1 : Win2, clocker.get()));
                     break;
                 case Brnz:
                     matchInfo.getParticipantIdScore().keySet().forEach(bid ->
                             bidDao.setBidState(matchInfo.getTid(), bid, Play,
-                                    winnerId == bid ? Win3 : Lost));
+                                    winnerId == bid ? Win3 : Lost, clocker.get()));
                     break;
                 default:
                     throw internalError("Match type "
@@ -194,13 +194,13 @@ public class MatchService {
         if (completedMatches < matches.size()) {
             log.debug("Matches {} left to play in the group {}",
                     matches.size() - completedMatches, gid);
-            uids.forEach(bid -> bidDao.setBidState(tid, bid, Play, Wait));
+            uids.forEach(bid -> bidDao.setBidState(tid, bid, Play, Wait, clocker.get()));
             return;
         }
         final List<Integer> left = bidDao.findLeft(tid, Optional.of(gid));
-        uids.forEach(bid -> bidDao.setBidState(tid, bid, Play, Wait));
+        uids.forEach(bid -> bidDao.setBidState(tid, bid, Play, Wait, clocker.get()));
         final Set<Integer> winnerIds = completeGroup(gid, tid, matches, left);
-        bidDao.setStatesAfterGroup(gid, tid, winnerIds);
+        bidDao.setStatesAfterGroup(gid, tid, winnerIds, clocker.get());
     }
 
     private Set<Integer> completeGroup(Integer gid, int tid,
@@ -224,7 +224,7 @@ public class MatchService {
             if (iTour.getQuitesFromGroup() == 1 && iGru.getOrdNumber() == 0) {
                 final int winnerId = pq.poll().get(0).getWinnerId().get();
                 log.info("1 group tid {} and no play off won {}", iTour.getTid(), winnerId);
-                bidDao.setBidState(iTour.getTid(), winnerId, Wait, Win1);
+                bidDao.setBidState(iTour.getTid(), winnerId, Wait, Win1, clocker.get());
                 endOfTournamentCategory(iTour.getTid());
                 return Collections.singleton(winnerId);
             } else {

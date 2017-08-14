@@ -36,7 +36,7 @@ public class TableService {
             final int mid = matches.get(i).getMid();
             tableDao.locateMatch(freeTables.get(i).getTableId(), mid);
             matchDao.markAsSchedule(mid, now);
-            bidDao.markParticipantsBusy(tid, matches.get(i).getUids());
+            bidDao.markParticipantsBusy(tid, matches.get(i).getUids(), now);
         }
         if (freeTables.isEmpty()
                 && !matches.isEmpty()

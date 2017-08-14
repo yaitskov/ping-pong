@@ -306,7 +306,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                 nextTid, nextCid, singletonList(userSession));
         tournamentDao.setState(previousTid, Close, clocker.get());
         bidDao.setBidState(previousTid, userSession.getUid(),
-                BidState.Here, BidState.Lost);
+                BidState.Here, BidState.Lost, clocker.get());
         final MyRecentTournaments r = myRest().get(MY_RECENT_TOURNAMENT,
                 userSession, MyRecentTournaments.class);
 

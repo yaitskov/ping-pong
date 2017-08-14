@@ -182,6 +182,12 @@ public class TournamentDao {
             case Replaced:
                 request.set(TOURNAMENT.COMPLETE_AT, Optional.of(now));
                 break;
+            case Draft:
+            case Announce:
+            case Open:
+            case Hidden:
+                // ok
+                break;
             default:
                 throw internalError("Unsupported state " + state);
         }
@@ -373,13 +379,14 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<CompleteTournamentDigest> findMyPreviousTournament(Instant now, int uid) {
+    public Optional<CompleteTournamentDigest> findMyPreviousTournament(Instant since, int uid) {
         return ofNullable(jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, BID.STATE)
                 .from(BID)
                 .innerJoin(TOURNAMENT).on(BID.TID.eq(TOURNAMENT.TID))
                 .where(BID.UID.eq(uid),
+                        BID.UPDATED.ge(Optional.of(since)),
                         BID.STATE.in(Win1, Win2, Win3, Expl, Lost, Quit))
-                .orderBy(TOURNAMENT.OPENS_AT.desc())
+                .orderBy(BID.UPDATED.desc())
                 .limit(1)
                 .fetchOne())
                 .map(r -> CompleteTournamentDigest
@@ -419,11 +426,11 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public MyRecentTournaments findMyRecentTournaments(Instant now, int uid) {
+    public MyRecentTournaments findMyRecentTournaments(Instant since, int uid) {
         return MyRecentTournaments.builder()
                 .next(findMyNextTournament(uid))
                 .current(findCurrentTournaments(uid))
-                .previous(findMyPreviousTournament(now, uid))
+                .previous(findMyPreviousTournament(since, uid))
                 .build();
     }
 

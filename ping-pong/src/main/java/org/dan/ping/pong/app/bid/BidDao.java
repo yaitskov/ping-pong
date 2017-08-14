@@ -23,6 +23,7 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,9 +37,11 @@ public class BidDao {
     private DSLContext jooq;
 
     @Transactional(TRANSACTION_MANAGER)
-    public void setBidState(BidId bid, List<BidState> expected, BidState state) {
+    public void setBidState(BidId bid, List<BidState> expected, BidState state, Instant now) {
         log.info("Set bid status {} for {} if {}", state, bid, expected);
-        if (0 == jooq.update(BID).set(BID.STATE, state)
+        if (0 == jooq.update(BID)
+                .set(BID.STATE, state)
+                .set(BID.UPDATED, Optional.of(now))
                 .where(BID.UID.eq(bid.getUid()),
                         BID.TID.eq(bid.getTid()),
                         BID.STATE.in(expected))
@@ -48,16 +51,17 @@ public class BidDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void setBidState(int tid, int uid, BidState expected, BidState state) {
+    public void setBidState(int tid, int uid, BidState expected, BidState state, Instant now) {
         setBidState(BidId.builder().tid(tid).uid(uid).build(),
-                singletonList(expected), state);
+                singletonList(expected), state, now);
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void casByTid(BidState expected, BidState set, int tid) {
+    public void casByTid(BidState expected, BidState set, int tid, Instant now) {
         log.info("Put all {} bids of tid {} into {} state", expected, tid, set);
         if (0 == jooq.update(BID)
                 .set(BID.STATE, set)
+                .set(BID.UPDATED, Optional.of(now))
                 .where(BID.TID.eq(tid), BID.STATE.eq(expected))
                 .execute()) {
             throw badRequest("Tournament " + tid + " has no participants");
@@ -65,9 +69,10 @@ public class BidDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void markParticipantsBusy(int tid, List<Integer> uids) {
+    public void markParticipantsBusy(int tid, List<Integer> uids, Instant now) {
         if (2 != jooq.update(BID)
                 .set(BID.STATE, Play)
+                .set(BID.UPDATED, Optional.of(now))
                 .where(BID.TID.eq(tid),
                         BID.UID.in(uids),
                         BID.STATE.eq(Wait))
@@ -76,9 +81,10 @@ public class BidDao {
         }
     }
 
-    public int setStatesAfterGroup(Integer gid, int tid, Set<Integer> winnerIds) {
+    public int setStatesAfterGroup(Integer gid, int tid, Set<Integer> winnerIds, Instant now) {
         return jooq.update(BID)
                 .set(BID.STATE, Lost)
+                .set(BID.UPDATED, Optional.of(now))
                 .where(BID.TID.eq(tid),
                         BID.STATE.notIn(Quit, Lost, Expl),
                         BID.GID.eq(Optional.of(gid)),
@@ -109,23 +115,25 @@ public class BidDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void resign(int uid, Integer tid, BidState targetState) {
+    public void resign(int uid, Integer tid, BidState targetState, Instant now) {
         log.info("User {} leaves {} from tid {}",
                 uid,
                 jooq.update(BID)
                         .set(BID.STATE, targetState)
+                        .set(BID.UPDATED, Optional.of(now))
                         .where(BID.UID.eq(uid), BID.TID.eq(tid))
                         .execute(),
                 tid);
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void enlist(int uid, EnlistTournament enlistment) {
+    public void enlist(int uid, EnlistTournament enlistment, Instant now) {
         log.info("User {} enlisted to tournament {}", uid, enlistment.getTid());
         jooq.insertInto(BID, BID.CID, BID.TID, BID.UID, BID.STATE)
                 .values(enlistment.getCategoryId(), enlistment.getTid(), uid, Want)
                 .onDuplicateKeyUpdate()
                 .set(BID.STATE, Want)
+                .set(BID.UPDATED, Optional.of(now))
                 .set(BID.CID, enlistment.getCategoryId())
                 .execute();
     }
@@ -178,16 +186,19 @@ public class BidDao {
                         .build());
     }
 
-    public void setCategory(SetCategory setCategory) {
-        jooq.update(BID).set(BID.CID, setCategory.getCid())
+    public void setCategory(SetCategory setCategory, Instant now) {
+        jooq.update(BID)
+                .set(BID.CID, setCategory.getCid())
+                .set(BID.UPDATED, Optional.of(now))
                 .where(BID.TID.eq(setCategory.getTid()),
                         BID.UID.eq(setCategory.getUid()))
                 .execute();
     }
 
-    public void resetStateByTid(int tid) {
+    public void resetStateByTid(int tid, Instant now) {
         jooq.update(BID)
                 .set(BID.STATE, BidState.Want)
+                .set(BID.UPDATED, Optional.of(now))
                 .where(BID.TID.eq(tid), BID.STATE.ne(Quit))
                 .execute();
     }

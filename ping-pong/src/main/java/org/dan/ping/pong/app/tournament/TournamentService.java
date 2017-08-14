@@ -1,10 +1,9 @@
 package org.dan.ping.pong.app.tournament;
 
-import static java.util.Collections.emptyList;
+import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Collections.emptySet;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
-import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
@@ -37,7 +36,6 @@ import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +47,7 @@ import javax.inject.Inject;
 public class TournamentService {
     private static final ImmutableSet<TournamentState> EDITABLE_STATES = ImmutableSet.of(Hidden, Announce, Draft);
     private static final ImmutableSet<TournamentState> CONFIGURABLE_STATES = EDITABLE_STATES;
+    private static final int DAYS_TO_SHOW_COMPLETE_BIDS = 30;
 
     @Inject
     private TournamentDao tournamentDao;
@@ -64,7 +63,7 @@ public class TournamentService {
                  .orElseThrow(() -> notFound("Tournament "
                          + enlistment.getTid() + " does not exist"));
         ensureDrafting(info.getState());
-        bidDao.enlist(uid, enlistment);
+        bidDao.enlist(uid, enlistment, clocker.get());
     }
 
     private void ensureDrafting(TournamentState state) {
@@ -76,7 +75,7 @@ public class TournamentService {
 
     public List<TournamentDigest> findInWithEnlisted(int uid, int days) {
         return tournamentDao.findEnlistedIn(uid,
-                clocker.get().minus(days, ChronoUnit.DAYS));
+                clocker.get().minus(days, DAYS));
     }
 
     public List<DatedTournamentDigest> findDrafting() {
@@ -98,8 +97,9 @@ public class TournamentService {
     @Transactional(TRANSACTION_MANAGER)
     public void begin(int tid) {
         castingLotsService.makeGroups(tid);
-        bidDao.casByTid(BidState.Here, BidState.Wait, tid);
-        tableService.scheduleFreeTables(tid, clocker.get());
+        final Instant now = clocker.get();
+        bidDao.casByTid(BidState.Here, BidState.Wait, tid, now);
+        tableService.scheduleFreeTables(tid, now);
     }
 
     @Inject
@@ -139,7 +139,7 @@ public class TournamentService {
             case Hidden:
             case Announce:
             case Draft:
-                bidDao.resign(uid, tid, targetState);
+                bidDao.resign(uid, tid, targetState, clocker.get());
                 break;
             default:
                 throw internalError("State " + state + " is not supported");
@@ -165,7 +165,7 @@ public class TournamentService {
             case Want:
             case Paid:
             case Here:
-                bidDao.setBidState(tid, uid, state, targetState);
+                bidDao.setBidState(tid, uid, state, targetState, clocker.get());
                 break;
             default:
                 throw internalError("Unknown state " + state);
@@ -191,10 +191,10 @@ public class TournamentService {
                 matchDao.complete(uid, match, now);
                 if (match.getState() == Game) {
                     tableDao.freeTable(match.getMid());
-                    bidDao.setBidState(tid, match.getOpponentUid(), BidState.Play, BidState.Wait);
+                    bidDao.setBidState(tid, match.getOpponentUid(), BidState.Play, BidState.Wait, now);
                 }
             }
-            bidDao.resign(uid, tid, target);
+            bidDao.resign(uid, tid, target, now);
             matchService.tryToCompleteGroup(gid, tid, emptySet());
             matchService.autoCompletePlayOffHalfMatches(tid);
             tableService.scheduleFreeTables(tid, now);
@@ -213,7 +213,7 @@ public class TournamentService {
                 tableService.scheduleFreeTables(tid, now);
             }
         } else { // play off is not begun yet
-            bidDao.resign(uid, tid, target);
+            bidDao.resign(uid, tid, target, now);
         }
     }
 
@@ -240,11 +240,13 @@ public class TournamentService {
 
     public List<OpenTournamentDigest> findRunning(int completeInLastDays) {
         return tournamentDao.findRunning(
-                clocker.get().minus(completeInLastDays, ChronoUnit.DAYS));
+                clocker.get().minus(completeInLastDays, DAYS));
     }
 
     public MyRecentTournaments findMyRecentTournaments(int uid) {
-        return tournamentDao.findMyRecentTournaments(clocker.get(), uid);
+        return tournamentDao.findMyRecentTournaments(
+                clocker.get().minus(DAYS_TO_SHOW_COMPLETE_BIDS, DAYS),
+                uid);
     }
 
     public MyRecentJudgedTournaments findMyRecentJudgedTournaments(int uid) {
@@ -308,9 +310,10 @@ public class TournamentService {
     @Transactional(TRANSACTION_MANAGER)
     public void cancel(int uid, int tid) {
         if (tournamentDao.isAdminOf(uid, tid)) {
-            tournamentDao.setState(tid, Canceled, clocker.get());
+            final Instant now = clocker.get();
+            tournamentDao.setState(tid, Canceled, now);
             matchDao.deleteAllByTid(tid);
-            bidDao.resetStateByTid(tid);
+            bidDao.resetStateByTid(tid, now);
             tableService.freeTables(tid);
         } else {
             throw forbidden("No write access to the tournament");
@@ -332,7 +335,7 @@ public class TournamentService {
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<TournamentDigest> findWritableForAdmin(int uid, int days) {
         return tournamentDao.findWritableForAdmin(uid,
-                clocker.get().minus(days, ChronoUnit.DAYS));
+                clocker.get().minus(days, DAYS));
     }
 
     @Inject
@@ -355,7 +358,7 @@ public class TournamentService {
                         .tid(enlistment.getTid())
                         .build());
         if (enlistment.getBidState() == Here || enlistment.getBidState() == Paid) {
-            bidDao.setBidState(enlistment.getTid(), participantUid, Want, enlistment.getBidState());
+            bidDao.setBidState(enlistment.getTid(), participantUid, Want, enlistment.getBidState(), clocker.get());
         }
         return participantUid;
     }

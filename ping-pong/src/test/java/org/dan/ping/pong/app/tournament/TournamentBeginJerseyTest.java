@@ -26,6 +26,7 @@ import org.dan.ping.pong.mock.TestAdmin;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
+import org.dan.ping.pong.util.time.Clocker;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
@@ -49,6 +50,9 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     @Named(ADMIN_SESSION)
     private TestAdmin session;
+
+    @Inject
+    private Clocker clocker;
 
     @Test
     public void failsToBeginUntilThereAreUncheckedParticipants() {
@@ -76,7 +80,7 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
                 scenario.getTestAdmin().getSession(), scenario.getTid())
                 .getStatus());
 
-        bidDao.setBidState(scenario.getTid(), uid2, Paid, Here);
+        bidDao.setBidState(scenario.getTid(), uid2, Paid, Here, clocker.get());
 
         assertEquals(204, myRest().post(BEGIN_TOURNAMENT,
                 scenario.getTestAdmin().getSession(), scenario.getTid())

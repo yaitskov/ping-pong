@@ -8,6 +8,7 @@ import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
+import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -20,12 +21,12 @@ public class BidService {
 
     @Transactional(TRANSACTION_MANAGER)
     public void paid(BidId bidId) {
-        bidDao.setBidState(bidId, singletonList(Want), Paid);
+        bidDao.setBidState(bidId, singletonList(Want), Paid, clocker.get());
     }
 
     @Transactional(TRANSACTION_MANAGER)
     public void readyToPlay(BidId bidId) {
-        bidDao.setBidState(bidId, asList(Paid, Want), Here);
+        bidDao.setBidState(bidId, asList(Paid, Want), Here, clocker.get());
     }
 
     public List<ParticipantState> findEnlisted(int tid) {
@@ -39,17 +40,20 @@ public class BidService {
 
     @Transactional(TRANSACTION_MANAGER)
     public void disappeared(BidId bidId) {
-        bidDao.setBidState(bidId, asList(Here, Paid), Want);
+        bidDao.setBidState(bidId, asList(Here, Paid), Want, clocker.get());
     }
+
+    @Inject
+    private Clocker clocker;
 
     @Transactional(TRANSACTION_MANAGER)
     public void setCategory(SetCategory setCategory) {
-        bidDao.setCategory(setCategory);
+        bidDao.setCategory(setCategory, clocker.get());
     }
 
     @Transactional(TRANSACTION_MANAGER)
     public void setBidState(SetBidState setState) {
         bidDao.setBidState(setState.getTid(), setState.getUid(),
-                setState.getExpected(), setState.getTarget());
+                setState.getExpected(), setState.getTarget(), clocker.get());
     }
 }

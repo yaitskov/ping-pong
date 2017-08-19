@@ -1,8 +1,9 @@
-'use strict';
+import angular from 'angular';
+import template from './participant.template.html';
 
 angular.module('participant').
     component('participant', {
-        templateUrl: 'my-tournament/participant/participant.template.html',
+        templateUrl: template,
         controller: ['$http', 'mainMenu', '$routeParams', 'auth', 'requestStatus', 'pageCtx', 'Participant',
                      function ($http, mainMenu, $routeParams, auth, requestStatus, pageCtx, Participant) {
                          mainMenu.setTitle('Participant');

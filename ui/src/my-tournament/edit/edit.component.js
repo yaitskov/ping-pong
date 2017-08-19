@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './edit.template.html';
 
 angular.
     module('tournamentEdit').
     component('tournamentEdit', {
-        templateUrl: 'my-tournament/edit/edit.template.html',
+        templateUrl: template,
         controller: ['auth', 'mainMenu', '$http', '$location', 'placePicker',
                      'pageCtx', '$scope', 'Tournament', 'requestStatus', '$routeParams', 'moment',
                      function (auth, mainMenu, $http, $location, placePicker,

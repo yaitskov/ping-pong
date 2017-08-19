@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './enlist.template.html';
 
 angular.
     module('enlistOffline').
     component('enlistOffline', {
-        templateUrl: 'my-tournament/offline/enlist.template.html',
+        templateUrl: template,
         cache: false,
         controller: ['$routeParams', 'Tournament', 'mainMenu',
                      'requestStatus', 'Participant', '$http', 'auth', 'pageCtx',

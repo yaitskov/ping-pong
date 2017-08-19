@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './complete-my-match.template.html';
 
 angular.
     module('completeMyMatch').
     component('completeMyMatch', {
-        templateUrl: 'complete-my-match/complete-my-match.template.html',
+        templateUrl: template,
         controller: ['auth', 'mainMenu', 'Match', '$routeParams',
                      'pageCtx', 'requestStatus', '$scope',
                      function (auth, mainMenu, Match, $routeParams,

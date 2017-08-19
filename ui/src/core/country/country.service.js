@@ -1,4 +1,4 @@
-'use strict';
+import angular from 'angular';
 
 angular.module('core.country').
     factory('Country', ['$resource', 'auth',

@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './sign-up.template.html';
 
 angular.
     module('signUp').
     component('signUp', {
-        templateUrl: 'sign-up/sign-up.template.html',
+        templateUrl: template,
         controller: [
             'mainMenu', '$http', 'cutil', 'auth', 'requestStatus',
             function (mainMenu, $http, cutil, auth, requestStatus) {

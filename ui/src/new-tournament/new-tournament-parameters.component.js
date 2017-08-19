@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './new-tournament-parameters.template.html';
 
 angular.
     module('newTournamentParameters').
     component('newTournamentParameters', {
-        templateUrl: 'new-tournament/new-tournament-parameters.template.html',
+        templateUrl: template,
         controller: ['auth', 'mainMenu', '$http', '$location', 'placePicker', 'pageCtx', 'requestStatus', 'moment',
                      function (auth, mainMenu, $http, $location, placePicker, pageCtx, requestStatus, $moment) {
                          mainMenu.setTitle('Tournament Parameters');

@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './my-place.template.html';
 
 angular.
     module('myPlace').
     component('myPlace', {
-        templateUrl: 'my-place/my-place.template.html',
+        templateUrl: template,
         controller: ['mainMenu', 'Place', '$routeParams', 'requestStatus', 'pageCtx', 'auth',
                      function (mainMenu, Place, $routeParams, requestStatus, pageCtx, auth) {
                          mainMenu.setTitle('My place');

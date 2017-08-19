@@ -1,8 +1,9 @@
-'use strict';
+import angular from 'angular';
+import template from './my-match-judge-list.template.html';
 
 angular.module('myMatchJudgeList').
     component('myMatchJudgeList', {
-        templateUrl: 'my-match-judge-list/my-match-judge-list.template.html',
+        templateUrl: template,
         controller: ['Match', 'Tournament', 'mainMenu', '$q', '$location', 'pageCtx', 'requestStatus',
                      function (Match, Tournament, mainMenu, $q, $location, pageCtx, requestStatus) {
                          mainMenu.setTitle('Match Judgement');

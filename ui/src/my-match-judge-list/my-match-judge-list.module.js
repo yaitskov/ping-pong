@@ -1,4 +1,4 @@
-'use strict';
+import angular from 'angular';
 
 angular.module('myMatchJudgeList', ['ngRoute', 'core.match',
                                     'core.requestStatus',

@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './do-sign-in.template.html';
 
 angular.
     module('doSignIn').
     component('doSignIn', {
-        templateUrl: 'sign-in/do/do-sign-in.template.html',
+        templateUrl: template,
         controller: [
             'mainMenu', '$routeParams', '$location', '$http', 'auth',
             function (mainMenu, $routeParams, $location, $http, auth) {

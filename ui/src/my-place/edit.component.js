@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './edit.template.html';
 
 angular.
     module('myPlaceEdit').
     component('myPlaceEdit', {
-        templateUrl: 'my-place/edit.template.html',
+        templateUrl: template,
         controller: [
             'mainMenu', 'auth', 'requestStatus', 'Place', '$routeParams',
             function (mainMenu, auth, requestStatus, Place, $routeParams) {

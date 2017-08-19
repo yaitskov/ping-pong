@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './edit.template.html';
 
 angular.
     module('accountEdit').
     component('accountEdit', {
-        templateUrl: 'account/edit.template.html',
+        templateUrl: template,
         controller: [
             'mainMenu', 'auth', 'requestStatus', 'User', '$http',
             function (mainMenu, auth, requestStatus, User, $http) {

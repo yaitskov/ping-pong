@@ -1,8 +1,9 @@
-'use strict';
+import angular from 'angular';
+import template from './my-match-play-list.template.html';
 
 angular.module('myMatchPlayList').
     component('myMatchPlayList', {
-        templateUrl: 'my-match-play-list/my-match-play-list.template.html',
+        templateUrl: template,
         controller: ['Match', 'Tournament', 'mainMenu', '$q', 'cutil',
                      'pageCtx', 'auth', 'requestStatus', '$location',
                      function (Match, Tournament, mainMenu, $q, cutil,

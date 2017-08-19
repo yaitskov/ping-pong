@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './main-menu.template.html';
 
 angular.
     module('mainMenu').
     component('mainMenu', {
-        templateUrl: 'main-menu/main-menu.template.html',
+        templateUrl: template,
         controller: ['auth', 'mainMenu',
                      function (auth, mainMenu) {
                          this.accountName = auth.myName();

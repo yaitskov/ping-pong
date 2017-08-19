@@ -1,4 +1,4 @@
-'use strict';
+import angular from 'angular';
 
 angular.module('openTournament', [
     'ngRoute', 'core.match', 'core.tournament',

@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './tournament-status.template.html';
 
 angular.
     module('core.tournamentStatus').
     component('tournamentStatus', {
-        templateUrl: 'core/tournament-status/tournament-status.template.html',
+        templateUrl: template,
         controller: ['$rootScope', function ($rootScope) {
             this.reset = function () {
                 this.tournament = {};

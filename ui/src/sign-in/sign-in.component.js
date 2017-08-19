@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './sign-in.template.html';
 
 angular.
     module('signIn').
     component('signIn', {
-        templateUrl: 'sign-in/sign-in.template.html',
+        templateUrl: template,
         controller: [
             'mainMenu', '$http', 'auth', 'requestStatus',
             function (mainMenu, $http, auth, requestStatus) {

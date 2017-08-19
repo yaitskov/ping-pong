@@ -1,4 +1,4 @@
-'use strict';
+import angular from 'angular';
 
 angular.module('tournamentEdit', [
     'ngRoute', 'core.tournament', 'mainMenu',

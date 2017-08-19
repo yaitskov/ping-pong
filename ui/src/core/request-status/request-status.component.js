@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './request-status.template.html';
 
 angular.
     module('core.requestStatus').
     component('requestStatus', {
-        templateUrl: 'core/request-status/request-status.template.html',
+        templateUrl: template,
         controller: [
             'requestStatus', '$rootScope', '$anchorScroll', '$timeout', '$route',
             function (requestStatus, $scope, $anchorScroll, $timeout, $route) {

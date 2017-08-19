@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './new-place.template.html';
 
 angular.
     module('newPlace').
     component('newPlace', {
-        templateUrl: 'new-place/new-place.template.html',
+        templateUrl: template,
         controller: ['auth', 'mainMenu', '$http', '$location', 'requestStatus',
                      'City', 'Country', 'LocalStorage', '$timeout', 'pageCtx',
                      function (auth, mainMenu, $http, $location, requestStatus,

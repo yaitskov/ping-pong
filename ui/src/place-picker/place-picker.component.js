@@ -1,8 +1,9 @@
-'use strict';
+import angular from 'angular';
+import template from './place-picker.template.html';
 
 angular.module('placePicker').
     component('placePicker', {
-        templateUrl: 'place-picker/place-picker.template.html',
+        templateUrl: template,
         controller: ['placePicker', 'mainMenu', 'requestStatus',
                      function (placePicker, mainMenu, requestStatus) {
                          mainMenu.setTitle('Choose place');

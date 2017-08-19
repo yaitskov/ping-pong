@@ -1,8 +1,9 @@
-'use strict';
+import angular from 'angular';
+import template from './play-in-tournament-list.template.html';
 
 angular.module('playInTournamentList').
     component('playInTournamentList', {
-        templateUrl: 'play-in-tournament-list/play-in-tournament-list.template.html',
+        templateUrl: template,
         cache: false,
         controller: ['Tournament', 'mainMenu', 'requestStatus',
                      function (Tournament, mainMenu, requestStatus) {

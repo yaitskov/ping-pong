@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './account.template.html';
 
 angular.
     module('account').
     component('account', {
-        templateUrl: 'account/account.template.html',
+        templateUrl: template,
         controller: [
             'mainMenu', '$http', 'cutil', 'auth', 'requestStatus', 'pageCtx',
             function (mainMenu, $http, cutil, auth, requestStatus, pageCtx) {

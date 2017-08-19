@@ -1,3 +1,3 @@
-'use strict';
+import angular from 'angular';
 
 angular.module('doSignIn', ['mainMenu', 'core']);

@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './tournament-detail.template.html';
 
 angular.
     module('tournamentDetail').
     component('tournamentDetail', {
-        templateUrl: 'tournament-detail/tournament-detail.template.html',
+        templateUrl: template,
         cache: false,
         controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu',
                      '$http', '$location', 'requestStatus', 'cutil', 'pageCtx',

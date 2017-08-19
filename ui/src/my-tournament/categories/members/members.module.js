@@ -1,4 +1,4 @@
-'use strict';
+import angular from 'angular';
 
 angular.module('categoryMemberList',
                ['ngRoute', 'mainMenu', 'auth', 'core.requestStatus',

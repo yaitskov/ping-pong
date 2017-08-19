@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './tables.template.html';
 
 angular.
     module('myTableList').
     component('myTableList', {
-        templateUrl: 'my-place/tables.template.html',
+        templateUrl: template,
         controller: [
             'mainMenu', 'auth', 'requestStatus', 'Place', 'Table', '$routeParams',
             function (mainMenu, auth, requestStatus, Place, Table, $routeParams) {

@@ -1,8 +1,9 @@
-'use strict';
+import angular from 'angular';
+import template from './open-tournament-list.template.html';
 
 angular.module('openTournamentList').
     component('openTournamentList', {
-        templateUrl: 'open-tournament-list/open-tournament-list.template.html',
+        templateUrl: template,
         controller: ['Tournament', 'mainMenu', 'requestStatus',
                      function (Tournament, mainMenu, requestStatus) {
                          mainMenu.setTitle('Running tournaments');

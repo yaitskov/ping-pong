@@ -1,8 +1,9 @@
-'use strict';
+import angular from 'angular';
+import template from './place-list.template.html';
 
 angular.module('placeList').
     component('placeList', {
-        templateUrl: 'place-list/place-list.template.html',
+        templateUrl: template,
         controller: ['Place', 'mainMenu', 'requestStatus',
                      function (Place, mainMenu, requestStatus) {
                          mainMenu.setTitle('My Places');

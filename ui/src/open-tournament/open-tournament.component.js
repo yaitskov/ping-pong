@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './open-tournament.template.html';
 
 angular.
     module('openTournament').
     component('openTournament', {
-        templateUrl: 'open-tournament/open-tournament.template.html',
+        templateUrl: template,
         controller: ['Match', 'Tournament', 'mainMenu', '$routeParams',
                      'refresher', '$q', 'requestStatus', '$scope',
                      function (Match, Tournament, mainMenu, $routeParams,

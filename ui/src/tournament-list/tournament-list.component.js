@@ -1,8 +1,9 @@
-'use strict';
+import angular from 'angular';
+import template from './tournament-list.template.html';
 
 angular.module('tournamentList').
     component('tournamentList', {
-        templateUrl: 'tournament-list/tournament-list.template.html',
+        templateUrl: template,
         controller: ['Tournament', 'mainMenu', '$location', 'requestStatus',
                      function (Tournament, mainMenu, $location, requestStatus) {
                          mainMenu.setTitle('Drafting');

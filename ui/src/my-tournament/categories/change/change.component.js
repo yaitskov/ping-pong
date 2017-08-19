@@ -1,8 +1,9 @@
-'use strict';
+import angular from 'angular';
+import template from './change.template.html';
 
 angular.module('changeCategory').
     component('changeCategory', {
-        templateUrl: 'my-tournament/categories/change/change.template.html',
+        templateUrl: template,
         controller: ['$http', 'mainMenu', '$routeParams', 'auth',
                      'requestStatus', 'pageCtx', '$location', 'Category', 'Participant',
                      function ($http, mainMenu, $routeParams, auth,

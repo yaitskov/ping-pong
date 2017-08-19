@@ -1,4 +1,5 @@
-'use strict';
+import angular from 'angular';
+import jQuery from 'jquery';
 
 angular.module('pingPong').
     config(['$httpProvider', function($httpProvider) {

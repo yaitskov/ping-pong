@@ -1,9 +1,10 @@
-'use strict';
+import angular from 'angular';
+import template from './complete-match.template.html';
 
 angular.
     module('completeMatch').
     component('completeMatch', {
-        templateUrl: 'complete-match/complete-match.template.html',
+        templateUrl: template,
         controller: ['mainMenu', 'Match', '$routeParams', 'pageCtx', 'requestStatus', '$scope',
                      function (mainMenu, Match, $routeParams, pageCtx, requestStatus, $scope) {
                          mainMenu.setTitle('Match Scoring');

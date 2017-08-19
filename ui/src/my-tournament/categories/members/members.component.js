@@ -1,8 +1,9 @@
-'use strict';
+import angular from 'angular';
+import template from './members.template.html';
 
 angular.module('categoryMemberList').
     component('categoryMemberList', {
-        templateUrl: 'my-tournament/categories/members/members.template.html',
+        templateUrl: template,
         controller: ['$http', 'mainMenu', '$routeParams', 'auth', 'requestStatus', 'pageCtx', 'Category',
                      function ($http, mainMenu, $routeParams, auth, requestStatus, pageCtx, Category) {
                          mainMenu.setTitle('Category Members');

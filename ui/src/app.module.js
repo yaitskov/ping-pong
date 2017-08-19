@@ -1,4 +1,5 @@
 import angular from 'angular';
+import coreModule from './core/core.module.js';
 
 angular.module('pingPong', [
     'ngRoute',

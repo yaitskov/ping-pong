@@ -43,6 +43,7 @@ import participantModule from './participant/participant.module.js';
 import participantService from './participant/participant.service.js';
 
 angular.module('core', ['core.tournament', 'core.match',
+                        'core.util',
                         'localStorage', 'core.place',
                         'core.table', 'core.city', 'core.country',
                         'core.participant', 'core.user',

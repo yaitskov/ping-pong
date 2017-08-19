@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-angular.module('core.validate').
+angular.module('core.validate.price', []).
     directive('validatePrice', function() {
         var priceRegexp = /^[1-9][0-9]*([.][0-9]{2})?$/;
         return {

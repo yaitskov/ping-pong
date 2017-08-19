@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-angular.module('core.validate').
+angular.module('core.validate.email', []).
     directive('validateEmail', function() {
         var emailRegexp = /^[_A-Za-z0-9]+(\.[_A-Za-z0-9]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*(\.[A-Za-z]{2,4})$/;
 

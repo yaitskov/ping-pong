@@ -10,10 +10,8 @@ import angularTouchSpin from 'angular-touchspin';
 import bootstrap from 'bootstrap/dist/js/bootstrap.js';
 import bootstrapClockPicker from 'clockpicker/dist/bootstrap-clockpicker.js';
 
-
 import appModule from './app.module.js';
 import appConfig from './app.config.js';
-import coreModule from './core/core.module.js';
 
 import authModule from './auth/auth.module.js';
 import authService from './auth/auth.service.js';

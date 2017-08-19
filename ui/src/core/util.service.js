@@ -1,8 +1,7 @@
-'use strict';
-
+import angular from 'angular';
 
 angular.
-    module('core').
+    module('core.util', []).
     factory('cutil', [function () {
         return new function () {
             this.genUserSessionPart = function () {

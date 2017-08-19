@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-angular.module('core.validate').
+angular.module('core.validate.phone', []).
     directive('validatePhone', function() {
         var phoneRegexp = /^[+]?([0-9]+[ -]?)+$$/;
         return {

@@ -1,4 +1,4 @@
-'use strict';
+import angular from 'angular';
 
 angular.module('core.ui', ['ngResource']).
     directive('backButton', function () {

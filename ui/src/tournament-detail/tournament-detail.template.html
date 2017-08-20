@@ -52,7 +52,8 @@
     </tbody>
   </table>
 
-  <div class="form-group clearfix" ng-show="$ctrl.tournament && !$ctrl.tournament.myCategoryId">
+  <div class="form-group clearfix"
+       ng-show="$ctrl.showCategoryList()">
     <div class="pull-left category-label">
       Categories
     </div>

@@ -35,6 +35,11 @@ angular.
                                  cutil.has(self.tournament.bidState,
                                            ['Play', 'Wait', 'Rest']);
                          };
+                         this.showCategoryList = function () {
+                             return self.tournament &&
+                                 (!self.tournament.bidState ||
+                                  self.tournament.bidState == 'Quit');
+                         };
                          this.showMyCategory = function () {
                              return self.tournament &&
                                  cutil.has(self.tournament.bidState, ['Want', 'Paid', 'Here', 'Play', 'Wait', 'Rest']);
@@ -80,6 +85,7 @@ angular.
                                          function (okResp) {
                                              requestStatus.complete();
                                              self.tournament.myCategoryId = self.myCategory.cid;
+                                             self.tournament.bidState = 'Want';
                                              self.myCategory.name = cutil.findValBy(self.tournament.categories,
                                                                                     {cid: self.myCategory.cid}).name;
                                          },
@@ -94,7 +100,7 @@ angular.
                              Tournament.resign(
                                  self.tournament.tid,
                                  function () {
-                                     self.tournament.myCategoryId = null;
+                                     self.tournament.bidState = 'Quit';
                                      requestStatus.complete();
                                  },
                                  requestStatus.failed);

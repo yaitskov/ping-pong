@@ -33,7 +33,7 @@ angular.
                 });
                 $scope.$on('event.request.failed', function (event, response) {
                     self.reset();
-                    if (response.status == 502) {
+                    if (response.status == 502 || response.status == -1) {
                         self.error = "Server is not available";
                     } else if (response.status == 401) {
                         self.error = "Session is not valid. Try to logout and login again if your account is bound to an email.";
@@ -80,7 +80,8 @@ angular.
                             self.error = "An application error happened.";
                         }
                     } else if (response.status < 299) {
-                        self.error = "Status looks good";
+                        self.error = "Status " + response.status +
+                            " looks good, but request failed.";
                     } else if (!response.status) {
                         self.error = "Status is missing";
                     } else {

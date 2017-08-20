@@ -26,6 +26,7 @@
     "ajv": "^5.2.2",
     "clean-webpack-plugin": "^0.1.16",
     "css-loader": "^0.28.5",
+    "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^0.11.2",
     "grunt": "^0.4.5",
     "grunt-contrib-concat": "^1.0.1",

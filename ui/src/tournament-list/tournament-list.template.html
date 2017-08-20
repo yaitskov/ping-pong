@@ -6,7 +6,7 @@
 </div>
 <div class="container-fluid list">
   <request-status></request-status>
-  <div ng-repeat="tournament in $ctrl.tournaments"
+  <div ng-repeat="tournament in $ctrl.tournaments | orderBy : 'opensAt'"
        clickable="/tournaments/{{tournament.tid}}"
        class="list-item tournament clearfix">
     <div class="name pull-left">

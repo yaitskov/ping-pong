@@ -1,4 +1,10 @@
+import 'flatpickr/dist/flatpickr.css';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'clockpicker/dist/bootstrap-clockpicker.css';
+import 'angular-touchspin/dist/angular-touchspin.css';
+
 import './app.scss';
+
 import jQuery from 'jquery';
 import moment from 'moment/moment.js';
 import flatpickr from 'flatpickr';

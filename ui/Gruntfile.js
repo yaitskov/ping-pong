@@ -29,6 +29,9 @@ module.exports = function(grunt) {
             dev: Object.assign({ watch: false }, webpackConfig)
         },
         exec: {
+            build_label: 'date >> dist/version.txt',
+            version_label: 'grep version package.json >> dist/version.txt',
+            git_label: 'git rev-list HEAD | head -1 >> dist/version.txt',
             remove_cache: 'sed -i "/^CACHE:/d" dist/appcache/manifest.appcache'
         }
     });

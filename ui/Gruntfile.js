@@ -11,24 +11,27 @@
 // npm install sass-loader node-sass webpack --save-dev
 // npm i -D html-loader
 // npm install offline-plugin --save-dev
+// npm install grunt-exec --save-dev
 
 const webpackConfig = require('./webpack.config');
 
 module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-install-dependencies');
     grunt.loadNpmTasks('grunt-webpack');
+    grunt.loadNpmTasks('grunt-exec');
     grunt.initConfig({
-        pkg: grunt.file.readJSON('package.json')
-    });
-    grunt.initConfig({
+        pkg: grunt.file.readJSON('package.json'),
         webpack: {
             options: {
                 stats: !process.env.NODE_ENV || process.env.NODE_ENV === 'development'
             },
             prod: webpackConfig,
             dev: Object.assign({ watch: false }, webpackConfig)
+        },
+        exec: {
+            remove_cache: 'sed -i "/^CACHE:/d" dist/appcache/manifest.appcache'
         }
     });
-    grunt.registerTask('all', ['install-dependencies', 'webpack']);
+    grunt.registerTask('all', ['install-dependencies', 'webpack', 'exec']);
     grunt.registerTask('default', ['all']);
 };

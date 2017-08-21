@@ -1,6 +1,6 @@
 import angular from 'angular';
 import jQuery from 'jquery';
-import angularTranslate from 'angular-translate';
+import translateTables from './translate.js';
 
 angular.module('pingPong').
     config(['$httpProvider', function($httpProvider) {
@@ -31,8 +31,11 @@ angular.module('pingPong').
             return config;
         };
     }]).
-    config(['$locationProvider', '$routeProvider',
-            function config($locationProvider, $routeProvider) {
+    config(['$locationProvider', '$routeProvider', '$translateProvider',
+            function config($locationProvider, $routeProvider, $translateProvider) {
+                $translateProvider
+                    .translations('pl', translateTables.pl)
+                    .preferredLanguage('pl');
                 $locationProvider.hashPrefix('!');
                 $routeProvider.
                     when('/tournaments', {

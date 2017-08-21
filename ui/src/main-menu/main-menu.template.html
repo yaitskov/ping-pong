@@ -1,5 +1,5 @@
 <nav class="navbar navbar-default">
-  <p class="navbar-text pull-left">{{$ctrl.title()}}</p>
+  <p class="navbar-text pull-left">{{$ctrl.title() | translate}}</p>
   <div class="pull-right btn-group">
     <button type="button" class="btn navbar-btn btn-danger dropdown-toggle"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -10,64 +10,64 @@
       <li>
         <a href="#!/tournaments">
           <span class="glyphicon glyphicon-pencil"></span>
-          Drafting
+          {{ 'Drafting' | translate }}
         </a>
       </li>
       <li>
         <a href="#!/watch/tournaments">
           <span class="glyphicon glyphicon-eye-open"></span>
-          Watch Games
+          {{ 'Watch Games' | translate }}
         </a>
       </li>
       <li role="separator" ng-show="$ctrl.isAuthenticated()" class="divider"></li>
       <li>
         <a href="#!/my/matches/play" ng-show="$ctrl.isAuthenticated()">
           <span class="glyphicon glyphicon-calendar"></span>
-          My Schedule
+          {{ 'My Schedule' | translate }}
         </a>
       </li>
       <li>
         <a href="#!/play/in/tournaments" ng-show="$ctrl.isAuthenticated()">
           <span class="glyphicon glyphicon-th-list"></span>
-          Participation
+          {{ 'Participation' | translate }}
         </a>
       </li>
       <li role="separator" ng-show="$ctrl.isAdmin()" class="divider"></li>
       <li>
         <a href="#!/my/tournaments" ng-show="$ctrl.isAdmin()">
           <span class="glyphicon glyphicon-thumbs-down"></span>
-          Administration
+          {{ 'Administration' | translate }}
         </a>
       </li>
       <li>
         <a href="#!/my/matches/judgement" ng-show="$ctrl.isAdmin()">
           <span class="glyphicon glyphicon-bullhorn"></span>
-          My Judgement
+          {{ 'My Judgement' | translate }}
         </a>
       </li>
       <li>
         <a href="#!/my/places" ng-show="$ctrl.isAdmin()">
           <span class="glyphicon glyphicon-map-marker"></span>
-          My Places
+          {{ 'My Places' | translate }}
         </a>
       </li>
       <li role="separator" class="divider"></li>
       <li>
         <a href="#!/sign-in" ng-show="!$ctrl.isAuthenticated()">
           <span class="glyphicon glyphicon-log-in"></span>
-          Login
+          {{ 'Login' | translate }}
         </a>
       </li>
       <li>
         <a href="#!/sign-up" ng-show="!$ctrl.isAuthenticated()">
           <span class="glyphicon glyphicon-log-in"></span>
-          Sign-Up
+          {{ 'Sign-Up' | translate }}
         </a>
       </li>
       <li>
         <a href="#!/account" ng-show="$ctrl.isAuthenticated()" class="wrap-long">
           <span class="glyphicon glyphicon-user"></span>
-          {{$ctrl.accountName || 'Account'}}
+          {{$ctrl.accountName || ('Account' | translate)}}
         </a>
       </li>
       <li role="separator" class="divider" ng-hide="$ctrl.contextMenu() | isEmpty"></li>

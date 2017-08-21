@@ -1,5 +1,6 @@
 import angular from 'angular';
 import jQuery from 'jquery';
+import angularTranslate from 'angular-translate';
 
 angular.module('pingPong').
     config(['$httpProvider', function($httpProvider) {

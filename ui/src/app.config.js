@@ -34,6 +34,7 @@ angular.module('pingPong').
     config(['$locationProvider', '$routeProvider', '$translateProvider',
             function config($locationProvider, $routeProvider, $translateProvider) {
                 $translateProvider
+                    // .useSanitizeValueStrategy(null)
                     .translations('pl', translateTables.pl)
                     .preferredLanguage('pl');
                 $locationProvider.hashPrefix('!');

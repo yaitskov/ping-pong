@@ -8,6 +8,7 @@ angular.
         controller: [
             'requestStatus', '$rootScope', '$anchorScroll', '$timeout', '$route', '$translate',
             function (requestStatus, $scope, $anchorScroll, $timeout, $route, $translate) {
+                var self = this;
                 this.reset = function () {
                     this.error = null;
                     this.loading = null;
@@ -20,7 +21,6 @@ angular.
                         $anchorScroll('errorOutput');
                     }, 1);
                 };
-                var self = this;
                 self.reset();
                 $scope.$on('event.request.started', function (event, msg) {
                     self.reset();

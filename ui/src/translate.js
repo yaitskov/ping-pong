@@ -15,7 +15,7 @@ module.exports = {
         'Account': 'Konto',
 
         // request status
-        'if-you-think-an-error': 'Jeśli myślisz, że to jest błąd w aplikacji to możesz stworzyć zaświadczenie w',
+        'if-you-think-an-error': 'Jeśli myślisz, że to jest błąd w aplikacji to możesz stworzyć zaświadczenie w {{url}}',
         'Loading': 'Ładowanie',
         'Server is not available': 'Serwer jest nie dostępny',
         'session-expired': 'Sesja wygasła. Wyloguj i zaloguj się ponownie jeśli twoje konto ma przywiązany email',
@@ -38,7 +38,7 @@ module.exports = {
         'Account': 'Account',
 
         // request status
-        'if-you-think-an-error': 'If you think that an application error happened. You could file a bug report at',
+        'if-you-think-an-error': 'If you think that an application error happened. You could file a bug report at {{url}}',
         'Loading': 'Loading',
         'Server is not available': 'Server is not available',
         'session-expired': 'Session is not valid. Try to logout and login again if your account is bound to an email.',

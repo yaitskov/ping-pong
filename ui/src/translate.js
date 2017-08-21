@@ -12,7 +12,15 @@ module.exports = {
         'My Places': 'Moi boiska',
         'Login': 'Zaloguj się',
         'Sign-Up': 'Zapisz się',
-        'Account': 'Konto'
+        'Account': 'Konto',
+
+        // request status
+        'if-you-think-an-error': 'Jeśli myślisz, że to jest błąd w aplikacji to możesz stworzyć zaświadczenie w',
+        'Loading': 'Ładowanie',
+        'Server is not available': 'Serwer jest nie dostępny',
+        'session-expired': 'Sesja wygasła. Wyloguj i zaloguj się ponownie jeśli twoje konto ma przywiązany email',
+        'no-permissions': 'Nie masz odpowiednich uprawnień',
+        'application-error': 'Wystąpił błąd aplikacji'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -27,6 +35,14 @@ module.exports = {
         'My Places': 'My Places',
         'Login': 'Login',
         'Sign-Up': 'Sign-Up',
-        'Account': 'Account'
+        'Account': 'Account',
+
+        // request status
+        'if-you-think-an-error': 'If you think that an application error happened. You could file a bug report at',
+        'Loading': 'Loading',
+        'Server is not available': 'Server is not available',
+        'session-expired': 'Session is not valid. Try to logout and login again if your account is bound to an email.',
+        'no-permissions': 'Not enough permissions',
+        'application-error': 'An application error happened'
     }
 };

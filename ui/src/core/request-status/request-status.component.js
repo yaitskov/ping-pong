@@ -6,8 +6,8 @@ angular.
     component('requestStatus', {
         templateUrl: template,
         controller: [
-            'requestStatus', '$rootScope', '$anchorScroll', '$timeout', '$route',
-            function (requestStatus, $scope, $anchorScroll, $timeout, $route) {
+            'requestStatus', '$rootScope', '$anchorScroll', '$timeout', '$route', '$translate',
+            function (requestStatus, $scope, $anchorScroll, $timeout, $route, $translate) {
                 this.reset = function () {
                     this.error = null;
                     this.loading = null;
@@ -24,7 +24,11 @@ angular.
                 self.reset();
                 $scope.$on('event.request.started', function (event, msg) {
                     self.reset();
-                    self.loading = msg || 'Loading';
+                    if (msg) {
+                        self.loading = msg;
+                    } else {
+                        $translate('Loading').then(function (loading) { self.loading = loading; });
+                    }
                 });
                 $scope.$on('event.request.validation', function (event, msg) {
                     self.reset();
@@ -34,15 +38,23 @@ angular.
                 $scope.$on('event.request.failed', function (event, response) {
                     self.reset();
                     if (response.status == 502 || response.status == -1) {
-                        self.error = "Server is not available";
+                        $translate("Server is not available").then(function (err) {
+                            self.error = err;
+                        });
                     } else if (response.status == 401) {
-                        self.error = "Session is not valid. Try to logout and login again if your account is bound to an email.";
+                        $translate('session-expired').then(function (err) {
+                            self.error = err;
+                        });
                     } else if (response.status == 403) {
                         if (typeof response.data == 'object') {
                             if (response.data.message) {
-                                self.error = "Not enough permissions: " + response.data.message;
+                                $translate('no-permissions').then(function (err) {
+                                    self.error = err + ": " + response.data.message;
+                                });
                             } else {
-                                self.error = "An application error happened: " + JSON.stringify(response.data);
+                                $translate('application-error').then(function (err) {
+                                    self.error = err + ": " + JSON.stringify(response.data);
+                                });
                             }
                         } else {
                             self.error = "Bad request: " + response.data;

@@ -4,78 +4,74 @@
   <div class="form-group">
     <button class="btn btn-primary"
             ng-click="$ctrl.logout()">
-      Logout
+      {{ 'Logout' | translate }}
     </button>
     <button class="btn btn-primary"
             ng-show="$ctrl.email"
             ng-click="$ctrl.generateSignInLink()">
-      Generate sign-in link
+      {{ 'Generate sign-in link' | translate }
     </button>
     <a href="#!/account/profile/edit" class="btn btn-primary">
-      Edit
+      {{ 'Edit' | translate }}
     </a>
     <a ng-click="$ctrl.requestAdminPermissions()"
        ng-show="$ctrl.email && !$ctrl.adminAccessRequested && !$ctrl.isAdmin"
        class="btn btn-default">
-      Request Admin permissions
+      {{ 'Request Admin permissions' | translate }}
     </a>
   </div>
   <div class="form-group" ng-show="$ctrl.signInEmailSent">
     <div class="alert alert-info">
-      Sign-in link has been generated and mailed to you.
+      {{ 'sing-in-lin-generated' | translate }}
     </div>
   </div>
   <div class="form-group" ng-show="$ctrl.logoutWithoutEmail">
     <div class="alert alert-danger">
-      Your account doesn't have an email bound to it. If you logout
-      right now, you will invalidate account forever! To logout from
-      this device and keep account - setup an email first.
+      {{ 'account-without-email-warning' | translate }}
     </div>
   </div>
   <div class="form-group" ng-show="$ctrl.logoutWithoutEmail">
     <button class="btn btn-danger" ng-click="$ctrl.lostAccessToAccount()">
-      Terminate account
+      {{ 'Terminate account' | translate }}
     </button>
     <a href="#!/account/profile/edit" class="btn btn-primary">
-      Set an email
+      {{ 'Set an email' | translate }}
     </a>
   </div>
   <div class="form-group">
     <table class="table">
       <tr>
-        <td>Email</td>
+        <td>{{ 'Email' | translate }}</td>
         <td>
           <div ng-show="$ctrl.email">
             {{$ctrl.email}}
           </div>
           <div class="alert alert-warning" ng-show="!$ctrl.email">
             <p>
-              An email is not set. It's required to login from other devices
-              or to recover current session.
+              {{ 'email-is-not-set' | translate }}
             </p>
-            <p>
-              Follow the
-              link <a href="#!/account/profile/edit">to set an email</a>
+            <p translate="follow-set-email-link"
+               translate-values="{'url': '#!/account/profile/edit'}">
             </p>
           </div>
         </td>
       </tr>
       <tr>
-        <td>Name</td>
+        <td>{{ 'first and last name' | translate }}</td>
         <td>{{$ctrl.name}}</td>
       </tr>
       <tr>
-        <td>Phone</td>
+        <td>{{ 'Phone' | translate }}</td>
         <td>
           <div>{{$ctrl.userData.phone}}</div>
           <div ng-show="!$ctrl.userData.phone" class="alert alert-info">
-            Not set
+            {{ 'Not set' | translate }}
           </div>
         </td>
       </tr>
       <tr ng-show="$ctrl.isAdmin">
-        <td>User type</td>
-        <td>Admin</td>
+        <td>{{ 'User type' | translate }}</td>
+        <td>{{ 'Admin' | translate }}</td>
       </tr>
     </table>
   </div>

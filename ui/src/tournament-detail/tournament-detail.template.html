@@ -3,21 +3,23 @@
   <table class="table" ng-show="$ctrl.tournament">
     <tbody>
       <tr>
-        <td>Name</td>
+        <td>{{ 'tournament name' | translate }}</td>
         <td>{{$ctrl.tournament.name}}</td>
       </tr>
       <tr>
-        <td>City</td>
+        <td>{{ 'tournament city' | translate }}</td>
         <td>{{$ctrl.tournament.place.address.city.name}}</td>
       </tr>
       <tr>
-        <td>Place</td>
+        <td>{{ 'tournament place' | translate }}</td>
         <td>
-          <a href="#!/place/{{$ctrl.tournament.place.pid}}">{{$ctrl.tournament.place.name}}</a>
+          <a href="#!/place/{{$ctrl.tournament.place.pid}}">
+            {{$ctrl.tournament.place.name}}
+          </a>
         </td>
       </tr>
       <tr>
-        <td>Date</td>
+        <td>{{ 'tournament date' | translate }}</td>
         <td>
           <span class="date">
             {{$ctrl.tournament.opensAt|date:"MMM d"}}
@@ -33,9 +35,15 @@
   <table class="table table-bordered" ng-show="$ctrl.tournament">
     <tbody>
       <tr>
-        <td title="Price per participant">Price</td>
-        <td title="How many people are already enlisted">Enlisted</td>
-        <td title="Available payment methods">Payment</td>
+        <td title="Price per participant">
+          {{ 'participation price' | translate }}
+        </td>
+        <td title="How many people are already enlisted">
+          {{ 'enlisted to tournament' | translate }}
+        </td>
+        <td title="Available payment methods">
+          {{ 'payment methods' | translate }}
+        </td>
       </tr>
       <tr>
         <td>
@@ -43,11 +51,11 @@
             {{$ctrl.tournament.price}}
           </span>
           <span ng-if="!$ctrl.tournament.price">
-            free
+            {{ 'free' | translate }}
           </span>
         </td>
         <td>{{$ctrl.tournament.alreadyEnlisted}}</td>
-        <td>cash</td>
+        <td>{{ 'cash' | translate }}</td>
       </tr>
     </tbody>
   </table>
@@ -55,7 +63,7 @@
   <div class="form-group clearfix"
        ng-show="$ctrl.showCategoryList()">
     <div class="pull-left category-label">
-      Categories
+      {{ 'Categories' | translate }}
     </div>
     <div class="pull-left category-value">
       <div class="row" ng-repeat="category in $ctrl.tournament.categories">
@@ -70,7 +78,7 @@
 
   <div class="form-group clearfix" ng-show="$ctrl.showMyCategory()">
     <div class="pull-left category-label">
-      My category
+      {{ 'My category' | translate }}
     </div>
     <div class="pull-left category-value">
       {{$ctrl.myCategory.name}}
@@ -79,8 +87,7 @@
 
   <div class="form-group clearfix" ng-show="$ctrl.tournament.bidState == 'Expl'">
     <div class="alert alert-danger">
-      Sorry to say, but you have been expelled from this tournament.
-      Ask administrator for clarification.
+      {{ 'you-have-been-expelled' | translate }}
     </div>
   </div>
 
@@ -91,44 +98,47 @@
 
   <div class="form-group" ng-show="$ctrl.showQuitConfirm">
     <div class="alert alert-danger">
-      Tournament is open. You are participate.
-      If you resign right now, there is no way back!
+      {{ 'open-tournament-resign-warn' | translate }}
     </div>
     <a class="btn btn-danger" ng-click="$ctrl.resign()">
-      Resign
+      {{ 'Resign btn' | translate }}
     </a>
     <a class="btn btn-primary" ng-click="$ctrl.showQuitConfirm = false">
-      Cancel
+      {{ 'Cancel btn' | translate }}
     </a>
   </div>
 
   <div class="form-group" ng-show="$ctrl.tournament">
     <button type="button" class="btn btn-primary"
             ng-click="$ctrl.enlistMe()"
-            ng-show="$ctrl.canEnlist()">Enlist Me</button>
+            ng-show="$ctrl.canEnlist()">
+      {{ 'Enlist Me btn' | translate }}
+    </button>
     <button type="button" class="btn btn-primary"
             ng-click="$ctrl.resign()"
-            ng-show="$ctrl.canResignFutureTournament()">Resign</button>
+            ng-show="$ctrl.canResignFutureTournament()">
+      {{ 'Resign btn' | translate }}
+    </button>
     <button type="button" class="btn btn-danger"
             ng-click="$ctrl.ensureResign()"
-            ng-show="canResignActiveTournament()">Resign</button>
-    <a class="btn btn-primary label-info" role="button" ng-show="$ctrl.tournament.previousTid"
+            ng-show="canResignActiveTournament()">
+      {{ 'Resign btn' | translate }}
+    </button>
+    <a class="btn btn-primary label-info" role="button"
+       ng-show="$ctrl.tournament.previousTid"
        href="#!/tournament/drafting/{{$ctrl.tournament.previousTid}}">
-      Previous tournament in the seria
+      {{ 'previous tournament' | translate }}
     </a>
   </div>
 
   <div class="form-group" ng-show="$ctrl.tournament.bidState == 'Want'">
-    <p>Thanks, you are enlisted to the tournament <b>{{$ctrl.tournament.name}}</b>.
-      It will start {{$ctrl.tournament.opensAt | amTimeAgo}}.
-      <a href="#!/my/matches/play">Here</a> is information about
-      matches, you need to play in the tournament.
+    <p translate="thanks-for-enlistment-info"
+       translate-values="{url: '#!/my/matches/play', name: $ctrl.tournament.name, time: $ctrl.tournament.opensAt}">
     </p>
   </div>
   <div class="form-group" ng-show="$ctrl.showScheduleLink()">
-    <p>
-      <a href="#!/my/matches/play">Here</a> it is information about
-      matches, you need to play in the tournament.
+    <p translate="info-link-to-matches"
+       translate-values="{url: '#!/my/matches/play'}">
     </p>
   </div>
 </div>

@@ -84,7 +84,35 @@ module.exports = {
         'first and last name are required': 'Imię i nazwisko są wymagane',
         'first-lasts-name-length': 'Łączna długość imieni i nazwiska musi być między {{min}} i {{max}}',
         'Change btn': 'Zmienić',
-        'Cancel btn': 'Anulować'
+        'Cancel btn': 'Anulować',
+
+        // tournament details page
+        'tournament name': 'Nazwa',
+        'tournament city': 'Miasto',
+        'tournament place': 'Miejsce',
+        'tournament date': 'Data',
+        'participation price': 'Cena',
+        'enlisted to tournament': 'Zapisany',
+        'payment methods': 'Platność',
+        'free': 'gratis',
+        'cash': 'gotówka',
+        'Categories': 'Kategorie',
+        'My category': 'Moja kategoria',
+        'you-have-been-expelled': 'Przykro mi powiedzieć, ale zostałeś wydalony z turneja.'
+            + ' Poproś administratora o wyjaśnienie.',
+        'open-tournament-resign-warn': 'Turniej jest już otwarty. Bierzesz w nim udział.'
+            + ' Gdy teraz zrezygnujesz, nie możesz zmienić dania!',
+        'Resign btn': 'Zresygnować',
+        'Enlist Me btn': 'Zapisać mnie',
+        'previous tournament': 'Powszedni turniej w serii',
+        'info-link-to-matches': '<a href="{{url}}">Tutaj</a> znajdziesz informację o meczach, w których musisz zagrać.',
+        'thanks-for-enlistment-info': 'Dziękuje za zapis do turnieja <b>{{name}}</b>.'
+            + ' Turneij zaczyna {{time | amTimeAgo}}.'
+            + ' <a href="{{url}}">Tutaj</a> znajdziesz informację o meczach, w których musis zagrać.',
+        'CategoryNotChosen': 'Kategoria nie zotała wybrana. Wybierz',
+        'ChooseCategory': 'Wybierz kategorie',
+        'Drafting to': 'Rekrutacja do {{name}}',
+        'Resigning': 'Rezygnacja'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -164,6 +192,35 @@ module.exports = {
         'first and last name are required': 'First and last name are required',
         'first-lasts-name-length': 'Name length must be in range {{min}} and {{max}}',
         'Change btn': 'Change',
-        'Cancel btn': 'Cancel'
+        'Cancel btn': 'Cancel',
+
+        // tournament details page
+        'tournament name': 'Name',
+        'tournament city': 'City',
+        'tournament place': 'Place',
+        'tournament date': 'Date',
+        'participation price': 'Price',
+        'enlisted to tournament': 'Enlisted',
+        'payment methods': 'Payment',
+        'free': 'free',
+        'cash': 'cash',
+        'Categories': 'Categories',
+        'My category': 'My category',
+        'you-have-been-expelled': 'Sorry to say, but you have been expelled from this tournament.'
+            + ' Ask administrator for clarification.',
+        'open-tournament-resign-warn': 'Tournament is open. You are participate.'
+            + ' If you resign right now, there is no way back!',
+        'Resign btn': 'Resign',
+        'Enlist Me btn': 'Enlist me',
+        'previous tournament': 'Previous tournament in the seria',
+        'info-link-to-matches': '<a href="{{url}}">Here</a> it is information about matches, you need to play in the tournament.',
+        'thanks-for-enlistment-info': 'Thanks, you are enlisted to the tournament <b>{{name}}</b>.'
+            + ' It will start {{time | amTimeAgo}}.'
+            + ' <a href="{{url}}">Here</a> is information about'
+            + ' matches, you need to play in the tournament.',
+        'CategoryNotChosen': 'Category is not chosen. Choose',
+        'ChooseCategory': 'Choose category',
+        'Drafting to': 'Drafting to {{name}}',
+        'Resigning': 'Resigning'
     }
 };

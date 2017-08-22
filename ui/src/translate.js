@@ -173,7 +173,21 @@ module.exports = {
         'There is no any open tournament.': 'Nie ma otwartych turniejów.',
         'Started': 'Rozpoczęty',
         'Overall matches': 'Całkowicie meczów',
-        'Running tournaments': 'Otwarty turnieje'
+        'Running tournaments': 'Otwarty turnieje',
+
+        // open tournament page
+        'tournament complete url': 'Turniej <a href="{{url}}">{{name}}</a> jest zakończony.',
+        'tournament canceled': 'Turniej <b>{{name}}</b> został anulowany.',
+        'no matches left to play': 'Nie zostało meczów do zagrania.',
+        'Winners': 'Zwycięzcy',
+        'Opponents': 'Oponenty',
+        'Table/Category': 'Stoły/Kategorie',
+        'Opponents participating in the match': 'Oponenty uczestniający w meczu',
+        'Current score in the match': 'Obecna ilość punktów w meczu',
+        'Table number': 'Numer stołu',
+        'Match start time': 'Czas rozpoczęcia meczu',
+        'IncompleteTournamentGames': 'Nie zakończony gry turnieja',
+        'MatchesOf': 'Mecz {{name}}'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -344,6 +358,20 @@ module.exports = {
         'There is no any open tournament.': 'There is no any open tournament.',
         'Started': 'Started',
         'Overall matches': 'Overall matches',
-        'Running tournaments': 'Running tournaments'
+        'Running tournaments': 'Running tournaments',
+
+        // open tournament page
+        'tournament complete url': 'Tournament <a href="{{url}}">{{name}}</a> is complete.',
+        'tournament canceled': 'Tournament <b>{{name}}</b> is canceled.',
+        'no matches left to play': 'There is no matches left to play.',
+        'Winner': 'Winner',
+        'Opponents': 'Opponents',
+        'Table/Category': 'Table/Category',
+        'Opponents participating in the match': 'Opponents participating in the match',
+        'Current score in the match': 'Current score in the match',
+        'Table number': 'Table number',
+        'Match start time': 'Match start time',
+        'IncompleteTournamentGames': 'Incomplete games of the tournament',
+        'MatchesOf': 'Match of {{name}}'
     }
 };

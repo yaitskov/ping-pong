@@ -2,27 +2,25 @@
 <div class="container open-tournament"
      ng-show="$ctrl.tournament.state == 'Close' || $ctrl.tournament.state == 'Canceled' || $ctrl.tournament.state == 'Open' && $ctrl.matches.length == 0">
   <div ng-show="$ctrl.tournament.state == 'Close'">
-    <div class="alert alert-info" >
-      Tournament <a href="#!/tournament/result/{{$ctrl.tournament.tid}}">
-        {{$ctrl.tournament.name}}
-      </a>
-      is complete.
+    <div class="alert alert-info" translate="tournament complete url"
+         translate-values="{url: '#!/tournament/result/' + $ctrl.tournament.tid, name: $ctrl.tournament.name}">
     </div>
   </div>
   <div class="alert alert-info"
+       translate="tournament canceled"
+       translate-values="{name: $ctrl.tournament.name}"
        ng-show="$ctrl.tournament.state == 'Canceled'">
-    Tournament <b>{{$ctrl.tournament.name}}</b> is canceled.
   </div>
   <div class="alert alert-info"
+       translate="no matches left to play"
        ng-show="$ctrl.tournament.state == 'Open' && $ctrl.matches.length == 0">
-    There is no matches left to play.
   </div>
 </div>
 <div class="container-fluid open-tournament">
   <request-status></request-status>
   <div ng-show="$ctrl.winners.length > 0">
     <fieldset>
-      <legend>Winners</legend>
+      <legend>{{ 'Winners' | translate }}</legend>
       <table class="table">
         <tbody>
           <tr ng-repeat="winner in $ctrl.winners">
@@ -43,41 +41,43 @@
   <table class="table" ng-show="$ctrl.matches.length > 0">
     <thead>
       <tr>
-        <td>Opponents</td>
-        <td>Score</td>
-        <td>Table/Category</td>
+        <td>{{ 'Opponents' | translate }}</td>
+        <td>{{ 'Score' | translate }}</td>
+        <td>{{ 'Table/Category' | translate }}</td>
       </tr>
     </thead>
     <tbody>
       <tr ng-repeat="match in $ctrl.matches">
         <td class="participant-names"
-            title="Opponents participating in the match">
+            title="{{ 'Opponents participating in the match' | translate }}">
           <a ng-repeat="participant in match.participants"
              class="btn btn-default"
              href="#!/participant/{{$ctrl.tid}}/{{participant.uid}}">
             {{participant.name}}
           </a>
         </td>
-        <td title="Current score in the match">
+        <td title="{{ 'Current score in the match' | translate }}">
           <span ng-repeat="score in match.score track by $index"
                 class="badge">
             {{score}}
           </span>
         <td class="clearfix">
           <div>
-            <a href="#!/table/{{match.table.id}}" title="Table number">
+            <a href="#!/table/{{match.table.id}}"
+               title="{{ 'Table number' | translate }}">
               <span class="glyphicon glyphicon-map-marker"></span>
               T{{match.table.label}}
             </a>
           </div>
-          <div title="Match start time">
+          <div title="{{ 'Match start time' | translate }}">
             <span class="glyphicon glyphicon-time"></span>
             {{match.started | date:'HH:mm'}}
           </div>
           <div>
             <a href="#!/tournament/category/{{$ctrl.tid}}/{{match.category.cid}}"
                data-toggle="popover"
-               title="Category" data-content="{{match.type}}">
+               title="{{ 'Category' | translate }}"
+               data-content="{{match.type}}">
               <span class="glyphicon glyphicon-tag"></span>
               {{match.category.name}}
             </a>

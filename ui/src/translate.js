@@ -74,7 +74,10 @@ module.exports = {
             + ' będzie wysłany na ten adres. Jeśli nie podałeś emaila podczas zalożenia konta'
             + ' lub później, wtedy nie ma możliwości do wygenerowania linku.'
             + ' Chociaż zawsze możesz zalożyć nowe konto.',
-        'Sending email': 'Wysłanie emaila'
+        'Sending email': 'Wysłanie emaila',
+
+        // do authentication page
+        'Authentication': 'Poświadczenie'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -141,6 +144,9 @@ module.exports = {
             + ' email during sing-up or later, there is no option to generate'
             + ' sign-in link to your account. You always can sign-up again via'
             + ' another account.',
-        'Sending email': 'Sending email'
+        'Sending email': 'Sending email',
+
+        // do authentication page
+        'Authentication': 'Authentication'
     }
 };

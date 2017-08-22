@@ -5,11 +5,13 @@ angular.module('myTournamentList').
     component('myTournamentList', {
         templateUrl: template,
         cache: false,
-        controller: ['Tournament', 'mainMenu',
-                     function (Tournament, mainMenu) {
+        controller: ['Tournament', 'mainMenu', '$translate',
+                     function (Tournament, mainMenu, $translate) {
                          console.log("init my tournament list");
-                         mainMenu.setTitle('Administrated tournaments');
-                         mainMenu.setContextMenu({'#!/tournament/new': 'Add Tournament'});
+                         $translate(['AddTournament', 'AdministratedTournaments']).then(function (translations) {
+                             mainMenu.setTitle(translations.AdministratedTournaments);
+                             mainMenu.setContextMenu({'#!/tournament/new': translations.AddTournament});
+                         });
                          this.tournaments = null;
                          var self = this;
                          Tournament.administered(

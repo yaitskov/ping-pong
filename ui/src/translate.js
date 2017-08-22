@@ -224,7 +224,38 @@ module.exports = {
         'no': 'nie',
         'Publishing': 'Ogłoszenie',
         'group-size-less-quits': 'Maks rozmiar grupy jest mniej niż ilość wychodziących z grupy',
-        'Tournament Parameters': 'Parametry Turnieja'
+        'Tournament Parameters': 'Parametry Turnieja',
+
+        // new place
+        'city name': 'Miasto',
+        'place-name-length': 'Nazwa musi być krócej niż {{max}} liter',
+        'country name': 'Kraj',
+        'Add new country': 'Dodać nowy kraj',
+        'Country is required': 'Kraj jest wymagany',
+        'Add new city': 'Dodać nowe miasto',
+        'City is required': 'Miasto jest wymagane',
+        'Address is required': 'Adres jest wymagany',
+        'postal-address-length': 'Długóść adresu musi być mniej niż {{max}} liter',
+        'Create Place': 'Stworzyć miejsce',
+        'Optional field': 'Opcjionalne pole',
+        'New country': 'Nowy kraj',
+        'Name': 'Nazwa',
+        'Country name is required': 'Nazwa kraju jest wymagane',
+        'country-name-length': 'Długość nazwy kraju musi być  mniej niż {{max}} liter',
+        'Add & Use': 'Dodać & Użyć',
+        'New city': 'Nowe miasto',
+        'City name is required': 'Nazwa miasta jest wymagana',
+        'city-name-length': 'Długość nazwy miasta musi być mniej niż {{max}} liter',
+        'New Place': 'Nowe Miejsce',
+        'Creating city': 'Stworzenie miasta',
+        'Creating country': 'Stworzenie kraju',
+        'Creating place': 'Stworzenie miejsca',
+        'Cities': 'Miasta',
+        'Countries': 'Kraje',
+
+        // my tournament list
+        'you-not-created-tournament': 'Nie masz własnych turniejów.',
+        'AdministratedTournaments': 'Administrowany turnieje'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -447,6 +478,37 @@ module.exports = {
         'no': 'no',
         'Publishing': 'Publishing',
         'group-size-less-quits': 'Max group size is less than number of people quitting group',
-        'Tournament Parameters': 'Tournament Parameters'
+        'Tournament Parameters': 'Tournament Parameters',
+
+        // new place
+        'city name': 'City',
+        'place-name-length': 'Name length must be less than {{max}} letters',
+        'country name': 'Country',
+        'Add new country': 'Add new country',
+        'Country is required': 'Country is required',
+        'Add new city': 'Add new city',
+        'City is required': 'City is required',
+        'Address is required': 'Address is required',
+        'postal-address-length': 'Name length must be less than {{max}} letters',
+        'Create Place': 'Create Place',
+        'Optional field': 'Optional field',
+        'New country': 'New country',
+        'Name': 'Name',
+        'Country name is required': 'Country name is required',
+        'country-name-length': 'Country name length must be less than {{max}} letters',
+        'Add & Use': 'Add & Use',
+        'New city': 'New city',
+        'City name is required': 'City name is required',
+        'city-name-length': 'City name length must be less than {{max}} letters',
+        'New Place': 'New Place',
+        'Creating city': 'Creating city',
+        'Creating country': 'Creating country',
+        'Creating place': 'Creating place',
+        'Cities': 'Cities',
+        'Countries': 'Countries',
+
+        // my tournament list
+        'you-not-created-tournament': 'You haven\'t created a tournament.',
+        'AdministratedTournaments': 'Administrated tournaments'
     }
 };

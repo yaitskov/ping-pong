@@ -1,10 +1,12 @@
 <main-menu></main-menu>
 <div class="container" ng-show="$ctrl.tournaments.length == 0">
   <div class="alert alert-info" >
-    You haven't created a tournament.
+    {{ 'you-not-created-tournament' | translate }}
   </div>
   <div class="form-group">
-    <a class="btn btn-primary" href="#!/tournament/new">Add Tournament</a>
+    <a class="btn btn-primary" href="#!/tournament/new">
+      {{ 'AddTournament' | translate }}
+    </a>
   </div>
 </div>
 <div class="container-fluid list judge">
@@ -26,7 +28,7 @@
         {{tournament.opensAt|date : 'MMM d'}}
       </span>
       <span ng-show="tournament.state == 'Close'">
-        complete
+        {{ 'complete status' | translate }}
       </span>
     </div>
   </div>

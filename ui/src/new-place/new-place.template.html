@@ -3,127 +3,127 @@
   <form novalidate name="$ctrl.form" ng-submit="$ctrl.createPlace()">
     <div class="form-group"
          ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.name.$dirty) && $ctrl.form.name.$invalid}">
-      <label for="name">Name</label>
+      <label for="name">{{ 'place name' | translate }}</label>
       <input type="text" class="form-control"
              ng-model="$ctrl.place.name"
              ng-maxlength="40"
              required
              name="name"
              id="name"
-             placeholder="Name" />
+             placeholder="{{ 'place name' | translate }}" />
       <p class="help-block" ng-show="$ctrl.form.name.$error.required">
-        Name is required
+        {{ 'Name is required' | translate }}
       </p>
       <p class="help-block"
          ng-show="$ctrl.form.name.$error.minlength || $ctrl.form.name.$error.maxlength">
-        Name length must be less than 40 letters
+        {{ 'place-name-length' | translate : '{max: 40}' }}
       </p>
     </div>
     <div class="form-group"
          ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.country.$dirty) && $ctrl.form.country.$invalid}">
-      <label for="country">Country</label>
+      <label for="country">{{ 'country name' | translate }}</label>
       <select class="form-control"
               ng-model="$ctrl.countryId"
               ng-change="$ctrl.countryChange()"
               required name="country" id="country">
         <option value="addNewCountry">
-          Add new country
+          {{ 'Add new country' | translate }}
         </option>
         <option ng-repeat="country in $ctrl.countries | orderBy : 'name'" value="{{country.id}}">
           {{country.name}}
         </option>
       </select>
       <p class="help-block" ng-show="$ctrl.form.country.$error.required">
-        Country is required
+        {{ 'Country is required' | translate }}
       </p>
     </div>
     <div class="form-group"
          ng-show="$ctrl.countryId"
          ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.city.$dirty) && $ctrl.form.city.$invalid}">
-      <label for="city">City</label>
+      <label for="city">
+        {{ 'city name' | translate }}
+      </label>
       <select class="form-control"
               ng-model="$ctrl.place.address.city.id"
               ng-change="$ctrl.cityChange()"
-              required name="city" id="city"
-              placeholder="City Address">
+              required name="city" id="city">
         <option value="addNewCity">
-          Add new city
+          {{ 'Add new city' | translate }}
         </option>
         <option ng-repeat="city in $ctrl.cities | orderBy : 'name'" value="{{city.id}}">
           {{city.name}}
         </option>
       </select>
       <p class="help-block" ng-show="$ctrl.form.city.$error.required">
-        City is required
+        {{ 'City is required' | translate }}
       </p>
     </div>
     <div class="form-group"
          ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.address.$dirty) && $ctrl.form.address.$invalid}">
-      <label for="postAddress">Post Address</label>
+      <label for="postAddress">
+        {{ 'Postal Address' | translate }}
+      </label>
       <input type="text" class="form-control"
              ng-model="$ctrl.place.address.address"
              ng-maxlength="200"
              required
              name="address"
              id="postAddress"
-             placeholder="Post Address"/>
+             placeholder="{{ 'Postal Address' | translate }}"/>
       <p class="help-block" ng-show="$ctrl.form.address.$error.required">
-        Address is required
+        {{ 'Address is required' | translate }}
       </p>
       <p class="help-block"
          ng-show="$ctrl.form.address.$error.minlength || $ctrl.form.address.$error.maxlength">
-        Name length must be less than 200 letters
+        {{ 'postal-address-length' | translate : '{max: 200}' }}
       </p>
     </div>
     <div class="form-group"
           ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.phone.$dirty) && $ctrl.form.phone.$invalid}">
-      <label for="phone">Phone</label>
+      <label for="phone">{{ 'Phone' | translate }} </label>
       <input type="text"  class="form-control"
              ng-model="$ctrl.place.address.phone"
              ng-maxlength="40"
              validate-phone
              name="phone"
              id="phone"
-             placeholder="Phone"/>
-      <p class="help-block" ng-show="$ctrl.form.phone.$valid">
-        Optional field. It could be used for account recovery.
-      </p>
+             placeholder="{{ 'Phone' | translate }}"/>
       <p class="help-block"
          ng-show="$ctrl.form.phone.$error.maxlength">
-        Phone length must be less than 40
+        {{ 'phone-length' | translate : '{max: 40}' }}
       </p>
       <p class="help-block"
          ng-show="$ctrl.form.phone.$error.phone">
-        Phone is in wrong format
+        {{ 'phone format wrong' | translate }}
       </p>
     </div>
     <div class="form-group"
          ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.email.$dirty) && $ctrl.form.email.$invalid}">
-      <label for="email">Contact Email</label>
+      <label for="email">{{ 'Contact Email' | translate }}</label>
       <input type="email" class="form-control"
              ng-model="$ctrl.place.address.email"
              ng-maxlength="40"
              validate-email
              name="email"
-             id="email" placeholder="Contact email"/>
+             id="email" placeholder="{{ 'Contact Email' | translate }}"/>
       <p class="help-block"
          ng-show="$ctrl.form.email.$error.maxlength">
-        Email length must be less than 40
+        {{ 'email-length' | translate : '{max : 40}' }}
       </p>
       <p class="help-block"
          ng-show="$ctrl.form.email.$error.email">
-        Email format is wrong
+        {{ 'email wrong format' | translate }}
       </p>
       <p class="help-block" ng-show="$ctrl.form.email.$valid">
-        Optional field.
+        {{ 'Optional field' | translate }}
       </p>
     </div>
     <div class="form-group">
       <button class="btn btn-primary" type="submit">
-        Create Place
+        {{ 'Create Place' | translate }}
       </button>
       <a class="btn btn-primary" ng-click="$ctrl.safeBack()">
-        Back
+        {{ 'Back btn' | translate }}
       </a>
     </div>
     <div class="form-group">
@@ -137,12 +137,16 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">New country</h4>
+            <h4 class="modal-title">
+              {{ 'New country' | translate }}
+            </h4>
           </div>
           <div class="modal-body">
             <div class="form-group"
                  ng-class="{'has-error': ($ctrl.countryForm.$submitted || $ctrl.countryForm.name.$dirty) && $ctrl.countryForm.name.$invalid}">
-              <label for="countryname">Name</label>
+              <label for="countryname">
+                {{ 'Name' | translate }}
+              </label>
               <input type="text" class="form-control"
                      ng-model="$ctrl.countryName"
                      ng-maxlength="80"
@@ -150,21 +154,25 @@
                      name="name"
                      index="0"
                      id="countryname"
-                     placeholder="Name" />
+                     placeholder="{{ 'Name' | translate }}" />
               <p class="help-block" ng-show="$ctrl.countryForm.name.$error.required">
-                Country name is required
+                {{ 'Country name is required' | translate }}
               </p>
               <p class="help-block"
                  ng-show="$ctrl.countryForm.name.$error.minlength || $ctrl.countryForm.name.$error.maxlength">
-                Country name length must be less than 80 letters
+                {{ 'country-name-length' | translate : '{max: 80}' }}
               </p>
             </div>
             <request-status></request-status>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default"
-                    data-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-primary">Add & Use</button>
+                    data-dismiss="modal">
+              {{ 'Cancel btn' | translate }}
+            </button>
+            <button type="submit" class="btn btn-primary">
+              {{ 'Add & Use' | translate }}
+            </button>
           </div>
         </div>
       </div>
@@ -177,33 +185,37 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">New city</h4>
+            <h4 class="modal-title">{{ 'New city' | translate }}</h4>
           </div>
           <div class="modal-body">
             <div class="form-group"
                  ng-class="{'has-error': ($ctrl.cityForm.$submitted || $ctrl.cityForm.name.$dirty) && $ctrl.cityForm.name.$invalid}">
-              <label for="cityname">Name</label>
+              <label for="cityname">{{ 'Name' | translate }}</label>
               <input type="text" class="form-control"
                      ng-model="$ctrl.cityName"
                      ng-maxlength="90"
                      required
                      name="name"
                      id="cityname"
-                     placeholder="Name" />
+                     placeholder="{{ 'Name' | translate }}" />
               <p class="help-block" ng-show="$ctrl.cityForm.name.$error.required">
-                City name is required
+                {{ 'City name is required' | translate }}
               </p>
               <p class="help-block"
                  ng-show="$ctrl.cityForm.name.$error.minlength || $ctrl.cityForm.name.$error.maxlength">
-                City name length must be less than 90 letters
+                {{ 'city-name-length' | translate : '{max: 90}' }}
               </p>
             </div>
             <request-status></request-status>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default"
-                    data-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-primary">Add & Use</button>
+                    data-dismiss="modal">
+              {{ 'Cancel btn' | translate }}
+            </button>
+            <button type="submit" class="btn btn-primary">
+              {{ 'Add & Use' | translate }}
+            </button>
           </div>
         </div>
       </div>

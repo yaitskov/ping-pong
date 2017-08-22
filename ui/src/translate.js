@@ -131,7 +131,13 @@ module.exports = {
         'complete status': 'zakończony',
         'you-not-enlisted-to-any-tournament': 'Nie ma żadnego turnieja w którym grasz. Zobać '
             + ' <a href="{{url}}">listę</a> nadchodzących turniejów i wybierz ktróry Cię odpowiada.',
-        'Tournaments I am enlisted to': 'Grasz w turniejach'
+        'Tournaments I am enlisted to': 'Grasz w turniejach',
+
+        // place picker
+        'AddPlaceBtn': 'Dodać miejsce',
+        'ChoosePlace': 'Wybrać miejsce',
+        'you dont administrate any place': 'Nie jesteś administratorem żadnego miejsca.'
+
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -260,6 +266,12 @@ module.exports = {
         'you-not-enlisted-to-any-tournament': 'You haven\'t enlisted yet to any tournament. Have a look at'
             + ' <a href="{{url}}">the list</a> of coming tournaments and'
             + ' pick an event fitting you.',
-        'Tournaments I am enlisted to': 'Tournaments I am enlisted to'
+        'Tournaments I am enlisted to': 'Tournaments I am enlisted to',
+
+        // place picker
+        'AddPlaceBtn': 'Add place',
+        'ChoosePlace': 'Choose place',
+        'you dont administrate any place': 'You don\'t administrate any place.'
+
     }
 };

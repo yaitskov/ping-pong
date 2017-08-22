@@ -136,8 +136,17 @@ module.exports = {
         // place picker
         'AddPlaceBtn': 'Dodać miejsce',
         'ChoosePlace': 'Wybrać miejsce',
-        'you dont administrate any place': 'Nie jesteś administratorem żadnego miejsca.'
+        'you dont administrate any place': 'Nie jesteś administratorem żadnego miejsca.',
 
+        // place detail
+        'place name': 'Nazwa',
+        'place city': 'Miasto',
+        'Postal Address': 'Adres pocztowy',
+        'Tables avaiable': 'Liczba stołów',
+        'Contact Email': 'Email kontaktowy',
+        'PlaceTitle': 'Miejsce',
+        'PlaceWithName': 'Miejsce {{name}}',
+        'AddTournament': 'Dodać turniej'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -271,7 +280,16 @@ module.exports = {
         // place picker
         'AddPlaceBtn': 'Add place',
         'ChoosePlace': 'Choose place',
-        'you dont administrate any place': 'You don\'t administrate any place.'
+        'you dont administrate any place': 'You don\'t administrate any place.',
 
+        // place detail
+        'place name': 'Name',
+        'place city': 'City',
+        'Postal Address': 'Postal Address',
+        'Tables avaiable': 'Tables avaiable',
+        'Contact Email': 'Contact Email',
+        'PlaceTitle': 'Place',
+        'PlaceWithName': 'Place {{name}}',
+        'AddTournament': 'Add Tournament'
     }
 };

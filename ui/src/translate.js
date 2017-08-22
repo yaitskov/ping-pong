@@ -41,7 +41,25 @@ module.exports = {
         'Phone': 'Number telefonu',
         'Not set': 'Nie ustawione',
         'User type': 'Typ użytkownika',
-        'Admin': 'Administrator'
+        'Admin': 'Administrator',
+
+        // sign up page
+        'First name': 'Imię',
+        'FirstName is required': 'Imię jest wymagane',
+        'LastName is required': 'Nazwisko jest wymagane',
+        'first-name-length-range': 'Długość imieni musi być między {{min}} i {{max}} literami',
+        'last-name-length-range': 'Długość nazwiska musi być między {{min}} i {{max}} literami',
+        'Last name': 'Nazwisko',
+        'email-length': 'Długość adresa email musi być mniej niż {{max}}',
+        'email wrong format': 'Email nie jest wlasciwy',
+        'email-purpose-description': 'Opcjonalne pole, ale one udostępnia twoje konto '
+            + ' dla innych urządzeń oraz regeneracje sesji która wygasła.'
+            + ' Jeśli chcesz właśnie zapisać się do jedno turnieja, wtedy możesz zostawić go pustym, '
+            + ' a email możesz nadać później.',
+        'phone-purpose-description': 'Opcjonalne pole. One może być wykożystano dla regenracji dostępa do konta.',
+        'phone-length': 'Długość numera telefonu musi być mniej niż {{max}}',
+        'Sing Up btn': 'Zalożyć konto',
+        'phone format wrong': 'Format numera telefonu nie jest odpowiedni'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -75,5 +93,23 @@ module.exports = {
             + ' or to recover current session.',
         'follow-set-email-link': 'Follow <a href="{{url}}">the link</a> to set an email',
         'first and last name': 'Name',
+
+        // sign up page
+        'First name': 'First name',
+        'FirstName is required': 'First name is required',
+        'LastName is required': 'Last name is required',
+        'first-name-length-range': 'Name length must be in range {{min}} and {{max}}',
+        'last-name-length-range': 'Name length must be in range {{min}} and {{max}}',
+        'Last name': 'Last name',
+        'email-length': 'Email length must be less than {{max}}',
+        'email wrong format': 'Email format is wrong',
+        'email-purpose-description': 'Optional field, but it allows to get access to your accont'
+            + ' from different devices or recover access in case of session'
+            + ' is lost or expired. If you want just enlist to the tournament,'
+            + ' then leave it empty. The email could be bound later.',
+        'phone-purpose-description': 'Optional field. It could be used for account recovery.',
+        'phone-length': 'Phone length must be less than {{max}}',
+        'Sing Up btn': 'Sign Up',
+        'phone format wrong': 'Phone is in wrong format'
     }
 };

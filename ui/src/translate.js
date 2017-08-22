@@ -60,6 +60,7 @@ module.exports = {
         'phone-length': 'Długość numera telefonu musi być mniej niż {{max}}',
         'Sing Up btn': 'Zalożyć konto',
         'phone format wrong': 'Format numera telefonu nie jest odpowiedni',
+        'Registering account': 'Rejestracja konta',
 
         // sign in page
         'Email is required': 'Adres email jest wymagany',
@@ -72,7 +73,8 @@ module.exports = {
             + ' konto posiada email.  Jednorazowy link do logogwania'
             + ' będzie wysłany na ten adres. Jeśli nie podałeś emaila podczas zalożenia konta'
             + ' lub później, wtedy nie ma możliwości do wygenerowania linku.'
-            + ' Chociaż zawsze możesz zalożyć nowe konto.'
+            + ' Chociaż zawsze możesz zalożyć nowe konto.',
+        'Sending email': 'Wysłanie emaila'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -124,6 +126,7 @@ module.exports = {
         'phone-length': 'Phone length must be less than {{max}}',
         'Sing Up btn': 'Sign Up',
         'phone format wrong': 'Phone is in wrong format',
+        'Registering account': 'Registering account',
 
         // sign in page
         'Email is required': 'Email is required',
@@ -137,6 +140,7 @@ module.exports = {
             + ' link will be sent to that address. If you haven\'t provided an'
             + ' email during sing-up or later, there is no option to generate'
             + ' sign-in link to your account. You always can sign-up again via'
-            + ' another account.'
+            + ' another account.',
+        'Sending email': 'Sending email'
     }
 };

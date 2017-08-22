@@ -19,7 +19,7 @@ angular.
                     }
                     $translate("Sending email").then(function (msg) {
                         requestStatus.startLoading(msg);
-                        this.ok = null;
+                        self.ok = null;
                         $http.post('/api/anonymous/auth/generate/sign-in-link',
                                    self.email,
                                    {'Content-Type': 'application/json'}).

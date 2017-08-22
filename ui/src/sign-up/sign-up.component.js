@@ -18,7 +18,7 @@ angular.
                     }
                     $translate('Registering account').then(function (msg) {
                         requestStatus.startLoading(msg);
-                        var userName = this.firstName + ' ' + this.lastName;
+                        var userName = self.firstName + ' ' + self.lastName;
                         $http.post('/api/anonymous/user/register',
                                    {name: userName,
                                     email: self.email,

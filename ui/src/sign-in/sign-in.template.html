@@ -5,36 +5,36 @@
     <div class="form-group"
          ng-show="!$ctrl.ok"
          ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.email.$dirty) && $ctrl.form.email.$invalid}">
-      <label for="email">Email</label>
+      <label for="email">{{ 'Email' | translate }}</label>
       <input type="email" class="form-control"
              required
              ng-model="$ctrl.email"
              ng-maxlength="60"
              validate-email
              name="email"
-             id="email" placeholder="Email"/>
+             id="email" placeholder="{{ 'Email' | translate }}"/>
       <p class="help-block"
          ng-show="($ctrl.form.$submitted || $ctrl.form.email.$dirty) && $ctrl.form.email.$error.required">
-        Email is required
+        {{ 'Email is required' | translate }}
       </p>
       <p class="help-block"
          ng-show="$ctrl.form.email.$error.maxlength">
-        Email length must be less than 60
+        {{ 'email-length' | translate : '{max: 60}' }}
       </p>
       <p class="help-block"
          ng-show="$ctrl.form.email.$error.email">
-        Email format is wrong
+        {{ 'email wrong format' | translate }}
       </p>
-      <p class="help-block" ng-show="!$ctrl.form.email.$dirty || $ctrl.form.email.$valid">
-        Provide an email address, which is used for the account registration.
+      <p class="help-block">
+        {{ 'provide-email-address' | translate }}
       </p>
-      <p class="help-block" ng-show="!$ctrl.form.email.$dirty || $ctrl.form.email.$valid">
-        An email with an one time authentication link will be sent.
+      <p class="help-block">
+        {{ 'auth-email-sent' | translate }}
       </p>
     </div>
     <div class="form-group" ng-show="!$ctrl.ok">
       <button type="submit" class="btn btn-default btn-primary">
-        Send Link
+        {{ 'Send Link btn' | translate }}
       </button>
     </div>
     <div class="form-group">
@@ -42,20 +42,14 @@
     </div>
     <div class="form-group">
       <div class="alert alert-info" ng-show="$ctrl.ok">
-        The email has been sent.
-        Now you can check your mail box for the letter.
+        {{ 'email-has-been-sent' | translate }}
       </div>
     </div>
   </form>
   <details>
-    <summary>Info</summary>
+    <summary>{{ 'Info' | translate }}</summary>
     <p class="alert alert-info">
-      Here you can get another session for your account, if the
-      account has been associated with an email.  One time sign-in
-      link will be sent to that address. If you haven't provided an
-      email during sing-up or later, there is no option to generate
-      sign-in link to your account. You always can sign-up again via
-      another account.
+      {{ 'sign-in-info' | translate }}
     </p>
   </details>
 </div>

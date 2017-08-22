@@ -27,7 +27,7 @@ module.exports = {
         'Generate sign-in link': 'Wyslać link do logowania',
         'Edit': 'Edytować',
         'Request Admin permissions': 'Chcę sądzić',
-        'sing-in-lin-generated': 'Link do logowania był wysłany na maila.',
+        'sing-in-lin-generated': 'Link do logowania został wysłany na maila.',
         'account-without-email-warning': 'Twoje konto nie ma skrzynki email. '
             + 'Straczisz dostęp do konta na zawsze w razie wylogowania. '
             + 'Bez skrzynki też nie możesz zalogować się z innych urządzeń.',
@@ -63,6 +63,7 @@ module.exports = {
         'Registering account': 'Rejestracja konta',
 
         // sign in page
+        'Sign In': 'Logowanie',
         'Email is required': 'Adres email jest wymagany',
         'provide-email-address': 'Podaj adres emaila który był zastosowany prz zalożeniu konta.',
         'auth-email-sent': 'Na który będzie wysłany list z jednorazowym linkiem dla logowania.',
@@ -77,7 +78,13 @@ module.exports = {
         'Sending email': 'Wysłanie emaila',
 
         // do authentication page
-        'Authentication': 'Poświadczenie'
+        'Authentication': 'Poświadczenie',
+
+        // edit account page
+        'first and last name are required': 'Imię i nazwisko są wymagane',
+        'first-lasts-name-length': 'Łączna długość imieni i nazwiska musi być między {{min}} i {{max}}',
+        'Change btn': 'Zmienić',
+        'Cancel btn': 'Anulować'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -103,6 +110,9 @@ module.exports = {
         'application-error': 'An application error happened',
 
         // account page
+        'Logout': 'Logout',
+        'Generate sign-in link': 'Generate sign-in link',
+        'Edit': 'Edit',
         'sing-in-lin-generated': 'Sign-in link has been generated and mailed to you.',
         'account-without-email-warning': 'Your account doesn\'t have an email bound to it. If you logout '
             + 'right now, you will invalidate account forever! To logout from '
@@ -132,6 +142,7 @@ module.exports = {
         'Registering account': 'Registering account',
 
         // sign in page
+        'Sign In': 'Sign In',
         'Email is required': 'Email is required',
         'provide-email-address': 'Provide an email address, which is used for the account registration.',
         'auth-email-sent': 'An email with an one time authentication link will be sent.',
@@ -147,6 +158,12 @@ module.exports = {
         'Sending email': 'Sending email',
 
         // do authentication page
-        'Authentication': 'Authentication'
+        'Authentication': 'Authentication',
+
+        // edit account page
+        'first and last name are required': 'First and last name are required',
+        'first-lasts-name-length': 'Name length must be in range {{min}} and {{max}}',
+        'Change btn': 'Change',
+        'Cancel btn': 'Cancel'
     }
 };

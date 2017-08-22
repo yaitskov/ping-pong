@@ -112,7 +112,20 @@ module.exports = {
         'CategoryNotChosen': 'Kategoria nie zotała wybrana. Wybierz',
         'ChooseCategory': 'Wybierz kategorie',
         'Drafting to': 'Rekrutacja do {{name}}',
-        'Resigning': 'Rezygnacja'
+        'Resigning': 'Rezygnacja',
+
+        // tournament result
+        'tournament complete': 'Turniej {{name}} jest zakończony.',
+        'tournament in progress': 'Turniej {{name}} trwa.',
+        'tournament not started': 'Turniej {{name}} jeszcze nie jest rozpoczęty.',
+        'Participant': 'Uczestnik',
+        'Matches': 'Mecze',
+        'Score': 'Wynik',
+        'count of won matches': 'liczba wygranych meczów',
+        'cumulative score across all matches': 'Łączna suma punktów wszystkich meczów',
+        'Opponents participating in the match': 'Oponenty uczestniający w meczu',
+        'Tournament results': 'Wyniki turnieja',
+        "Loading participants": "Ladowanie uczestników"
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -221,6 +234,19 @@ module.exports = {
         'CategoryNotChosen': 'Category is not chosen. Choose',
         'ChooseCategory': 'Choose category',
         'Drafting to': 'Drafting to {{name}}',
-        'Resigning': 'Resigning'
+        'Resigning': 'Resigning',
+
+        // tournament result
+        'tournament complete': 'Tournament {{name}} is complete.',
+        'tournament in progress': 'Tournament {{name}} is in progress.',
+        'tournament not started': 'Tournament {{name}} is not started yet.',
+        'Participant': 'Participant',
+        'Matches': 'Matches',
+        'Score': 'Score',
+        'count of won matches': 'count of won matches',
+        'cumulative score across all matches': 'cumulative score across all matches',
+        'Opponents participating in the match': 'Opponents participating in the match',
+        'Tournament results': 'Tournament results',
+        "Loading participants": "Loading participants"
     }
 };

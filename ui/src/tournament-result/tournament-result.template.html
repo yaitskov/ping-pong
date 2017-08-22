@@ -3,18 +3,18 @@
   <request-status></request-status>
   <div class="alert alert-success"
        ng-show="$ctrl.tournament.state == 'Close'">
-    Tournament {{$ctrl.tournament.name}} is complete.
+    {{ 'tournament complete' | translate : '{name: $ctrl.tournament.name}' }}
   </div>
   <div class="alert alert-info"
        ng-show="$ctrl.tournament.state == 'Open'">
-    Tournament {{$ctrl.tournament.name}} is in progress.
+    {{ 'tournament in progress' | translate : '{name: $ctrl.tournament.name}' }}
   </div>
  <div class="alert alert-info"
        ng-show="$ctrl.tournament.state == 'Draft' || $ctrl.tournament.state == 'Announce'">
-    Tournament {{$ctrl.tournament.name}} is not started yet.
+    {{ 'tournament not started | translate : '{name: $ctrl.tournament.name}' }}
   </div>
   <div class="form-group" ng-show="$ctrl.tournament">
-    <label>Categories</label>
+    <label>{{ 'Categories' | translate }}</label>
     <div class="btn-group">
       <a ng-click="$ctrl.pickCategory(category.cid)"
          class="btn"
@@ -28,15 +28,19 @@
     <thead>
       <tr>
         <td>#</td>
-        <td>Participant</td>
-        <td title="count of won matches">Matches</td>
-        <td title="cumulative score across all matches">Score</td>
+        <td>{{ 'Participant' | translate }}</td>
+        <td title="{{ 'count of won matches' | translate }}">
+          {{ 'Matches' | translate }}
+        </td>
+        <td title="{{ 'cumulative score across all matches' | translate }}">
+          {{ 'Score' | translate }}
+        </td>
       </tr>
     </thead>
     <tbody>
       <tr ng-repeat="participant in $ctrl.participants">
         <td>{{$index + 1}}</td>
-        <td title="Opponents participating in the match">
+        <td title="{{ 'Opponents participating in the match' | translate }}">
           <a href="#!/participant/{{$ctrl.tournament.tid}}/{{participant.user.uid}}">
             {{participant.user.name}}
           </a>

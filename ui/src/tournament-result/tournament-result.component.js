@@ -5,9 +5,11 @@ angular.
     module('tournamentResult').
     component('tournamentResult', {
         templateUrl: template,
-        controller: ['Tournament', 'mainMenu', '$routeParams', 'requestStatus',
-                     function (Tournament, mainMenu, $routeParams, requestStatus) {
-                         mainMenu.setTitle('Tournament results');
+        controller: ['Tournament', 'mainMenu', '$routeParams', 'requestStatus', '$translate',
+                     function (Tournament, mainMenu, $routeParams, requestStatus, $translate) {
+                         $translate('Tournament results').then(function (msg) {
+                             mainMenu.setTitle(msg);
+                         });
                          var self = this;
                          self.matches = null;
                          self.winners = null;
@@ -16,18 +18,20 @@ angular.
                          self.tid = $routeParams.tournamentId;
                          var params = {tournamentId: $routeParams.tournamentId};
                          this.pickCategory = function (cid) {
-                             requestStatus.startLoading("Loading participants");
-                             self.currentCid = cid;
-                             Tournament.result(
-                                 {tournamentId: $routeParams.tournamentId,
-                                  categoryId: cid},
-                                 function (participants) {
-                                     requestStatus.complete();
-                                     self.currentCid = cid;
-                                     self.participants = participants;
-                                 },
-                                 requestStatus.failed);
-                         }
+                             $translate("Loading participants").then(function (msg) {
+                                 requestStatus.startLoading(msg);
+                                 self.currentCid = cid;
+                                 Tournament.result(
+                                     {tournamentId: $routeParams.tournamentId,
+                                      categoryId: cid},
+                                     function (participants) {
+                                         requestStatus.complete();
+                                         self.currentCid = cid;
+                                         self.participants = participants;
+                                     },
+                                     requestStatus.failed);
+                             });
+                         };
                          requestStatus.startLoading();
                          Tournament.aComplete(
                              {tournamentId: $routeParams.tournamentId},

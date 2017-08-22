@@ -5,9 +5,11 @@ angular.
     module('newTournament').
     component('newTournament', {
         templateUrl: template,
-        controller: ['auth', 'mainMenu', '$http', '$location', 'placePicker', 'pageCtx', '$scope',
-                     function (auth, mainMenu, $http, $location, placePicker, pageCtx, $scope) {
-                         mainMenu.setTitle('New Tournament');
+        controller: ['auth', 'mainMenu', '$http', '$location', 'placePicker', 'pageCtx', '$scope', '$translate',
+                     function (auth, mainMenu, $http, $location, placePicker, pageCtx, $scope, $translate) {
+                         $translate('New Tournament').then(function (msg) {
+                             mainMenu.setTitle(msg);
+                         });
                          this.tournament = pageCtx.get('newTournament') || {quitsFromGroup: 2,
                                                                             maxGroupSize: 8,
                                                                             ticketPrice: 30,

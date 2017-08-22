@@ -187,7 +187,24 @@ module.exports = {
         'Table number': 'Numer stołu',
         'Match start time': 'Czas rozpoczęcia meczu',
         'IncompleteTournamentGames': 'Nie zakończony gry turnieja',
-        'MatchesOf': 'Mecz {{name}}'
+        'MatchesOf': 'Mecz {{name}}',
+
+        // new tournament
+        'Name is required': 'Nazwa jest wymagana',
+        'tournament-name-length': 'Nazwa turnieju musi być mniej niz {{max}} liter',
+        'tournament start date': 'Data rozpoczęcia',
+        'Date is required': 'Data jest wymagana',
+        'tournament start time': 'Czas rozpoczęcia (localna strefa)',
+        'Choose start time': 'Wybierz czas rozpoczęcia',
+        'Time is required': 'Czas rozpoczęcia jest wymagany',
+        'Choose a place': 'Wybierz miejsce',
+        'Place is required': 'Miejsce jest wymagane',
+        'Ticket price': 'Cena biltu',
+        'price-length': 'Cena musi być krócej niż {{max}} liter',
+        'price positive': 'Cena musi być więcej zera.',
+        'ticket-price-hint': 'Cena biletu jest opcjonalna. Zostaw pole puste jeśli gratis.',
+        'Next btn': 'Dalej',
+        'New Tournament': 'Nowy turniej'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -372,6 +389,24 @@ module.exports = {
         'Table number': 'Table number',
         'Match start time': 'Match start time',
         'IncompleteTournamentGames': 'Incomplete games of the tournament',
-        'MatchesOf': 'Match of {{name}}'
+        'MatchesOf': 'Match of {{name}}',
+
+        // new tournament
+        'Name is required': 'Name is required',
+        'tournament-name-length': 'Name length must be less than {{max}} letters',
+        'tournament start date': 'Start Date',
+        'Date is required': 'Date is required',
+        'tournament start time': 'Local Time (tz)',
+        'Choose start time': 'Choose start time',
+        'Time is required': 'Time is required',
+        'Choose a place': 'Choose a place',
+        'Place is required': 'Place is required',
+        'Ticket price': 'Ticket price',
+        'price-length': 'Price length must be less than {{max}} letters',
+        'price positive': 'Price should a positive number.',
+        'ticket-price-hint': 'Participant\'s ticket price is optinal. Empty means for free.',
+        'Next btn': 'Next',
+        'New Tournament': 'New Tournament'
+
     }
 };

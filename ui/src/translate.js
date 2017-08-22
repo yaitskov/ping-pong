@@ -146,7 +146,28 @@ module.exports = {
         'Contact Email': 'Email kontaktowy',
         'PlaceTitle': 'Miejsce',
         'PlaceWithName': 'Miejsce {{name}}',
-        'AddTournament': 'Dodać turniej'
+        'AddTournament': 'Dodać turniej',
+
+        // participant presence
+        'nobody has enlisted': 'Nikt jeszcze nie zgłosił się.',
+        'Tournament btn': 'Turniej',
+        'participant name': 'Uczestnik',
+        'bid state': 'Stan',
+        'Expel participant': 'Wydalić uczestnika',
+        'Mark that participant paid': 'Oznaczyć uczestnika jak zaplacony',
+        'Mark that participant is here': 'Oznaczyć, że uczestnik jest obecny',
+        'Reset to state - want to participate': 'Zresetować stan uczestnika do wole uczestniczyć',
+        'Participant Expel title': 'Wydalinie uczestnika',
+        'Expel btn': 'Wydalić',
+        'expel-warn': 'Chcesz wydalić uczestnika'
+            + ' <a href="{{url}}">{{name}}</a>.'
+            + ' Ta operacja jest nie odwracalna w razie trwającego turnieja.',
+        'ManagementOfParticipants': 'Zarządzanie uczestnikami',
+        'Tournament': 'Turniej',
+        'Expelling': 'Wydalenie',
+        "Paying": "Oplacenie",
+        "Marking participant presence": "Oznaczenie obecności uczestnika",
+        "Reseting participant": "Resetowanie stanu uczestnika"
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -290,6 +311,27 @@ module.exports = {
         'Contact Email': 'Contact Email',
         'PlaceTitle': 'Place',
         'PlaceWithName': 'Place {{name}}',
-        'AddTournament': 'Add Tournament'
+        'AddTournament': 'Add Tournament',
+
+        // participant presence
+        'nobody has enlisted': 'Nobody has enlisted yet.',
+        'Tournament btn': 'Tournament',
+        'participant name': 'Name',
+        'bid state': 'State',
+        'Expel participant': 'Expel participant',
+        'Mark that participant paid': 'Mark that participant paid',
+        'Mark that participant is here': 'Mark that participant is here',
+        'Reset to state - want to participate': 'Reset to state - want to participate',
+        'Participant Expel title': 'Participant Expel',
+        'Expel btn': 'Expel',
+        'expel-warn': 'You are going to expel participant'
+            + ' <a href="{{url}}">{{name}}</a>.'
+            + ' This operation is irrivertible in running tournament.',
+        'ManagementOfParticipants': 'Management of participants',
+        'Tournament': 'Tournament',
+        'Expelling': 'Expelling',
+        "Paying": "Paying",
+        "Marking participant presence": "Marking participant presence",
+        "Reseting participant": "Reseting participant"
     }
 };

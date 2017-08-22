@@ -23,7 +23,7 @@ angular.
                                                   if (auth.isAuthenticated()) {
                                                       mainMenu.setContextMenu({'#!/tournament/new': translations.AddTournament});
                                                   }
-                                              }
+                                              });
                                           },
                                           requestStatus.failed);
                          });

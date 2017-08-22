@@ -4,7 +4,7 @@
   <table class="table" ng-show="$ctrl.place">
     <tr>
       <td>
-        Name
+        {{ 'place name' | translate }}
       </td>
       <td>
         {{$ctrl.place.name}}
@@ -12,7 +12,7 @@
     </tr>
     <tr ng-show="$ctrl.place.address.address">
       <td>
-        City
+        {{ 'place city' | translate }}
       </td>
       <td>
         {{$ctrl.place.address.city.name}}
@@ -20,7 +20,7 @@
     </tr>
     <tr ng-show="$ctrl.place.address.address">
       <td>
-        Postal Address
+        {{ 'Postal Address' | translate }}
       </td>
       <td>
         {{$ctrl.place.address.address}}
@@ -28,7 +28,7 @@
     </tr>
     <tr ng-show="$ctrl.place.tables">
       <td>
-        Tables avaiable
+        {{ 'Tables avaiable' | translate }}
       </td>
       <td>
         {{$ctrl.place.tables}}
@@ -36,7 +36,7 @@
     </tr>
     <tr ng-show="$ctrl.place.address.phone">
       <td>
-        Phone
+        {{ 'Phone' | translate }}
       </td>
       <td>
         {{$ctrl.place.address.phone}}
@@ -44,7 +44,7 @@
     </tr>
     <tr ng-show="$ctrl.place.address.email">
       <td>
-        Contact Email
+        {{ 'Contact Email' | translate }}
       </td>
       <td>
         {{$ctrl.place.address.email}}

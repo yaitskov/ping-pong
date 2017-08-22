@@ -2,11 +2,11 @@
 <request-status></request-status>
 <div class="container participant-presence">
   <div class="alert alert-info" ng-show="$ctrl.enlisted.length == 0">
-    Nobody has enlisted yet.
+    {{ 'nobody has enlisted' | translate }}
   </div>
   <div class="form-group">
     <a class="btn btn-default" href="#!/my/tournament/{{$ctrl.tournamentId}}">
-      Tournament
+      {{ 'Tournament btn' | translate }}
     </a>
   </div>
   <table class="table" ng-show="$ctrl.enlisted.length > 0">
@@ -15,9 +15,9 @@
         <td>
           <!-- Operation -->
         </td>
-        <td>Name</td>
-        <td>State</td>
-        <td>Category</td>
+        <td>{{ 'participant name' | translate }}</td>
+        <td>{{ 'bid state' | translate }}</td>
+        <td>{{ 'Category' | translate }}</td>
       </tr>
     </thead>
     <tbody>
@@ -27,25 +27,25 @@
             <a class="btn btn-danger"
                ng-click="$ctrl.confirmExpel(participant)"
                ng-show="$ctrl.canExpel(participant)"
-               title="Expel participant">
+               title="{{ 'Expel participant' | translate }}">
               <span class="glyphicon glyphicon-remove"></span>
             </a>
             <a class="btn btn-primary"
                ng-click="$ctrl.markAsPaid(participant)"
                ng-show="$ctrl.canPay(participant)"
-               title="Mark that participant paid">
+               title="{{ 'Mark that participant paid' | translate }}">
               <span class="glyphicon glyphicon-credit-card"></span>
             </a>
             <a class="btn btn-primary"
                ng-click="$ctrl.participantIsHere(participant)"
                ng-show="$ctrl.canCheck(participant)"
-               title="Mark that participant is here">
+               title="{{ 'Mark that participant is here' | translate }}">
               <span class="glyphicon glyphicon-ok"></span>
             </a>
             <a class="btn btn-primary"
                ng-click="$ctrl.resetToWant(participant)"
                ng-show="$ctrl.canReset(participant)"
-               title="Reset to state - want to participate">
+               title="{{ 'Reset to state - want to participate' | translate }}">
               <span class="glyphicon glyphicon-repeat"></span>
             </a>
           </div>
@@ -70,21 +70,23 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Participant Expel</h4>
+          <h4 class="modal-title">{{ 'Participant Expel title' | translate }}</h4>
         </div>
         <div class="modal-body">
-          <p>You are going to expel participant
-            <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{$ctrl.toBeExpelled.user.uid}}">
-              {{$ctrl.toBeExpelled.user.name}}</a>.
-            This operation is irrivertible in running tournament.
+          <p translate="expel-warn"
+             translate-values="{url: $ctrl.expelUrl($ctrl.tournamentId, $ctrl.toBeExpelled.user.uid), name: $ctrl.toBeExpelled.user.name}">
           </p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default"
-                  data-dismiss="modal">Cancel</button>
+                  data-dismiss="modal">
+            {{ 'Cancel btn' | translate }}
+          </button>
           <button type="button" class="btn btn-danger"
                   ng-click="$ctrl.expel($ctrl.toBeExpelled)"
-                  data-dismiss="modal">Expel</button>
+                  data-dismiss="modal">
+            {{ 'Expel btn' | translate }}
+          </button>
         </div>
       </div>
     </div>

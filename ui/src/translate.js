@@ -125,7 +125,13 @@ module.exports = {
         'cumulative score across all matches': 'Łączna suma punktów wszystkich meczów',
         'Opponents participating in the match': 'Oponenty uczestniający w meczu',
         'Tournament results': 'Wyniki turnieja',
-        "Loading participants": "Ladowanie uczestników"
+        "Loading participants": "Ladowanie uczestników",
+
+        // play in tournament list
+        'complete status': 'zakończony',
+        'you-not-enlisted-to-any-tournament': 'Nie ma żadnego turnieja w którym grasz. Zobać '
+            + ' <a href="{{url}}">listę</a> nadchodzących turniejów i wybierz ktróry Cię odpowiada.',
+        'Tournaments I am enlisted to': 'Grasz w turniejach'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -247,6 +253,13 @@ module.exports = {
         'cumulative score across all matches': 'cumulative score across all matches',
         'Opponents participating in the match': 'Opponents participating in the match',
         'Tournament results': 'Tournament results',
-        "Loading participants": "Loading participants"
+        "Loading participants": "Loading participants",
+
+        // play in tournament list
+        'complete status': 'complete',
+        'you-not-enlisted-to-any-tournament': 'You haven\'t enlisted yet to any tournament. Have a look at'
+            + ' <a href="{{url}}">the list</a> of coming tournaments and'
+            + ' pick an event fitting you.',
+        'Tournaments I am enlisted to': 'Tournaments I am enlisted to'
     }
 };

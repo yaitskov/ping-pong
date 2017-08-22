@@ -1,9 +1,8 @@
 <main-menu></main-menu>
 <div class="container">
-  <div class="alert alert-info" ng-show="$ctrl.tournaments.length == 0">
-    You haven't enlisted yet to any tournament. Have a look at
-    <a href="#!/tournaments">the list</a> of coming tournaments and
-    pick an event fitting you.
+  <div class="alert alert-info" ng-show="$ctrl.tournaments.length == 0"
+       translate="you-not-enlisted-to-any-tournament"
+       translate-values="{url: '#!/tournaments'}">
   </div>
 </div>
 <div class="container-fluid list">
@@ -22,7 +21,7 @@
         {{tournament.opensAt|amTimeAgo}}
       </span>
       <span ng-show="tournament.state == 'Close'">
-        complete
+        {{ 'complete status' | translate }}
       </span>
     </div>
   </div>

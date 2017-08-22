@@ -167,7 +167,13 @@ module.exports = {
         'Expelling': 'Wydalenie',
         "Paying": "Oplacenie",
         "Marking participant presence": "Oznaczenie obecności uczestnika",
-        "Reseting participant": "Resetowanie stanu uczestnika"
+        "Reseting participant": "Resetowanie stanu uczestnika",
+
+        // open tournament list
+        'There is no any open tournament.': 'Nie ma otwartych turniejów.',
+        'Started': 'Rozpoczęty',
+        'Overall matches': 'Całkowicie meczów',
+        'Running tournaments': 'Otwarty turnieje'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -332,6 +338,12 @@ module.exports = {
         'Expelling': 'Expelling',
         "Paying": "Paying",
         "Marking participant presence": "Marking participant presence",
-        "Reseting participant": "Reseting participant"
+        "Reseting participant": "Reseting participant",
+
+        // open tournament list
+        'There is no any open tournament.': 'There is no any open tournament.',
+        'Started': 'Started',
+        'Overall matches': 'Overall matches',
+        'Running tournaments': 'Running tournaments'
     }
 };

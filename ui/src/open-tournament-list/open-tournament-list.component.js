@@ -4,9 +4,11 @@ import template from './open-tournament-list.template.html';
 angular.module('openTournamentList').
     component('openTournamentList', {
         templateUrl: template,
-        controller: ['Tournament', 'mainMenu', 'requestStatus',
-                     function (Tournament, mainMenu, requestStatus) {
-                         mainMenu.setTitle('Running tournaments');
+        controller: ['Tournament', 'mainMenu', 'requestStatus', '$translate',
+                     function (Tournament, mainMenu, requestStatus, $translate) {
+                         $translate('Running tournaments').then(function (msg) {
+                             mainMenu.setTitle(msg);
+                         });
                          var self = this;
                          self.tournaments = null;
                          requestStatus.startLoading();

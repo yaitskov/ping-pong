@@ -1,7 +1,7 @@
 <main-menu></main-menu>
 <div class="container" ng-show="$ctrl.tournaments.length == 0">
   <div class="alert alert-info" >
-    There is no any open tournament.
+    {{ 'There is no any open tournament.' | translate }}
   </div>
 </div>
 <div class="container-fluid list">
@@ -16,15 +16,16 @@
       </a>
     </div>
     <div class="datetime pull-right">
-      <span class="time" title="Started" ng-show="tournament.state == 'Open'">
+      <span class="time" title="{{ 'Started' | translate }}" ng-show="tournament.state == 'Open'">
         {{tournament.startedAt|amTimeAgo}}
       </span>
 
       <span class="ended" ng-show="tournament.state == 'Close'">
-        complete
+        {{ 'complete status' | translate }}
       </span>
 
-      <span class="completeness" ng-show="tournament.state == 'Open'" title="Overall matches">
+      <span class="completeness" ng-show="tournament.state == 'Open'"
+            title="{{ 'Overall matches' | translate }}">
         {{$ctrl.percent(tournament)}}
       </span>
     </div>

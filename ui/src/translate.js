@@ -204,7 +204,27 @@ module.exports = {
         'price positive': 'Cena musi być więcej zera.',
         'ticket-price-hint': 'Cena biletu jest opcjonalna. Zostaw pole puste jeśli gratis.',
         'Next btn': 'Dalej',
-        'New Tournament': 'Nowy turniej'
+        'New Tournament': 'Nowy turniej',
+
+        // new tournament parameters
+        'thank-tournament-created-info': 'Dzieńkuje, turniej <a href="{{url}}">{{name}}</a>'
+            + ' został stworzony i ogłoszony. Dodaj kategorie do turnieja i zaczinaj rekrutacje.',
+        'Add categories btn': 'Dodać kategorie',
+        'View tournament btn': 'Zobaczyć turniej',
+        'Quits from a group': 'Wychodzi z grupy',
+        'quits-group-help': 'Ilość uczestników wychodzących z grupy do play-off turnieja.',
+        'Max group size': 'Maks rozmiar grupy',
+        'max-group-size-help': 'Maksymalna ilość uczestników w grupie.',
+        'Match score': 'Ilość punktów',
+        'match-score-help': 'Ile punktów uczestnik musi zdobyć, żeby wygrać mecz.',
+        'Match for 3rd place': 'Mecz za 3 miejsce',
+        'Back btn': 'Cofni',
+        'Create & Open Draft': 'Ztworzyć & Zacząć rekrutacje',
+        'yes': 'tak',
+        'no': 'nie',
+        'Publishing': 'Ogłoszenie',
+        'group-size-less-quits': 'Maks rozmiar grupy jest mniej niż ilość wychodziących z grupy',
+        'Tournament Parameters': 'Parametry Turnieja'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -406,7 +426,27 @@ module.exports = {
         'price positive': 'Price should a positive number.',
         'ticket-price-hint': 'Participant\'s ticket price is optinal. Empty means for free.',
         'Next btn': 'Next',
-        'New Tournament': 'New Tournament'
+        'New Tournament': 'New Tournament',
 
+        // new tournament parameters
+        'thank-tournament-created-info': 'Thanks, tournament <a href="{{url}}">{{name}}</a>'
+            + ' has been created and announced. Add categories to the tournament and begin drafting.',
+        'Add categories btn': 'Add categories',
+        'View tournament btn': 'View tournament',
+        'Quits from a group': 'Quits from a group',
+        'quits-group-help': 'How many players quits from a group and continue participate'
+            + ' in play-off tournament stage.',
+        'Max group size': 'Max group size',
+        'max-group-size-help': 'Maximum number of players, which could be in a group.',
+        'Match score': 'Match score',
+        'match-score-help': 'Determines how many sets an opponent should take, to win the match.',
+        'Match for 3rd place': 'Match for 3rd place',
+        'Back btn': 'Back',
+        'Create & Open Draft': 'Create & Open Draft',
+        'yes': 'yes',
+        'no': 'no',
+        'Publishing': 'Publishing',
+        'group-size-less-quits': 'Max group size is less than number of people quitting group',
+        'Tournament Parameters': 'Tournament Parameters'
     }
 };

@@ -5,9 +5,13 @@ angular.
     module('newTournamentParameters').
     component('newTournamentParameters', {
         templateUrl: template,
-        controller: ['auth', 'mainMenu', '$http', '$location', 'placePicker', 'pageCtx', 'requestStatus', 'moment',
-                     function (auth, mainMenu, $http, $location, placePicker, pageCtx, requestStatus, $moment) {
-                         mainMenu.setTitle('Tournament Parameters');
+        controller: ['auth', 'mainMenu', '$http', '$location', 'placePicker',
+                     'pageCtx', 'requestStatus', 'moment', '$translate',
+                     function (auth, mainMenu, $http, $location, placePicker,
+                               pageCtx, requestStatus, $moment, $translate) {
+                         $translate('Tournament Parameters').then(function (msg) {
+                             mainMenu.setTitle(msg);
+                         });
                          this.tournament = pageCtx.get('newTournament') || {quitsFromGroup: 2,
                                                                             maxGroupSize: 8,
                                                                             matchScore: 3,
@@ -37,11 +41,14 @@ angular.
                                  return;
                              }
                              if (self.tournament.maxGroupSize <= self.tournament.quitsFromGroup) {
-                                 requestStatus.validationFailed(
-                                     'Max group size is less than number of people quitting group');
+                                 $translate('group-size-less-quits').then(function (msg) {
+                                     requestStatus.validationFailed(msg);
+                                 });
                                  return;
                              }
-                             requestStatus.startLoading('Publishing');
+                             $translate('Publishing').then(function (msg) {
+                                 requestStatus.startLoading(msg);
+                             });
                              var req = angular.copy(self.tournament);
                              req.opensAt =  $moment(req.openDate + " " + req.startTime, 'Y-MM-DD HH:mm A').
                                  utc().format("Y-MM-DDTHH:mm:ss.SSS") + "Z";

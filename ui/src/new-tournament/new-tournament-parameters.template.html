@@ -1,20 +1,17 @@
 <main-menu></main-menu>
 <div class="container">
   <div ng-show="$ctrl.published">
-    <div class="alert alert-info">
-      Thanks, tournament
-      <a href="#!/my/tournament/{{$ctrl.tournament.tid}}">{{$ctrl.tournament.name}}</a>
-      has been created and announced. Add categories to the tournament
-      and begin drafting.
+    <div class="alert alert-info" translate="thank-tournament-created-info"
+         translate-values="{url: '#!/my/tournament/' + $ctrl.tournament.tid, name: $ctrl.tournament.name}">
     </div>
     <div class="form-group">
       <a class="btn btn-primary"
          href="#!/my/tournament/categories/{{$ctrl.tournament.tid}}">
-        Add categories
+        {{ 'Add categories btn' | translate }}
       </a>
       <a class="btn btn-default"
          href="#!/my/tournament/{{$ctrl.tournament.tid}}">
-        View tournament
+        {{ 'View tournament btn' | transalte }}
       </a>
     </div>
   </div>
@@ -23,48 +20,54 @@
         default-button-type
         ng-show="!$ctrl.published">
     <div class="form-group">
-      <label for="quitsFromGroup">Quits from a group</label>
+      <label for="quitsFromGroup">{{ 'Quits from a group' | translate }}</label>
       <div touch-spin options="$ctrl.options.quitsFromGroup"
            ng-model="$ctrl.tournament.quitsFromGroup"></div>
       <p class="help-block">
-        How many players quits from a group and continue participate
-        in play-off tournament stage.
+        {{ 'quits-group-help' | translate }}
       </p>
     </div>
     <div class="form-group">
-      <label for="maxGroupSize">Max group size</label>
+      <label for="maxGroupSize">{{ 'Max group size' | translate }}</label>
       <div touch-spin options="$ctrl.options.maxGroupSize"
            ng-model="$ctrl.tournament.maxGroupSize"></div>
       <p class="help-block">
-        Maximum number of players, which could be in a group.
+        {{ 'max-group-size-help' | translate }}
       </p>
     </div>
     <div class="form-group">
-      <label for="matchScore">Match score</label>
+      <label for="matchScore">{{ 'Match score' | translate }}</label>
       <div touch-spin options="$ctrl.options.matchScore"
            ng-model="$ctrl.tournament.matchScore"></div>
       <p class="help-block">
-        Determines how many sets an opponent should take, to win the
-        match.
+        {{ 'match-score-help' | translate }}
       </p>
     </div>
     <div class="form-group">
-      <label for="thirdPlaceMatch" class="toggle-option">Match for 3rd place</label>
+      <label for="thirdPlaceMatch" class="toggle-option">
+        {{ 'Match for 3rd place' | translate }}
+      </label>
       <a class="btn btn-default"
          ng-click="$ctrl.setThirdPlaceMatch(1)"
          ng-class="{'btn-primary': $ctrl.tournament.thirdPlaceMatch == 1}">
-        yes
+        {{ 'yes' | translate }}
       </a>
       <a class="btn btn-default"
          ng-click="$ctrl.setThirdPlaceMatch(0)"
          ng-class="{'btn-danger': $ctrl.tournament.thirdPlaceMatch == 0}">
-        no
+        {{ 'no' | translate }}
       </a>
     </div>
     <div class="form-group">
-      <button class="btn btn-primary" type="submit">Create & Open Draft</button>
-      <a class="btn btn-default" type="button" ng-click="$ctrl.back()">Back</a>
-      <a ng-click="$ctrl.cancel()" class="btn btn-danger">Cancel</a>
+      <button class="btn btn-primary" type="submit">
+        {{ 'Create & Open Draft' | translate }}
+      </button>
+      <a class="btn btn-default" type="button" ng-click="$ctrl.back()">
+        {{ 'Back btn' | translate }}
+      </a>
+      <a ng-click="$ctrl.cancel()" class="btn btn-danger">
+        {{ 'Cancel btn' | translate }}
+      </a>
     </div>
     <div class="form-group">
       <request-status></request-status>

@@ -5,20 +5,20 @@
     <a class="btn btn-primary"
        ng-show="$ctrl.participant"
        href="#!/my/tournament/{{$ctrl.tournamentId}}/change-category/{{$ctrl.participant.user.uid}}">
-      Change category
+      {{ 'Change category' | translate }}
     </a>
     <a class="btn btn-default" back-button>
-      Back
+      {{ 'Back btn' | translate }}
     </a>
     <a class="btn btn-default" href="#!/my/tournament/{{$ctrl.tournamentId}}">
-      Tournament
+      {{ 'Tournament btn' | translate }}
     </a>
   </div>
   <div class="form-group" ng-show="$ctrl.participant">
     <table class="table">
       <tr>
         <td>
-          Name
+          {{ 'participant name' | translate }}
         </td>
         <td>
           {{$ctrl.participant.user.name}}
@@ -26,7 +26,7 @@
       </tr>
       <tr>
         <td>
-          Category
+          {{ 'Category' | translate }}
         </td>
         <td>
           <a href="#!/my/tournament/{{$ctrl.tournamentId}}/category/{{$ctrl.participant.category.cid}}/members">
@@ -36,7 +36,7 @@
       </tr>
       <tr>
         <td>
-          State
+          {{ 'bid state' | translate }}
         </td>
         <td>
           {{$ctrl.participant.state}}
@@ -44,7 +44,7 @@
       </tr>
       <tr>
         <td>
-          Enlisted at
+          {{ 'Enlisted at' | translate }}
         </td>
         <td>
           {{$ctrl.participant.enlistedAt}}

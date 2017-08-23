@@ -281,7 +281,12 @@ module.exports = {
         'ExpellingOf': 'Wydalenie {{name}}',
         'Starting the tournament': 'Rozpoczęczie turnieju',
         "Reseting": "Zresetowanie",
-        'Cancelation of the tournament': 'Anulowanie turnieju'
+        'Cancelation of the tournament': 'Anulowanie turnieju',
+
+        // my tournament participant
+        'Change category': 'Zmienić kategorię',
+        'Enlisted at': 'Zapisany o',
+        'Loading participant': 'Ladowanie uczestnika'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -561,6 +566,11 @@ module.exports = {
         'ExpellingOf': 'Expelling {{name}}',
         'Starting the tournament': 'Starting the tournament',
         "Reseting": "Resetting",
-        'Cancelation of the tournament': 'Cancellation of the tournament'
+        'Cancelation of the tournament': 'Cancellation of the tournament',
+
+        // my tournament participant
+        'Change category': 'Change category',
+        'Enlisted at': 'Enlisted at',
+        'Loading participant': 'Loading participant'
     }
 };

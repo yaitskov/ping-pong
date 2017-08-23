@@ -1,6 +1,6 @@
 module.exports = {
     pl: {
-        'no-drafting-tournament-found': 'Nie znależiono żadnego turnieja otwartego do zapisu.',
+        'no-drafting-tournament-found': 'Nie znależiono żadnego turnieju otwartego do zapisu.',
         'Drafting': 'Rekrutacja',
 
         // main menu
@@ -54,7 +54,7 @@ module.exports = {
         'email wrong format': 'Email nie jest wlasciwy',
         'email-purpose-description': 'Opcjonalne pole, ale one udostępnia twoje konto '
             + ' dla innych urządzeń oraz regeneracje sesji która wygasła.'
-            + ' Jeśli chcesz właśnie zapisać się do jedno turnieja, wtedy możesz zostawić go pustym, '
+            + ' Jeśli chcesz właśnie zapisać się do jedno turnieju, wtedy możesz zostawić go pustym, '
             + ' a email możesz nadać później.',
         'phone-purpose-description': 'Opcjonalne pole. One może być wykożystano dla regenracji dostępa do konta.',
         'phone-length': 'Długość numera telefonu musi być mniej niż {{max}}',
@@ -106,7 +106,7 @@ module.exports = {
         'Enlist Me btn': 'Zapisać mnie',
         'previous tournament': 'Powszedni turniej w serii',
         'info-link-to-matches': '<a href="{{url}}">Tutaj</a> znajdziesz informację o meczach, w których musisz zagrać.',
-        'thanks-for-enlistment-info': 'Dziękuje za zapis do turnieja <b>{{name}}</b>.'
+        'thanks-for-enlistment-info': 'Dziękuje za zapis do turnieju <b>{{name}}</b>.'
             + ' Turneij zaczyna {{time | amTimeAgo}}.'
             + ' <a href="{{url}}">Tutaj</a> znajdziesz informację o meczach, w których musis zagrać.',
         'CategoryNotChosen': 'Kategoria nie zotała wybrana. Wybierz',
@@ -124,12 +124,12 @@ module.exports = {
         'count of won matches': 'liczba wygranych meczów',
         'cumulative score across all matches': 'Łączna suma punktów wszystkich meczów',
         'Opponents participating in the match': 'Oponenty uczestniający w meczu',
-        'Tournament results': 'Wyniki turnieja',
+        'Tournament results': 'Wyniki turnieju',
         "Loading participants": "Ladowanie uczestników",
 
         // play in tournament list
         'complete status': 'zakończony',
-        'you-not-enlisted-to-any-tournament': 'Nie ma żadnego turnieja w którym grasz. Zobać '
+        'you-not-enlisted-to-any-tournament': 'Nie ma żadnego turnieju w którym grasz. Zobać '
             + ' <a href="{{url}}">listę</a> nadchodzących turniejów i wybierz ktróry Cię odpowiada.',
         'Tournaments I am enlisted to': 'Grasz w turniejach',
 
@@ -161,7 +161,7 @@ module.exports = {
         'Expel btn': 'Wydalić',
         'expel-warn': 'Chcesz wydalić uczestnika'
             + ' <a href="{{url}}">{{name}}</a>.'
-            + ' Ta operacja jest nie odwracalna w razie trwającego turnieja.',
+            + ' Ta operacja jest nie odwracalna w razie trwającego turnieju.',
         'ManagementOfParticipants': 'Zarządzanie uczestnikami',
         'Tournament': 'Turniej',
         'Expelling': 'Wydalenie',
@@ -186,7 +186,7 @@ module.exports = {
         'Current score in the match': 'Obecna ilość punktów w meczu',
         'Table number': 'Numer stołu',
         'Match start time': 'Czas rozpoczęcia meczu',
-        'IncompleteTournamentGames': 'Nie zakończony gry turnieja',
+        'IncompleteTournamentGames': 'Nie zakończony gry turnieju',
         'MatchesOf': 'Mecz {{name}}',
 
         // new tournament
@@ -208,11 +208,11 @@ module.exports = {
 
         // new tournament parameters
         'thank-tournament-created-info': 'Dzieńkuje, turniej <a href="{{url}}">{{name}}</a>'
-            + ' został stworzony i ogłoszony. Dodaj kategorie do turnieja i zaczinaj rekrutacje.',
+            + ' został stworzony i ogłoszony. Dodaj kategorie do turnieju i zaczinaj rekrutacje.',
         'Add categories btn': 'Dodać kategorie',
         'View tournament btn': 'Zobaczyć turniej',
         'Quits from a group': 'Wychodzi z grupy',
-        'quits-group-help': 'Ilość uczestników wychodzących z grupy do play-off turnieja.',
+        'quits-group-help': 'Ilość uczestników wychodzących z grupy do play-off turnieju.',
         'Max group size': 'Maks rozmiar grupy',
         'max-group-size-help': 'Maksymalna ilość uczestników w grupie.',
         'Match score': 'Ilość punktów',
@@ -224,7 +224,7 @@ module.exports = {
         'no': 'nie',
         'Publishing': 'Ogłoszenie',
         'group-size-less-quits': 'Maks rozmiar grupy jest mniej niż ilość wychodziących z grupy',
-        'Tournament Parameters': 'Parametry Turnieja',
+        'Tournament Parameters': 'Parametry Turnieju',
 
         // new place
         'city name': 'Miasto',
@@ -255,7 +255,33 @@ module.exports = {
 
         // my tournament list
         'you-not-created-tournament': 'Nie masz własnych turniejów.',
-        'AdministratedTournaments': 'Administrowany turnieje'
+        'AdministratedTournaments': 'Administrowany turnieje',
+
+        // my tournament
+        'Split participants into groups and open tournament': 'Podzielić uczestników na grupy i otworzyć turniej',
+        'Judge and score open matches in the tournament': 'Oceniać otwarty mecze w turnieju',
+        'Browser tournament results': 'Zobaczyć wyniki turnieju',
+        'Previous Tournament in the seria': 'Previous Tournament in the seria',
+        'Edit tournament': 'Prawić turniej',
+        'Configure tournament parameters': 'Skonfigurować parametry turnieju',
+        'Stop and cancel tournament': 'Zatrzymać i anulować turniej',
+        'Announce and Open Draft': 'Ogłosić i Otworzyć Rekrutację',
+        'Restart canceled tournament from scratch': 'Zrestartować anulowany turniej',
+        'Add offline participant, who does not have internet and a good phone': 'Dodać offline uczestinka, który nie ma internetu oraz komórki',
+        'tournament-with-uncheched-participants-warn': 'Turniej ma {{users}} zapisanych, ale nie sprawdzionych uczestników'
+            + ' i, żeby zacząć turniej trzeba ich wydalić lub oznaczyć jako obecnych.',
+        'Expel listed below &amp; open': 'Wydalić wymienionych poniżej &amp; otworzyć',
+        'confirm-tournament-termination': 'Potwierdź, że chcesz zakończyć/anulować turniej.'
+            + ' Możesz otworzyć turniej ponownie póżniej, ale wszystcy uczestnicy będą grać od początku.',
+        'Confirm': 'Potwierdzić',
+        'tournament state': 'Stan',
+        'MyTournament': 'Mój Turniej',
+        'CheckPresence': 'Sprawdić obecność',
+        'Administration of': 'Administracja {{name}}',
+        'ExpellingOf': 'Wydalenie {{name}}',
+        'Starting the tournament': 'Rozpoczęczie turnieju',
+        "Reseting": "Zresetowanie",
+        'Cancelation of the tournament': 'Anulowanie turnieju'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -420,7 +446,7 @@ module.exports = {
         'Expelling': 'Expelling',
         "Paying": "Paying",
         "Marking participant presence": "Marking participant presence",
-        "Reseting participant": "Reseting participant",
+        "Reseting participant": "Resetting participant",
 
         // open tournament list
         'There is no any open tournament.': 'There is no any open tournament.',
@@ -509,6 +535,32 @@ module.exports = {
 
         // my tournament list
         'you-not-created-tournament': 'You haven\'t created a tournament.',
-        'AdministratedTournaments': 'Administrated tournaments'
+        'AdministratedTournaments': 'Administrated tournaments',
+
+        // my tournament
+        'Split participants into groups and open tournament': 'Split participants into groups and open tournament',
+        'Judge and score open matches in the tournament': 'Judge and score open matches in the tournament',
+        'Browser tournament results': 'Browser tournament results',
+        'Previous Tournament in the seria': 'Previous Tournament in the seria',
+        'Edit tournament': 'Edit tournament',
+        'Configure tournament parameters': 'Configure tournament parameters',
+        'Stop and cancel tournament': 'Stop and cancel tournament',
+        'Announce and Open Draft': 'Announce and Open Draft',
+        'Restart canceled tournament from scratch': 'Restart canceled tournament from scratch',
+        'Add offline participant, who does not have internet and a good phone': 'Add offline participant, who does not have internet and a good phone',
+        'tournament-with-uncheched-participants-warn': 'Tournament has {{users}} enlisted, but not checked participants.'
+            + ' To begin the tournament you need to expel all of them or mark as participanting.',
+        'Expel listed below &amp; open': 'Expel listed below &amp; open',
+        'confirm-tournament-termination': 'Confirm that you want to terminate/cancel tournament.'
+            + ' You can reopen tournament later, but players should replay matches from the begginning.',
+        'Confirm': 'Confirm',
+        'tournament state': 'State',
+        'MyTournament': 'My Tournament',
+        'CheckPresence': 'Check Presence',
+        'Administration of': 'Administration of {{name}}',
+        'ExpellingOf': 'Expelling {{name}}',
+        'Starting the tournament': 'Starting the tournament',
+        "Reseting": "Resetting",
+        'Cancelation of the tournament': 'Cancellation of the tournament'
     }
 };

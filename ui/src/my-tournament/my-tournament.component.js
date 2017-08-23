@@ -5,12 +5,16 @@ angular.
     module('myTournament').
     component('myTournament', {
         templateUrl: template,
-        controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu', '$http', 'pageCtx', 'requestStatus', '$location',
-                     function ($routeParams, Tournament, auth, mainMenu, $http, pageCtx, requestStatus, $location) {
-                         mainMenu.setTitle('My tournament ...');
-                         var ctxMenu = {};
-                         ctxMenu['#!/my/tournament/presence/' + $routeParams.tournamentId] = 'Check Presence';
-                         ctxMenu['#!/my/tournament/categories/' + $routeParams.tournamentId] = 'Categories';
+        controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu',
+                     '$http', 'pageCtx', 'requestStatus', '$location', '$translate',
+                     function ($routeParams, Tournament, auth, mainMenu,
+                               $http, pageCtx, requestStatus, $location, $translate) {
+                         $translate(['MyTournament', 'CheckPresence', 'Categories']).then(function (translations) {
+                             mainMenu.setTitle(translations.MyTournament);
+                             var ctxMenu = {};
+                             ctxMenu['#!/my/tournament/presence/' + $routeParams.tournamentId] = translations.CheckPresence;
+                             ctxMenu['#!/my/tournament/categories/' + $routeParams.tournamentId] = translations.Categories;
+                         });
                          var self = this;
                          self.tournament = null;
                          self.wantRemove = false;
@@ -20,8 +24,10 @@ angular.
                              {tournamentId: $routeParams.tournamentId},
                              function (tournament) {
                                  requestStatus.complete();
-                                 mainMenu.setTitle('Administration of ' + tournament.name);
-                                 mainMenu.setContextMenu(ctxMenu);
+                                 $translate('Administration of', {name: tournament.name}).then(function (msg) {
+                                     mainMenu.setTitle(msg);
+                                     mainMenu.setContextMenu(ctxMenu);
+                                 });
                                  self.tournament = tournament;
                                  pageCtx.put('tournamentInfoForCategories',
                                              {tid: self.tournament.tid,
@@ -66,35 +72,39 @@ angular.
                                  return;
                              }
                              var participant = self.errorHasUncheckedUsers.shift();
-                             requestStatus.startLoading('Expelling ' + participant.name + '...');
-                             Tournament.expel(
-                                 {tid: self.tournament.tid,
-                                  uid: participant.uid},
-                                 function (ok) {
-                                     self.expelAndOpenTournament();
-                                 },
-                                 requestStatus.failed);
+                             $translate('ExpellingOf', {name: participant.name}).then(function (msg) {
+                                 requestStatus.startLoading(msg);
+                                 Tournament.expel(
+                                     {tid: self.tournament.tid,
+                                      uid: participant.uid},
+                                     function (ok) {
+                                         self.expelAndOpenTournament();
+                                     },
+                                     requestStatus.failed);
+                             });
                          };
                          this.cancelExpelAll = function () {
                              self.errorHasUncheckedUsers = null;
                          };
                          this.open = function () {
-                             requestStatus.startLoading('Starting the tournament');
-                             $http.post('/api/tournament/begin',
-                                        self.tournament.tid,
-                                        {headers: {session: auth.mySession()}}).
-                                 then(
-                                     function (okResp) {
-                                         self.tournament.state = 'Open';
-                                         requestStatus.complete();
-                                         $location.path("/my/matches/judgement");
-                                     },
-                                     function (error) {
-                                         if (error.data.error == 'uncheckedUsers') {
-                                             self.errorHasUncheckedUsers = error.data.users;
-                                         }
-                                         requestStatus.failed(error);
-                                     });
+                             $translate('Starting the tournament').then(function (msg) {
+                                 requestStatus.startLoading(msg);
+                                 $http.post('/api/tournament/begin',
+                                            self.tournament.tid,
+                                            {headers: {session: auth.mySession()}}).
+                                     then(
+                                         function (okResp) {
+                                             self.tournament.state = 'Open';
+                                             requestStatus.complete();
+                                             $location.path("/my/matches/judgement");
+                                         },
+                                         function (error) {
+                                             if (error.data.error == 'uncheckedUsers') {
+                                                 self.errorHasUncheckedUsers = error.data.users;
+                                             }
+                                             requestStatus.failed(error);
+                                         });
+                             });
                          };
                          this.isNotCanceled = function () {
                              return self.tournament && !(self.tournament.state == 'Close'
@@ -105,29 +115,33 @@ angular.
                              this.wantRemove = true;
                          }
                          this.restart = function () {
-                             requestStatus.startLoading("Reseting");
-                             Tournament.state(
-                                 {tid: self.tournament.tid,
-                                  state: 'Draft'
-                                 },
-                                 function (ok) {
-                                     requestStatus.complete();
-                                     self.tournament.state = 'Draft';
-                                 },
-                                 requestStatus.failed);
+                             $translate("Reseting").then(function (msg) {
+                                 requestStatus.startLoading(msg);
+                                 Tournament.state(
+                                     {tid: self.tournament.tid,
+                                      state: 'Draft'
+                                     },
+                                     function (ok) {
+                                         requestStatus.complete();
+                                         self.tournament.state = 'Draft';
+                                     },
+                                     requestStatus.failed);
+                             });
                          }
                          this.confirmCancel = function () {
                              this.wantRemove = false;
-                             requestStatus.startLoading('Cancelation of the tournament');
-                             $http.post("/api/tournament/cancel",
-                                        self.tournament.tid,
-                                        {headers: {session: auth.mySession()}}).
-                                 then(
-                                     function (okResp) {
-                                         self.tournament.state = 'Canceled';
-                                         requestStatus.complete();
-                                     },
-                                     requestStatus.failed);
+                             $translate('Cancelation of the tournament').then(function (msg) {
+                                 requestStatus.startLoading(msg);
+                                 $http.post("/api/tournament/cancel",
+                                            self.tournament.tid,
+                                            {headers: {session: auth.mySession()}}).
+                                     then(
+                                         function (okResp) {
+                                             self.tournament.state = 'Canceled';
+                                             requestStatus.complete();
+                                         },
+                                         requestStatus.failed);
+                             });
                          };
                      }
                     ]

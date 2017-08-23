@@ -6,35 +6,35 @@
       <a class="btn btn-success"
          ng-click="$ctrl.open()"
          ng-show="$ctrl.isDrafting()"
-         title="Split participants into groups and open tournament">
+         title="{{ 'Split participants into groups and open tournament' | translate }}">
         <span class="glyphicon glyphicon-play-circle"></span>
       </a>
       <a class="btn btn-primary"
          href="#!/my/matches/judgement"
          ng-show="$ctrl.tournament.state == 'Open'"
-         title="Judge and score open matches in the tournament">
+         title="{{ 'Judge and score open matches in the tournament' | translate }}">
         <img src="/img/whistle.png" class="icon-image"/>
       </a>
       <a class="btn btn-primary"
          href="#!/tournament/result/{{$ctrl.tournament.tid}}"
          ng-show="$ctrl.tournament.state == 'Close'"
-         title="Browser tournament results">
+         title="{{ 'Browser tournament results' | translate }}">
         <span class="glyphicon glyphicon-eye-open"></span>
       </a>
       <a class="btn btn-default"
-         title="Previous Tournament in the seria"
+         title="{{ 'Previous Tournament in the seria' | translate }}"
          href="#!/my/tournament/{{$ctrl.tournament.previousTid}}"
          ng-show="$ctrl.tournament.previousTid">
         <span class="glyphicon glyphicon-circle-arrow-left"></span>
       </a>
       <a class="btn btn-default"
-         title="Edit tournament"
+         title="{{ 'Edit tournament' | translate }}"
          ng-show="$ctrl.canEdit()"
          href="#!/my/tournament/edit/{{$ctrl.tournament.tid}}">
         <span class="glyphicon glyphicon-edit"></span>
       </a>
       <a class="btn btn-default"
-         title="Configure tournament parameters"
+         title="{{ 'Configure tournament parameters' | translate }}"
          ng-show="$ctrl.canConfigureParams()"
          href="#!/my/tournament/parameters/{{$ctrl.tournament.tid}}">
         <span class="glyphicon glyphicon-cog"></span>
@@ -42,23 +42,23 @@
       <a class="btn btn-danger"
          ng-click="$ctrl.cancel()"
          ng-show="$ctrl.isNotCanceled()"
-         title="Stop and cancel tournament">
+         title="{{ 'Stop and cancel tournament' | translate }}">
         <span class="glyphicon glyphicon-stop"></span>
       </a>
       <a class="btn btn-primary"
-         title="Announce and Open Draft"
+         title="{{ 'Announce and Open Draft' | translate }}"
          ng-click="$ctrl.beginDrafting()"
          ng-show="$ctrl.canBeginDrafting()">
         <span class="glyphicon glyphicon-globe"></span>
       </a>
       <a class="btn btn-primary"
-         title="Restart canceled tournament from scratch"
+         title="{{ 'Restart canceled tournament from scratch' | translate }}"
          ng-click="$ctrl.restart()"
          ng-show="$ctrl.tournament.state == 'Canceled'">
         <span class="glyphicon glyphicon-repeat"></span>
       </a>
       <a class="btn btn-primary"
-         title="Add offline participant, who does not have internet and a good phone"
+         title="{{ 'Add offline participant, who does not have internet and a good phone' | translate }}"
          href="#!/tournament/enlist/offline/{{$ctrl.tournament.tid}}"
          ng-show="$ctrl.tournament.state == 'Draft'">
         <span class="glyphicon glyphicon-plus-sign"></span>
@@ -67,18 +67,17 @@
   </div>
   <div ng-show="$ctrl.errorHasUncheckedUsers.length > 0">
     <div class="form-group">
-      <div class="alert alert-danger">
-        Tournament has {{$ctrl.errorHasUncheckedUsers.length}}
-        enlisted, but unchecked participants. To begin the tournament
-        you need to expel all of them or mark as participanting.
+      <div class="alert alert-danger"
+           translate="tournament-with-uncheched-participants-warn"
+           translate-values="{users: $ctrl.errorHasUncheckedUsers.length}">
       </div>
     </div>
     <div class="form-group">
       <a class="btn btn-danger" ng-click="$ctrl.expelAndOpenTournament()">
-        Expel listed below &amp; open
+        {{ 'Expel listed below &amp; open' | translate }}
       </a>
       <a class="btn btn-default" ng-click="$ctrl.cancelExpelAll()">
-        Cancel
+        {{ 'Cancel btn' | translate }}
       </a>
     </div>
     <div class="form-group">
@@ -94,30 +93,27 @@
     </div>
   </div>
   <div class="form-group" ng-show="$ctrl.wantRemove">
-    <div class="alert alert-danger">
-      Confirm that you want to terminate/cancel tournament. You can
-      reopen tournament later, but players should replay matches from
-      the begginning.
+    <div class="alert alert-danger" translate="confirm-tournament-termination">
     </div>
   </div>
   <div class="form-group" ng-show="$ctrl.wantRemove">
     <a class="btn btn-danger" ng-click="$ctrl.confirmCancel()">
-      Confirm
+      {{ 'Confirm' | translate }}
     </a>
   </div>
   <div class="form-group">
     <table class="table">
       <tbody>
         <tr>
-          <td>Name</td>
+          <td>{{ 'tournament name' | translate }}</td>
           <td>{{$ctrl.tournament.name}}</td>
         </tr>
         <tr>
-          <td>State</td>
+          <td>{{ 'tournament state' | translate }}}</td>
           <td>{{$ctrl.tournament.state}}</td>
         </tr>
         <tr>
-          <td>Place</td>
+          <td>{{ 'tournament place' | translate }}</td>
           <td>
             <a href="#!/place/{{$ctrl.tournament.place.pid}}">
               {{$ctrl.tournament.place.name}}
@@ -125,13 +121,13 @@
           </td>
         </tr>
         <tr>
-          <td>Date</td>
+          <td>{{ 'tournament date' | translate }}</td>
           <td>
             {{$ctrl.tournament.opensAt|date : 'MMM d EEE h a Z' }}
           </td>
         </tr>
         <tr>
-          <td>Categories</td>
+          <td>{{ 'Categories' | translate }}</td>
           <td>
             <a class="btn btn-default"
                href="#!/my/tournament/categories/{{$ctrl.tournament.tid}}">
@@ -140,7 +136,7 @@
           </td>
         </tr>
         <tr>
-          <td>Enlisted</td>
+          <td>{{ 'enlisted to tournament' | translate }}</td>
           <td>
             <a class="btn btn-default"
                href="#!/my/tournament/presence/{{$ctrl.tournament.tid}}">

@@ -6,11 +6,12 @@ angular.
         return new function () {
             var self = this;
             var stranslate = syncTranslate.create();
+            var stranslateMenu = syncTranslate.create();
             this.title = '....';
             this.contextMenu = {};
             this.setTitle = function (originTitle) {
-                this.contextMenu = {};
-                stranslate.trans(originTitle, function (title) {
+                self.contextMenu = {};
+                stranslate.trans(originTitle || 'Loading', function (title) {
                     self.title = title;
                     $rootScope.$broadcast('title.set', title);
                 });
@@ -18,11 +19,14 @@ angular.
             this.getTitle = function () {
                 return self.title;
             };
-            this.setContextMenu = function (contextMenu) {
-                this.contextMenu = contextMenu;
+            this.setContextMenu = function (originMenu) {
+                stranslateMenu.transMenu(originMenu, function (menu) {
+                    self.contextMenu = menu;
+                    $rootScope.$broadcast('menu.set', menu);
+                });
             };
             this.getContextMenu = function () {
-                return this.contextMenu;
+                return self.contextMenu;
             };
         };
     }]);

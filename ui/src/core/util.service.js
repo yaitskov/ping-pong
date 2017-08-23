@@ -58,10 +58,29 @@ angular.
                     this.lastCallId = new Object();
                     this.callTranslate = function (originMessage) {
                         if (typeof originMessage == "string") {
-                            return $translate(originMessage)
+                            return $translate(originMessage);
                         } else {
                             return $translate(originMessage[0], originMessage[1]);
                         }
+                    };
+                    this.transMenu = function (map, nextCallback) {
+                        var callId = new Object();
+                        self.lastCallId = callId;
+                        var keys = Object.keys(map);
+                        var origins = [];
+                        for (var i = 0; i < keys.length; ++i) {
+                            origins.push(map[keys[i]]);
+                        }
+                        $translate(origins).then(function (translations) {
+                            if (self.lastCallId == callId) {
+                                for (var i = 0; i < keys.length; ++i) {
+                                    map[keys[i]] = translations[map[keys[i]]];
+                                }
+                                nextCallback(map);
+                            } else {
+                                console.log("Reject obsolete translations");
+                            }
+                        });
                     };
                     this.trans = function (originMessage, nextCallback) {
                         var callId = new Object();

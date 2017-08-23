@@ -19,8 +19,9 @@ angular.
                          this.isAdmin = function () {
                              return auth.userType() == 'Admin' || auth.userType() == 'Super';
                          };
-                         this.contextMenu = function () {
-                             return mainMenu.getContextMenu();
-                         };
+                         $rootScope.$on('menu.set', function (event, menu) {
+                             self.contextMenu = menu;
+                         });
+                         this.contextMenu = mainMenu.getContextMenu();
                      }]
     });

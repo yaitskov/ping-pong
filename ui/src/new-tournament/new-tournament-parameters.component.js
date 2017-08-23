@@ -6,12 +6,10 @@ angular.
     component('newTournamentParameters', {
         templateUrl: template,
         controller: ['auth', 'mainMenu', '$http', '$location', 'placePicker',
-                     'pageCtx', 'requestStatus', 'moment', '$translate',
+                     'pageCtx', 'requestStatus', 'moment',
                      function (auth, mainMenu, $http, $location, placePicker,
-                               pageCtx, requestStatus, $moment, $translate) {
-                         $translate('Tournament Parameters').then(function (msg) {
-                             mainMenu.setTitle(msg);
-                         });
+                               pageCtx, requestStatus, $moment) {
+                         mainMenu.setTitle('Tournament Parameters');
                          this.tournament = pageCtx.get('newTournament') || {quitsFromGroup: 2,
                                                                             maxGroupSize: 8,
                                                                             matchScore: 3,
@@ -41,14 +39,10 @@ angular.
                                  return;
                              }
                              if (self.tournament.maxGroupSize <= self.tournament.quitsFromGroup) {
-                                 $translate('group-size-less-quits').then(function (msg) {
-                                     requestStatus.validationFailed(msg);
-                                 });
+                                 requestStatus.validationFailed('group-size-less-quits');
                                  return;
                              }
-                             $translate('Publishing').then(function (msg) {
-                                 requestStatus.startLoading(msg);
-                             });
+                             requestStatus.startLoading('Publishing');
                              var req = angular.copy(self.tournament);
                              req.opensAt =  $moment(req.openDate + " " + req.startTime, 'Y-MM-DD HH:mm A').
                                  utc().format("Y-MM-DDTHH:mm:ss.SSS") + "Z";

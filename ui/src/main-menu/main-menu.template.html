@@ -70,8 +70,8 @@
           {{$ctrl.accountName || ('Account' | translate)}}
         </a>
       </li>
-      <li role="separator" class="divider" ng-hide="$ctrl.contextMenu() | isEmpty"></li>
-      <li ng-repeat="(path, label) in $ctrl.contextMenu()">
+      <li role="separator" class="divider" ng-hide="$ctrl.contextMenu | isEmpty"></li>
+      <li ng-repeat="(path, label) in $ctrl.contextMenu">
         <a ng-attr-href="{{path}}">
           {{label}}
         </a>

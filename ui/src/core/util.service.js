@@ -50,6 +50,27 @@ angular.
             };
         };
     }]).
+    factory('syncTranslate', ['$translate', function ($translate) {
+        return new function () {
+            this.stranslate = function () {
+                return new function () {
+                    var self = this;
+                    this.lastCallId = new Object();
+                    this.trans = function (originMessage, nextCallback) {
+                        var callId = new Object();
+                        self.lastCallId = callId;
+                        $translate(originMessage).then(function (msg) {
+                            if (self.lastCallId == callId) {
+                                nextCallback(msg);
+                            } else {
+                                console.log("Reject obsolete translation: " + msg);
+                            }
+                        });
+                    };
+                };
+            };
+        };
+    }]).
     factory('countDown', ['$interval', function ($interval) {
         return new function () {
             var self = this;

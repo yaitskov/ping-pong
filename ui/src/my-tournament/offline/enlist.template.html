@@ -2,7 +2,7 @@
 <div class="container enlist-form">
   <div class="form-group clearfix" ng-show="$ctrl.categories">
     <div class="pull-left category-label">
-      Categories
+      {{ 'Categories' | translate }}
     </div>
     <div class="pull-left category-value">
       <div class="row" ng-repeat="category in $ctrl.categories">
@@ -16,8 +16,9 @@
   </div>
 
   <form novalidate name="$ctrl.form" ng-submit="$ctrl.enlist('Here')">
-    <div class="form-group" ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.firstName.$dirty) && $ctrl.form.firstName.$invalid}">
-      <label for="firstName">First name</label>
+    <div class="form-group"
+         ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.firstName.$dirty) && $ctrl.form.firstName.$invalid}">
+      <label for="firstName">{{ 'First name' | translate }}</label>
       <input type="text" class="form-control"
              ng-model="$ctrl.firstName"
              ng-maxlength="20"
@@ -25,51 +26,52 @@
              required
              name="firstName"
              id="firstName"
-             placeholder="First name"/>
+             placeholder="{{ 'First name' | translate }}"/>
       <p class="help-block"
          ng-show="$ctrl.form.firstName.$error.required">
-        Name is required
+        {{ 'FirstName is required' | translate }}
       </p>
       <p class="help-block"
          ng-show="$ctrl.form.firstName.$error.minlength || $ctrl.form.firstName.$error.maxlength">
-        Name length must be in range 2 and 20
+        {{ 'first-name-length-range' | translate : '{min: 2, max: 20}' }}
       </p>
     </div>
     <div class="form-group" ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.lastName.$dirty) && $ctrl.form.lastName.$invalid}">
-      <label for="lastName">Last name</label>
+      <label for="lastName">{{ 'Last name' | translate }}</label>
       <input type="text" class="form-control"
              name="lastName"
              ng-maxlength="20"
              ng-minlength="2"
              required
              ng-model="$ctrl.lastName"
-             id="lastName" placeholder="Last name"/>
+             id="lastName" placeholder="{{ 'Last name' | translate }}"/>
       <p class="help-block"
          ng-show="$ctrl.form.lastName.$error.required">
-        Name is required
+        {{ 'LastName is required' | translate }}
       </p>
       <p class="help-block"
          ng-show="$ctrl.form.lastName.$error.minlength || $ctrl.form.lastName.$error.maxlength">
-        Name length must be in range 2 and 20
+        {{ 'last-name-length-range' | translate : '{min: 2, max: 20}' }}
       </p>
     </div>
     <div class="form-group">
       <a title="Enlist participant, mark him as paid and ready to participate"
          ng-click="$ctrl.enlist('Here')"
          class="btn btn-primary">
-        Ready to Play
+        {{ 'Ready to Play' | translate }}
       </a>
       <a title="Just enlist participant"
          ng-click="$ctrl.enlist('Want')"
          class="btn btn-default">
-        Just Enlist
+        {{ 'Just Enlist' | translate }}
       </a>
       <a title="Return to tournament control panel"
          back-button
          class="btn btn-default">
-        Back
+        {{ 'Back btn' | translate }}
       </a>
-      <button ng-show="false" type="submit">submit on enter</button>
+      <button ng-show="false" type="submit">
+      </button>
     </div>
   </form>
 
@@ -80,7 +82,7 @@
   <div class="form-group" ng-show="$ctrl.enlisted.length">
     <table class="table">
       <tr>
-        <td>Right now enlisted</td>
+        <td>{{ 'Right now enlisted' | translate }}</td>
         <td>{{$ctrl.enlisted.length}}</td>
       </tr>
       <tr ng-repeat="enlisted in $ctrl.enlisted">

@@ -291,7 +291,15 @@ module.exports = {
         // my tournament parameters
         'Update btn': 'Zmienić',
         'Tournament Modification': 'Modyfikacja turnieju',
-        'Saving changes': 'Zapisywanie zmian'
+        'Saving changes': 'Zapisywanie zmian',
+
+        // my tournament offline enlist
+        'Ready to Play': 'Gotowy zagrać',
+        'Just Enlist': 'Właśnie zapisany',
+        'Right now enlisted': 'Teraz zapisane',
+        'Offline enlist': 'Rekrutacja offline',
+        'Offline enlist to': 'Offline rekrutacja do {{name}}',
+        'Enlisting': 'Zapisywanie'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -581,6 +589,14 @@ module.exports = {
         // my tournament parameters
         'Update btn': 'Update',
         'Tournament Modification': 'Tournament Modification',
-        'Saving changes': 'Saving changes'
+        'Saving changes': 'Saving changes',
+
+        // my tournament offline enlist
+        'Ready to Play': 'Ready to Play',
+        'Just Enlist': 'Just Enlist',
+        'Right now enlisted': 'Right now enlisted',
+        'Offline enlist': 'Offline enlist',
+        'Offline enlist to': 'Offline enlist to {{name}}',
+        'Enlisting': 'Enlisting'
     }
 };

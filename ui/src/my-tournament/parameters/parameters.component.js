@@ -5,11 +5,13 @@ angular.
     module('tournamentParameters').
     component('tournamentParameters', {
         templateUrl: template,
-        controller: ['auth', 'mainMenu', '$http', '$location',
+        controller: ['auth', 'mainMenu', '$http', '$location', '$translate',
                      'pageCtx', '$scope', 'Tournament', 'requestStatus', '$routeParams',
-                     function (auth, mainMenu, $http, $location,
+                     function (auth, mainMenu, $http, $location, $translate,
                                pageCtx, $scope, Tournament, requestStatus, $routeParams) {
-                         mainMenu.setTitle('Tournament Modification');
+                         $translate('Tournament Modification').then(function (msg) {
+                             mainMenu.setTitle(msg);
+                         });
                          this.tournament = {};
                          this.options = {
                              quitsGroup: {min: 1, max: 5},
@@ -25,19 +27,21 @@ angular.
                              if (!self.form.$valid) {
                                  return;
                              }
-                             requestStatus.startLoading('Saving changes');
-                             Tournament.updateParams(
-                                 {tid: $routeParams.tournamentId,
-                                  quitsGroup: self.tournament.quitsGroup,
-                                  maxGroupSize: self.tournament.maxGroupSize,
-                                  matchScore: self.tournament.matchScore,
-                                  thirdPlaceMatch: self.tournament.thirdPlaceMatch
-                                 },
-                                 function (ok) {
-                                     requestStatus.complete();
-                                     history.back();
-                                 },
-                                 requestStatus.failed);
+                             $translate('Saving changes').then(function (msg) {
+                                 requestStatus.startLoading(msg);
+                                 Tournament.updateParams(
+                                     {tid: $routeParams.tournamentId,
+                                      quitsGroup: self.tournament.quitsGroup,
+                                      maxGroupSize: self.tournament.maxGroupSize,
+                                      matchScore: self.tournament.matchScore,
+                                      thirdPlaceMatch: self.tournament.thirdPlaceMatch
+                                     },
+                                     function (ok) {
+                                         requestStatus.complete();
+                                         history.back();
+                                     },
+                                     requestStatus.failed);
+                             });
                          };
                          requestStatus.startLoading();
                          Tournament.parameters(

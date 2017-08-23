@@ -286,7 +286,12 @@ module.exports = {
         // my tournament participant
         'Change category': 'Zmienić kategorię',
         'Enlisted at': 'Zapisany o',
-        'Loading participant': 'Ladowanie uczestnika'
+        'Loading participant': 'Ladowanie uczestnika',
+
+        // my tournament parameters
+        'Update btn': 'Zmienić',
+        'Tournament Modification': 'Modyfikacja turnieju',
+        'Saving changes': 'Zapisywanie zmian'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -571,6 +576,11 @@ module.exports = {
         // my tournament participant
         'Change category': 'Change category',
         'Enlisted at': 'Enlisted at',
-        'Loading participant': 'Loading participant'
+        'Loading participant': 'Loading participant',
+
+        // my tournament parameters
+        'Update btn': 'Update',
+        'Tournament Modification': 'Tournament Modification',
+        'Saving changes': 'Saving changes'
     }
 };

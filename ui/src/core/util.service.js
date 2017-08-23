@@ -52,14 +52,21 @@ angular.
     }]).
     factory('syncTranslate', ['$translate', function ($translate) {
         return new function () {
-            this.stranslate = function () {
+            this.create = function () {
                 return new function () {
                     var self = this;
                     this.lastCallId = new Object();
+                    this.callTranslate = function (originMessage) {
+                        if (typeof originMessage == "string") {
+                            return $translate(originMessage)
+                        } else {
+                            return $translate(originMessage[0], originMessage[1]);
+                        }
+                    };
                     this.trans = function (originMessage, nextCallback) {
                         var callId = new Object();
                         self.lastCallId = callId;
-                        $translate(originMessage).then(function (msg) {
+                        self.callTranslate(originMessage).then(function (msg) {
                             if (self.lastCallId == callId) {
                                 nextCallback(msg);
                             } else {

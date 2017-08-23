@@ -5,12 +5,14 @@ angular.
     module('mainMenu').
     component('mainMenu', {
         templateUrl: template,
-        controller: ['auth', 'mainMenu',
-                     function (auth, mainMenu) {
+        controller: ['auth', 'mainMenu', '$rootScope',
+                     function (auth, mainMenu, $rootScope) {
+                         var self = this;
                          this.accountName = auth.myName();
-                         this.title = function () {
-                             return mainMenu.getTitle();
-                         };
+                         $rootScope.$on('title.set', function (event, title) {
+                             self.title = title;
+                         });
+                         this.title = mainMenu.getTitle();
                          this.isAuthenticated = function () {
                              return auth.isAuthenticated();
                          };

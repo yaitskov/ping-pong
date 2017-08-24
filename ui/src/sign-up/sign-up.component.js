@@ -6,8 +6,8 @@ angular.
     component('signUp', {
         templateUrl: template,
         controller: [
-            'mainMenu', '$http', 'cutil', 'auth', 'requestStatus', '$translate',
-            function (mainMenu, $http, cutil, auth, requestStatus, $translate) {
+            'mainMenu', '$http', 'cutil', 'auth', 'requestStatus',
+            function (mainMenu, $http, cutil, auth, requestStatus) {
                 mainMenu.setTitle('Sign Up');
                 this.form = {};
                 var self = this;
@@ -16,24 +16,22 @@ angular.
                     if (!self.form.$valid) {
                         return;
                     }
-                    $translate('Registering account').then(function (msg) {
-                        requestStatus.startLoading(msg);
-                        var userName = self.firstName + ' ' + self.lastName;
-                        $http.post('/api/anonymous/user/register',
-                                   {name: userName,
-                                    email: self.email,
-                                    phone: self.phone,
-                                    sessionPart: cutil.genUserSessionPart()
-                                   },
-                                   {'Content-Type': 'application/json'}).
-                            then(
-                                function (okResp) {
-                                    requestStatus.complete(okResp);
-                                    auth.storeSession(okResp.data.session,
-                                                      okResp.data.uid,
-                                                      userName, self.email, 'User');
-                                },
-                                requestStatus.failed);
-                    });
+                    requestStatus.startLoading('Registering account');
+                    var userName = self.firstName + ' ' + self.lastName;
+                    $http.post('/api/anonymous/user/register',
+                               {name: userName,
+                                email: self.email,
+                                phone: self.phone,
+                                sessionPart: cutil.genUserSessionPart()
+                               },
+                               {'Content-Type': 'application/json'}).
+                        then(
+                            function (okResp) {
+                                requestStatus.complete(okResp);
+                                auth.storeSession(okResp.data.session,
+                                                  okResp.data.uid,
+                                                  userName, self.email, 'User');
+                            },
+                            requestStatus.failed);
                 };
             }]});

@@ -17,10 +17,8 @@ angular.
                                           requestStatus.complete();
                                           self.place = place;
                                           pageCtx.put('place', place);
-                                          mainMenu.setTitle(['ManagementOf', {name: place.name}]);
-                                          if (auth.isAuthenticated()) {
-                                              mainMenu.setContextMenu({'#!/tournament/new': 'AddTournament'});
-                                          }
+                                          mainMenu.setTitle(['ManagementOf', {name: place.name}],
+                                                            auth.isAuthenticated() ? {'#!/tournament/new': 'AddTournament'} : null);
                                       },
                                       requestStatus.failed);
                      }]});

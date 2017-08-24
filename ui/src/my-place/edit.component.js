@@ -35,7 +35,7 @@ angular.
                                  self.data.address.email = self.place.address.email;
                                  self.data.address.phone = self.place.address.phone;
                                  self.data.address.address = self.place.address.address;
-                                 mainMenu.setTitle(place.name + " modification");
+                                 mainMenu.setTitle(['ModificationOf', {name: place.name}]);
                              },
                              requestStatus.failed);
             }]});

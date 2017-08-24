@@ -5,11 +5,9 @@ angular.module('playInTournamentList').
     component('playInTournamentList', {
         templateUrl: template,
         cache: false,
-        controller: ['Tournament', 'mainMenu', 'requestStatus', '$translate',
-                     function (Tournament, mainMenu, requestStatus, $translate) {
-                         $translate('Tournaments I am enlisted to').then(function (msg) {
-                             mainMenu.setTitle(msg);
-                         });
+        controller: ['Tournament', 'mainMenu', 'requestStatus',
+                     function (Tournament, mainMenu, requestStatus) {
+                         mainMenu.setTitle('Tournaments I am enlisted to');
                          this.tournaments = null;
                          var self = this;
                          requestStatus.startLoading();

@@ -50,7 +50,7 @@ angular.
             };
         };
     }]).
-    factory('syncTranslate', ['$translate', function ($translate) {
+    factory('syncTranslate', ['$translate', '$q', function ($translate, $q) {
         return new function () {
             this.create = function () {
                 return new function () {
@@ -92,6 +92,27 @@ angular.
                                 console.log("Reject obsolete translation: " + msg);
                             }
                         });
+                    };
+                    this.transTitleAndMenu = function (originTitle, originMenu, callback) {
+                        var callId = new Object();
+                        self.lastCallId = callId;
+                        var keys = Object.keys(originMenu);
+                        var origins = [];
+                        for (var i = 0; i < keys.length; ++i) {
+                            origins.push(originMenu[keys[i]]);
+                        }
+                        $q.all([self.callTranslate(originTitle).$promise, $translate(origins).$promise]).then(
+                            function (responses) {
+                                translations = responses[1];
+                                if (self.lastCallId == callId) {
+                                    for (var i = 0; i < keys.length; ++i) {
+                                        originMenu[keys[i]] = translations[originMenu[keys[i]]];
+                                    }
+                                    nextCallback(responses[0], originMenu);
+                                } else {
+                                    console.log("Reject obsolete translations");
+                                }
+                            });
                     };
                 };
             };

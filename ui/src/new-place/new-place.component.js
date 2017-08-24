@@ -6,12 +6,10 @@ angular.
     component('newPlace', {
         templateUrl: template,
         controller: ['auth', 'mainMenu', '$http', '$location', 'requestStatus',
-                     'City', 'Country', 'LocalStorage', '$timeout', 'pageCtx', '$translate',
+                     'City', 'Country', 'LocalStorage', '$timeout', 'pageCtx',
                      function (auth, mainMenu, $http, $location, requestStatus,
-                               City, Country, LocalStorage, $timeout, pageCtx, $translate) {
-                         $translate('New Place').then(function (msg) {
-                             mainMenu.setTitle(msg);
-                         });
+                               City, Country, LocalStorage, $timeout, pageCtx) {
+                         mainMenu.setTitle('New Place');
                          this.form = {};
                          this.cityForm = {};
                          this.countryForm = {};
@@ -56,98 +54,91 @@ angular.
                              if (!self.cityForm.$valid) {
                                  return;
                              }
-                             $translate('Creating city').then(function (msg) {
-                                 requestStatus.startLoading(msg);
-                                 $http.post('/api/city/create',
-                                            {countryId: self.countryId,
-                                             name: self.cityName},
-                                            {headers: {'Content-Type': 'application/json',
-                                                       session: auth.mySession()}
-                                            }).
-                                     then(
-                                         function (ok) {
-                                             self.cities.push({id: ok.data, name: self.cityName});
-                                             self.place.address.city.id = "" + ok.data;
-                                             jQuery('#newCityForm').modal('hide');
-                                             requestStatus.complete();
-                                             self.cityForm.$setPristine(true);
-                                         },
-                                         requestStatus.failed);
-                             });
+                             requestStatus.startLoading('Creating city');
+                             $http.post('/api/city/create',
+                                        {countryId: self.countryId,
+                                         name: self.cityName},
+                                        {headers: {'Content-Type': 'application/json',
+                                                   session: auth.mySession()}
+                                        }).
+                                 then(
+                                     function (ok) {
+                                         self.cities.push({id: ok.data, name: self.cityName});
+                                         self.place.address.city.id = "" + ok.data;
+                                         jQuery('#newCityForm').modal('hide');
+                                         requestStatus.complete();
+                                         self.cityForm.$setPristine(true);
+                                     },
+                                     requestStatus.failed);
+
                          };
                          this.createCountryAndUse = function () {
                              self.countryForm.$setSubmitted();
                              if (!self.countryForm.$valid) {
                                  return;
                              }
-                             $translate('Creating country').then(function (msg) {
-                                 requestStatus.startLoading(msg);
-                                 $http.post('/api/country/create',
-                                            {name: self.countryName},
-                                            {headers: {'Content-Type': 'application/json',
-                                                       session: auth.mySession()}
-                                            }).
-                                     then(
-                                         function (ok) {
-                                             self.countries.push({id: ok.data, name: self.countryName});
-                                             self.countryId = "" + ok.data; // to string to match type
-                                             jQuery('#newCountryForm').modal('hide');
-                                             requestStatus.complete();
-                                             self.countryForm.$setPristine(true);
-                                             self.showNewCityForm();
-                                         },
-                                         requestStatus.failed);
-                             });
+                             requestStatus.startLoading('Creating country');
+                             $http.post('/api/country/create',
+                                        {name: self.countryName},
+                                        {headers: {'Content-Type': 'application/json',
+                                                   session: auth.mySession()}
+                                        }).
+                                 then(
+                                     function (ok) {
+                                         self.countries.push({id: ok.data, name: self.countryName});
+                                         self.countryId = "" + ok.data; // to string to match type
+                                         jQuery('#newCountryForm').modal('hide');
+                                         requestStatus.complete();
+                                         self.countryForm.$setPristine(true);
+                                         self.showNewCityForm();
+                                     },
+                                     requestStatus.failed);
                          };
                          this.createPlace = function () {
                              self.form.$setSubmitted();
                              if (!self.form.$valid) {
                                  return;
                              }
-                             $translate('Creating place').then(function (msg) {
-                                 requestStatus.startLoading(msg);
-                                 $http.post('/api/place/create',
-                                            self.place,
-                                            {headers: {'Content-Type': 'application/json',
-                                                       session: auth.mySession()}
-                                            }).
-                                     then(
-                                         function (okResp) {
-                                             pageCtx.put('new-place', self.place);
-                                             requestStatus.complete();
-                                             window.history.back();
-                                         },
-                                         requestStatus.failed);
-                             });
+                             requestStatus.startLoading('Creating place');
+                             $http.post('/api/place/create',
+                                        self.place,
+                                        {headers: {'Content-Type': 'application/json',
+                                                   session: auth.mySession()}
+                                        }).
+                                 then(
+                                     function (okResp) {
+                                         pageCtx.put('new-place', self.place);
+                                         requestStatus.complete();
+                                         window.history.back();
+                                     },
+                                     requestStatus.failed);
                          };
-                         $translate(['Countries', 'Cities']).then(function (translations) {
-                             requestStatus.startLoading(translations.Countries);
-                             Country.list(
-                                 {},
-                                 function (countries) {
-                                     self.countries = countries;
-                                     if (!self.countryId) {
-                                         for (var i in countries) {
-                                             self.countryId = countries[i].id;
-                                             break;
-                                         }
-                                         self.loadCities();
+                         requestStatus.startLoading('Countries');
+                         Country.list(
+                             {},
+                             function (countries) {
+                                 self.countries = countries;
+                                 if (!self.countryId) {
+                                     for (var i in countries) {
+                                         self.countryId = countries[i].id;
+                                         break;
                                      }
+                                     self.loadCities();
+                                 }
+                                 requestStatus.complete();
+                             },
+                             requestStatus.failed);
+                         self.loadCities = function () {
+                             requestStatus.startLoading('Cities');
+                             City.list(
+                                 {countryId: self.countryId},
+                                 function (cities) {
+                                     self.cities = cities;
                                      requestStatus.complete();
                                  },
                                  requestStatus.failed);
-                             self.loadCities = function () {
-                                 requestStatus.startLoading(translations.Cities);
-                                 City.list(
-                                     {countryId: self.countryId},
-                                     function (cities) {
-                                         self.cities = cities;
-                                         requestStatus.complete();
-                                     },
-                                     requestStatus.failed);
-                             }
-                             if (self.countryId) {
-                                 self.loadCities();
-                             }
-                         });
+                         }
+                         if (self.countryId) {
+                             self.loadCities();
+                         }
                      }]});

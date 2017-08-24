@@ -6,10 +6,9 @@ angular.module('tournamentCategories').
         templateUrl: template,
         controller: ['$http', 'mainMenu', '$routeParams', 'auth', 'requestStatus', 'pageCtx', '$location',
                      function ($http, mainMenu, $routeParams, auth, requestStatus, pageCtx, $location) {
-                         mainMenu.setTitle('Categories');
                          var ctxMenu = {};
                          ctxMenu['#!/my/tournament/' + $routeParams.tournamentId] = 'Tournament';
-                         mainMenu.setContextMenu(ctxMenu);
+                         mainMenu.setTitle('Categories', ctxMenu);
                          this.tournament = pageCtx.get('tournamentInfoForCategories') || {tid: $routeParams.tournamentId};
                          this.categories = null;
                          this.newCategoryName = '';

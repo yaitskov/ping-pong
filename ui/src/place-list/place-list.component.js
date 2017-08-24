@@ -6,8 +6,7 @@ angular.module('placeList').
         templateUrl: template,
         controller: ['Place', 'mainMenu', 'requestStatus',
                      function (Place, mainMenu, requestStatus) {
-                         mainMenu.setTitle('My Places');
-                         mainMenu.setContextMenu({'#!/my/new/place': 'Add Place'});
+                         mainMenu.setTitle('My Places', {'#!/my/new/place': 'AddPlaceBtn'});
                          this.places = null;
                          var self = this;
                          requestStatus.startLoading();

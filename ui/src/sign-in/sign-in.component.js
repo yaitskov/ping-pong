@@ -6,8 +6,8 @@ angular.
     component('signIn', {
         templateUrl: template,
         controller: [
-            'mainMenu', '$http', 'auth', 'requestStatus', '$translate',
-            function (mainMenu, $http, auth, requestStatus, $translate) {
+            'mainMenu', '$http', 'auth', 'requestStatus',
+            function (mainMenu, $http, auth, requestStatus) {
                 mainMenu.setTitle('Sign In');
                 var self = this;
                 this.email = auth.myEmail()
@@ -17,18 +17,16 @@ angular.
                     if (!self.form.$valid) {
                         return;
                     }
-                    $translate("Sending email").then(function (msg) {
-                        requestStatus.startLoading(msg);
-                        self.ok = null;
-                        $http.post('/api/anonymous/auth/generate/sign-in-link',
-                                   self.email,
-                                   {'Content-Type': 'application/json'}).
-                            then(
-                                function (ok) {
-                                    self.ok = 1;
-                                    requestStatus.complete(ok);
-                                },
-                                requestStatus.failed);
-                    });
+                    requestStatus.startLoading("Sending email");
+                    self.ok = null;
+                    $http.post('/api/anonymous/auth/generate/sign-in-link',
+                               self.email,
+                               {'Content-Type': 'application/json'}).
+                        then(
+                            function (ok) {
+                                self.ok = 1;
+                                requestStatus.complete(ok);
+                            },
+                            requestStatus.failed);
                 };
             }]});

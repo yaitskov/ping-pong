@@ -7,9 +7,9 @@ angular.
         templateUrl: template,
         cache: false,
         controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu',
-                     '$http', '$location', 'requestStatus', 'cutil', 'pageCtx', '$translate',
+                     '$http', '$location', 'requestStatus', 'cutil', 'pageCtx',
                      function ($routeParams, Tournament, auth, mainMenu,
-                               $http,  $location, requestStatus, cutil, pageCtx, $translate) {
+                               $http,  $location, requestStatus, cutil, pageCtx) {
                          var self = this;
                          self.myCategory = pageCtx.get('my-category-' + $routeParams.tournamentId) || {};
                          self.tournament = null;
@@ -52,69 +52,57 @@ angular.
                              self.showQuitConfirm = true;
                          };
                          this.enlistMe = function () {
-                             $translate(['Enlisting', "ChooseCategory", "CategoryNotChosen"]).then(
-                                 function (translations) {
-                                     requestStatus.startLoading(translations.Enlisting, self.tournament);
-                                     if (!self.myCategory.cid) {
-                                         self.error = translations.ChooseCategory;
-                                         requestStatus.validationFailed(translations.CategoryNotChosen);
-                                         return;
-                                     }
-                                     if (auth.isAuthenticated()) {
-                                         $http.post('/api/tournament/enlist',
-                                                    {tid: self.tournament.tid,
-                                                     categoryId: self.myCategory.cid} ,
-                                                    {headers: {session: auth.mySession()}}).
-                                             then(
-                                                 function (okResp) {
-                                                     requestStatus.complete();
-                                                     self.tournament.myCategoryId = self.myCategory.cid;
-                                                     self.tournament.bidState = 'Want';
-                                                     self.myCategory.name = cutil.findValBy(self.tournament.categories,
-                                                                                            {cid: self.myCategory.cid}).name;
-                                                 },
-                                                 requestStatus.failed);
-                                     } else {
-                                         auth.requireLogin();
-                                     }
-                                 });
+                             requestStatus.startLoading('Enlisting', self.tournament);
+                             if (!self.myCategory.cid) {
+                                 requestStatus.validationFailed('CategoryNotChosen');
+                                 return;
+                             }
+                             if (auth.isAuthenticated()) {
+                                 $http.post('/api/tournament/enlist',
+                                            {tid: self.tournament.tid,
+                                             categoryId: self.myCategory.cid} ,
+                                            {headers: {session: auth.mySession()}}).
+                                     then(
+                                         function (okResp) {
+                                             requestStatus.complete();
+                                             self.tournament.myCategoryId = self.myCategory.cid;
+                                             self.tournament.bidState = 'Want';
+                                             self.myCategory.name = cutil.findValBy(self.tournament.categories,
+                                                                                    {cid: self.myCategory.cid}).name;
+                                         },
+                                         requestStatus.failed);
+                             } else {
+                                 auth.requireLogin();
+                             }
                          };
 
                          this.resign = function () {
-                             $translate('Resigning').then(function (resignin) {
-                                 requestStatus.startLoading(resignin, self.tournament);
-                                 Tournament.resign(
-                                     self.tournament.tid,
-                                     function () {
-                                         self.tournament.bidState = 'Quit';
-                                         requestStatus.complete();
-                                     },
-                                     requestStatus.failed);
-                             });
-                         };
-
-                         $translate(['Loading', 'Drafting']).then(function (translations) {
-                             requestStatus.startLoading(translations.Loading);
-                             mainMenu.setTitle(translations.Drafting);
-                             Tournament.aDrafting(
-                                 {tournamentId: $routeParams.tournamentId},
-                                 function (tournament) {
+                             requestStatus.startLoading('Resigning', self.tournament);
+                             Tournament.resign(
+                                 self.tournament.tid,
+                                 function () {
+                                     self.tournament.bidState = 'Quit';
                                      requestStatus.complete();
-                                     $translate('Drafting to', {name: tournament.name}).then(
-                                         function (title) {
-                                             mainMenu.setTitle(title);
-                                             self.tournament = tournament;
-                                             if (self.tournament.myCategoryId) {
-                                                 self.myCategory = {cid: tournament.myCategoryId,
-                                                                    name: cutil.findValBy(self.tournament.categories,
-                                                                                          {cid: tournament.myCategoryId}).name}
-                                             }
-                                         });
                                  },
-                                 function (r) {
-                                     requestStatus.failed(r, {tid: $routeParams.tournamentId});
-                                 });
-                         });
+                                 requestStatus.failed);
+                         };
+                         requestStatus.startLoading('Loading');
+                         mainMenu.setTitle('Drafting');
+                         Tournament.aDrafting(
+                             {tournamentId: $routeParams.tournamentId},
+                             function (tournament) {
+                                 requestStatus.complete();
+                                 mainMenu.setTitle(['Drafting to', {name: tournament.name}]);
+                                 self.tournament = tournament;
+                                 if (self.tournament.myCategoryId) {
+                                     self.myCategory = {cid: tournament.myCategoryId,
+                                                        name: cutil.findValBy(self.tournament.categories,
+                                                                              {cid: tournament.myCategoryId}).name}
+                                 }
+                             },
+                             function (r) {
+                                 requestStatus.failed(r, {tid: $routeParams.tournamentId});
+                             });
                      }
                     ]
     });

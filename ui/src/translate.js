@@ -299,7 +299,24 @@ module.exports = {
         'Right now enlisted': 'Teraz zapisane',
         'Offline enlist': 'Rekrutacja offline',
         'Offline enlist to': 'Offline rekrutacja do {{name}}',
-        'Enlisting': 'Zapisywanie'
+        'Enlisting': 'Zapisywanie',
+
+        // my place
+        'ManagementOf': '{{name}} zarządzanie',
+
+        // my place edit
+        'ModificationOf': '{{name}} modifykacja',
+
+        // my tournament categories
+        'Begin Draft': 'Zacząć rekrutację',
+        'No categories': 'Nie ma katorii',
+        'Category Name': 'Nazwa katorii',
+        'category-name-length': 'Długość nazwy musi być mniej niż {{max}} liter',
+        'remove-category-btn-hint': 'Usunąć pustę kategorię',
+        "Openning draft": "Rozpoczęcie rekrutacji",
+        'Adding category': 'Dodawanie kategorii',
+        'Removing category': 'Usuwanie kategorii',
+        'Load categories': 'Ladowanie kategorii'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -600,6 +617,20 @@ module.exports = {
         'Enlisting': 'Enlisting',
 
         // my place
-        'ManagementOf': '{{name}} management'
+        'ManagementOf': '{{name}} management',
+
+        // my place edit
+        'ModificationOf': '{{name}} modification',
+
+        // my tournament categories
+        'Begin Draft': 'Begin Draft',
+        'No categories': 'No categories',
+        'Category Name': 'Category Name',
+        'category-name-length': 'Name length must be less than {{max}} letters',
+        'remove-category-btn-hint': 'Remove category if it\'s empty',
+        "Openning draft": "Openning draft",
+        'Adding category': 'Adding category',
+        'Removing category': 'Removing category',
+        'Load categories': 'Load categories'
     }
 };

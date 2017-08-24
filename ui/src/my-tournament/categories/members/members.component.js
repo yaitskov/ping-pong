@@ -6,10 +6,9 @@ angular.module('categoryMemberList').
         templateUrl: template,
         controller: ['$http', 'mainMenu', '$routeParams', 'auth', 'requestStatus', 'pageCtx', 'Category',
                      function ($http, mainMenu, $routeParams, auth, requestStatus, pageCtx, Category) {
-                         mainMenu.setTitle('Category Members');
                          var ctxMenu = {};
                          ctxMenu['#!/my/tournament/' + $routeParams.tournamentId] = 'Tournament';
-                         mainMenu.setContextMenu(ctxMenu);
+                         mainMenu.setTitle('Category Members', ctxMenu);
                          this.tournamentId = $routeParams.tournamentId;
                          this.members = null;
                          this.newCategoryName = '';

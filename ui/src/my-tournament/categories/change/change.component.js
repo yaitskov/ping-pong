@@ -8,10 +8,9 @@ angular.module('changeCategory').
                      'requestStatus', 'pageCtx', '$location', 'Category', 'Participant',
                      function ($http, mainMenu, $routeParams, auth,
                                requestStatus, pageCtx, $location, Category, Participant) {
-                         mainMenu.setTitle('Pick category');
                          var ctxMenu = {};
                          ctxMenu['#!/my/tournament/' + $routeParams.tournamentId] = 'Tournament';
-                         mainMenu.setContextMenu(ctxMenu);
+                         mainMenu.setTitle('Pick category', ctxMenu);
                          this.tournament = pageCtx.get('tournamentInfoForCategories') || {tid: $routeParams.tournamentId};
                          this.categories = null;
                          var self = this;

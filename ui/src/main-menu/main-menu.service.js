@@ -9,8 +9,11 @@ angular.
             var stranslateMenu = syncTranslate.create();
             this.title = '....';
             this.contextMenu = {};
-            this.setTitle = function (originTitle) {
+            this.setTitle = function (originTitle, menu) {
                 self.contextMenu = {};
+                if (menu) {
+                    self.setContextMenu(menu);
+                }
                 stranslate.trans(originTitle || 'Loading', function (title) {
                     self.title = title;
                     $rootScope.$broadcast('title.set', title);

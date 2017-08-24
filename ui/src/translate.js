@@ -316,7 +316,11 @@ module.exports = {
         "Openning draft": "Rozpoczęcie rekrutacji",
         'Adding category': 'Dodawanie kategorii',
         'Removing category': 'Usuwanie kategorii',
-        'Load categories': 'Ladowanie kategorii'
+        'Load categories': 'Ladowanie kategorii',
+
+        // my tournament categories change
+        'Changing category': 'Zmiana kategorii',
+        'Pick category': 'Wybierz kategorię'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -631,6 +635,10 @@ module.exports = {
         "Openning draft": "Openning draft",
         'Adding category': 'Adding category',
         'Removing category': 'Removing category',
-        'Load categories': 'Load categories'
+        'Load categories': 'Load categories',
+
+        // my tournament categories change
+        'Changing category':'Changing category',
+        'Pick category': 'Pick category'
     }
 };

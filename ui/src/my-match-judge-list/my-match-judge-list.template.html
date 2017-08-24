@@ -2,18 +2,17 @@
 <div class="container-fluid admin-judgement">
   <request-status></request-status>
   <div class="container" ng-show="$ctrl.previouslyScoredEnded">
-    <div class="alert alert-info">
-      Tournament <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
-          {{$ctrl.tournament.previous.name}}</a> is complete.
+    <div class="alert alert-info" translate="tournament is complete"
+         translate-values="{url: '#!/tournament/result/' + $ctrl.tournament.previous.tid, name: $ctrl.tournament.previous.name}">
     </div>
     <div class="form-group">
       <button class="btn btn-primary"
               ng-click="$ctrl.iSawTournamentEnd()">
-        Ok, I see
+        {{ 'Ok, I see' | translate }}
       </button>
       <a class="btn btn-default"
          href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
-        Watch Ratings
+        {{ 'Watch Ratings' | translate }}
       </a>
     </div>
   </div>
@@ -28,10 +27,17 @@
   <table class="table" ng-show="$ctrl.matches.length > 0">
     <thead>
       <tr>
-        <td class="match-cell">Match</td>
-        <td>Table</td>
-        <td>Opponents</td>
-        <td>Score</td>
+        <td class="match-cell">
+          {{ 'the match' | translate }}</td>
+        <td>
+          {{ 'the table' | translate }}
+        </td>
+        <td>
+          {{ 'Opponents' | translate }}
+        </td>
+        <td>
+          {{ 'Score' | translate }}
+        </td>
       </tr>
     </thead>
     <tbody>
@@ -53,7 +59,7 @@
         <td>
           <a class="btn btn-primary"
              ng-click="$ctrl.completeMatch(match.mid, $index)">
-            Score
+            {{ 'Score' | translate }}
           </a>
         </td>
       </tr>
@@ -61,34 +67,30 @@
   </table>
   <div class="container" ng-show="!$ctrl.previouslyScoredEnded && $ctrl.matches.length == 0">
     <div class="alert alert-info">
-      <p ng-show="!$ctrl.tournament.current">
-        You don't have any match to judge.
-        <a href="#!/tournament/new">Add tournament.</a>
+      <p ng-show="!$ctrl.tournament.current"
+         translate="no-match-to-judge"
+         translate-values="{url: '#!/tournament/new'}">
       </p>
       <p ng-show="$ctrl.tournament.current.length">
-        Rigth now you judge:
+        {{ 'you-judge-now' | translate }}
         <a ng-repeat="tournament in $ctrl.tournament.current"
            href="#!/watch/tournament/{{tournament.tid}}">
           <span ng-show="$index > 0">, </span>{{tournament.name}}
         </a>
         <span ng-show="$ctrl.tournament.current.length == 1">
-          tournament,
+          {{ 'tournament' | translate }},
         </span>
         <span ng-show="$ctrl.tournament.current.length > 1">
-          tournaments,
+          {{ 'tournaments' | translate }},
         </span>
-        but there is no any match to judge.
+        {{ 'you-judge-now-but' | translate }}
       </p>
-      <p ng-show="$ctrl.tournament.next">
-        Next tournament, you judge, is <a href="#!/my/tournament/{{$ctrl.tournament.next.tid}}">
-          {{$ctrl.tournament.next.name}}
-        </a> tournament, which begins at {{$ctrl.tournament.next.opensAt
-        | date: 'MMM d EEE h a Z'}}.
+      <p ng-show="$ctrl.tournament.next"
+         translate="next-tournament-you-judge"
+         translate-values="{url: '#!/my/tournament/' + $ctrl.tournament.next.tid, name: $ctrl.tournament.next.name, date: $ctrl.tournament.next.opensAt | date: 'MMM d EEE h a Z'}">
       </p>
-      <p ng-show="$ctrl.tournament.previous">
-        Latest
-          tournment <a href="#!/my/tournament/{{$ctrl.tournament.previous.tid}}">
-          {{$ctrl.tournament.previous.name}}</a> is complete.
+      <p ng-show="$ctrl.tournament.previous" translate="latest-tournament-complete"
+         translate-values="{url: '#!/my/tournament/' + $ctrl.tournament.previous.tid, name: $ctrl.tournament.previous.name}">
       </p>
   </div>
 </div>

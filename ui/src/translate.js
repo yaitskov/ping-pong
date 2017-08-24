@@ -390,7 +390,16 @@ module.exports = {
         'the-state-place-descr': 'Wszystki uczestniki meczu są ustaliony i brakuje tylko wolnego stołu, żeby zacząć gre.',
         'the-state-draft-descr': 'Nie szystki uczestniki jeszcze są wiadome. Taki stan może wydażyć tylko meczu <b>play off</b>.',
         'the-state-over-descr': 'Mecz jest zakończony.',
-        "Meaning of states in a match": "Znaczenia stanów w meczu"
+        "Meaning of states in a match": "Znaczenia stanów w meczu",
+
+        // my match judge list
+        'tournament is complete': 'Turniej <a href="{{url}}">{{name}}</a> jest zakończony.',
+        'no-match-to-judge': 'You don\'t have any match to judge. <a href="{{url}}">Dodać tourniej.</a>',
+        'you-judge-now': 'Teraz jesteś sędzią w:',
+        'you-judge-now-but':  'ale nie ma żadnego meczu dla oceny.'
+        'next-tournament-you-judge': 'Następny turniej, ty sądzisz, to <a href="{{url}}">{{name}}</a> turniej, który zaczyna {{date}}',
+        'latest-tournament-complete': 'Powszedni  zakończony tourniej <a href="{{url}}">{{name}}</a>',
+        'Match Judgement': 'Ocena meczów'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -780,6 +789,15 @@ module.exports = {
         'the-state-place-descr': 'All players for the match have been determined and it lacks only a spare table to start the game.',
         'the-state-draft-descr': 'Not all match\'s players are known yet. It could be encountered in <b>play off</b> games.',
         'the-state-over-descr': 'Match is complete.',
-        "Meaning of states in a match": "Meaning of states in a match"
+        "Meaning of states in a match": "Meaning of states in a match",
+
+        // my match judge list
+        'tournament is complete': 'Tournament <a href="{{url}}">{{name}}</a> is complete.',
+        'no-match-to-judge': 'You don\'t have any match to judge. <a href="{{url}}">Add tournament.</a>',
+        'you-judge-now': 'Rigth now you judge:',
+        'you-judge-now-but':  'but there is no any match to judge.'
+        'next-tournament-you-judge': 'Next tournament, you judge, is <a href="{{url}}">{{name}}</a> tournament, which begins at {{date}}',
+        'latest-tournament-complete': 'Latest tournament <a href="{{url}}">{{name}}</a> is complete.',
+        'Match Judgement': 'Match Judgement'
     }
 };

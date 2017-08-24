@@ -35,8 +35,9 @@ angular.module('pingPong').
             function config($locationProvider, $routeProvider, $translateProvider) {
                 $translateProvider
                     // .useSanitizeValueStrategy(null)
+                    .translations('en', translateTables.en)
                     .translations('pl', translateTables.pl)
-                    .preferredLanguage('pl');
+                    .preferredLanguage(localStorage.getItem('myLang') || 'pl');
                 $locationProvider.hashPrefix('!');
                 $routeProvider.
                     when('/tournaments', {

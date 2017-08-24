@@ -20,6 +20,9 @@ angular.
                                  LocalStorage.clearAll();
                                  $location.path('/');
                              };
+                             this.myLang = function () {
+                                 return LocalStorage.get('myLang') || 'pl';
+                             };
                              this.myEmail = function () {
                                  return LocalStorage.get('myEmail');
                              };

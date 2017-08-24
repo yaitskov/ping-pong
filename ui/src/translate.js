@@ -86,6 +86,9 @@ module.exports = {
         'Change btn': 'Zmienić',
         'Cancel btn': 'Anulować',
 
+        // account
+        'Account Details': 'Szczegóły konta',
+
         // tournament details page
         'tournament name': 'Nazwa',
         'tournament city': 'Miasto',
@@ -480,6 +483,9 @@ module.exports = {
         'first-lasts-name-length': 'Name length must be in range {{min}} and {{max}}',
         'Change btn': 'Change',
         'Cancel btn': 'Cancel',
+
+        // account
+        'Account Details': 'Account Details',
 
         // tournament details page
         'tournament name': 'Name',

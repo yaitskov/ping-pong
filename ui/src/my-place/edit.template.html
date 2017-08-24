@@ -2,7 +2,7 @@
 <div class="container">
   <form novalidate name="$ctrl.form" ng-submit="$ctrl.change()">
     <div class="form-group" ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.name.$dirty) && $ctrl.form.name.$invalid}">
-      <label for="name">Name</label>
+      <label for="name">{{ 'table name' | translate }}</label>
       <input type="text" class="form-control"
              ng-model="$ctrl.data.name"
              ng-maxlength="40"
@@ -10,19 +10,19 @@
              required
              name="name"
              id="name"
-             placeholder="Name"/>
+             placeholder="{{ 'table name' | translate }}"/>
       <p class="help-block"
          ng-show="$ctrl.form.name.$error.required">
-        Name is required
+        {{ 'Name is required' | translate }}
       </p>
       <p class="help-block"
          ng-show="$ctrl.form.name.$error.minlength || $ctrl.form.name.$error.maxlength">
-        Name length must be in range 1 and 40
+        {{ 'place-name-length' | translate : '{max: 40}' }}
       </p>
     </div>
     <div class="form-group"
          ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.address.$dirty) && $ctrl.form.address.$invalid}">
-      <label for="address">Address</label>
+      <label for="address">{{ 'Postal Address' | translate }}</label>
       <input type="text" class="form-control"
              ng-model="$ctrl.data.address.address"
              ng-maxlength="200"
@@ -30,19 +30,19 @@
              required
              name="address"
              id="address"
-             placeholder="Postal adress"/>
+             placeholder="{{ 'Postal Address' | translate }}"/>
       <p class="help-block"
          ng-show="$ctrl.form.address.$error.required">
-        Postal is required
+        {{ 'Address is required' | translate }}
       </p>
       <p class="help-block"
          ng-show="$ctrl.form.address.$error.minlength || $ctrl.form.address.$error.maxlength">
-        Postal address length must be in range 1 and 200
+        {{ 'postal-address-length' | translate : '{max: 200}' }}
       </p>
     </div>
     <div class="form-group"
          ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.email.$dirty) && $ctrl.form.email.$invalid}">
-      <label for="email">Email</label>
+      <label for="email">{{ 'Email' | translate }}</label>
       <input type="email" class="form-control"
              ng-model="$ctrl.data.address.email"
              ng-maxlength="40"
@@ -51,41 +51,45 @@
              id="email" placeholder="Email"/>
       <p class="help-block"
          ng-show="$ctrl.form.email.$error.maxlength">
-        Email length must be less than 40
+        {{ 'email-length' | translate : '{max: 40}' }}
       </p>
       <p class="help-block"
          ng-show="$ctrl.form.email.$error.email">
-        Email format is wrong
+        {{ 'email wrong format' | translate }}
       </p>
       <p class="help-block" ng-show="$ctrl.form.email.$valid">
-        Optional field
+        {{ 'Optional field' | translate }}
       </p>
     </div>
     <div class="form-group"
          ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.phone.$dirty) && $ctrl.form.phone.$invalid}">
-      <label for="phone">Phone</label>
+      <label for="phone">{{ 'Phone' | translate }}</label>
       <input type="text" class="form-control"
              ng-model="$ctrl.data.address.phone"
              ng-maxlength="40"
              validate-phone
              name="phone"
              id="phone"
-             placeholder="Phone"/>
+             placeholder="{{ 'Phone' | translate }}"/>
       <p class="help-block" ng-show="$ctrl.form.phone.$valid">
-        Optional field.
+        {{ 'Optional field' | translate }}
       </p>
       <p class="help-block"
          ng-show="$ctrl.form.phone.$error.maxlength">
-        Phone length must be less than 40
+        {{ 'phone-length' | translate : '{max: 40}' }}
       </p>
       <p class="help-block"
          ng-show="$ctrl.form.phone.$error.phone">
-        Phone is in wrong format
+        {{ 'phone wrong format' | translate }}
       </p>
     </div>
     <div class="form-group">
-      <button type="submit" class="btn btn-default btn-primary">Change</button>
-      <a class="btn btn-default" back-button>Cancel</a>
+      <button type="submit" class="btn btn-default btn-primary">
+        {{ 'Change btn' | translate }}
+      </button>
+      <a class="btn btn-default" back-button>
+        {{ 'Cancel btn' | translate }}
+      </a>
     </div>
     <div class="form-group">
       <request-status></request-status>

@@ -335,7 +335,12 @@ module.exports = {
         'table state': 'Stan',
         'Place Tables': 'Stoły miejsca',
         "Archiving table": "Archiwizowanie stołów",
-        "Adding tables": "Dodanie stołów"
+        "Adding tables": "Dodanie stołów",
+
+        //  my place edit
+        'table name': 'Nazwa',
+        'Place Modification': 'Modifykacja miejsca',
+        "Saving": "Zapisywanie"
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -669,6 +674,11 @@ module.exports = {
         'table state': 'State',
         'Place Tables': 'Place Tables',
         "Archiving table": "Archiving table",
-        "Adding tables": "Adding tables"
+        "Adding tables": "Adding tables",
+
+        //  my place edit
+        'table name': 'Name',
+        'Place Modification': 'Place Modification',
+        "Saving": "Saving"
     }
 };

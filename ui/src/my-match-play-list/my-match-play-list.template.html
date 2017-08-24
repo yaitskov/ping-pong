@@ -3,101 +3,90 @@
   <request-status></request-status>
   <div ng-show="$ctrl.previouslyScored.ended">
     <div class="alert alert-info" ng-switch="$ctrl.tournament.previous.outcome">
-      <div ng-switch-when="Win1">
-        Congratulations! You are the champion of the
-          tournament <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
-          {{$ctrl.tournament.previous.name}}</a>. Follow the previous link to
-          see ratings.
+      <div ng-switch-when="Win1"
+           translate="congrat-1st-place",
+           translate-values="{url: '#!/tournament/result/' + $ctrl.tournament.previous.tid, name: $ctrl.tournament.previous.name}">
       </div>
-      <div ng-switch-when="Win2">
-        Congratulations! You won 2rd place in the
-          tournament <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
-          {{$ctrl.tournament.previous.name}}</a>. Follow the previous link to
-          see ratings.
+      <div ng-switch-when="Win2"
+           translate="congrat-1st-place",
+           translate-values="{url: '#!/tournament/result/' + $ctrl.tournament.previous.tid, name: $ctrl.tournament.previous.name}">
       </div>
-      <div ng-switch-when="Win3">
-        Congratulations! You won 3rd place in the
-          tournament <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
-          {{$ctrl.tournament.previous.name}}</a>. Follow the previous link to
-          see ratings.
+      <div ng-switch-when="Win3"
+           translate="congrat-3rd-place",
+           translate-values="{url: '#!/tournament/result/' + $ctrl.tournament.previous.tid, name: $ctrl.tournament.previous.name}">
       </div>
-      <div ng-switch-when="Lost">
-        You've lost the
-          tournament <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
-          {{$ctrl.tournament.previous.name}}</a>. Follow the previous link to
-          see ratings.
+      <div ng-switch-when="Lost" translate="congrat-lost"
+           translate-values="{url: '#!/tournament/result/' + $ctrl.tournament.previous.tid, name: $ctrl.tournament.previous.name}">
       </div>
-      <div ng-switch-when="Quit">
-        You have resign from further participation in the tournament
-        <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
-          {{$ctrl.tournament.previous.name}}</a>.
+      <div ng-switch-when="Quit" translate="congrat-quit"
+           translate-values="{url: '#!/tournament/result/' + $ctrl.tournament.previous.tid, name: $ctrl.tournament.previous.name}">
       </div>
-      <div ng-switch-when="Expl">
-        You have been expelled from the
-          tournament <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
-          {{$ctrl.tournament.previous.name}}</a>. Next time obey the rules.
+      <div ng-switch-when="Expl" translate="congrat-expelled"
+           translate-values="{url: '#!/tournament/result/' + $ctrl.tournament.previous.tid, name: $ctrl.tournament.previous.name}">
       </div>
       <div ng-switch-default>
-        Unsupported player state
-        {{$ctrl.tournament.previous.outcome}}. Report about this bug.
+        {{ 'unsupported-player-state' | translate : '{name: $ctrl.tournament.previous.outcome}' }}
       </div>
     </div>
     <div class="form-group">
       <button class="btn btn-primary"
               ng-click="$ctrl.iSawMyOutcomeInTournament()">
-        Ok, I see
+        {{ 'Ok, I see' | translate }}
       </button>
       <a class="btn btn-default"
          href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
-        Watch Ratings
+        {{ 'Watch Ratings' | translate }}
       </a>
     </div>
   </div>
   <div ng-show="$ctrl.openMatch" class="form-group">
     <a class="btn btn-primary wrap-long" ng-click="$ctrl.matchScoring()">
-      Complete match with {{$ctrl.openMatch.enemy.name}}
+      {{ 'complete-match-with' | translate : '{name: $ctrl.openMatch.enemy.name}' }}
+
     </a>
   </div>
   <div ng-show="!$ctrl.openMatch && $ctrl.matches.length > 0"
        class="form-group alert alert-info">
-    Wait for a free table.
+    {{ 'Wait for a free table.' | translate }}
   </div>
   <table class="table" ng-show="$ctrl.matches.length > 0">
     <thead>
       <tr>
-        <td title="Description of possible states in a match.">
-          <a href="#!/match/state/description">State</a>
+        <td title="{{ 'state-descr-hint' | translate }}">
+          <a href="#!/match/state/description">
+            {{ 'match state' | translate }}
+          </a>
         </td>
-        <td title="Match type. It could be a game in a group or play off.">
-          Match
+        <td title="{{ 'match-type-hint' | translate }}">
+          {{ 'the match' | translate }}
         </td>
-        <td title="Table number where the match should be held or dash if it's not known yet.">
-          Table
+        <td title="{{ 'table-number-hint' | translate }}">
+          {{ 'the table' | translate }}
         </td>
-        <td title="Your opponent in a game.">
-          Contestant
+        <td title="{{ 'opponent-name' | translate }}">
+          {{ 'the contestant' | translate }}
         </td>
       </tr>
     </thead>
     <tbody>
       <tr ng-repeat="match in $ctrl.matches">
         <td class="match-state-description"
-            title="Match state. Start playing once it become the Game."
+            title="{{ 'match-state-descr-in-row' | translate }}"
             ng-class="{'text-danger': match.state == 'Game'}">
           {{match.state}}
         </td>
-        <td title="Match type. It could be a game in a group or play off.">
+        <td title="{{ 'match-type-descr-in-row' | translate }}">
           {{match.matchType}}
         </td>
         <td class="table-number">
           <a href="#!/place/tables/{{match.table.id}}"
-             title="Table number where the match should be held or dash if it's not known yet."
+             title="{{ 'table-label-descr-row' | translate }}"
              ng-show="match.table.id">
             {{match.table.label}}
           </a>
-          <span title="No free table" ng-show="!match.table.id">-</span>
+          <span title="{{ 'No free table' | translate }}" ng-show="!match.table.id">-</span>
         </td>
-        <td title="Your opponent in a game.">
+        <td title="{{ 'Your opponent in a game.' | translate }}">
           <a href="#!/participant/{{match.tid}}/{{match.enemy.uid}}">
             {{match.enemy.name}}
           </a>
@@ -107,39 +96,32 @@
   </table>
   <div ng-show="!$ctrl.previouslyScored.ended && $ctrl.matches.length == 0">
     <div class="alert alert-info">
-      <p ng-show="!$ctrl.tournament.current">
-        Right now you don't participate in any tournament.
-        <a href="#!/tournaments">Find a drafting tournament</a>
-        interesting your and enlist!
+      <p ng-show="!$ctrl.tournament.current"
+         translate="you-dont-participate-in-tournament"
+         translate-values="{url: '#!/tournaments'}">
       </p>
       <p ng-show="$ctrl.tournament.current.length">
-        Right now you participate in
+        {{ 'you-participate-in' | translate }}
         <a ng-repeat="tournament in $ctrl.tournament.current"
            href="#!/watch/tournament/{{tournament.tid}}">
           <span ng-show="$index > 0">, </span>{{tournament.name}}
         </a>
         <span ng-show="$ctrl.tournament.current.length == 1">
-          tournament,
+          {{ 'tournament' | translate }},
         </span>
         <span ng-show="$ctrl.tournament.current.length > 1">
-          tournaments,
+          {{ 'tournaments' | translate }},
         </span>
-        but there is no any match to play. You played all
-        group matches and other participants don't. So wait for update
-        on you schedule.
+        {{ 'you-participate-in-but' | translate }}
       </p>
     </div>
-    <div class="alert alert-info" ng-show="$ctrl.tournament.next">
-      The closest tournament, you have enlisted,
-      is <a href="#!/tournaments/{{$ctrl.tournament.next.tid}}">
-        {{$ctrl.tournament.next.name}}
-      </a>, which begins at {{$ctrl.tournament.next.opensAt | date:
-      'MMM d EEE h a Z'}}.
+    <div class="alert alert-info" ng-show="$ctrl.tournament.next"
+         translate="closest-tournament"
+         translate-values="{url: $ctrl.nextUrl(), name: $ctrl.nextName(), date: $ctrl.tournament.next.opensAt | date: 'MMM d EEE h a Z' }">
     </div>
-    <div class="alert alert-info" ng-show="$ctrl.tournament.previous">
-      The latest tournament, you've been,
-      is <a href="#!/tournament/result/{{$ctrl.tournament.previous.tid}}">
-        {{$ctrl.tournament.previous.name}}</a> tournament.
+    <div class="alert alert-info" ng-show="$ctrl.tournament.previous"
+         translate="latest-tournament"
+         translate-values="{url: '#!/tournament/result/' + $ctrl.tournament.previous.tid, name: $ctrl.tournament.previous.name}">
     </div>
   </div>
 </div>

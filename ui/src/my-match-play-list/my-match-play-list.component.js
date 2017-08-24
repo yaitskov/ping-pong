@@ -19,6 +19,12 @@ angular.module('myMatchPlayList').
                              pageCtx.put('match-max-score-' + self.openMatch.mid, self.openMatch.matchScore);
                              $location.path("/complete/my/match/" + self.openMatch.mid);
                          };
+                         this.nextName = function () {
+                             return self.tournament.next.name;
+                         };
+                         this.nextUrl = function () {
+                             return '#!/tournaments/' + self.tournament.next.tid;
+                         };
                          this.iSawMyOutcomeInTournament = function () {
                              pageCtx.put('last-scoring-match', {});
                              self.previouslyScored = {};
@@ -39,7 +45,6 @@ angular.module('myMatchPlayList').
                                      self.checkTournamentEnd();
                                      var matches = responses[1];
                                      requestStatus.complete();
-                                     console.log("Loaded matches " + matches.length);
                                      self.matches = matches;
                                      self.openMatch = cutil.findValByO(matches, {state: 'Game'});
                                      if (self.openMatch) {

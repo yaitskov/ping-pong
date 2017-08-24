@@ -2,14 +2,20 @@
 <div class="container">
   <request-status></request-status>
   <div class="form-group">
-    <a class="btn btn-primary" href="#!/my-place/edit/{{$ctrl.place.pid}}">Edit</a>
-    <a class="btn btn-default" href="#!/tournament/new">Add Tournament</a>
-    <a class="btn btn-default" back-button>Back</a>
+    <a class="btn btn-primary" href="#!/my-place/edit/{{$ctrl.place.pid}}">
+      {{ 'Edit' | translate }}
+    </a>
+    <a class="btn btn-default" href="#!/tournament/new">
+      {{ 'AddTournament' | translate }}
+    </a>
+    <a class="btn btn-default" back-button>
+      {{ 'Back btn' | translate }}
+    </a>
   </div>
   <table class="table" ng-show="$ctrl.place">
     <tr>
       <td>
-        Name
+        {{ 'place name' | translate }}
       </td>
       <td>
         {{$ctrl.place.name}}
@@ -17,7 +23,7 @@
     </tr>
     <tr ng-show="$ctrl.place.address.city">
       <td>
-        City
+        {{ 'city name' | translate }}
       </td>
       <td>
         {{$ctrl.place.address.city.name}}
@@ -25,7 +31,7 @@
     </tr>
     <tr ng-show="$ctrl.place.address.address">
       <td>
-        Postal Address
+        {{ 'Postal Address' | translate }}
       </td>
       <td>
         {{$ctrl.place.address.address}}
@@ -33,7 +39,7 @@
     </tr>
     <tr ng-show="$ctrl.place.address.phone">
       <td>
-        Phone
+        {{ 'Phone' | translate }}
       </td>
       <td>
         {{$ctrl.place.address.phone}}
@@ -41,7 +47,7 @@
     </tr>
     <tr ng-show="$ctrl.place.address.email">
       <td>
-        Contact Email
+        {{ 'Contact Email' | translate }}
       </td>
       <td>
         {{$ctrl.place.address.email}}
@@ -49,7 +55,7 @@
     </tr>
     <tr>
       <td>
-        Tables
+        {{ 'Tables' | translate }}
       </td>
       <td>
         <a href="#!/my-place/tables/{{$ctrl.place.pid}}"

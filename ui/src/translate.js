@@ -303,6 +303,8 @@ module.exports = {
 
         // my place
         'ManagementOf': '{{name}} zarządzanie',
+        'Tables': 'Stoły',
+        'My place': 'Moje miejsce',
 
         // my place edit
         'ModificationOf': '{{name}} modifykacja',
@@ -635,6 +637,8 @@ module.exports = {
 
         // my place
         'ManagementOf': '{{name}} management',
+        'Tables': 'Tables',
+        'My place': 'My place',
 
         // my place edit
         'ModificationOf': '{{name}} modification',

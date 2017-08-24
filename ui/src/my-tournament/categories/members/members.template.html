@@ -3,12 +3,12 @@
   <request-status></request-status>
   <div class="form-group">
     <a class="btn btn-primary" back-button>
-      Back
+      {{ 'Back btn' | translate }}
     </a>
   </div>
   <div class="form-group" ng-show="$ctrl.members.length == 0">
     <div class="alert alert-info" >
-      Category does not have members.
+      {{ 'empty category' | translate }}
     </div>
   </div>
   <div class="form-group" ng-show="$ctrl.members.length > 0">

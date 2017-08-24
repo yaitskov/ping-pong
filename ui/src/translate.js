@@ -320,7 +320,12 @@ module.exports = {
 
         // my tournament categories change
         'Changing category': 'Zmiana kategorii',
-        'Pick category': 'Wybierz kategorię'
+        'Pick category': 'Wybierz kategorię',
+
+        // my tournament categories members
+        'empty category': 'Kategoria jest pusta.',
+        'Category Members': 'Członki kategorii'
+        'Loading members': 'Ladowanie członków kategorii'
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -639,6 +644,11 @@ module.exports = {
 
         // my tournament categories change
         'Changing category':'Changing category',
-        'Pick category': 'Pick category'
+        'Pick category': 'Pick category',
+
+        // my tournament categories members
+        'empty category': 'Category does not have members.',
+        'Category Members': 'Category Members'
+        'Loading members': 'Loading members'
     }
 };

@@ -326,7 +326,7 @@ module.exports = {
 
         // my tournament categories members
         'empty category': 'Kategoria jest pusta.',
-        'Category Members': 'Członki kategorii'
+        'Category Members': 'Członki kategorii',
         'Loading members': 'Ladowanie członków kategorii',
 
         // my place tables
@@ -396,7 +396,7 @@ module.exports = {
         'tournament is complete': 'Turniej <a href="{{url}}">{{name}}</a> jest zakończony.',
         'no-match-to-judge': 'You don\'t have any match to judge. <a href="{{url}}">Dodać tourniej.</a>',
         'you-judge-now': 'Teraz jesteś sędzią w:',
-        'you-judge-now-but':  'ale nie ma żadnego meczu dla oceny.'
+        'you-judge-now-but':  'ale nie ma żadnego meczu dla oceny.',
         'next-tournament-you-judge': 'Następny turniej, ty sądzisz, to <a href="{{url}}">{{name}}</a> turniej, który zaczyna {{date}}',
         'latest-tournament-complete': 'Powszedni  zakończony tourniej <a href="{{url}}">{{name}}</a>',
         'Match Judgement': 'Ocena meczów'
@@ -724,7 +724,7 @@ module.exports = {
 
         // my tournament categories members
         'empty category': 'Category does not have members.',
-        'Category Members': 'Category Members'
+        'Category Members': 'Category Members',
         'Loading members': 'Loading members',
 
         // my place tables
@@ -795,7 +795,7 @@ module.exports = {
         'tournament is complete': 'Tournament <a href="{{url}}">{{name}}</a> is complete.',
         'no-match-to-judge': 'You don\'t have any match to judge. <a href="{{url}}">Add tournament.</a>',
         'you-judge-now': 'Rigth now you judge:',
-        'you-judge-now-but':  'but there is no any match to judge.'
+        'you-judge-now-but':  'but there is no any match to judge.',
         'next-tournament-you-judge': 'Next tournament, you judge, is <a href="{{url}}">{{name}}</a> tournament, which begins at {{date}}',
         'latest-tournament-complete': 'Latest tournament <a href="{{url}}">{{name}}</a> is complete.',
         'Match Judgement': 'Match Judgement'

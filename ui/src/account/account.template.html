@@ -19,6 +19,25 @@
        class="btn btn-default">
       {{ 'Request Admin permissions' | translate }}
     </a>
+    <div class="btn-group">
+      <button type="button" class="btn navbar-btn btn-danger dropdown-toggle"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{ $ctrl.language }}
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li>
+          <a ng-click="$ctrl.setLanguage('en')">
+            {{ 'English' | translate }}
+          </a>
+        </li>
+        <li>
+          <a ng-click="$ctrl.setLanguage('pl')">
+            {{ 'Polish' | translate }}
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
   <div class="form-group" ng-show="$ctrl.signInEmailSent">
     <div class="alert alert-info">

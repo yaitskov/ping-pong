@@ -6,9 +6,10 @@ angular.
     component('account', {
         templateUrl: template,
         controller: [
-            'mainMenu', '$http', 'cutil', 'auth', 'requestStatus', 'pageCtx',
-            function (mainMenu, $http, cutil, auth, requestStatus, pageCtx) {
+            'mainMenu', '$http', 'cutil', 'auth', 'requestStatus', 'pageCtx', 'syncTranslate',
+            function (mainMenu, $http, cutil, auth, requestStatus, pageCtx, syncTranslate) {
                 mainMenu.setTitle('Account Details');
+                var stranslate = syncTranslate.create();
                 var self = this;
                 this.uid = auth.myUid();
                 this.session = auth.mySession();
@@ -17,6 +18,14 @@ angular.
                 this.isAdmin = auth.isAdmin();
                 this.adminAccessRequested = pageCtx.get('amdin-access-requested');
                 this.userData = null;
+                this.language = null;
+                this.setLanguage = function (originLanguage) {
+                    stranslate.trans(originLanguage, function (language) {
+                        auth.setMyLang(originLanguage);
+                        self.language = language;
+                    });
+                };
+                this.setLanguage(auth.myLang());
                 this.logoutWithoutEmail = false;
                 this.signInEmailSent = false;
                 requestStatus.startLoading();

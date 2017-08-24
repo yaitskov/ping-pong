@@ -2,9 +2,10 @@ import angular from 'angular';
 
 angular.
     module('auth').
-    factory('auth', ['LocalStorage', '$location',
-                     function (LocalStorage, $location) {
+    factory('auth', ['LocalStorage', '$location', '$window',
+                     function (LocalStorage, $location, $window) {
                          function auth() {
+                             var self = this;
                              this.returnOnAuth = null;
                              this.isAuthenticated = function () {
                                  return !!LocalStorage.get('mySession');
@@ -22,6 +23,13 @@ angular.
                              };
                              this.myLang = function () {
                                  return LocalStorage.get('myLang') || 'pl';
+                             };
+                             this.setMyLang = function (lang) {
+                                 if (self.myLang() == lang) {
+                                     return;
+                                 }
+                                 LocalStorage.store('myLang', lang);
+                                 $window.location.reload();
                              };
                              this.myEmail = function () {
                                  return LocalStorage.get('myEmail');

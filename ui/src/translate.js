@@ -42,6 +42,10 @@ module.exports = {
         'Not set': 'Nie ustawione',
         'User type': 'Typ użytkownika',
         'Admin': 'Administrator',
+        'English': 'Angielski',
+        'Polish': 'Polski',
+        'en': 'Angielski',
+        'pl': 'Polski',
 
         // sign up page
         'First name': 'Imię',
@@ -439,6 +443,10 @@ module.exports = {
             + ' or to recover current session.',
         'follow-set-email-link': 'Follow <a href="{{url}}">the link</a> to set an email',
         'first and last name': 'Name',
+        'English': 'English',
+        'Polish': 'Polish',
+        'en': 'English',
+        'pl': 'Polish',
 
         // sign up page
         'First name': 'First name',

@@ -325,7 +325,15 @@ module.exports = {
         // my tournament categories members
         'empty category': 'Kategoria jest pusta.',
         'Category Members': 'Członki kategorii'
-        'Loading members': 'Ladowanie członków kategorii'
+        'Loading members': 'Ladowanie członków kategorii',
+
+        // my place tables
+        'Place has no tables': 'W miejscu nie żadnego stołu',
+        'table label': 'Nalekpa',
+        'table state': 'Stan',
+        'Place Tables': 'Stoły miejsca',
+        "Archiving table": "Archiwizowanie stołów",
+        "Adding tables": "Dodanie stołów"
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -649,6 +657,14 @@ module.exports = {
         // my tournament categories members
         'empty category': 'Category does not have members.',
         'Category Members': 'Category Members'
-        'Loading members': 'Loading members'
+        'Loading members': 'Loading members',
+
+        // my place tables
+        'Place has no tables': 'Place has no tables',
+        'table label': 'Label',
+        'table state': 'State',
+        'Place Tables': 'Place Tables',
+        "Archiving table": "Archiving table",
+        "Adding tables": "Adding tables"
     }
 };

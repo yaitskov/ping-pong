@@ -1,5 +1,6 @@
 import angular from 'angular';
 import template from './my-tournament.template.html';
+import whistle from './whistle.png';
 
 angular.
     module('myTournament').
@@ -14,6 +15,7 @@ angular.
                          ctxMenu['#!/my/tournament/categories/' + $routeParams.tournamentId] = 'Categories';
                          mainMenu.setTitle('MyTournament', ctxMenu);
                          var self = this;
+                         self.whistle = whistle;
                          self.tournament = null;
                          self.wantRemove = false;
                          self.errorHasUncheckedUsers = null;

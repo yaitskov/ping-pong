@@ -117,7 +117,7 @@
     </div>
     <div class="alert alert-info" ng-show="$ctrl.tournament.next"
          translate="closest-tournament"
-         translate-values="{url: $ctrl.nextUrl(), name: $ctrl.nextName(), date: $ctrl.tournament.next.opensAt | date: 'MMM d EEE h a Z' }">
+         translate-values="{url: $ctrl.nextUrl(), name: $ctrl.nextName(), date: ($ctrl.tournament.next.opensAt | date: 'MMM d EEE h a Z')}">
     </div>
     <div class="alert alert-info" ng-show="$ctrl.tournament.previous"
          translate="latest-tournament"

@@ -2,12 +2,10 @@
 <form>
   <div class="container match-scoring">
     <div class="form-group">
-      <label>Choose your score in the <b>{{$ctrl.match.matchType}}</b> match
-      with
+      <label>{{ 'choose-you-score' | translate : '{type: $ctrl.match.matchType}' }}
         <a href="#!/participant/{{$ctrl.match.tid}}/{{$ctrl.match.enemy.uid}}">
           {{$ctrl.match.enemy.name}}
         </a>
-        for you.
       </label>
       <div>
         <a class="btn btn-default score"
@@ -19,7 +17,7 @@
       </div>
     </div>
     <div class="form-group">
-      <label>Choose opponent's score</label>
+      <label>{{ 'choose opponent score' | translate }}</label>
       <div>
         <a class="btn btn-default score"
            ng-repeat="score in $ctrl.possibleScores"
@@ -32,10 +30,14 @@
     <div class="form-group">
       <button class="btn btn-primary"
               ng-show="!$ctrl.rated"
-              ng-click="$ctrl.scoreMatch()">Complete Match</button>
+              ng-click="$ctrl.scoreMatch()">
+        {{ 'Complete Match' | translate }}
+      </button>
       <button class="btn btn-default"
               ng-class="{'btn-primary': $ctrl.rated}"
-              back-button>Back</button>
+              back-button>
+        {{ 'Back btn' | translate }}
+      </button>
     </div>
     <div class="form-group">
       <request-status></request-status>

@@ -3,10 +3,10 @@
   <div class="container admin-score">
     <div class="form-group">
       <label>
-        Between
+        {{ 'Between' | translate }}
         <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{$ctrl.participants[0].uid}}">
           {{$ctrl.participants[0].name}}
-        </a> and
+        </a> {{ 'and' | translate }}
         <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{$ctrl.participants[1].uid}}">
           {{$ctrl.participants[1].name}}
         </a>
@@ -14,7 +14,7 @@
     </div>
     <div class="form-group">
       <label>
-        Score of
+        {{ 'Score of' | translate }}
         <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{$ctrl.participants[0].uid}}">
           {{$ctrl.participants[0].name}}
         </a>
@@ -29,7 +29,8 @@
       </div>
     </div>
     <div class="form-group">
-      <label>Score of
+      <label>
+        {{ 'Score of' | translate }}
         <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{$ctrl.participants[1].uid}}">
           {{$ctrl.participants[1].name}}
         </a>
@@ -49,10 +50,10 @@
     <div class="form-group">
       <button class="btn btn-primary"
               ng-click="$ctrl.scoreMatch()">
-        Score & Complete Match
+        {{ 'Score & Complete Match' | translate }}
       </button>
-      <button class="btn btn-default"
-              back-button>Back
+      <button class="btn btn-default" back-button>
+        {{ 'Back btn' | translate }}
       </button>
     </div>
   </div>

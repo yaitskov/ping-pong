@@ -32,7 +32,7 @@ angular.
                                  return;
                              }
                              if (self.scores[0] < maxScore && self.scores[1] < maxScore) {
-                                 requestStatus.validationFailed("Match continues until " + maxScore);
+                                 requestStatus.validationFailed(["Match continues until", {maxScore: maxScore}]);
                                  return;
                              }
                              Match.scoreMatch(

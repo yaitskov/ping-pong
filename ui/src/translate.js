@@ -406,7 +406,18 @@ module.exports = {
         'you-judge-now-but':  'ale nie ma żadnego meczu dla oceny.',
         'next-tournament-you-judge': 'Następny turniej, ty sądzisz, to <a href="{{url}}">{{name}}</a> turniej, który zaczyna {{date}}',
         'latest-tournament-complete': 'Powszedni  zakończony tourniej <a href="{{url}}">{{name}}</a>',
-        'Match Judgement': 'Ocena meczów'
+        'Match Judgement': 'Ocena meczów',
+
+        // complete match
+        'Score of': 'Ocena dla',
+        'Between': 'Między',
+        'and': 'i',
+        'Score & Complete Match': 'Ocenić & Skończyć mecz',
+        'Match Scoring': 'Ocenianie meczu',
+        "Documenting the score": "Dokumentowanie oceny",
+        "Not all participants have been scored": "Nie wszystcy uczestniki są oceniony",
+        "Participants cannot have same scores": "Uczestniki nie mogą mieć podobny oceny",
+        "Match continues until": "Mecz trwa do {{maxScore}} punktów"
     },
     en: {
         'no-drafting-tournament-found': 'There is no any dratfing tournament.',
@@ -812,6 +823,22 @@ module.exports = {
         'you-judge-now-but':  'but there is no any match to judge.',
         'next-tournament-you-judge': 'Next tournament, you judge, is <a href="{{url}}">{{name}}</a> tournament, which begins at {{date}}',
         'latest-tournament-complete': 'Latest tournament <a href="{{url}}">{{name}}</a> is complete.',
-        'Match Judgement': 'Match Judgement'
+        'Match Judgement': 'Match Judgement',
+
+        // complete match
+        'Score of': 'Score of',
+        'Between': 'Between',
+        'and': 'and',
+        'Score & Complete Match': 'Score & Complete Match',
+        'Match Scoring': 'Match Scoring',
+        "Documenting the score": "Documenting the score",
+        "Not all participants have been scored": "Not all participants have been scored",
+        "Participants cannot have same scores": "Participants cannot have same scores",
+        "Match continues until": "Match continues until {{maxScore}}",
+
+        // complete my match
+        'choose-you-score': 'Choose your score in the <b>{{type}}</b> match against',
+        'choose opponent score': 'Choose opponent\'s score',
+        'Complete Match': 'Complete Match'
     }
 };

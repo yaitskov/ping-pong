@@ -50,6 +50,14 @@ angular.
             };
         };
     }]).
+    factory('longDateTime', ['$filter', function ($filter) {
+        return function (dt) {
+            if (!dt) {
+                return "";
+            }
+            return $filter('date')(dt, 'MMM d EEE h a Z');
+        };
+    }]).
     factory('syncTranslate', ['$translate', '$q', function ($translate, $q) {
         return new function () {
             this.create = function () {

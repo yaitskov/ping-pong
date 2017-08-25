@@ -4,13 +4,25 @@ import template from './my-match-judge-list.template.html';
 angular.module('myMatchJudgeList').
     component('myMatchJudgeList', {
         templateUrl: template,
-        controller: ['Match', 'Tournament', 'mainMenu', '$q', '$location', 'pageCtx', 'requestStatus',
-                     function (Match, Tournament, mainMenu, $q, $location, pageCtx, requestStatus) {
+        controller: ['Match', 'Tournament', 'mainMenu', '$q', '$location',
+                     'pageCtx', 'requestStatus', 'longDateTime',
+                     function (Match, Tournament, mainMenu, $q, $location,
+                               pageCtx, requestStatus, longDateTime) {
                          mainMenu.setTitle('Match Judgement');
                          this.matches = null;
                          this.tournament = null;
                          var self = this;
                          this.previouslyScoredEnded = null;
+                         this.nextFormatted = function () { // why angularjs translate is strict
+                             if (!self.tournament || !self.tournament.next) {
+                                 return {};
+                             }
+                             return {
+                                 url: '#!/my/tournament/' + self.tournament.next.tid,
+                                 name: self.tournament.next.name,
+                                 date: longDateTime(self.tournament.next.opensAt)
+                             }
+                         }
                          this.checkTournamentEnd = function () {
                              self.previouslyScoredEnded = (
                                  pageCtx.get('last-admin-scoring-tournament-id')

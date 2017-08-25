@@ -5,9 +5,9 @@ angular.module('myMatchPlayList').
     component('myMatchPlayList', {
         templateUrl: template,
         controller: ['Match', 'Tournament', 'mainMenu', '$q', 'cutil',
-                     'pageCtx', 'auth', 'requestStatus', '$location',
+                     'pageCtx', 'auth', 'requestStatus', '$location', 'longDateTime',
                      function (Match, Tournament, mainMenu, $q, cutil,
-                               pageCtx, auth, requestStatus, $location) {
+                               pageCtx, auth, requestStatus, $location, longDateTime) {
                          mainMenu.setTitle('My matches to be played');
                          this.matches = null;
                          this.openMatch = null;
@@ -19,11 +19,24 @@ angular.module('myMatchPlayList').
                              pageCtx.put('match-max-score-' + self.openMatch.mid, self.openMatch.matchScore);
                              $location.path("/complete/my/match/" + self.openMatch.mid);
                          };
-                         this.nextName = function () {
-                             return self.tournament.next.name;
+                         this.nextFormatted = function () {
+                             if (!self.tournament || !self.tournament.next) {
+                                 return {};
+                             }
+                             return {
+                                 url: '#!/tournaments/' + self.tournament.next.tid,
+                                 name: self.tournament.next.name,
+                                 date: longDateTime(self.tournament.next.opensAt)
+                             };
                          };
-                         this.nextUrl = function () {
-                             return '#!/tournaments/' + self.tournament.next.tid;
+                         this.prevFormatted = function () {
+                             if (!self.tournament || !self.tournament.previous) {
+                                 return {};
+                             }
+                             return {
+                                 url: '#!/tournaments/result/' + self.tournament.previous.tid,
+                                 name: self.tournament.previous.name
+                             };
                          };
                          this.iSawMyOutcomeInTournament = function () {
                              pageCtx.put('last-scoring-match', {});

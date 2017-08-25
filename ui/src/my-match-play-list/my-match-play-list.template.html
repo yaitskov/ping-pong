@@ -117,11 +117,11 @@
     </div>
     <div class="alert alert-info" ng-show="$ctrl.tournament.next"
          translate="closest-tournament"
-         translate-values="{url: $ctrl.nextUrl(), name: $ctrl.nextName(), date: ($ctrl.tournament.next.opensAt | date: 'MMM d EEE h a Z')}">
+         translate-values="$ctrl.nextFormatted()">
     </div>
     <div class="alert alert-info" ng-show="$ctrl.tournament.previous"
          translate="latest-tournament"
-         translate-values="{url: '#!/tournament/result/' + $ctrl.tournament.previous.tid, name: $ctrl.tournament.previous.name}">
+         translate-values="$ctrl.prevFormatted()">
     </div>
   </div>
 </div>

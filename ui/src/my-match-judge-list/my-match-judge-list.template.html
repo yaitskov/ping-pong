@@ -87,7 +87,7 @@
       </p>
       <p ng-show="$ctrl.tournament.next"
          translate="next-tournament-you-judge"
-         translate-values="{url: '#!/my/tournament/' + $ctrl.tournament.next.tid, name: $ctrl.tournament.next.name, date: ($ctrl.tournament.next.opensAt | date: 'MMM d EEE h a Z')}">
+         translate-values="$ctrl.nextFormatted()">
       </p>
       <p ng-show="$ctrl.tournament.previous" translate="latest-tournament-complete"
          translate-values="{url: '#!/my/tournament/' + $ctrl.tournament.previous.tid, name: $ctrl.tournament.previous.name}">

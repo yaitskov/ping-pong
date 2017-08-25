@@ -12,7 +12,7 @@
     <name>Ping Pong</name>
 
     <properties>
-        <docker.network>ping-pong-integration</docker.network>
+        <docker.network>classes_default</docker.network>
         <my.version>1.0.0-SNAPSHOT</my.version>
         <mysql.host>127.0.0.1</mysql.host>
         <mysql.port>3306</mysql.port>
@@ -25,5 +25,7 @@
     <modules>
         <module>setup-env</module>
         <module>ping-pong</module>
+        <module>ui</module>
+        <module>docker-image</module>
     </modules>
 </project>

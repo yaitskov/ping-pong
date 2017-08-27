@@ -9,6 +9,7 @@ import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.Player.p5;
 import static org.dan.ping.pong.mock.simulator.Player.p6;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
+import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_2;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_2_G_8;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_3_Q_1_G_8;
@@ -98,5 +99,19 @@ public class OneCategorySim {
                 .ignoreUnexpectedGames()
                 .name("quits2Of2")
                 .category(c1, p1, p2));
+    }
+
+    @Test
+    public void almostComplete() {
+        simulator.simulate(T_1_Q_1_G_2, TournamentScenario.begin()
+                .name("almostComplete")
+                .ignoreUnexpectedGames()
+                .category(c1, p1, p2, p3, p4)
+                .w30(p1, p2)
+                .w30(p3, p4)
+                .quitsGroup(p1, p3)
+                .w30(p1, p3)
+                .pause(p1, p3, BeforeScore)
+                .champions(c1, p1, p3));
     }
 }

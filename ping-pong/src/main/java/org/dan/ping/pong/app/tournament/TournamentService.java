@@ -362,4 +362,11 @@ public class TournamentService {
         }
         return participantUid;
     }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public int copy(CopyTournament copyTournament) {
+        final int tid = tournamentDao.copy(copyTournament);
+        categoryDao.copy(copyTournament.getOriginTid(), tid);
+        return tid;
+    }
 }

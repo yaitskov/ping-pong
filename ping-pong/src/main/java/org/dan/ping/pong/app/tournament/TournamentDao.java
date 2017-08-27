@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.time.temporal.ChronoUnit.DAYS;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
@@ -33,6 +34,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Replaced;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
+import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.records.TournamentRecord;
@@ -78,7 +80,18 @@ public class TournamentDao {
 
     @Transactional(TRANSACTION_MANAGER)
     public int create(int uid, CreateTournament newTournament) {
-        final int tid = jooq.insertInto(TOURNAMENT, TOURNAMENT.STATE,
+        final int tid = justCreate(newTournament, Hidden);
+        log.info("User {} created tournament {}", uid, tid);
+
+        jooq.insertInto(TOURNAMENT_ADMIN, TOURNAMENT_ADMIN.TID,
+                TOURNAMENT_ADMIN.UID, TOURNAMENT_ADMIN.TYPE)
+                .values(tid, uid, AUTHOR)
+                .execute();
+        return tid;
+    }
+
+    private Integer justCreate(CreateTournament newTournament, TournamentState hidden) {
+        return jooq.insertInto(TOURNAMENT, TOURNAMENT.STATE,
                 TOURNAMENT.OPENS_AT,
                 TOURNAMENT.PID,
                 TOURNAMENT.PREVIOUS_TID,
@@ -88,7 +101,7 @@ public class TournamentDao {
                 TOURNAMENT.NAME,
                 TOURNAMENT.MATCH_SCORE,
                 TOURNAMENT.MAX_GROUP_SIZE)
-                .values(Hidden,
+                .values(hidden,
                         newTournament.getOpensAt(),
                         newTournament.getPlaceId(),
                         newTournament.getPreviousTid(),
@@ -101,13 +114,6 @@ public class TournamentDao {
                 .returning(TOURNAMENT.TID)
                 .fetchOne()
                 .getTid();
-        log.info("User {} created tournament {}", uid, tid);
-
-        jooq.insertInto(TOURNAMENT_ADMIN, TOURNAMENT_ADMIN.TID,
-                TOURNAMENT_ADMIN.UID, TOURNAMENT_ADMIN.TYPE)
-                .values(tid, uid, AUTHOR)
-                .execute();
-        return tid;
     }
 
     @Transactional(transactionManager = TRANSACTION_MANAGER)
@@ -583,5 +589,44 @@ public class TournamentDao {
                         .name(r.get(TOURNAMENT.NAME))
                         .build());
 
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public int copy(CopyTournament copyTournament) {
+        final int originTid = copyTournament.getOriginTid();
+        final int newTid = copyTournamentRow(copyTournament);
+        copyPermissions(originTid, newTid);
+        return newTid;
+    }
+
+    private int copyTournamentRow(CopyTournament copyTournament) {
+        final int originTid = copyTournament.getOriginTid();
+        final MyTournamentInfo tinfo = getMyTournamentInfo(originTid)
+                .orElseThrow(() -> notFound("Tournament " + originTid + " not found"));
+        final TournamentParameters tparams = getTournamentParams(originTid)
+                .orElseThrow(() -> notFound("Tournament " + originTid + " not found"));
+        return justCreate(CreateTournament.builder()
+                .name(copyTournament.getName())
+                .matchScore(tparams.getMatchScore())
+                .opensAt(copyTournament.getOpensAt())
+                .quitsFromGroup(tparams.getQuitsGroup())
+                .placeId(tinfo.getPlace().getPid())
+                .ticketPrice(tinfo.getPrice())
+                .thirdPlaceMatch(tparams.getThirdPlaceMatch())
+                .previousTid(of(originTid))
+                .maxGroupSize(tparams.getMaxGroupSize())
+                .build(), Draft);
+    }
+
+    private void copyPermissions(int originTid, int newTid) {
+       jooq.batch(jooq.select(TOURNAMENT_ADMIN.TYPE, TOURNAMENT_ADMIN.UID)
+                .from(TOURNAMENT_ADMIN)
+                .where(TOURNAMENT_ADMIN.TID.eq(originTid))
+                .fetch()
+                .map(r ->
+                        jooq.insertInto(TOURNAMENT_ADMIN, TOURNAMENT_ADMIN.TID,
+                                TOURNAMENT_ADMIN.UID, TOURNAMENT_ADMIN.TYPE)
+                                .values(newTid, r.get(TOURNAMENT_ADMIN.UID),
+                                        r.get(TOURNAMENT_ADMIN.TYPE)))).execute();
     }
 }

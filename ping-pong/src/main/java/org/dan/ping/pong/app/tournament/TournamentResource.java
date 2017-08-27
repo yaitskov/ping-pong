@@ -42,6 +42,7 @@ public class TournamentResource {
     public static final String GET_TOURNAMENT_PARAMS = TOURNAMENT_PARAMS + "/{tid}";
     public static final String EDITABLE_TOURNAMENTS = TOURNAMENT + "editable/by/me";
     public static final String TOURNAMENT_CREATE = TOURNAMENT + "create";
+    public static final String TOURNAMENT_COPY = TOURNAMENT + "copy";
     public static final String TOURNAMENT_ENLIST = TOURNAMENT + "enlist";
     public static final String TOURNAMENT_ENLIST_OFFLINE = TOURNAMENT + "enlist-offline";
     public static final String TOURNAMENT_RESIGN = TOURNAMENT + "resign";
@@ -70,6 +71,21 @@ public class TournamentResource {
         return tournamentService.create(
                 authService.userInfoBySession(session).getUid(),
                 newTournament);
+    }
+
+    @POST
+    @Path(TOURNAMENT_COPY)
+    @Consumes(APPLICATION_JSON)
+    public int copy(
+            @HeaderParam(SESSION) String session,
+            CopyTournament copyTournament) {
+        final int uid = authService.userInfoBySession(session).getUid();
+        if (tournamentDao.isAdminOf(uid, copyTournament.getOriginTid())) {
+            return tournamentService.copy(copyTournament);
+        } else {
+            throw forbidden("You are not administrator of tournament "
+                    + copyTournament.getOriginTid());
+        }
     }
 
     @GET

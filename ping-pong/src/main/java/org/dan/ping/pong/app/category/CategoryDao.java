@@ -1,11 +1,13 @@
 package org.dan.ping.pong.app.category;
 
+import static java.util.stream.Collectors.toList;
 import static ord.dan.ping.pong.jooq.Tables.USERS;
 import static ord.dan.ping.pong.jooq.tables.Bid.BID;
 import static ord.dan.ping.pong.jooq.tables.Category.CATEGORY;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
+import ord.dan.ping.pong.jooq.Tables;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.tournament.EnlistedCategory;
 import org.dan.ping.pong.app.user.UserInfo;
@@ -83,6 +85,17 @@ public class CategoryDao {
         log.info("Delete category {}", cid);
         jooq.deleteFrom(CATEGORY)
                 .where(CATEGORY.CID.eq(cid))
+                .execute();
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void copy(int originTid, int tid) {
+        final List<CategoryInfo> categories = listCategoriesByTid(originTid);
+        jooq.batch(
+                categories.stream().map(cinfo ->
+                        jooq.insertInto(CATEGORY, CATEGORY.NAME, CATEGORY.TID)
+                                .values(cinfo.getName(), tid))
+                .collect(toList()))
                 .execute();
     }
 }

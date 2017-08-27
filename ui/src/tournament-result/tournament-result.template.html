@@ -11,7 +11,7 @@
   </div>
  <div class="alert alert-info"
        ng-show="$ctrl.tournament.state == 'Draft' || $ctrl.tournament.state == 'Announce'">
-    {{ 'tournament not started | translate : '{name: $ctrl.tournament.name}' }}
+    {{ 'tournament not started' | translate : '{name: $ctrl.tournament.name}' }}
   </div>
   <div class="form-group" ng-show="$ctrl.tournament">
     <label>{{ 'Categories' | translate }}</label>

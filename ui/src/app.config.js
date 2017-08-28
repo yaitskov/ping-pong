@@ -1,6 +1,6 @@
 import angular from 'angular';
 import jQuery from 'jquery';
-import translateTables from './translate.js';
+var translateTables = require('./translate/translate.js');
 
 angular.module('pingPong').
     config(['$httpProvider', function($httpProvider) {

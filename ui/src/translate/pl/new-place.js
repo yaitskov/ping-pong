@@ -1,0 +1,28 @@
+module.exports = {
+        // new-place
+    'city name': 'Miasto',
+    'place-name-length': 'Nazwa musi być krócej niż {{max}} liter',
+    'country name': 'Kraj',
+    'Add new country': 'Dodać nowy kraj',
+    'Country is required': 'Kraj jest wymagany',
+    'Add new city': 'Dodać nowe miasto',
+    'City is required': 'Miasto jest wymagane',
+    'Address is required': 'Adres jest wymagany',
+    'postal-address-length': 'Długóść adresu musi być mniej niż {{max}} liter',
+    'Create Place': 'Stworzyć miejsce',
+    'Optional field': 'Opcjionalne pole',
+    'New country': 'Nowy kraj',
+    'Name': 'Nazwa',
+    'Country name is required': 'Nazwa kraju jest wymagane',
+    'country-name-length': 'Długość nazwy kraju musi być  mniej niż {{max}} liter',
+    'Add & Use': 'Dodać & Użyć',
+    'New city': 'Nowe miasto',
+    'City name is required': 'Nazwa miasta jest wymagana',
+    'city-name-length': 'Długość nazwy miasta musi być mniej niż {{max}} liter',
+    'New Place': 'Nowe Miejsce',
+    'Creating city': 'Stworzenie miasta',
+    'Creating country': 'Stworzenie kraju',
+    'Creating place': 'Stworzenie miejsca',
+    'Cities': 'Miasta',
+    'Countries': 'Kraje'
+};

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.util.time.Clocker;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 

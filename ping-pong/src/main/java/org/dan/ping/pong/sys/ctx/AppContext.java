@@ -16,6 +16,7 @@ import org.dan.ping.pong.app.user.UserCtx;
 import org.dan.ping.pong.sys.EmailService;
 import org.dan.ping.pong.sys.ctx.jackson.JacksonContext;
 import org.dan.ping.pong.sys.db.DbContext;
+import org.dan.ping.pong.sys.seqex.SeqexCtx;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -37,6 +38,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         JacksonContext.class,
         CronContext.class,
         EmailService.class,
+        SeqexCtx.class,
         DbContext.class})
 @EnableTransactionManagement(proxyTargetClass = true)
 public class AppContext {

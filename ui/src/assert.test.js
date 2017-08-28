@@ -1,11 +1,14 @@
-// import chai from 'chai';
 const assert = require('assert');
 
-
 describe('Demo', () => {
-  it('should add correctly', () => {
-    assert.equal(1 + 1, 2);
-  });
-});
+    it('should add correctly', () => {
+        assert.equal(1 + 1, 2);
+    });
 
-//assert.equal(1,1);
+    it('compare map', () => {
+        var m1 = {};
+        var m2 = {x: 1};
+        m1['x'] = 1;
+        assert.deepEqual(m1, m2);
+    });
+});

@@ -3,6 +3,7 @@ var merge = require('merge');
 module.exports = merge.apply(
     null,
     [{},
+     require('./pl.copy-tournament.js'),
      require('./drafting.js'),
      require('./main-menu.js'),
      require('./request-status.js'),

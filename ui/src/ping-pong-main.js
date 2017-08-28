@@ -42,6 +42,8 @@ import placeListModule from './place-list/place-list.module.js';
 import placeListComponent from './place-list/place-list.component.js';
 import newPlaceModule from './new-place/new-place.module.js';
 import newPlaceComponent from './new-place/new-place.component.js';
+import copyTournamentModule from './new-tournament/copy-tournament.module.js';
+import copyTournamentComponent from './new-tournament/copy-tournament.component.js';
 import newTournamentModule from './new-tournament/new-tournament.module.js';
 import newTournamentComponent from './new-tournament/new-tournament.component.js';
 import newTournamentParamsModule from './new-tournament/new-tournament-parameters.module.js';

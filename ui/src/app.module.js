@@ -22,6 +22,7 @@ angular.module('pingPong', [
     'placePicker',
     'myTournamentList',
     'playInTournamentList',
+    'copyTournament',
     'newTournament',
     'tournamentEdit',
     'enlistOffline',

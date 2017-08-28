@@ -1,0 +1,80 @@
+<main-menu></main-menu>
+<div class="container new-tournament">
+  <form novalidate name="$ctrl.form" ng-submit="$ctrl.copyTournament()">
+    <div class="form-group"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.name.$dirty) && $ctrl.form.name.$invalid}">
+      <label for="name">{{ 'tournament name' | translate }}</label>
+      <input type="text" class="form-control"
+             ng-model="$ctrl.tournament.name"
+             ng-maxlength="120"
+             required
+             name="name"
+             id="name"
+             placeholder="{{ 'tournament name' | translate }}" />
+      <p class="help-block" ng-show="$ctrl.form.name.$error.required">
+        {{ 'Name is required' | translate }}
+      </p>
+      <p class="help-block"
+         ng-show="$ctrl.form.name.$error.minlength || $ctrl.form.name.$error.maxlength">
+        {{ 'tournament-name-length' | translate : '{max: 120}' }}
+      </p>
+    </div>
+    <div class="form-group">
+      <div class="pull-left"
+           ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.openDate.$dirty) && $ctrl.form.openDate.$invalid}">
+        <label for="openDate">{{ 'tournament start date' | translate }}</label>
+        <div class="date-picker">
+          <input ng-flatpickr
+                 class="form-control pull-left"
+                 ng-model="$ctrl.tournament.openDate"
+                 fp-opts="$ctrl.dateOpts"
+                 fp-on-setup="$ctrl.dataPickerUi"
+                 placeholder="Click to pick open date"
+                 name="openDate"
+                 required
+                 id="openDate" />
+          <span class="input-group-addon" ng-click="$ctrl.dataPickerUi.fpItem.open()">
+            <span class="glyphicon glyphicon-calendar"></span>
+          </span>
+        </div>
+        <p class="help-block" ng-show="$ctrl.form.openDate.$error.required">
+          {{ 'Date is required' | translate }}
+        </p>
+      </div>
+      <div class="pull-left input-group clockpicker" clock-picker
+           data-placement="right" data-align="top" data-autoclose="true"
+           ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.startTime.$dirty) && $ctrl.form.startTime.$invalid}">
+        <label for="startTime">
+          {{ 'tournament start time' | translate }}
+        </label>
+        <div>
+        <input class="form-control time-picker"
+               ng-model="$ctrl.tournament.startTime"
+               name="startTime"
+               required
+               readonly
+               id="startTime"
+               placeholder="{{ 'Choose start time' | translate }}"/>
+        <span class="input-group-addon">
+          <span class="glyphicon glyphicon-time"></span>
+        </span>
+        </div>
+        <p class="help-block" ng-show="$ctrl.form.startTime.$error.required">
+          {{ 'Time is required' | translate }}
+        </p>
+      </div>
+      <div style="clear: both"></div>
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary" type="submit">
+        {{ 'Copy &amp; Draft' | translate }}
+      </button>
+      <button class="btn btn-danger" type="button" back-button>
+        {{ 'Cancel btn' | translate }}
+      </button>
+    </div>
+    <div class="form-group">
+      <request-status></request-status>
+    </div>
+  </form>
+</div>

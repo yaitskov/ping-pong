@@ -1,5 +1,5 @@
 module.exports = {
-        // account-page
+    // account-page
     'Logout': 'Wyloguj',
     'Generate sign-in link': 'Wyslać link do logowania',
     'Edit': 'Edytować',

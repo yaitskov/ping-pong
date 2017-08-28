@@ -63,6 +63,11 @@
          ng-show="$ctrl.tournament.state == 'Draft'">
         <span class="glyphicon glyphicon-plus-sign"></span>
       </a>
+      <a class="btn btn-primary"
+         href="#!/tournament/copy/{{$ctrl.tournament.tid}}"
+         title="{{ 'copy-tournament-hint | translate }}">
+        <span class="glyphicon glyphicon-duplicate"></span>
+      </a>
     </div>
   </div>
   <div ng-show="$ctrl.errorHasUncheckedUsers.length > 0">

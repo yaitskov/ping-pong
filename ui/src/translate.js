@@ -289,6 +289,7 @@ module.exports = {
         'Starting the tournament': 'Rozpoczęczie turnieju',
         "Reseting": "Zresetowanie",
         'Cancelation of the tournament': 'Anulowanie turnieju',
+        'copy-tournament-hint': 'Zaplanować kolejny turniej na postawie obecnego',
 
         // my tournament participant
         'Change category': 'Zmienić kategorię',
@@ -705,6 +706,7 @@ module.exports = {
         'Starting the tournament': 'Starting the tournament',
         "Reseting": "Resetting",
         'Cancelation of the tournament': 'Cancellation of the tournament',
+        'copy-tournament-hint': 'Schedule next tournament as a copy this one',
 
         // my tournament participant
         'Change category': 'Change category',

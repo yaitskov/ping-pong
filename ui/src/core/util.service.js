@@ -50,12 +50,20 @@ angular.
             };
         };
     }]).
+    filter('longDateTime', ['$filter', function ($filter) {
+        return function (dt) {
+            if (!dt) {
+                return "";
+            }
+            return $filter('date')(dt, 'MMM d EEE h:mm a Z').replace(/:00 /, ' ');
+        };
+    }]).
     factory('longDateTime', ['$filter', function ($filter) {
         return function (dt) {
             if (!dt) {
                 return "";
             }
-            return $filter('date')(dt, 'MMM d EEE h a Z');
+            return $filter('date')(dt, 'MMM d EEE h:mm a Z').replace(/:00 /, ' ');
         };
     }]).
     factory('syncTranslate', ['$translate', '$q', function ($translate, $q) {

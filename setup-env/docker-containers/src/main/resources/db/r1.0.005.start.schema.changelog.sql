@@ -165,6 +165,13 @@ create table match_score(
     updated timestamp(3) null,
     primary key (mid, uid));
 
+create table set_score(
+    set_id int(11) not null auto_increment primary key,
+    mid int(11) not null references matches(mid),
+    uid int(11) not null references users(uid),
+    games int(11) not null,
+    created timestamp(3) default current_timestamp(3));
+
 alter table bid
       add constraint bid_group_id
          foreign key (gid)

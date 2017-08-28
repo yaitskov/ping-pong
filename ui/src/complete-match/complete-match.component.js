@@ -44,6 +44,7 @@ angular.
                              }
                              Match.scoreMatch(
                                  {mid: $routeParams.matchId,
+                                  tid: self.tournamentId,
                                   scores: findScores()},
                                  function (okResp) {
                                      requestStatus.complete();

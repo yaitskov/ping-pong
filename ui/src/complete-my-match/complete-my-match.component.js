@@ -37,6 +37,7 @@ angular.
                              }
                              Match.scoreMatch(
                                  {mid: $routeParams.matchId,
+                                  tid: self.match.tid,
                                   scores: [{uid: auth.myUid(), score: self.scores[0]},
                                            {uid: pageCtx.getEnemyUid(auth.myUid(), $routeParams.matchId),
                                             score: self.scores[1]}]},

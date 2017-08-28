@@ -6,10 +6,11 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.user.UserLink;
+import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
-import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -19,6 +20,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 
 @Slf4j
 @Path("/")
@@ -51,16 +54,28 @@ public class MatchResource {
     @Inject
     private Clocker clocker;
 
+    @Inject
+    private SequentialExecutor sequentialExecutor;
+
     @POST
     @Path(COMPLETE_MATCH)
     @Consumes(APPLICATION_JSON)
     public void complete(
+            @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             FinalMatchScore score) {
+        response.setTimeout(30, TimeUnit.SECONDS);
         final int uid = authService.userInfoBySession(session).getUid();
         log.info("User {} sets scores {} for match {}",
                 uid, score.getScores(), score.getMid());
-        matchService.complete(uid, score, clocker.get());
+        sequentialExecutor.execute(score.getTid(), () -> {
+            try {
+                matchService.complete(uid, score, clocker.get());
+                response.resume("");
+            } catch (Exception e) {
+                response.resume(e);
+            }
+        });
     }
 
     @GET

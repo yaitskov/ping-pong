@@ -33,6 +33,7 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.stringContainsInOrder;
+import static org.hamcrest.Matchers.theInstance;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -140,6 +141,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
 
         rest.voidPost(COMPLETE_MATCH, adminSession,
                 FinalMatchScore.builder()
+                        .tid(tid)
                         .mid(adminOpenMatches.get(0).getMid())
                         .scores(asList(
                                 IdentifiedScore.builder().score(LOSER_SCORE)
@@ -230,6 +232,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
 
         rest.voidPost(COMPLETE_MATCH, adminSession,
                 FinalMatchScore.builder()
+                        .tid(tid)
                         .mid(adminOpenMatches.get(0).getMid())
                         .scores(asList(
                                 IdentifiedScore.builder().score(LOSER_SCORE)
@@ -340,6 +343,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .callback((s, meta) -> {
                             myRest().voidPost(COMPLETE_MATCH, adminSession,
                                     FinalMatchScore.builder()
+                                            .tid(s.getTid())
                                             .mid(meta.getOpenMatch().getMid())
                                             .scores(asList(
                                                     IdentifiedScore.builder()
@@ -371,6 +375,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .callback((s, meta) -> {
                             final Response re = myRest().post(COMPLETE_MATCH, adminSession,
                                     FinalMatchScore.builder()
+                                            .tid(s.getTid())
                                             .mid(meta.getOpenMatch().getMid())
                                             .scores(asList(
                                                     IdentifiedScore.builder()

@@ -208,6 +208,7 @@ public class Simulator {
             case Score:
                 rest.voidPost(COMPLETE_MATCH, testAdmin,
                         FinalMatchScore.builder()
+                                .tid(scenario.getTid())
                                 .mid(openMatch.getMid())
                                 .scores(asList(
                                         IdentifiedScore.builder()

@@ -50,6 +50,14 @@ angular.
             };
         };
     }]).
+    filter('shortDate', ['$filter', function ($filter) {
+        return function (dt) {
+            if (!dt) {
+                return "";
+            }
+            return $filter('date')(dt, 'MMM d');
+        };
+    }]).
     filter('weekSmartMinute', ['$filter', function ($filter) {
         return function (dt) {
             if (!dt) {

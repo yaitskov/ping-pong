@@ -22,10 +22,10 @@
     </div>
     <div class="datetime pull-right">
       <span class="time" ng-show="tournament.state != 'Close'">
-        {{tournament.opensAt|date : 'EEE h a'}}
+        {{tournament.opensAt|weekSmartMinute}}
       </span>
       <span class="date" ng-show="tournament.state != 'Close'">
-        {{tournament.opensAt|date : 'MMM d'}}
+        {{tournament.opensAt|shortDate}}
       </span>
       <span ng-show="tournament.state == 'Close'">
         {{ 'complete status' | translate }}

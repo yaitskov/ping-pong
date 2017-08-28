@@ -32,8 +32,8 @@ angular.
                              }
                          });
                          this.splitDate = function () {
-                             self.tournament.openDate = moment(self.opensAt).format('Y-MM-DD');
-                             self.tournament.startTime = moment(self.opensAt).format('hh:mm a');
+                             self.tournament.openDate = moment(self.tournament.opensAt).format('Y-MM-DD');
+                             self.tournament.startTime = moment(self.tournament.opensAt).format('hh:mm a');
                          };
                          this.choosePlace = function () {
                              pageCtx.put('editableTournament', self.tournament);

@@ -136,6 +136,9 @@ create table matches(
     gid int(11) null references groups(gid),
     tid int(11) not null references tournament(tid),
     cid int(11) not null references category(cid),
+    uid_less int(11) not null references users(uid),
+    uid_more int(11) not null references users(uid),
+    uid_win int(11) null references users(uid),
     type char(4) not null,
     started timestamp(3) null,
     ended timestamp(3) null,
@@ -153,17 +156,6 @@ create table tables(
     mid int(11) null references matches(mid),
     state varchar(8) not null, -- free, busy, archived
     category_id int(11) null references category(cat_id));
-
-create table match_score(
-    mid int(11) not null references matches(mid),
-    uid int(11) not null references users(uid),
-    tid int(11) not null references tournament(tid),
-    cid int(11) not null references category(cid),
-    won int(1) not null default 0,
-    sets_won int(11) not null default 0,
-    created timestamp(3) default current_timestamp(3),
-    updated timestamp(3) null,
-    primary key (mid, uid));
 
 create table set_score(
     set_id int(11) not null auto_increment primary key,

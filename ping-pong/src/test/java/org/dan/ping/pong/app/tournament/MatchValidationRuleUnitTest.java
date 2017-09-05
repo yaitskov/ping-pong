@@ -103,11 +103,13 @@ public class MatchValidationRuleUnitTest {
     }
 
     private void cannotFindWinner(List<Integer> a, List<Integer> b) {
-        assertEquals(Optional.empty(), PING_PONG_RULE.findWinnerId(match(a, b)));
+        assertEquals(Optional.empty(),
+                PING_PONG_RULE.findWinnerId(PING_PONG_RULE.calcWonSets(match(a, b))));
     }
 
     private void findWinner(int uid, List<Integer> a, List<Integer> b) {
-        assertEquals(Optional.of(uid), PING_PONG_RULE.findWinnerId(match(a, b)));
+        assertEquals(Optional.of(uid),
+                PING_PONG_RULE.findWinnerId(PING_PONG_RULE.calcWonSets(match(a, b))));
     }
 
     private MatchInfo match(List<Integer> a, List<Integer> b) {

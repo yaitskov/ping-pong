@@ -11,19 +11,26 @@ import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
+import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_2_ROWS;
+import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_A_ROW;
+import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.category.CategoryInfo;
+import org.dan.ping.pong.app.tournament.DbUpdate;
+import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
+import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,24 +43,25 @@ public class BidDao {
     @Inject
     private DSLContext jooq;
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void setBidState(BidId bid, List<BidState> expected, BidState state, Instant now) {
-        log.info("Set bid status {} for {} if {}", state, bid, expected);
-        if (0 == jooq.update(BID)
-                .set(BID.STATE, state)
-                .set(BID.UPDATED, Optional.of(now))
-                .where(BID.UID.eq(bid.getUid()),
-                        BID.TID.eq(bid.getTid()),
-                        BID.STATE.in(expected))
-                .execute()) {
-            throw badRequest("Participant status was not " + expected);
-        }
+    public void setBidState(int tid, int uid, BidState state,
+            BidState expected, Instant now, DbUpdater batch) {
+        setBidState(tid, uid, state, singletonList(expected), now, batch);
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void setBidState(int tid, int uid, BidState expected, BidState state, Instant now) {
-        setBidState(BidId.builder().tid(tid).uid(uid).build(),
-                singletonList(expected), state, now);
+    public void setBidState(int tid, int uid, BidState target,
+            List<BidState> expected, Instant now, DbUpdater batch) {
+        batch.exec(DbUpdate.builder()
+                .logBefore(() -> log.info("Set bid status {} for {} if {}",
+                        target, uid, expected))
+                .onFailure(u -> badRequest("Participant status was not " + expected))
+                .mustAffectRows(JUST_A_ROW)
+                .query(jooq.update(BID)
+                        .set(BID.STATE, target)
+                        .set(BID.UPDATED, Optional.of(now))
+                        .where(BID.UID.eq(uid),
+                                BID.TID.eq(tid),
+                                BID.STATE.in(expected)))
+                .build());
     }
 
     @Transactional(TRANSACTION_MANAGER)
@@ -69,19 +77,23 @@ public class BidDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void markParticipantsBusy(int tid, List<Integer> uids, Instant now) {
-        if (2 != jooq.update(BID)
-                .set(BID.STATE, Play)
-                .set(BID.UPDATED, Optional.of(now))
-                .where(BID.TID.eq(tid),
-                        BID.UID.in(uids),
-                        BID.STATE.eq(Wait))
-                .execute()) {
-            throw internalError("One of uids " + uids + " was busy");
-        }
+    public void markParticipantsBusy(OpenTournamentMemState tournament,
+            Collection<Integer> uids, Instant now, DbUpdater batch) {
+        uids.stream().map(tournament::getBid)
+                .forEach(bid -> bid.setBidState(Play));
+        batch.exec(DbUpdate.builder()
+                .mustAffectRows(JUST_2_ROWS)
+                .onFailure(u -> internalError("One of uids " + uids + " was busy"))
+                .query(jooq.update(BID)
+                        .set(BID.STATE, Play)
+                        .set(BID.UPDATED, Optional.of(now))
+                        .where(BID.TID.eq(tournament.getTid()),
+                                BID.UID.in(uids),
+                                BID.STATE.eq(Wait)))
+                .build());
     }
 
-    public int setStatesAfterGroup(Integer gid, int tid, Set<Integer> winnerIds, Instant now) {
+    public int setStatesAfterGroup(Integer gid, int tid, List<Integer> winnerIds, Instant now, DbUpdater batch) {
         return jooq.update(BID)
                 .set(BID.STATE, Lost)
                 .set(BID.UPDATED, Optional.of(now))
@@ -201,16 +213,5 @@ public class BidDao {
                 .set(BID.UPDATED, Optional.of(now))
                 .where(BID.TID.eq(tid), BID.STATE.ne(Quit))
                 .execute();
-    }
-
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<Integer> findLeft(int tid, Optional<Integer> gid) {
-        return jooq.select(BID.UID)
-                .from(BID)
-                .where(BID.TID.eq(tid),
-                        BID.GID.eq(gid),
-                        BID.STATE.in(Quit, Expl, Lost))
-                .fetch()
-                .map(Record1::value1);
     }
 }

@@ -280,7 +280,7 @@ public class TournamentResource {
         final int uid = authService.userInfoBySession(session).getUid();
         log.info("Uid {} sets status {} for tid {}", uid,
                 stateUpdate.getState(), stateUpdate.getTid());
-        tournamentService.setTournamentStatus(uid, stateUpdate);
+        tournamentService.setTournamentState(uid, stateUpdate);
     }
 
     @GET

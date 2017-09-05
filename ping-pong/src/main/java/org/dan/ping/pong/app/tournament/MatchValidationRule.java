@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import org.dan.ping.pong.app.match.MatchInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Getter
@@ -46,7 +48,7 @@ public class MatchValidationRule {
         }
     }
 
-    public Optional<Integer> findWinnerId(MatchInfo matchInfo) {
+    public Map<Integer, Integer> calcWonSets(MatchInfo matchInfo) {
         final List<Integer> uids = new ArrayList<>(
                 matchInfo.getParticipantIdScore().keySet());
         final int uidA = uids.get(0);
@@ -62,12 +64,13 @@ public class MatchValidationRule {
                 ++wonsB;
             }
         }
-        if (wonsA >= setsToWin) {
-            return Optional.of(uidA);
-        }
-        if (wonsB >= setsToWin) {
-            return Optional.of(uidB);
-        }
-        return Optional.empty();
+        return ImmutableMap.of(uidA, wonsA, uidB, wonsB);
+    }
+
+    public Optional<Integer> findWinnerId(Map<Integer, Integer> wonSets) {
+        return wonSets.entrySet().stream()
+                .filter(e -> e.getValue() > setsToWin)
+                .map(Map.Entry::getKey)
+                .findAny();
     }
 }

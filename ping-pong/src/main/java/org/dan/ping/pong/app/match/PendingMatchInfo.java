@@ -12,7 +12,5 @@ import java.util.Optional;
 @ToString
 public class PendingMatchInfo {
     private int mid;
-    private int cid;
-    private Optional<Integer> gid;
     private List<Integer> uids;
 }

@@ -10,8 +10,8 @@ import lombok.ToString;
 @Builder
 @ToString
 public class GroupInfo {
-    private int tid;
     private int gid;
     private int cid;
     private int ordNumber;
+    private String label;
 }

@@ -16,5 +16,6 @@ import java.util.List;
 public class FinalMatchScore {
     private int tid;
     private int mid;
+    private int setOrdNumber;
     private List<IdentifiedScore> scores;
 }

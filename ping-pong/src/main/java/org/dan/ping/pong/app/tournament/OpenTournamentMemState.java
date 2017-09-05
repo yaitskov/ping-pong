@@ -1,0 +1,67 @@
+package org.dan.ping.pong.app.tournament;
+
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
+import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import org.dan.ping.pong.app.group.GroupInfo;
+import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.Pid;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+@Getter
+@Setter
+@Builder
+public class OpenTournamentMemState {
+    private int tid;
+    private Pid pid;
+    private Set<Integer> adminIds;
+    private Map<Integer, ParticipantMemState> participants;
+    private Map<Integer, MatchInfo> matches;
+    private Map<Integer, GroupInfo> groups;
+    private TournamentRules rule;
+    private TournamentState state;
+    private Optional<Instant> completeAt;
+
+    public MatchInfo getMatchById(int mid) {
+        return ofNullable(matches.get(mid))
+                .orElseThrow(() -> notFound("Match " + mid + " doesn't exist"));
+    }
+
+    public boolean isAdminOf(int uid) {
+        return adminIds.contains(uid);
+    }
+
+    public void matchCompleted(MatchInfo matchInfo, Integer winUid, DbUpdater batch) {
+
+    }
+
+    public MatchScoreResult matchScoreResult() {
+        if (state == TournamentState.Open) {
+            return MatchScoreResult.MatchComplete;
+        } else if (state == TournamentState.Close) {
+            return MatchScoreResult.LastMatchComplete;
+        } else {
+            throw internalError("Unexpected tournament state " + state);
+        }
+    }
+
+    public ParticipantMemState getBid(int bid) {
+        return participants.get(bid);
+    }
+
+    public List<GroupInfo> getGroupsByCategory(int cid) {
+        return groups.values().stream()
+                .filter(groupInfo -> groupInfo.getCid() == cid)
+                .collect(toList());
+    }
+}

@@ -6,12 +6,14 @@ import static org.jooq.impl.DSL.using;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.jooq.DSLContext;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -20,6 +22,7 @@ import javax.inject.Named;
 import javax.sql.DataSource;
 
 @Slf4j
+@Import(DbUpdaterFactory.class)
 @EnableTransactionManagement
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class DbContext {

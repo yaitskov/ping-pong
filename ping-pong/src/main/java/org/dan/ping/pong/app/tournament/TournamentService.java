@@ -9,6 +9,7 @@ import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
+import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
@@ -25,6 +26,7 @@ import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryInfo;
+import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.GroupMatchForResign;
 import org.dan.ping.pong.app.match.MatchService;
@@ -40,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -99,7 +102,7 @@ public class TournamentService {
         castingLotsService.makeGroups(tid);
         final Instant now = clocker.get();
         bidDao.casByTid(BidState.Here, BidState.Wait, tid, now);
-        tableService.scheduleFreeTables(tid, now);
+        tableService.scheduleFreeTables(place, tid, now, batch);
     }
 
     @Inject
@@ -188,16 +191,16 @@ public class TournamentService {
             leaveFromPlayOff(uid, tid, now, target);
         } else {
             for (GroupMatchForResign match : incompleteMy.values()) {
-                matchDao.complete(uid, match, now);
+                matchDao.scoreSet(uid, match, now);
                 if (match.getState() == Game) {
-                    tableDao.freeTable(match.getMid());
+                    tableDao.freeTable(match.getMid(), batch);
                     bidDao.setBidState(tid, match.getOpponentUid(), BidState.Play, BidState.Wait, now);
                 }
             }
             bidDao.resign(uid, tid, target, now);
-            matchService.tryToCompleteGroup(gid, tid, emptySet());
+            matchService.tryToCompleteGroup(matchInfo, gid, tid, emptySet());
             matchService.autoCompletePlayOffHalfMatches(tid);
-            tableService.scheduleFreeTables(tid, now);
+            tableService.scheduleFreeTables(place, tid, now, batch);
         }
     }
 
@@ -206,11 +209,11 @@ public class TournamentService {
         if (playOffMatch.isPresent()) {
             boolean schedule = matchService.completePlayOffMatch(uid, tid, target, playOffMatch.get());
             if (playOffMatch.get().getState() == Game) {
-                tableDao.freeTable(playOffMatch.get().getMid());
+                tableDao.freeTable(playOffMatch.get().getMid(), batch);
             }
             if (schedule) {
                 matchService.autoCompletePlayOffHalfMatches(tid);
-                tableService.scheduleFreeTables(tid, now);
+                tableService.scheduleFreeTables(place, tid, now, batch);
             }
         } else { // play off is not begun yet
             bidDao.resign(uid, tid, target, now);
@@ -232,10 +235,18 @@ public class TournamentService {
         return gid;
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void setTournamentStatus(int uid, SetTournamentState stateUpdate) {
+    public void setTournamentState(int uid, SetTournamentState stateUpdate) {
         // check permissions
         tournamentDao.setState(stateUpdate.getTid(), stateUpdate.getState(), clocker.get());
+    }
+
+    public void setTournamentState(OpenTournamentMemState tournament, DbUpdater batch) {
+        tournamentDao.setState(tournament, batch);
+    }
+
+    public void setTournamentCompleteAt(OpenTournamentMemState tournament, Instant now, DbUpdater batch) {
+        tournament.setCompleteAt(Optional.of(now));
+        tournamentDao.setCompleteAt(tournament.getTid(), tournament.getCompleteAt(), batch);
     }
 
     public List<OpenTournamentDigest> findRunning(int completeInLastDays) {
@@ -368,5 +379,24 @@ public class TournamentService {
         final int tid = tournamentDao.copy(copyTournament);
         categoryDao.copy(copyTournament.getOriginTid(), tid);
         return tid;
+    }
+
+    @Inject
+    private CategoryService categoryService;
+
+    public boolean endOfTournamentCategory(OpenTournamentMemState tournament, int cid, DbUpdater batch) {
+        int tid = tournament.getTid();
+        log.info("Tid {} complete in cid {}", tid, cid);
+        Set<Integer> incompleteCids = categoryService.findIncompleteCategories(tournament);
+        if (incompleteCids.isEmpty()) {
+            log.info("All matches of tid {} are complete", tid);
+            setTournamentCompleteAt(tournament, clocker.get(), batch);
+            tournament.setState(Close);
+            setTournamentState(tournament, batch);
+            return true;
+        } else {
+            log.info("Tid {} is fully complete", tid);
+            return false;
+        }
     }
 }

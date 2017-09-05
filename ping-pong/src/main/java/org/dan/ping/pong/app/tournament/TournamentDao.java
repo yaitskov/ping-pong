@@ -24,6 +24,7 @@ import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
+import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
@@ -33,11 +34,9 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.app.tournament.TournamentState.Replaced;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
-import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import lombok.extern.slf4j.Slf4j;
-import ord.dan.ping.pong.jooq.tables.records.TournamentRecord;
 import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.place.PlaceAddress;
@@ -47,7 +46,6 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectField;
 import org.jooq.SelectJoinStep;
-import org.jooq.UpdateSetMoreStep;
 import org.jooq.impl.DSL;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -177,29 +175,16 @@ public class TournamentDao {
         setState(tid, state, null);
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void setState(int tid, TournamentState state, Instant now) {
-        log.info("Switch tournament {} into {} state.", tid, state);
-        final UpdateSetMoreStep<TournamentRecord> request = jooq.update(TOURNAMENT)
-                .set(TOURNAMENT.STATE, state);
-        switch (state) {
-            case Close:
-            case Canceled:
-            case Replaced:
-                request.set(TOURNAMENT.COMPLETE_AT, Optional.of(now));
-                break;
-            case Draft:
-            case Announce:
-            case Open:
-            case Hidden:
-                // ok
-                break;
-            default:
-                throw internalError("Unsupported state " + state);
-        }
-        if (request.where(TOURNAMENT.TID.eq(tid)).execute() == 0) {
-            throw badRequest("Stale state");
-        }
+    public void setState(OpenTournamentMemState tournament, DbUpdater batch) {
+        batch.exec(DbUpdate.builder()
+                .logBefore(() -> log.info("Switch tournament {} into {} state.",
+                        tournament.getTid(), tournament.getState()))
+                .mustAffectRows(NON_ZERO_ROWS)
+                .onFailure(u -> badRequest("Stale state"))
+                .query(jooq.update(TOURNAMENT)
+                        .set(TOURNAMENT.STATE, tournament.getState())
+                        .where(TOURNAMENT.TID.eq(tournament.getTid())))
+                .build());
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
@@ -242,21 +227,6 @@ public class TournamentDao {
                 .where(TOURNAMENT.TID.eq(tid),
                         TOURNAMENT_ADMIN.UID.eq(uid))
                 .fetchOne() != null;
-    }
-
-    @Transactional(TRANSACTION_MANAGER)
-    public boolean tryToCompleteTournament(int tid, Instant now) {
-        final int categoriesLeft = jooq.selectCount()
-                .from(MATCHES)
-                .where(MATCHES.TID.eq(tid),
-                        MATCHES.STATE.ne(MatchState.Over))
-                .fetchOne()
-                .value1();
-        if (categoriesLeft == 0) {
-            log.info("All matches of tid {} are complete", tid);
-            setState(tid, TournamentState.Close, now);
-        }
-        return false;
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
@@ -628,5 +598,13 @@ public class TournamentDao {
                                 TOURNAMENT_ADMIN.UID, TOURNAMENT_ADMIN.TYPE)
                                 .values(newTid, r.get(TOURNAMENT_ADMIN.UID),
                                         r.get(TOURNAMENT_ADMIN.TYPE)))).execute();
+    }
+
+    public void setCompleteAt(int tid, Optional<Instant> now, DbUpdater batch) {
+        batch.exec(DbUpdate.builder()
+                .query(jooq.update(TOURNAMENT)
+                        .set(TOURNAMENT.COMPLETE_AT, now)
+                        .where(TOURNAMENT.TID.eq(tid)))
+                .build());
     }
 }

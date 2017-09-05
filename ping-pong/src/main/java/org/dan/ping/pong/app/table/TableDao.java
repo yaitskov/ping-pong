@@ -5,6 +5,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static ord.dan.ping.pong.jooq.tables.Tables.TABLES;
+import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_A_ROW;
+import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -13,6 +15,8 @@ import static org.dan.ping.pong.app.table.TableState.Free;
 
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.Tables;
+import org.dan.ping.pong.app.tournament.DbUpdate;
+import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.impl.DSL;
@@ -78,41 +82,33 @@ public class TableDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void locateMatch(int tableId, int mid) {
-        if (0 == jooq.update(TABLES)
-                .set(TABLES.STATE, Busy)
-                .set(TABLES.MID, of(mid))
-                .where(TABLES.TABLE_ID.eq(tableId),
-                        TABLES.STATE.eq(Free))
-                .execute()) {
-            throw internalError("Failed placing mid "
-                    + mid + " on table " + tableId);
-        }
+    public void locateMatch(TableInfo tableInfo, int mid, DbUpdater batch) {
+        tableInfo.setState(Busy);
+        tableInfo.setMid(Optional.of(mid));
+        batch.exec(DbUpdate.builder()
+                .onFailure(u -> internalError("Failed placing mid "
+                        + mid + " on table " + tableInfo.getTableId()))
+                .mustAffectRows(JUST_A_ROW)
+                .query(jooq.update(TABLES)
+                        .set(TABLES.STATE, Busy)
+                        .set(TABLES.MID, of(mid))
+                        .where(TABLES.TABLE_ID.eq(tableInfo.getTableId()),
+                                TABLES.STATE.eq(Free)))
+                .build());
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void freeTable(int mid) {
-        log.info("Return table of mid {}", mid);
-        if (0 == jooq.update(TABLES)
-                .set(TABLES.MID, empty())
-                .set(TABLES.STATE, Free)
-                .where(TABLES.MID.eq(Optional.of(mid)),
-                        TABLES.STATE.eq(Busy))
-                .execute()) {
-            throw internalError("Mid " + mid + " doesn't have a table");
-        }
-    }
-
-    @Transactional(TRANSACTION_MANAGER)
-    public boolean hasUsableTables(int tid) {
-        return jooq.selectCount()
-                .from(TABLES)
-                .innerJoin(TOURNAMENT)
-                .on(TABLES.PID.eq(TOURNAMENT.PID))
-                .where(TOURNAMENT.TID.eq(tid),
-                        TABLES.STATE.in(Busy, Free))
-                .fetchOne()
-                .value1() > 0;
+    public void freeTable(int mid, DbUpdater batch) {
+        batch.exec(DbUpdate.builder()
+                .mustAffectRows(NON_ZERO_ROWS)
+                .logBefore(() -> log.info("Return table of mid {}", mid))
+                .onFailure((u) -> internalError("Mid " + mid + " doesn't have a table"))
+                .query(jooq.update(TABLES)
+                        .set(TABLES.MID, empty())
+                        .set(TABLES.STATE, Free)
+                        .where(TABLES.MID.eq(Optional.of(mid)),
+                                TABLES.STATE.eq(Busy)))
+                .build());
     }
 
     @Transactional(TRANSACTION_MANAGER)

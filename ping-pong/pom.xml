@@ -542,8 +542,8 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
-                                    <name>OptionalInstant</name>
-                                    <expression>.*match_score\.updated</expression>
+                                    <name>OptionalInteger</name>
+                                    <expression>.*matches\.(win_uid)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
@@ -579,11 +579,6 @@
                                 <forcedType>
                                     <name>OptionalDouble</name>
                                     <expression>.*tournament\.(ticket_price)</expression>
-                                    <types>.*</types>
-                                </forcedType>
-                                <forcedType>
-                                    <name>OptionalInteger</name>
-                                    <expression>.*category\.(max_age|min_age)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

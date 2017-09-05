@@ -1,16 +1,29 @@
 package org.dan.ping.pong.app.table;
 
+import static java.util.stream.Collectors.toList;
+import static org.dan.ping.pong.app.match.MatchState.Place;
+import static org.dan.ping.pong.app.table.TableState.Busy;
+import static org.dan.ping.pong.app.table.TableState.Free;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
+import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.match.MatchDao;
+import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.match.PendingMatchInfo;
+import org.dan.ping.pong.app.place.PlaceMemState;
+import org.dan.ping.pong.app.tournament.DbUpdater;
+import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -23,29 +36,58 @@ public class TableService {
     @Inject
     private BidDao bidDao;
 
+    private List<TableInfo> findFreeTables(PlaceMemState place) {
+        return findTablesByState(place, Free);
+    }
+
+    private List<TableInfo> findTablesByState(PlaceMemState place, TableState state) {
+        return place.getTables().values().stream()
+                .filter(tinfo -> tinfo.getState() == state)
+                .collect(toList());
+    }
+
+    private List<MatchInfo> selectForScheduling(
+            int matchesToSchedule, OpenTournamentMemState tournament) {
+        return tournament.getMatches().values().stream()
+                .filter(minfo -> minfo.getState() == Place)
+                .filter(minfo -> minfo.getParticipantIdScore().size() == 2)
+                .filter(minfo -> minfo.getParticipantIdScore().keySet().stream()
+                        .map(uid -> tournament.getParticipants().get(uid).getBidState())
+                        .allMatch(bidState -> bidState == BidState.Wait))
+                .limit(matchesToSchedule)
+                .collect(toList());
+    }
+
     @Transactional(TRANSACTION_MANAGER)
-    public int scheduleFreeTables(int tid, Instant now) {
-        log.info("Schedule matches in tid {}", tid);
-        final List<TableInfo> freeTables = tableDao.findFreeTables(tid);
-        final List<PendingMatchInfo> matches = matchDao.selectForScheduling(
-                Math.max(1, freeTables.size()), tid);
+    public int scheduleFreeTables(OpenTournamentMemState tournament, PlaceMemState place,
+            Instant now, DbUpdater batch) {
+        log.info("Schedule matches in tid {}", tournament.getTid());
+        final List<TableInfo> freeTables = findFreeTables(place);
+        final List<MatchInfo> matches = selectForScheduling(
+                Math.max(1, freeTables.size()), tournament);
         log.info("Found {} free tables and {} matches for them",
                 freeTables.size(), matches.size());
         final int tablesToAllocate = Math.min(freeTables.size(), matches.size());
         for (int i = 0; i < tablesToAllocate; ++i) {
-            final int mid = matches.get(i).getMid();
-            tableDao.locateMatch(freeTables.get(i).getTableId(), mid);
-            matchDao.markAsSchedule(mid, now);
-            bidDao.markParticipantsBusy(tid, matches.get(i).getUids(), now);
+            final MatchInfo match = matches.get(i);
+            tableDao.locateMatch(freeTables.get(i), match.getMid(), batch);
+            matchDao.markAsSchedule(match, now);
+            bidDao.markParticipantsBusy(tournament, match.getUids(), now, batch);
         }
         if (freeTables.isEmpty()
                 && !matches.isEmpty()
-                && !tableDao.hasUsableTables(tid)) {
-            throw badRequest("Tournament " + tid
+                && !hasUsableTables(place)) {
+            throw badRequest("Tournament " + tournament.getTid()
                     + " doesn't have any table. "
                     + "Add tables to the place and schedule matches again.");
         }
         return tablesToAllocate;
+    }
+
+    boolean hasUsableTables(PlaceMemState place) {
+        return place.getTables().values().stream()
+                .map(TableInfo::getState)
+                .allMatch(state -> state == Free || state == Busy);
     }
 
     public void freeTables(int tid) {
@@ -62,5 +104,18 @@ public class TableService {
 
     public void create(CreateTables create) {
         tableDao.createTables(create.getPlaceId(), create.getQuantity());
+    }
+
+    public void freeTable(PlaceMemState place, int mid, DbUpdater batch) {
+        final TableInfo tableInfo = place.getTables().values().stream()
+                .filter(tinfo -> tinfo.getMid().equals(Optional.of(mid)))
+                .findAny()
+                .orElseThrow(() -> internalError("Place "
+                        + place.getName()
+                        + " has no table allocated for the match "
+                        + mid));
+        tableInfo.setMid(Optional.empty());
+        tableInfo.setState(Free);
+        tableDao.freeTable(mid, batch);
     }
 }

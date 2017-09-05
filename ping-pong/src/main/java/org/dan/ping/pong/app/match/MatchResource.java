@@ -5,6 +5,7 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
@@ -68,10 +69,9 @@ public class MatchResource {
         final int uid = authService.userInfoBySession(session).getUid();
         log.info("User {} sets scores {} for match {}",
                 uid, score.getScores(), score.getMid());
-        sequentialExecutor.execute(score.getTid(), () -> {
+        sequentialExecutor.execute(new Tid(score.getTid()), () -> {
             try {
-                matchService.complete(uid, score, clocker.get());
-                response.resume("");
+                response.resume(matchService.scoreSet(uid, score, clocker.get()));
             } catch (Exception e) {
                 response.resume(e);
             }

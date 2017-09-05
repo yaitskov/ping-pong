@@ -6,6 +6,7 @@ import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
 import static ord.dan.ping.pong.jooq.Tables.MATCH_SCORE;
+import static ord.dan.ping.pong.jooq.Tables.SET_SCORE;
 import static ord.dan.ping.pong.jooq.Tables.TABLES;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT_ADMIN;
@@ -15,6 +16,8 @@ import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.match.MatchState.Auto;
+import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_A_ROW;
+import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -29,10 +32,13 @@ import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.Bid;
 import ord.dan.ping.pong.jooq.tables.MatchScore;
 import ord.dan.ping.pong.jooq.tables.Users;
-import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.dan.ping.pong.app.table.TableLink;
+import org.dan.ping.pong.app.tournament.DbUpdate;
+import org.dan.ping.pong.app.tournament.DbUpdater;
+import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.PlayOffMatchForResign;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
@@ -42,22 +48,15 @@ import org.jooq.Record6;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
 @Slf4j
 public class MatchDao {
-    static final MatchScore ENEMY_SCORE = MATCH_SCORE.as("enemy");
     private static final Users ENEMY_USER = USERS.as("enemy_user");
     public static final int FIRST_PLAY_OFF_MATCH_LEVEL = 1;
     private static final MatchScore MS_2 = MATCH_SCORE.as("ms2");
@@ -181,45 +180,14 @@ public class MatchDao {
                         .build());
     }
 
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<PendingMatchInfo> selectForScheduling(int size, int tid) {
-        final Set<Integer> metUids = new HashSet<>();
-        return jooq
-                .select(MATCHES.MID, MATCHES.CID, MATCHES.GID,
-                        BID.UID, UID_2)
-                .from(MATCHES)
-                .innerJoin(MATCH_SCORE).on(MATCHES.MID.eq(MATCH_SCORE.MID))
-                .innerJoin(MS_2).on(MATCHES.MID.eq(MS_2.MID))
-                .innerJoin(BID).on(MATCH_SCORE.UID.eq(BID.UID),
-                        MATCH_SCORE.CID.eq(BID.CID))
-                .innerJoin(BID_2).on(MS_2.UID.eq(BID_2.UID),
-                        MS_2.CID.eq(BID_2.CID))
-                .where(MATCHES.TID.eq(tid), MATCHES.STATE.eq(Place),
-                        MS_2.UID.lt(MATCH_SCORE.UID),
-                        BID.STATE.eq(Wait), BID_2.STATE.eq(Wait))
-                .orderBy(MATCHES.PRIORITY, MATCHES.MID)
-                .fetch()
-                .stream()
-                .filter(r -> !metUids.contains(r.get(BID.UID))
-                        && metUids.add(r.get(UID_2))
-                        && metUids.add(r.get(BID.UID)))
-                .limit(size)
-                .map(r -> PendingMatchInfo.builder()
-                        .mid(r.get(MATCHES.MID))
-                        .gid(r.get(MATCHES.GID))
-                        .cid(r.get(MATCHES.CID))
-                        .uids(asList(r.get(BID.UID), r.get(UID_2)))
-                        .build())
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(TRANSACTION_MANAGER)
-    public void changeStatus(int mid, MatchState state) {
-        log.info("Put match {} into {}", mid, state);
-        jooq.update(MATCHES)
-                .set(MATCHES.STATE, state)
-                .where(MATCHES.MID.eq(mid))
-                .execute();
+    public void changeStatus(int mid, MatchState state, DbUpdater batch) {
+        batch.exec(DbUpdate.builder()
+                .mustAffectRows(NON_ZERO_ROWS)
+                .logBefore(() -> log.info("Put match {} into {}", mid, state))
+                .query(jooq.update(MATCHES)
+                        .set(MATCHES.STATE, state)
+                        .where(MATCHES.MID.eq(mid)))
+                .build());
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
@@ -245,84 +213,38 @@ public class MatchDao {
                         .tid(r.get(MATCHES.TID))
                         .winnerMid(r.get(MATCHES.WIN_MID))
                         .loserMid(r.get(MATCHES.LOSE_MID))
-                        .participantIdScore(participantIdScore)
+                        //.participantIdScore(participantIdScore)
                         .build();
             }
         });
         return ofNullable(result[0]);
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void complete(Instant now, FinalMatchScore matchScore) {
-        final List<Integer> scores = matchScore.getScores()
-                .stream().map(IdentifiedScore::getScore)
-                .collect(Collectors.toList());
-        final Iterator<Integer> diffs = asList(
-                scores.get(0) - scores.get(1),
-                scores.get(1) - scores.get(0))
-                .iterator();
-        final List<Integer> updates = Ints.asList(jooq.batch(
-                Stream.concat(
-                        Stream.of(jooq.update(MATCHES)
-                                .set(MATCHES.STATE, MatchState.Over)
-                                .set(MATCHES.ENDED, Optional.of(now))
-                                .where(MATCHES.MID.eq(matchScore.getMid()),
-                                        MATCHES.STATE.eq(Game))),
-                        matchScore.getScores()
-                                .stream().map(score ->
-                                jooq.update(MATCH_SCORE)
-                                        .set(MATCH_SCORE.UPDATED, Optional.of(now))
-                                        .set(MATCH_SCORE.WON, diffs.next())
-                                        .set(MATCH_SCORE.SETS_WON, score.getScore())
-                                        .where(MATCH_SCORE.UID.eq(score.getUid()),
-                                                MATCH_SCORE.MID.eq(matchScore.getMid()))))
-                        .collect(Collectors.toList()))
-                .execute());
-        if (!updates.equals(asList(1,1,1))) {
-            throw internalError("Match " + matchScore.getMid()
-                    + " is not in the game state: " + updates);
-        }
+    public Optional<Integer> scoreSet(OpenTournamentMemState tournament, MatchInfo matchInfo,
+            DbUpdater batch, FinalMatchScore matchScore) {
+        final Optional<Integer> winUidO = matchInfo.addSetScore(
+                matchScore.getScores(), tournament.getRule().getMatch());
+        insertSetScore(batch, matchScore);
+        return winUidO;
     }
 
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<GroupMatchInfo> findMatchesInGroup(int gid) {
-        return jooq.select(
-                MATCHES.MID,
-                MATCHES.STATE,
-                MATCH_SCORE.UID,
-                MATCH_SCORE.WON)
-                .from(MATCHES)
-                .leftJoin(MATCH_SCORE)
-                .on(MATCHES.MID.eq(MATCH_SCORE.MID), MATCH_SCORE.WON.gt(0))
-                .where(MATCHES.GID.eq(Optional.of(gid)))
-                .fetch()
-                .map(r -> GroupMatchInfo.builder()
-                        .mid(r.get(MATCHES.MID))
-                        .state(r.get(MATCHES.STATE))
-                        .setsWon(ofNullable(r.get(MATCH_SCORE.WON)))
-                        .winnerId(ofNullable(r.get(MATCH_SCORE.UID)))
-                        .build());
+    public void completeMatch(int mid, int winUid, Instant now, DbUpdater batch) {
+        batch.exec(DbUpdate.builder()
+                .mustAffectRows(JUST_A_ROW)
+                .query(jooq.update(MATCHES)
+                        .set(MATCHES.STATE, MatchState.Over)
+                        .set(MATCHES.WIN_MID, Optional.of(winUid))
+                        .set(MATCHES.ENDED, Optional.of(now))
+                        .where(MATCHES.MID.eq(mid),
+                                MATCHES.STATE.eq(Game)))
+                .build());
     }
 
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<PlayOffMatchInfo> findPlayOffMatches(int tid, int cid) {
-        return jooq
-                .select(MATCHES.MID, MATCHES.STATE, MATCH_SCORE.UID.count())
-                .from(MATCHES).leftJoin(MATCH_SCORE)
-                .on(MATCHES.MID.eq(MATCH_SCORE.MID))
-                .where(MATCHES.TID.eq(tid),
-                        MATCHES.CID.eq(cid),
-                        MATCHES.GID.isNull(),
-                        MATCHES.LEVEL.eq(FIRST_PLAY_OFF_MATCH_LEVEL))
-                .groupBy(MATCHES.MID, MATCHES.STATE)
-                .orderBy(MATCHES.MID)
-                .fetch()
-                .map(r -> PlayOffMatchInfo.builder()
-                        .mid(r.get(MATCHES.MID))
-                        .cid(cid)
-                        .tid(tid)
-                        .state(r.get(MATCHES.STATE))
-                        .drafted(r.get(2, MATCH_SCORE.UID.getType())).build());
+    private void insertSetScore(DbUpdater batch, FinalMatchScore matchScore) {
+        matchScore.getScores().forEach(score -> batch.exec(
+                jooq.insertInto(SET_SCORE, SET_SCORE.MID,
+                        SET_SCORE.UID, SET_SCORE.GAMES)
+                        .values(matchScore.getMid(), score.getUid(), score.getScore())));
     }
 
     @Inject
@@ -339,61 +261,7 @@ public class MatchDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void autoCompleteWinner(int tid, OneOpponentMatch match) {
-        log.info("auto complete match {} for uid {} in tid {}",
-                match.getMid(), match.getUid(), tid);
-        matchScoreDao.setScore(match.getMid(), match.getUid(), 1, 0);
-        changeStatus(match.getMid(), Over);
-        match.getWinnerMid().ifPresent(wmid -> {
-            assignMatchForWinner(tid, wmid, match.getUid());
-        });
-    }
-
-    @Transactional(TRANSACTION_MANAGER)
-    public void assignMatchForWinner(int tid, int mid, int uid) {
-        final Record4 x = jooq
-                .select(MATCH_SCORE.UID, MATCHES.CID, MATCH_SCORE.WON, MATCHES.WIN_MID)
-                .from(MATCHES)
-                .leftJoin(MATCH_SCORE)
-                .on(MATCHES.MID.eq(MATCH_SCORE.MID))
-                .where(MATCHES.MID.eq(mid))
-                .fetchOne();
-        final int cid = x.get(MATCHES.CID);
-        final Integer waitingOpponent = x.get(MATCH_SCORE.UID);
-        final Optional<Integer> winMid = x.get(MATCHES.WIN_MID);
-        if (waitingOpponent == null) {
-            log.info("assign for win. no opponent in mid {} for uid {}", mid, uid);
-            matchScoreDao.createScore(mid, uid, cid, tid);
-        } else if (x.get(MATCH_SCORE.WON) < 0) {
-            log.info("assign for win. no opponent {} gave up first mid {} for uid {}",
-                    waitingOpponent, mid, uid);
-            // lost
-            matchScoreDao.createScore(mid, uid, cid, tid, 1, 0);
-            winMid.ifPresent(wmid -> {
-                assignMatchForWinner(tid, uid, wmid);
-            });
-        } else {
-            log.info("assign for win. opponent {} waits for mid {} for uid {}",
-                    waitingOpponent, mid, uid);
-            matchScoreDao.createScore(mid, uid, cid, tid, 0, 0);
-            changeStatus(mid, Place);
-        }
-    }
-
-    @Transactional(TRANSACTION_MANAGER)
-    public void assignForMatch(int uid, int cid, int mid, int tid) {
-        log.info("play off assign for wid {} mid {}", uid, mid);
-        final Optional<Integer> enemyUid = matchScoreDao.findEnemy(mid, uid);
-        matchScoreDao.createScore(mid, uid, cid, tid);
-        if (enemyUid.isPresent()) {
-            log.info("Uid {} will play against uid {} in mid {}",
-                    uid, enemyUid.get(), mid);
-            changeStatus(mid, Place);
-        }
-    }
-
-    @Transactional(TRANSACTION_MANAGER)
-    public void markAsSchedule(int mid, Instant now) {
+    public void markAsSchedule(MatchInfo mid, Instant now) {
         if (0 == jooq.update(MATCHES)
                 .set(MATCHES.STATE, Game)
                 .set(MATCHES.STARTED, Optional.of(now))
@@ -414,16 +282,11 @@ public class MatchDao {
                 .from(TOURNAMENT)
                 .innerJoin(MATCHES)
                 .on(TOURNAMENT.TID.eq(MATCHES.TID))
-                .innerJoin(MATCH_SCORE)
-                .on(MATCH_SCORE.MID.eq(MATCHES.MID))
-                .innerJoin(ENEMY_SCORE)
-                .on(ENEMY_SCORE.MID.eq(MATCHES.MID))
                 .innerJoin(USERS)
-                .on(MATCH_SCORE.UID.eq(USERS.UID))
+                .on(MATCHES.UID_LESS.eq(USERS.UID))
                 .innerJoin(ENEMY_USER)
-                .on(ENEMY_SCORE.UID.eq(ENEMY_USER.UID))
+                .on(MATCHES.UID_MORE.eq(ENEMY_USER.UID))
                 .where(TOURNAMENT.TID.eq(tid),
-                        ENEMY_SCORE.UID.lt(MATCH_SCORE.UID),
                         MATCHES.STATE.eq(Over))
                 .orderBy(MATCHES.STARTED)
                 .fetch()
@@ -512,8 +375,8 @@ public class MatchDao {
 
     @Transactional(TRANSACTION_MANAGER)
     public void deleteAllByTid(int tid) {
-        jooq.deleteFrom(MATCH_SCORE)
-                .where(MATCH_SCORE.TID.eq(tid))
+        jooq.deleteFrom(SET_SCORE)
+                .where(SET_SCORE.TID.eq(tid))
                 .execute();
         jooq.deleteFrom(MATCHES)
                 .where(MATCHES.TID.eq(tid))
@@ -521,7 +384,7 @@ public class MatchDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void complete(int uid, GroupMatchForResign match, Instant now) {
+    public void scoreSet(int uid, GroupMatchForResign match, Instant now) {
         List<Integer> result = Ints.asList(jooq.batch(
                     jooq.update(MATCHES)
                             .set(MATCHES.STATE, MatchState.Over)
@@ -596,66 +459,6 @@ public class MatchDao {
                         .build());
     }
 
-    public void complete(int uid, Optional<Integer> opponentUid, int mid) {
-        log.info("Uid {} lose to {} in mid {} due leaving",
-                uid, opponentUid, mid);
-        jooq.update(MATCH_SCORE)
-                .set(MATCH_SCORE.WON, -1)
-                .set(MATCH_SCORE.SETS_WON, 0)
-                .where(MATCH_SCORE.MID.eq(mid), MATCH_SCORE.UID.eq(uid))
-                .execute();
-        jooq.update(MATCHES)
-                .set(MATCHES.STATE, opponentUid.isPresent() ? Over : Auto)
-                .where(MATCHES.MID.eq(mid))
-                .execute();
-        opponentUid.ifPresent((u) -> {
-            jooq.update(MATCH_SCORE)
-                    .set(MATCH_SCORE.WON, 1)
-                    .set(MATCH_SCORE.SETS_WON, 0)
-                    .where(MATCH_SCORE.MID.eq(mid), MATCH_SCORE.UID.eq(u))
-                    .execute();
-        });
-    }
-
-    public void resignFromMatchForLoser(int tid, int loserUid, int match) {
-        final Record6 x = jooq
-                .select(MATCH_SCORE.UID, MATCHES.STATE,
-                        MATCHES.CID, MATCH_SCORE.WON,
-                        MATCHES.WIN_MID, MATCHES.LOSE_MID)
-                .from(MATCHES)
-                .leftJoin(MATCH_SCORE)
-                .on(MATCHES.MID.eq(MATCH_SCORE.MID))
-                .where(MATCHES.MID.eq(match))
-                .fetchOne();
-
-        final int cid = x.get(MATCHES.CID);
-        final Integer waitingOpponent = x.get(MATCH_SCORE.UID);
-        final Optional<Integer> winMid = x.get(MATCHES.WIN_MID);
-        final Optional<Integer> loseMid = x.get(MATCHES.LOSE_MID);
-
-        if (waitingOpponent == null) {
-            complete(loserUid, empty(), match);
-            loseMid.ifPresent(lmid -> {
-                resignFromMatchForLoser(tid, loserUid, lmid);
-            });
-        } else if (x.get(MATCH_SCORE.WON) < 0) {
-            // opponent resigned first so loser wins here
-            // but fails on the next stage
-            matchScoreDao.createScore(match, loserUid, cid, tid, 1, 0);
-            winMid.ifPresent(wmid -> {
-                resignFromMatchForLoser(tid, loserUid, wmid);
-            });
-        } else {
-            complete(loserUid, Optional.of(waitingOpponent), match);
-            loseMid.ifPresent(lmid -> {
-                resignFromMatchForLoser(tid, loserUid, lmid);
-            });
-            winMid.ifPresent(wmid -> {
-                assignMatchForWinner(tid, wmid, waitingOpponent);
-            });
-        }
-    }
-
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<OneOpponentMatch> findMatchesForAutoComplete(int tid) {
         return jooq.select()
@@ -670,5 +473,16 @@ public class MatchDao {
                         .winnerMid(r.get(MATCHES.WIN_MID))
                         .mid(r.get(MATCHES.MID))
                         .build());
+    }
+
+    public void setParticipant(int n, int mid, int uid, DbUpdater batch) {
+        batch.exec(DbUpdate.builder()
+                .mustAffectRows(NON_ZERO_ROWS)
+                .query(jooq.update(MATCHES)
+                        .set(n == 0
+                                ? MATCHES.UID_LESS
+                                : MATCHES.UID_MORE, uid)
+                        .where(MATCHES.MID.eq(mid)))
+                .build());
     }
 }

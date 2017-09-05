@@ -34,16 +34,6 @@ public class MatchScoreDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<Integer> findEnemy(int mid, int winnerUid) {
-        return ofNullable(jooq.select(MATCH_SCORE.UID)
-                .from(MATCH_SCORE)
-                .where(MATCH_SCORE.MID.eq(mid),
-                        MATCH_SCORE.UID.ne(winnerUid))
-                .fetchOne())
-                .map(Record1::value1);
-    }
-
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public Optional<ScoreInfo> get(int mid, int uid) {
         return ofNullable(jooq
                 .select(MATCH_SCORE.SETS_WON, MATCH_SCORE.WON, MATCH_SCORE.TID)
@@ -58,15 +48,4 @@ public class MatchScoreDao {
                         .build());
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void setScore(int mid, int uid, int won, int score) {
-        if (jooq.update(MATCH_SCORE)
-                .set(MATCH_SCORE.WON, won)
-                .set(MATCH_SCORE.SETS_WON, score)
-                .where(MATCH_SCORE.MID.eq(mid), MATCH_SCORE.UID.eq(uid))
-                .execute() == 0) {
-            throw PiPoEx.internalError("match " + mid + " with uid "
-                    + uid + " is not update");
-        };
-    }
 }

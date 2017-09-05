@@ -5,7 +5,6 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
-import org.dan.ping.pong.app.place.PlaceLink;
 import org.dan.ping.pong.util.time.Clocker;
 
 import java.util.List;
@@ -39,7 +38,7 @@ public class TableResource {
             ScheduleFreeTables scheduleFreeTables) {
         final int uid = authService.userInfoBySession(session).getUid();
         log.info("Admin {} uid schedules free table in {}", uid, scheduleFreeTables);
-        return tableService.scheduleFreeTables(scheduleFreeTables.getTid(), clocker.get());
+        return tableService.scheduleFreeTables(place, scheduleFreeTables.getTid(), clocker.get(), batch);
     }
 
     @GET

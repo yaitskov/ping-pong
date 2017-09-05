@@ -12,6 +12,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.records.PlaceRecord;
 import org.dan.ping.pong.app.city.CityLink;
+import org.dan.ping.pong.app.match.Pid;
 import org.jooq.DSLContext;
 import org.jooq.UpdateSetMoreStep;
 import org.jooq.exception.DataAccessException;
@@ -134,5 +135,16 @@ public class PlaceDao {
                 .ifPresent(city -> request.set(PLACE.CITY_ID, city.getId()));
         request.where(PLACE.PID.eq(place.getPid()))
                 .execute();
+    }
+
+    public Optional<PlaceMemState> load(Pid pid) {
+        return ofNullable(jooq.select(PLACE.NAME)
+                .from(PLACE)
+                .where(PLACE.PID.eq(pid.getPid()))
+                .fetchOne())
+                .map(r -> PlaceMemState.builder()
+                        .pid(pid)
+                        .name(r.get(PLACE.NAME))
+                        .build());
     }
 }

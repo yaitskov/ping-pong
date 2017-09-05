@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.table;
 import static com.google.common.primitives.Ints.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toMap;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static ord.dan.ping.pong.jooq.tables.Tables.TABLES;
 import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_A_ROW;
@@ -15,6 +16,7 @@ import static org.dan.ping.pong.app.table.TableState.Free;
 
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.Tables;
+import org.dan.ping.pong.app.match.Pid;
 import org.dan.ping.pong.app.tournament.DbUpdate;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.jooq.DSLContext;
@@ -23,6 +25,7 @@ import org.jooq.impl.DSL;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -145,5 +148,20 @@ public class TableDao {
                 .execute() == 0) {
             throw badRequest("Table state changed");
         }
+    }
+
+    public Map<Integer, TableInfo> load(Pid pid) {
+        return jooq.select().from(TABLES)
+                .where(TABLES.PID.eq(pid.getPid()))
+                .fetch()
+                .stream()
+                .collect(toMap(r -> r.get(TABLES.TABLE_ID),
+                        r -> TableInfo.builder()
+                                .mid(r.get(Tables.TABLES.MID))
+                                .pid(pid.getPid())
+                                .state(r.get(TABLES.STATE))
+                                .label(r.get(TABLES.LABEL))
+                                .tableId(r.get(TABLES.TABLE_ID))
+                                .build()));
     }
 }

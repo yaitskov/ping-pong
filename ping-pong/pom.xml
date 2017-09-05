@@ -542,11 +542,6 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
-                                    <name>OptionalInteger</name>
-                                    <expression>.*matches\.(win_uid)</expression>
-                                    <types>.*</types>
-                                </forcedType>
-                                <forcedType>
                                     <name>OptionalInstant</name>
                                     <expression>.*matches\.(started|ended)</expression>
                                     <types>.*</types>
@@ -603,7 +598,7 @@
                                 </forcedType>
                                 <forcedType>
                                     <name>OptionalInteger</name>
-                                    <expression>.*matches\.(win_mid|lose_mid)</expression>
+                                    <expression>.*matches\.(win_mid|lose_mid|uid_win)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

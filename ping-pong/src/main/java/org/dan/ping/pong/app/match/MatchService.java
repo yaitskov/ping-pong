@@ -38,7 +38,7 @@ import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.tournament.MatchScoreResult;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
-import org.dan.ping.pong.app.tournament.OpenTournamentService;
+import org.dan.ping.pong.app.tournament.TournamentCache;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentService;
@@ -78,7 +78,7 @@ public class MatchService {
     private BidDao bidDao;
 
     @Inject
-    private OpenTournamentService openTournamentService;
+    private TournamentCache tournamentCache;
 
     @Inject
     private SequentialExecutor sequentialExecutor;
@@ -93,7 +93,7 @@ public class MatchService {
     private PlaceService placeService;
 
     public MatchScoreResult scoreSet(int uid, FinalMatchScore score, Instant now) {
-        final OpenTournamentMemState tournament = openTournamentService
+        final OpenTournamentMemState tournament = tournamentCache
                 .load(score.getTid());
         tournament.getRule().getMatch().validateSet(score.getScores());
         final MatchInfo matchInfo = tournament.getMatchById(score.getMid());
@@ -106,7 +106,7 @@ public class MatchService {
                     : MatchContinues;
         }
         final DbUpdater batch = dbUpdaterFactory.create()
-                .onFailure(() -> openTournamentService.invalidate(score.getTid()));
+                .onFailure(() -> tournamentCache.invalidate(score.getTid()));
         try {
             final Optional<Integer> winUidO = matchDao.scoreSet(tournament, matchInfo, batch, score);
             winUidO.ifPresent(winUid -> matchWinnerDetermined(tournament, matchInfo, winUid, batch));

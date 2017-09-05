@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.tournament;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toSet;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
 import static ord.dan.ping.pong.jooq.Tables.CITY;
@@ -39,6 +40,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.match.MatchState;
+import org.dan.ping.pong.app.match.Pid;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceLink;
 import org.dan.ping.pong.app.user.UserLink;
@@ -56,6 +58,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -606,5 +609,41 @@ public class TournamentDao {
                         .set(TOURNAMENT.COMPLETE_AT, now)
                         .where(TOURNAMENT.TID.eq(tid)))
                 .build());
+    }
+
+    public Set<Integer> loadAdmins(Tid tid) {
+        return jooq.select(TOURNAMENT_ADMIN.UID)
+                .from(TOURNAMENT_ADMIN)
+                .where(TOURNAMENT_ADMIN.TID.eq(tid.getTid()))
+                .fetch()
+                .stream()
+                .map(r -> r.get(TOURNAMENT_ADMIN.UID))
+                .collect(toSet());
+    }
+
+    public Optional<TournamentRow> getRow(Tid tid) {
+        return ofNullable(jooq.select().from(TOURNAMENT)
+                .where(TOURNAMENT.TID.eq(tid.getTid()))
+                .fetchOne())
+                .map(r -> TournamentRow.builder()
+                        .pid(new Pid(r.get(TOURNAMENT.PID)))
+                        .endedAt(r.get(TOURNAMENT.COMPLETE_AT))
+                        .startedAt(r.get(TOURNAMENT.OPENS_AT))
+                        .name(r.get(TOURNAMENT.NAME))
+                        .state(r.get(TOURNAMENT.STATE))
+                        .rules(TournamentRules.builder()
+                                .prizeWinningPlaces(2 + r.get(TOURNAMENT.THIRD_PLACE_MATCH))
+                                .group(GroupRules.builder()
+                                        .quits(r.get(TOURNAMENT.QUITS_FROM_GROUP))
+                                        .build())
+                                .match(MatchValidationRule.builder()
+                                        .setsToWin(3)
+                                        .minAdvanceInGames(2)
+                                        .minGamesToWin(11)
+                                        .minPossibleGames(0)
+                                        .build())
+                                .build())
+                        .tid(tid)
+                        .build());
     }
 }

@@ -1,11 +1,9 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Arrays.asList;
-import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
-import static ord.dan.ping.pong.jooq.Tables.MATCH_SCORE;
 import static ord.dan.ping.pong.jooq.Tables.SET_SCORE;
 import static ord.dan.ping.pong.jooq.Tables.TABLES;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
@@ -15,36 +13,30 @@ import static ord.dan.ping.pong.jooq.tables.Matches.MATCHES;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
-import static org.dan.ping.pong.app.match.MatchState.Auto;
-import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_A_ROW;
-import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
-import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
-import static org.dan.ping.pong.app.bid.BidState.Wait;
-import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
+import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_A_ROW;
+import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
+import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
+import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.Bid;
-import ord.dan.ping.pong.jooq.tables.MatchScore;
 import ord.dan.ping.pong.jooq.tables.Users;
 import org.dan.ping.pong.app.category.CategoryInfo;
-import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.dan.ping.pong.app.table.TableLink;
 import org.dan.ping.pong.app.tournament.DbUpdate;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
-import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.PlayOffMatchForResign;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
 import org.jooq.Field;
-import org.jooq.Record4;
-import org.jooq.Record6;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -59,7 +51,6 @@ import javax.inject.Inject;
 public class MatchDao {
     private static final Users ENEMY_USER = USERS.as("enemy_user");
     public static final int FIRST_PLAY_OFF_MATCH_LEVEL = 1;
-    private static final MatchScore MS_2 = MATCH_SCORE.as("ms2");
     private static final Bid BID_2 = BID.as("bid2");
     private static final Field<Integer> UID_2 = BID_2.UID.as("uid2");
     @Inject
@@ -245,19 +236,6 @@ public class MatchDao {
                 jooq.insertInto(SET_SCORE, SET_SCORE.MID,
                         SET_SCORE.UID, SET_SCORE.GAMES)
                         .values(matchScore.getMid(), score.getUid(), score.getScore())));
-    }
-
-    @Inject
-    private MatchScoreDao matchScoreDao;
-
-    @Transactional(TRANSACTION_MANAGER)
-    public void goPlayOff(int winnerId, PlayOffMatchInfo playOffMatch) {
-        matchScoreDao.createScore(playOffMatch.getMid(), winnerId,
-                playOffMatch.getCid(), playOffMatch.getTid());
-        if (playOffMatch.getDrafted() == 1 && playOffMatch.getState() == Draft) {
-            changeStatus(playOffMatch.getMid(), MatchState.Place);
-        }
-        playOffMatch.incrementDrafted();
     }
 
     @Transactional(TRANSACTION_MANAGER)
@@ -459,22 +437,6 @@ public class MatchDao {
                         .build());
     }
 
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<OneOpponentMatch> findMatchesForAutoComplete(int tid) {
-        return jooq.select()
-                .from(MATCHES)
-                .innerJoin(MATCH_SCORE).on(MATCH_SCORE.MID.eq(MATCHES.MID))
-                .innerJoin(BID).on(BID.UID.eq(MATCH_SCORE.UID))
-                .where(BID.TID.eq(tid), BID.STATE.eq(Wait),
-                        MATCHES.STATE.eq(Auto))
-                .fetch()
-                .map(r -> OneOpponentMatch.builder()
-                        .uid(r.get(BID.UID))
-                        .winnerMid(r.get(MATCHES.WIN_MID))
-                        .mid(r.get(MATCHES.MID))
-                        .build());
-    }
-
     public void setParticipant(int n, int mid, int uid, DbUpdater batch) {
         batch.exec(DbUpdate.builder()
                 .mustAffectRows(NON_ZERO_ROWS)
@@ -485,4 +447,26 @@ public class MatchDao {
                         .where(MATCHES.MID.eq(mid)))
                 .build());
     }
+
+    public List<MatchInfo> load(Tid tid) {
+        return jooq.select(MATCHES.MID, MATCHES.GID, MATCHES.CID,
+                MATCHES.WIN_MID, MATCHES.LOSE_MID,
+                MATCHES.STATE, MATCHES.TYPE, MATCHES.ENDED,
+                MATCHES.UID_LESS, MATCHES.UID_MORE, MATCHES.UID_WIN)
+                .from(MATCHES)
+                .where(MATCHES.TID.eq(tid.getTid()))
+                .fetch()
+                .map(r -> MatchInfo.builder()
+                        .mid(r.get(MATCHES.MID))
+                        .cid(r.get(MATCHES.CID))
+                        .gid(r.get(MATCHES.GID))
+                        .state(r.get(MATCHES.STATE))
+                        .type(r.get(MATCHES.TYPE))
+                        .loserMid(r.get(MATCHES.LOSE_MID))
+                        .winnerMid(r.get(MATCHES.WIN_MID))
+                        .winnerId(r.get(MATCHES.UID_WIN))
+                        .tid(tid.getTid())
+                        .build());
+    }
+
 }

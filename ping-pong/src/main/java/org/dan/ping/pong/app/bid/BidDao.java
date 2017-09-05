@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.bid;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toMap;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
 import static ord.dan.ping.pong.jooq.Tables.USERS;
@@ -24,6 +25,9 @@ import org.dan.ping.pong.app.tournament.DbUpdate;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.ParticipantMemState;
+import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -32,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -213,5 +218,19 @@ public class BidDao {
                 .set(BID.UPDATED, Optional.of(now))
                 .where(BID.TID.eq(tid), BID.STATE.ne(Quit))
                 .execute();
+    }
+
+    public Map<Integer, ParticipantMemState> loadParticipants(Tid tid) {
+        return jooq.select(BID.UID, BID.STATE)
+                .from(BID)
+                .where(BID.TID.eq(tid.getTid()))
+                .fetch()
+                .stream()
+                .collect(toMap(r -> r.get(BID.UID),
+                        r -> ParticipantMemState.builder()
+                                .tid(tid)
+                                .uid(new Uid(r.get(BID.UID)))
+                                .bidState(r.get(BID.STATE))
+                                .build()));
     }
 }

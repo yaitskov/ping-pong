@@ -143,7 +143,6 @@ public class BidDao {
                 tid);
     }
 
-    @Transactional(TRANSACTION_MANAGER)
     public void enlist(ParticipantMemState bid, Instant now, DbUpdater batch) {
         batch.exec(DbUpdate.builder()
                 .logBefore(() -> log.info("User {} enlisted to tournament {}", bid.getUid(), bid.getTid()))

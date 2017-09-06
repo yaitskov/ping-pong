@@ -1,6 +1,5 @@
 package org.dan.ping.pong.app.tournament;
 
-import static java.time.Duration.ofSeconds;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -37,7 +36,6 @@ import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.match.Pid;
-import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.table.TableDao;
@@ -50,7 +48,6 @@ import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
@@ -92,7 +89,8 @@ public class TournamentService {
                 .build());
         enlist(tournament, uid, batch);
     }
-    public void enlist(OpenTournamentMemState tournament, int uid, DbUpdater batch) {
+
+    private void enlist(OpenTournamentMemState tournament, int uid, DbUpdater batch) {
         if (tournament.getState() != TournamentState.Draft) {
             throw badRequest(BadStateError.of(tournament.getState(),
                     "Tournament is not in a draft state"));
@@ -128,7 +126,6 @@ public class TournamentService {
     @Inject
     private Clocker clocker;
 
-    @Transactional(TRANSACTION_MANAGER)
     public void begin(OpenTournamentMemState tournament, DbUpdater batch) {
         if (tournament.getState() != TournamentState.Draft) {
             throw badRequest("Tournament " + tournament.getTid()
@@ -142,11 +139,11 @@ public class TournamentService {
         findReadyToStartTournamentBid(tournament).forEach(bid -> {
             bidService.setBidState(bid, BidState.Wait, singletonList(bid.getBidState()), batch);
         });
-        sequentialExecutor.executeSync(tournament.getPid(), ofSeconds(matchScoreTimeout), () -> {
-            final PlaceMemState place = placeCache.load(tournament.getPid());
-            tableService.scheduleFreeTables(tournament, place, now, batch);
-            return null;
-        });
+        sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
+                place -> {
+                    batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
+                    return tableService.scheduleFreeTables(tournament, place, now, batch);
+                });
     }
 
     private List<ParticipantMemState> findReadyToStartTournamentBid(OpenTournamentMemState tournament) {
@@ -259,10 +256,11 @@ public class TournamentService {
             }
             bidService.setBidState(bid, target, singletonList(bid.getBidState()), batch);
         }
-        sequentialExecutor.executeSync(tournament.getPid(), ofSeconds(matchScoreTimeout), () -> {
-            tableService.scheduleFreeTables(tournament, placeCache.load(tournament.getPid()), now, batch);
-            return null;
-        });
+        sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
+                place -> {
+                    batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
+                    return tableService.scheduleFreeTables(tournament, place, now, batch);
+                });
     }
 
     private void leaveFromPlayOff(ParticipantMemState bid, OpenTournamentMemState tournament, DbUpdater batch) {
@@ -359,8 +357,7 @@ public class TournamentService {
                 .filter(bid -> bid.getState() != Quit)
                 .forEach(bid -> bid.setBidState(Want));
         bidDao.resetStateByTid(tid, now, batch);
-        sequentialExecutor.executeSync(tournament.getPid(), ofSeconds(matchScoreTimeout), () -> {
-            final PlaceMemState place = placeCache.load(tournament.getPid());
+        sequentialExecutor.executeSync(placeCache.load(tournament.getPid()), place -> {
             batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
             tableService.freeTables(place, mids, batch);
             return null;

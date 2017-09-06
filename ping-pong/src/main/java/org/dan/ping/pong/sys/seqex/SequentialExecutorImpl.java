@@ -6,7 +6,9 @@ import lombok.SneakyThrows;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 
@@ -22,15 +24,9 @@ public class SequentialExecutorImpl implements SequentialExecutor {
 
     @Override
     @SneakyThrows
-    public <T> T executeSync(Object id, Duration timeout, Supplier<T> s) {
-        final CompletableFuture<T> future = new CompletableFuture<>();
-        execute(id, () -> {
-            try {
-                future.complete(s.get());
-            } catch (Exception e) {
-                future.completeExceptionally(e);
-            }
-        });
-        return future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+    public <A, R> R executeSync(A o, Function<A, R> s) {
+        synchronized (o) {
+            return s.apply(o);
+        }
     }
 }

@@ -110,17 +110,18 @@ public class MatchService {
         }
         final Optional<Integer> winUidO = matchDao.scoreSet(tournament, matchInfo, batch, score);
         winUidO.ifPresent(winUid -> matchWinnerDetermined(tournament, matchInfo, winUid, batch));
-        return sequentialExecutor.executeSync(tournament.getPid(),
-                ofSeconds(matchScoreTimeout),
-                () -> freeTableAndSchedule(batch, tournament, now, winUidO));
+        return sequentialExecutor.executeSync(placeService.load(tournament.getPid()),
+                place -> {
+                    batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
+                    return freeTableAndSchedule(place, batch, tournament, now, winUidO);
+                });
     }
 
-    MatchScoreResult freeTableAndSchedule(DbUpdater batch, OpenTournamentMemState tournament,
+    MatchScoreResult freeTableAndSchedule(PlaceMemState place, DbUpdater batch,
+            OpenTournamentMemState tournament,
             Instant now, Optional<Integer> winUidO) {
-        final PlaceMemState place = placeService.load(tournament.getPid());
         batch.onFailure(() -> placeService.invalidate(tournament.getPid()));
         tableService.scheduleFreeTables(tournament, place, now, batch);
-        batch.flush();
         return winUidO.map(u -> tournament.matchScoreResult())
                 .orElse(MatchScoreResult.MatchContinues);
     }
@@ -398,25 +399,23 @@ public class MatchService {
     private PlaceService placeCache;
 
     public List<OpenMatchForWatch> findOpenMatchesForWatching(OpenTournamentMemState tournament) {
-        return sequentialExecutor.executeSync(tournament.getPid(), ofSeconds(matchScoreTimeout), () -> {
-            final PlaceMemState place = placeCache.load(tournament.getPid());
-            return tournament.getMatches().values().stream()
-                    .filter(m -> m.getState() == Game)
-                    .map(m -> OpenMatchForWatch.builder()
-                            .mid(m.getMid())
-                            .started(m.getStartedAt().get())
-                            .score(tournament.getRule().getMatch().calcWonSets(m).values()
-                                    .stream().collect(toList()))
-                            .category(tournament.getCategory(m.getCid()))
-                            .table(place.getTableByMid(m.getMid()).toLink())
-                            .type(m.getType())
-                            .participants(
-                                    m.getUids().stream()
-                                            .map(tournament::getParticipant)
-                                            .map(ParticipantMemState::toLink)
-                                            .collect(toList()))
-                            .build())
-                    .collect(toList());
-        });
+        return sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
+                place -> tournament.getMatches().values().stream()
+                        .filter(m -> m.getState() == Game)
+                        .map(m -> OpenMatchForWatch.builder()
+                                .mid(m.getMid())
+                                .started(m.getStartedAt().get())
+                                .score(tournament.getRule().getMatch().calcWonSets(m).values()
+                                        .stream().collect(toList()))
+                                .category(tournament.getCategory(m.getCid()))
+                                .table(place.getTableByMid(m.getMid()).toLink())
+                                .type(m.getType())
+                                .participants(
+                                        m.getUids().stream()
+                                                .map(tournament::getParticipant)
+                                                .map(ParticipantMemState::toLink)
+                                                .collect(toList()))
+                                .build())
+                        .collect(toList()));
     }
 }

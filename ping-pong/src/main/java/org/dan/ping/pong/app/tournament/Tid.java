@@ -14,4 +14,8 @@ public class Tid {
     public static Tid valueOf(String s) {
         return new Tid(Integer.valueOf(s));
     }
+
+    public String toString() {
+        return String.valueOf(tid);
+    }
 }

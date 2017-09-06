@@ -549,6 +549,7 @@ public class TournamentDao {
                 .select(TOURNAMENT.PID, TOURNAMENT.MAX_GROUP_SIZE,
                         TOURNAMENT.COMPLETE_AT, TOURNAMENT.OPENS_AT,
                         TOURNAMENT.NAME, TOURNAMENT.STATE,
+                        TOURNAMENT.QUITS_FROM_GROUP,
                         TOURNAMENT.THIRD_PLACE_MATCH)
                 .from(TOURNAMENT)
                 .where(TOURNAMENT.TID.eq(tid.getTid()))

@@ -1,9 +1,8 @@
 package org.dan.ping.pong.sys.seqex;
 
-import java.time.Duration;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public interface SequentialExecutor {
     void execute(Object id, Runnable r);
-    <T> T executeSync(Object id, Duration timeout, Supplier <T> s);
+    <A, R> R executeSync(A id, Function<A, R> s);
 }

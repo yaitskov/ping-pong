@@ -123,7 +123,6 @@ public class TournamentResource {
         tournamentAccessor.update(new Tid(enlistment.getTid()), response, (tournament, batch) -> {
             tournamentService.enlistOnline(enlistment, tournament, user, batch);
         });
-
     }
 
     @POST

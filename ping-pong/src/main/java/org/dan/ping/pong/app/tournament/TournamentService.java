@@ -1,12 +1,14 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.time.temporal.ChronoUnit.DAYS;
-import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
+import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
-import static org.dan.ping.pong.app.bid.BidState.Paid;
+import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Want;
-import static org.dan.ping.pong.app.match.MatchState.Game;
-import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.tournament.CumulativeScore.BEST_ORDER;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
@@ -15,30 +17,43 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
-import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.category.CategoryService;
+import org.dan.ping.pong.app.group.BidSuccessInGroup;
+import org.dan.ping.pong.app.group.GroupDao;
+import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchDao;
-import org.dan.ping.pong.app.match.GroupMatchForResign;
+import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
+import org.dan.ping.pong.app.match.Pid;
+import org.dan.ping.pong.app.place.PlaceMemState;
+import org.dan.ping.pong.app.place.PlaceService;
+import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.user.UserDao;
+import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserRegRequest;
+import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,13 +75,28 @@ public class TournamentService {
         return tournamentDao.create(uid, newTournament);
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void enlist(int uid, EnlistTournament enlistment) {
-        final MyTournamentInfo info = tournamentDao.getMyTournamentInfo(enlistment.getTid())
-                 .orElseThrow(() -> notFound("Tournament "
-                         + enlistment.getTid() + " does not exist"));
-        ensureDrafting(info.getState());
-        bidDao.enlist(uid, enlistment, clocker.get());
+    public void enlistOnline(EnlistTournament enlistment,
+            OpenTournamentMemState tournament, UserInfo user, DbUpdater batch) {
+        if (tournament.getState() != Draft) {
+            throw badRequest("Tournament is not in Draft but "
+                    + tournament.getState());
+        }
+        int uid = user.getUid();
+        tournament.getParticipants().put(uid, ParticipantMemState.builder()
+                .bidState(Want)
+                .uid(new Uid(uid))
+                .name(user.getName())
+                .cid(enlistment.getCategoryId())
+                .tid(new Tid(tournament.getTid()))
+                .build());
+        enlist(tournament, uid, batch);
+    }
+    public void enlist(OpenTournamentMemState tournament, int uid, DbUpdater batch) {
+        if (tournament.getState() != TournamentState.Draft) {
+            throw badRequest(BadStateError.of(tournament.getState(),
+                    "Tournament is not in a draft state"));
+        }
+        bidDao.enlist(tournament.getParticipant(uid), clocker.get(), batch);
     }
 
     private void ensureDrafting(TournamentState state) {
@@ -98,11 +128,31 @@ public class TournamentService {
     private Clocker clocker;
 
     @Transactional(TRANSACTION_MANAGER)
-    public void begin(int tid) {
-        castingLotsService.makeGroups(tid);
+    public void begin(OpenTournamentMemState tournament, DbUpdater batch) {
+        if (tournament.getState() != TournamentState.Draft) {
+            throw badRequest("Tournament " + tournament.getTid()
+                    + " is not in draft state but "
+                    + tournament.getState());
+        }
+        castingLotsService.makeGroups(tournament);
+        tournament.setState(TournamentState.Open);
+        tournamentDao.setState(tournament, batch);
         final Instant now = clocker.get();
-        bidDao.casByTid(BidState.Here, BidState.Wait, tid, now);
-        tableService.scheduleFreeTables(place, tid, now, batch);
+        findReadyToStartTournamentBid(tournament).forEach(bid -> {
+            bidService.setBidState(bid, BidState.Wait, singletonList(bid.getBidState()), batch);
+        });
+        sequentialExecutor.executeSync(tournament.getPid(), matchScoreTimeout, () -> {
+            final PlaceMemState place = placeCache.load(tournament.getPid());
+            tableService.scheduleFreeTables(tournament, place, now, batch);
+            return null;
+        });
+    }
+
+    private List<ParticipantMemState> findReadyToStartTournamentBid(OpenTournamentMemState tournament) {
+        return tournament.getParticipants().values()
+                .stream()
+                .filter(bid -> bid.getBidState() == Here)
+                .collect(toList());
     }
 
     @Inject
@@ -125,39 +175,38 @@ public class TournamentService {
                         + tid + " not found"));
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void leaveTournament(int uid, int tid, BidState targetState) {
-        log.info("User {} leaves tournament {} as {}", uid, tid, targetState);
-        final TournamentInfo tinfo = tournamentDao.getById(tid)
-                .orElseThrow(() -> notFound("Tournament {} not found"));
-        final TournamentState state = tinfo.getState();
+    public void leaveTournament(ParticipantMemState bid, OpenTournamentMemState tournament,
+            BidState targetState, DbUpdater batch) {
+        final int tid = tournament.getTid();
+        log.info("User {} leaves tournament {} as {}", bid.getUid(), tid, targetState);
+        final TournamentState state = tournament.getState();
         switch (state) {
             case Close:
             case Canceled:
             case Replaced:
                 throw badRequest("Tournament is complete");
             case Open:
-                leaveOpenTournament(uid, tid, targetState);
+                leaveOpenTournament(bid, tournament, targetState, batch);
                 break;
             case Hidden:
             case Announce:
             case Draft:
-                bidDao.resign(uid, tid, targetState, clocker.get());
+                bidService.setBidState(bid, targetState, singletonList(bid.getBidState()), batch);
                 break;
             default:
                 throw internalError("State " + state + " is not supported");
         }
     }
 
-    private void leaveOpenTournament(int uid, int tid, BidState targetState) {
-        log.info("User {} leaves open tournament {}", uid, tid);
-        final BidState state = bidDao.getState(tid, uid)
-                .orElseThrow(() -> notFound("User does participant in the tournament"));
-        switch (state) {
+    private void leaveOpenTournament(ParticipantMemState bid, OpenTournamentMemState tournament,
+            BidState targetState, DbUpdater batch) {
+        final int tid = tournament.getTid();
+        log.info("User {} leaves open tournament {}", bid.getUid(), tid);
+        switch (bid.getBidState()) {
             case Play:
             case Rest:
             case Wait:
-                activeParticipantLeave(uid, tid, clocker.get(), targetState);
+                activeParticipantLeave(bid, tournament, clocker.get(), targetState, batch);
                 break;
             case Win1:
             case Win2:
@@ -168,10 +217,10 @@ public class TournamentService {
             case Want:
             case Paid:
             case Here:
-                bidDao.setBidState(tid, uid, state, targetState, clocker.get());
+                bidService.setBidState(bid, targetState, singletonList(bid.getBidState()), batch);
                 break;
             default:
-                throw internalError("Unknown state " + state);
+                throw internalError("Unknown state " + bid.getBidState());
         }
     }
 
@@ -181,63 +230,46 @@ public class TournamentService {
     @Inject
     private TableDao tableDao;
 
-    public void activeParticipantLeave(int uid, int tid, Instant now, BidState target) {
-        List<GroupMatchForResign> list = matchDao.groupMatchesOfParticipant(uid, tid);
-        final Map<Integer, GroupMatchForResign> completeMy = new HashMap<>();
-        final Map<Integer, GroupMatchForResign> incompleteMy = new HashMap<>();
-        int gid = groupMatches(list, completeMy, incompleteMy);
+    @Inject
+    private SequentialExecutor sequentialExecutor;
+
+    @Inject
+    private PlaceService placeCache;
+
+    @Inject
+    private BidService bidService;
+
+    @Value("${match.score.timeout}")
+    private Duration matchScoreTimeout;
+
+    public void activeParticipantLeave(ParticipantMemState bid, OpenTournamentMemState tournament,
+            Instant now, BidState target, DbUpdater batch) {
+        final int uid = bid.getUid().getId();
+        List<MatchInfo> incompleteMy = matchService.bidIncompleteGroupMatches(uid, tournament);
         log.info("activeParticipantLeave uid {} incomplete {}", uid, incompleteMy.size());
         if (incompleteMy.isEmpty()) {
-            leaveFromPlayOff(uid, tid, now, target);
+            leaveFromPlayOff(bid, tournament, batch);
+            if (bid.getBidState() != Win2 || target == Expl) {
+                bidService.setBidState(bid, target, singletonList(bid.getBidState()), batch);
+            }
         } else {
-            for (GroupMatchForResign match : incompleteMy.values()) {
-                matchDao.scoreSet(uid, match, now);
-                if (match.getState() == Game) {
-                    tableDao.freeTable(match.getMid(), batch);
-                    bidDao.setBidState(tid, match.getOpponentUid(), BidState.Play, BidState.Wait, now);
-                }
+            for (MatchInfo match : incompleteMy) {
+                matchService.walkOver(tournament, uid, match, batch);
             }
-            bidDao.resign(uid, tid, target, now);
-            matchService.tryToCompleteGroup(matchInfo, gid, tid, emptySet());
-            matchService.autoCompletePlayOffHalfMatches(tid);
-            tableService.scheduleFreeTables(place, tid, now, batch);
+            bidService.setBidState(bid, target, singletonList(bid.getBidState()), batch);
         }
+        sequentialExecutor.executeSync(tournament.getPid(), matchScoreTimeout, () -> {
+            tableService.scheduleFreeTables(tournament, placeCache.load(tournament.getPid()), now, batch);
+            return null;
+        });
     }
 
-    private void leaveFromPlayOff(int uid, int tid, Instant now, BidState target) {
-        Optional<PlayOffMatchForResign> playOffMatch = matchDao.playOffMatchForResign(uid, tid);
-        if (playOffMatch.isPresent()) {
-            boolean schedule = matchService.completePlayOffMatch(uid, tid, target, playOffMatch.get());
-            if (playOffMatch.get().getState() == Game) {
-                tableDao.freeTable(playOffMatch.get().getMid(), batch);
-            }
-            if (schedule) {
-                matchService.autoCompletePlayOffHalfMatches(tid);
-                tableService.scheduleFreeTables(place, tid, now, batch);
-            }
-        } else { // play off is not begun yet
-            bidDao.resign(uid, tid, target, now);
-        }
-    }
-
-    private int groupMatches(List<GroupMatchForResign> list,
-            Map<Integer, GroupMatchForResign> completeMy,
-            Map<Integer, GroupMatchForResign> incompleteMy) {
-        int gid = 0;
-        for(GroupMatchForResign match : list) {
-            gid = match.getGid();
-            if (match.getState() == Over) {
-                completeMy.put(match.getMid(), match);
-            } else {
-                incompleteMy.put(match.getMid(), match);
-            }
-        }
-        return gid;
-    }
-
-    public void setTournamentState(int uid, SetTournamentState stateUpdate) {
-        // check permissions
-        tournamentDao.setState(stateUpdate.getTid(), stateUpdate.getState(), clocker.get());
+    private void leaveFromPlayOff(ParticipantMemState bid, OpenTournamentMemState tournament, DbUpdater batch) {
+        matchService.playOffMatchForResign(bid.getUid().getId(), tournament)
+                .ifPresent(match -> {
+                    matchService.walkOver(tournament, bid.getUid().getId(), match, batch);
+                    leaveFromPlayOff(bid, tournament, batch);
+                });
     }
 
     public void setTournamentState(OpenTournamentMemState tournament, DbUpdater batch) {
@@ -265,18 +297,12 @@ public class TournamentService {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void update(int uid, TournamentUpdate update) {
-        if (tournamentDao.isAdminOf(uid, update.getTid())) {
-            final TournamentState state = tournamentDao.getById(update.getTid())
-                    .orElseThrow(() -> notFound("Tournament does not exist"))
-                    .getState();
-            if (!EDITABLE_STATES.contains(state)) {
-                throw badRequest("Tournament could be modified until it's open");
-            }
-            tournamentDao.update(update);
-        } else {
-            throw forbidden("No write access to the tournament");
+    public void update(OpenTournamentMemState tournament, TournamentUpdate update, DbUpdater batch) {
+        if (!EDITABLE_STATES.contains(tournament.getState())) {
+            throw badRequest("Tournament could be modified until it's open");
         }
+        tournament.setPid(new Pid(update.getPlaceId()));
+        tournamentDao.update(update, batch);
     }
 
     public TournamentParameters getTournamentParams(int tid) {
@@ -284,20 +310,17 @@ public class TournamentService {
                 .orElseThrow(() -> notFound("Tournament does not exist"));
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void updateTournamentParams(int uid, TournamentParameters parameters) {
+    public void updateTournamentParams(OpenTournamentMemState tournament,
+            TournamentParameters parameters, DbUpdater batch) {
         validate(parameters);
-        if (tournamentDao.isAdminOf(uid, parameters.getTid())) {
-            final TournamentState state = tournamentDao.getById(parameters.getTid())
-                    .orElseThrow(() -> notFound("Tournament does not exist"))
-                    .getState();
-            if (!CONFIGURABLE_STATES.contains(state)) {
-                throw badRequest("Tournament could be modified until it's open");
-            }
-            tournamentDao.updateParams(parameters);
-        } else {
-            throw forbidden("No write access to the tournament");
+        if (!CONFIGURABLE_STATES.contains(tournament.getState())) {
+            throw badRequest("Tournament could be modified until it's open");
         }
+        tournament.getRule().getGroup().setQuits(parameters.getQuitsGroup());
+        tournament.getRule().getGroup().setMaxSize(parameters.getMaxGroupSize());
+        tournament.getRule().getMatch().setSetsToWin(parameters.getMatchScore());
+        tournament.getRule().setPrizeWinningPlaces(2 + parameters.getThirdPlaceMatch());
+        tournamentDao.updateParams(parameters, batch);
     }
 
     private void validate(TournamentParameters parameters) {
@@ -318,21 +341,79 @@ public class TournamentService {
     @Inject
     private MatchDao matchDao;
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void cancel(int uid, int tid) {
-        if (tournamentDao.isAdminOf(uid, tid)) {
-            final Instant now = clocker.get();
-            tournamentDao.setState(tid, Canceled, now);
-            matchDao.deleteAllByTid(tid);
-            bidDao.resetStateByTid(tid, now);
-            tableService.freeTables(tid);
-        } else {
-            throw forbidden("No write access to the tournament");
-        }
+    @Inject
+    private GroupDao groupDao;
+
+    public void cancel(OpenTournamentMemState tournament, DbUpdater batch) {
+        final int tid = tournament.getTid();
+        tournament.setState(Canceled);
+        setTournamentState(tournament, batch);
+        matchDao.deleteAllByTid(tournament, batch);
+        final Set<Integer> mids = new HashSet<>(tournament.getMatches().keySet());
+        tournament.getMatches().clear();
+        tournament.getGroups().clear();
+        groupDao.deleteAllByTid(tournament.getTid(), batch);
+        final Instant now = clocker.get();
+        tournament.getParticipants().values().stream()
+                .filter(bid -> bid.getState() != Quit)
+                .forEach(bid -> bid.setBidState(Want));
+        bidDao.resetStateByTid(tid, now, batch);
+        sequentialExecutor.executeSync(tournament.getPid(), matchScoreTimeout, () -> {
+            final PlaceMemState place = placeCache.load(tournament.getPid());
+            batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
+            tableService.freeTables(place, mids, batch);
+            return null;
+        });
     }
 
-    public List<TournamentResultEntry> tournamentResult(int tid, int cid) {
-        return tournamentDao.tournamentResult(tid, cid);
+    @Inject
+    private PlayOffService playOffService;
+
+    @Inject
+    private GroupService groupService;
+
+    public List<TournamentResultEntry> tournamentResult(OpenTournamentMemState tournament, int cid) {
+        final List<MatchInfo> cidMatches = categoryService.findMatchesInCategory(tournament, cid);
+        int level = 1;
+        final Map<Integer, CumulativeScore> uidLevel = new HashMap<>();
+        Collection<MatchInfo> baseMatches = playOffService.findBaseMatches(cidMatches);
+        final MatchValidationRule matchRules = tournament.getRule().getMatch();
+        while (true) {
+            ranksLevelMatches(tournament, level++, uidLevel, baseMatches, matchRules);
+            final Collection<MatchInfo> nextLevel = playOffService
+                    .findNextMatches(tournament.getMatches(), baseMatches);
+            if (nextLevel.isEmpty()) {
+                break;
+            }
+            baseMatches = nextLevel;
+        }
+        ranksLevelMatches(tournament, 0, uidLevel, playOffService.findGroupMatches(cidMatches), matchRules);
+        return uidLevel.values().stream().sorted(BEST_ORDER)
+                .map(cuScore -> {
+                    final ParticipantMemState participant = tournament.getParticipant(cuScore.getRating().getUid());
+                    return TournamentResultEntry.builder()
+                            .user(participant.toLink())
+                            .state(participant.getState())
+                            .punkts(cuScore.getRating().getPunkts())
+                            .score(cuScore)
+                        .build();
+                })
+                .collect(toList());
+    }
+
+    private void ranksLevelMatches(OpenTournamentMemState tournament, int level,
+            Map<Integer, CumulativeScore> uidLevel,
+            Collection<MatchInfo> matches, MatchValidationRule rules) {
+        final Map<Integer, BidSuccessInGroup> uid2Stat = groupService.emptyMatchesState(tournament, matches);
+        matches.forEach(m -> groupService.aggMatch(uid2Stat, m, rules));
+        uid2Stat.forEach((uid, stat) ->
+                uidLevel.merge(uid,
+                    CumulativeScore.builder()
+                            .level(level)
+                            .rating(stat)
+                            .weighted(stat.multiply((int) Math.pow(10, level)))
+                            .build(),
+                    CumulativeScore::merge));
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
@@ -352,25 +433,23 @@ public class TournamentService {
     @Inject
     private UserDao userDao;
 
-    @Transactional(TRANSACTION_MANAGER)
-    public int enlistOffline(EnlistOffline enlistment) {
-        final MyTournamentInfo myTournamentInfo = getMyTournamentInfo(enlistment.getTid());
-        if (myTournamentInfo.getState() != Draft) {
+    public int enlistOffline(OpenTournamentMemState tournament,
+            EnlistOffline enlistment, DbUpdater batch) {
+        if (tournament.getState() != Draft) {
             throw badRequest("Tournament is not in Draft but "
-                    + myTournamentInfo.getState());
+                    + tournament.getState());
         }
         final int participantUid = userDao.register(UserRegRequest.builder()
                 .name(enlistment.getName())
-
                 .build());
-        enlist(participantUid,
-                EnlistTournament.builder()
-                        .categoryId(enlistment.getCid())
-                        .tid(enlistment.getTid())
-                        .build());
-        if (enlistment.getBidState() == Here || enlistment.getBidState() == Paid) {
-            bidDao.setBidState(enlistment.getTid(), participantUid, Want, enlistment.getBidState(), clocker.get());
-        }
+        tournament.getParticipants().put(participantUid, ParticipantMemState.builder()
+                .bidState(enlistment.getBidState())
+                .name(enlistment.getName())
+                .cid(enlistment.getCid())
+                .uid(new Uid(participantUid))
+                .tid(new Tid(tournament.getTid()))
+                .build());
+        enlist(tournament, participantUid, batch);
         return participantUid;
     }
 

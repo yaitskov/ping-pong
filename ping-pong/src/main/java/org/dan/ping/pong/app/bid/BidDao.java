@@ -109,16 +109,16 @@ public class BidDao {
                 .execute();
     }
 
-    public void setGroupForUids(int gid, int tid, List<TournamentGroupingBid> groupBids) {
-        if (groupBids.size() != jooq.update(BID)
+    public void setGroupForUids(int gid, int tid, List<ParticipantMemState> groupBids) {
+        groupBids.forEach(bid -> bid.setGid(Optional.of(gid)));
+        jooq.update(BID)
                 .set(BID.GID, Optional.of(gid))
                 .where(BID.TID.eq(tid),
                         BID.UID.in(groupBids.stream()
-                                .map(TournamentGroupingBid::getUid)
+                                .map(ParticipantMemState::getUid)
+                                .map(Uid::getId)
                                 .collect(Collectors.toList())))
-                .execute()) {
-            throw internalError("Not all bids got group " + gid);
-        }
+                .execute();
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
@@ -144,15 +144,16 @@ public class BidDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void enlist(int uid, EnlistTournament enlistment, Instant now) {
-        log.info("User {} enlisted to tournament {}", uid, enlistment.getTid());
-        jooq.insertInto(BID, BID.CID, BID.TID, BID.UID, BID.STATE)
-                .values(enlistment.getCategoryId(), enlistment.getTid(), uid, Want)
-                .onDuplicateKeyUpdate()
-                .set(BID.STATE, Want)
-                .set(BID.UPDATED, Optional.of(now))
-                .set(BID.CID, enlistment.getCategoryId())
-                .execute();
+    public void enlist(ParticipantMemState bid, Instant now, DbUpdater batch) {
+        batch.exec(DbUpdate.builder()
+                .logBefore(() -> log.info("User {} enlisted to tournament {}", bid.getUid(), bid.getTid()))
+                .query(jooq.insertInto(BID, BID.CID, BID.TID, BID.UID, BID.STATE)
+                        .values(bid.getCid(), bid.getTid().getTid(), bid.getUid().getId(), bid.getBidState())
+                        .onDuplicateKeyUpdate()
+                        .set(BID.STATE, bid.getBidState())
+                        .set(BID.UPDATED, Optional.of(now))
+                        .set(BID.CID, bid.getCid()))
+                .build());
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
@@ -203,32 +204,36 @@ public class BidDao {
                         .build());
     }
 
-    public void setCategory(SetCategory setCategory, Instant now) {
-        jooq.update(BID)
-                .set(BID.CID, setCategory.getCid())
-                .set(BID.UPDATED, Optional.of(now))
-                .where(BID.TID.eq(setCategory.getTid()),
-                        BID.UID.eq(setCategory.getUid()))
-                .execute();
+    public void setCategory(SetCategory setCategory, Instant now, DbUpdater batch) {
+        batch.exec(DbUpdate.builder()
+                .query(jooq.update(BID)
+                        .set(BID.CID, setCategory.getCid())
+                        .set(BID.UPDATED, Optional.of(now))
+                        .where(BID.TID.eq(setCategory.getTid()),
+                                BID.UID.eq(setCategory.getUid())))
+                .build());
     }
 
-    public void resetStateByTid(int tid, Instant now) {
-        jooq.update(BID)
+    public void resetStateByTid(int tid, Instant now, DbUpdater batch) {
+        batch.exec(jooq.update(BID)
                 .set(BID.STATE, BidState.Want)
                 .set(BID.UPDATED, Optional.of(now))
-                .where(BID.TID.eq(tid), BID.STATE.ne(Quit))
-                .execute();
+                .where(BID.TID.eq(tid), BID.STATE.ne(Quit)));
     }
 
     public Map<Integer, ParticipantMemState> loadParticipants(Tid tid) {
-        return jooq.select(BID.UID, BID.STATE)
+        return jooq.select(BID.UID, BID.STATE, USERS.NAME, BID.GID, BID.CID)
                 .from(BID)
+                .innerJoin(USERS).on(BID.UID.eq(USERS.UID))
                 .where(BID.TID.eq(tid.getTid()))
                 .fetch()
                 .stream()
                 .collect(toMap(r -> r.get(BID.UID),
                         r -> ParticipantMemState.builder()
                                 .tid(tid)
+                                .cid(r.get(BID.CID))
+                                .gid(r.get(BID.GID))
+                                .name(r.get(USERS.NAME))
                                 .uid(new Uid(r.get(BID.UID)))
                                 .bidState(r.get(BID.STATE))
                                 .build()));

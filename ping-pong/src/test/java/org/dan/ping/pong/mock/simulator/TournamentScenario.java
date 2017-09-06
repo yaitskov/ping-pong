@@ -15,7 +15,6 @@ import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.dan.ping.pong.mock.TestAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
 
 import java.util.HashMap;

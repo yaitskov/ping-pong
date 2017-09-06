@@ -12,12 +12,12 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import org.dan.ping.pong.app.tournament.DbUpdater;
+import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -28,13 +28,13 @@ public class BidService {
     private BidDao bidDao;
 
     @Transactional(TRANSACTION_MANAGER)
-    public void paid(BidId bidId) {
-        bidDao.setBidState(bidId, singletonList(Want), Paid, clocker.get());
+    public void paid(OpenTournamentMemState tournament, int uid, DbUpdater batch) {
+        setBidState(tournament.getParticipant(uid), Paid, singletonList(Want), batch);
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void readyToPlay(BidId bidId) {
-        bidDao.setBidState(bidId, asList(Paid, Want), Here, clocker.get());
+    public void readyToPlay(OpenTournamentMemState tournament, int uid, DbUpdater batch) {
+        setBidState(tournament.getParticipant(uid), Here, asList(Paid, Want), batch);
     }
 
     public List<ParticipantState> findEnlisted(int tid) {
@@ -46,23 +46,19 @@ public class BidService {
                 .orElseThrow(() -> notFound("Participant has not been found"));
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void disappeared(BidId bidId) {
-        bidDao.setBidState(bidId, asList(Here, Paid), Want, clocker.get());
-    }
-
     @Inject
     private Clocker clocker;
 
     @Transactional(TRANSACTION_MANAGER)
-    public void setCategory(SetCategory setCategory) {
-        bidDao.setCategory(setCategory, clocker.get());
+    public void setCategory(OpenTournamentMemState tournament, SetCategory setCategory, DbUpdater batch) {
+        tournament.checkCategory(setCategory.getCid());
+        tournament.getParticipant(setCategory.getUid()).setCid(setCategory.getCid());
+        bidDao.setCategory(setCategory, clocker.get(), batch);
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void setBidState(SetBidState setState) {
-        bidDao.setBidState(setState.getTid(), setState.getUid(),
-                setState.getExpected(), setState.getTarget(), clocker.get());
+    public void setBidState(OpenTournamentMemState tournament, SetBidState setState, DbUpdater batch) {
+        setBidState(tournament.getParticipant(setState.getUid()), setState.getTarget(),
+                singletonList(setState.getExpected()), batch);
     }
 
     public void setBidState(ParticipantMemState bid, BidState target,

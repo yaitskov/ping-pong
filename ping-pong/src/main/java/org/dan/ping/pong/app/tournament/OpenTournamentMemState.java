@@ -2,15 +2,20 @@ package org.dan.ping.pong.app.tournament;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
+import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import ord.dan.ping.pong.jooq.tables.Category;
+import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.Pid;
+import org.dan.ping.pong.util.Integers;
 
 import java.time.Instant;
 import java.util.List;
@@ -28,6 +33,7 @@ public class OpenTournamentMemState {
     private Map<Integer, ParticipantMemState> participants;
     private Map<Integer, MatchInfo> matches;
     private Map<Integer, GroupInfo> groups;
+    private Map<Integer, CategoryInfo> categories;
     private TournamentRules rule;
     private TournamentState state;
     private Optional<Instant> completeAt;
@@ -41,8 +47,10 @@ public class OpenTournamentMemState {
         return adminIds.contains(uid);
     }
 
-    public void matchCompleted(MatchInfo matchInfo, Integer winUid, DbUpdater batch) {
-
+    public ParticipantMemState getParticipant(int uid) {
+        return ofNullable(participants.get(uid))
+                .orElseThrow(() -> notFound("User " + uid
+                        + " does participate in the tournament " + tid));
     }
 
     public MatchScoreResult matchScoreResult() {
@@ -63,5 +71,23 @@ public class OpenTournamentMemState {
         return groups.values().stream()
                 .filter(groupInfo -> groupInfo.getCid() == cid)
                 .collect(toList());
+    }
+
+    public void checkAdmin(int uid) {
+        if (isAdminOf(uid)) {
+            return;
+        }
+        throw forbidden("You (" + uid + ") are not an administrator of " + tid);
+    }
+
+    public CategoryInfo getCategory(int cid) {
+        return categories.get(cid);
+    }
+
+    public void checkCategory(int cid) {
+        if (categories.containsKey(cid)) {
+            return;
+        }
+        throw badRequest("Category " + cid + " is not in tournament " + tid);
     }
 }

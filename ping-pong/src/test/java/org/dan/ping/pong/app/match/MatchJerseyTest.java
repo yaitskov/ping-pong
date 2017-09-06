@@ -32,8 +32,6 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.stringContainsInOrder;
-import static org.hamcrest.Matchers.theInstance;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -114,6 +112,9 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
     private MatchScoreDao matchScoreDao;
 
     @Inject
+    private ForTestMatchDao forTestMatchDao;
+
+    @Inject
     private TournamentDao tournamentDao;
 
     @Inject
@@ -155,24 +156,9 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         bidDao.getState(tid, participants.get(LOSER).getUid())));
 
         assertEquals(Stream.of(Over, Close).map(Optional::of).collect(toList()),
-                asList(matchDao.getById(adminOpenMatches.get(0).getMid())
+                asList(forTestMatchDao.getById(adminOpenMatches.get(0).getMid())
                                 .map(MatchInfo::getState),
                         tournamentDao.getById(tid).map(TournamentInfo::getState)));
-
-        assertEquals(Stream.of(
-                ScoreInfo.builder().tid(tid).uid(participants.get(WINER).getUid())
-                        .score(WINNER_SCORE)
-                        .won(WINNER_SCORE - LOSER_SCORE)
-                        .build(),
-                ScoreInfo.builder().tid(tid).uid(participants.get(LOSER).getUid())
-                        .score(LOSER_SCORE)
-                        .won(LOSER_SCORE - WINNER_SCORE)
-                        .build())
-                        .map(Optional::of).collect(toList()),
-                Stream.of(WINER, LOSER).map(i ->
-                        matchScoreDao.get(adminOpenMatches.get(0).getMid(),
-                                participants.get(i).getUid()))
-                        .collect(toList()));
 
         List<TableInfo> tables = tableDao.findFreeTables(tid);
         assertEquals(singletonList(Free), tables.stream().map(TableInfo::getState).collect(toList()));
@@ -257,20 +243,6 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .collect(toList()));
         assertEquals(Optional.of(Open),
                 tournamentDao.getById(tid).map(TournamentInfo::getState));
-        assertEquals(Stream.of(
-                ScoreInfo.builder().tid(tid).uid(participants.get(WINER).getUid())
-                        .score(WINNER_SCORE)
-                        .won(WINNER_SCORE - LOSER_SCORE)
-                        .build(),
-                ScoreInfo.builder().tid(tid).uid(participants.get(LOSER).getUid())
-                        .score(LOSER_SCORE)
-                        .won(LOSER_SCORE - WINNER_SCORE)
-                        .build())
-                        .map(Optional::of).collect(toList()),
-                Stream.of(WINER, LOSER).map(i ->
-                        matchScoreDao.get(adminOpenMatches.get(0).getMid(),
-                                participants.get(i).getUid()))
-                        .collect(toList()));
 
         List<TableInfo> tables = tableDao.findTournamentTablesByState(tid, Busy);
         assertEquals(singletonList(Busy), tables.stream().map(TableInfo::getState).collect(toList()));

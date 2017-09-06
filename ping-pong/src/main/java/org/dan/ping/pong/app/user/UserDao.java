@@ -13,7 +13,6 @@ import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -111,17 +110,5 @@ public class UserDao {
             log.info("User {} changed email from {} to {}",
                     userInfo.getUid(), userInfo.getEmail(), update.getEmail());
         }
-    }
-
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<UserLink> loadNamesById(List<Integer> uids) {
-        return jooq.select(USERS.NAME, USERS.UID)
-                .from(USERS)
-                .where(USERS.UID.in(uids))
-                .fetch()
-                .map(r -> UserLink.builder()
-                        .uid(r.get(USERS.UID))
-                        .name(r.get(USERS.NAME))
-                        .build());
     }
 }

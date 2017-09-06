@@ -14,28 +14,38 @@ import java.util.List;
 import java.util.Map;
 
 public class GroupService {
-    public List<Integer> orderUidsInGroup(OpenTournamentMemState tournament,
-            List<MatchInfo> allMatchesInGroup) {
+    public Map<Integer, BidSuccessInGroup> emptyMatchesState(
+            OpenTournamentMemState tournament,
+            Collection<MatchInfo> allMatchesInGroup) {
         checkArgument(allMatchesInGroup.stream()
                 .allMatch(minfo -> minfo.getState() == Over));
-        final Map<Integer, BidSuccessInGroup> uid2Stat = allMatchesInGroup.stream()
+        return allMatchesInGroup.stream()
                 .map(MatchInfo::getParticipantIdScore)
                 .map(Map::keySet)
                 .flatMap(Collection::stream)
-                .collect(toMap(o -> o, BidSuccessInGroup::new));
-
-        final MatchValidationRule matchRule = tournament.getRule().getMatch();
-        allMatchesInGroup.forEach(minfo -> aggMatch(uid2Stat, minfo, matchRule));
-        List<BidSuccessInGroup> sorted = uid2Stat.values().stream()
-                .sorted(BidSuccessInGroup.BEST_COMPARATOR).collect(toList());
-        return sorted.stream().map(BidSuccessInGroup::getUid).collect(toList());
+                .collect(toMap(uid -> uid,
+                        uid -> new BidSuccessInGroup(uid, tournament.getParticipant(uid).getState())));
     }
 
-    private void aggMatch(Map<Integer, BidSuccessInGroup> uid2Stat,
+    public List<Integer> orderUidsInGroup(OpenTournamentMemState tournament,
+            List<MatchInfo> allMatchesInGroup) {
+        final Map<Integer, BidSuccessInGroup> uid2Stat = emptyMatchesState(tournament, allMatchesInGroup);
+        final MatchValidationRule matchRule = tournament.getRule().getMatch();
+        allMatchesInGroup.forEach(minfo -> aggMatch(uid2Stat, minfo, matchRule));
+        return order(uid2Stat.values())
+                .stream().map(BidSuccessInGroup::getUid)
+                .collect(toList());
+    }
+
+    public Collection<BidSuccessInGroup> order(Collection<BidSuccessInGroup> bidSuccess) {
+        return bidSuccess.stream().sorted(BidSuccessInGroup.BEST_COMPARATOR).collect(toList());
+    }
+
+    public void aggMatch(Map<Integer, BidSuccessInGroup> uid2Stat,
             MatchInfo minfo, MatchValidationRule matchRule) {
         final int winUid = minfo.getWinnerId().get();
         final BidSuccessInGroup winner = uid2Stat.get(winUid);
-        final int lostUid = minfo.getLoserUid(winUid).get();
+        final int lostUid = minfo.getOpponentUid(winUid).get();
         final BidSuccessInGroup loser = uid2Stat.get(lostUid);
 
         minfo.getParticipantIdScore().get(winUid)

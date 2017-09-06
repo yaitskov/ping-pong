@@ -1,5 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
+import static org.dan.ping.pong.app.tournament.TournamentResource.RESULT_CATEGORY;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -22,6 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.GenericType;
 
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = JerseyWithSimulator.class)
@@ -52,25 +55,22 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
                 .champions(c2, p4, p5);
 
         simulator.simulate(T_1_Q_2_G_8, scenario);
-        final List<TournamentResultEntry> result = tournamentService
-                .tournamentResult(scenario.getTid(),
-                        scenario.getCategoryDbId().get(c1));
+        final List<TournamentResultEntry> result = myRest()
+                .get(TOURNAMENT_RESULT + scenario.getTid() + RESULT_CATEGORY + scenario.getCategoryDbId().get(c1),
+                        new GenericType<List<TournamentResultEntry>>() {});
 
         TournamentResultEntry p1Result = result.get(0);
-        assertEquals(9, p1Result.getScore());
-        assertEquals(3, p1Result.getWonMatches());
+        assertEquals(7, p1Result.getPunkts());
         assertEquals(scenario.getPlayersSessions().get(p1).getUid(),
                 p1Result.getUser().getUid());
 
         TournamentResultEntry p2Result = result.get(1);
-        assertEquals(5, p2Result.getScore());
-        assertEquals(1, p2Result.getWonMatches());
+        assertEquals(4, p2Result.getPunkts());
         assertEquals(scenario.getPlayersSessions().get(p2).getUid(),
                 p2Result.getUser().getUid());
 
         TournamentResultEntry p3Result = result.get(2);
-        assertEquals(2, p3Result.getScore());
-        assertEquals(0, p3Result.getWonMatches());
+        assertEquals(3, p3Result.getPunkts());
         assertEquals(scenario.getPlayersSessions().get(p3).getUid(),
                 p3Result.getUser().getUid());
     }

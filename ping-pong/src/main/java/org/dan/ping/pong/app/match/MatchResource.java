@@ -6,8 +6,8 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.TournamentAccessor;
 import org.dan.ping.pong.app.user.UserLink;
-import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
 
 import java.util.List;
@@ -56,12 +56,12 @@ public class MatchResource {
     private Clocker clocker;
 
     @Inject
-    private SequentialExecutor sequentialExecutor;
+    private TournamentAccessor tournamentAccessor;
 
     @POST
     @Path(COMPLETE_MATCH)
     @Consumes(APPLICATION_JSON)
-    public void complete(
+    public void scoreSetAndCompleteIfWinOrLose(
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             FinalMatchScore score) {
@@ -69,13 +69,10 @@ public class MatchResource {
         final int uid = authService.userInfoBySession(session).getUid();
         log.info("User {} sets scores {} for match {}",
                 uid, score.getScores(), score.getMid());
-        sequentialExecutor.execute(new Tid(score.getTid()), () -> {
-            try {
-                response.resume(matchService.scoreSet(uid, score, clocker.get()));
-            } catch (Exception e) {
-                response.resume(e);
-            }
-        });
+        tournamentAccessor.update(new Tid(score.getTid()), response,
+                (tournament, batch) -> {
+                    return matchService.scoreSet(tournament, uid, score, clocker.get(), batch);
+                });
     }
 
     @GET
@@ -95,9 +92,13 @@ public class MatchResource {
 
     @GET
     @Path(MATCH_WATCH_LIST_OPEN + "/{tid}")
-    public List<OpenMatchForWatch> findOpenMatchesForWatching(
-            @PathParam("tid") int tid) {
-        return matchDao.findOpenMatchesForWatching(tid);
+    public void findOpenMatchesForWatching(
+            @Suspended AsyncResponse response,
+            @PathParam("tid") Tid tid) {
+        tournamentAccessor.update(tid, response,
+                (tournament, batch) -> {
+                    return matchService.findOpenMatchesForWatching(tournament);
+                });
     }
 
     @GET

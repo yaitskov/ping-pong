@@ -23,7 +23,6 @@ import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
-import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.Bid;
 import ord.dan.ping.pong.jooq.tables.Users;
@@ -57,12 +56,13 @@ public class MatchDao {
     private DSLContext jooq;
 
     @Transactional(TRANSACTION_MANAGER)
-    public int createGroupMatch(int tid, int gid, int cid, int priorityGroup) {
+    public int createGroupMatch(int tid, int gid, int cid, int priorityGroup, int uid1, int uid2) {
         log.info("Create a match in group {} of tournament {}", gid, tid);
         return jooq.insertInto(MATCHES, MATCHES.TID,
                 MATCHES.GID, MATCHES.CID,
-                MATCHES.STATE, MATCHES.PRIORITY, MATCHES.TYPE)
-                .values(tid, Optional.of(gid), cid, Place, priorityGroup, Grup)
+                MATCHES.STATE, MATCHES.PRIORITY, MATCHES.TYPE,
+                MATCHES.UID_LESS, MATCHES.UID_MORE)
+                .values(tid, Optional.of(gid), cid, Place, priorityGroup, Grup, uid1, uid2)
                 .returning()
                 .fetchOne()
                 .getMid();
@@ -92,18 +92,13 @@ public class MatchDao {
                 .on(TOURNAMENT_ADMIN.TID.eq(TOURNAMENT.TID))
                 .innerJoin(MATCHES)
                 .on(TOURNAMENT.TID.eq(MATCHES.TID))
-                .innerJoin(MATCH_SCORE)
-                .on(MATCH_SCORE.MID.eq(MATCHES.MID))
-                .innerJoin(ENEMY_SCORE)
-                .on(ENEMY_SCORE.MID.eq(MATCHES.MID))
                 .innerJoin(USERS)
-                .on(MATCH_SCORE.UID.eq(USERS.UID))
+                .on(MATCHES.UID_LESS.eq(USERS.UID))
                 .innerJoin(ENEMY_USER)
-                .on(ENEMY_SCORE.UID.eq(ENEMY_USER.UID))
+                .on(MATCHES.UID_MORE.eq(ENEMY_USER.UID))
                 .innerJoin(TABLES)
                 .on(MATCHES.MID.eq(TABLES.MID.cast(Integer.class)))
                 .where(TOURNAMENT_ADMIN.UID.eq(adminUid),
-                        ENEMY_SCORE.UID.lt(MATCH_SCORE.UID),
                         MATCHES.STATE.eq(Game))
                 .orderBy(MATCHES.STARTED)
                 .fetch()
@@ -134,24 +129,19 @@ public class MatchDao {
         return jooq.select(MATCHES.MID, MATCHES.TID, TABLES.TABLE_ID,
                 TABLES.LABEL, MATCHES.TYPE, ENEMY_USER.UID, ENEMY_USER.NAME,
                 MATCHES.STATE, TOURNAMENT.MATCH_SCORE)
-                .from(MATCH_SCORE)
-                .innerJoin(TOURNAMENT).on(TOURNAMENT.TID.eq(MATCH_SCORE.TID))
-                .innerJoin(MATCHES)
-                .on(MATCH_SCORE.MID.eq(MATCHES.MID))
-                .leftJoin(ENEMY_SCORE)
-                .on(ENEMY_SCORE.MID.eq(MATCHES.MID))
+                .from(MATCHES)
+                .innerJoin(TOURNAMENT)
+                .on(TOURNAMENT.TID.eq(MATCHES.TID))
                 .innerJoin(USERS)
-                .on(MATCH_SCORE.UID.eq(USERS.UID))
+                .on(MATCHES.UID_LESS.eq(USERS.UID))
                 .leftJoin(ENEMY_USER)
-                .on(ENEMY_SCORE.UID.eq(ENEMY_USER.UID))
+                .on(MATCHES.UID_MORE.eq(ENEMY_USER.UID))
                 .leftJoin(TABLES)
                 .on(MATCHES.MID.eq(TABLES.TABLE_ID))
-                .where(MATCH_SCORE.UID.eq(uid),
-                        ENEMY_SCORE.UID.notEqual(uid),
+                .where(MATCHES.UID_MORE.eq(uid).or(MATCHES.UID_LESS.eq(uid)),
                         MATCHES.STATE.in(Place, Game))
                 .orderBy(MATCHES.STATE.asc(), MATCHES.MID.asc())
                 .fetch()
-
                 .map(r -> MyPendingMatch.builder()
                         .tid(r.get(MATCHES.TID))
                         .mid(r.get(MATCHES.MID))
@@ -181,36 +171,6 @@ public class MatchDao {
                 .build());
     }
 
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<MatchInfo> getById(int mid) {
-        final Map<Integer, Integer> participantIdScore = new HashMap<>();
-        final MatchInfo[] result = new MatchInfo[1];
-        jooq.select(MATCHES.TID, MATCHES.STATE, MATCHES.GID,
-                MATCHES.CID, MATCHES.LOSE_MID, MATCHES.WIN_MID,
-                MATCH_SCORE.UID, MATCH_SCORE.SETS_WON, MATCHES.TYPE)
-                .from(MATCHES)
-                .leftJoin(MATCH_SCORE)
-                .on(MATCHES.MID.eq(MATCH_SCORE.MID))
-                .where(MATCHES.MID.eq(mid))
-                .fetch().forEach(r -> {
-            participantIdScore.put(r.get(MATCH_SCORE.UID), r.get(MATCH_SCORE.SETS_WON));
-            if (result[0] == null) {
-                result[0] = MatchInfo.builder()
-                        .gid(r.get(MATCHES.GID))
-                        .mid(mid)
-                        .cid(r.get(MATCHES.CID))
-                        .type(r.get(MATCHES.TYPE))
-                        .state(r.get(MATCHES.STATE))
-                        .tid(r.get(MATCHES.TID))
-                        .winnerMid(r.get(MATCHES.WIN_MID))
-                        .loserMid(r.get(MATCHES.LOSE_MID))
-                        //.participantIdScore(participantIdScore)
-                        .build();
-            }
-        });
-        return ofNullable(result[0]);
-    }
-
     public Optional<Integer> scoreSet(OpenTournamentMemState tournament, MatchInfo matchInfo,
             DbUpdater batch, FinalMatchScore matchScore) {
         final Optional<Integer> winUidO = matchInfo.addSetScore(
@@ -219,7 +179,7 @@ public class MatchDao {
         return winUidO;
     }
 
-    public void completeMatch(int mid, int winUid, Instant now, DbUpdater batch) {
+    public void completeMatch(int mid, int winUid, Instant now, DbUpdater batch, MatchState expected) {
         batch.exec(DbUpdate.builder()
                 .mustAffectRows(JUST_A_ROW)
                 .query(jooq.update(MATCHES)
@@ -227,7 +187,7 @@ public class MatchDao {
                         .set(MATCHES.WIN_MID, Optional.of(winUid))
                         .set(MATCHES.ENDED, Optional.of(now))
                         .where(MATCHES.MID.eq(mid),
-                                MATCHES.STATE.eq(Game)))
+                                MATCHES.STATE.eq(expected)))
                 .build());
     }
 
@@ -239,15 +199,15 @@ public class MatchDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void markAsSchedule(MatchInfo mid, Instant now) {
+    public void markAsSchedule(MatchInfo match, Instant now) {
         if (0 == jooq.update(MATCHES)
                 .set(MATCHES.STATE, Game)
                 .set(MATCHES.STARTED, Optional.of(now))
-                .where(MATCHES.MID.eq(mid),
+                .where(MATCHES.MID.eq(match.getMid()),
                         MATCHES.STATE.eq(Place))
                 .execute()) {
             throw internalError("Match "
-                    + mid + " is not in place state");
+                    + match.getMid() + " is not in place state");
         }
     }
 
@@ -286,57 +246,6 @@ public class MatchDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<OpenMatchForWatch> findOpenMatchesForWatching(int tid) {
-        return jooq
-                .select(MATCHES.MID, MATCHES.STARTED, CATEGORY.NAME,
-                        MATCHES.CID, TABLES.TABLE_ID, TABLES.LABEL,
-                        MATCHES.TYPE, ENEMY_USER.UID, ENEMY_USER.NAME,
-                        MATCH_SCORE.SETS_WON, ENEMY_SCORE.SETS_WON,
-                        USERS.UID, USERS.NAME)
-                .from(MATCHES)
-                .innerJoin(MATCH_SCORE)
-                .on(MATCH_SCORE.MID.eq(MATCHES.MID))
-                .innerJoin(ENEMY_SCORE)
-                .on(ENEMY_SCORE.MID.eq(MATCHES.MID))
-                .innerJoin(USERS)
-                .on(MATCH_SCORE.UID.eq(USERS.UID))
-                .innerJoin(ENEMY_USER)
-                .on(ENEMY_SCORE.UID.eq(ENEMY_USER.UID))
-                .innerJoin(CATEGORY)
-                .on(MATCHES.CID.eq(CATEGORY.CID))
-                .innerJoin(TABLES)
-                .on(MATCHES.MID.eq(TABLES.MID.cast(Integer.class)))
-                .where(MATCHES.TID.eq(tid),
-                        MATCHES.STATE.eq(Game),
-                        ENEMY_SCORE.UID.lt(MATCH_SCORE.UID))
-                .orderBy(MATCHES.STARTED)
-                .fetch()
-                .map(r -> OpenMatchForWatch.builder()
-                        .mid(r.get(MATCHES.MID))
-                        .started(r.get(MATCHES.STARTED).get())
-                        .score(asList(r.get(MATCH_SCORE.SETS_WON), r.get(ENEMY_SCORE.SETS_WON)))
-                        .category(CategoryInfo.builder()
-                                .cid(r.get(MATCHES.CID))
-                                .name(r.get(CATEGORY.NAME))
-                                .build())
-                        .table(TableLink.builder()
-                                .id(r.get(TABLES.TABLE_ID))
-                                .label(r.get(TABLES.LABEL))
-                                .build())
-                        .type(r.get(MATCHES.TYPE))
-                        .participants(asList(
-                                UserLink.builder()
-                                        .name(r.get(USERS.NAME))
-                                        .uid(r.get(USERS.UID))
-                                        .build(),
-                                UserLink.builder()
-                                        .name(r.get(ENEMY_USER.NAME))
-                                        .uid(r.get(ENEMY_USER.UID))
-                                        .build()))
-                        .build());
-    }
-
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<UserLink> findWinners(int tid) {
         return jooq.select(USERS.NAME, BID.UID)
                 .from(BID)
@@ -352,88 +261,15 @@ public class MatchDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void deleteAllByTid(int tid) {
-        jooq.deleteFrom(SET_SCORE)
-                .where(SET_SCORE.TID.eq(tid))
-                .execute();
-        jooq.deleteFrom(MATCHES)
-                .where(MATCHES.TID.eq(tid))
-                .execute();
-    }
-
-    @Transactional(TRANSACTION_MANAGER)
-    public void scoreSet(int uid, GroupMatchForResign match, Instant now) {
-        List<Integer> result = Ints.asList(jooq.batch(
-                    jooq.update(MATCHES)
-                            .set(MATCHES.STATE, MatchState.Over)
-                            .set(MATCHES.ENDED, Optional.of(now))
-                            .where(MATCHES.MID.eq(match.getMid()),
-                                    MATCHES.STATE.in(Game, Place)),
-                    jooq.update(MATCH_SCORE)
-                            .set(MATCH_SCORE.UPDATED, Optional.of(now))
-                            .set(MATCH_SCORE.WON, -1)
-                            .set(MATCH_SCORE.SETS_WON, 0)
-                            .where(MATCH_SCORE.UID.eq(uid),
-                                    MATCH_SCORE.MID.eq(match.getMid())),
-                    jooq.update(MATCH_SCORE)
-                            .set(MATCH_SCORE.UPDATED, Optional.of(now))
-                            .set(MATCH_SCORE.WON, 1)
-                            .set(MATCH_SCORE.SETS_WON, 0)
-                            .where(MATCH_SCORE.UID.eq(match.getOpponentUid()),
-                                    MATCH_SCORE.MID.eq(match.getMid())))
-                    .execute());
-        if (match.getState() == Draft) {
-            if (!result.equals(asList(1, 1, 0))) {
-                throw internalError("Wrong update pattern " + result);
-            }
-        } else if (match.getState() == Game || match.getState() == Place) {
-            if (!result.equals(asList(1, 1, 1))) {
-                throw internalError("Wrong update pattern " + result);
-            }
-        } else {
-            throw internalError("Unexpected");
-        }
-    }
-
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<GroupMatchForResign> groupMatchesOfParticipant(int uid, int tid) {
-        return jooq
-                .select(MATCHES.MID, MATCHES.STATE, MATCHES.GID, ENEMY_SCORE.UID)
-                .from(MATCH_SCORE)
-                .innerJoin(MATCHES).on(MATCH_SCORE.MID.eq(MATCHES.MID))
-                .innerJoin(ENEMY_SCORE).on(ENEMY_SCORE.MID.eq(MATCHES.MID))
-                .where(MATCH_SCORE.TID.eq(tid), MATCH_SCORE.UID.eq(uid),
-                        ENEMY_SCORE.UID.ne(uid), MATCHES.GID.isNotNull())
-                .fetch()
-                .map(r -> GroupMatchForResign
-                        .builder()
-                        .mid(r.get(MATCHES.MID))
-                        .gid(r.get(MATCHES.GID).get())
-                        .opponentUid(r.get(ENEMY_SCORE.UID))
-                        .state(r.get(MATCHES.STATE))
-                        .build());
-    }
-
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<PlayOffMatchForResign> playOffMatchForResign(int uid, int tid) {
-        return ofNullable(jooq
-                .select(MATCHES.STATE, MATCHES.MID, MATCHES.WIN_MID,
-                        MATCHES.LOSE_MID, ENEMY_SCORE.UID, MATCHES.TYPE)
-                .from(MATCH_SCORE)
-                .innerJoin(MATCHES).on(MATCH_SCORE.MID.eq(MATCHES.MID))
-                .leftJoin(ENEMY_SCORE).on(
-                        MATCHES.MID.eq(ENEMY_SCORE.MID),
-                        ENEMY_SCORE.UID.ne(uid))
-                .where(MATCH_SCORE.UID.eq(uid), MATCH_SCORE.TID.eq(tid),
-                        MATCHES.STATE.in(Game, Place, Draft))
-                .fetchOne())
-                .map(r -> PlayOffMatchForResign.builder()
-                        .winMatch(r.get(MATCHES.WIN_MID))
-                        .lostMatch(r.get(MATCHES.LOSE_MID))
-                        .mid(r.get(MATCHES.MID))
-                        .state(r.get(MATCHES.STATE))
-                        .type(r.get(MATCHES.TYPE))
-                        .opponentId(ofNullable(r.get(ENEMY_SCORE.UID)))
+    public void deleteAllByTid(OpenTournamentMemState tournament, DbUpdater batch) {
+        batch
+                .exec(DbUpdate.builder()
+                        .query(jooq.deleteFrom(SET_SCORE)
+                                .where(SET_SCORE.MID.in(tournament.getMatches().keySet())))
+                        .build())
+                .exec(DbUpdate.builder()
+                        .query(jooq.deleteFrom(MATCHES)
+                        .where(MATCHES.TID.eq(tournament.getTid())))
                         .build());
     }
 

@@ -6,11 +6,13 @@ import static org.dan.ping.pong.app.castinglots.GroupState.Open;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -19,7 +21,6 @@ public class GroupDao {
     @Inject
     private DSLContext jooq;
 
-    @Transactional(TRANSACTION_MANAGER)
     public int createGroup(int tid, Integer cid, String label,
             int quits, int ordNumber) {
         final int gid = jooq.insertInto(GROUPS, GROUPS.TID, GROUPS.LABEL,
@@ -46,5 +47,9 @@ public class GroupDao {
                                 .label(r.get(GROUPS.LABEL))
                                 .build()));
 
+    }
+
+    public void deleteAllByTid(int tid, DbUpdater batch) {
+        batch.exec(jooq.deleteFrom(GROUPS).where(GROUPS.TID.eq(tid)));
     }
 }

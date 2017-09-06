@@ -17,4 +17,11 @@ public class TableInfo {
     private int pid;
     private TableState state;
     private Optional<Integer> mid;
+
+    public TableLink toLink() {
+        return TableLink.builder()
+                .id(tableId)
+                .label(label)
+                .build();
+    }
 }

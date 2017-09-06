@@ -8,11 +8,9 @@ import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
 import static ord.dan.ping.pong.jooq.Tables.CITY;
 import static ord.dan.ping.pong.jooq.Tables.MATCHES;
-import static ord.dan.ping.pong.jooq.Tables.MATCH_SCORE;
 import static ord.dan.ping.pong.jooq.Tables.PLACE;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT_ADMIN;
-import static ord.dan.ping.pong.jooq.Tables.USERS;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
@@ -43,7 +41,6 @@ import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.match.Pid;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceLink;
-import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectField;
@@ -52,11 +49,7 @@ import org.jooq.impl.DSL;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -174,10 +167,6 @@ public class TournamentDao {
                 .map(this::mapToDatedDigest);
     }
 
-    public void setState(int tid, TournamentState state) {
-        setState(tid, state, null);
-    }
-
     public void setState(OpenTournamentMemState tournament, DbUpdater batch) {
         batch.exec(DbUpdate.builder()
                 .logBefore(() -> log.info("Switch tournament {} into {} state.",
@@ -188,23 +177,6 @@ public class TournamentDao {
                         .set(TOURNAMENT.STATE, tournament.getState())
                         .where(TOURNAMENT.TID.eq(tournament.getTid())))
                 .build());
-    }
-
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<TournamentInfo> lockById(int tid) {
-        return ofNullable(jooq.select(TOURNAMENT.QUITS_FROM_GROUP,
-                TOURNAMENT.STATE, TOURNAMENT.MAX_GROUP_SIZE,
-                TOURNAMENT.THIRD_PLACE_MATCH)
-                .from(TOURNAMENT)
-                .where(TOURNAMENT.TID.eq(tid))
-                .forUpdate().fetchOne())
-                .map(r -> TournamentInfo.builder()
-                        .tid(tid)
-                        .state(r.get(TOURNAMENT.STATE))
-                        .thirdPlaceMath(r.get(TOURNAMENT.THIRD_PLACE_MATCH))
-                        .maxGroupSize(r.get(TOURNAMENT.MAX_GROUP_SIZE))
-                        .quitesFromGroup(r.get(TOURNAMENT.QUITS_FROM_GROUP))
-                        .build());
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
@@ -460,15 +432,15 @@ public class TournamentDao {
                 .build();
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void update(TournamentUpdate update) {
-        jooq.update(TOURNAMENT)
-                .set(TOURNAMENT.TICKET_PRICE, update.getPrice())
-                .set(TOURNAMENT.PID, update.getPlaceId())
-                .set(TOURNAMENT.NAME, update.getName())
-                .set(TOURNAMENT.OPENS_AT, update.getOpensAt())
-                .where(TOURNAMENT.TID.eq(update.getTid()))
-                .execute();
+    public void update(TournamentUpdate update, DbUpdater batch) {
+        batch.exec(DbUpdate.builder()
+                .query(jooq.update(TOURNAMENT)
+                        .set(TOURNAMENT.TICKET_PRICE, update.getPrice())
+                        .set(TOURNAMENT.PID, update.getPlaceId())
+                        .set(TOURNAMENT.NAME, update.getName())
+                        .set(TOURNAMENT.OPENS_AT, update.getOpensAt())
+                        .where(TOURNAMENT.TID.eq(update.getTid())))
+                .build());
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
@@ -490,64 +462,15 @@ public class TournamentDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void updateParams(TournamentParameters parameters) {
-        jooq.update(TOURNAMENT)
-                .set(TOURNAMENT.MAX_GROUP_SIZE, parameters.getMaxGroupSize())
-                .set(TOURNAMENT.MATCH_SCORE, parameters.getMatchScore())
-                .set(TOURNAMENT.QUITS_FROM_GROUP, parameters.getQuitsGroup())
-                .set(TOURNAMENT.THIRD_PLACE_MATCH, parameters.getThirdPlaceMatch())
-                .where(TOURNAMENT.TID.eq(parameters.getTid()))
-                .execute();
-    }
-
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<TournamentResultEntry> tournamentResult(int tid, int cid) {
-        Map<Integer, TournamentResultEntry> allMap = new HashMap<>();
-        Map<Integer, TournamentResultEntry> groupMap = new HashMap<>();
-        jooq
-                .select(USERS.NAME, USERS.UID, BID.STATE,
-                        MATCHES.GID, MATCH_SCORE.WON, MATCH_SCORE.SETS_WON)
-                .from(BID)
-                .innerJoin(USERS).on(BID.UID.eq(USERS.UID))
-                .innerJoin(MATCH_SCORE).on(
-                        MATCH_SCORE.TID.eq(BID.TID),
-                        MATCH_SCORE.UID.eq(BID.UID))
-                .innerJoin(MATCHES)
-                .on(MATCH_SCORE.MID.eq(MATCHES.MID))
-                .where(BID.TID.eq(tid), BID.CID.eq(cid))
-                .forEach(r -> {
-                    final int uid = r.get(USERS.UID);
-                    final int won = r.get(MATCH_SCORE.WON);
-                    final int score = r.get(MATCH_SCORE.SETS_WON);
-                    Optional<Integer> ogid = r.get(MATCHES.GID);
-                    TournamentResultEntry tre = allMap.get(uid);
-                    if (tre == null) {
-                        allMap.put(uid, tre = TournamentResultEntry.builder().user(UserLink
-                                .builder()
-                                .name(r.get(USERS.NAME))
-                                .uid(uid)
-                                .build())
-                                .state(r.get(BID.STATE))
-                                .wonMatches(won > 0 ? 1 : 0)
-                                .score(score)
-                                .build());
-                    } else {
-                        if (won > 0) {
-                            tre.setWonMatches(tre.getWonMatches() + 1);
-                        }
-                        tre.setScore(tre.getScore() + score);
-                    }
-                    if (ogid.isPresent()) {
-                        groupMap.put(uid, tre);
-                    }
-                });
-        allMap.keySet().removeAll(groupMap.keySet());
-        List<TournamentResultEntry> playOff = new ArrayList<>(allMap.values());
-        Collections.sort(playOff);
-        List<TournamentResultEntry> group = new ArrayList<>(groupMap.values());
-        Collections.sort(group);
-        playOff.addAll(group);
-        return playOff;
+    public void updateParams(TournamentParameters parameters, DbUpdater batch) {
+        batch.exec(DbUpdate.builder()
+                .query(jooq.update(TOURNAMENT)
+                        .set(TOURNAMENT.MAX_GROUP_SIZE, parameters.getMaxGroupSize())
+                        .set(TOURNAMENT.MATCH_SCORE, parameters.getMatchScore())
+                        .set(TOURNAMENT.QUITS_FROM_GROUP, parameters.getQuitsGroup())
+                        .set(TOURNAMENT.THIRD_PLACE_MATCH, parameters.getThirdPlaceMatch())
+                        .where(TOURNAMENT.TID.eq(parameters.getTid())))
+                .build());
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
@@ -622,7 +545,12 @@ public class TournamentDao {
     }
 
     public Optional<TournamentRow> getRow(Tid tid) {
-        return ofNullable(jooq.select().from(TOURNAMENT)
+        return ofNullable(jooq
+                .select(TOURNAMENT.PID, TOURNAMENT.MAX_GROUP_SIZE,
+                        TOURNAMENT.COMPLETE_AT, TOURNAMENT.OPENS_AT,
+                        TOURNAMENT.NAME, TOURNAMENT.STATE,
+                        TOURNAMENT.THIRD_PLACE_MATCH)
+                .from(TOURNAMENT)
                 .where(TOURNAMENT.TID.eq(tid.getTid()))
                 .fetchOne())
                 .map(r -> TournamentRow.builder()
@@ -635,6 +563,7 @@ public class TournamentDao {
                                 .prizeWinningPlaces(2 + r.get(TOURNAMENT.THIRD_PLACE_MATCH))
                                 .group(GroupRules.builder()
                                         .quits(r.get(TOURNAMENT.QUITS_FROM_GROUP))
+                                        .maxSize(r.get(TOURNAMENT.MAX_GROUP_SIZE))
                                         .build())
                                 .match(MatchValidationRule.builder()
                                         .setsToWin(3)

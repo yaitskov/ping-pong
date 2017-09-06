@@ -1,17 +1,16 @@
 package org.dan.ping.pong.app.match;
 
-import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.MATCHES;
-import static ord.dan.ping.pong.jooq.Tables.MATCH_SCORE;
-import static org.dan.ping.pong.app.match.MatchDao.ENEMY_SCORE;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
+import ord.dan.ping.pong.jooq.tables.Matches;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -28,34 +27,21 @@ public class ForTestMatchDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public TestMatchInfo findByParticipants(int tid, int uid1, int uid2) {
-        return ofNullable(
-                jooq.select(MATCHES.MID, MATCHES.STATE,
-                        MATCH_SCORE.UID, ENEMY_SCORE.UID,
-                        MATCH_SCORE.SETS_WON, MATCH_SCORE.WON,
-                        ENEMY_SCORE.SETS_WON, ENEMY_SCORE.WON)
-                        .from(MATCHES)
-                        .innerJoin(MATCH_SCORE).on(MATCHES.MID.eq(MATCH_SCORE.MID))
-                        .innerJoin(ENEMY_SCORE).on(MATCHES.MID.eq(ENEMY_SCORE.MID))
-                        .where(MATCHES.TID.eq(tid), MATCH_SCORE.UID.eq(uid1),
-                                ENEMY_SCORE.UID.eq(uid2))
-                        .fetchOne())
-                .map(r -> TestMatchInfo.builder()
-                        .mid(r.get(MATCHES.MID))
-                        .state(r.get(MATCHES.STATE))
-                        .scores(asList(
-                                ParticipantScoreInfo.builder()
-                                        .uid(r.get(MATCH_SCORE.UID))
-                                        .score(r.get(MATCH_SCORE.SETS_WON))
-                                        .won(r.get(MATCH_SCORE.WON))
-                                        .build(),
-                                ParticipantScoreInfo.builder()
-                                        .uid(r.get(ENEMY_SCORE.UID))
-                                        .score(r.get(ENEMY_SCORE.SETS_WON))
-                                        .won(r.get(ENEMY_SCORE.WON))
-                                        .build()))
-                        .build())
-                .orElseThrow(() -> new IllegalArgumentException("No match in tid "
-                        + tid + " between players " + uid1 + " " + uid2));
+    public Optional<MatchInfo> getById(int mid) {
+        return ofNullable(jooq.select(Matches.MATCHES.TID, Matches.MATCHES.STATE, Matches.MATCHES.GID,
+                Matches.MATCHES.CID, Matches.MATCHES.LOSE_MID, Matches.MATCHES.WIN_MID, Matches.MATCHES.TYPE)
+                .from(Matches.MATCHES)
+                .where(Matches.MATCHES.MID.eq(mid))
+                .fetchOne()).map(r ->
+                MatchInfo.builder()
+                        .gid(r.get(Matches.MATCHES.GID))
+                        .mid(mid)
+                        .cid(r.get(Matches.MATCHES.CID))
+                        .type(r.get(Matches.MATCHES.TYPE))
+                        .state(r.get(Matches.MATCHES.STATE))
+                        .tid(r.get(Matches.MATCHES.TID))
+                        .winnerMid(r.get(Matches.MATCHES.WIN_MID))
+                        .loserMid(r.get(Matches.MATCHES.LOSE_MID))
+                        .build());
     }
 }

@@ -2,11 +2,13 @@ package org.dan.ping.pong.app.match;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.dan.ping.pong.app.tournament.MatchValidationRule;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,12 +25,13 @@ public class MatchInfo {
     private int tid;
     private int cid;
     private MatchType type;
-    private Optional<Integer> gid;
+    private Optional<Integer> gid = Optional.empty();
     private MatchState state;
-    private Optional<Integer> loserMid;
-    private Optional<Integer> winnerMid;
-    private Optional<Integer> winnerId;
+    private Optional<Integer> loserMid = Optional.empty();
+    private Optional<Integer> winnerMid = Optional.empty();
+    private Optional<Integer> winnerId = Optional.empty();
     private Map<Integer, List<Integer>> participantIdScore;
+    private Optional<Instant> startedAt;
 
     public int getPlayedSets() {
         for (List<Integer> sets : participantIdScore.values()) {
@@ -53,9 +56,13 @@ public class MatchInfo {
         return participantIdScore.keySet();
     }
 
-    public Optional<Integer> getLoserUid(int winUid) {
+    public Optional<Integer> getOpponentUid(int uid) {
         return participantIdScore.keySet().stream()
-                .filter(uid -> uid != winUid)
+                .filter(participantUid -> participantUid != uid)
                 .findFirst();
+    }
+
+    public boolean hasParticipant(int uid) {
+        return participantIdScore.containsKey(uid);
     }
 }

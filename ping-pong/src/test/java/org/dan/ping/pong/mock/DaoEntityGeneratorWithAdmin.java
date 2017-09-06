@@ -13,10 +13,6 @@ public class DaoEntityGeneratorWithAdmin {
     private final TestAdmin testAdmin;
     private final DaoEntityGenerator daoEntityGenerator;
 
-    public int getAdminUid() {
-        return testAdmin.getUid();
-    }
-
     public int genTournament(int placeId) {
         return genTournament(placeId, Draft);
     }
@@ -35,20 +31,12 @@ public class DaoEntityGeneratorWithAdmin {
         return daoEntityGenerator.genTournament(testAdmin.getUid(), placeId, props);
     }
 
-    public int genTournament(String name, int placeId, TournamentProps props) {
-        return daoEntityGenerator.genTournament(name, testAdmin.getUid(), placeId, props);
-    }
-
     public int genPlace(int tables) {
         return daoEntityGenerator.genPlace(testAdmin.getUid(), tables);
     }
 
     public int genCategory(int tid) {
         return daoEntityGenerator.genCategory(UUID.randomUUID().toString(), tid);
-    }
-
-    public int genCategory(String name, int tid) {
-        return daoEntityGenerator.genCategory(name, tid);
     }
 
     public int genCity() {

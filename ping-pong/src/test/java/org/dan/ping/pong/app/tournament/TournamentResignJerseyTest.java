@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Score;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Skip;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
@@ -17,13 +18,11 @@ import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_2;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +31,7 @@ import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.match.ForTestMatchDao;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.simulator.Hook;
 import org.dan.ping.pong.mock.simulator.HookCallback;
 import org.dan.ping.pong.mock.simulator.HookDecision;
@@ -45,8 +45,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -70,9 +70,9 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .category(c1, p1, p2, p3);
 
         simulator.simulate(T_1_Q_1_G_8, scenario);
-        final int uid = scenario.getPlayersSessions().get(p1).getUid();
-        tournamentService.leaveTournament(uid, scenario.getTid(), Quit);
-
+        final Map<Player, TestUserSession> session = scenario.getPlayersSessions();
+        myRest().voidPost(TOURNAMENT_RESIGN, session.get(p1), scenario.getTid());
+        final int uid = session.get(p1).getUid();
         assertEquals(Optional.of(Quit), bidDao.getState(scenario.getTid(), uid));
     }
 
@@ -118,26 +118,12 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
     }
 
     private HookDecision checkQuit(TournamentScenario s, MatchMetaInfo metaInfo, Player p1, Player p3) {
-        final int uid1 = s.getPlayersSessions().get(p1).getUid();
-        tournamentService.leaveTournament(uid1, s.getTid(), Quit);
+        final TestUserSession p1Session = s.getPlayersSessions().get(p1);
+        final int uid1 = p1Session.getUid();
+        myRest().voidPost(TOURNAMENT_RESIGN, p1Session, s.getTid());
         assertEquals(Optional.of(Quit), bidDao.getState(s.getTid(), uid1));
-        assertEquals(Optional.of(Over), matchDao.getById(metaInfo.getOpenMatch().getMid())
+        assertEquals(Optional.of(Over), forTestMatchDao.getById(metaInfo.getOpenMatch().getMid())
                 .map(MatchInfo::getState));
-
-        final int uid3 = s.getPlayersSessions().get(p3).getUid();
-        assertThat(forTestMatchDao.findByParticipants(s.getTid(), uid1, uid3),
-                allOf(
-                        hasProperty("state", is(Over)),
-                        hasProperty("scores",
-                                allOf(
-                                        hasItem(allOf(
-                                                hasProperty("uid", is(uid3)),
-                                                hasProperty("won", is(1)),
-                                                hasProperty("score", is(0)))),
-                                        hasItem(allOf(
-                                                hasProperty("uid", is(uid1)),
-                                                hasProperty("won", is(-1)),
-                                                hasProperty("score", is(0))))))));
         return Skip;
     }
 
@@ -150,8 +136,8 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
         @Override
         public HookDecision apply(TournamentScenario s, MatchMetaInfo metaInfo) {
             if (++counter == resignAfter) {
-                final int uid1 = s.getPlayersSessions().get(player).getUid();
-                tournamentService.leaveTournament(uid1, s.getTid(), Quit);
+                myRest().voidPost(TOURNAMENT_RESIGN,
+                        s.getPlayersSessions().get(player), s.getTid());
             }
             return Score;
         }
@@ -215,11 +201,7 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .champions(c1, p3, p1)
                 .pause(p1, p3, PlayHook.builder()
                         .type(Hook.BeforeScore)
-                        .callback((s, meta) -> {
-                            final int uid1 = s.getPlayersSessions().get(p1).getUid();
-                            tournamentService.leaveTournament(uid1, s.getTid(), Quit);
-                            return Skip;
-                        })
+                        .callback(new ResignCallback())
                         .build());
 
         simulator.simulate(T_1_Q_1_G_2, scenario);
@@ -241,14 +223,18 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .champions(c1, p3, p5)
                 .pause(p1, p3, PlayHook.builder()
                         .type(Hook.BeforeScore)
-                        .callback((s, meta) -> {
-                            final int uid1 = s.getPlayersSessions().get(p1).getUid();
-                            tournamentService.leaveTournament(uid1, s.getTid(), Quit);
-                            return Skip;
-                        })
+                        .callback(new ResignCallback())
                         .build());
 
         simulator.simulate(T_1_Q_1_G_2, scenario);
+    }
+
+    class ResignCallback implements HookCallback {
+        @Override
+        public HookDecision apply(TournamentScenario scenario, MatchMetaInfo metaInfo) {
+            myRest().voidPost(TOURNAMENT_RESIGN, scenario.getPlayersSessions().get(p1), scenario.getTid());
+            return Skip;
+        }
     }
 
     @Test
@@ -266,11 +252,7 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .champions(c1, p3, p5)
                 .pause(p1, p2, PlayHook.builder()
                         .type(Hook.AfterScore)
-                        .callback((s, meta) -> {
-                            final int uid1 = s.getPlayersSessions().get(p1).getUid();
-                            tournamentService.leaveTournament(uid1, s.getTid(), Quit);
-                            return Skip;
-                        })
+                        .callback(new ResignCallback())
                         .build());
 
         simulator.simulate(T_1_Q_1_G_2, scenario);
@@ -295,8 +277,7 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                             assertThat(s.getGroupMatches().keySet(),
                                     allOf(not(hasItem(ImmutableSet.of(p1, p2))),
                                             not(hasItem(ImmutableSet.of(p3, p4)))));
-                            final int uid1 = s.getPlayersSessions().get(p1).getUid();
-                            tournamentService.leaveTournament(uid1, s.getTid(), Quit);
+                            new ResignCallback().apply(s, meta);
                             return Score;
                         })
                         .build());

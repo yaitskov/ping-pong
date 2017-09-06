@@ -24,6 +24,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 
 @Slf4j
 @Path("/")
@@ -31,7 +33,7 @@ import javax.ws.rs.Produces;
 public class TournamentResource {
     private static final String TOURNAMENT = "/tournament/";
     public static final String RUNNING_TOURNAMENTS = TOURNAMENT + "running";
-    private static final String TOURNAMENT_STATE = TOURNAMENT + "state";
+    public static final String TOURNAMENT_STATE = TOURNAMENT + "state";
     public static final String BEGIN_TOURNAMENT = TOURNAMENT + "begin";
     public static final String CANCEL_TOURNAMENT = TOURNAMENT + "cancel";
     public static final String DRAFTING = TOURNAMENT + "drafting/";
@@ -51,6 +53,8 @@ public class TournamentResource {
     public static final String TOURNAMENT_ENLISTED = TOURNAMENT + "enlisted";
     public static final String MY_RECENT_TOURNAMENT = "/tournament/my-recent";
     public static final String MY_RECENT_TOURNAMENT_JUDGEMENT =  TOURNAMENT + "my-recent-judgement";
+    public static final String TOURNAMENT_RESULT = "/tournament/result/";
+    public static final String RESULT_CATEGORY = "/category/";
 
     @Inject
     private TournamentService tournamentService;
@@ -109,20 +113,24 @@ public class TournamentResource {
     @Path(TOURNAMENT_ENLIST)
     @Consumes(APPLICATION_JSON)
     public void enlist(
+            @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             EnlistTournament enlistment) {
         if (enlistment.getCategoryId() < 1) {
             throw badRequest("Category is not set");
         }
-        tournamentService.enlist(
-                authService.userInfoBySession(session).getUid(),
-                enlistment);
+        final UserInfo user = authService.userInfoBySession(session);
+        tournamentAccessor.update(new Tid(enlistment.getTid()), response, (tournament, batch) -> {
+            tournamentService.enlistOnline(enlistment, tournament, user, batch);
+        });
+
     }
 
     @POST
     @Path(TOURNAMENT_ENLIST_OFFLINE)
     @Consumes(APPLICATION_JSON)
-    public int enlistOffline(
+    public void enlistOffline(
+            @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             EnlistOffline enlistment) {
         if (enlistment.getCid() < 1) {
@@ -132,23 +140,25 @@ public class TournamentResource {
             throw badRequest("Bid state could be " + asList(Want, Paid, Here));
         }
         final int adminUid = authService.userInfoBySession(session).getUid();
-        if (tournamentDao.isAdminOf(adminUid, enlistment.getTid())) {
-            return tournamentService.enlistOffline(enlistment);
-        } else {
-            throw forbidden("You are not administrator of tournament "
-                    + enlistment.getTid());
-        }
+        tournamentAccessor.update(new Tid(enlistment.getTid()), response, (tournament, batch) -> {
+            tournament.checkAdmin(adminUid);
+            return tournamentService.enlistOffline(tournament, enlistment, batch);
+        });
     }
 
     @POST
     @Path(TOURNAMENT_UPDATE)
     @Consumes(APPLICATION_JSON)
     public void update(
+            @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             TournamentUpdate update) {
-        tournamentService.update(
-                authService.userInfoBySession(session).getUid(),
-                update);
+        final int adminUid = authService.userInfoBySession(session).getUid();
+        tournamentAccessor.update(new Tid(update.getTid()), response, (tournament, batch) -> {
+            tournament.checkAdmin(adminUid);
+            tournamentService.update(tournament, update, batch);
+        });
+
     }
 
     @POST
@@ -156,25 +166,32 @@ public class TournamentResource {
     @Consumes(APPLICATION_JSON)
     public void resign(
             @HeaderParam(SESSION) String session,
+            @Suspended AsyncResponse response,
             int tid) {
         final int uid = authService.userInfoBySession(session).getUid();
-        tournamentService.leaveTournament(uid, tid, BidState.Quit);
+        tournamentAccessor.update(new Tid(tid), response, (tournament, batch) -> {
+            tournamentService.leaveTournament(tournament.getParticipant(uid),
+                    tournament, BidState.Quit, batch);
+        });
     }
+
+    @Inject
+    private TournamentAccessor tournamentAccessor;
 
     @POST
     @Path(TOURNAMENT_EXPEL)
     @Consumes(APPLICATION_JSON)
     public void expel(
+            @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             ExpelParticipant expelParticipant) {
         final int uid = authService.userInfoBySession(session).getUid();
-        if (tournamentDao.isAdminOf(uid, expelParticipant.getTid())) {
-            tournamentService.leaveTournament(expelParticipant.getUid(),
-                    expelParticipant.getTid(), BidState.Expl);
-        } else {
-            throw forbidden("You are not administrator of tournament "
-                    + expelParticipant.getTid());
-        }
+        tournamentAccessor.update(new Tid(expelParticipant.getTid()), response, (tournament, batch) -> {
+            tournament.checkAdmin(uid);
+            tournamentService.leaveTournament(
+                    tournament.getParticipant(expelParticipant.getUid()),
+                    tournament, BidState.Expl, batch);
+        });
     }
 
     @GET
@@ -245,42 +262,59 @@ public class TournamentResource {
     @Path(TOURNAMENT_PARAMS)
     @Consumes(APPLICATION_JSON)
     public void updateTournamentParams(
+            @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             TournamentParameters parameters) {
         int uid = authService.userInfoBySession(session).getUid();
-        tournamentService.updateTournamentParams(uid, parameters);
+        tournamentAccessor.update(new Tid(parameters.getTid()), response, (tournament, batch) -> {
+            tournament.checkAdmin(uid);
+            tournamentService.updateTournamentParams(tournament, parameters, batch);
+        });
     }
 
     @POST
     @Path(BEGIN_TOURNAMENT)
     @Consumes(APPLICATION_JSON)
-    public void beginTournament(@HeaderParam(SESSION) String session, int tid) {
-        int uid = authService.userInfoBySession(session).getUid();
+    public void beginTournament(
+            @Suspended AsyncResponse response,
+            @HeaderParam(SESSION) String session,
+            int tid) {
+        final int uid = authService.userInfoBySession(session).getUid();
         log.info("Uid {} begins tid {}", uid, tid);
-        if (tournamentDao.isAdminOf(uid, tid)) {
-            tournamentService.begin(tid);
-        } else {
-            throw forbidden("You are not an administrator");
-        }
+        tournamentAccessor.update(new Tid(tid), response, (tournament, batch) -> {
+            tournament.checkAdmin(uid);
+            tournamentService.begin(tournament, batch);
+        });
     }
 
     @POST
     @Path(CANCEL_TOURNAMENT)
     @Consumes(APPLICATION_JSON)
-    public void cancelTournament(@HeaderParam(SESSION) String session, int tid) {
+    public void cancelTournament(
+            @Suspended AsyncResponse response,
+            @HeaderParam(SESSION) String session,
+            int tid) {
         final int uid = authService.userInfoBySession(session).getUid();
-        tournamentService.cancel(uid, tid);
+        tournamentAccessor.update(new Tid(tid), response, (tournament, batch) -> {
+            tournament.checkAdmin(uid);
+            tournamentService.cancel(tournament, batch);
+        });
     }
 
     @POST
     @Path(TOURNAMENT_STATE)
     @Consumes(APPLICATION_JSON)
-    public void setTournamentStatus(@HeaderParam(SESSION) String session,
+    public void setTournamentStatus(
+            @Suspended AsyncResponse response,
+            @HeaderParam(SESSION) String session,
             SetTournamentState stateUpdate) {
         final int uid = authService.userInfoBySession(session).getUid();
         log.info("Uid {} sets status {} for tid {}", uid,
                 stateUpdate.getState(), stateUpdate.getTid());
-        tournamentService.setTournamentState(uid, stateUpdate);
+        tournamentAccessor.update(new Tid(stateUpdate.getTid()), response, (tournament, batch) -> {
+            tournament.setState(stateUpdate.getState());
+            tournamentService.setTournamentState(tournament, batch);
+        });
     }
 
     @GET
@@ -300,11 +334,13 @@ public class TournamentResource {
     }
 
     @GET
-    @Path("/tournament/result/{tid}/category/{cid}")
-    public List<TournamentResultEntry> tournamentResult(
+    @Path(TOURNAMENT_RESULT + "{tid}" + RESULT_CATEGORY + "{cid}")
+    public void tournamentResult(
+            @Suspended AsyncResponse response,
             @PathParam("tid") int tid,
             @PathParam("cid") int cid) {
-        return tournamentService.tournamentResult(tid, cid);
+        tournamentAccessor.read(new Tid(tid), response,
+                (tournament) -> tournamentService.tournamentResult(tournament, cid));
     }
 
     @GET

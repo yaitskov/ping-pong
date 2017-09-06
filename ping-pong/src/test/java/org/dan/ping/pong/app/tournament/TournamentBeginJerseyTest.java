@@ -1,9 +1,10 @@
 package org.dan.ping.pong.app.tournament;
 
+import static org.dan.ping.pong.app.bid.BidResource.BID_SET_STATE;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
-import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
 import static org.dan.ping.pong.mock.simulator.EnlistMode.Enlist;
 import static org.dan.ping.pong.mock.simulator.EnlistMode.Pay;
@@ -21,8 +22,10 @@ import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.bid.SetBidState;
 import org.dan.ping.pong.app.castinglots.UncheckedParticipantsError;
 import org.dan.ping.pong.mock.TestAdmin;
+import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
@@ -64,8 +67,10 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
                 .category(c1, p1, p2, p3, p4);
 
         simulator.simulate(T_1_Q_1_G_8, scenario);
-        final int uid1 = scenario.getPlayersSessions().get(p1).getUid();
-        final int uid2 = scenario.getPlayersSessions().get(p2).getUid();
+        TestUserSession session1 = scenario.getPlayersSessions().get(p1);
+        final int uid1 = session1.getUid();
+        TestUserSession session2 = scenario.getPlayersSessions().get(p2);
+        final int uid2 = session2.getUid();
         final Response re = myRest().post(BEGIN_TOURNAMENT, scenario.getTestAdmin().getSession(), scenario.getTid());
         assertEquals(400, re.getStatus());
         assertThat(
@@ -74,13 +79,20 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
                         hasProperty("uid", is(uid1)),
                         hasProperty("uid", is(uid2)))));
 
-        tournamentService.leaveTournament(uid1, scenario.getTid(), Quit);
+
+        myRest().voidPost(TOURNAMENT_RESIGN, session1, scenario.getTid());
 
         assertEquals(400, myRest().post(BEGIN_TOURNAMENT,
                 scenario.getTestAdmin().getSession(), scenario.getTid())
                 .getStatus());
 
-        bidDao.setBidState(scenario.getTid(), uid2, Paid, Here, clocker.get());
+        myRest().voidPost(BID_SET_STATE, scenario.getTestAdmin(),
+                SetBidState.builder()
+                        .expected(Paid)
+                        .target(Here)
+                        .tid(scenario.getTid())
+                        .uid(uid2)
+                        .build());
 
         assertEquals(204, myRest().post(BEGIN_TOURNAMENT,
                 scenario.getTestAdmin().getSession(), scenario.getTid())

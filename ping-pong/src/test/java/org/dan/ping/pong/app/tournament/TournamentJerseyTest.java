@@ -6,6 +6,7 @@ import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 import static javax.ws.rs.core.Response.Status.Family.familyOf;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
+import static org.dan.ping.pong.app.bid.BidResource.BID_SET_STATE;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Want;
@@ -21,6 +22,7 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENL
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLISTED;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST_OFFLINE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_STATE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
@@ -49,6 +51,7 @@ import static org.junit.Assert.fail;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.bid.SetBidState;
 import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
@@ -88,7 +91,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
     @Inject
     @Named(ADMIN_SESSION)
-    private TestAdmin session;
+    private TestAdmin adminSession;
 
     @Inject
     private RestEntityGenerator restEntityGenerator;
@@ -102,7 +105,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final Instant opensAt = genFutureTime();
         final Response response = request().path(TOURNAMENT_CREATE)
                 .request(APPLICATION_JSON)
-                .header(SESSION, session.getSession())
+                .header(SESSION, adminSession.getSession())
                 .post(Entity.entity(CreateTournament.builder()
                         .name(name)
                         .placeId(daoGenerator.genPlace(0))
@@ -117,7 +120,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
         final List<TournamentDigest> digest = request().path(EDITABLE_TOURNAMENTS)
                 .request(APPLICATION_JSON)
-                .header(SESSION, session.getSession())
+                .header(SESSION, adminSession.getSession())
                 .get(DigestList.class);
 
         assertThat(digest, hasItem(allOf(
@@ -161,7 +164,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final String address = genPlaceLocation();
         final String phone = genPhone();
         final int cityId = daoGenerator.genCity();
-        final int placeId = placeDao.createAndGrant(session.getUid(), placeName,
+        final int placeId = placeDao.createAndGrant(adminSession.getUid(), placeName,
                 PlaceAddress.builder()
                         .address(address)
                         .city(CityLink.builder().id(cityId).build())
@@ -171,7 +174,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final int cid = daoGenerator.genCategory(tid);
 
         final DraftingTournamentInfo adminResult = myRest().get(DRAFTING + tid,
-                session, DraftingTournamentInfo.class);
+                adminSession, DraftingTournamentInfo.class);
         assertEquals(Optional.empty(), adminResult.getMyCategoryId());
         assertEquals(Optional.empty(), adminResult.getBidState());
         assertTrue(adminResult.isIAmAdmin());
@@ -245,7 +248,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final int tid = daoGenerator.genTournament(daoGenerator.genPlace(0), Open);
         assertThat(myRest().get(DRAFTING + tid, DraftingTournamentInfo.class),
                 hasProperty("state", is(Open)));
-        tournamentDao.setState(tid, Close, clocker.get());
+        setTournamentState(tid, Close);
         try {
             myRest().get(DRAFTING + tid, DraftingTournamentInfo.class);
             fail();
@@ -265,12 +268,12 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final int cid = daoGenerator.genCategory(tid);
 
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
-        restEntityGenerator.enlistParticipants(myRest(), session, tid, cid, participants);
+        restEntityGenerator.enlistParticipants(myRest(), adminSession, tid, cid, participants);
 
         final List<OpenTournamentDigest> openBefore = myRest()
                 .get(RUNNING_TOURNAMENTS, new GenericType<List<OpenTournamentDigest>>() {});
         assertThat(openBefore, not(hasItem(hasProperty("tid", is(tid)))));
-        final Response response = myRest().post(BEGIN_TOURNAMENT, session.getSession(), tid);
+        final Response response = myRest().post(BEGIN_TOURNAMENT, adminSession.getSession(), tid);
         assertEquals(SUCCESSFUL, familyOf(response.getStatus()));
         final List<OpenTournamentDigest> openAfter = myRest()
                 .get(RUNNING_TOURNAMENTS, new GenericType<List<OpenTournamentDigest>>() {});
@@ -285,6 +288,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
     @Inject
     private BidDao bidDao;
+
 
     @Test
     public void myRecentTournaments() {
@@ -301,13 +305,21 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                         .opensAt(Optional.of(nextOpensAt))
                         .state(Draft).build());
         final int nextCid = daoGenerator.genCategory(nextTid);
-        restEntityGenerator.enlistParticipants(myRest(), session,
+        restEntityGenerator.enlistParticipants(myRest(), adminSession,
                 previousTid, previousCid, singletonList(userSession));
-        restEntityGenerator.enlistParticipants(myRest(), session,
+        restEntityGenerator.enlistParticipants(myRest(), adminSession,
                 nextTid, nextCid, singletonList(userSession));
-        tournamentDao.setState(previousTid, Close, clocker.get());
-        bidDao.setBidState(previousTid, userSession.getUid(),
-                BidState.Here, BidState.Lost, clocker.get());
+
+        setTournamentState(previousTid, Close);
+
+        myRest().voidPost(BID_SET_STATE, adminSession,
+                SetBidState.builder()
+                        .tid(previousTid)
+                        .uid(userSession.getUid())
+                        .target(BidState.Lost)
+                        .expected(BidState.Here)
+                        .build());
+
         final MyRecentTournaments r = myRest().get(MY_RECENT_TOURNAMENT,
                 userSession, MyRecentTournaments.class);
 
@@ -318,6 +330,14 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         assertEquals(nextTid, r.getNext().get().getTid());
         assertEquals(nextOpensAt, r.getNext().get().getOpensAt());
         assertThat(r.getNext().get().getName(), notNullValue());
+    }
+
+    private void setTournamentState(int previousTid, TournamentState state) {
+        myRest().voidPost(TOURNAMENT_STATE, adminSession,
+                SetTournamentState.builder()
+                        .tid(previousTid)
+                        .state(state)
+                        .build());
     }
 
     @Test
@@ -333,11 +353,11 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                 TournamentProps.builder()
                         .opensAt(Optional.of(nextOpensAt))
                         .state(Draft).build());
-        tournamentDao.setState(previousTid, Close, clocker.get());
+        setTournamentState(previousTid, Close);
 
         final MyRecentJudgedTournaments r = myRest()
                 .get(MY_RECENT_TOURNAMENT_JUDGEMENT,
-                        session, MyRecentJudgedTournaments.class);
+                        adminSession, MyRecentJudgedTournaments.class);
 
         assertEquals(previousTid, r.getPrevious().get().getTid());
         assertThat(r.getPrevious().get().getName(), notNullValue());
@@ -355,7 +375,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                 daoGenerator.genPlace(0), Draft);
         final int cid = daoGenerator.genCategory(tid);
         final String name = UUID.randomUUID().toString();
-        final int uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, session.getSession(),
+        final int uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, adminSession.getSession(),
                 EnlistOffline.builder()
                         .tid(tid)
                         .cid(cid)

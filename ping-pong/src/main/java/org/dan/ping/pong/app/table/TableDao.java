@@ -101,15 +101,15 @@ public class TableDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void freeTable(int mid, DbUpdater batch) {
+    public void freeTable(int tableId, DbUpdater batch) {
         batch.exec(DbUpdate.builder()
                 .mustAffectRows(NON_ZERO_ROWS)
-                .logBefore(() -> log.info("Return table of mid {}", mid))
-                .onFailure((u) -> internalError("Mid " + mid + " doesn't have a table"))
+                .logBefore(() -> log.info("Return table of table {}", tableId))
+                .onFailure((u) -> internalError("Table " + tableId + " doesn't have a match"))
                 .query(jooq.update(TABLES)
                         .set(TABLES.MID, empty())
                         .set(TABLES.STATE, Free)
-                        .where(TABLES.MID.eq(Optional.of(mid)),
+                        .where(TABLES.TABLE_ID.eq(tableId),
                                 TABLES.STATE.eq(Busy)))
                 .build());
     }

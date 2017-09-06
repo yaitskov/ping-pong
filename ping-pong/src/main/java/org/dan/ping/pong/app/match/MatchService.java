@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.min;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -14,6 +15,9 @@ import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
+import static org.dan.ping.pong.app.match.MatchState.Auto;
+import static org.dan.ping.pong.app.match.MatchState.Draft;
+import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.tournament.MatchScoreResult.MatchContinues;
@@ -21,10 +25,13 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
+import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.category.CategoryDao;
+import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupService;
@@ -32,16 +39,19 @@ import org.dan.ping.pong.app.group.PlayOffMatcherFromGroup;
 import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.table.TableDao;
+import org.dan.ping.pong.app.table.TableLink;
 import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.tournament.MatchScoreResult;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.PlayOffMatchForResign;
 import org.dan.ping.pong.app.tournament.TournamentCache;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentService;
+import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.beans.factory.annotation.Value;
@@ -92,9 +102,8 @@ public class MatchService {
     @Inject
     private PlaceService placeService;
 
-    public MatchScoreResult scoreSet(int uid, FinalMatchScore score, Instant now) {
-        final OpenTournamentMemState tournament = tournamentCache
-                .load(score.getTid());
+    public MatchScoreResult scoreSet(OpenTournamentMemState tournament, int uid,
+            FinalMatchScore score, Instant now, DbUpdater batch) {
         tournament.getRule().getMatch().validateSet(score.getScores());
         final MatchInfo matchInfo = tournament.getMatchById(score.getMid());
         try {
@@ -105,24 +114,17 @@ public class MatchService {
                     ? tournament.matchScoreResult()
                     : MatchContinues;
         }
-        final DbUpdater batch = dbUpdaterFactory.create()
-                .onFailure(() -> tournamentCache.invalidate(score.getTid()));
-        try {
-            final Optional<Integer> winUidO = matchDao.scoreSet(tournament, matchInfo, batch, score);
-            winUidO.ifPresent(winUid -> matchWinnerDetermined(tournament, matchInfo, winUid, batch));
-            return sequentialExecutor.executeSync(tournament.getPid(),
-                    matchScoreTimeout,
-                    () -> freeTableAndSchedule(batch, tournament, now, score, winUidO));
-        } finally {
-            batch.rollback();
-        }
+        final Optional<Integer> winUidO = matchDao.scoreSet(tournament, matchInfo, batch, score);
+        winUidO.ifPresent(winUid -> matchWinnerDetermined(tournament, matchInfo, winUid, batch));
+        return sequentialExecutor.executeSync(tournament.getPid(),
+                matchScoreTimeout,
+                () -> freeTableAndSchedule(batch, tournament, now, winUidO));
     }
 
     MatchScoreResult freeTableAndSchedule(DbUpdater batch, OpenTournamentMemState tournament,
-            Instant now, FinalMatchScore score, Optional<Integer> winUidO) {
+            Instant now, Optional<Integer> winUidO) {
         final PlaceMemState place = placeService.load(tournament.getPid());
         batch.onFailure(() -> placeService.invalidate(tournament.getPid()));
-        tableService.freeTable(place, score.getMid(), batch);
         tableService.scheduleFreeTables(tournament, place, now, batch);
         batch.flush();
         return winUidO.map(u -> tournament.matchScoreResult())
@@ -142,7 +144,7 @@ public class MatchService {
     private void completeMatch(MatchInfo matchInfo, int winUid, DbUpdater batch) {
         matchInfo.setState(Over);
         matchInfo.setWinnerId(Optional.of(winUid));
-        matchDao.completeMatch(matchInfo.getMid(), winUid, clocker.get(), batch);
+        matchDao.completeMatch(matchInfo.getMid(), winUid, clocker.get(), batch, Game);
     }
 
     private void completeNoLastPlayOffMatch(OpenTournamentMemState tournament, MatchInfo matchInfo,
@@ -150,7 +152,7 @@ public class MatchService {
         ParticipantMemState winBid = tournament.getParticipants().get(winUid);
         bidService.setBidState(winBid, Wait, singletonList(Play), batch);
         assignBidToMatch(tournament, matchInfo.getWinnerMid().get(), winUid, batch);
-        final int lostUid = matchInfo.getLoserUid(winUid).get();
+        final int lostUid = matchInfo.getOpponentUid(winUid).get();
         if (matchInfo.getLoserMid().isPresent()) {
             assignBidToMatch(tournament, matchInfo.getLoserMid().get(), lostUid, batch);
         } else {
@@ -365,5 +367,62 @@ public class MatchService {
             }
             throw badRequest(new MatchScoredError());
         }
+    }
+
+    private static final Set<MatchState> incompleteStates = ImmutableSet.of(Draft, Place, Game);
+
+    public List<MatchInfo> bidIncompleteGroupMatches(int uid, OpenTournamentMemState tournament) {
+        return tournament.getMatches().values().stream()
+                .filter(minfo -> minfo.getParticipantIdScore().containsKey(uid))
+                .filter(minfo -> minfo.getGid().isPresent())
+                .filter(minfo -> incompleteStates.contains(minfo.getState()))
+                .collect(toList());
+    }
+
+    public void walkOver(OpenTournamentMemState tournament, int walkoverUid, MatchInfo matchInfo, DbUpdater batch) {
+        Optional<Integer> winUid = matchInfo.getOpponentUid(walkoverUid);
+        if (winUid.isPresent()) {
+            matchWinnerDetermined(tournament, matchInfo, winUid.get(), batch);
+        } else {
+            matchInfo.setState(Auto);
+            changeStatus(batch, matchInfo);
+            matchInfo.getLoserMid()
+                    .ifPresent(lmid -> assignBidToMatch(tournament, lmid, walkoverUid, batch));
+        }
+    }
+
+    public Optional<MatchInfo> playOffMatchForResign(int uid, OpenTournamentMemState tournament) {
+        return tournament.getMatches().values()
+                .stream()
+                .filter(minfo -> minfo.hasParticipant(uid))
+                .filter(minfo -> !minfo.getGid().isPresent())
+                .filter(minfo -> ImmutableSet.of(Game, Place, Draft).contains(minfo.getState()))
+                .findAny();
+    }
+
+    @Inject
+    private PlaceService placeCache;
+
+    public List<OpenMatchForWatch> findOpenMatchesForWatching(OpenTournamentMemState tournament) {
+        return sequentialExecutor.executeSync(tournament.getPid(), matchScoreTimeout, () -> {
+            final PlaceMemState place = placeCache.load(tournament.getPid());
+            return tournament.getMatches().values().stream()
+                    .filter(m -> m.getState() == Game)
+                    .map(m -> OpenMatchForWatch.builder()
+                            .mid(m.getMid())
+                            .started(m.getStartedAt().get())
+                            .score(tournament.getRule().getMatch().calcWonSets(m).values()
+                                    .stream().collect(toList()))
+                            .category(tournament.getCategory(m.getCid()))
+                            .table(place.getTableByMid(m.getMid()).toLink())
+                            .type(m.getType())
+                            .participants(
+                                    m.getUids().stream()
+                                            .map(tournament::getParticipant)
+                                            .map(ParticipantMemState::toLink)
+                                            .collect(toList()))
+                            .build())
+                    .collect(toList());
+        });
     }
 }

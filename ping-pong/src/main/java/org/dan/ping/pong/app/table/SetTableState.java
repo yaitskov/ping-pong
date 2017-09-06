@@ -14,6 +14,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SetTableState {
+    private int pid;
     private int tableId;
     private TableState expected;
     private TableState target;

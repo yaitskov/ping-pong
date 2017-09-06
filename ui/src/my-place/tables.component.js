@@ -22,6 +22,7 @@ angular.
                     requestStatus.startLoading("Archiving table");
                     Table.setState(
                         {tableId: table.id,
+                         pid: $routeParams.placeId,
                          expected: 'Free',
                          target: 'Archived'
                         },

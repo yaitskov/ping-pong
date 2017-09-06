@@ -114,17 +114,6 @@ public class TableDao {
                 .build());
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void freeTablesByTid(int tid) {
-        jooq.update(TABLES)
-                .set(TABLES.MID, empty())
-                .set(TABLES.STATE, Free)
-                .where(TABLES.PID.eq(DSL.select(TOURNAMENT.PID)
-                        .from(TOURNAMENT)
-                        .where(TOURNAMENT.TID.eq(tid))))
-                .execute();
-    }
-
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<TableStatedLink> findByPlaceId(int placeId) {
         return jooq.select(TABLES.TABLE_ID, TABLES.LABEL, TABLES.STATE)
@@ -139,15 +128,15 @@ public class TableDao {
                         .build());
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void setStatus(SetTableState update) {
-        if (jooq.update(TABLES)
-                .set(TABLES.STATE, update.getTarget())
-                .where(TABLES.TABLE_ID.eq(update.getTableId()),
-                        TABLES.STATE.eq(update.getExpected()))
-                .execute() == 0) {
-            throw badRequest("Table state changed");
-        }
+    public void setStatus(SetTableState update, DbUpdater batch) {
+        batch.exec(DbUpdate.builder()
+                .mustAffectRows(JUST_A_ROW)
+                .onFailure(u -> badRequest("Table state changed"))
+                .query(jooq.update(TABLES)
+                        .set(TABLES.STATE, update.getTarget())
+                        .where(TABLES.TABLE_ID.eq(update.getTableId()),
+                                TABLES.STATE.eq(update.getExpected())))
+                .build());
     }
 
     public Map<Integer, TableInfo> load(Pid pid) {

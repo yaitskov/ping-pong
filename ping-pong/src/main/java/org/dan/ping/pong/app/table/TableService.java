@@ -121,23 +121,17 @@ public class TableService {
         return tableDao.findByPlaceId(placeId);
     }
 
-    public void setStatus(SetTableState update) {
-        tableDao.setStatus(update);
+    public void setStatus(PlaceMemState place, SetTableState update, DbUpdater batch) {
+        TableInfo table = place.getTable(update.getTableId());
+        if (table.getMid().isPresent()) {
+            throw badRequest("Table " + table.getTableId()
+                    + " is used by match " + table.getMid());
+        }
+        tableDao.setStatus(update, batch);
     }
 
     public void create(CreateTables create) {
         tableDao.createTables(create.getPlaceId(), create.getQuantity());
-    }
-
-    public void freeTable(PlaceMemState place, int mid, DbUpdater batch) {
-        final TableInfo tableInfo = place.getTables().values().stream()
-                .filter(tinfo -> tinfo.getMid().equals(Optional.of(mid)))
-                .findAny()
-                .orElseThrow(() -> internalError("Place "
-                        + place.getName()
-                        + " has no table allocated for the match "
-                        + mid));
-        freeTable(batch, tableInfo);
     }
 
     private void freeTable(DbUpdater batch, TableInfo tableInfo) {

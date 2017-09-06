@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Import;
 
 @Import({TournamentDao.class, TournamentResource.class,
         TournamentCacheFactory.class,
+        TournamentCacheLoader.class,
         TournamentCache.class,
         TournamentAccessor.class,
         TournamentService.class})

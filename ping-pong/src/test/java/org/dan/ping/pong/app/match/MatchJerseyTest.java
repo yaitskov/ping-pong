@@ -40,7 +40,6 @@ import static org.junit.Assert.assertThat;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.score.MatchScoreDao;
-import org.dan.ping.pong.app.score.ScoreInfo;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.TournamentDao;

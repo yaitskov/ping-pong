@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
+import static java.time.Duration.ofSeconds;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -141,7 +142,7 @@ public class TournamentService {
         findReadyToStartTournamentBid(tournament).forEach(bid -> {
             bidService.setBidState(bid, BidState.Wait, singletonList(bid.getBidState()), batch);
         });
-        sequentialExecutor.executeSync(tournament.getPid(), matchScoreTimeout, () -> {
+        sequentialExecutor.executeSync(tournament.getPid(), ofSeconds(matchScoreTimeout), () -> {
             final PlaceMemState place = placeCache.load(tournament.getPid());
             tableService.scheduleFreeTables(tournament, place, now, batch);
             return null;
@@ -240,7 +241,7 @@ public class TournamentService {
     private BidService bidService;
 
     @Value("${match.score.timeout}")
-    private Duration matchScoreTimeout;
+    private int matchScoreTimeout;
 
     public void activeParticipantLeave(ParticipantMemState bid, OpenTournamentMemState tournament,
             Instant now, BidState target, DbUpdater batch) {
@@ -258,7 +259,7 @@ public class TournamentService {
             }
             bidService.setBidState(bid, target, singletonList(bid.getBidState()), batch);
         }
-        sequentialExecutor.executeSync(tournament.getPid(), matchScoreTimeout, () -> {
+        sequentialExecutor.executeSync(tournament.getPid(), ofSeconds(matchScoreTimeout), () -> {
             tableService.scheduleFreeTables(tournament, placeCache.load(tournament.getPid()), now, batch);
             return null;
         });
@@ -358,7 +359,7 @@ public class TournamentService {
                 .filter(bid -> bid.getState() != Quit)
                 .forEach(bid -> bid.setBidState(Want));
         bidDao.resetStateByTid(tid, now, batch);
-        sequentialExecutor.executeSync(tournament.getPid(), matchScoreTimeout, () -> {
+        sequentialExecutor.executeSync(tournament.getPid(), ofSeconds(matchScoreTimeout), () -> {
             final PlaceMemState place = placeCache.load(tournament.getPid());
             batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
             tableService.freeTables(place, mids, batch);

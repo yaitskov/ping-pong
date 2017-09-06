@@ -16,6 +16,7 @@ import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.tournament.CreateTournament;
+import org.dan.ping.pong.app.tournament.ForTestTournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
@@ -38,6 +39,9 @@ public class DaoEntityGenerator {
 
     @Inject
     private ValueGenerator valueGenerator;
+
+    public DaoEntityGenerator() {
+    }
 
     public int genAdmin(int said) {
         final int uid = genUser().getUid();
@@ -122,6 +126,9 @@ public class DaoEntityGenerator {
     private TournamentDao tournamentDao;
 
     @Inject
+    private ForTestTournamentDao forTestTournamentDao;
+
+    @Inject
     private Clocker clocker;
 
     public int genTournament(int adminId, int placeId, TournamentProps props) {
@@ -141,7 +148,7 @@ public class DaoEntityGenerator {
                 .matchScore(props.getMatchScore())
                 .thirdPlaceMatch(props.isThirdPlace() ? 1 : 0)
                 .build());
-        tournamentDao.setState(tid, props.getState(), clocker.get());
+        forTestTournamentDao.setState(tid, props.getState());
         return tid;
     }
 

@@ -9,4 +9,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class Tid {
     private final int tid;
+
+    // jax-rs
+    public static Tid valueOf(String s) {
+        return new Tid(Integer.valueOf(s));
+    }
 }

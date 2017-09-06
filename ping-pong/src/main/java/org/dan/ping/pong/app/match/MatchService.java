@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.match;
 
+import static java.time.Duration.ofSeconds;
 import static java.util.Arrays.asList;
-import static java.util.Collections.min;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -30,8 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
-import org.dan.ping.pong.app.category.CategoryDao;
-import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupService;
@@ -39,24 +37,20 @@ import org.dan.ping.pong.app.group.PlayOffMatcherFromGroup;
 import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.table.TableDao;
-import org.dan.ping.pong.app.table.TableLink;
 import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.tournament.MatchScoreResult;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
-import org.dan.ping.pong.app.tournament.PlayOffMatchForResign;
-import org.dan.ping.pong.app.tournament.TournamentCache;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
+import org.dan.ping.pong.app.tournament.TournamentCache;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentService;
-import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -94,7 +88,7 @@ public class MatchService {
     private SequentialExecutor sequentialExecutor;
 
     @Value("${match.score.timeout}")
-    private Duration matchScoreTimeout;
+    private int matchScoreTimeout;
 
     @Inject
     private DbUpdaterFactory dbUpdaterFactory;
@@ -117,7 +111,7 @@ public class MatchService {
         final Optional<Integer> winUidO = matchDao.scoreSet(tournament, matchInfo, batch, score);
         winUidO.ifPresent(winUid -> matchWinnerDetermined(tournament, matchInfo, winUid, batch));
         return sequentialExecutor.executeSync(tournament.getPid(),
-                matchScoreTimeout,
+                ofSeconds(matchScoreTimeout),
                 () -> freeTableAndSchedule(batch, tournament, now, winUidO));
     }
 
@@ -404,7 +398,7 @@ public class MatchService {
     private PlaceService placeCache;
 
     public List<OpenMatchForWatch> findOpenMatchesForWatching(OpenTournamentMemState tournament) {
-        return sequentialExecutor.executeSync(tournament.getPid(), matchScoreTimeout, () -> {
+        return sequentialExecutor.executeSync(tournament.getPid(), ofSeconds(matchScoreTimeout), () -> {
             final PlaceMemState place = placeCache.load(tournament.getPid());
             return tournament.getMatches().values().stream()
                     .filter(m -> m.getState() == Game)

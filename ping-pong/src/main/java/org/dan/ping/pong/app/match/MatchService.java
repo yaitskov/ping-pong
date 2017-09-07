@@ -257,6 +257,7 @@ public class MatchService {
         final int quits = tournament.getRule().getGroup().getQuits();
         final List<Integer> orderUids = groupService.orderUidsInGroup(tournament, matches);
         final List<Integer> quitUids = orderUids.subList(0, quits);
+        log.info("{} quit group {}", quitUids, gid);
         final GroupInfo iGru = tournament.getGroups().get(gid);
         final List<MatchInfo> playOffMatches = findPlayOffMatches(tournament, iGru.getCid());
         if (playOffMatches.isEmpty()) {
@@ -276,7 +277,6 @@ public class MatchService {
                 assignBidToMatch(tournament, playOffMatches.get(matchIdx).getMid(),
                         quitUids.get(iQuitter), batch);
             }
-            return quitUids;
         }
         return orderUids.subList(quits, orderUids.size());
     }

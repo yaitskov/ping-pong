@@ -32,7 +32,6 @@ import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
-
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -50,7 +49,6 @@ public class MatchDao {
     @Inject
     private DSLContext jooq;
 
-    @Transactional(TRANSACTION_MANAGER)
     public int createGroupMatch(int tid, int gid, int cid, int priorityGroup, int uid1, int uid2) {
         log.info("Create a match in group {} of tournament {}", gid, tid);
         return jooq.insertInto(MATCHES, MATCHES.TID,

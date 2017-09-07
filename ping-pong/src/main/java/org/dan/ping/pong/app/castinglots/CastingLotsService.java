@@ -24,6 +24,7 @@ import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.util.collection.SetUtil;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +65,7 @@ public class CastingLotsService {
                 throw badRequest("There is a category with 1 participant."
                         + " Expel him/her or move into another category.");
             }
+            bids = bids.stream().sorted(Comparator.comparingInt(bid -> bid.getUid().getId())).collect(toList());
             final double bidsInCategory = bids.size();
             final int groups = max(1, (int) ceil(bidsInCategory
                     / tournament.getRule().getGroup().getMaxSize()));

@@ -14,6 +14,7 @@ import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.table.TableState.Free;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
+import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -50,6 +51,7 @@ import org.dan.ping.pong.mock.TestAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.TournamentProps;
 import org.dan.ping.pong.mock.UserSessionGenerator;
+import org.dan.ping.pong.mock.simulator.FixedSetGenerator;
 import org.dan.ping.pong.mock.simulator.Hook;
 import org.dan.ping.pong.mock.simulator.HookDecision;
 import org.dan.ping.pong.mock.simulator.PlayHook;
@@ -248,24 +250,25 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void acceptScoreIfItTheSame() {
+        final FixedSetGenerator game = game(p1, p2, 11, 2, 11, 3, 11, 5);
         TournamentScenario scenario = TournamentScenario.begin()
                 .category(c1, p1, p2)
-                .w31(p1, p2)
+                .custom(game)
                 .quitsGroup(p1)
                 .pause(p1, p2, PlayHook.builder()
                         .type(Hook.AfterScore)
                         .callback((s, meta) -> {
-                            myRest().voidPost(COMPLETE_MATCH, adminSession,
+                            myRest().voidPost(COMPLETE_MATCH, s.getPlayersSessions().get(p1),
                                     FinalMatchScore.builder()
                                             .tid(s.getTid())
                                             .mid(meta.getOpenMatch().getMid())
                                             .scores(asList(
                                                     IdentifiedScore.builder()
-                                                            .score(3)
+                                                            .score(11)
                                                             .uid(s.getPlayersSessions().get(p1).getUid())
                                                             .build(),
                                                     IdentifiedScore.builder()
-                                                            .score(1)
+                                                            .score(2)
                                                             .uid(s.getPlayersSessions().get(p2).getUid())
                                                             .build()))
                                             .build());
@@ -280,24 +283,26 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void rejectDifferentScore() {
+        final FixedSetGenerator game = game(p1, p2, 11, 2, 11, 3, 11, 5);
         TournamentScenario scenario = TournamentScenario.begin()
                 .category(c1, p1, p2)
-                .w31(p1, p2)
+                .custom(game)
                 .quitsGroup(p1)
                 .pause(p1, p2, PlayHook.builder()
                         .type(Hook.AfterScore)
                         .callback((s, meta) -> {
-                            final Response re = myRest().post(COMPLETE_MATCH, adminSession,
+                            final Response re = myRest().post(COMPLETE_MATCH, s.getPlayersSessions().get(p1),
                                     FinalMatchScore.builder()
+                                            .setOrdNumber(0)
                                             .tid(s.getTid())
                                             .mid(meta.getOpenMatch().getMid())
                                             .scores(asList(
                                                     IdentifiedScore.builder()
-                                                            .score(3)
+                                                            .score(11)
                                                             .uid(s.getPlayersSessions().get(p1).getUid())
                                                             .build(),
                                                     IdentifiedScore.builder()
-                                                            .score(2)
+                                                            .score(3)
                                                             .uid(s.getPlayersSessions().get(p2).getUid())
                                                             .build()))
                                             .build());

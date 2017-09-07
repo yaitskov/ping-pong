@@ -5,7 +5,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.tournament.MatchValidationRuleUnitTest.PING_PONG_RULE;
-import static org.dan.ping.pong.mock.simulator.MatchOutcome.L03;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.L13;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.L23;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.W30;
@@ -128,6 +127,10 @@ public class TournamentScenario {
         return match(pa, W31, pb);
     }
 
+    public TournamentScenario custom(SetGenerator generator) {
+        return match(generator.getPlayerA(), W31, generator.getPlayerB(), generator);
+    }
+
     public TournamentScenario w30(Player pa, Player pb) {
         return match(pa, W30, pb);
     }
@@ -138,10 +141,6 @@ public class TournamentScenario {
 
     public TournamentScenario lose(Player pa, Player pb) {
         return l13(pa, pb);
-    }
-
-    public TournamentScenario l03(Player pa, Player pb) {
-        return match(pa, L03, pb);
     }
 
     public TournamentScenario l13(Player pa, Player pb) {

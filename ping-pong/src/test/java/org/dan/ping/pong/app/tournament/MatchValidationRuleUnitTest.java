@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class MatchValidationRuleUnitTest {
-    private static final MatchValidationRule PING_PONG_RULE = MatchValidationRule.builder()
+    public static final MatchValidationRule PING_PONG_RULE = MatchValidationRule.builder()
             .minGamesToWin(11)
             .minPossibleGames(0)
             .minAdvanceInGames(2)

@@ -3,18 +3,22 @@ package org.dan.ping.pong.mock.simulator;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static org.dan.ping.pong.mock.simulator.GameOutcome.L03;
-import static org.dan.ping.pong.mock.simulator.GameOutcome.L13;
-import static org.dan.ping.pong.mock.simulator.GameOutcome.L23;
-import static org.dan.ping.pong.mock.simulator.GameOutcome.W30;
-import static org.dan.ping.pong.mock.simulator.GameOutcome.W31;
-import static org.dan.ping.pong.mock.simulator.GameOutcome.W32;
+import static org.dan.ping.pong.app.match.MatchType.Grup;
+import static org.dan.ping.pong.app.tournament.MatchValidationRuleUnitTest.PING_PONG_RULE;
+import static org.dan.ping.pong.mock.simulator.MatchOutcome.L03;
+import static org.dan.ping.pong.mock.simulator.MatchOutcome.L13;
+import static org.dan.ping.pong.mock.simulator.MatchOutcome.L23;
+import static org.dan.ping.pong.mock.simulator.MatchOutcome.W30;
+import static org.dan.ping.pong.mock.simulator.MatchOutcome.W31;
+import static org.dan.ping.pong.mock.simulator.MatchOutcome.W32;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.mock.TestUserSession;
 
 import java.util.HashMap;
@@ -68,15 +72,22 @@ public class TournamentScenario {
         return new TournamentScenario();
     }
 
+    public Map<Set<Player>, GameEnd> chooseMatchMap(OpenMatchForJudge openMatch) {
+        return openMatch.getType() == Grup
+                ? getGroupMatches()
+                : getPlayOffMatches();
+    }
+
     public TournamentScenario name(String namePrefix) {
         this.name = Optional.of(namePrefix);
         return this;
     }
 
-    private TournamentScenario match(Player pa, GameOutcome outcome, Player pb) {
+    private TournamentScenario match(Player pa, MatchOutcome outcome, Player pb,
+            SetGenerator setGenerator) {
         playersSessions.put(pa, null);
         playersSessions.put(pb, null);
-        GameEnd match = GameEnd.game(pa, outcome, pb);
+        GameEnd match = GameEnd.game(pa, outcome, pb, setGenerator);
         if (!playOffPlayers.contains(pa) && !playOffPlayers.contains(pb)) {
             if (groupMatches.putIfAbsent(new HashSet<>(match.getParticipants()), match) != null) {
                 throw new IllegalStateException("Multiple matches between " +
@@ -139,6 +150,17 @@ public class TournamentScenario {
 
     public TournamentScenario l23(Player pa, Player pb) {
         return match(pa, L23, pb);
+    }
+
+    public TournamentScenario match(Player pa, MatchOutcome outcome, Player pb) {
+        return match(pa, outcome, pb,
+                createRndGen(pa, outcome, pb));
+    }
+
+    public static RndSetGenerator createRndGen(Player pa, MatchOutcome outcome, Player pb) {
+        return new RndSetGenerator(
+                ImmutableMap.of(pa, outcome.first(), pb, outcome.second()),
+                PING_PONG_RULE);
     }
 
     public TournamentScenario quitsGroup(Player... ps) {

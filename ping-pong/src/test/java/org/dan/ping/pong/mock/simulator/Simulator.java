@@ -14,8 +14,11 @@ import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.match.MatchResource.COMPLETE_MATCH;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
+import static org.dan.ping.pong.mock.simulator.TournamentScenario.createRndGen;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,7 @@ import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableInfo;
+import org.dan.ping.pong.app.tournament.MatchScoreResult;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentInfo;
 import org.dan.ping.pong.app.tournament.TournamentState;
@@ -42,6 +46,7 @@ import org.dan.ping.pong.mock.UserSessionGenerator;
 import org.dan.ping.pong.mock.ValueGenerator;
 import org.hamcrest.Matchers;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +55,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.Response;
 
 @Slf4j
 public class Simulator {
@@ -182,7 +188,8 @@ public class Simulator {
             int[] completedMatches, List<OpenMatchForJudge> openMatches) {
         for (OpenMatchForJudge openMatch : openMatches) {
             final Set<Player> players = matchToPlayers(scenario, openMatch);
-            findGame(scenario, openMatch, players).ifPresent(game -> {
+            final Map<Set<Player>, GameEnd> matchMap = scenario.chooseMatchMap(openMatch);
+            findGame(matchMap, scenario, openMatch, players).ifPresent(game -> {
                 final PlayHook hook = scenario.getHooksOnMatches().getOrDefault(players,
                         PlayHook.builder()
                                 .type(Hook.NonStop)
@@ -194,49 +201,68 @@ public class Simulator {
                 final HookDecision hookDecision = hook.pauseBefore(scenario, matchMetaInfo);
                 ++completedMatches[0];
                 log.info("Match id {} outcome {}", openMatch.getMid(), game);
-                completeMatch(scenario, openMatch, game, hookDecision);
+                completeMatch(players, scenario, openMatch, game, hookDecision);
                 hook.pauseAfter(scenario, matchMetaInfo);
             });
         }
     }
 
-    private void completeMatch(TournamentScenario scenario, OpenMatchForJudge openMatch,
+    private void completeMatch(Set<Player> players, TournamentScenario scenario,
+            OpenMatchForJudge openMatch,
             GameEnd game, HookDecision hookDecision) {
         switch (hookDecision) {
             case Skip:
                 break;
             case Score:
-                rest.voidPost(COMPLETE_MATCH, testAdmin,
+                final Map<Player, Integer> setOutcome = game.getSetGenerator().generate();
+                final Response response = rest.post(COMPLETE_MATCH, testAdmin,
                         FinalMatchScore.builder()
                                 .tid(scenario.getTid())
                                 .mid(openMatch.getMid())
                                 .scores(asList(
                                         IdentifiedScore.builder()
-                                                .score(game.getOutcome().first())
+                                                .score(setOutcome.get(
+                                                        game.getParticipants().get(0)))
                                                 .uid(scenario.getPlayersSessions()
                                                         .get(game.getParticipants()
                                                                 .get(0)).getUid())
                                                 .build(),
                                         IdentifiedScore.builder()
-                                                .score(game.getOutcome().second())
+                                                .score(setOutcome.get(
+                                                        game.getParticipants().get(1)))
                                                 .uid(scenario.getPlayersSessions()
                                                         .get(game.getParticipants()
                                                                 .get(1)).getUid())
                                                 .build()))
                                 .build());
+
+                switch (response.readEntity(MatchScoreResult.class)) {
+                    case LastMatchComplete:
+                    case MatchComplete:
+                        assertTrue("Match " + openMatch.getMid()
+                                        + " ended before set generator",
+                                game.getSetGenerator().isEmpty());
+                        scenario.chooseMatchMap(openMatch).remove(players);
+                        break;
+                    case MatchContinues:
+                        assertFalse("Match " + openMatch.getMid()
+                                + " continues while generator is empty",
+                                game.getSetGenerator().isEmpty());
+                        break;
+                    default:
+                        throw new IllegalStateException("Unknown match event");
+                }
                 break;
             default:
                 throw new IllegalArgumentException("Unknown decision " + hookDecision);
         }
     }
 
-    private Optional<GameEnd> findGame(TournamentScenario scenario,
+    private Optional<GameEnd> findGame(Map<Set<Player>, GameEnd> matchMap,
+            TournamentScenario scenario,
             OpenMatchForJudge openMatch,
             Set<Player> players) {
-        final Map<Set<Player>, GameEnd> matchMap = openMatch.getType() == Grup
-                ? scenario.getGroupMatches()
-                : scenario.getPlayOffMatches();
-        final GameEnd gameEnd = matchMap.remove(players);
+        final GameEnd gameEnd = matchMap.get(players);
         if (gameEnd == null) {
             if (scenario.getAutoResolution().isPresent()) {
                 Iterator<Player> iterator = players.iterator();

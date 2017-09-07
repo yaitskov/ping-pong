@@ -24,7 +24,8 @@ public class GroupService {
                 .map(Map::keySet)
                 .flatMap(Collection::stream)
                 .collect(toMap(uid -> uid,
-                        uid -> new BidSuccessInGroup(uid, tournament.getParticipant(uid).getState())));
+                        uid -> new BidSuccessInGroup(uid, tournament.getParticipant(uid).getState()),
+                        (a, b) -> a));
     }
 
     public List<Integer> orderUidsInGroup(OpenTournamentMemState tournament,

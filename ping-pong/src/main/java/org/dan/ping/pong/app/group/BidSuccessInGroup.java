@@ -8,12 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.dan.ping.pong.app.bid.BidState;
 
 import java.util.Comparator;
 
 @Setter
 @Getter
+@ToString(of={"uid","finalState","punkts"})
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class BidSuccessInGroup {

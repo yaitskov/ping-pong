@@ -1,6 +1,5 @@
 package org.dan.ping.pong.app.match;
 
-import static java.time.Duration.ofSeconds;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -27,7 +26,6 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.group.GroupDao;
@@ -77,9 +75,6 @@ public class MatchService {
 
     @Inject
     private TableService tableService;
-
-    @Inject
-    private BidDao bidDao;
 
     @Inject
     private TournamentCache tournamentCache;
@@ -160,10 +155,10 @@ public class MatchService {
             int winUid, DbUpdater batch) {
         switch (matchInfo.getType()) {
             case Gold:
-                setMedalMatchBidStatuses(matchInfo, winUid, batch, Win1, Win2);
+                setMedalMatchBidStatuses(tournament, matchInfo, winUid, batch, Win1, Win2);
                 break;
             case Brnz:
-                setMedalMatchBidStatuses(matchInfo, winUid, batch, Win3, Lost);
+                setMedalMatchBidStatuses(tournament, matchInfo, winUid, batch, Win3, Lost);
                 break;
             default:
                 throw internalError("Match type "
@@ -173,13 +168,11 @@ public class MatchService {
         tournamentService.endOfTournamentCategory(tournament, matchInfo.getCid(), batch);
     }
 
-    private void setMedalMatchBidStatuses(MatchInfo matchInfo, int winUid, DbUpdater batch,
+    private void setMedalMatchBidStatuses(OpenTournamentMemState tournament, MatchInfo matchInfo, int winUid, DbUpdater batch,
             BidState win, BidState lost) {
-        matchInfo.getParticipantIdScore().keySet().forEach(bid ->
-                bidDao.setBidState(matchInfo.getTid(), bid,
-                        winUid == bid ? win : lost,
-                        asList(Play, Rest),
-                        clocker.get(), batch));
+        matchInfo.getParticipantIdScore().keySet().forEach(uid ->
+                bidService.setBidState(tournament.getParticipant(uid),
+                        winUid == uid ? win : lost, asList(Play, Rest), batch));
     }
 
     private void completePlayOffMatch(OpenTournamentMemState tournament, MatchInfo matchInfo,
@@ -205,25 +198,27 @@ public class MatchService {
 
     public void tryToCompleteGroup(OpenTournamentMemState tournament, MatchInfo matchInfo, DbUpdater batch) {
         final int gid = matchInfo.getGid().get();
-        final int tid = matchInfo.getTid();
+
         final Set<Integer> uids = matchInfo.getParticipantIdScore().keySet();
         final List<MatchInfo> matches = findMatchesInGroup(tournament, gid);
         final long completedMatches = matches.stream()
                 .map(MatchInfo::getState)
                 .filter(Over::equals)
                 .count();
-        uids.forEach(bid -> bidDao.setBidState(tid, bid, Wait, Play, clocker.get(), batch));
+        uids.forEach(uid -> bidService.setBidState(tournament.getParticipant(uid), Wait,
+                singletonList(Play), batch));
         if (completedMatches < matches.size()) {
             log.debug("Matches {} left to play in the group {}",
                     matches.size() - completedMatches, gid);
             return;
         }
-        completeParticipationLeftBids(tid, completeGroup(gid, tournament, matches, batch), batch);
+        completeParticipationLeftBids(tournament, completeGroup(gid, tournament, matches, batch), batch);
     }
 
-    private void completeParticipationLeftBids(int tid, List<Integer> leftUids, DbUpdater batch) {
-        final Instant now = clocker.get();
-        leftUids.forEach(uid -> bidDao.setBidState(tid, uid, Lost, asList(Wait, Rest), now, batch));
+    private void completeParticipationLeftBids(OpenTournamentMemState tournament,
+            List<Integer> leftUids, DbUpdater batch) {
+        leftUids.forEach(uid -> bidService.setBidState(tournament.getParticipant(uid),
+                Lost, asList(Wait, Rest), batch));
     }
 
     @Inject

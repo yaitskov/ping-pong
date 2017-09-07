@@ -32,7 +32,7 @@ import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
-import org.jooq.Field;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -46,7 +46,7 @@ public class MatchDao {
     private static final Users ENEMY_USER = USERS.as("enemy_user");
     public static final int FIRST_PLAY_OFF_MATCH_LEVEL = 1;
     private static final Bid BID_2 = BID.as("bid2");
-    private static final Field<Integer> UID_2 = BID_2.UID.as("uid2");
+
     @Inject
     private DSLContext jooq;
 

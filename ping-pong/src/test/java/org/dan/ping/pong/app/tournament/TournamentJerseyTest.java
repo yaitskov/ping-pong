@@ -288,48 +288,6 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     private BidDao bidDao;
 
-    @Test
-    public void myRecentTournaments() {
-        final int placeId = daoGenerator.genPlace(1);
-        final Instant previousOpensAt = clocker.get().minus(1, ChronoUnit.DAYS);
-        final int previousTid = daoGenerator.genTournament(placeId,
-                TournamentProps.builder()
-                        .opensAt(Optional.of(previousOpensAt))
-                        .state(Draft).build());
-        final int previousCid = daoGenerator.genCategory(previousTid);
-        final Instant nextOpensAt = clocker.get().plus(3, ChronoUnit.DAYS);
-        final int nextTid = daoGenerator.genTournament(placeId,
-                TournamentProps.builder()
-                        .opensAt(Optional.of(nextOpensAt))
-                        .state(Draft).build());
-        final int nextCid = daoGenerator.genCategory(nextTid);
-        restEntityGenerator.enlistParticipants(myRest(), adminSession,
-                previousTid, previousCid, singletonList(userSession));
-        restEntityGenerator.enlistParticipants(myRest(), adminSession,
-                nextTid, nextCid, singletonList(userSession));
-
-        setTournamentState(previousTid, Close);
-
-        myRest().voidPost(BID_SET_STATE, adminSession,
-                SetBidState.builder()
-                        .tid(previousTid)
-                        .uid(userSession.getUid())
-                        .target(BidState.Lost)
-                        .expected(BidState.Here)
-                        .build());
-
-        final MyRecentTournaments r = myRest().get(MY_RECENT_TOURNAMENT,
-                userSession, MyRecentTournaments.class);
-
-        assertEquals(previousTid, r.getPrevious().get().getTid());
-        assertEquals(BidState.Lost, r.getPrevious().get().getOutcome());
-        assertThat(r.getPrevious().get().getName(), notNullValue());
-
-        assertEquals(nextTid, r.getNext().get().getTid());
-        assertEquals(nextOpensAt, r.getNext().get().getOpensAt());
-        assertThat(r.getNext().get().getName(), notNullValue());
-    }
-
     private void setTournamentState(int previousTid, TournamentState state) {
         myRest().voidPost(TOURNAMENT_STATE, adminSession,
                 SetTournamentState.builder()

@@ -335,9 +335,10 @@ public class Simulator {
                         .thirdPlace(params.isThirdPlace())
                         .build());
         scenario.setTid(tid);
-        final List<Player> players = scenario.getPlayersByCategories().values()
-                .stream().sorted().collect(toList());
         final Map<Player, TestUserSession> playersSession = scenario.getPlayersSessions();
+        final List<Player> players = scenario.getPlayersByCategories().values()
+                .stream().filter(p -> playersSession.get(p) == null)
+                .sorted().collect(toList());
         final List<String> playerLabels = players.stream()
                 .map(p -> "_p" + p.getNumber())
                 .collect(toList());
@@ -346,6 +347,12 @@ public class Simulator {
         final Iterator<TestUserSession> sessions = userSessions.iterator();
         assertEquals(players.size(), userSessions.size());
         restGenerator.generateSignInLinks(userSessions);
+        playersSession.forEach((pl, ses) -> {
+            if (ses == null) {
+                return;
+            }
+            scenario.getUidPlayer().put(ses.getUid(), pl);
+        });
         for (Player player : players) {
             TestUserSession user = sessions.next();
             playersSession.put(player, user);

@@ -5,8 +5,16 @@ public enum BidState {
     Paid, // once he paid for the ticket
     Here, // passed check right before the tournament
     Play, // participates right now in a match
-    Rest, // temporary not available due timeout
-    Wait, // wait for place or enemy
+    Rest {
+        public int score() {
+            return 4;
+        }
+    }, // temporary not available due timeout
+    Wait {
+        public int score() {
+            return 4;
+        }
+    }, // wait for place or enemy
     Expl {
         public int score() {
             return 10;

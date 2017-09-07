@@ -103,20 +103,10 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .w30(p1, p2)
                 .w32(p2, p3)
                 .custom(game(p1, p3, -1, 0))
-                .quitsGroup(p2)
-                .champions(c1, p2);
+                .quitsGroup(p1)
+                .champions(c1, p1);
 
         simulator.simulate(T_1_Q_1_G_8, scenario);
-    }
-
-    private HookDecision checkQuit(TournamentScenario s, MatchMetaInfo metaInfo, Player p1, Player p3) {
-        final TestUserSession p1Session = s.getPlayersSessions().get(p1);
-        final int uid1 = p1Session.getUid();
-        myRest().voidPost(TOURNAMENT_RESIGN, p1Session, s.getTid());
-        assertEquals(Optional.of(Quit), bidDao.getState(s.getTid(), uid1));
-        assertEquals(Optional.of(Over), forTestMatchDao.getById(metaInfo.getOpenMatch().getMid())
-                .map(MatchInfo::getState));
-        return Skip;
     }
 
     @RequiredArgsConstructor
@@ -254,8 +244,8 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .w32(p5, p7)
                 .w32(p3, p5)
                 .champions(c1, p3, p5)
-                .pause(p5, p6, PlayHook.builder()
-                        .type(Hook.BeforeScore)
+                .pause(p3, p4, PlayHook.builder()
+                        .type(AfterMatch)
                         .callback((s, meta) -> {
                             assertThat(s.getGroupMatches().keySet(),
                                     allOf(not(hasItem(ImmutableSet.of(p1, p2))),

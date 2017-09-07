@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidService.WIN_STATES;
+import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
@@ -217,8 +218,13 @@ public class MatchService {
 
     private void completeParticipationLeftBids(OpenTournamentMemState tournament,
             List<Integer> leftUids, DbUpdater batch) {
-        leftUids.forEach(uid -> bidService.setBidState(tournament.getParticipant(uid),
-                Lost, asList(Wait, Rest), batch));
+        leftUids.forEach(uid -> {
+            final ParticipantMemState participant = tournament.getParticipant(uid);
+            if (participant.getState() == Quit || participant.getState() == Expl) {
+                return;
+            }
+            bidService.setBidState(participant, Lost, asList(Wait, Rest), batch);
+        });
     }
 
     @Inject

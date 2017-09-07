@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.bid;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.dan.ping.pong.app.bid.BidState.Here;
@@ -9,8 +10,10 @@ import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
+import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
+import com.google.common.base.Preconditions;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -65,6 +68,11 @@ public class BidService {
             List<BidState> expected, DbUpdater batch) {
         if (bid.getState() == target) {
             return;
+        }
+        if (!expected.contains(bid.getState())) {
+            throw internalError(
+                    "Bid " + bid.getUid() + " state "
+                            + bid.getState() + " but expected " + expected);
         }
         bid.setBidState(target);
         bidDao.setBidState(bid.getTid().getTid(), bid.getUid().getId(),

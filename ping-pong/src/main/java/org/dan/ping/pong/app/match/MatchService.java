@@ -149,7 +149,7 @@ public class MatchService {
             assignBidToMatch(tournament, matchInfo.getLoserMid().get(), lostUid, batch);
         } else {
             bidService.setBidState(tournament.getParticipants().get(lostUid),
-                    Lost, asList(Play, Rest), batch);
+                    Lost, asList(Play, Wait, Rest), batch);
         }
     }
 

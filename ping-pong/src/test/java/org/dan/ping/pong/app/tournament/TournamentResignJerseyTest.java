@@ -103,8 +103,8 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .w30(p1, p2)
                 .w32(p2, p3)
                 .custom(game(p1, p3, -1, 0))
-                .quitsGroup(p1)
-                .champions(c1, p1);
+                .quitsGroup(p2)
+                .champions(c1, p2);
 
         simulator.simulate(T_1_Q_1_G_8, scenario);
     }
@@ -157,7 +157,7 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .w30(p1, p2)
                 .w32(p2, p3)
                 .w32(p1, p3)
-                .quitsGroup(p2)
+                .quitsGroup(p1)
                 .pause(p1, p2, PlayHook.builder()
                         .type(AfterMatch)
                         .callback(resignAfter2)
@@ -166,7 +166,7 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                         .type(AfterMatch)
                         .callback(resignAfter2)
                         .build())
-                .champions(c1, p2);
+                .champions(c1, p1);
 
         simulator.simulate(T_1_Q_1_G_8, scenario);
     }

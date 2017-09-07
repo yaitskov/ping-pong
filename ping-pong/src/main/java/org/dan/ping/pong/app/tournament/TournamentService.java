@@ -349,6 +349,7 @@ public class TournamentService {
         final int tid = tournament.getTid();
         tournament.setState(Canceled);
         setTournamentState(tournament, batch);
+        setTournamentCompleteAt(tournament, clocker.get(), batch);
         matchDao.deleteAllByTid(tournament, batch);
         final Set<Integer> mids = new HashSet<>(tournament.getMatches().keySet());
         tournament.getMatches().clear();

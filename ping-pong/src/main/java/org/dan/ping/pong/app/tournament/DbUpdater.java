@@ -4,16 +4,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.primitives.Ints.asList;
 import static java.util.stream.Collectors.toList;
-import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
-import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.Query;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -43,7 +40,6 @@ public class DbUpdater {
         return exec(DbUpdate.builder().query(q).build());
     }
 
-    @Transactional(TRANSACTION_MANAGER)
     public void flush() {
         final List<Query> queries = updates.stream()
                 .map(u -> {

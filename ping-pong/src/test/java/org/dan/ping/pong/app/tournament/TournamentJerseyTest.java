@@ -15,7 +15,6 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAME
 import static org.dan.ping.pong.app.tournament.TournamentResource.DRAFTING;
 import static org.dan.ping.pong.app.tournament.TournamentResource.EDITABLE_TOURNAMENTS;
 import static org.dan.ping.pong.app.tournament.TournamentResource.MY_RECENT_TOURNAMENT;
-import static org.dan.ping.pong.app.tournament.TournamentResource.MY_RECENT_TOURNAMENT_JUDGEMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.RUNNING_TOURNAMENTS;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_CREATE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST;
@@ -337,33 +336,6 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                         .tid(previousTid)
                         .state(state)
                         .build());
-    }
-
-    @Test
-    public void myRecentJudgeTournaments() {
-        final int placeId = daoGenerator.genPlace(1);
-        final Instant previousOpensAt = clocker.get().minus(1, ChronoUnit.DAYS);
-        final int previousTid = daoGenerator.genTournament(placeId,
-                TournamentProps.builder()
-                        .opensAt(Optional.of(previousOpensAt))
-                        .state(Draft).build());
-        final Instant nextOpensAt = clocker.get().plus(3, ChronoUnit.DAYS);
-        final int nextTid = daoGenerator.genTournament(placeId,
-                TournamentProps.builder()
-                        .opensAt(Optional.of(nextOpensAt))
-                        .state(Draft).build());
-        setTournamentState(previousTid, Close);
-
-        final MyRecentJudgedTournaments r = myRest()
-                .get(MY_RECENT_TOURNAMENT_JUDGEMENT,
-                        adminSession, MyRecentJudgedTournaments.class);
-
-        assertEquals(previousTid, r.getPrevious().get().getTid());
-        assertThat(r.getPrevious().get().getName(), notNullValue());
-
-        assertEquals(nextTid, r.getNext().get().getTid());
-        assertEquals(nextOpensAt, r.getNext().get().getOpensAt());
-        assertThat(r.getNext().get().getName(), notNullValue());
     }
 
     static class UserInfoList extends ArrayList<UserInfo> {};

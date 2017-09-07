@@ -95,7 +95,7 @@ public class Simulator {
         if (!scenario.isBegin()) {
             return;
         }
-        restGenerator.beginTournament(testAdmin, scenario.getTid());
+        restGenerator.beginTournament(scenario.getTestAdmin(), scenario.getTid());
         try {
             final boolean allMatchesComplete = expendAllMatches(scenario);
             if (allMatchesComplete && !scenario.isIgnoreUnexpectedGames()
@@ -316,8 +316,12 @@ public class Simulator {
         final String prefix = scenario.getName()
                 .orElseGet(() -> "todo")
                 + " " + valueGenerator.genName(8);
-        testAdmin = userSessionGenerator.generate(prefix + " admin", UserType.Admin);
-        scenario.setTestAdmin(testAdmin);
+        if (scenario.getTestAdmin() == null) {
+            testAdmin = userSessionGenerator.generate(prefix + " admin", UserType.Admin);
+            scenario.setTestAdmin(testAdmin);
+        } else {
+            testAdmin = scenario.getTestAdmin();
+        }
         restGenerator.generateSignInLinks(singletonList(testAdmin));
         final int countryId = daoGenerator.genCountry(prefix, testAdmin.getUid());
         final int cityId = daoGenerator.genCity(countryId, prefix, testAdmin.getUid());

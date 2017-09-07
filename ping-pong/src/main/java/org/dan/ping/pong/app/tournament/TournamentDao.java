@@ -550,6 +550,7 @@ public class TournamentDao {
                         TOURNAMENT.COMPLETE_AT, TOURNAMENT.OPENS_AT,
                         TOURNAMENT.NAME, TOURNAMENT.STATE,
                         TOURNAMENT.QUITS_FROM_GROUP,
+                        TOURNAMENT.MATCH_SCORE,
                         TOURNAMENT.THIRD_PLACE_MATCH)
                 .from(TOURNAMENT)
                 .where(TOURNAMENT.TID.eq(tid.getTid()))
@@ -567,7 +568,7 @@ public class TournamentDao {
                                         .maxSize(r.get(TOURNAMENT.MAX_GROUP_SIZE))
                                         .build())
                                 .match(MatchValidationRule.builder()
-                                        .setsToWin(3)
+                                        .setsToWin(r.get(TOURNAMENT.MATCH_SCORE))
                                         .minAdvanceInGames(2)
                                         .minGamesToWin(11)
                                         .minPossibleGames(0)

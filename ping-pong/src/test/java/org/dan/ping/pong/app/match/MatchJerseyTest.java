@@ -6,17 +6,13 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
-import static org.dan.ping.pong.app.bid.BidState.Play;
-import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.match.MatchResource.COMPLETE_MATCH;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_WATCH_LIST_OPEN;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
-import static org.dan.ping.pong.app.table.TableState.Busy;
 import static org.dan.ping.pong.app.table.TableState.Free;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
-import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -34,7 +30,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
@@ -81,9 +76,8 @@ import javax.ws.rs.core.Response;
 public class MatchJerseyTest extends AbstractSpringJerseyTest {
     private static final int LOSER = 0;
     private static final int WINER = 1;
-    private static final int NEXT = 2;
 
-    private static final int WINNER_SCORE = 3;
+    private static final int WINNER_SCORE = 11;
     private static final int LOSER_SCORE = 1;
     @Inject
     @Named(ADMIN_SESSION)
@@ -126,6 +120,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
     public void adminCompleteOnlyMatchIn1Group() {
         final int placeId = daoGenerator.genPlace(1);
         final int tid = daoGenerator.genTournament(placeId, TournamentProps.builder()
+                .matchScore(1)
                 .quitsFromGroup(1).build());
         final int cid = daoGenerator.genCategory(tid);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
@@ -195,61 +190,6 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 hasProperty("table",
                         allOf(hasProperty("label", notNullValue()),
                                 hasProperty("id", is(got.getTableIds().get(0))))))));
-    }
-
-    @Test
-    public void adminCompleteFirstMatchInGroup() {
-        final int placeId = daoGenerator.genPlace(1);
-        final int tid = daoGenerator.genTournament(placeId, TournamentProps.builder()
-                .quitsFromGroup(1).build());
-        final int cid = daoGenerator.genCategory(tid);
-        final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(3);
-        restGenerator.enlistParticipants(tid, cid, participants);
-        assertEquals(emptyList(), restGenerator.listOpenMatches());
-        restGenerator.beginTournament(tid);
-
-        assertEquals(emptyList(), restGenerator.listCompleteMatches(tid));
-        final List<OpenMatchForJudge> adminOpenMatches = restGenerator.listOpenMatches();
-
-        assertEquals(
-                participants.stream().limit(2).map(TestUserSession::getUid).collect(toSet()),
-                adminOpenMatches.stream().map(OpenMatchForJudge::getParticipants)
-                        .flatMap(List::stream)
-                        .map(UserLink::getUid)
-                        .collect(toSet()));
-
-        rest.voidPost(COMPLETE_MATCH, adminSession,
-                FinalMatchScore.builder()
-                        .tid(tid)
-                        .mid(adminOpenMatches.get(0).getMid())
-                        .scores(asList(
-                                IdentifiedScore.builder().score(LOSER_SCORE)
-                                        .uid(participants.get(LOSER).getUid()).build(),
-                                IdentifiedScore.builder().score(WINNER_SCORE)
-                                        .uid(participants.get(WINER).getUid()).build()))
-                        .build());
-
-        assertEquals(Stream.of(Wait, Play, Play).map(Optional::of).collect(toList()),
-                Stream.of(WINER, LOSER, NEXT)
-                        .map(i -> forTestBidDao.getState(tid, participants.get(i).getUid()))
-                        .collect(toList()));
-        final List<CompleteMatch> completeMatches = restGenerator.listCompleteMatches(tid);
-        assertEquals(
-                singletonList(adminOpenMatches.get(0).getMid()),
-                completeMatches.stream().map(CompleteMatch::getMid)
-                        .collect(toList()));
-        final List<OpenMatchForJudge> adminOpenMatches2 = restGenerator.listOpenMatches();
-        assertNotEquals(
-                singletonList(adminOpenMatches2.get(0).getMid()),
-                completeMatches.stream().map(CompleteMatch::getMid)
-                        .collect(toList()));
-        assertEquals(Optional.of(Open),
-                tournamentDao.getById(tid).map(TournamentInfo::getState));
-
-        List<TableInfo> tables = tableDao.findTournamentTablesByState(tid, Busy);
-        assertEquals(singletonList(Busy), tables.stream().map(TableInfo::getState).collect(toList()));
-        assertEquals(singletonList(Optional.of(adminOpenMatches2.get(0).getMid())),
-                tables.stream().map(TableInfo::getMid).collect(toList()));
     }
 
     @Inject

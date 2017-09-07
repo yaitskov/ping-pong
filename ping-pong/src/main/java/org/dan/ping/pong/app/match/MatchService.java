@@ -198,7 +198,6 @@ public class MatchService {
 
     public void tryToCompleteGroup(OpenTournamentMemState tournament, MatchInfo matchInfo, DbUpdater batch) {
         final int gid = matchInfo.getGid().get();
-
         final Set<Integer> uids = matchInfo.getParticipantIdScore().keySet();
         final List<MatchInfo> matches = findMatchesInGroup(tournament, gid);
         final long completedMatches = matches.stream()
@@ -240,8 +239,8 @@ public class MatchService {
             List<Integer> quitUids, DbUpdater batch) {
         if (iGru.getOrdNumber() == 0) {
             for (int i = 0; i < quitUids.size(); ++i) {
-                bidService.setBidState(tournament.getParticipants().get(quitUids.get(i)),
-                        WIN_STATES.get(i), asList(Wait, Quit, Lost, Rest), batch);
+                bidService.setBidState(tournament.getParticipant(quitUids.get(i)),
+                        WIN_STATES.get(i), asList(Play, Wait, Quit, Lost, Rest), batch);
             }
             tournamentService.endOfTournamentCategory(tournament, iGru.getCid(), batch);
         } else {

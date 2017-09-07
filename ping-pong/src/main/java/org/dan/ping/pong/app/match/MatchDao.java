@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.SET_SCORE;
@@ -23,7 +24,6 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
-import ord.dan.ping.pong.jooq.tables.Bid;
 import ord.dan.ping.pong.jooq.tables.Users;
 import org.dan.ping.pong.app.table.TableLink;
 import org.dan.ping.pong.app.tournament.DbUpdate;
@@ -32,6 +32,7 @@ import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
+import org.jooq.Record11;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -119,7 +120,8 @@ public class MatchDao {
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<MyPendingMatch> findPendingMatches(int uid) {
         return jooq.select(MATCHES.MID, MATCHES.TID, TABLES.TABLE_ID,
-                TABLES.LABEL, MATCHES.TYPE, ENEMY_USER.UID, ENEMY_USER.NAME,
+                TABLES.LABEL, MATCHES.TYPE, USERS.UID, USERS.NAME,
+                ENEMY_USER.UID, ENEMY_USER.NAME,
                 MATCHES.STATE, TOURNAMENT.MATCH_SCORE)
                 .from(MATCHES)
                 .innerJoin(TOURNAMENT)
@@ -145,12 +147,28 @@ public class MatchDao {
                                         .id(tableId)
                                         .label(r.get(TABLES.LABEL))
                                         .build()))
-                        .enemy(ofNullable(r.get(ENEMY_USER.UID))
-                                .map(enemyId -> UserLink.builder()
-                                        .name(r.get(ENEMY_USER.NAME))
-                                        .uid(enemyId)
-                                        .build()))
+                        .enemy(enemy(uid, r))
                         .build());
+    }
+
+    private Optional<UserLink> enemy(int uid,
+            Record11<Integer, Integer, Integer, String, MatchType,
+                    Integer, String, Integer, String, MatchState, Integer> r) {
+        final Optional<Integer> enemId = ofNullable(r.get(ENEMY_USER.UID));
+        final Optional<Integer> userId = ofNullable(r.get(USERS.UID));
+
+        if (Optional.of(uid).equals(enemId)) {
+            return userId.map(id -> UserLink.builder()
+                    .name(r.get(USERS.NAME))
+                    .uid(id)
+                    .build());
+        } else if (Optional.of(uid).equals(userId)) {
+            return enemId.map(id -> UserLink.builder()
+                    .name(r.get(ENEMY_USER.NAME))
+                    .uid(id)
+                    .build());
+        }
+        return empty();
     }
 
     public void changeStatus(int mid, MatchState state, DbUpdater batch) {

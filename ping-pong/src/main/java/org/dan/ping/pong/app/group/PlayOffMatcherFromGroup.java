@@ -27,8 +27,8 @@ public class PlayOffMatcherFromGroup {
                     4, ImmutableMap.of( // quits group
                             1, ImmutableMap.of( // group
                                     0, asList(0),
-                                    1, asList(1),
-                                    2, asList(0),
+                                    1, asList(0),
+                                    2, asList(1),
                                     3, asList(1)),
                             2, ImmutableMap.of( // group
                                     0, asList(0, 3),

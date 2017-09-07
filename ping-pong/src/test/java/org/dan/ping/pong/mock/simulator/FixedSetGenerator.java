@@ -26,8 +26,14 @@ public class FixedSetGenerator implements SetGenerator {
 
     @Override
     public Map<Player, Integer> generate() {
-        final Map<Player, Integer> result = ImmutableMap.of(playerA, games.get(setNumber * 2),
-                playerB, games.get(setNumber * 2 + 1));
+        final int gamesA = games.get(setNumber * 2);
+        final int gamesB = games.get(setNumber * 2 + 1);
+        if (gamesB == 0 && gamesA == -1) {
+            return ImmutableMap.of(playerA, -1);
+        } else if (gamesB == -1 && gamesA == 0) {
+            return ImmutableMap.of(playerB, -1);
+        }
+        final Map<Player, Integer> result = ImmutableMap.of(playerA, gamesA, playerB, gamesB);
         ++setNumber;
         return result;
     }

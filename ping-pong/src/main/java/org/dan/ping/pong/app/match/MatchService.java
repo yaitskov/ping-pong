@@ -34,6 +34,7 @@ import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.group.PlayOffMatcherFromGroup;
 import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.place.PlaceService;
+import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
@@ -223,14 +224,6 @@ public class MatchService {
     @Inject
     private GroupService groupService;
 
-    List<MatchInfo> findPlayOffMatches(OpenTournamentMemState tournament, int cid) {
-        return tournament.getMatches().values().stream()
-                .filter(minfo -> minfo.getCid() == cid)
-                .filter(minfo -> !minfo.getGid().isPresent())
-                .sorted(Comparator.comparingInt(MatchInfo::getMid))
-                .collect(toList());
-    }
-
     @Inject
     private BidService bidService;
 
@@ -250,6 +243,9 @@ public class MatchService {
         }
     }
 
+    @Inject
+    private PlayOffService playOffService;
+
     private List<Integer> completeGroup(Integer gid, OpenTournamentMemState tournament,
             List<MatchInfo> matches, DbUpdater batch) {
         log.info("Pick bids for playoff from gid {} in tid {}", gid, tournament.getTid());
@@ -258,7 +254,10 @@ public class MatchService {
         final List<Integer> quitUids = orderUids.subList(0, quits);
         log.info("{} quit group {}", quitUids, gid);
         final GroupInfo iGru = tournament.getGroups().get(gid);
-        final List<MatchInfo> playOffMatches = findPlayOffMatches(tournament, iGru.getCid());
+        final List<MatchInfo> playOffMatches = playOffService.findBaseMatches(
+                playOffService.findPlayOffMatches(tournament, iGru.getCid())).stream()
+                .sorted(Comparator.comparingInt(MatchInfo::getMid))
+                .collect(toList());
         if (playOffMatches.isEmpty()) {
             completeMiniTournamentGroup(tournament, iGru, quitUids, batch);
         } else {

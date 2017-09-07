@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.tournament;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
+import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Score;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Skip;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
@@ -215,15 +216,10 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .w30(p5, p6)
                 .w30(p7, p8)
                 .quitsGroup(p1, p3, p5, p7)
-                .w32(p1, p3)
+                .custom(game(p1, p3, -1, 0))
                 .w32(p5, p7)
                 .w32(p3, p5)
-                .champions(c1, p3, p5)
-                .pause(p1, p3, PlayHook.builder()
-                        .type(Hook.BeforeScore)
-                        .callback(new ResignCallback())
-                        .build());
-
+                .champions(c1, p3, p5);
         simulator.simulate(T_1_Q_1_G_2, scenario);
     }
 

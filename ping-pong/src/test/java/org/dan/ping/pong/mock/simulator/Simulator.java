@@ -14,6 +14,8 @@ import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.match.MatchResource.COMPLETE_MATCH;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
+import static org.dan.ping.pong.mock.simulator.Hook.AfterMatch;
+import static org.dan.ping.pong.mock.simulator.Hook.AfterScore;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -200,27 +202,29 @@ public class Simulator {
                 final HookDecision hookDecision = hook.pauseBefore(scenario, matchMetaInfo);
                 ++completedMatches[0];
                 log.info("Match id {} outcome {}", openMatch.getMid(), game);
-                completeMatch(players, scenario, openMatch, game, hookDecision);
-                hook.pauseAfter(scenario, matchMetaInfo);
+                final Optional<MatchScoreResult> result = completeMatch(players, scenario, openMatch, game, hookDecision);
+                if (hook.getType() == AfterScore ||
+                        hook.getType() == AfterMatch && result.equals(Optional.of(MatchScoreResult.MatchComplete))) {
+                    hook.pauseAfter(scenario, matchMetaInfo);
+                }
             });
         }
     }
 
-    private void completeMatch(Set<Player> players, TournamentScenario scenario,
+    private Optional<MatchScoreResult> completeMatch(Set<Player> players, TournamentScenario scenario,
             OpenMatchForJudge openMatch,
             GameEnd game, HookDecision hookDecision) {
         switch (hookDecision) {
             case Skip:
-                break;
+                return empty();
             case Score:
-                scoreSet(players, scenario, openMatch, game);
-                break;
+                return Optional.of(scoreSet(players, scenario, openMatch, game));
             default:
                 throw new IllegalArgumentException("Unknown decision " + hookDecision);
         }
     }
 
-    private void scoreSet(Set<Player> players, TournamentScenario scenario,
+    private MatchScoreResult scoreSet(Set<Player> players, TournamentScenario scenario,
             OpenMatchForJudge openMatch, GameEnd game) {
         final int ordNumber = game.getSetGenerator().getSetNumber();
         final Map<Player, Integer> setOutcome = game.getSetGenerator().generate();
@@ -230,7 +234,7 @@ public class Simulator {
                     scenario.getTid());
             log.info("Player {} resigned in match with {}", resigningPlayer, players);
             scenario.chooseMatchMap(openMatch).remove(players);
-            return;
+            return MatchScoreResult.MatchComplete;
         }
         final Response response = rest.post(COMPLETE_MATCH, testAdmin,
                 FinalMatchScore.builder()
@@ -261,12 +265,12 @@ public class Simulator {
                                 + " ended before set generator",
                         game.getSetGenerator().isEmpty());
                 scenario.chooseMatchMap(openMatch).remove(players);
-                break;
+                return MatchScoreResult.MatchComplete;
             case MatchContinues:
                 assertFalse("Match " + openMatch.getMid()
                         + " continues while generator is empty",
                         game.getSetGenerator().isEmpty());
-                break;
+                return MatchScoreResult.MatchContinues;
             default:
                 throw new IllegalStateException("Unknown match event");
         }

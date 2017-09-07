@@ -172,7 +172,7 @@ public class MatchDao {
         return winUidO;
     }
 
-    public void completeMatch(int mid, int winUid, Instant now, DbUpdater batch, MatchState expected) {
+    public void completeMatch(int mid, int winUid, Instant now, DbUpdater batch, MatchState... expected) {
         batch.exec(DbUpdate.builder()
                 .mustAffectRows(JUST_A_ROW)
                 .logBefore(() -> log.info("Match {} won uid {}", mid, winUid))
@@ -181,7 +181,7 @@ public class MatchDao {
                         .set(MATCHES.WIN_MID, Optional.of(winUid))
                         .set(MATCHES.ENDED, Optional.of(now))
                         .where(MATCHES.MID.eq(mid),
-                                MATCHES.STATE.eq(expected)))
+                                MATCHES.STATE.in(expected)))
                 .build());
     }
 
@@ -195,7 +195,7 @@ public class MatchDao {
     public void markAsSchedule(MatchInfo match, DbUpdater batch) {
         batch.exec(
                 DbUpdate.builder()
-                        .logBefore(() -> log.info("Match " + match.getMid() + " began"))
+                        .logBefore(() -> log.info("Match {} began", match.getMid()))
                         .onFailure(u -> internalError("Match "
                                 + match.getMid() + " is not in place state"))
                         .query(jooq.update(MATCHES)

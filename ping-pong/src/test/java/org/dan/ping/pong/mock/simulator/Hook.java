@@ -17,6 +17,21 @@ public enum Hook {
                 MatchMetaInfo players, HookCallback callback) {
         }
     },
+
+    AfterMatch {
+        @Override
+        public HookDecision pauseBefore(TournamentScenario scenario,
+                MatchMetaInfo players, HookCallback callback) {
+            return HookDecision.Score;
+        }
+
+        @Override
+        public void pauseAfter(TournamentScenario scenario,
+                MatchMetaInfo players, HookCallback callback) {
+            callback.apply(scenario, players);
+        }
+    },
+
     AfterScore {
         @Override
         public HookDecision pauseBefore(TournamentScenario scenario,

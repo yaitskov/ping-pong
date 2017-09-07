@@ -135,7 +135,7 @@ public class MatchService {
     private void completeMatch(MatchInfo matchInfo, int winUid, DbUpdater batch) {
         matchInfo.setState(Over);
         matchInfo.setWinnerId(Optional.of(winUid));
-        matchDao.completeMatch(matchInfo.getMid(), winUid, clocker.get(), batch, Game);
+        matchDao.completeMatch(matchInfo.getMid(), winUid, clocker.get(), batch, Game, Place);
     }
 
     private void completeNoLastPlayOffMatch(OpenTournamentMemState tournament, MatchInfo matchInfo,
@@ -303,6 +303,8 @@ public class MatchService {
     }
 
     private void autoWinComplete(OpenTournamentMemState tournament, MatchInfo matchInfo, int uid, DbUpdater batch) {
+        log.info("Auto complete mid {} due {} quit and {} detected",
+                matchInfo.getMid(), matchInfo.getOpponentUid(uid), uid);
         completeMatch(matchInfo, uid, batch);
         matchInfo.getWinnerMid()
                 .ifPresent(wmid -> assignBidToMatch(tournament, wmid, uid, batch));

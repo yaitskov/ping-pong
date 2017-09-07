@@ -63,6 +63,9 @@ public class BidService {
 
     public void setBidState(ParticipantMemState bid, BidState target,
             List<BidState> expected, DbUpdater batch) {
+        if (bid.getState() == target) {
+            return;
+        }
         bid.setBidState(target);
         bidDao.setBidState(bid.getTid().getTid(), bid.getUid().getId(),
                 target, expected, clocker.get(), batch);

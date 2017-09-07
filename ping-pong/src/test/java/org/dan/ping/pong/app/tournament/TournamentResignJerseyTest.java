@@ -4,6 +4,7 @@ import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
+import static org.dan.ping.pong.mock.simulator.Hook.AfterMatch;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Score;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Skip;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
@@ -105,12 +106,8 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .category(c1, p1, p2, p3)
                 .w30(p1, p2)
                 .w32(p2, p3)
-                .w30(p1, p3)
+                .custom(game(p1, p3, -1, 0))
                 .quitsGroup(p2)
-                .pause(p1, p3, PlayHook.builder()
-                        .type(Hook.BeforeScore)
-                        .callback((s, metaInfo) -> checkQuit(s, metaInfo, p1, p3))
-                        .build())
                 .champions(c1, p2);
 
         simulator.simulate(T_1_Q_1_G_8, scenario);
@@ -151,16 +148,16 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .w30(p1, p2)
                 .w32(p2, p3)
                 .w30(p1, p3)
-                .quitsGroup(p2)
+                .quitsGroup(p1)
                 .pause(p1, p2, PlayHook.builder()
-                        .type(Hook.AfterScore)
+                        .type(AfterMatch)
                         .callback(resignAfter2)
                         .build())
                 .pause(p1, p3, PlayHook.builder()
-                        .type(Hook.AfterScore)
+                        .type(AfterMatch)
                         .callback(resignAfter2)
                         .build())
-                .champions(c1, p2);
+                .champions(c1, p1);
 
         simulator.simulate(T_1_Q_1_G_8, scenario);
     }
@@ -196,12 +193,8 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .w30(p1, p2)
                 .w32(p3, p4)
                 .quitsGroup(p1, p3)
-                .w32(p1, p3)
-                .champions(c1, p3, p1)
-                .pause(p1, p3, PlayHook.builder()
-                        .type(Hook.BeforeScore)
-                        .callback(new ResignCallback())
-                        .build());
+                .custom(game(p1, p3, -1, 0))
+                .champions(c1, p3, p1);
 
         simulator.simulate(T_1_Q_1_G_2, scenario);
     }

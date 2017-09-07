@@ -11,6 +11,7 @@ import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_2_ROWS;
 import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_A_ROW;
+import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -88,6 +89,7 @@ public class BidDao {
     public void enlist(ParticipantMemState bid, Instant now, DbUpdater batch) {
         batch.exec(DbUpdate.builder()
                 .logBefore(() -> log.info("User {} enlisted to tournament {}", bid.getUid(), bid.getTid()))
+                .mustAffectRows(NON_ZERO_ROWS)
                 .query(jooq.insertInto(BID, BID.CID, BID.TID, BID.UID, BID.STATE)
                         .values(bid.getCid(), bid.getTid().getTid(), bid.getUid().getId(), bid.getBidState())
                         .onDuplicateKeyUpdate()

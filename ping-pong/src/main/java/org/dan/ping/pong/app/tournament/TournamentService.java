@@ -79,6 +79,8 @@ public class TournamentService {
             throw badRequest("Tournament is not in Draft but "
                     + tournament.getState());
         }
+        log.info("Uid {} enlists to tid {} in cid {}",
+                user.getUid(), tournament.getTid(), enlistment.getCategoryId());
         int uid = user.getUid();
         tournament.getParticipants().put(uid, ParticipantMemState.builder()
                 .bidState(Want)

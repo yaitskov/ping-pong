@@ -4,7 +4,7 @@ import static java.util.Collections.singletonList;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 import static javax.ws.rs.core.Response.Status.Family.familyOf;
-import static javax.ws.rs.core.Response.Status.NO_CONTENT;
+import static javax.ws.rs.core.Response.Status.OK;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.app.bid.BidResource.BID_SET_STATE;
 import static org.dan.ping.pong.app.bid.BidState.Here;
@@ -138,7 +138,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final int tid = daoGenerator.genTournament(
                 daoGenerator.genPlace(0), Draft);
 
-        assertEquals(NO_CONTENT.getStatusCode(),
+        assertEquals(OK.getStatusCode(),
                 request().path(TOURNAMENT_ENLIST).request(APPLICATION_JSON)
                         .header(SESSION, userSession.getSession())
                         .post(Entity.entity(EnlistTournament.builder()
@@ -288,7 +288,6 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
     @Inject
     private BidDao bidDao;
-
 
     @Test
     public void myRecentTournaments() {

@@ -135,7 +135,7 @@ public class MatchService {
     private void completeMatch(MatchInfo matchInfo, int winUid, DbUpdater batch) {
         matchInfo.setState(Over);
         matchInfo.setWinnerId(Optional.of(winUid));
-        matchDao.completeMatch(matchInfo.getMid(), winUid, clocker.get(), batch, Game, Place);
+        matchDao.completeMatch(matchInfo.getMid(), winUid, clocker.get(), batch, Game, Place, Auto);
     }
 
     private void completeNoLastPlayOffMatch(OpenTournamentMemState tournament, MatchInfo matchInfo,
@@ -290,7 +290,7 @@ public class MatchService {
         if (matchInfo.getParticipantIdScore().size() == 2) {
             switch (matchInfo.getState()) {
                 case Draft:
-                    changeStatus(batch, matchInfo);
+                    changeStatus(batch, matchInfo, Place);
                     break;
                 case Auto:
                     autoWinComplete(tournament, matchInfo, uid, batch);
@@ -324,9 +324,12 @@ public class MatchService {
         }
     }
 
-    private void changeStatus(DbUpdater batch, MatchInfo matchInfo) {
-        matchDao.changeStatus(matchInfo.getMid(), Place, batch);
-        matchInfo.setState(Place);
+    private void changeStatus(DbUpdater batch, MatchInfo matchInfo, MatchState state) {
+        if (matchInfo.getState() == state) {
+            return;
+        }
+        matchInfo.setState(state);
+        matchDao.changeStatus(matchInfo.getMid(), state, batch);
     }
 
     private void checkPermissions(OpenTournamentMemState tournament, int senderUid,
@@ -374,8 +377,7 @@ public class MatchService {
         if (winUid.isPresent()) {
             matchWinnerDetermined(tournament, matchInfo, winUid.get(), batch);
         } else {
-            matchInfo.setState(Auto);
-            changeStatus(batch, matchInfo);
+            changeStatus(batch, matchInfo, Auto);
             matchInfo.getLoserMid()
                     .ifPresent(lmid -> assignBidToMatch(tournament, lmid, walkoverUid, batch));
         }

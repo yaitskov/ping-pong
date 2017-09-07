@@ -41,7 +41,7 @@ public class PlayOffGenerator {
                 .cid(cid)
                 .build());
         log.info("Play off match {}:{} of tournament {} in category {}",
-                types.getType(), omid, tournament, cid);
+                types.getType(), omid, tournament.getTid(), cid);
         Optional<Integer> midBronze = Optional.empty();
         if (thirdPlaceMatch && types.getType() == Gold) {
             midBronze = Optional.of(matchDao.createPlayOffMatch(

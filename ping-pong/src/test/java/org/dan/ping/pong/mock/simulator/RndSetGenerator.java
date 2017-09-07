@@ -34,6 +34,16 @@ public class RndSetGenerator implements SetGenerator {
     }
 
     @Override
+    public Player getPlayerA() {
+        return winer;
+    }
+
+    @Override
+    public Player getPlayerB() {
+        return loser;
+    }
+
+    @Override
     public Map<Player, Integer> generate() {
         final int winGames = random.nextInt(2) + rule.getMinGamesToWin();
         final int loseGames = winGames > rule.getMinGamesToWin()

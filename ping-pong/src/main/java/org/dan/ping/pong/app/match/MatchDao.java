@@ -175,7 +175,7 @@ public class MatchDao {
     public void completeMatch(int mid, int winUid, Instant now, DbUpdater batch, MatchState... expected) {
         batch.exec(DbUpdate.builder()
                 .mustAffectRows(JUST_A_ROW)
-                .logBefore(() -> log.info("Match {} won uid {}", mid, winUid))
+                .logBefore(() -> log.info("Match {} won uid {} if {}", mid, winUid, expected))
                 .query(jooq.update(MATCHES)
                         .set(MATCHES.STATE, MatchState.Over)
                         .set(MATCHES.WIN_MID, Optional.of(winUid))

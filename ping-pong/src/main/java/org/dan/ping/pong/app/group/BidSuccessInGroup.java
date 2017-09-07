@@ -4,8 +4,11 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,9 +18,10 @@ import java.util.Comparator;
 
 @Setter
 @Getter
-@ToString(of={"uid","finalState","punkts"})
+@Builder
 @AllArgsConstructor
-@RequiredArgsConstructor
+@ToString(of={"uid","finalState","punkts"})
+@NoArgsConstructor(onConstructor = @__(@JsonCreator))
 public class BidSuccessInGroup {
     public static final Comparator<BidSuccessInGroup> BEST_COMPARATOR
             = comparingInt((BidSuccessInGroup o) -> o.getFinalState().score())
@@ -27,13 +31,18 @@ public class BidSuccessInGroup {
             .thenComparing(comparingInt(BidSuccessInGroup::getWinBalls).reversed())
             .thenComparingInt(BidSuccessInGroup::getLostBalls);
 
-    private final int uid;
-    private final BidState finalState;
+    private int uid;
+    private BidState finalState;
     private int punkts;
     private int winSets;
     private int lostSets;
     private int winBalls;
     private int lostBalls;
+
+    public BidSuccessInGroup(int uid, BidState finalState) {
+        this.uid = uid;
+        this.finalState = finalState;
+    }
 
     public void win() {
         punkts += 2;

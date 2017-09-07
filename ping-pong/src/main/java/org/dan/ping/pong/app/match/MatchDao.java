@@ -44,7 +44,6 @@ import javax.inject.Inject;
 public class MatchDao {
     private static final Users ENEMY_USER = USERS.as("enemy_user");
     public static final int FIRST_PLAY_OFF_MATCH_LEVEL = 1;
-    private static final Bid BID_2 = BID.as("bid2");
 
     @Inject
     private DSLContext jooq;

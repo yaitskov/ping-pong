@@ -1,5 +1,7 @@
 package org.dan.ping.pong.app.match;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -18,20 +20,31 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(onConstructor = @__(@JsonCreator))
 @AllArgsConstructor
 public class MatchInfo {
     private int mid;
     private int tid;
     private int cid;
     private MatchType type;
-    private Optional<Integer> gid = Optional.empty();
+    private Optional<Integer> gid;
     private MatchState state;
-    private Optional<Integer> loserMid = Optional.empty();
-    private Optional<Integer> winnerMid = Optional.empty();
-    private Optional<Integer> winnerId = Optional.empty();
+    private Optional<Integer> loserMid;
+    private Optional<Integer> winnerMid;
+    private Optional<Integer> winnerId;
     private Map<Integer, List<Integer>> participantIdScore;
     private Optional<Instant> startedAt;
+
+    public static class MatchInfoBuilder {
+        Optional<Integer> gid = Optional.empty();
+        Optional<Integer> loserMid = Optional.empty();
+        Optional<Integer> winnerMid = Optional.empty();
+        Optional<Integer> winnerId = Optional.empty();
+    }
+
+    public String toString() {
+        return "Mid(" + mid + ")";
+    }
 
     public int getPlayedSets() {
         for (List<Integer> sets : participantIdScore.values()) {

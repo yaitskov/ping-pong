@@ -60,7 +60,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
                         new GenericType<List<TournamentResultEntry>>() {});
 
         TournamentResultEntry p1Result = result.get(0);
-        assertEquals(7, p1Result.getPunkts());
+        assertEquals(6, p1Result.getPunkts());
         assertEquals(scenario.getPlayersSessions().get(p1).getUid(),
                 p1Result.getUser().getUid());
 
@@ -70,7 +70,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
                 p2Result.getUser().getUid());
 
         TournamentResultEntry p3Result = result.get(2);
-        assertEquals(3, p3Result.getPunkts());
+        assertEquals(2, p3Result.getPunkts());
         assertEquals(scenario.getPlayersSessions().get(p3).getUid(),
                 p3Result.getUser().getUid());
     }

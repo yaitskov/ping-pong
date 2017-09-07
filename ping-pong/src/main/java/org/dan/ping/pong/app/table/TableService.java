@@ -106,7 +106,7 @@ public class TableService {
     }
 
     private boolean hasUsableTables(PlaceMemState place) {
-        return place.getTables().values().stream()
+        return !place.getTables().isEmpty() && place.getTables().values().stream()
                 .map(TableInfo::getState)
                 .allMatch(state -> state == Free || state == Busy);
     }

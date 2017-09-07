@@ -3,8 +3,10 @@ package org.dan.ping.pong.app.tournament;
 import static java.util.Comparator.comparing;
 import static org.dan.ping.pong.app.group.BidSuccessInGroup.BEST_COMPARATOR;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.dan.ping.pong.app.group.BidSuccessInGroup;
 
@@ -13,6 +15,8 @@ import java.util.Comparator;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CumulativeScore {
     public static final Comparator<CumulativeScore> BEST_ORDER
             = comparing(CumulativeScore::getWeighted, BEST_COMPARATOR);

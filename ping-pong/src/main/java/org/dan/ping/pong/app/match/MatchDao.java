@@ -3,7 +3,6 @@ package org.dan.ping.pong.app.match;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
-import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
 import static ord.dan.ping.pong.jooq.Tables.SET_SCORE;
 import static ord.dan.ping.pong.jooq.Tables.TABLES;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
@@ -26,12 +25,10 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.Bid;
 import ord.dan.ping.pong.jooq.tables.Users;
-import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.table.TableLink;
 import org.dan.ping.pong.app.tournament.DbUpdate;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
-import org.dan.ping.pong.app.tournament.PlayOffMatchForResign;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
@@ -39,9 +36,7 @@ import org.jooq.Field;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -198,17 +193,18 @@ public class MatchDao {
                         .values(matchScore.getMid(), score.getUid(), score.getScore())));
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void markAsSchedule(MatchInfo match, Instant now) {
-        if (0 == jooq.update(MATCHES)
-                .set(MATCHES.STATE, Game)
-                .set(MATCHES.STARTED, Optional.of(now))
-                .where(MATCHES.MID.eq(match.getMid()),
-                        MATCHES.STATE.eq(Place))
-                .execute()) {
-            throw internalError("Match "
-                    + match.getMid() + " is not in place state");
-        }
+    public void markAsSchedule(MatchInfo match, DbUpdater batch) {
+        batch.exec(
+                DbUpdate.builder()
+                        .logBefore(() -> log.info("Match " + match.getMid() + " began"))
+                        .onFailure(u -> internalError("Match "
+                                + match.getMid() + " is not in place state"))
+                        .query(jooq.update(MATCHES)
+                                .set(MATCHES.STATE, match.getState())
+                                .set(MATCHES.STARTED, match.getStartedAt())
+                                .where(MATCHES.MID.eq(match.getMid()),
+                                        MATCHES.STATE.eq(Place)))
+                        .build());
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)

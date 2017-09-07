@@ -4,7 +4,6 @@ import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.table.TableState.Busy;
 import static org.dan.ping.pong.app.table.TableState.Free;
-import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
@@ -13,10 +12,10 @@ import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -33,6 +32,8 @@ public class TableService {
     private MatchDao matchDao;
     @Inject
     private BidDao bidDao;
+    @Inject
+    private MatchService matchService;
 
     private List<TableInfo> findFreeTables(PlaceMemState place) {
         return findTablesByState(place, Free);
@@ -78,7 +79,6 @@ public class TableService {
                 });
     }
 
-    @Transactional(TRANSACTION_MANAGER)
     public int scheduleFreeTables(OpenTournamentMemState tournament, PlaceMemState place,
             Instant now, DbUpdater batch) {
         log.info("Schedule matches in tid {}", tournament.getTid());
@@ -92,7 +92,7 @@ public class TableService {
         for (int i = 0; i < tablesToAllocate; ++i) {
             final MatchInfo match = matches.get(i);
             tableDao.locateMatch(freeTables.get(i), match.getMid(), batch);
-            matchDao.markAsSchedule(match, now);
+            matchService.markAsSchedule(match, now, batch);
             bidDao.markParticipantsBusy(tournament, match.getUids(), now, batch);
         }
         if (freeTables.isEmpty()

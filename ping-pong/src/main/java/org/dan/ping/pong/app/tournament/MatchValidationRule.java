@@ -69,7 +69,7 @@ public class MatchValidationRule {
 
     public Optional<Integer> findWinnerId(Map<Integer, Integer> wonSets) {
         return wonSets.entrySet().stream()
-                .filter(e -> e.getValue() > setsToWin)
+                .filter(e -> e.getValue() >= setsToWin)
                 .map(Map.Entry::getKey)
                 .findAny();
     }

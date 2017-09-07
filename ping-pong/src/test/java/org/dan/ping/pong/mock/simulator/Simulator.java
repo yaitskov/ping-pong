@@ -12,9 +12,7 @@ import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.match.MatchResource.COMPLETE_MATCH;
-import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
-import static org.dan.ping.pong.mock.simulator.TournamentScenario.createRndGen;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -46,7 +44,6 @@ import org.dan.ping.pong.mock.UserSessionGenerator;
 import org.dan.ping.pong.mock.ValueGenerator;
 import org.hamcrest.Matchers;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -214,10 +211,12 @@ public class Simulator {
             case Skip:
                 break;
             case Score:
+                final int ordNumber = game.getSetGenerator().getSetNumber();
                 final Map<Player, Integer> setOutcome = game.getSetGenerator().generate();
                 final Response response = rest.post(COMPLETE_MATCH, testAdmin,
                         FinalMatchScore.builder()
                                 .tid(scenario.getTid())
+                                .setOrdNumber(ordNumber)
                                 .mid(openMatch.getMid())
                                 .scores(asList(
                                         IdentifiedScore.builder()

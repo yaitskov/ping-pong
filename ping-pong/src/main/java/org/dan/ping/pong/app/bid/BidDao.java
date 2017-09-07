@@ -6,15 +6,11 @@ import static java.util.stream.Collectors.toMap;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
 import static ord.dan.ping.pong.jooq.Tables.USERS;
-import static org.dan.ping.pong.app.bid.BidState.Expl;
-import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
-import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_2_ROWS;
 import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_A_ROW;
-import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -23,14 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.tournament.DbUpdate;
 import org.dan.ping.pong.app.tournament.DbUpdater;
-import org.dan.ping.pong.app.tournament.EnlistTournament;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -38,7 +32,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -69,19 +62,6 @@ public class BidDao {
                 .build());
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void casByTid(BidState expected, BidState set, int tid, Instant now) {
-        log.info("Put all {} bids of tid {} into {} state", expected, tid, set);
-        if (0 == jooq.update(BID)
-                .set(BID.STATE, set)
-                .set(BID.UPDATED, Optional.of(now))
-                .where(BID.TID.eq(tid), BID.STATE.eq(expected))
-                .execute()) {
-            throw badRequest("Tournament " + tid + " has no participants");
-        }
-    }
-
-    @Transactional(TRANSACTION_MANAGER)
     public void markParticipantsBusy(OpenTournamentMemState tournament,
             Collection<Integer> uids, Instant now, DbUpdater batch) {
         uids.stream().map(tournament::getBid)
@@ -98,17 +78,6 @@ public class BidDao {
                 .build());
     }
 
-    public int setStatesAfterGroup(Integer gid, int tid, List<Integer> winnerIds, Instant now, DbUpdater batch) {
-        return jooq.update(BID)
-                .set(BID.STATE, Lost)
-                .set(BID.UPDATED, Optional.of(now))
-                .where(BID.TID.eq(tid),
-                        BID.STATE.notIn(Quit, Lost, Expl),
-                        BID.GID.eq(Optional.of(gid)),
-                        BID.UID.notIn(winnerIds))
-                .execute();
-    }
-
     public void setGroupForUids(int gid, int tid, List<ParticipantMemState> groupBids) {
         groupBids.forEach(bid -> bid.setGid(Optional.of(gid)));
         jooq.update(BID)
@@ -119,28 +88,6 @@ public class BidDao {
                                 .map(Uid::getId)
                                 .collect(Collectors.toList())))
                 .execute();
-    }
-
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<BidState> getState(int tid, int uid) {
-        return ofNullable(
-                jooq.select(BID.STATE)
-                        .from(BID)
-                        .where(BID.TID.eq(tid), BID.UID.eq(uid))
-                        .fetchOne())
-                .map(Record1::value1);
-    }
-
-    @Transactional(TRANSACTION_MANAGER)
-    public void resign(int uid, Integer tid, BidState targetState, Instant now) {
-        log.info("User {} leaves {} from tid {}",
-                uid,
-                jooq.update(BID)
-                        .set(BID.STATE, targetState)
-                        .set(BID.UPDATED, Optional.of(now))
-                        .where(BID.UID.eq(uid), BID.TID.eq(tid))
-                        .execute(),
-                tid);
     }
 
     public void enlist(ParticipantMemState bid, Instant now, DbUpdater batch) {

@@ -19,6 +19,7 @@ public class RndSetGenerator implements SetGenerator {
     private final Player loser;
     private final List<Player> players;
     private final Random random = new Random();
+    private int setNumber;
 
     public RndSetGenerator(Map<Player, Integer> targetSets, MatchValidationRule rule) {
         this.targetSets = targetSets;
@@ -38,7 +39,7 @@ public class RndSetGenerator implements SetGenerator {
         final int loseGames = winGames > rule.getMinGamesToWin()
                 ? winGames - rule.getMinAdvanceInGames()
                 : random.nextInt(rule.getMinGamesToWin() - rule.getMinAdvanceInGames() + 1);
-
+        ++setNumber;
         final int leftToWin = diff(winer);
         final int leftToLose = diff(loser);
         if (leftToWin == 1 || leftToLose == 0) {
@@ -70,5 +71,10 @@ public class RndSetGenerator implements SetGenerator {
     @Override
     public boolean isEmpty() {
         return diff(winer) == 0 && diff(loser) == 0;
+    }
+
+    @Override
+    public int getSetNumber() {
+        return setNumber;
     }
 }

@@ -114,6 +114,9 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
     private ForTestMatchDao forTestMatchDao;
 
     @Inject
+    private ForTestBidDao forTestBidDao;
+
+    @Inject
     private TournamentDao tournamentDao;
 
     @Inject
@@ -151,8 +154,8 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .build());
 
         assertEquals(Stream.of(Win1, Lost).map(Optional::of).collect(toList()),
-                asList(bidDao.getState(tid, participants.get(WINER).getUid()),
-                        bidDao.getState(tid, participants.get(LOSER).getUid())));
+                asList(forTestBidDao.getState(tid, participants.get(WINER).getUid()),
+                        forTestBidDao.getState(tid, participants.get(LOSER).getUid())));
 
         assertEquals(Stream.of(Over, Close).map(Optional::of).collect(toList()),
                 asList(forTestMatchDao.getById(adminOpenMatches.get(0).getMid())
@@ -228,7 +231,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
 
         assertEquals(Stream.of(Wait, Play, Play).map(Optional::of).collect(toList()),
                 Stream.of(WINER, LOSER, NEXT)
-                        .map(i -> bidDao.getState(tid, participants.get(i).getUid()))
+                        .map(i -> forTestBidDao.getState(tid, participants.get(i).getUid()))
                         .collect(toList()));
         final List<CompleteMatch> completeMatches = restGenerator.listCompleteMatches(tid);
         assertEquals(

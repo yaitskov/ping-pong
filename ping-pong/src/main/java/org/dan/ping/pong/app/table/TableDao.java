@@ -84,11 +84,12 @@ public class TableDao {
                         .build());
     }
 
-    @Transactional(TRANSACTION_MANAGER)
     public void locateMatch(TableInfo tableInfo, int mid, DbUpdater batch) {
         tableInfo.setState(Busy);
         tableInfo.setMid(Optional.of(mid));
         batch.exec(DbUpdate.builder()
+                .logBefore(() -> log.info("Mid {} will be hold on table {}",
+                        mid, tableInfo.getTableId()))
                 .onFailure(u -> internalError("Failed placing mid "
                         + mid + " on table " + tableInfo.getTableId()))
                 .mustAffectRows(JUST_A_ROW)

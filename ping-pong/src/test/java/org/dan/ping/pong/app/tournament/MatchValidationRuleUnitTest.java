@@ -118,4 +118,10 @@ public class MatchValidationRuleUnitTest {
                 .participantIdScore(ImmutableMap.of(UID_A, a, UID_B, b))
                 .build();
     }
+
+    @Test
+    public void findWinnerId3To1() {
+        assertEquals(Optional.of(111),
+                PING_PONG_RULE.findWinnerId(ImmutableMap.of(111, 3, 222, 1)));
+    }
 }

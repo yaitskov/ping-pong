@@ -5,4 +5,5 @@ import java.util.Map;
 public interface SetGenerator {
     Map<Player, Integer> generate();
     boolean isEmpty();
+    int getSetNumber();
 }

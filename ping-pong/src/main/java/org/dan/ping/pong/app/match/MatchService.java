@@ -418,4 +418,10 @@ public class MatchService {
                                 .build())
                         .collect(toList()));
     }
+
+    public void markAsSchedule(MatchInfo match, Instant now, DbUpdater batch) {
+        match.setState(Game);
+        match.setStartedAt(Optional.of(now));
+        matchDao.markAsSchedule(match, batch);
+    }
 }

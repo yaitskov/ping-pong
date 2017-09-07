@@ -19,15 +19,13 @@ import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.RequiredArgsConstructor;
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.match.ForTestBidDao;
 import org.dan.ping.pong.app.match.ForTestMatchDao;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -60,7 +58,7 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
     private TournamentService tournamentService;
 
     @Inject
-    private BidDao bidDao;
+    private ForTestBidDao bidDao;
 
     @Test
     public void resignInDraft() {

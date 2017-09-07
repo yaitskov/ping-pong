@@ -6,6 +6,8 @@ import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import com.google.common.cache.CacheLoader;
 import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.category.CategoryDao;
+import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -34,12 +36,17 @@ public class TournamentCacheLoader extends CacheLoader<Tid, OpenTournamentMemSta
     @Inject
     private GroupDao groupDao;
 
+    @Inject
+    private CategoryDao categoryDao;
+
     @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public OpenTournamentMemState load(Tid tid) throws Exception {
         final TournamentRow row = tournamentDao.getRow(tid).orElseThrow(() -> notFound("tournament " + tid));
         return OpenTournamentMemState.builder()
                 .participants(bidDao.loadParticipants(tid))
+                .categories(categoryDao.listCategoriesByTid(tid.getTid()).stream()
+                        .collect(toMap(CategoryInfo::getCid, o -> o)))
                 .groups(groupDao.load(tid))
                 .matches(combineMatchesAndSets(matchDao.load(tid), matchScoreDao.load(tid)))
                 .tid(tid.getTid())

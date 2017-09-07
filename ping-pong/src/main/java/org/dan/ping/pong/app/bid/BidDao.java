@@ -41,11 +41,6 @@ public class BidDao {
     @Inject
     private DSLContext jooq;
 
-    public void setBidState(int tid, int uid, BidState state,
-            BidState expected, Instant now, DbUpdater batch) {
-        setBidState(tid, uid, state, singletonList(expected), now, batch);
-    }
-
     public void setBidState(int tid, int uid, BidState target,
             List<BidState> expected, Instant now, DbUpdater batch) {
         batch.exec(DbUpdate.builder()

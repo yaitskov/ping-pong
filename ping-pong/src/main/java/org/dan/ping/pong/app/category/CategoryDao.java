@@ -7,9 +7,6 @@ import static ord.dan.ping.pong.jooq.tables.Category.CATEGORY;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
-import ord.dan.ping.pong.jooq.Tables;
-import org.dan.ping.pong.app.bid.BidState;
-import org.dan.ping.pong.app.tournament.EnlistedCategory;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +17,6 @@ import javax.inject.Inject;
 
 @Slf4j
 public class CategoryDao {
-    private static final String ENLISTED = "enlisted";
     @Inject
     private DSLContext jooq;
 
@@ -61,22 +57,6 @@ public class CategoryDao {
                         .userType(r.get(USERS.TYPE))
                         .phone(r.get(USERS.PHONE))
                         .email(r.get(USERS.EMAIL))
-                        .build());
-    }
-
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<EnlistedCategory> listEnlistedInCategoriesByTid(int tid) {
-        return jooq.select(CATEGORY.CID, CATEGORY.NAME, BID.UID.count().as(ENLISTED))
-                .from(CATEGORY)
-                .leftJoin(BID).on(CATEGORY.CID.eq(BID.CID))
-                .where(CATEGORY.TID.eq(tid), BID.STATE.ne(BidState.Quit))
-                .fetch()
-                .map(r -> EnlistedCategory.builder()
-                        .categoryInfo(CategoryInfo.builder()
-                                .cid(r.get(CATEGORY.CID))
-                                .name(r.get(CATEGORY.NAME))
-                                .build())
-                        .enlisted(r.get(BID.UID.as(ENLISTED)))
                         .build());
     }
 

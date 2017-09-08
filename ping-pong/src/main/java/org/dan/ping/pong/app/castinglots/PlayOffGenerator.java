@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
+import org.dan.ping.pong.app.match.MatchType;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 
 import java.util.HashMap;
@@ -26,8 +27,20 @@ public class PlayOffGenerator {
         if (level < MatchDao.FIRST_PLAY_OFF_MATCH_LEVEL) {
             return Optional.empty();
         }
+        final Optional<Integer> omid = createMatch(parentMid, loserMid, priority, level, types.getType());
+        Optional<Integer> midBronze = Optional.empty();
+        if (thirdPlaceMatch && types.getType() == Gold) {
+            midBronze = createMatch(Optional.empty(), Optional.empty(), priority, level, Brnz);
+        }
+        generateTree(level - 1, omid, priority - 1, types.next(), midBronze);
+        generateTree(level - 1, omid, priority - 1, types.next(), midBronze);
+        return omid;
+    }
+
+    private Optional<Integer> createMatch(Optional<Integer> winMid, Optional<Integer> loserMid,
+            int priority, int level, MatchType type) {
         final int mid = matchDao.createPlayOffMatch(
-                tournament.getTid(), cid, parentMid, loserMid, priority, level, types.getType());
+                tournament.getTid(), cid, winMid, loserMid, priority, level, type);
         final Optional<Integer> omid = Optional.of(mid);
         tournament.getMatches().put(mid, MatchInfo.builder()
                 .tid(tournament.getTid())
@@ -35,20 +48,13 @@ public class PlayOffGenerator {
                 .state(MatchState.Draft)
                 .gid(Optional.empty())
                 .participantIdScore(new HashMap<>())
-                .type(types.getType())
-                .winnerMid(parentMid)
+                .type(type)
+                .winnerMid(winMid)
                 .loserMid(loserMid)
                 .cid(cid)
                 .build());
         log.info("Play off match {}:{} of tournament {} in category {}",
-                types.getType(), omid, tournament.getTid(), cid);
-        Optional<Integer> midBronze = Optional.empty();
-        if (thirdPlaceMatch && types.getType() == Gold) {
-            midBronze = Optional.of(matchDao.createPlayOffMatch(
-                    tournament.getTid(), cid, parentMid, Optional.empty(), priority, level, Brnz));
-        }
-        generateTree(level - 1, omid, priority - 1, types.next(), midBronze);
-        generateTree(level - 1, omid, priority - 1, types.next(), midBronze);
+                type, omid, tournament.getTid(), cid);
         return omid;
     }
 }

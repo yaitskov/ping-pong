@@ -350,11 +350,11 @@ public class TournamentService {
         tournament.setState(Canceled);
         setTournamentState(tournament, batch);
         setTournamentCompleteAt(tournament, clocker.get(), batch);
-        matchDao.deleteAllByTid(tournament, batch);
+        matchDao.deleteAllByTid(tournament, batch, tournament.getMatches().size());
         final Set<Integer> mids = new HashSet<>(tournament.getMatches().keySet());
         tournament.getMatches().clear();
         tournament.getGroups().clear();
-        groupDao.deleteAllByTid(tournament.getTid(), batch);
+        groupDao.deleteAllByTid(tournament.getTid(), batch, tournament.getGroups().size());
         final Instant now = clocker.get();
         tournament.getParticipants().values().stream()
                 .filter(bid -> bid.getState() != Quit)

@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.bid;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toMap;
 import static ord.dan.ping.pong.jooq.Tables.BID;
@@ -158,10 +159,13 @@ public class BidDao {
     }
 
     public void resetStateByTid(int tid, Instant now, DbUpdater batch) {
-        batch.exec(jooq.update(BID)
-                .set(BID.STATE, BidState.Want)
-                .set(BID.UPDATED, Optional.of(now))
-                .where(BID.TID.eq(tid), BID.STATE.ne(Quit)));
+        batch.exec(
+                DbUpdate.builder()
+                        .mustAffectRows(empty())
+                        .query(jooq.update(BID)
+                                .set(BID.STATE, BidState.Want)
+                                .set(BID.UPDATED, Optional.of(now))
+                                .where(BID.TID.eq(tid), BID.STATE.ne(Quit))).build());
     }
 
     public Map<Integer, ParticipantMemState> loadParticipants(Tid tid) {

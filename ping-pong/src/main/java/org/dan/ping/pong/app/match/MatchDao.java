@@ -272,14 +272,15 @@ public class MatchDao {
                         .build());
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void deleteAllByTid(OpenTournamentMemState tournament, DbUpdater batch) {
+    public void deleteAllByTid(OpenTournamentMemState tournament, DbUpdater batch, int size) {
         batch
                 .exec(DbUpdate.builder()
+                        .mustAffectRows(empty())
                         .query(jooq.deleteFrom(SET_SCORE)
                                 .where(SET_SCORE.MID.in(tournament.getMatches().keySet())))
                         .build())
                 .exec(DbUpdate.builder()
+                        .mustAffectRows(Optional.of(size))
                         .query(jooq.deleteFrom(MATCHES)
                         .where(MATCHES.TID.eq(tournament.getTid())))
                         .build());

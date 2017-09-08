@@ -195,7 +195,7 @@ public class MatchDao {
                 .logBefore(() -> log.info("Match {} won uid {} if {}", mid, winUid, expected))
                 .query(jooq.update(MATCHES)
                         .set(MATCHES.STATE, MatchState.Over)
-                        .set(MATCHES.WIN_MID, Optional.of(winUid))
+                        .set(MATCHES.UID_WIN, Optional.of(winUid))
                         .set(MATCHES.ENDED, Optional.of(now))
                         .where(MATCHES.MID.eq(mid),
                                 MATCHES.STATE.in(expected)))

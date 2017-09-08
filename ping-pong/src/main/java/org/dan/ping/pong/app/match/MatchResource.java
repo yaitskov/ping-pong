@@ -65,7 +65,7 @@ public class MatchResource {
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             FinalMatchScore score) {
-        response.setTimeout(30, TimeUnit.SECONDS);
+        //response.setTimeout(30, TimeUnit.SECONDS);
         final int uid = authService.userInfoBySession(session).getUid();
         log.info("User {} sets scores {} for match {}",
                 uid, score.getScores(), score.getMid());

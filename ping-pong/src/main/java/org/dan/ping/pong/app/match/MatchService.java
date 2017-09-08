@@ -145,11 +145,12 @@ public class MatchService {
         bidService.setBidState(winBid, Wait, singletonList(Play), batch);
         assignBidToMatch(tournament, matchInfo.getWinnerMid().get(), winUid, batch);
         final int lostUid = matchInfo.getOpponentUid(winUid).get();
+        final ParticipantMemState lostBid = tournament.getParticipants().get(lostUid);
         if (matchInfo.getLoserMid().isPresent()) {
+            bidService.setBidState(lostBid, Wait, asList(Play, Rest), batch);
             assignBidToMatch(tournament, matchInfo.getLoserMid().get(), lostUid, batch);
         } else {
-            bidService.setBidState(tournament.getParticipants().get(lostUid),
-                    Lost, asList(Play, Wait, Rest), batch);
+            bidService.setBidState(lostBid, Lost, asList(Play, Wait, Rest), batch);
         }
     }
 

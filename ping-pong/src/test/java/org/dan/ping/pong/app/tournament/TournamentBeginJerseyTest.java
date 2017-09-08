@@ -94,8 +94,6 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
                         .uid(uid2)
                         .build());
 
-        assertEquals(204, myRest().post(BEGIN_TOURNAMENT,
-                scenario.getTestAdmin().getSession(), scenario.getTid())
-                .getStatus());
+        myRest().voidPost(BEGIN_TOURNAMENT, scenario.getTestAdmin(), scenario.getTid());
     }
 }

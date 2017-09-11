@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.groupingByConcurrent;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
@@ -10,12 +11,11 @@ import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import ord.dan.ping.pong.jooq.tables.Category;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.Pid;
-import org.dan.ping.pong.util.Integers;
+import org.dan.ping.pong.app.match.SetScoreResult;
 
 import java.time.Instant;
 import java.util.List;
@@ -53,11 +53,11 @@ public class OpenTournamentMemState {
                         + " does participate in the tournament " + tid));
     }
 
-    public MatchScoreResult matchScoreResult() {
+    public SetScoreResultName matchScoreResult() {
         if (state == TournamentState.Open) {
-            return MatchScoreResult.MatchComplete;
+            return SetScoreResultName.MatchComplete;
         } else if (state == TournamentState.Close) {
-            return MatchScoreResult.LastMatchComplete;
+            return SetScoreResultName.LastMatchComplete;
         } else {
             throw internalError("Unexpected tournament state " + state);
         }

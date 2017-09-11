@@ -20,7 +20,7 @@ import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
-import static org.dan.ping.pong.app.tournament.MatchScoreResult.MatchContinues;
+import static org.dan.ping.pong.app.tournament.SetScoreResultName.MatchContinues;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -41,7 +41,7 @@ import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
-import org.dan.ping.pong.app.tournament.MatchScoreResult;
+import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentCache;
@@ -93,7 +93,7 @@ public class MatchService {
     @Inject
     private PlaceService placeService;
 
-    public MatchScoreResult scoreSet(OpenTournamentMemState tournament, int uid,
+    public SetScoreResult scoreSet(OpenTournamentMemState tournament, int uid,
             FinalMatchScore score, Instant now, DbUpdater batch) {
         tournament.getRule().getMatch().validateSet(score.getScores());
         final MatchInfo matchInfo = tournament.getMatchById(score.getMid());
@@ -101,26 +101,43 @@ public class MatchService {
             checkPermissions(tournament, uid, matchInfo, score);
         } catch (ConfirmSetScore e) {
             log.info("User {} confirmed set score in mid {}", uid, score.getMid());
-            return matchInfo.getState() == Over
+            return setScoreResult(matchInfo.getState() == Over
                     ? tournament.matchScoreResult()
-                    : MatchContinues;
+                    : MatchContinues, matchInfo);
         }
         final Optional<Integer> winUidO = matchDao.scoreSet(tournament, matchInfo, batch, score);
         winUidO.ifPresent(winUid -> matchWinnerDetermined(tournament, matchInfo, winUid, batch));
         return sequentialExecutor.executeSync(placeService.load(tournament.getPid()),
                 place -> {
                     batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
-                    return freeTableAndSchedule(place, batch, tournament, now, winUidO);
+                    return setScoreResult(
+                            freeTableAndSchedule(place, batch, tournament, now, winUidO),
+                            matchInfo);
                 });
     }
 
-    MatchScoreResult freeTableAndSchedule(PlaceMemState place, DbUpdater batch,
+    SetScoreResult setScoreResult(SetScoreResultName name, MatchInfo matchInfo) {
+        switch (name) {
+            case LastMatchComplete:
+            case MatchComplete:
+                return SetScoreResult.builder().scoreOutcome(name).build();
+            case MatchContinues:
+                return SetScoreResult.builder()
+                        .scoreOutcome(name)
+                        .nextSetNumberToScore(Optional.of(matchInfo.getNumberOfSets()))
+                        .build();
+            default:
+                throw internalError("Unknown state " + name);
+        }
+    }
+
+    SetScoreResultName freeTableAndSchedule(PlaceMemState place, DbUpdater batch,
             OpenTournamentMemState tournament,
             Instant now, Optional<Integer> winUidO) {
         batch.onFailure(() -> placeService.invalidate(tournament.getPid()));
         tableService.scheduleFreeTables(tournament, place, now, batch);
         return winUidO.map(u -> tournament.matchScoreResult())
-                .orElse(MatchScoreResult.MatchContinues);
+                .orElse(SetScoreResultName.MatchContinues);
     }
 
     private void matchWinnerDetermined(OpenTournamentMemState tournament, MatchInfo matchInfo,
@@ -365,8 +382,18 @@ public class MatchService {
             if (newSetScore.equals(setScore)) {
                 throw new ConfirmSetScore();
             }
-            throw badRequest(new MatchScoredError());
+            throw badRequest(new MatchScoredError(matchScore(tournament, matchInfo)));
         }
+    }
+
+    public MatchScore matchScore(OpenTournamentMemState tournament, MatchInfo matchInfo) {
+        return MatchScore.builder()
+                .mid(matchInfo.getMid())
+                .tid(matchInfo.getTid())
+                .winUid(matchInfo.getWinnerId())
+                .sets(matchInfo.getParticipantIdScore())
+                .wonSets(tournament.getRule().getMatch().calcWonSets(matchInfo))
+                .build();
     }
 
     private static final Set<MatchState> incompleteStates = ImmutableSet.of(Draft, Place, Game);

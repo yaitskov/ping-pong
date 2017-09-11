@@ -1,4 +1,4 @@
 import angular from 'angular';
 
-angular.module('completeMatch', ['ngRoute', 'core.match', 'mainMenu',
+angular.module('adminScoreSet', ['ngRoute', 'core.match', 'mainMenu',
                                  'auth', 'core.requestStatus']);

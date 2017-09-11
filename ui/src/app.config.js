@@ -53,7 +53,10 @@ angular.module('pingPong').
                         template: '<complete-my-match></complete-my-match>'
                     }).
                     when('/complete/match/:matchId', {
-                        template: '<complete-match></complete-match>'
+                        template: '<admin-score-set></admin-score-set>'
+                    }).
+                    when('/match/conflict-review/:matchId', {
+                        template: '<match-score-conflict></match-score-conflict>'
                     }).
                     when('/my/matches/play', {
                         template: '<my-match-play-list></my-match-play-list>'

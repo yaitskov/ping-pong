@@ -1,0 +1,60 @@
+<main-menu></main-menu>
+<form>
+  <div class="container admin-score">
+    <div class="form-group">
+      <label>
+        Set won name
+      </label>
+      <div class="row" ng-repeat="participant in $ctrl.participants">
+        <a ng-click="$ctrl.activate($index)"
+           class="btn btn-default"
+           ng-class="{'btn-primary': $ctrl.winnerIdx == $index}"
+           holdLink="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}">
+          {{participant.name}}
+        </a>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>
+        Win set score
+      </label>
+      <div>
+        <a class="btn btn-default score"
+           ng-repeat="score in $ctrl.possibleWinScores"
+           ng-click="$ctrl.pick($ctrl.winnerIdx, score)"
+           ng-class="{'btn-primary': score == $ctrl.scores[$ctrl.winnerIdx]}">
+          {{score}}
+        </a>
+        <a class="btn btn-default score"
+           ng-click="$ctrl.extendWinScore()">
+          ...
+        </a>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>
+        Lost set score
+      </label>
+      <div>
+        <a class="btn btn-default score"
+           ng-repeat="score in $ctrl.possibleLostScores"
+           ng-click="$ctrl.pick(1 - $ctrl.winnerIdx, score)"
+           ng-class="{'btn-primary': score == $ctrl.scores[1 - $ctrl.winnerIdx]}">
+          {{score}}
+        </a>
+      </div>
+    </div>
+    <div class="form-group">
+      <request-status></request-status>
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary"
+              ng-click="$ctrl.scoreMatchSet()">
+        {{ 'Score Set' | translate : '{n: $ctrl.nextSetNumberToScore}' }}
+      </button>
+      <button class="btn btn-default" back-button>
+        {{ 'Back btn' | translate }}
+      </button>
+    </div>
+  </div>
+</form>

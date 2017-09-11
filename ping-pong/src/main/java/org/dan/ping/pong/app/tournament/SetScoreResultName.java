@@ -1,5 +1,5 @@
 package org.dan.ping.pong.app.tournament;
 
-public enum MatchScoreResult {
+public enum SetScoreResultName {
     MatchContinues, MatchComplete, LastMatchComplete
 }

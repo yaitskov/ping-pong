@@ -35,6 +35,13 @@ public class MatchInfo {
     private Map<Integer, List<Integer>> participantIdScore;
     private Optional<Instant> startedAt;
 
+    public int getNumberOfSets() {
+        for (List<Integer> l : participantIdScore.values()) {
+            return l.size();
+        }
+        return 0;
+    }
+
     public static class MatchInfoBuilder {
         Optional<Integer> gid = Optional.empty();
         Optional<Integer> loserMid = Optional.empty();

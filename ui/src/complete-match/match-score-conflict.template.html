@@ -1,0 +1,70 @@
+<main-menu></main-menu>
+<form>
+  <div class="container admin-score">
+    <div class="form-group">
+      <div class="alert alert-danger">
+        You tried to score set {{$ctrl.yourSet}}, while it is already complete.
+        Original set score of {{$ctrl.yourSet}} is different.
+      </div>
+    </div>
+    <div class="form-group">
+      <table>
+        <tr>
+          <td>Sets</td>
+          <td ng-repeat="participant in $ctrl.participants">
+            {{participant.name | compactName}}
+          </td>
+        </tr>
+        <tr ng-repeat="set in $ctrl.sets()"
+            ng-class="{'active-set': set == $ctrl.yourSet, 'won-set': $ctrl.isWon(set), 'lost-set': !$ctrl.isWon(set)}">
+          <td>{{$index + 1}}</td>
+          <td>
+            {{set.a}}
+            <span ng-show="set == $ctrl.yourSet">
+              / {{$ctrl.yourSetScore[0]['score']}}
+            </span>
+          </td>
+          <td>
+            {{set.b}}
+            <span ng-show="set == $ctrl.yourSet">
+              / {{$ctrl.yourSetScore[1]['score']}}
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td>Total</td>
+          <td class="alert" ng-class="{'alert-success': $ctrl.participants[0].uid == $ctrl.matchScore.winUid, 'alert-danger': $ctrl.participants[1].uid == $ctrl.matchScore.winUid}">
+            {{$ctrl.matchScore.wonSets[$ctrl.participants[0].uid]}}
+          </td>
+          <td class="alert" ng-class="{'alert-success': $ctrl.participants[1].uid == $ctrl.matchScore.winUid, 'alert-danger': $ctrl.participants[0].uid == $ctrl.matchScore.winUid}"
+            {{$ctrl.matchScore.wonSets[$ctrl.participants[1].uid]}}
+          </td>
+        </tr>
+        <tr ng-show="$ctrl.matchScore.winUid">
+          <td>Winner</td>
+          <td colspan="2">
+            <span ng-repeat="participant in $ctrl.pariticipants">
+              <a href="#!/my/tournament/{{$ctrl.matchScore.tid}}/participant/{{participant.uid}}"
+                 ng-if="participant.uid == $ctrl.matchScore.winUid">
+                {{participant.name}}
+              </a>
+            </span>
+          </td>
+        </tr>
+        <tr ng-show="$ctrl.matchScore.winUid">
+          <td colspan="3">
+            Match continues...
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="form-group">
+      <a href="#!/my/matches/judgement" class="btn btn-success">
+        Keep score
+      </a>
+      <a ng-click="$ctrl.rescore()" class="btn btn-primary">
+        Overwrite score
+      </a>
+    </div>
+  </div>
+</div>

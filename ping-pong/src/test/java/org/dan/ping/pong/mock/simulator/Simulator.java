@@ -30,12 +30,12 @@ import org.dan.ping.pong.app.match.ForTestMatchDao;
 import org.dan.ping.pong.app.match.IdentifiedScore;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
+import org.dan.ping.pong.app.match.SetScoreResult;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableInfo;
-import org.dan.ping.pong.app.tournament.MatchScoreResult;
+import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentInfo;
-import org.dan.ping.pong.app.tournament.TournamentResource;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.app.user.UserType;
@@ -202,16 +202,16 @@ public class Simulator {
                 final HookDecision hookDecision = hook.pauseBefore(scenario, matchMetaInfo);
                 ++completedMatches[0];
                 log.info("Match id {} outcome {}", openMatch.getMid(), game);
-                final Optional<MatchScoreResult> result = completeMatch(players, scenario, openMatch, game, hookDecision);
+                final Optional<SetScoreResultName> result = completeMatch(players, scenario, openMatch, game, hookDecision);
                 if (hook.getType() == AfterScore ||
-                        hook.getType() == AfterMatch && result.equals(Optional.of(MatchScoreResult.MatchComplete))) {
+                        hook.getType() == AfterMatch && result.equals(Optional.of(SetScoreResultName.MatchComplete))) {
                     hook.pauseAfter(scenario, matchMetaInfo);
                 }
             });
         }
     }
 
-    private Optional<MatchScoreResult> completeMatch(Set<Player> players, TournamentScenario scenario,
+    private Optional<SetScoreResultName> completeMatch(Set<Player> players, TournamentScenario scenario,
             OpenMatchForJudge openMatch,
             GameEnd game, HookDecision hookDecision) {
         switch (hookDecision) {
@@ -224,7 +224,7 @@ public class Simulator {
         }
     }
 
-    private MatchScoreResult scoreSet(Set<Player> players, TournamentScenario scenario,
+    private SetScoreResultName scoreSet(Set<Player> players, TournamentScenario scenario,
             OpenMatchForJudge openMatch, GameEnd game) {
         final int ordNumber = game.getSetGenerator().getSetNumber();
         final Map<Player, Integer> setOutcome = game.getSetGenerator().generate();
@@ -234,7 +234,7 @@ public class Simulator {
                     scenario.getTid());
             log.info("Player {} resigned in match with {}", resigningPlayer, players);
             scenario.chooseMatchMap(openMatch).remove(players);
-            return MatchScoreResult.MatchComplete;
+            return SetScoreResultName.MatchComplete;
         }
         final Response response = rest.post(COMPLETE_MATCH, testAdmin,
                 FinalMatchScore.builder()
@@ -258,19 +258,19 @@ public class Simulator {
                                         .build()))
                         .build());
 
-        switch (response.readEntity(MatchScoreResult.class)) {
+        switch (response.readEntity(SetScoreResult.class).getScoreOutcome()) {
             case LastMatchComplete:
             case MatchComplete:
                 assertTrue("Match " + openMatch.getMid()
                                 + " ended before set generator",
                         game.getSetGenerator().isEmpty());
                 scenario.chooseMatchMap(openMatch).remove(players);
-                return MatchScoreResult.MatchComplete;
+                return SetScoreResultName.MatchComplete;
             case MatchContinues:
                 assertFalse("Match " + openMatch.getMid()
                         + " continues while generator is empty",
                         game.getSetGenerator().isEmpty());
-                return MatchScoreResult.MatchContinues;
+                return SetScoreResultName.MatchContinues;
             default:
                 throw new IllegalStateException("Unknown match event");
         }

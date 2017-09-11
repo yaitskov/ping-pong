@@ -82,6 +82,11 @@ angular.
             return $filter('date')(dt, 'MMM d EEE h:mm a Z').replace(/:00 /, ' ');
         };
     }]).
+    filter('compactName',  function () {
+        return function (name) {
+            return name.split(' ').map(function (part) { return part.substr(0, 4); }).join(' ');
+        };
+    }).
     factory('syncTranslate', ['$translate', '$q', function ($translate, $q) {
         return new function () {
             this.create = function () {

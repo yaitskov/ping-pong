@@ -50,8 +50,8 @@ import newTournamentParamsModule from './new-tournament/new-tournament-parameter
 import newTournamentParamsComponent from './new-tournament/new-tournament-parameters.component.js';
 import completeMyMatchModule from './complete-my-match/complete-my-match.module.js';
 import completeMyMatchComponent from './complete-my-match/complete-my-match.component.js';
-import completeMatchModule from './complete-match/complete-match.module.js';
-import completeMatchComponent from './complete-match/complete-match.component.js';
+import adminScoreSet from './complete-match/admin-score-set.module.js';
+import adminScoreSetComponent from './complete-match/admin-score-set.component.js';
 import openTournamentModule from './open-tournament/open-tournament.module.js';
 import openTournamentComponent from './open-tournament/open-tournament.component.js';
 import tournamentResultModule from './tournament-result/tournament-result.module.js';

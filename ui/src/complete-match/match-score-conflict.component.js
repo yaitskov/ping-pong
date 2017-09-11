@@ -10,19 +10,17 @@ angular.
                          var self = this;
                          mainMenu.setTitle('Match scoring conflict');
                          self.conflict = pageCtx.get('match-score-conflict-' + $routeParams.matchId);
-                         self.matchScore = conflict.matchScore;
-                         self.yourSet = conflict.yourSet;
+                         self.matchScore = self.conflict.matchScore;
+                         self.yourSet = self.conflict.yourSet;
+                         self.yourSetScore = self.conflict.yourSetScore;
                          self.participants = pageCtx.getMatchParticipants($routeParams.matchId);
-
-                         this.sets = function () {
-                             var result = [];
-                             var l = self.matchScore.sets[self.participants[i].uid].length;
-                             for (var i = 0; i < l; ++i) {
-                                 result.push({a: self.matchScore.sets[self.participants[0].uid][i],
-                                              b: self.matchScore.sets[self.participants[1].uid][i]});
-                             }
-                             return result;
-                         };
+                         var result = [];
+                         var l = self.matchScore.sets[self.participants[0].uid].length;
+                         for (var i = 0; i < l; ++i) {
+                             result.push({a: self.matchScore.sets[self.participants[0].uid][i],
+                                          b: self.matchScore.sets[self.participants[1].uid][i]});
+                         }
+                         this.sets = result;
                          this.isWon = function (set) {
                              return set.a > set.b;
                          };
@@ -36,8 +34,8 @@ angular.
                                      Match.scoreMatch(
                                          {mid: self.matchScore.mid,
                                           tid: self.matchScore.tid,
-                                          ordOrdNumber: self.yourSet,
-                                          scores: self.conflict.yourSetScore}
+                                          setOrdNumber: self.yourSet,
+                                          scores: self.conflict.yourSetScore},
                                          function (ok) {
                                              requestStatus.complete();
                                              window.history.back();

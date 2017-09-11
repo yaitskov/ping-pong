@@ -17,8 +17,10 @@ import java.util.Optional;
 public class SetScoreResult {
     private SetScoreResultName scoreOutcome;
     private Optional<Integer> nextSetNumberToScore;
+    private Optional<MatchScore> matchScore;
 
     public static class SetScoreResultBuilder {
         private Optional<Integer> nextSetNumberToScore = Optional.empty();
+        private Optional<MatchScore> matchScore = Optional.empty();
     }
 }

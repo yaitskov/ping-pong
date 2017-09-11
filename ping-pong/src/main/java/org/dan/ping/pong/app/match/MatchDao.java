@@ -36,7 +36,10 @@ import org.jooq.Record11;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -305,17 +308,27 @@ public class MatchDao {
                 .from(MATCHES)
                 .where(MATCHES.TID.eq(tid.getTid()))
                 .fetch()
-                .map(r -> MatchInfo.builder()
-                        .mid(r.get(MATCHES.MID))
-                        .cid(r.get(MATCHES.CID))
-                        .gid(r.get(MATCHES.GID))
-                        .state(r.get(MATCHES.STATE))
-                        .type(r.get(MATCHES.TYPE))
-                        .loserMid(r.get(MATCHES.LOSE_MID))
-                        .winnerMid(r.get(MATCHES.WIN_MID))
-                        .winnerId(r.get(MATCHES.UID_WIN))
-                        .tid(tid.getTid())
-                        .build());
+                .map(r -> {
+                    final Map<Integer, List<Integer>> uids = new HashMap<>();
+                    if (r.get(MATCHES.UID_LESS) > 0) {
+                        uids.put(r.get(MATCHES.UID_LESS), new ArrayList<>());
+                    }
+                    if (r.get(MATCHES.UID_MORE) > 0) {
+                        uids.put(r.get(MATCHES.UID_MORE), new ArrayList<>());
+                    }
+                    return MatchInfo.builder()
+                            .mid(r.get(MATCHES.MID))
+                            .cid(r.get(MATCHES.CID))
+                            .gid(r.get(MATCHES.GID))
+                            .state(r.get(MATCHES.STATE))
+                            .type(r.get(MATCHES.TYPE))
+                            .loserMid(r.get(MATCHES.LOSE_MID))
+                            .winnerMid(r.get(MATCHES.WIN_MID))
+                            .winnerId(r.get(MATCHES.UID_WIN))
+                            .participantIdScore(uids)
+                            .tid(tid.getTid())
+                            .build();
+                });
     }
 
 }

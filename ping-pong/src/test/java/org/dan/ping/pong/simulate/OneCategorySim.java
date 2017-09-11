@@ -1,6 +1,7 @@
 package org.dan.ping.pong.simulate;
 
 import static org.dan.ping.pong.mock.simulator.AutoResolution.RANDOM;
+import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Hook.BeforeScore;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -113,5 +114,16 @@ public class OneCategorySim {
                 .w30(p1, p3)
                 .pause(p1, p3, BeforeScore)
                 .champions(c1, p1, p3));
+    }
+
+    @Test
+    public void scoreLastSet() {
+        simulator.simulate(T_1_Q_1_G_8, TournamentScenario.begin()
+                .name("scoreLastSet")
+                .ignoreUnexpectedGames()
+                .category(c1, p1, p2)
+                .custom(game(p1, p2, 11, 0, 11, 1, 0, 0, 11, 2))
+                .quitsGroup(p1)
+                .champions(c1, p1));
     }
 }

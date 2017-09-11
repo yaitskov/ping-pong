@@ -52,6 +52,11 @@ import completeMyMatchModule from './complete-my-match/complete-my-match.module.
 import completeMyMatchComponent from './complete-my-match/complete-my-match.component.js';
 import adminScoreSet from './complete-match/admin-score-set.module.js';
 import adminScoreSetComponent from './complete-match/admin-score-set.component.js';
+import matchScoreConflict from './complete-match/match-score-conflict.module.js';
+import matchScoreConflictComponent from './complete-match/match-score-conflict.component.js';
+import reviewMatchScore from './complete-match/review-match-score.module.js';
+import reviewMatchScoreComponent from './complete-match/review-match-score.component.js';
+
 import openTournamentModule from './open-tournament/open-tournament.module.js';
 import openTournamentComponent from './open-tournament/open-tournament.component.js';
 import tournamentResultModule from './tournament-result/tournament-result.module.js';

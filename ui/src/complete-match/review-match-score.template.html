@@ -1,0 +1,55 @@
+<main-menu></main-menu>
+<form>
+  <div class="container">
+    <div class="form-group">
+      <div class="alert alert-info">
+        The match is complete. Review outcome and proceed with next match.
+      </div>
+    </div>
+    <div class="form-group">
+      <table>
+        <tr>
+          <td>Sets</td>
+          <td ng-repeat="participant in $ctrl.participants">
+            {{participant.name | compactName}}
+          </td>
+        </tr>
+        <tr ng-repeat="set in $ctrl.sets()"
+            ng-class="{'won-set': $ctrl.isWon(set), 'lost-set': !$ctrl.isWon(set)}">
+          <td>{{$index + 1}}</td>
+          <td>
+            {{set.a}}
+          </td>
+          <td>
+            {{set.b}}
+          </td>
+        </tr>
+        <tr>
+          <td>Total</td>
+          <td class="alert" ng-class="{'alert-success': $ctrl.participants[0].uid == $ctrl.matchScore.winUid, 'alert-danger': $ctrl.participants[1].uid == $ctrl.matchScore.winUid}">
+            {{$ctrl.matchScore.wonSets[$ctrl.participants[0].uid]}}
+          </td>
+          <td class="alert" ng-class="{'alert-success': $ctrl.participants[1].uid == $ctrl.matchScore.winUid, 'alert-danger': $ctrl.participants[0].uid == $ctrl.matchScore.winUid}"
+            {{$ctrl.matchScore.wonSets[$ctrl.participants[1].uid]}}
+          </td>
+        </tr>
+        <tr ng-show="$ctrl.matchScore.winUid">
+          <td>Winner</td>
+          <td colspan="2">
+            <span ng-repeat="participant in $ctrl.pariticipants">
+              <a href="#!/my/tournament/{{$ctrl.matchScore.tid}}/participant/{{participant.uid}}"
+                 ng-if="participant.uid == $ctrl.matchScore.winUid">
+                {{participant.name}}
+              </a>
+            </span>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="form-group">
+      <a href="#!/my/matches/judgement" class="btn btn-success">
+        Judge next
+      </a>
+    </div>
+  </div>
+</div>

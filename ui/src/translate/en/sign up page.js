@@ -14,7 +14,7 @@ module.exports = {
         + ' then leave it empty. The email could be bound later.',
     'phone-purpose-description': 'Optional field. It could be used for account recovery.',
     'phone-length': 'Phone length must be less than {{max}}',
-    'Sing Up btn': 'Sign Up',
+    'Sign Up btn': 'Sign Up',
     'phone format wrong': 'Phone is in wrong format',
     'Registering account': 'Registering account'
 };

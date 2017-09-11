@@ -101,9 +101,11 @@ public class MatchService {
             checkPermissions(tournament, uid, matchInfo, score);
         } catch (ConfirmSetScore e) {
             log.info("User {} confirmed set score in mid {}", uid, score.getMid());
-            return setScoreResult(matchInfo.getState() == Over
-                    ? tournament.matchScoreResult()
-                    : MatchContinues, matchInfo);
+            return setScoreResult(tournament,
+                    matchInfo.getState() == Over
+                            ? tournament.matchScoreResult()
+                            : MatchContinues,
+                    matchInfo);
         }
         final Optional<Integer> winUidO = matchDao.scoreSet(tournament, matchInfo, batch, score);
         winUidO.ifPresent(winUid -> matchWinnerDetermined(tournament, matchInfo, winUid, batch));
@@ -111,16 +113,20 @@ public class MatchService {
                 place -> {
                     batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
                     return setScoreResult(
+                            tournament,
                             freeTableAndSchedule(place, batch, tournament, now, winUidO),
                             matchInfo);
                 });
     }
 
-    SetScoreResult setScoreResult(SetScoreResultName name, MatchInfo matchInfo) {
+    SetScoreResult setScoreResult(OpenTournamentMemState tournament, SetScoreResultName name, MatchInfo matchInfo) {
         switch (name) {
             case LastMatchComplete:
             case MatchComplete:
-                return SetScoreResult.builder().scoreOutcome(name).build();
+                return SetScoreResult.builder()
+                        .matchScore(Optional.of(matchScore(tournament, matchInfo)))
+                        .scoreOutcome(name)
+                        .build();
             case MatchContinues:
                 return SetScoreResult.builder()
                         .scoreOutcome(name)

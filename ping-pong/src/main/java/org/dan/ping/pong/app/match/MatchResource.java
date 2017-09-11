@@ -5,6 +5,7 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
+import org.dan.ping.pong.app.tournament.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
 import org.dan.ping.pong.app.user.UserLink;
@@ -73,6 +74,14 @@ public class MatchResource {
                 (tournament, batch) -> {
                     return matchService.scoreSet(tournament, uid, score, clocker.get(), batch);
                 });
+    }
+
+    @GET
+    @Path("/match/rules/{tid}")
+    public void getMatchRules(
+            @Suspended AsyncResponse response,
+            @PathParam("tid") Tid tid) {
+        tournamentAccessor.read(tid, response, tournament -> tournament.getRule().getMatch());
     }
 
     @GET

@@ -1,5 +1,14 @@
 module.exports = {
         // complete match
+    'Set n scored. Match continues': 'Set {{n}} is scored. Match continues',
+    'Match score response unknown': 'Match score response {{name}} is unknown',
+    'Load match rules': 'Load match rules',
+    'Match Scoring': 'Match Scoring',
+    'Score Set': 'Score {{n}} set',
+    'Match scoring conflict': 'Match scoring conflict',
+    'Reset match score': 'Reset match score',
+    'Setting your set score': 'Setting your set score',
+
     'Score of': 'Score of',
     'Between': 'Between',
     'and': 'and',

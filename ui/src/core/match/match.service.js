@@ -18,6 +18,17 @@ angular.
                                       session: 1
                                   }
                               },
+                              getRules: {
+                                  url: '/api/match/rules/:tournamentId',
+                                  method: 'GET'
+                              },
+                              resetSetScoreDownTo: {
+                                  url: '/api/match/reset-set-score',
+                                  method: 'POST',
+                                  headers: {
+                                      session: 1
+                                  }
+                              },
                               myMatchesNeedToJudge: {
                                   url: '/api/match/judge/list/open',
                                   method: 'GET',

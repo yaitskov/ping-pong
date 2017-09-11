@@ -14,7 +14,7 @@ module.exports = {
         + ' a email możesz nadać później.',
     'phone-purpose-description': 'Opcjonalne pole. One może być wykożystano dla regenracji dostępa do konta.',
     'phone-length': 'Długość numera telefonu musi być mniej niż {{max}}',
-    'Sing Up btn': 'Zalożyć konto',
+    'Sign Up btn': 'Zalożyć konto',
     'phone format wrong': 'Format numera telefonu nie jest odpowiedni',
     'Registering account': 'Rejestracja konta'
 };

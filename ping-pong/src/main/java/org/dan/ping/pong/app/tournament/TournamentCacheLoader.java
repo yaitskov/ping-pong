@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
@@ -63,7 +64,9 @@ public class TournamentCacheLoader extends CacheLoader<Tid, OpenTournamentMemSta
         return matches.stream().collect(
                 toMap(MatchInfo::getMid,
                         m -> {
-                            m.setParticipantIdScore(sets.get(m.getMid()));
+                            ofNullable(sets.get(m.getMid()))
+                                    .ifPresent(psets -> psets.forEach((uid, usets) ->
+                                            m.getParticipantIdScore().put(uid, usets)));
                             return m;
                         }));
     }

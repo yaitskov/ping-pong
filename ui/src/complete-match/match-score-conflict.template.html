@@ -3,40 +3,42 @@
   <div class="container admin-score">
     <div class="form-group">
       <div class="alert alert-danger">
-        You tried to score set {{$ctrl.yourSet}}, while it is already complete.
-        Original set score of {{$ctrl.yourSet}} is different.
+        You tried to score set {{1 + $ctrl.yourSet}}, while it is already complete.
+        Original score of set {{1 + $ctrl.yourSet}} is different.
       </div>
     </div>
     <div class="form-group">
-      <table>
+      <table class="table">
         <tr>
-          <td>Sets</td>
+          <td>Set</td>
           <td ng-repeat="participant in $ctrl.participants">
-            {{participant.name | compactName}}
+            <a href="#!/my/tournament/{{$ctrl.matchScore.tid}}/participant/{{participant.uid}}">
+               {{participant.name | compactName}}
+            </a>
           </td>
         </tr>
-        <tr ng-repeat="set in $ctrl.sets()"
-            ng-class="{'active-set': set == $ctrl.yourSet, 'won-set': $ctrl.isWon(set), 'lost-set': !$ctrl.isWon(set)}">
+        <tr ng-repeat="set in $ctrl.sets"
+            ng-class="{'warning': $index == $ctrl.yourSet}">
           <td>{{$index + 1}}</td>
           <td>
             {{set.a}}
-            <span ng-show="set == $ctrl.yourSet">
-              / {{$ctrl.yourSetScore[0]['score']}}
+            <span ng-show="$index == $ctrl.yourSet">
+              / <strong>{{$ctrl.yourSetScore[0]['score']}}</strong>
             </span>
           </td>
           <td>
             {{set.b}}
-            <span ng-show="set == $ctrl.yourSet">
-              / {{$ctrl.yourSetScore[1]['score']}}
+            <span ng-show="$index == $ctrl.yourSet">
+              / <strong>{{$ctrl.yourSetScore[1]['score']}}</strong>
             </span>
           </td>
         </tr>
         <tr>
           <td>Total</td>
-          <td class="alert" ng-class="{'alert-success': $ctrl.participants[0].uid == $ctrl.matchScore.winUid, 'alert-danger': $ctrl.participants[1].uid == $ctrl.matchScore.winUid}">
+          <td class="alert" ng-class="{'success': $ctrl.participants[0].uid == $ctrl.matchScore.winUid, 'danger': $ctrl.participants[1].uid == $ctrl.matchScore.winUid}">
             {{$ctrl.matchScore.wonSets[$ctrl.participants[0].uid]}}
           </td>
-          <td class="alert" ng-class="{'alert-success': $ctrl.participants[1].uid == $ctrl.matchScore.winUid, 'alert-danger': $ctrl.participants[0].uid == $ctrl.matchScore.winUid}"
+          <td class="alert" ng-class="{'success': $ctrl.participants[1].uid == $ctrl.matchScore.winUid, 'danger': $ctrl.participants[0].uid == $ctrl.matchScore.winUid}">
             {{$ctrl.matchScore.wonSets[$ctrl.participants[1].uid]}}
           </td>
         </tr>
@@ -51,7 +53,7 @@
             </span>
           </td>
         </tr>
-        <tr ng-show="$ctrl.matchScore.winUid">
+        <tr ng-show="!$ctrl.matchScore.winUid">
           <td colspan="3">
             Match continues...
           </td>

@@ -8,7 +8,7 @@ angular.
         controller: [
             'mainMenu', '$http', 'cutil', 'auth', 'requestStatus',
             function (mainMenu, $http, cutil, auth, requestStatus) {
-                mainMenu.setTitle('Sign Up');
+                mainMenu.setTitle('Sign Up btn');
                 this.form = {};
                 var self = this;
                 this.signUp = function (form) {

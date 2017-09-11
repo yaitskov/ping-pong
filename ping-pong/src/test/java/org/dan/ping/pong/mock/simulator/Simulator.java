@@ -90,13 +90,13 @@ public class Simulator {
     private TournamentDao tournamentDao;
 
     public void simulate(SimulatorParams params, TournamentScenario scenario) {
-        scenario.setParams(params);
-        setupEnvironment(params, scenario);
-        if (!scenario.isBegin()) {
-            return;
-        }
-        restGenerator.beginTournament(scenario.getTestAdmin(), scenario.getTid());
         try {
+            scenario.setParams(params);
+            setupEnvironment(params, scenario);
+            if (!scenario.isBegin()) {
+                return;
+            }
+            restGenerator.beginTournament(scenario.getTestAdmin(), scenario.getTid());
             final boolean allMatchesComplete = expendAllMatches(scenario);
             if (allMatchesComplete && !scenario.isIgnoreUnexpectedGames()
                     && !scenario.getAutoResolution().isPresent()) {

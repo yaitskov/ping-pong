@@ -23,6 +23,7 @@ import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_2;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
 import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_2_G_8;
+import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_3_Q_1_G_8;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
@@ -316,6 +317,18 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 .ignoreUnexpectedGames();
 
         simulator.simulate(T_1_Q_1_G_8, scenario);
+    }
+
+    @Test
+    public void participantPlays1GameAtTime() {
+        simulator.simulate(T_3_Q_1_G_8,
+                TournamentScenario.begin()
+                        .category(c1, p1, p2, p3)
+                        .win(p1, p2)
+                        .win(p1, p3)
+                        .lose(p2, p3)
+                        .quitsGroup(p1)
+                        .champions(c1, p1));
     }
 
     /**

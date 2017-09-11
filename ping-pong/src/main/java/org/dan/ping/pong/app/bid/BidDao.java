@@ -7,6 +7,7 @@ import static java.util.stream.Collectors.toMap;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
 import static ord.dan.ping.pong.jooq.Tables.USERS;
+import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;

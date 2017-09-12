@@ -27,7 +27,9 @@ angular.
                          this.rescore = function () {
                              requestStatus.startLoading('Reset match score');
                              Match.resetSetScoreDownTo(
-                                 {mid: self.matchScore.mid, setNumber: self.yourSet},
+                                 {mid: self.matchScore.mid,
+                                  tid: self.matchScore.tid,
+                                  setNumber: self.yourSet},
                                  function (ok) {
                                      requestStatus.complete();
                                      requestStatus.startLoading('Setting your set score');

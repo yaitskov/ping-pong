@@ -7,7 +7,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
-import static org.dan.ping.pong.app.match.MatchResource.COMPLETE_MATCH;
+import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_WATCH_LIST_OPEN;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
@@ -140,7 +140,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .map(UserLink::getUid)
                         .collect(toSet()));
 
-        rest.voidPost(COMPLETE_MATCH, adminSession,
+        rest.voidPost(SCORE_SET, adminSession,
                 FinalMatchScore.builder()
                         .tid(tid)
                         .mid(adminOpenMatches.get(0).getMid())
@@ -259,7 +259,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 .pause(p1, p2, PlayHook.builder()
                         .type(Hook.AfterScore)
                         .callback((s, meta) -> {
-                            myRest().voidPost(COMPLETE_MATCH, s.getPlayersSessions().get(p1),
+                            myRest().voidPost(SCORE_SET, s.getPlayersSessions().get(p1),
                                     FinalMatchScore.builder()
                                             .tid(s.getTid())
                                             .mid(meta.getOpenMatch().getMid())
@@ -292,7 +292,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 .pause(p1, p2, PlayHook.builder()
                         .type(Hook.AfterScore)
                         .callback((s, meta) -> {
-                            final Response re = myRest().post(COMPLETE_MATCH, s.getPlayersSessions().get(p1),
+                            final Response re = myRest().post(SCORE_SET, s.getPlayersSessions().get(p1),
                                     FinalMatchScore.builder()
                                             .setOrdNumber(0)
                                             .tid(s.getTid())

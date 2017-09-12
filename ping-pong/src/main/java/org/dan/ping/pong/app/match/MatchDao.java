@@ -33,6 +33,7 @@ import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
 import org.jooq.Record11;
+import org.jooq.impl.DSL;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -331,4 +332,44 @@ public class MatchDao {
                 });
     }
 
+    public void deleteSets(DbUpdater batch, MatchInfo minfo, int setNumber) {
+        minfo.getParticipantIdScore().keySet().forEach(uid -> {
+            batch.exec(DbUpdate.builder()
+                    .mustAffectRows(NON_ZERO_ROWS)
+                    .logBefore(() -> log.info("Delete sets after {} in mid {}",
+                            setNumber, minfo.getMid()))
+                    .query(jooq.query("delete from "
+                                    + SET_SCORE.getSchema().getName() + "." + SET_SCORE.getName()
+                                    + " where " + SET_SCORE.MID.getName() + " = ? and "
+                                    + SET_SCORE.UID.getName() + " = ? order by "
+                                    + SET_SCORE.SET_ID.getName() + " desc limit ?",
+                            minfo.getMid(), uid, minfo.getNumberOfSets() - setNumber))
+                    .build());
+        });
+    }
+
+    public void removeSecondParticipant(DbUpdater batch, int mid, int uidKeep) {
+        batch.exec(DbUpdate.builder()
+                .query(jooq.update(MATCHES)
+                        .set(MATCHES.UID_LESS, uidKeep)
+                        .set(MATCHES.UID_MORE, (Integer) null)
+                        .where(MATCHES.MID.eq(mid)))
+                .build());
+    }
+
+    public void removeParticipants(DbUpdater batch, int mid) {
+        batch.exec(DbUpdate.builder()
+                .query(jooq.update(MATCHES)
+                        .set(MATCHES.UID_LESS, (Integer) null)
+                        .set(MATCHES.UID_MORE, (Integer) null)
+                        .where(MATCHES.MID.eq(mid)))
+                .build());
+    }
+
+    public void removeScores(DbUpdater batch, int mid, int uid) {
+        batch.exec(DbUpdate.builder()
+                .query(jooq.deleteFrom(SET_SCORE)
+                        .where(SET_SCORE.MID.eq(mid), SET_SCORE.UID.eq(uid)))
+                .build());
+    }
 }

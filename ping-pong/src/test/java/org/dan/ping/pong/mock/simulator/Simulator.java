@@ -11,7 +11,7 @@ import static org.dan.ping.pong.app.auth.AuthResource.DEV_CLEAN_SIGN_IN_TOKEN_TA
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
-import static org.dan.ping.pong.app.match.MatchResource.COMPLETE_MATCH;
+import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.mock.simulator.Hook.AfterMatch;
@@ -191,6 +191,7 @@ public class Simulator {
             final Set<Player> players = matchToPlayers(scenario, openMatch);
             final Map<Set<Player>, GameEnd> matchMap = scenario.chooseMatchMap(openMatch);
             findGame(matchMap, scenario, openMatch, players).ifPresent(game -> {
+                game.getSetGenerator().setMid(openMatch.getMid());
                 final PlayHook hook = scenario.getHooksOnMatches().getOrDefault(players,
                         PlayHook.builder()
                                 .type(Hook.NonStop)
@@ -226,8 +227,8 @@ public class Simulator {
 
     private SetScoreResultName scoreSet(Set<Player> players, TournamentScenario scenario,
             OpenMatchForJudge openMatch, GameEnd game) {
-        final int ordNumber = game.getSetGenerator().getSetNumber();
-        final Map<Player, Integer> setOutcome = game.getSetGenerator().generate();
+        final Map<Player, Integer> setOutcome = game.getSetGenerator().generate(scenario);
+        final int ordNumber = game.getSetGenerator().getSetNumber() - 1;
         if (setOutcome.size() == 1) {
             Player resigningPlayer = setOutcome.keySet().stream().findFirst().get();
             rest.voidPost(TOURNAMENT_RESIGN, scenario.getPlayersSessions().get(resigningPlayer),
@@ -236,7 +237,7 @@ public class Simulator {
             scenario.chooseMatchMap(openMatch).remove(players);
             return SetScoreResultName.MatchComplete;
         }
-        final Response response = rest.post(COMPLETE_MATCH, testAdmin,
+        final Response response = rest.post(SCORE_SET, testAdmin,
                 FinalMatchScore.builder()
                         .tid(scenario.getTid())
                         .setOrdNumber(ordNumber)

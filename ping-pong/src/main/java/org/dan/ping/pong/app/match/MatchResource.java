@@ -5,14 +5,12 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
-import org.dan.ping.pong.app.tournament.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.util.time.Clocker;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -32,8 +30,9 @@ public class MatchResource {
     public static final String MY_PENDING_MATCHES = "/match/list/my/pending";
     public static final String OPEN_MATCHES_FOR_JUDGE = "/match/judge/list/open";
     public static final String COMPLETE_MATCHES = "/match/list/completed/";
-    public static final String COMPLETE_MATCH = "/match/participant/score";
+    public static final String SCORE_SET = "/match/participant/score";
     public static final String MATCH_WATCH_LIST_OPEN = "/match/watch/list/open";
+    public static final String MATCH_RESET_SET_SCORE = "/match/reset-set-score";
 
     @Inject
     private AuthService authService;
@@ -60,7 +59,7 @@ public class MatchResource {
     private TournamentAccessor tournamentAccessor;
 
     @POST
-    @Path(COMPLETE_MATCH)
+    @Path(SCORE_SET)
     @Consumes(APPLICATION_JSON)
     public void scoreSetAndCompleteIfWinOrLose(
             @Suspended AsyncResponse response,
@@ -73,6 +72,22 @@ public class MatchResource {
         tournamentAccessor.update(new Tid(score.getTid()), response,
                 (tournament, batch) -> {
                     return matchService.scoreSet(tournament, uid, score, clocker.get(), batch);
+                });
+    }
+
+    @POST
+    @Path(MATCH_RESET_SET_SCORE)
+    public void resetSetScore(
+            @Suspended AsyncResponse response,
+            @HeaderParam(SESSION) String session,
+            ResetSetScore reset) {
+        final int uid = authService.userInfoBySession(session).getUid();
+        log.info("User {} reset scores in min {} of tid {}",
+                uid, reset.getMid(), reset.getTid());
+        tournamentAccessor.update(new Tid(reset.getTid()), response,
+                (tournament, batch) -> {
+                    tournament.checkAdmin(uid);
+                    matchService.resetMatchScore(tournament, reset, batch);
                 });
     }
 

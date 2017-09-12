@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.min;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -27,6 +28,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.util.Lists;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.group.GroupDao;
@@ -460,5 +462,124 @@ public class MatchService {
         match.setState(Game);
         match.setStartedAt(Optional.of(now));
         matchDao.markAsSchedule(match, batch);
+    }
+
+    public void resetMatchScore(OpenTournamentMemState tournament, ResetSetScore reset, DbUpdater batch) {
+        final MatchInfo minfo = tournament.getMatchById(reset.getMid());
+        final int numberOfSets = minfo.getNumberOfSets();
+        if (numberOfSets < reset.getSetNumber()) {
+            throw badRequest("Match has just " + numberOfSets + " sets");
+        }
+        if (numberOfSets == reset.getSetNumber()) {
+            return;
+        }
+        if (minfo.getState() == Game) {
+            truncateSets(batch, minfo, reset.getSetNumber());
+            return;
+        }
+        final List<MatchInfo> groupMatches = minfo.getGid()
+                .map(gid -> findMatchesInGroup(tournament, gid))
+                .orElse(Lists.emptyList());
+
+        boolean notAllMatchesComplete = !allMatchesInGroupComplete(groupMatches);
+        final List<Integer> quitUids = groupService.orderUidsInGroup(tournament, groupMatches)
+                .subList(0, tournament.getRule().getGroup().getQuits());
+        changeStatus(batch, minfo, Game);
+        truncateSets(batch, minfo, reset.getSetNumber());
+        if (!groupMatches.isEmpty() && notAllMatchesComplete) {
+            return;
+        }
+        final List<MatchInfo> affectedMatches = findAffectedMatches(tournament, minfo, quitUids);
+        resetMatches(tournament, batch, affectedMatches, quitUids);
+        affectedMatches.stream().flatMap(m -> m.getParticipantIdScore().keySet().stream())
+                .collect(toSet())
+                .stream()
+                .map(tournament::getParticipant)
+                .forEach(participant -> bidService.setBidState(participant, Wait,
+                        asList(Win1, Win2, Win3, Lost, Play), batch));
+    }
+
+    private void resetMatches(OpenTournamentMemState tournament, DbUpdater batch,
+            List<MatchInfo> affectedMatches, List<Integer> quitUids) {
+        affectedMatches.forEach(minfo ->
+                quitUids.forEach(uid -> removeParticipant(tournament, batch, minfo, uid)));
+    }
+
+    private void removeParticipant(OpenTournamentMemState tournament,
+            DbUpdater batch, MatchInfo minfo, int uid) {
+        if (minfo.getParticipantIdScore().remove(uid) == null) {
+            return;
+        }
+        matchDao.removeScores(batch, minfo.getMid(), uid);
+        if (minfo.getParticipantIdScore().size() == 1) {
+            final int opUid = minfo.getOpponentUid(uid).get();
+            final BidState opoState = tournament.getParticipant(opUid).getState();
+            switch (opoState) {
+                case Expl:
+                case Quit:
+                    changeStatus(batch, minfo, Auto);
+                    break;
+                default:
+                    changeStatus(batch, minfo, Draft);
+                    break;
+            }
+            matchDao.removeSecondParticipant(batch, minfo.getMid(), opUid);
+        } else if (minfo.getParticipantIdScore().isEmpty()) {
+            changeStatus(batch, minfo, Draft);
+            matchDao.removeParticipants(batch, minfo.getMid());
+        }
+    }
+
+    private List<MatchInfo> findAffectedMatches(OpenTournamentMemState tournament,
+            MatchInfo minfo, List<Integer> quitUids) {
+        if (minfo.getGid().isPresent()) {
+            return findPlayOffMatches(tournament, quitUids);
+        } else {
+            List<MatchInfo> winLoseMatches = getWinLoseMatches(tournament, minfo);
+            List<MatchInfo> result = new ArrayList<>(winLoseMatches);
+            findFollowingMatches(tournament, winLoseMatches, result);
+            return result;
+        }
+    }
+
+    private void findFollowingMatches(OpenTournamentMemState tournament,
+            List<MatchInfo> baseMatches, List<MatchInfo> result) {
+        if (baseMatches.isEmpty()) {
+            return;
+        }
+        List<MatchInfo> follows = baseMatches.stream()
+                .flatMap(m -> getWinLoseMatches(tournament, m).stream())
+                .collect(toList());
+        result.addAll(follows);
+        findFollowingMatches(tournament, follows, result);
+    }
+
+    private List<MatchInfo> findPlayOffMatches(OpenTournamentMemState tournament, List<Integer> quitUids) {
+        return tournament.getMatches().values().stream()
+                .filter(minfo -> quitUids.stream()
+                        .anyMatch(uid -> minfo.getParticipantIdScore().containsKey(uid)))
+                .collect(toList());
+    }
+
+    private List<MatchInfo> getWinLoseMatches(OpenTournamentMemState tournament, MatchInfo minfo) {
+        final List<MatchInfo> result = new ArrayList<>();
+        minfo.getWinnerMid().map(tournament::getMatchById).ifPresent(result::add);
+        minfo.getLoserMid().map(tournament::getMatchById).ifPresent(result::add);
+        return result;
+    }
+
+    private boolean allMatchesInGroupComplete(List<MatchInfo> groupMatches ) {
+        return groupMatches.stream().allMatch(minfo -> minfo.getState() == Over);
+    }
+
+    private void truncateSets(DbUpdater batch, MatchInfo minfo, int setNumber) {
+        matchDao.deleteSets(batch, minfo, setNumber);
+        cutTrailingSets(minfo, setNumber);
+    }
+
+    public void cutTrailingSets(MatchInfo minfo, int setNumber) {
+        minfo.getParticipantIdScore().values()
+                .forEach(scores -> scores.subList(setNumber, scores.size()).clear());
+
     }
 }

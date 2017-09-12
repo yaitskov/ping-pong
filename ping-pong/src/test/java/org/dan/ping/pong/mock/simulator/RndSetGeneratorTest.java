@@ -14,9 +14,9 @@ public class RndSetGeneratorTest {
     public void complete() {
         final RndSetGenerator generator = createRndGen(p1, W30, p2);
         assertFalse(generator.isEmpty());
-        generator.generate();
-        generator.generate();
-        generator.generate();
+        generator.generate(null);
+        generator.generate(null);
+        generator.generate(null);
         assertTrue(generator.isEmpty());
     }
 }

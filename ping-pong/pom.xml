@@ -466,6 +466,11 @@
                             </schemata>
                             <customTypes>
                                 <customType>
+                                    <name>TournamentRule</name>
+                                    <type>org.dan.ping.pong.app.tournament.TournamentRules</type>
+                                    <binding>org.dan.ping.pong.app.tournament.TournamentRulesConverter</binding>
+                                </customType>
+                                <customType>
                                     <name>OptionalString</name>
                                     <type>java.util.Optional&lt;java.lang.String&gt;</type>
                                     <binding>org.dan.ping.pong.sys.db.converters.OptionalStringConverter</binding>
@@ -580,6 +585,11 @@
                                 <forcedType>
                                     <name>OptionalDouble</name>
                                     <expression>.*tournament\.(ticket_price)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>TournamentRule</name>
+                                    <expression>.*tournament\.(rules)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

@@ -82,10 +82,7 @@ create table tournament(
     state varchar(10) not null, -- hidden, announce, draft, open, close, canceled
     created timestamp(3) default current_timestamp(3),
     complete_at timestamp(3) null,
-    quits_from_group int(11) not null,
-    third_place_match int(11) not null,
-    match_score int(11) not null,
-    max_group_size int(11) not null,
+    rules varchar(2700) not null,
     pid int(11) not null references place(pid));
 
 alter table tournament

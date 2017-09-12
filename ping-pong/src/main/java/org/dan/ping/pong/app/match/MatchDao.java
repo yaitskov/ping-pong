@@ -30,6 +30,7 @@ import org.dan.ping.pong.app.tournament.DbUpdate;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
 import org.jooq.Record11;
@@ -81,7 +82,7 @@ public class MatchDao {
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<OpenMatchForJudge> findOpenMatchesFurJudge(int adminUid) {
         return jooq.select(MATCHES.MID, MATCHES.TID, MATCHES.STARTED,
-                TABLES.TABLE_ID, TABLES.LABEL, TOURNAMENT.MATCH_SCORE,
+                TABLES.TABLE_ID, TABLES.LABEL, TOURNAMENT.RULES,
                 MATCHES.TYPE, USERS.UID, USERS.NAME,
                 ENEMY_USER.UID, ENEMY_USER.NAME)
                 .from(TOURNAMENT_ADMIN)
@@ -102,7 +103,7 @@ public class MatchDao {
                 .map(r -> OpenMatchForJudge.builder()
                         .mid(r.get(MATCHES.MID))
                         .tid(r.get(MATCHES.TID))
-                        .matchScore(r.get(TOURNAMENT.MATCH_SCORE))
+                        .matchScore(r.get(TOURNAMENT.RULES).getMatch().getMinGamesToWin())
                         .started(r.get(MATCHES.STARTED).get())
                         .type(r.get(MATCHES.TYPE))
                         .table(TableLink.builder()
@@ -126,7 +127,7 @@ public class MatchDao {
         return jooq.select(MATCHES.MID, MATCHES.TID, TABLES.TABLE_ID,
                 TABLES.LABEL, MATCHES.TYPE, USERS.UID, USERS.NAME,
                 ENEMY_USER.UID, ENEMY_USER.NAME,
-                MATCHES.STATE, TOURNAMENT.MATCH_SCORE)
+                MATCHES.STATE, TOURNAMENT.RULES)
                 .from(MATCHES)
                 .innerJoin(TOURNAMENT)
                 .on(TOURNAMENT.TID.eq(MATCHES.TID))
@@ -143,7 +144,7 @@ public class MatchDao {
                 .map(r -> MyPendingMatch.builder()
                         .tid(r.get(MATCHES.TID))
                         .mid(r.get(MATCHES.MID))
-                        .matchScore(r.get(TOURNAMENT.MATCH_SCORE))
+                        .matchScore(r.get(TOURNAMENT.RULES).getMatch().getMinGamesToWin())
                         .state(r.get(MATCHES.STATE))
                         .matchType(r.get(MATCHES.TYPE))
                         .table(ofNullable(r.get(TABLES.TABLE_ID))
@@ -157,7 +158,7 @@ public class MatchDao {
 
     private Optional<UserLink> enemy(int uid,
             Record11<Integer, Integer, Integer, String, MatchType,
-                    Integer, String, Integer, String, MatchState, Integer> r) {
+                    Integer, String, Integer, String, MatchState, TournamentRules> r) {
         final Optional<Integer> enemId = ofNullable(r.get(ENEMY_USER.UID));
         final Optional<Integer> userId = ofNullable(r.get(USERS.UID));
 

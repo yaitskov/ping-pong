@@ -317,11 +317,12 @@ public class TournamentService {
         if (!CONFIGURABLE_STATES.contains(tournament.getState())) {
             throw badRequest("Tournament could be modified until it's open");
         }
-        tournament.getRule().getGroup().setQuits(parameters.getQuitsGroup());
-        tournament.getRule().getGroup().setMaxSize(parameters.getMaxGroupSize());
-        tournament.getRule().getMatch().setSetsToWin(parameters.getMatchScore());
-        tournament.getRule().setPrizeWinningPlaces(2 + parameters.getThirdPlaceMatch());
-        tournamentDao.updateParams(parameters, batch);
+        final TournamentRules rules = tournament.getRule();
+        rules.getGroup().setQuits(parameters.getQuitsGroup());
+        rules.getGroup().setMaxSize(parameters.getMaxGroupSize());
+        rules.getMatch().setSetsToWin(parameters.getMatchScore());
+        rules.setThirdPlaceMatch(parameters.getThirdPlaceMatch());
+        tournamentDao.updateParams(tournament.getTid(), rules, batch);
     }
 
     private void validate(TournamentParameters parameters) {

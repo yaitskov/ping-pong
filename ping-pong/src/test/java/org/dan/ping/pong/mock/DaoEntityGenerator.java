@@ -142,11 +142,8 @@ public class DaoEntityGenerator {
                 .placeId(placeId)
                 .name(name)
                 .previousTid(Optional.empty())
-                .maxGroupSize(props.getMaxGroupSize())
-                .quitsFromGroup(props.getQuitsFromGroup())
+                .rules(props.getRules())
                 .ticketPrice(Optional.empty())
-                .matchScore(props.getMatchScore())
-                .thirdPlaceMatch(props.isThirdPlace() ? 1 : 0)
                 .build());
         forTestTournamentDao.setState(tid, props.getState());
         return tid;

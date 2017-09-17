@@ -4,6 +4,9 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.mock.Generators.genStr;
 
 import lombok.RequiredArgsConstructor;
+import org.dan.ping.pong.app.tournament.GroupRules;
+import org.dan.ping.pong.app.tournament.MatchValidationRule;
+import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
 
 import java.util.UUID;
@@ -18,13 +21,32 @@ public class DaoEntityGeneratorWithAdmin {
     }
 
     public int genTournament(int placeId, TournamentState state) {
-        return genTournament(placeId, TournamentProps.builder().state(state).build());
+        return genTournament(placeId, TournamentProps.builder()
+                .state(state)
+                .rules(rules(2))
+                .build());
     }
 
     public int genTournament(int placeId, TournamentState state, int quits) {
         return genTournament(placeId, TournamentProps.builder()
-                .state(state).quitsFromGroup(quits)
+                .state(state)
+                .rules(rules(quits))
                 .build());
+    }
+
+    private TournamentRules rules(int quits) {
+        return TournamentRules.builder()
+                .match(MatchValidationRule.builder()
+                        .setsToWin(3)
+                        .minGamesToWin(11)
+                        .minAdvanceInGames(2)
+                        .build())
+                .group(GroupRules.builder()
+                        .maxSize(8)
+                        .quits(quits)
+                        .build())
+                .prizeWinningPlaces(3)
+                .build();
     }
 
     public int genTournament(int placeId, TournamentProps props) {

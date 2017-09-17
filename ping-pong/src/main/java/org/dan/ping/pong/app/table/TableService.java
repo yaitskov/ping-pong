@@ -59,7 +59,8 @@ public class TableService {
                          .noneMatch(pickedUids::contains))
                 .map(minfo -> {
                     minfo.getParticipantIdScore().keySet().forEach(pickedUids::add);
-                    return minfo; })
+                    return minfo;
+                })
                 .limit(matchesToSchedule)
                 .collect(toList());
     }

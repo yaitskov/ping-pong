@@ -5,6 +5,7 @@ import static org.dan.ping.pong.mock.simulator.TournamentScenario.createRndGen;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.dan.ping.pong.app.tournament.MatchValidationRule;
 
 import java.util.List;
 
@@ -15,8 +16,9 @@ public class GameEnd {
     private final MatchOutcome outcome;
     private final SetGenerator setGenerator;
 
-    public static GameEnd game(Player a, MatchOutcome outcome, Player b) {
-        return game(a, outcome, b, createRndGen(a, outcome, b));
+    public static GameEnd game(Player a, MatchOutcome outcome, Player b,
+            MatchValidationRule matchRules) {
+        return game(a, outcome, b, createRndGen(a, outcome, b, matchRules));
     }
 
     public static GameEnd game(Player a, MatchOutcome outcome, Player b,

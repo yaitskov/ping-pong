@@ -11,6 +11,7 @@ public class MatchOutcome {
     public static final MatchOutcome W30 = new MatchOutcome(3, 0);
     public static final MatchOutcome W31 = new MatchOutcome(3, 1);
     public static final MatchOutcome W32 = new MatchOutcome(3, 2);
+    public static final MatchOutcome W10 = new MatchOutcome(1, 0);
     public static final MatchOutcome L03 = W30.flip();
     public static final MatchOutcome L13 = W31.flip();
     public static final MatchOutcome L23 = W32.flip();

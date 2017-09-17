@@ -4,9 +4,9 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
-import static org.dan.ping.pong.app.tournament.MatchValidationRuleUnitTest.PING_PONG_RULE;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.L13;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.L23;
+import static org.dan.ping.pong.mock.simulator.MatchOutcome.W10;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.W30;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.W31;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.W32;
@@ -18,8 +18,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
+import org.dan.ping.pong.app.tournament.MatchValidationRule;
+import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.mock.TestUserSession;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,16 +45,18 @@ public class TournamentScenario {
     private final Map<PlayerCategory, Integer> categoryDbId = new HashMap<>();
     private final Map<Set<Player>, PlayHook> hooksOnMatches = new HashMap<>();
     private final Map<Player, EnlistMode> playerPresence = new HashMap<>();
+    private final List<HookCallbackPro> onBeforeAnyMatch = new ArrayList<>();
 
     private boolean begin = true;
     @Setter
     private int tid;
     @Setter
     private int placeId;
-    @Setter
-    private SimulatorParams params;
+    private int tables = 1;
     @Setter
     private TestUserSession testAdmin;
+
+    private TournamentRules rules;
 
     private boolean ignoreUnexpectedGames;
 
@@ -67,8 +72,18 @@ public class TournamentScenario {
         return this;
     }
 
+    public TournamentScenario tables(int tables) {
+        this.tables = tables;
+        return this;
+    }
+
     public static TournamentScenario begin() {
         return new TournamentScenario();
+    }
+
+    public TournamentScenario rules(TournamentRules rules) {
+        this.rules = rules;
+        return this;
     }
 
     public Map<Set<Player>, GameEnd> chooseMatchMap(OpenMatchForJudge openMatch) {
@@ -119,12 +134,21 @@ public class TournamentScenario {
         return this;
     }
 
+    public TournamentScenario onBeforeMatch(HookCallbackPro playHook) {
+        onBeforeAnyMatch.add(playHook);
+        return this;
+    }
+
     public TournamentScenario win(Player pa, Player pb) {
         return w31(pa, pb);
     }
 
     public TournamentScenario w31(Player pa, Player pb) {
         return match(pa, W31, pb);
+    }
+
+    public TournamentScenario w10(Player pa, Player pb) {
+        return match(pa, W10, pb);
     }
 
     public TournamentScenario custom(SetGenerator generator) {
@@ -153,13 +177,14 @@ public class TournamentScenario {
 
     public TournamentScenario match(Player pa, MatchOutcome outcome, Player pb) {
         return match(pa, outcome, pb,
-                createRndGen(pa, outcome, pb));
+                createRndGen(pa, outcome, pb, getRules().getMatch()));
     }
 
-    public static RndSetGenerator createRndGen(Player pa, MatchOutcome outcome, Player pb) {
+    public static RndSetGenerator createRndGen(Player pa, MatchOutcome outcome, Player pb,
+            MatchValidationRule matchRules) {
         return new RndSetGenerator(
                 ImmutableMap.of(pa, outcome.first(), pb, outcome.second()),
-                PING_PONG_RULE);
+                matchRules);
     }
 
     public TournamentScenario quitsGroup(Player... ps) {

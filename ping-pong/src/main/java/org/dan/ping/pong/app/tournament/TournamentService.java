@@ -306,8 +306,8 @@ public class TournamentService {
         tournamentDao.update(update, batch);
     }
 
-    public TournamentParameters getTournamentParams(int tid) {
-        return tournamentDao.getTournamentParams(tid)
+    public TournamentRules getTournamentRules(int tid) {
+        return tournamentDao.getTournamentRules(tid)
                 .orElseThrow(() -> notFound("Tournament does not exist"));
     }
 

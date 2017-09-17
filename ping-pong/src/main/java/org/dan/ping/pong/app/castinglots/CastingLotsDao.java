@@ -3,15 +3,19 @@ package org.dan.ping.pong.app.castinglots;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.log;
 import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.match.MatchType.POff;
+import static org.dan.ping.pong.app.tournament.GroupSchedule.DEFAULT_SCHEDULE;
+import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
+import org.dan.ping.pong.app.tournament.GroupSchedule;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.jooq.DSLContext;
@@ -30,31 +34,41 @@ public class CastingLotsDao {
     @Inject
     private MatchDao matchDao;
 
-    public int generateGroupMatches(OpenTournamentMemState tournament, int gid, List<ParticipantMemState> groupBids) {
+    private List<Integer> pickSchedule(OpenTournamentMemState tournament,
+            List<ParticipantMemState> groupBids) {
+        final GroupSchedule groupSchedules = tournament.getRule().getGroup()
+                .getSchedule().orElse(DEFAULT_SCHEDULE);
+        return ofNullable(groupSchedules.getSize2Schedule().get(groupBids.size()))
+                .orElseGet(() -> ofNullable(DEFAULT_SCHEDULE.getSize2Schedule().get(groupBids.size()))
+                        .orElseThrow(() -> internalError("No schedule for group of " + groupBids.size())));
+    }
+
+    public int generateGroupMatches(OpenTournamentMemState tournament, int gid,
+            List<ParticipantMemState> groupBids, int priorityGroup) {
         final int tid = tournament.getTid();
         CastingLotsDao.log.info("Generate matches for group {} in tournament {}", gid, tid);
-        int priorityGroup = 0;
-        for (int i = 0; i < groupBids.size(); ++i) {
-            final ParticipantMemState bid1 = groupBids.get(i);
-            for (int j = i + 1; j < groupBids.size(); ++j) {
-                final ParticipantMemState bid2 = groupBids.get(j);
-                final int mid = matchDao.createGroupMatch(tid,
-                        gid, bid1.getCid(), ++priorityGroup,
-                        bid1.getUid().getId(), bid2.getUid().getId());
-                tournament.getMatches().put(mid, MatchInfo.builder()
-                        .tid(tid)
-                        .mid(mid)
-                        .state(MatchState.Place)
-                        .gid(Optional.of(gid))
-                        .participantIdScore(ImmutableMap.of(
-                                bid1.getUid().getId(), new ArrayList<>(),
-                                bid2.getUid().getId(), new ArrayList<>()))
-                        .type(Grup)
-                        .cid(tournament.getGroups().get(gid).getCid())
-                        .build());
-                CastingLotsDao.log.info("New match {} between {} and {}", mid,
-                        bid1.getUid(), bid2.getUid());
-            }
+        final List<Integer> schedule = pickSchedule(tournament, groupBids);
+        for (int i = 0; i < schedule.size();) {
+            final int bidIdxA = schedule.get(i++);
+            final int bidIdxB = schedule.get(i++);
+            final ParticipantMemState bid1 = groupBids.get(bidIdxA);
+            final ParticipantMemState bid2 = groupBids.get(bidIdxB);
+            final int mid = matchDao.createGroupMatch(tid,
+                    gid, bid1.getCid(), ++priorityGroup,
+                    bid1.getUid().getId(), bid2.getUid().getId());
+            tournament.getMatches().put(mid, MatchInfo.builder()
+                    .tid(tid)
+                    .mid(mid)
+                    .state(MatchState.Place)
+                    .gid(Optional.of(gid))
+                    .participantIdScore(ImmutableMap.of(
+                            bid1.getUid().getId(), new ArrayList<>(),
+                            bid2.getUid().getId(), new ArrayList<>()))
+                    .type(Grup)
+                    .cid(tournament.getGroups().get(gid).getCid())
+                    .build());
+            CastingLotsDao.log.info("New match {} between {} and {}", mid,
+                    bid1.getUid(), bid2.getUid());
         }
         return priorityGroup;
     }

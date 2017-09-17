@@ -1,20 +1,19 @@
 package org.dan.ping.pong.app.tournament;
 
-import static java.util.Collections.singletonList;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 import static javax.ws.rs.core.Response.Status.Family.familyOf;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
-import static org.dan.ping.pong.app.bid.BidResource.BID_SET_STATE;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Want;
+import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q1;
+import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.W1A2G11;
 import static org.dan.ping.pong.app.category.CategoryResource.CATEGORY_MEMBERS;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.DRAFTING;
 import static org.dan.ping.pong.app.tournament.TournamentResource.EDITABLE_TOURNAMENTS;
-import static org.dan.ping.pong.app.tournament.TournamentResource.MY_RECENT_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.RUNNING_TOURNAMENTS;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_CREATE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST;
@@ -39,7 +38,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -49,8 +47,6 @@ import static org.junit.Assert.fail;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
-import org.dan.ping.pong.app.bid.BidState;
-import org.dan.ping.pong.app.bid.SetBidState;
 import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
@@ -59,7 +55,6 @@ import org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin;
 import org.dan.ping.pong.mock.RestEntityGenerator;
 import org.dan.ping.pong.mock.TestAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
-import org.dan.ping.pong.mock.TournamentProps;
 import org.dan.ping.pong.mock.UserSessionGenerator;
 import org.dan.ping.pong.sys.ctx.TestCtx;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
@@ -70,7 +65,6 @@ import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -110,10 +104,11 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                         .placeId(daoGenerator.genPlace(0))
                         .opensAt(opensAt)
                         .previousTid(Optional.empty())
-                        .quitsFromGroup(2)
+                        .rules(TournamentRules.builder()
+                                .group(G8Q1)
+                                .match(W1A2G11)
+                                .build())
                         .ticketPrice(Optional.empty())
-                        .thirdPlaceMatch(0)
-                        .matchScore(3)
                         .build(), APPLICATION_JSON));
         final int tid = response.readEntity(Integer.class);
 

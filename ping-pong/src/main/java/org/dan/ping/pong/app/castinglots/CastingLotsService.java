@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.castinglots;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
+import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.bid.BidState.Here;
@@ -18,13 +19,10 @@ import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
-import org.dan.ping.pong.app.tournament.TournamentDao;
-import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.util.collection.SetUtil;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -41,9 +39,6 @@ public class CastingLotsService {
 
     @Inject
     private CastingLotsDao castingLotsDao;
-
-    @Inject
-    private TournamentDao tournamentDao;
 
     @Inject
     private BidDao bidDao;
@@ -65,7 +60,7 @@ public class CastingLotsService {
                 throw badRequest("There is a category with 1 participant."
                         + " Expel him/her or move into another category.");
             }
-            bids = bids.stream().sorted(Comparator.comparingInt(bid -> bid.getUid().getId())).collect(toList());
+            bids = bids.stream().sorted(comparingInt(bid -> bid.getUid().getId())).collect(toList());
             final double bidsInCategory = bids.size();
             final int groups = max(1, (int) ceil(bidsInCategory
                     / tournament.getRule().getGroup().getMaxSize()));
@@ -82,7 +77,7 @@ public class CastingLotsService {
                     throw badRequest("Category should have more participants than quits from a group");
                 }
                 basePlayOffPriority = Math.max(
-                        castingLotsDao.generateGroupMatches(tournament, gid, groupBids),
+                        castingLotsDao.generateGroupMatches(tournament, gid, groupBids, 0),
                         basePlayOffPriority);
                 bidDao.setGroupForUids(gid, tid, groupBids);
             }
@@ -97,9 +92,6 @@ public class CastingLotsService {
                 .filter(bid -> ImmutableSet.of(Want, Paid, Here).contains(bid.getBidState()))
                 .collect(toList());
     }
-
-    @Inject
-    private UserDao userDao;
 
     private void checkAllThatAllHere(List<ParticipantMemState> readyBids) {
         final List<UserLink> notHere = readyBids.stream().filter(bid ->

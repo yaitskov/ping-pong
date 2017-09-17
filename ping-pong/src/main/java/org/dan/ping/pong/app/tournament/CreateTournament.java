@@ -23,9 +23,6 @@ public class CreateTournament {
     private String name;
     private Optional<Integer> previousTid;
     private int placeId;
-    private int matchScore;
-    private int quitsFromGroup;
+    private TournamentRules rules;
     private Optional<Double> ticketPrice;
-    private int thirdPlaceMatch;
-    private int maxGroupSize;
 }

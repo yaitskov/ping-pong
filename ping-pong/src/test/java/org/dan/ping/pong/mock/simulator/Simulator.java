@@ -90,9 +90,12 @@ public class Simulator {
     private TournamentDao tournamentDao;
 
     public void simulate(SimulatorParams params, TournamentScenario scenario) {
+        simulate(scenario);
+    }
+
+    public void simulate(TournamentScenario scenario) {
         try {
-            scenario.setParams(params);
-            setupEnvironment(params, scenario);
+            setupEnvironment(scenario);
             if (!scenario.isBegin()) {
                 return;
             }
@@ -112,7 +115,7 @@ public class Simulator {
         assertEquals(emptyList(),
                 testMatchDao.findIncompleteTournamentMatches(scenario.getTid()));
         List<TableInfo> tables = tableDao.findFreeTables(scenario.getTid());
-        assertThat(tables, Matchers.hasSize(scenario.getParams().getTables()));
+        assertThat(tables, Matchers.hasSize(scenario.getTables()));
         assertEquals(emptyList(),
                 tables.stream().map(TableInfo::getMid)
                         .filter(Optional::isPresent)
@@ -154,7 +157,7 @@ public class Simulator {
             final List<OpenMatchForJudge> openMatches = matchDao.findOpenMatchesFurJudge(
                     testAdmin.getUid());
             assertThat(tableDao.findFreeTables(scenario.getTid()),
-                    Matchers.hasSize(scenario.getParams().getTables() - openMatches.size()));
+                    Matchers.hasSize(scenario.getTables() - openMatches.size()));
             completeOpenMatches(scenario, completedMatches, openMatches);
             if (scenario.isIgnoreUnexpectedGames()
                     && scenario.getGroupMatches().isEmpty()
@@ -200,6 +203,7 @@ public class Simulator {
                 final MatchMetaInfo matchMetaInfo = MatchMetaInfo.builder()
                         .openMatch(openMatch)
                         .players(players).build();
+                scenario.getOnBeforeAnyMatch().forEach(hk -> hk.accept(scenario, matchMetaInfo));
                 final HookDecision hookDecision = hook.pauseBefore(scenario, matchMetaInfo);
                 ++completedMatches[0];
                 log.info("Match id {} outcome {}", openMatch.getMid(), game);
@@ -263,13 +267,13 @@ public class Simulator {
             case LastMatchComplete:
             case MatchComplete:
                 assertTrue("Match " + openMatch.getMid()
-                                + " ended before set generator",
+                                + " ended before its set generator",
                         game.getSetGenerator().isEmpty());
                 scenario.chooseMatchMap(openMatch).remove(players);
                 return SetScoreResultName.MatchComplete;
             case MatchContinues:
                 assertFalse("Match " + openMatch.getMid()
-                        + " continues while generator is empty",
+                        + " continues while its set generator is empty",
                         game.getSetGenerator().isEmpty());
                 return SetScoreResultName.MatchContinues;
             default:
@@ -287,7 +291,7 @@ public class Simulator {
                 Iterator<Player> iterator = players.iterator();
                 return Optional.of(GameEnd.game(iterator.next(),
                         scenario.getAutoResolution().get().choose(players),
-                        iterator.next()));
+                        iterator.next(), scenario.getRules().getMatch()));
             }
             if (scenario.isIgnoreUnexpectedGames()) {
                 return empty();
@@ -312,7 +316,7 @@ public class Simulator {
     @Inject
     private ValueGenerator valueGenerator;
 
-    private void setupEnvironment(SimulatorParams params, TournamentScenario scenario) {
+    private void setupEnvironment(TournamentScenario scenario) {
         rest.voidAnonymousPost(DEV_CLEAN_SIGN_IN_TOKEN_TABLE, "");
         final String prefix = scenario.getName()
                 .orElseGet(() -> "todo")
@@ -326,14 +330,13 @@ public class Simulator {
         restGenerator.generateSignInLinks(singletonList(testAdmin));
         final int countryId = daoGenerator.genCountry(prefix, testAdmin.getUid());
         final int cityId = daoGenerator.genCity(countryId, prefix, testAdmin.getUid());
-        final int placeId = daoGenerator.genPlace(cityId, prefix, testAdmin.getUid(), params.getTables());
+        final int placeId = daoGenerator.genPlace(cityId, prefix,
+                testAdmin.getUid(), scenario.getTables());
         scenario.setPlaceId(placeId);
         final int tid = daoGenerator.genTournament(prefix, testAdmin.getUid(),
                 placeId, TournamentProps.builder()
-                        .maxGroupSize(params.getMaxGroupSize())
-                        .quitsFromGroup(params.getQuitsFromGroup())
+                        .rules(scenario.getRules())
                         .state(TournamentState.Draft)
-                        .thirdPlace(params.isThirdPlace())
                         .build());
         scenario.setTid(tid);
         final Map<Player, TestUserSession> playersSession = scenario.getPlayersSessions();

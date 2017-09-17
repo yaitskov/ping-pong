@@ -96,20 +96,7 @@ public class TournamentDao {
                         newTournament.getOpensAt(),
                         newTournament.getPlaceId(),
                         newTournament.getPreviousTid(),
-                        TournamentRules.builder()
-                                .group(GroupRules.builder()
-                                        .maxSize(newTournament.getMaxGroupSize())
-                                        .quits(newTournament.getQuitsFromGroup())
-                                        .build())
-                                .match(MatchValidationRule.builder()
-                                        .minPossibleGames(0)
-                                        .minAdvanceInGames(2)
-                                        .minGamesToWin(11)
-                                        .setsToWin(newTournament.getMatchScore())
-                                        .build())
-                                .thirdPlaceMatch(newTournament.getThirdPlaceMatch())
-                                .prizeWinningPlaces(3)
-                                .build(),
+                        newTournament.getRules(),
                         newTournament.getTicketPrice(),
                         newTournament.getName())
                 .returning(TOURNAMENT.TID)
@@ -453,23 +440,13 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<TournamentParameters> getTournamentParams(int tid) {
+    public Optional<TournamentRules> getTournamentRules(int tid) {
         return ofNullable(jooq
                 .select(TOURNAMENT.RULES)
                 .from(TOURNAMENT)
                 .where(TOURNAMENT.TID.eq(tid))
                 .fetchOne())
-                .map(r -> {
-                    TournamentRules rules = r.get(TOURNAMENT.RULES);
-                    return TournamentParameters
-                        .builder()
-                        .tid(tid)
-                        .matchScore(rules.getMatch().getMinGamesToWin())
-                        .quitsGroup(rules.getGroup().getQuits())
-                        .maxGroupSize(rules.getGroup().getMaxSize())
-                        .thirdPlaceMatch(rules.getThirdPlaceMatch())
-                        .build(); }
-                        );
+                .map(r -> r.get(TOURNAMENT.RULES));
     }
 
     @Transactional(TRANSACTION_MANAGER)
@@ -507,18 +484,15 @@ public class TournamentDao {
         final int originTid = copyTournament.getOriginTid();
         final MyTournamentInfo tinfo = getMyTournamentInfo(originTid)
                 .orElseThrow(() -> notFound("Tournament " + originTid + " not found"));
-        final TournamentParameters tparams = getTournamentParams(originTid)
+        final TournamentRules rules = getTournamentRules(originTid)
                 .orElseThrow(() -> notFound("Tournament " + originTid + " not found"));
         return justCreate(CreateTournament.builder()
                 .name(copyTournament.getName())
-                .matchScore(tparams.getMatchScore())
+                .rules(rules)
                 .opensAt(copyTournament.getOpensAt())
-                .quitsFromGroup(tparams.getQuitsGroup())
                 .placeId(tinfo.getPlace().getPid())
                 .ticketPrice(tinfo.getPrice())
-                .thirdPlaceMatch(tparams.getThirdPlaceMatch())
                 .previousTid(of(originTid))
-                .maxGroupSize(tparams.getMaxGroupSize())
                 .build(), Draft);
     }
 

@@ -7,8 +7,10 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
-import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
+import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q1;
+import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.W1A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_WATCH_LIST_OPEN;
+import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.table.TableState.Free;
@@ -39,14 +41,14 @@ import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableInfo;
+import org.dan.ping.pong.app.tournament.GroupRules;
+import org.dan.ping.pong.app.tournament.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentInfo;
+import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin;
-import org.dan.ping.pong.mock.GeneratedOpenTournament;
 import org.dan.ping.pong.mock.MyLocalRest;
-import org.dan.ping.pong.mock.OpenTournamentGenerator;
-import org.dan.ping.pong.mock.OpenTournamentParams;
 import org.dan.ping.pong.mock.RestEntityGeneratorWithAdmin;
 import org.dan.ping.pong.mock.TestAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
@@ -75,13 +77,19 @@ import javax.ws.rs.core.Response;
 
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = {TestCtx.class, ForTestMatchDao.class,
-        ForTestBidDao.class, Simulator.class, OpenTournamentGenerator.class})
+        ForTestBidDao.class, Simulator.class})
 public class MatchJerseyTest extends AbstractSpringJerseyTest {
     private static final int LOSER = 0;
     private static final int WINER = 1;
 
     private static final int WINNER_SCORE = 11;
     private static final int LOSER_SCORE = 1;
+    public static final TournamentRules RULES_G8Q1_S1A2G11 = TournamentRules
+            .builder()
+            .match(W1A2G11)
+            .group(G8Q1)
+            .build();
+
     @Inject
     @Named(ADMIN_SESSION)
     private TestAdmin adminSession;
@@ -122,9 +130,8 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void adminCompleteOnlyMatchIn1Group() {
         final int placeId = daoGenerator.genPlace(1);
-        final int tid = daoGenerator.genTournament(placeId, TournamentProps.builder()
-                .matchScore(1)
-                .quitsFromGroup(1).build());
+        final int tid = daoGenerator.genTournament(placeId,
+                TournamentProps.builder().rules(RULES_G8Q1_S1A2G11).build());
         final int cid = daoGenerator.genCategory(tid);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
         restGenerator.enlistParticipants(tid, cid, participants);
@@ -167,14 +174,14 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
         assertEquals(emptyList(), restGenerator.listOpenMatches());
     }
 
-    @Inject
-    private OpenTournamentGenerator openTournamentGenerator;
-
     @Test
     public void listOpenMatchesForWatch() {
-        final GeneratedOpenTournament got = openTournamentGenerator.genOpenTour(
-                OpenTournamentParams.builder().build());
-        List<OpenMatchForWatch> result = rest.get(MATCH_WATCH_LIST_OPEN + "/" + got.getTid(),
+        TournamentScenario scenario = TournamentScenario.begin()
+                .category(c1, p1, p2)
+                .ignoreUnexpectedGames();
+
+        simulator.simulate(T_1_Q_1_G_2, scenario);
+        List<OpenMatchForWatch> result = rest.get(MATCH_WATCH_LIST_OPEN + "/" + scenario.getTid(),
                 new GenericType<List<OpenMatchForWatch>>() {});
         assertThat(result, hasItem(allOf(
                 hasProperty("mid", greaterThan(0)),
@@ -182,17 +189,19 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 hasProperty("score", is(asList(0, 0))),
                 hasProperty("category", allOf(
                         hasProperty("name", notNullValue()),
-                        hasProperty("cid", is(got.getCid())))),
+                        hasProperty("cid", is(scenario.getCategoryDbId().get(c1))))),
                 hasProperty("participants", hasItems(
                         allOf(
                                 hasProperty("name", notNullValue()),
-                                hasProperty("uid", is(got.getSessions().get(1).getUid()))),
+                                hasProperty("uid", is(scenario.getPlayersSessions()
+                                        .get(p1).getUid()))),
                         allOf(
                                 hasProperty("name", notNullValue()),
-                                hasProperty("uid", is(got.getSessions().get(0).getUid()))))),
+                                hasProperty("uid", is(scenario.getPlayersSessions()
+                                        .get(p2).getUid()))))),
                 hasProperty("table",
                         allOf(hasProperty("label", notNullValue()),
-                                hasProperty("id", is(got.getTableIds().get(0))))))));
+                                hasProperty("id", greaterThan(0)))))));
     }
 
     @Inject

@@ -69,7 +69,7 @@ public class TournamentResource {
     public int create(
             @HeaderParam(SESSION) String session,
             CreateTournament newTournament) {
-        if (newTournament.getMatchScore() <= 0) {
+        if (newTournament.getRules().getMatch().getSetsToWin() <= 0) {
             throw badRequest("Match Score is not positive");
         }
         return tournamentService.create(
@@ -253,8 +253,8 @@ public class TournamentResource {
     @GET
     @Path(GET_TOURNAMENT_PARAMS)
     @Consumes(APPLICATION_JSON)
-    public TournamentParameters getTournamentParams(@PathParam("tid") int tid) {
-        return tournamentService.getTournamentParams(tid);
+    public TournamentRules getTournamentRules(@PathParam("tid") int tid) {
+        return tournamentService.getTournamentRules(tid);
     }
 
     @POST

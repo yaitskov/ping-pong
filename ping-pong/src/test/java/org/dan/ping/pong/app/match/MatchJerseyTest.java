@@ -7,8 +7,11 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
+import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G2Q1;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q1;
-import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.W1A2G11;
+import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q2;
+import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S1A2G11;
+import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S3A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_WATCH_LIST_OPEN;
 import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
 import static org.dan.ping.pong.app.match.MatchState.Over;
@@ -22,10 +25,6 @@ import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_2;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_2_G_8;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_3_Q_1_G_8;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
@@ -41,8 +40,6 @@ import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableInfo;
-import org.dan.ping.pong.app.tournament.GroupRules;
-import org.dan.ping.pong.app.tournament.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentInfo;
 import org.dan.ping.pong.app.tournament.TournamentRules;
@@ -84,10 +81,34 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
 
     private static final int WINNER_SCORE = 11;
     private static final int LOSER_SCORE = 1;
+    public static final TournamentRules RULES_G8Q1_S3A2G11 = TournamentRules
+            .builder()
+            .match(S3A2G11)
+            .group(G8Q1)
+            .build();
+
     public static final TournamentRules RULES_G8Q1_S1A2G11 = TournamentRules
             .builder()
-            .match(W1A2G11)
+            .match(S1A2G11)
             .group(G8Q1)
+            .build();
+
+    public static final TournamentRules RULES_G2Q1_S1A2G11 = TournamentRules
+            .builder()
+            .match(S1A2G11)
+            .group(G2Q1)
+            .build();
+
+    public static final TournamentRules RULES_G8Q2_S1A2G11 = TournamentRules
+            .builder()
+            .match(S1A2G11)
+            .group(G8Q2)
+            .build();
+
+    public static final TournamentRules RULES_G8Q2_S3A2G11 = TournamentRules
+            .builder()
+            .match(S3A2G11)
+            .group(G8Q2)
             .build();
 
     @Inject
@@ -178,9 +199,10 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
     public void listOpenMatchesForWatch() {
         TournamentScenario scenario = TournamentScenario.begin()
                 .category(c1, p1, p2)
+                .rules(RULES_G8Q1_S1A2G11)
                 .ignoreUnexpectedGames();
 
-        simulator.simulate(T_1_Q_1_G_2, scenario);
+        simulator.simulate(scenario);
         List<OpenMatchForWatch> result = rest.get(MATCH_WATCH_LIST_OPEN + "/" + scenario.getTid(),
                 new GenericType<List<OpenMatchForWatch>>() {});
         assertThat(result, hasItem(allOf(
@@ -209,8 +231,9 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void twoGroupsBy2Guys1TableQuit1() {
-        simulator.simulate(T_1_Q_1_G_2,
+        simulator.simulate(
                 TournamentScenario.begin()
+                        .rules(RULES_G2Q1_S1A2G11)
                         .category(c1, p1, p2, p3, p4)
                         .win(p1, p2)
                         .lose(p4, p3)
@@ -221,8 +244,9 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void aGroupOf2Guys1TableQuit1() {
-        simulator.simulate(T_1_Q_1_G_8,
+        simulator.simulate(
                 TournamentScenario.begin()
+                        .rules(RULES_G8Q1_S1A2G11)
                         .category(c1, p1, p2)
                         .win(p1, p2)
                         .quitsGroup(p1)
@@ -231,8 +255,9 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void aGroupOf3Guys1TableQuit2() {
-        simulator.simulate(T_1_Q_2_G_8,
+        simulator.simulate(
                 TournamentScenario.begin()
+                        .rules(RULES_G8Q2_S1A2G11)
                         .category(c1, p1, p2, p3)
                         .win(p1, p2)
                         .win(p1, p3)
@@ -244,15 +269,16 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void aGroupOf4Guys1TableQuit2_p3_lose_by_sets() {
-        simulator.simulate(T_1_Q_2_G_8,
+        simulator.simulate(
                 TournamentScenario.begin()
+                        .rules(RULES_G8Q2_S3A2G11)
                         .category(c1, p1, p2, p3, p4)
-                        .win(p1, p2) // p1 2 wins
+                        .w31(p1, p2) // p1 2 wins
                         .w30(p1, p3)
-                        .lose(p1, p4)
-                        .win(p4, p2) // p4 2 wins
+                        .l13(p1, p4)
+                        .w31(p4, p2) // p4 2 wins
                         .l23(p4, p3)
-                        .win(p3, p2) // p3 1 wins
+                        .w31(p3, p2) // p3 1 wins
                         .quitsGroup(p1, p4)
                         .lose(p4, p1)
                         .champions(c1, p1, p4));
@@ -262,6 +288,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
     public void acceptScoreIfItTheSame() {
         final FixedSetGenerator game = game(p1, p2, 11, 2, 11, 3, 11, 5);
         TournamentScenario scenario = TournamentScenario.begin()
+                .rules(RULES_G8Q1_S3A2G11)
                 .category(c1, p1, p2)
                 .custom(game)
                 .quitsGroup(p1)
@@ -274,7 +301,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                                             .mid(meta.getOpenMatch().getMid())
                                             .scores(asList(
                                                     IdentifiedScore.builder()
-                                                            .score(11)
+                                                            .score(s.getRules().getMatch().getMinGamesToWin())
                                                             .uid(s.getPlayersSessions().get(p1).getUid())
                                                             .build(),
                                                     IdentifiedScore.builder()
@@ -288,13 +315,14 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 .champions(c1, p1)
                 .ignoreUnexpectedGames();
 
-        simulator.simulate(T_1_Q_1_G_8, scenario);
+        simulator.simulate(scenario);
     }
 
     @Test
     public void rejectDifferentScore() {
         final FixedSetGenerator game = game(p1, p2, 11, 2, 11, 3, 11, 5);
         TournamentScenario scenario = TournamentScenario.begin()
+                .rules(RULES_G8Q1_S3A2G11)
                 .category(c1, p1, p2)
                 .custom(game)
                 .quitsGroup(p1)
@@ -308,7 +336,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                                             .mid(meta.getOpenMatch().getMid())
                                             .scores(asList(
                                                     IdentifiedScore.builder()
-                                                            .score(11)
+                                                            .score(s.getRules().getMatch().getMinGamesToWin())
                                                             .uid(s.getPlayersSessions().get(p1).getUid())
                                                             .build(),
                                                     IdentifiedScore.builder()
@@ -325,13 +353,15 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 .champions(c1, p1)
                 .ignoreUnexpectedGames();
 
-        simulator.simulate(T_1_Q_1_G_8, scenario);
+        simulator.simulate(scenario);
     }
 
     @Test
     public void participantPlays1GameAtTime() {
-        simulator.simulate(T_3_Q_1_G_8,
+        simulator.simulate(
                 TournamentScenario.begin()
+                        .tables(3)
+                        .rules(RULES_G8Q1_S1A2G11)
                         .category(c1, p1, p2, p3)
                         .win(p1, p2)
                         .win(p1, p3)

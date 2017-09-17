@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.table;
 
 import static java.util.Comparator.comparingInt;
-import static java.util.stream.Collectors.minBy;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.table.TableState.Busy;
@@ -20,7 +19,6 @@ import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -58,10 +56,12 @@ public class TableService {
                 .filter(minfo -> minfo.getParticipantIdScore().keySet().stream()
                         .map(uid -> tournament.getParticipants().get(uid).getBidState())
                         .allMatch(bidState -> bidState == BidState.Wait))
-                .filter(minfo -> minfo.getParticipantIdScore().keySet().stream()
-                         .noneMatch(pickedUids::contains))
                 .sorted(comparingInt(MatchInfo::getPriority)
                         .thenComparingInt(MatchInfo::getMid))
+                .collect(toList())
+                .stream()
+                .filter(minfo -> minfo.getParticipantIdScore().keySet().stream()
+                         .noneMatch(pickedUids::contains))
                 .map(minfo -> {
                     minfo.getParticipantIdScore().keySet().forEach(pickedUids::add);
                     return minfo;

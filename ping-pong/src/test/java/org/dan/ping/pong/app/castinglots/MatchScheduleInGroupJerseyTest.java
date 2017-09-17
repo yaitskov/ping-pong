@@ -40,8 +40,25 @@ public class MatchScheduleInGroupJerseyTest extends AbstractSpringJerseyTest {
             .quits(1)
             .build();
 
+    public static final GroupRules G8Q2 = GroupRules.builder()
+            .maxSize(8)
+            .quits(2)
+            .build();
+
+    public static final GroupRules G2Q1 = GroupRules.builder()
+            .maxSize(2)
+            .quits(1)
+            .build();
+
     public static final MatchValidationRule S1A2G11 = MatchValidationRule.builder()
             .setsToWin(1)
+            .minAdvanceInGames(2)
+            .minPossibleGames(0)
+            .minGamesToWin(11)
+            .build();
+
+    public static final MatchValidationRule S3A2G11 = MatchValidationRule.builder()
+            .setsToWin(3)
             .minAdvanceInGames(2)
             .minPossibleGames(0)
             .minGamesToWin(11)

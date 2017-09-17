@@ -15,6 +15,7 @@ public class MatchOutcome {
     public static final MatchOutcome L03 = W30.flip();
     public static final MatchOutcome L13 = W31.flip();
     public static final MatchOutcome L23 = W32.flip();
+    public static final MatchOutcome L01 = W10.flip();
     public static final List<MatchOutcome> OUTCOMES = asList(W30, W31, W32, L03, L13, L23);
 
     private final int first;

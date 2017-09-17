@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
+import static org.dan.ping.pong.mock.simulator.MatchOutcome.L01;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.L13;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.L23;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.W10;
@@ -140,15 +141,17 @@ public class TournamentScenario {
     }
 
     public TournamentScenario win(Player pa, Player pb) {
-        return w31(pa, pb);
+        return match(pa,
+                new MatchOutcome(getRules().getMatch().getSetsToWin(), 0),
+                pb, getRules().getMatch());
     }
 
     public TournamentScenario w31(Player pa, Player pb) {
-        return match(pa, W31, pb);
+        return match(pa, W31, pb, getRules().getMatch());
     }
 
     public TournamentScenario w10(Player pa, Player pb) {
-        return match(pa, W10, pb);
+        return match(pa, W10, pb, getRules().getMatch());
     }
 
     public TournamentScenario custom(SetGenerator generator) {
@@ -156,28 +159,35 @@ public class TournamentScenario {
     }
 
     public TournamentScenario w30(Player pa, Player pb) {
-        return match(pa, W30, pb);
+        return match(pa, W30, pb, getRules().getMatch());
     }
 
     public TournamentScenario w32(Player pa, Player pb) {
-        return match(pa, W32, pb);
+        return match(pa, W32, pb, getRules().getMatch());
     }
 
     public TournamentScenario lose(Player pa, Player pb) {
-        return l13(pa, pb);
+        return match(pa, new MatchOutcome(0, getRules().getMatch().getSetsToWin()),
+                pb, getRules().getMatch());
     }
 
     public TournamentScenario l13(Player pa, Player pb) {
-        return match(pa, L13, pb);
+        return match(pa, L13, pb, getRules().getMatch());
     }
 
     public TournamentScenario l23(Player pa, Player pb) {
-        return match(pa, L23, pb);
+        return match(pa, L23, pb, getRules().getMatch());
     }
 
-    public TournamentScenario match(Player pa, MatchOutcome outcome, Player pb) {
+    public TournamentScenario l01(Player pa, Player pb) {
+        return match(pa, L01, pb, getRules().getMatch());
+    }
+
+    public TournamentScenario match(
+            Player pa, MatchOutcome outcome, Player pb,
+            MatchValidationRule matchRules) {
         return match(pa, outcome, pb,
-                createRndGen(pa, outcome, pb, getRules().getMatch()));
+                createRndGen(pa, outcome, pb, matchRules));
     }
 
     public static RndSetGenerator createRndGen(Player pa, MatchOutcome outcome, Player pb,

@@ -85,6 +85,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .builder()
             .match(S3A2G11)
             .group(G8Q1)
+            .prizeWinningPlaces(3)
             .build();
 
     public static final TournamentRules RULES_G8Q1_S1A2G11 = TournamentRules
@@ -99,6 +100,14 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .group(G2Q1)
             .build();
 
+    public static final TournamentRules RULES_G2Q1_S1A2G11_3P = TournamentRules
+            .builder()
+            .match(S1A2G11)
+            .group(G2Q1)
+            .thirdPlaceMatch(1)
+            .prizeWinningPlaces(3)
+            .build();
+
     public static final TournamentRules RULES_G8Q2_S1A2G11 = TournamentRules
             .builder()
             .match(S1A2G11)
@@ -109,6 +118,13 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .builder()
             .match(S3A2G11)
             .group(G8Q2)
+            .build();
+
+    public static final TournamentRules RULES_G2Q1_S3A2G11 = TournamentRules
+            .builder()
+            .match(S3A2G11)
+            .group(G2Q1)
+            .prizeWinningPlaces(3)
             .build();
 
     @Inject

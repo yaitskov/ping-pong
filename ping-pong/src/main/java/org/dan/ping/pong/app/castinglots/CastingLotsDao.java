@@ -91,7 +91,7 @@ public class CastingLotsDao {
         return PlayOffGenerator.builder()
                 .tournament(tinfo)
                 .cid(cid)
-                .thirdPlaceMatch(tinfo.getRule().getPrizeWinningPlaces() > 2)
+                .thirdPlaceMatch(tinfo.getRule().getThirdPlaceMatch() == 1)
                 .matchDao(matchDao)
                 .build()
                 .generateTree(levels, empty(), lowestPriority,

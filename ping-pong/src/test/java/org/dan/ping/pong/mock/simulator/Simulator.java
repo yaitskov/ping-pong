@@ -89,10 +89,6 @@ public class Simulator {
     @Inject
     private TournamentDao tournamentDao;
 
-    public void simulate(SimulatorParams params, TournamentScenario scenario) {
-        simulate(scenario);
-    }
-
     public void simulate(TournamentScenario scenario) {
         try {
             setupEnvironment(scenario);

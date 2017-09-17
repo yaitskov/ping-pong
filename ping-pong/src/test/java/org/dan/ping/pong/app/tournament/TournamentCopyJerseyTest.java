@@ -1,17 +1,16 @@
 package org.dan.ping.pong.app.tournament;
 
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_COPY;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.mock.Generators.genStr;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
@@ -45,12 +44,13 @@ public class TournamentCopyJerseyTest extends AbstractSpringJerseyTest {
     public void tournamentResult() {
         final TournamentScenario scenario = TournamentScenario.begin()
                 .name("copyCompleteTour")
+                .rules(RULES_G8Q1_S1A2G11)
                 .category(c1, p1, p2)
-                .w31(p1, p2)
+                .win(p1, p2)
                 .quitsGroup(p1, p2)
                 .champions(c1, p1);
 
-        simulator.simulate(T_1_Q_1_G_8, scenario);
+        simulator.simulate(scenario);
 
         final String newName = genStr();
         final Instant opensAt = clocker.get();

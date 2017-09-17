@@ -1,11 +1,11 @@
 package org.dan.ping.pong.app.tournament;
 
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.MY_RECENT_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.MY_RECENT_TOURNAMENT_JUDGEMENT;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -39,20 +39,22 @@ public class TournamentRecentJerseyTest extends AbstractSpringJerseyTest {
     public void myRecentJudgeTournaments() {
         final TournamentScenario pastScenario = TournamentScenario.begin()
                 .name("recentJudgePast")
+                .rules(RULES_G8Q1_S1A2G11)
                 .category(c1, p1, p2)
-                .w31(p1, p2)
+                .win(p1, p2)
                 .quitsGroup(p1, p2)
                 .champions(c1, p1);
 
-        simulator.simulate(T_1_Q_1_G_8, pastScenario);
+        simulator.simulate(pastScenario);
 
         final TournamentScenario futureScenario = TournamentScenario.begin()
                 .name("recentJudgeFuture")
+                .rules(RULES_G8Q1_S1A2G11)
                 .category(c1, p1, p2)
                 .doNotBegin();
 
         futureScenario.setTestAdmin(pastScenario.getTestAdmin());
-        simulator.simulate(T_1_Q_1_G_8, futureScenario);
+        simulator.simulate(futureScenario);
 
         final MyRecentJudgedTournaments r = myRest()
                 .get(MY_RECENT_TOURNAMENT_JUDGEMENT,
@@ -70,22 +72,24 @@ public class TournamentRecentJerseyTest extends AbstractSpringJerseyTest {
     public void myRecentTournaments() {
         final TournamentScenario pastScenario = TournamentScenario.begin()
                 .name("recentJudgePast")
+                .rules(RULES_G8Q1_S1A2G11)
                 .category(c1, p1, p2)
-                .l13(p1, p2)
+                .lose(p1, p2)
                 .quitsGroup(p1, p2)
                 .champions(c1, p2);
 
-        simulator.simulate(T_1_Q_1_G_8, pastScenario);
+        simulator.simulate(pastScenario);
 
         final TournamentScenario futureScenario = TournamentScenario.begin()
                 .name("recentJudgeFuture")
+                .rules(RULES_G8Q1_S1A2G11)
                 .category(c1, p1, p2)
                 .doNotBegin();
         final TestUserSession userSession = pastScenario.getPlayersSessions().get(p1);
 
         futureScenario.getPlayersSessions().put(p1, userSession);
 
-        simulator.simulate(T_1_Q_1_G_8, futureScenario);
+        simulator.simulate(futureScenario);
 
         final MyRecentTournaments r = myRest().get(MY_RECENT_TOURNAMENT,
                 userSession, MyRecentTournaments.class);

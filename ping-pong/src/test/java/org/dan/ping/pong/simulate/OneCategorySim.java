@@ -1,5 +1,8 @@
 package org.dan.ping.pong.simulate;
 
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
 import static org.dan.ping.pong.mock.simulator.AutoResolution.RANDOM;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Hook.BeforeScore;
@@ -10,10 +13,6 @@ import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.Player.p5;
 import static org.dan.ping.pong.mock.simulator.Player.p6;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_2;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_2_G_8;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_3_Q_1_G_8;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +36,9 @@ public class OneCategorySim {
     @Test
     @SneakyThrows
     public void pauseBeforeSecondScore() {
-        simulator.simulate(T_1_Q_1_G_8,
+        simulator.simulate(
                 TournamentScenario.begin()
+                        .rules(RULES_G8Q1_S3A2G11)
                         .ignoreUnexpectedGames()
                         .autoResolution(RANDOM)
                         .name("pauseBeforeSecondScore")
@@ -51,8 +51,9 @@ public class OneCategorySim {
     @Test
     @SneakyThrows
     public void justEnlist() {
-        simulator.simulate(T_1_Q_1_G_8,
+        simulator.simulate(
                 TournamentScenario.begin()
+                        .rules(RULES_G8Q1_S3A2G11)
                         .ignoreUnexpectedGames()
                         .name("justEnlist")
                         .category(c1, p1, p2, p3, p4)
@@ -64,8 +65,10 @@ public class OneCategorySim {
     @Test
     @SneakyThrows
     public void schedule3ConcurrentGames() {
-        simulator.simulate(T_3_Q_1_G_8,
+        simulator.simulate(
                 TournamentScenario.begin()
+                        .tables(3)
+                        .rules(RULES_G8Q1_S3A2G11)
                         .ignoreUnexpectedGames()
                         .name("sched 3 con games")
                         .category(c1, p1, p2, p3, p4, p5, p6));
@@ -74,8 +77,9 @@ public class OneCategorySim {
     @Test
     @SneakyThrows
     public void justBeginTournamentOf2() {
-        simulator.simulate(T_1_Q_1_G_8,
+        simulator.simulate(
                 TournamentScenario.begin()
+                        .rules(RULES_G8Q1_S3A2G11)
                         .ignoreUnexpectedGames()
                         .name("justBeginTournamentOf2")
                         .category(c1, p1, p2));
@@ -83,8 +87,9 @@ public class OneCategorySim {
 
     @Test
     public void quits2Of3() {
-        simulator.simulate(T_1_Q_2_G_8, TournamentScenario.begin()
+        simulator.simulate(TournamentScenario.begin()
                 .name("quits2Of3")
+                .rules(RULES_G8Q1_S3A2G11)
                 .category(c1, p1, p2, p3)
                 .w31(p1, p2)
                 .w30(p1, p3)
@@ -96,30 +101,33 @@ public class OneCategorySim {
 
     @Test(expected = AssertionError.class)
     public void quits2Of2() {
-        simulator.simulate(T_1_Q_2_G_8, TournamentScenario.begin()
+        simulator.simulate(TournamentScenario.begin()
                 .ignoreUnexpectedGames()
+                .rules(RULES_G8Q1_S1A2G11)
                 .name("quits2Of2")
                 .category(c1, p1, p2));
     }
 
     @Test
     public void almostComplete() {
-        simulator.simulate(T_1_Q_1_G_2, TournamentScenario.begin()
+        simulator.simulate(TournamentScenario.begin()
                 .name("almostComplete")
+                .rules(RULES_G2Q1_S1A2G11)
                 .ignoreUnexpectedGames()
                 .category(c1, p1, p2, p3, p4)
-                .w30(p1, p2)
-                .w30(p3, p4)
+                .win(p1, p2)
+                .win(p3, p4)
                 .quitsGroup(p1, p3)
-                .w30(p1, p3)
+                .win(p1, p3)
                 .pause(p1, p3, BeforeScore)
                 .champions(c1, p1, p3));
     }
 
     @Test
     public void scoreLastSet() {
-        simulator.simulate(T_1_Q_1_G_8, TournamentScenario.begin()
+        simulator.simulate(TournamentScenario.begin()
                 .name("scoreLastSet")
+                .rules(RULES_G8Q1_S3A2G11)
                 .ignoreUnexpectedGames()
                 .category(c1, p1, p2)
                 .custom(game(p1, p2, 11, 0, 11, 1, 0, 0, 11, 2))

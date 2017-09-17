@@ -1,12 +1,12 @@
 package org.dan.ping.pong.app.match;
 
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.RESULT_CATEGORY;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_1_G_8;
 import static org.junit.Assert.assertEquals;
 
 import org.dan.ping.pong.JerseySpringTest;
@@ -38,6 +38,7 @@ public class MatchResetJerseyTest extends AbstractSpringJerseyTest {
     public void resetOpenGroupMatch() {
         final TournamentScenario scenario = TournamentScenario.begin()
                 .name("resetOpenGroupMatch")
+                .rules(RULES_G8Q1_S3A2G11)
                 .category(c1, p1, p2)
                 .custom(game(p1, p2, 0, 11, 1, 11)
                         .reset(0, myRest())
@@ -45,7 +46,7 @@ public class MatchResetJerseyTest extends AbstractSpringJerseyTest {
                 .quitsGroup(p1)
                 .champions(c1, p1);
 
-        simulator.simulate(T_1_Q_1_G_8, scenario);
+        simulator.simulate(scenario);
 
         final List<TournamentResultEntry> result = myRest().get(
                 TOURNAMENT_RESULT + scenario.getTid() + RESULT_CATEGORY + scenario.getCategoryDbId().get(c1),

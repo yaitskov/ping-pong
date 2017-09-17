@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S3A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.RESULT_CATEGORY;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
@@ -10,7 +11,6 @@ import static org.dan.ping.pong.mock.simulator.Player.p5;
 import static org.dan.ping.pong.mock.simulator.Player.p6;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c2;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_2_G_8;
 import static org.junit.Assert.assertEquals;
 
 import org.dan.ping.pong.JerseySpringTest;
@@ -39,6 +39,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
     public void tournamentResult() {
         final TournamentScenario scenario = TournamentScenario.begin()
                 .name("tournamentResult")
+                .rules(RULES_G8Q2_S3A2G11)
                 .category(c1, p1, p2, p3)
                 .category(c2, p4, p5, p6)
                 .w31(p1, p2)
@@ -54,7 +55,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
                 .w32(p4, p5)
                 .champions(c2, p4, p5);
 
-        simulator.simulate(T_1_Q_2_G_8, scenario);
+        simulator.simulate(scenario);
         final List<TournamentResultEntry> result = myRest()
                 .get(TOURNAMENT_RESULT + scenario.getTid() + RESULT_CATEGORY + scenario.getCategoryDbId().get(c1),
                         new GenericType<List<TournamentResultEntry>>() {});

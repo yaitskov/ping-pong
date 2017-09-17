@@ -1,9 +1,9 @@
 package org.dan.ping.pong.app.tournament;
 
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.CANCEL_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.EDITABLE_TOURNAMENTS;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_1_Q_2_G_8;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
@@ -33,9 +33,12 @@ public class TournamentListJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void listCancelledAdministrableTournamentForAWhile() {
-        final TournamentScenario scenario = TournamentScenario.begin()
-                .doNotBegin().name("listClosedTournament");
-        simulator.simulate(T_1_Q_2_G_8, scenario);
+        final TournamentScenario scenario = TournamentScenario
+                .begin()
+                .rules(RULES_G8Q2_S1A2G11)
+                .doNotBegin()
+                .name("listClosedTournament");
+        simulator.simulate(scenario);
         myRest().voidPost(CANCEL_TOURNAMENT, scenario.getTestAdmin(), scenario.getTid());
         assertThat(myRest().get(EDITABLE_TOURNAMENTS + "/20",
                 scenario.getTestAdmin(), DigestList.class),

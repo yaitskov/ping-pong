@@ -1,5 +1,6 @@
 package org.dan.ping.pong.simulate;
 
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -13,7 +14,6 @@ import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c2;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c3;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c4;
-import static org.dan.ping.pong.mock.simulator.SimulatorParams.T_3_Q_1_G_8;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -37,9 +37,11 @@ public class FourCategoriesSim {
     @Test
     @SneakyThrows
     public void justEnlistSmallestGroup() {
-        simulator.simulate(T_3_Q_1_G_8,
+        simulator.simulate(
                 TournamentScenario.begin()
                         .doNotBegin()
+                        .rules(RULES_G8Q1_S1A2G11)
+                        .tables(3)
                         .ignoreUnexpectedGames()
                         .name("justEnlistSmallestGroup")
                         .category(c1, p1, p2)
@@ -51,8 +53,10 @@ public class FourCategoriesSim {
     @Test
     @SneakyThrows
     public void playRandomSmallestGroup() {
-        simulator.simulate(T_3_Q_1_G_8,
+        simulator.simulate(
                 TournamentScenario.begin()
+                        .rules(RULES_G8Q1_S1A2G11)
+                        .tables(3)
                         .autoResolution(AutoResolution.RANDOM)
                         .name("playRandomSmallestGroup")
                         .category(c1, p1, p2)

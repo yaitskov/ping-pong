@@ -8,9 +8,8 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Want;
-import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q1;
-import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.W1A2G11;
 import static org.dan.ping.pong.app.category.CategoryResource.CATEGORY_MEMBERS;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.DRAFTING;
 import static org.dan.ping.pong.app.tournament.TournamentResource.EDITABLE_TOURNAMENTS;
@@ -104,10 +103,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                         .placeId(daoGenerator.genPlace(0))
                         .opensAt(opensAt)
                         .previousTid(Optional.empty())
-                        .rules(TournamentRules.builder()
-                                .group(G8Q1)
-                                .match(W1A2G11)
-                                .build())
+                        .rules(RULES_G2Q1_S1A2G11)
                         .ticketPrice(Optional.empty())
                         .build(), APPLICATION_JSON));
         final int tid = response.readEntity(Integer.class);

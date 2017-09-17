@@ -9,10 +9,15 @@ import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.tournament.rules.TournamentRulesValidator;
+import org.dan.ping.pong.app.tournament.rules.ValidationError;
 import org.dan.ping.pong.app.user.UserInfo;
+import org.dan.ping.pong.sys.error.ValidationErrors;
 
 import java.util.List;
 
@@ -62,6 +67,8 @@ public class TournamentResource {
     private TournamentDao tournamentDao;
     @Inject
     private AuthService authService;
+    @Inject
+    private TournamentRulesValidator rulesValidator;
 
     @POST
     @Path(TOURNAMENT_CREATE)
@@ -69,8 +76,13 @@ public class TournamentResource {
     public int create(
             @HeaderParam(SESSION) String session,
             CreateTournament newTournament) {
-        if (newTournament.getRules().getMatch().getSetsToWin() <= 0) {
-            throw badRequest("Match Score is not positive");
+        if (newTournament.getRules() == null) {
+            throw badRequest("No rules");
+        }
+        final Multimap<String, ValidationError> errors = HashMultimap.create();
+        rulesValidator.validate(newTournament.getRules(), errors);
+        if (!errors.isEmpty()) {
+            throw badRequest(new ValidationErrors("tournament-rules-are-wrong", errors));
         }
         return tournamentService.create(
                 authService.userInfoBySession(session).getUid(),

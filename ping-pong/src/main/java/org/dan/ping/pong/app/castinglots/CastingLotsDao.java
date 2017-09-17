@@ -59,6 +59,7 @@ public class CastingLotsDao {
             tournament.getMatches().put(mid, MatchInfo.builder()
                     .tid(tid)
                     .mid(mid)
+                    .priority(priorityGroup)
                     .state(MatchState.Place)
                     .gid(Optional.of(gid))
                     .participantIdScore(ImmutableMap.of(

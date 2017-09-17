@@ -34,6 +34,7 @@ public class MatchInfo {
     private Optional<Integer> winnerId;
     private Map<Integer, List<Integer>> participantIdScore;
     private Optional<Instant> startedAt;
+    private int priority;
 
     public int getNumberOfSets() {
         for (List<Integer> l : participantIdScore.values()) {

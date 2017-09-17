@@ -83,4 +83,31 @@ public class MatchScheduleInGroupJerseyTest extends AbstractSpringJerseyTest {
                 ImmutableSet.of(p1, p2),
                 ImmutableSet.of(p3, p1))));
     }
+
+    @Test
+    public void groupOf3DefaultSchedule() {
+        final List<Set<Player>> matchOrder = new ArrayList<>();
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .name("groupOf3DefaultSchedule")
+                .category(c1, p1, p2, p3)
+                .rules(TournamentRules.builder()
+                        .group(G8Q1)
+                        .match(S1A2G11)
+                        .prizeWinningPlaces(1)
+                        .thirdPlaceMatch(0)
+                        .build())
+                .onBeforeMatch((s, minfo) -> matchOrder.add(minfo.getPlayers()))
+                .w10(p1, p2)
+                .w10(p1, p3)
+                .w10(p2, p3)
+                .quitsGroup(p1)
+                .champions(c1, p1);
+
+        simulator.simulate(scenario);
+
+        assertThat(matchOrder, is(asList(
+                ImmutableSet.of(p1, p3),
+                ImmutableSet.of(p1, p2),
+                ImmutableSet.of(p2, p3))));
+    }
 }

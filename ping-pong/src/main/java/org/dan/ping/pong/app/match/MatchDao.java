@@ -304,7 +304,7 @@ public class MatchDao {
 
     public List<MatchInfo> load(Tid tid) {
         return jooq.select(MATCHES.MID, MATCHES.GID, MATCHES.CID,
-                MATCHES.WIN_MID, MATCHES.LOSE_MID,
+                MATCHES.WIN_MID, MATCHES.LOSE_MID, MATCHES.PRIORITY,
                 MATCHES.STATE, MATCHES.TYPE, MATCHES.ENDED,
                 MATCHES.UID_LESS, MATCHES.UID_MORE, MATCHES.UID_WIN)
                 .from(MATCHES)
@@ -325,6 +325,7 @@ public class MatchDao {
                             .state(r.get(MATCHES.STATE))
                             .type(r.get(MATCHES.TYPE))
                             .loserMid(r.get(MATCHES.LOSE_MID))
+                            .priority(r.get(MATCHES.PRIORITY))
                             .winnerMid(r.get(MATCHES.WIN_MID))
                             .winnerId(r.get(MATCHES.UID_WIN))
                             .participantIdScore(uids)

@@ -46,6 +46,7 @@ public class PlayOffGenerator {
                 .tid(tournament.getTid())
                 .mid(mid)
                 .state(MatchState.Draft)
+                .priority(priority)
                 .gid(Optional.empty())
                 .participantIdScore(new HashMap<>())
                 .type(type)

@@ -45,8 +45,8 @@ public class TournamentResource {
     private static final String DRAFTING_PARAM = "drafting";
     public static final String DRAFTING_INFO = DRAFTING + "{" + DRAFTING_PARAM + "}";
     public static final String MY_TOURNAMENT = TOURNAMENT + "mine/{tid}";
-    public static final String TOURNAMENT_PARAMS = TOURNAMENT + "params";
-    public static final String GET_TOURNAMENT_PARAMS = TOURNAMENT_PARAMS + "/{tid}";
+    public static final String TOURNAMENT_RULES = TOURNAMENT + "params";
+    public static final String GET_TOURNAMENT_RULES = TOURNAMENT_RULES + "/{tid}";
     public static final String EDITABLE_TOURNAMENTS = TOURNAMENT + "editable/by/me";
     public static final String TOURNAMENT_CREATE = TOURNAMENT + "create";
     public static final String TOURNAMENT_COPY = TOURNAMENT + "copy";
@@ -267,19 +267,19 @@ public class TournamentResource {
     }
 
     @GET
-    @Path(GET_TOURNAMENT_PARAMS)
+    @Path(GET_TOURNAMENT_RULES)
     @Consumes(APPLICATION_JSON)
     public TournamentRules getTournamentRules(@PathParam("tid") int tid) {
         return tournamentService.getTournamentRules(tid);
     }
 
     @POST
-    @Path(TOURNAMENT_PARAMS)
+    @Path(TOURNAMENT_RULES)
     @Consumes(APPLICATION_JSON)
     public void updateTournamentParams(
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
-            TournamentParameters parameters) {
+            TidIdentifiedRules parameters) {
         validate(parameters.getRules());
         int uid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(new Tid(parameters.getTid()), response, (tournament, batch) -> {

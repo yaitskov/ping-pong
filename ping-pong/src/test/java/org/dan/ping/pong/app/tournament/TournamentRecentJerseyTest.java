@@ -16,7 +16,6 @@ import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
-import org.dan.ping.pong.util.time.Clocker;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
@@ -28,12 +27,6 @@ import javax.inject.Inject;
 public class TournamentRecentJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     private Simulator simulator;
-
-    @Inject
-    private TournamentService tournamentService;
-
-    @Inject
-    private Clocker clocker;
 
     @Test
     public void myRecentJudgeTournaments() {

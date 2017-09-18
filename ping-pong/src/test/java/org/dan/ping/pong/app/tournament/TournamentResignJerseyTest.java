@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.app.bid.BidState.Quit;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
@@ -54,9 +53,6 @@ import javax.inject.Inject;
 public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     private Simulator simulator;
-
-    @Inject
-    private TournamentService tournamentService;
 
     @Inject
     private ForTestBidDao bidDao;

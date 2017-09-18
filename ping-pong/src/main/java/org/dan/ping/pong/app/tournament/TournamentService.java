@@ -312,7 +312,7 @@ public class TournamentService {
     }
 
     public void updateTournamentParams(OpenTournamentMemState tournament,
-            TournamentParameters parameters, DbUpdater batch) {
+            TidIdentifiedRules parameters, DbUpdater batch) {
         if (!CONFIGURABLE_STATES.contains(tournament.getState())) {
             throw badRequest("Tournament could be modified until it's open");
         }

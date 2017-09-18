@@ -79,14 +79,18 @@ public class TournamentResource {
         if (newTournament.getRules() == null) {
             throw badRequest("No rules");
         }
-        final Multimap<String, ValidationError> errors = HashMultimap.create();
-        rulesValidator.validate(newTournament.getRules(), errors);
-        if (!errors.isEmpty()) {
-            throw badRequest(new ValidationErrors("tournament-rules-are-wrong", errors));
-        }
+        validate(newTournament.getRules());
         return tournamentService.create(
                 authService.userInfoBySession(session).getUid(),
                 newTournament);
+    }
+
+    private void validate(TournamentRules rules) {
+        final Multimap<String, ValidationError> errors = HashMultimap.create();
+        rulesValidator.validate(rules, errors);
+        if (!errors.isEmpty()) {
+            throw badRequest(new ValidationErrors("tournament-rules-are-wrong", errors));
+        }
     }
 
     @POST
@@ -276,6 +280,7 @@ public class TournamentResource {
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             TournamentParameters parameters) {
+        validate(parameters.getRules());
         int uid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(new Tid(parameters.getTid()), response, (tournament, batch) -> {
             tournament.checkAdmin(uid);

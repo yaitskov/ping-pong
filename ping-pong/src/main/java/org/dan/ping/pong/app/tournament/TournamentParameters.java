@@ -13,8 +13,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TournamentParameters {
     private int tid;
-    private int matchScore;
-    private int maxGroupSize;
-    private int quitsGroup;
-    private int thirdPlaceMatch;
+    private TournamentRules rules;
 }

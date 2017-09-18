@@ -313,31 +313,11 @@ public class TournamentService {
 
     public void updateTournamentParams(OpenTournamentMemState tournament,
             TournamentParameters parameters, DbUpdater batch) {
-        validate(parameters);
         if (!CONFIGURABLE_STATES.contains(tournament.getState())) {
             throw badRequest("Tournament could be modified until it's open");
         }
-        final TournamentRules rules = tournament.getRule();
-        rules.getGroup().setQuits(parameters.getQuitsGroup());
-        rules.getGroup().setMaxSize(parameters.getMaxGroupSize());
-        rules.getMatch().setSetsToWin(parameters.getMatchScore());
-        rules.setThirdPlaceMatch(parameters.getThirdPlaceMatch());
-        tournamentDao.updateParams(tournament.getTid(), rules, batch);
-    }
-
-    private void validate(TournamentParameters parameters) {
-        if (parameters.getMatchScore() < 1) {
-            throw badRequest("Match score is less than 1");
-        }
-        if (parameters.getQuitsGroup() < 1) {
-            throw badRequest("Quits from group is less than 1");
-        }
-        if (parameters.getMaxGroupSize() < 2 || parameters.getMaxGroupSize() > 20) {
-            throw badRequest("Max group size is out of range");
-        }
-        if (parameters.getMaxGroupSize() <= parameters.getQuitsGroup()) {
-            throw badRequest("Max group size is less than quits from group");
-        }
+        tournament.setRule(parameters.getRules());
+        tournamentDao.updateParams(tournament.getTid(), tournament.getRule(), batch);
     }
 
     @Inject

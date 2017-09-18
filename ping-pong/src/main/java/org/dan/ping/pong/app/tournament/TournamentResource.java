@@ -45,7 +45,7 @@ public class TournamentResource {
     private static final String DRAFTING_PARAM = "drafting";
     public static final String DRAFTING_INFO = DRAFTING + "{" + DRAFTING_PARAM + "}";
     public static final String MY_TOURNAMENT = TOURNAMENT + "mine/{tid}";
-    public static final String TOURNAMENT_RULES = TOURNAMENT + "params";
+    public static final String TOURNAMENT_RULES = TOURNAMENT + "rules";
     public static final String GET_TOURNAMENT_RULES = TOURNAMENT_RULES + "/{tid}";
     public static final String EDITABLE_TOURNAMENTS = TOURNAMENT + "editable/by/me";
     public static final String TOURNAMENT_CREATE = TOURNAMENT + "create";

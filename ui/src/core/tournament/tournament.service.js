@@ -80,12 +80,12 @@ angular.
                                        }
                                    },
                                    parameters: {
-                                       url: '/api/tournament/params/:tournamentId',
+                                       url: '/api/tournament/rules/:tournamentId',
                                        method: 'GET',
                                        cache: false
                                    },
                                    updateParams: {
-                                       url: '/api/tournament/params/:tournamentId',
+                                       url: '/api/tournament/rules/:tournamentId',
                                        method: 'POST',
                                        headers: {
                                            session: 1

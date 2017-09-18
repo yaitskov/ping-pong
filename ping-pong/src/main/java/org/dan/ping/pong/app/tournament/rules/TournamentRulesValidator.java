@@ -7,7 +7,7 @@ import javax.inject.Inject;
 
 public class TournamentRulesValidator {
     private static final String THIRD_PLACE = "third-place";
-    private static final String PRICE_WINNING_PLACES = "price-winning-places";
+    private static final String PRIZE_WINNING_PLACES = "prize-winning-places";
 
     @Inject
     private GroupRuleValidator groupRuleValidator;
@@ -24,7 +24,7 @@ public class TournamentRulesValidator {
                     .build());
         }
         if (rules.getPrizeWinningPlaces() < 1 || rules.getPrizeWinningPlaces() > 3) {
-            errors.put(PRICE_WINNING_PLACES, ValidationError.builder()
+            errors.put(PRIZE_WINNING_PLACES, ValidationError.builder()
                     .template("out-of-range")
                     .build());
         }

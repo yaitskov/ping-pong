@@ -69,13 +69,13 @@ public class GroupRuleValidator {
         unexpectedMatches.removeAll(setOfExpectedPairs);
         if (!unexpectedMatches.isEmpty()) {
             errors.put(GROUP_RULE + SCHEDULE,
-                    ofTemplate(UNEXPECTED_MATCHES, MATCHES, unexpectedMatches));
+                    ofTemplate(UNEXPECTED_MATCHES, MATCHES, unexpectedMatches, n));
             return;
         }
         setOfExpectedPairs.removeAll(setOfPairs);
         if (!setOfExpectedPairs.isEmpty()) {
             errors.put(GROUP_RULE + SCHEDULE,
-                    ofTemplate(MISSING_MATCHES, MATCHES, setOfExpectedPairs));
+                    ofTemplate(MISSING_MATCHES, MATCHES, setOfExpectedPairs, n));
         }
     }
 }

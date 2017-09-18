@@ -31,9 +31,11 @@ public class ValidationError {
                 .build();
     }
 
-    public static ValidationError ofTemplate(String template, String key, Set<Set<Integer>> value) {
+    public static ValidationError ofTemplate(String template,
+            String key, Set<Set<Integer>> value,
+            int participants) {
         return ValidationError.builder().template(template)
-                .templateParams(ImmutableMap.of(key, value))
+                .templateParams(ImmutableMap.of(key, value, "participants", participants))
                 .build();
     }
 }

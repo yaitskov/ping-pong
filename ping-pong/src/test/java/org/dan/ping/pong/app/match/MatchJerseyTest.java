@@ -98,6 +98,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .builder()
             .match(S1A2G11)
             .group(G2Q1)
+            .prizeWinningPlaces(3)
             .build();
 
     public static final TournamentRules RULES_G2Q1_S1A2G11_3P = TournamentRules

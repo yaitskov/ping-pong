@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.tournament.rules;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -39,10 +40,11 @@ public class MultimapJacksonTest {
                 ValidationErrors.class);
         assertEquals("msg", m.getMessage());
         assertEquals(
-                values.stream().map(ValidationError::getTemplate)
-                        .collect(toList()),
+                values.stream()
+                        .map(ValidationError::getTemplate)
+                        .collect(toSet()),
                 m.getField2Errors().get("k").stream()
                         .map(ValidationError::getTemplate)
-                        .collect(toList()));
+                        .collect(toSet()));
     }
 }

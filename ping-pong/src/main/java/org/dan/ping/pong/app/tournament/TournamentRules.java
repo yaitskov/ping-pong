@@ -16,4 +16,8 @@ public class TournamentRules {
     private GroupRules group;
     private int prizeWinningPlaces = 3;
     private int thirdPlaceMatch;
+
+    public static class TournamentRulesBuilder {
+        private int prizeWinningPlaces = 3;
+    }
 }

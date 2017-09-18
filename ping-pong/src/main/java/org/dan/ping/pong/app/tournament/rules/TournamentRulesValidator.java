@@ -17,6 +17,7 @@ public class TournamentRulesValidator {
 
     public void validate(TournamentRules rules, Multimap<String, ValidationError> errors) {
         groupRuleValidator.validate(errors, rules.getGroup());
+        matchRuleValidator.validate(errors, rules.getMatch());
         if (rules.getThirdPlaceMatch() < 0 || rules.getThirdPlaceMatch() > 1) {
             errors.put(THIRD_PLACE, ValidationError.builder()
                     .template("out-of-range")

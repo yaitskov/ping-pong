@@ -42,7 +42,7 @@ public class GroupSchedule {
     public static List<Integer> generateDefaultSchedule(int groupSize) {
         final List<Integer> result = new ArrayList<>();
         for (int i = 0; i < groupSize; ++i) {
-            for (int j = i; j < groupSize; ++j) {
+            for (int j = i + 1; j < groupSize; ++j) {
                 result.add(i);
                 result.add(j);
             }

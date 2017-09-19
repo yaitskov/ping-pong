@@ -6,21 +6,45 @@ angular.
     component('newTournamentParameters', {
         templateUrl: template,
         controller: ['auth', 'mainMenu', '$http', '$location', 'placePicker',
-                     'pageCtx', 'requestStatus', 'moment',
+                     'pageCtx', 'requestStatus', 'moment', 'groupSchedule',
+                     '$scope',
                      function (auth, mainMenu, $http, $location, placePicker,
-                               pageCtx, requestStatus, $moment) {
+                               pageCtx, requestStatus, $moment, groupSchedule, $scope) {
                          mainMenu.setTitle('Tournament Parameters');
-                         this.tournament = pageCtx.get('newTournament') || {quitsFromGroup: 2,
-                                                                            maxGroupSize: 8,
-                                                                            matchScore: 3,
-                                                                            thirdPlaceMatch: 1};
+                         var self = this;
+                         self.tournament = pageCtx.get('newTournament') || {};
+                         this.errors = {};
+                         self.tournament.rules = self.tournament.rules || {
+                             prizeWinningPlaces: 3,
+                             thirdPlaceMatch: 1,
+                             group: {
+                                 quits: 2,
+                                 maxSize: 8,
+                                 schedule: {
+                                    size2Schedule: {
+                                       2: [0, 1],
+                                       3: [0, 2, 0, 1, 1, 2]
+                                    }
+                                 }
+                             },
+                             match: {
+                                 minGamesToWin: 11,
+                                 minAdvanceInGames: 2,
+                                 minPossibleGames: 0,
+                                 setsToWin: 3
+                             }
+                         };
+                         self.groupSchedule = groupSchedule.convertToText(
+                              self.tournament.rules.group.schedule.size2Schedule);
+                         $scope.$watch('$ctrl.groupSchedule', function (oldValue, newValue) {
+                              self.tournament.rules.group.schedule.size2Schedule = groupSchedule.parseText(newValue);
+                         });
                          this.options = {
                              quitsFromGroup: {min: 1, max: 5},
                              maxGroupSize: {min: 2, max: 20},
                              matchScore: {min: 1, max: 100}
                          };
-                         this.published = this.tournament.tid;
-                         var self = this;
+                         self.published = self.tournament.tid;
                          this.setThirdPlaceMatch = function (v) {
                              self.tournament.thirdPlaceMatch = v;
                              pageCtx.put('newTournament', self.tournament);
@@ -32,6 +56,11 @@ angular.
                          this.cancel = function () {
                              pageCtx.put('newTournament', null);
                              $location.path('/tournaments');
+                         };
+                         this.formatScheduleError = function (templateParams) {
+                             templateParams.matches = templateParams.matches.
+                                map(function (match) { return (match[0] + 1) + "-" + (match[1] + 1); }).
+                                join(", ");
                          };
                          this.createTournament = function () {
                              self.form.$setSubmitted();
@@ -65,7 +94,12 @@ angular.
                                                       state: 'Hidden'});
                                          requestStatus.complete();
                                      },
-                                     requestStatus.failed);
+                                     function (resp) {
+                                        if (resp.status == 400 && resp.data.message == 'tournament-rules-are-wrong') {
+                                           self.errors = resp.data.field2Errors;
+                                        }
+                                        requestStatus.failed(resp);
+                                     });
                          }
                      }
                     ]});

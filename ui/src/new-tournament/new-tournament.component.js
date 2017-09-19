@@ -8,11 +8,7 @@ angular.
         controller: ['auth', 'mainMenu', '$http', '$location', 'placePicker', 'pageCtx', '$scope',
                      function (auth, mainMenu, $http, $location, placePicker, pageCtx, $scope) {
                          mainMenu.setTitle('New Tournament');
-                         this.tournament = pageCtx.get('newTournament') || {quitsFromGroup: 2,
-                                                                            maxGroupSize: 8,
-                                                                            ticketPrice: 30,
-                                                                            thirdPlaceMatch: 1,
-                                                                            matchScore: 3};
+                         this.tournament = pageCtx.get('newTournament') || {ticketPrice: 30};
                          if (this.tournament.tid) {
                              delete this.tournament.tid;
                          }

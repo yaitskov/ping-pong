@@ -18,5 +18,8 @@ module.exports = {
     'no': 'no',
     'Publishing': 'Publishing',
     'group-size-less-quits': 'Max group size is less than number of people quitting group',
-    'Tournament Parameters': 'Tournament Parameters'
+    'Tournament Parameters': 'Tournament Parameters',
+
+    'unexpected-matches': 'There are unexpected matches {{matches}} encountered in case for {{participants}} participants',
+    'missing-matches': 'Following matches are missing {{matches}} in case for {{participants}} participants'
 };

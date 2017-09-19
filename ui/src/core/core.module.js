@@ -14,6 +14,9 @@ import tournamentStatusComponent from './tournament-status/tournament-status.com
 import localStorageModule from './local-storage/local-storage.module.js';
 import localStorageService from './local-storage/local-storage.service.js';
 
+import groupModule from './group/group.module.js';
+import groupScheduleService from './group/group.schedule.service.js';
+
 import placeModule from './place/place.module.js';
 import placeService from './place/place.service.js';
 
@@ -43,7 +46,7 @@ import participantModule from './participant/participant.module.js';
 import participantService from './participant/participant.service.js';
 
 angular.module('core', ['core.tournament', 'core.match',
-                        'core.util',
+                        'core.util', 'core.group',
                         'localStorage', 'core.place',
                         'core.table', 'core.city', 'core.country',
                         'core.participant', 'core.user',

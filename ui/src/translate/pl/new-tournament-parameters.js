@@ -17,5 +17,9 @@ module.exports = {
     'no': 'nie',
     'Publishing': 'Ogłoszenie',
     'group-size-less-quits': 'Maks rozmiar grupy jest mniej niż ilość wychodziących z grupy',
-    'Tournament Parameters': 'Parametry Turnieju'
+    'Tournament Parameters': 'Parametry Turnieju',
+
+
+    'unexpected-matches': 'There are unexpected matches {{matches}} encountered in case for {{participants}} participants',
+    'missing-matches': 'Following matches are missing {{matches}} in case for {{participants}} participants'
 };

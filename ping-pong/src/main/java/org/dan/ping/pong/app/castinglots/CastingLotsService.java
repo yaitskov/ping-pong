@@ -31,6 +31,9 @@ import javax.inject.Inject;
 
 @Slf4j
 public class CastingLotsService {
+    public static final String NOT_ENOUGH_PARTICIPANTS = "Not enough participants";
+    public static final String N = "n";
+
     public static Map<Integer, List<ParticipantMemState>> groupByCategories(
             List<ParticipantMemState> bids) {
         return bids.stream().collect(groupingBy(
@@ -55,6 +58,7 @@ public class CastingLotsService {
         log.info("Casting log tournament {}", tournament.getTid());
         final List<ParticipantMemState> readyBids = findBidsReadyToPlay(tournament);
         checkAllThatAllHere(readyBids);
+        checkAtLeast(readyBids);
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
             if (bids.size() < 2) {
                 throw badRequest("There is a category with 1 participant."
@@ -85,6 +89,12 @@ public class CastingLotsService {
                     basePlayOffPriority + 1);
         });
         log.info("Casting lots for tid {} is scoreSetAndCompleteIfWinOrLose", tid);
+    }
+
+    private void checkAtLeast(List<ParticipantMemState> readyBids) {
+        if (readyBids.size() < 3) {
+            throw badRequest(NOT_ENOUGH_PARTICIPANTS, N, readyBids.size());
+        }
     }
 
     private List<ParticipantMemState> findBidsReadyToPlay(OpenTournamentMemState tournament) {

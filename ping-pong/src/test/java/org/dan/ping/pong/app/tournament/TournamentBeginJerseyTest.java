@@ -3,6 +3,8 @@ package org.dan.ping.pong.app.tournament;
 import static org.dan.ping.pong.app.bid.BidResource.BID_SET_STATE;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
+import static org.dan.ping.pong.app.castinglots.CastingLotsService.N;
+import static org.dan.ping.pong.app.castinglots.CastingLotsService.NOT_ENOUGH_PARTICIPANTS;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
@@ -13,6 +15,8 @@ import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
@@ -25,6 +29,7 @@ import org.dan.ping.pong.app.castinglots.UncheckedParticipantsError;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
+import org.dan.ping.pong.sys.error.TemplateError;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -78,5 +83,25 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
                         .build());
 
         myRest().voidPost(BEGIN_TOURNAMENT, scenario.getTestAdmin(), scenario.getTid());
+    }
+
+    @Test
+    public void failedToBeginDueNotEnoughParticipants() {
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .doNotBegin()
+                .rules(RULES_G8Q1_S1A2G11)
+                .name("failBeginNoParticipants")
+                .category(c1, p1);
+
+        simulator.simulate(scenario);
+
+        final Response response = myRest().post(BEGIN_TOURNAMENT,
+                scenario.getTestAdmin().getSession(), scenario.getTid());
+        assertEquals(400, response.getStatus());
+        assertThat(
+                response.readEntity(TemplateError.class),
+                allOf(
+                        hasProperty("message", is(NOT_ENOUGH_PARTICIPANTS)),
+                        hasProperty("params", hasEntry(N, 1))));
     }
 }

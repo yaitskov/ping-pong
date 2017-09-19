@@ -20,6 +20,9 @@ module.exports = {
     'group-size-less-quits': 'Max group size is less than number of people quitting group',
     'Tournament Parameters': 'Tournament Parameters',
 
-    'unexpected-matches': 'There are unexpected matches {{matches}} encountered in case for {{participants}} participants',
-    'missing-matches': 'Following matches are missing {{matches}} in case for {{participants}} participants'
+    'unexpected-matches': 'There are unexpected matches [{{matches}}] encountered in the case for {{participants}} participants',
+    'missing-matches': 'Following matches are missing [{{matches}}] in the case for {{participants}} participants',
+
+    'Line has wrong match': 'Line [{{line}}] has wrong match [{{match}}]',
+    'Line has no colon': 'Line [{{line}}] has no colon'
 };

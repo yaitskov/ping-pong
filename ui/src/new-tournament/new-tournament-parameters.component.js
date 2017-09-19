@@ -34,10 +34,16 @@ angular.
                                  setsToWin: 3
                              }
                          };
+                         self.groupScheduleErrors = [];
                          self.groupSchedule = groupSchedule.convertToText(
                               self.tournament.rules.group.schedule.size2Schedule);
-                         $scope.$watch('$ctrl.groupSchedule', function (oldValue, newValue) {
-                              self.tournament.rules.group.schedule.size2Schedule = groupSchedule.parseText(newValue);
+                         $scope.$watch('$ctrl.groupSchedule', function (newValue, oldValue) {
+                              try {
+                                 self.groupScheduleErrors = [];
+                                 self.tournament.rules.group.schedule.size2Schedule = groupSchedule.parseText(newValue);
+                              } catch (e) {
+                                 self.groupScheduleErrors.push(e);
+                              }
                          });
                          this.options = {
                              quitsFromGroup: {min: 1, max: 5},
@@ -57,14 +63,10 @@ angular.
                              pageCtx.put('newTournament', null);
                              $location.path('/tournaments');
                          };
-                         this.formatScheduleError = function (templateParams) {
-                             templateParams.matches = templateParams.matches.
-                                map(function (match) { return (match[0] + 1) + "-" + (match[1] + 1); }).
-                                join(", ");
-                         };
+                         this.formatScheduleError = groupSchedule.formatScheduleError;
                          this.createTournament = function () {
                              self.form.$setSubmitted();
-                             if (!self.form.$valid) {
+                             if (!self.form.$valid || self.groupScheduleErrors.length) {
                                  return;
                              }
                              if (self.tournament.maxGroupSize <= self.tournament.quitsFromGroup) {

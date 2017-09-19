@@ -11,35 +11,82 @@
         default-button-type
         ng-show="!$ctrl.published">
     <div class="form-group">
-      <label for="quitsGroup">{{ 'Quits from a group' | translate }}</label>
-      <div touch-spin options="$ctrl.options.quitsGroup"
-           ng-model="$ctrl.tournament.quitsGroup"></div>
-      <p class="help-block" translate="quits-group-help"></p>
+      <label>{{ 'Quits from a group' | translate }}</label>
+      <div touch-spin options="$ctrl.options.quitsFromGroup"
+           ng-model="$ctrl.tournament.rules.group.quits"></div>
+      <p class="help-block">
+        {{ 'quits-group-help' | translate }}
+      </p>
     </div>
     <div class="form-group">
-      <label for="maxGroupSize">{{ 'Max group size' | translate }}</label>
+      <label>{{ 'Max group size' | translate }}</label>
       <div touch-spin options="$ctrl.options.maxGroupSize"
-           ng-model="$ctrl.tournament.maxGroupSize"></div>
-      <p class="help-block" translate="max-group-size-help"></p>
+           ng-model="$ctrl.tournament.rules.group.maxSize"></div>
+      <p class="help-block">
+        {{ 'max-group-size-help' | translate }}
+      </p>
     </div>
     <div class="form-group">
-      <label for="matchScore">{{ 'Match score' | translate }}</label>
+      <label>{{ 'Match schedule in a group' }}</label>
+      <textarea class="form-control" name="groupSchedule"
+                rows="5" ng-model="$ctrl.groupSchedule"></textarea>
+      <p class="help-block alert-danger" ng-repeat="error in $ctrl.errors['group-rule.schedule']">
+        {{ error.template | translate : $ctrl.formatScheduleError(error.templateParams) }}
+      </p>
+      <p class="help-block alert-danger" ng-repeat="error in $ctrl.groupScheduleErrors">
+        {{ error.template | translate : error.templateParams }}
+      </p>
+      <p class="help-block">
+        Sets up an order for playing matches in a group.
+        One line per case with a specified number of participants.
+        An example for 3 participants in a group is
+        <b>3: 1-2, 1-3, 2-3</b>.
+        If there is no schedule for a group
+        then matches will be scheduled according to the rules in PZTS 2016.
+      </p>
+    </div>
+    <div class="form-group">
+      <label>{{ 'Sets to win a match' }}</label>
       <div touch-spin options="$ctrl.options.matchScore"
-           ng-model="$ctrl.tournament.matchScore"></div>
-      <p class="help-block" translate="match-score-help"></p>
+           ng-model="$ctrl.tournament.rules.match.setsToWin"></div>
+      <p class="help-block">
+        {{ 'match-score-help' | translate }}
+      </p>
+    </div>
+    <div class="form-group"
+         ng-class="{'has-error': $ctrl.errors['match-rule.min-games-to-win']}">
+      <label>{{ 'Min score to win a set' }}</label>
+      <div touch-spin
+           ng-model="$ctrl.tournament.rules.match.minGamesToWin"></div>
+      <p class="help-block" ng-repeat="error in $ctrl.errors['match-rule.min-games-to-win']">
+        {{ error.template | translate : JSON.stringify(error.templateParams) }}
+      </p>
+      <p class="help-block">
+        How many balls a participant should get without równowagi
+        to win a match.
+      </p>
     </div>
     <div class="form-group">
-      <label for="thirdPlaceMatch" class="toggle-option">
+      <label>{{ 'Min score advance to win a set' }}</label>
+      <div touch-spin
+           ng-model="$ctrl.tournament.rules.match.minGamesToWin"></div>
+      <p class="help-block">
+        Minimal required difference between participants'
+        scores in a match to figure out its winner.
+      </p>
+    </div>
+    <div class="form-group">
+      <label class="toggle-option">
         {{ 'Match for 3rd place' | translate }}
       </label>
       <a class="btn btn-default"
          ng-click="$ctrl.setThirdPlaceMatch(1)"
-         ng-class="{'btn-primary': $ctrl.tournament.thirdPlaceMatch == 1}">
+         ng-class="{'btn-primary': $ctrl.tournament.rules.thirdPlaceMatch == 1}">
         yes
       </a>
       <a class="btn btn-default"
          ng-click="$ctrl.setThirdPlaceMatch(0)"
-         ng-class="{'btn-danger': $ctrl.tournament.thirdPlaceMatch == 0}">
+         ng-class="{'btn-danger': $ctrl.tournament.rules.thirdPlaceMatch == 0}">
         no
       </a>
     </div>

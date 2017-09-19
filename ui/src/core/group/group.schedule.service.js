@@ -20,6 +20,9 @@ angular.
 
             this.parseText = function (txt) {
                 var result = {};
+                if (!txt) {
+                   return result;
+                }
                 var lines = txt.split("\n").
                    map(function (l) { return l.trim(); }).
                    filter(function (l) { return l; });
@@ -31,7 +34,7 @@ angular.
                              templateParams: {line: line}};
                    }
                    var numOfParticipants = line.substr(0, colonIdx);
-                   if (!numOfParticipants.match(/[0-9]+/)) {
+                   if (!numOfParticipants.match(/^ *[0-9]+ *$/)) {
                       throw {}
                    }
                    var indexes = [];
@@ -39,16 +42,23 @@ angular.
                        map(function (p) {return p.trim();}).
                        filter(function (p) { return p;});
                    for (var j = 0; j < pairs.length; ++j) {
-                       var match = pairs[j].match(/([0-9]+) *- *([0-9]+)/);
+                       var match = pairs[j].match(/^ *([0-9]+) *- *([0-9]+) *$/);
                        if (!match) {
                           throw {template: "Line has wrong match",
-                                 templateParams: {line: line, match: pair}};
+                                 templateParams: {line: line, match: pairs[j]}};
                        }
                        indexes.push(parseInt(match[1]) - 1, parseInt(match[2]) - 1);
                    }
                    result[parseInt(numOfParticipants)] = indexes;
                 }
                 return result;
+            };
+
+            this.formatScheduleError = function (templateParams) {
+                templateParams.matches = templateParams.matches.
+                    map(function (match) { return (match[0] + 1) + "-" + (match[1] + 1); }).
+                    join(", ");
+                return templateParams;
             };
         };
     }]);

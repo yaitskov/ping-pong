@@ -20,7 +20,7 @@
           default-button-type
           ng-show="!$ctrl.published">
         <div class="form-group">
-            <label for="quitsFromGroup">{{ 'Quits from a group' | translate }}</label>
+            <label>{{ 'Quits from a group' | translate }}</label>
             <div touch-spin options="$ctrl.options.quitsFromGroup"
                  ng-model="$ctrl.tournament.rules.group.quits"></div>
             <p class="help-block">
@@ -35,13 +35,15 @@
                 {{ 'max-group-size-help' | translate }}
             </p>
         </div>
-        <div class="form-group"
-             ng-class="{'has-error': $ctrl.errors['group-rule.schedule']}">
+        <div class="form-group">
             <label>{{ 'Match schedule in a group' }}</label>
             <textarea class="form-control" rows="5" ng-model="$ctrl.groupSchedule"></textarea>
-            <p class="help-block" ng-repeat="error in $ctrl.errors['group-rule.schedule']">
+            <p class="help-block alert-danger" ng-repeat="error in $ctrl.errors['group-rule.schedule']">
                 {{ error.template | translate : $ctrl.formatScheduleError(error.templateParams) }}
            </p>
+            <p class="help-block alert-danger" ng-repeat="error in $ctrl.groupScheduleErrors">
+                {{ error.template | translate : error.templateParams }}
+            </p>
             <p class="help-block">
                 Sets up an order for playing matches in a group.
                 One line per case with a specified number of participants.

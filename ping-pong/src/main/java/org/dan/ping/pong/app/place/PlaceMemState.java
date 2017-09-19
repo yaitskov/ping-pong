@@ -1,7 +1,9 @@
 package org.dan.ping.pong.app.place;
 
 import static java.util.Optional.ofNullable;
+import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
+import static org.dan.ping.pong.sys.error.PiPoEx.notAuthorized;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import lombok.Builder;
@@ -12,14 +14,19 @@ import org.dan.ping.pong.app.table.TableInfo;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Getter
 @Setter
 @Builder
 public class PlaceMemState {
+    public static final String PID = "pid";
+    public static final String NO_ADMIN_ACCESS_TO_PLACE = "no-admin-access-to-place";
+
     private final Pid pid;
     private String name;
     private Map<Integer, TableInfo> tables;
+    private Set<Integer> adminIds;
 
     public TableInfo getTableByMid(int mid) {
         return tables.values().stream()
@@ -33,5 +40,12 @@ public class PlaceMemState {
         return ofNullable(tables.get(tableId))
                 .orElseThrow(() -> notFound("Table " + tableId
                         + " is not in place " + pid));
+    }
+
+    public void checkAdmin(int uid) {
+        if (adminIds.contains(uid)) {
+            return;
+        }
+        throw forbidden(NO_ADMIN_ACCESS_TO_PLACE, PID, pid.getPid());
     }
 }

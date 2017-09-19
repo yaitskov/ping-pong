@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.place;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static ord.dan.ping.pong.jooq.Tables.CITY;
 import static ord.dan.ping.pong.jooq.Tables.PLACE;
 import static ord.dan.ping.pong.jooq.Tables.PLACE_ADMIN;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -137,6 +139,15 @@ public class PlaceDao {
                 .execute();
     }
 
+    private Set<Integer> loadAdmins(Pid pid) {
+        return jooq.select(PLACE_ADMIN.UID)
+                .from(PLACE_ADMIN).where(PLACE_ADMIN.PID.eq(pid.getPid()))
+                .fetch()
+                .stream()
+                .map(r -> r.get(PLACE_ADMIN.UID))
+                .collect(toSet());
+    }
+
     public Optional<PlaceMemState> load(Pid pid) {
         return ofNullable(jooq.select(PLACE.NAME)
                 .from(PLACE)
@@ -145,6 +156,7 @@ public class PlaceDao {
                 .map(r -> PlaceMemState.builder()
                         .pid(pid)
                         .name(r.get(PLACE.NAME))
+                        .adminIds(loadAdmins(pid))
                         .build());
     }
 }

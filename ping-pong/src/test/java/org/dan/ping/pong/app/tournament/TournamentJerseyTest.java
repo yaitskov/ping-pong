@@ -10,6 +10,8 @@ import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.category.CategoryResource.CATEGORY_MEMBERS;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
+import static org.dan.ping.pong.app.place.PlaceMemState.NO_ADMIN_ACCESS_TO_PLACE;
+import static org.dan.ping.pong.app.place.PlaceMemState.PID;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.DRAFTING;
 import static org.dan.ping.pong.app.tournament.TournamentResource.EDITABLE_TOURNAMENTS;
@@ -20,6 +22,7 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENL
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST_OFFLINE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_STATE;
+import static org.dan.ping.pong.app.tournament.TournamentService.UNKNOWN_PLACE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
@@ -33,6 +36,7 @@ import static org.dan.ping.pong.mock.Generators.genStr;
 import static org.dan.ping.pong.mock.UserSessionGenerator.USER_SESSION;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
@@ -47,6 +51,7 @@ import static org.junit.Assert.fail;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.city.CityLink;
+import org.dan.ping.pong.app.place.ForTestPlaceDao;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.user.UserInfo;
@@ -56,6 +61,7 @@ import org.dan.ping.pong.mock.TestAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.UserSessionGenerator;
 import org.dan.ping.pong.sys.ctx.TestCtx;
+import org.dan.ping.pong.sys.error.TemplateError;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
 import org.dan.ping.pong.util.time.Clocker;
 import org.hamcrest.Matchers;
@@ -77,7 +83,7 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 @Category(JerseySpringTest.class)
-@ContextConfiguration(classes = TestCtx.class)
+@ContextConfiguration(classes = {TestCtx.class, ForTestPlaceDao.class})
 public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     static class DigestList extends ArrayList<TournamentDigest> {}
 
@@ -92,20 +98,42 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     private DaoEntityGeneratorWithAdmin daoGenerator;
 
     @Test
+    public void failsToCreateTournamentWithUnknownPid() {
+        final String name = genStr();
+        final Instant opensAt = genFutureTime();
+        final int badPid = 1111111;
+        final Response response = createTournament(name, opensAt, badPid);
+        assertEquals(400, response.getStatus());
+        final TemplateError error = response.readEntity(TemplateError.class);
+        assertThat(error, allOf(
+                hasProperty("message", is(UNKNOWN_PLACE)),
+                hasProperty("params", hasEntry(PID, badPid))
+        ));
+    }
+
+    @Inject
+    private ForTestPlaceDao forTestPlaceDao;
+
+    @Test
+    public void failsToCreateTournamentWithForeignPid() {
+        final String name = genStr();
+        final Instant opensAt = genFutureTime();
+        final int badPid = daoGenerator.genPlace(0);
+        forTestPlaceDao.revokeAdmin(badPid, adminSession.getUid());
+        final Response response = createTournament(name, opensAt, badPid);
+        assertEquals(403, response.getStatus());
+        final TemplateError error = response.readEntity(TemplateError.class);
+        assertThat(error, allOf(
+                hasProperty("message", is(NO_ADMIN_ACCESS_TO_PLACE)),
+                hasProperty("params", hasEntry(PID, badPid))
+        ));
+    }
+
+    @Test
     public void createTournament() {
         final String name = genStr();
         final Instant opensAt = genFutureTime();
-        final Response response = request().path(TOURNAMENT_CREATE)
-                .request(APPLICATION_JSON)
-                .header(SESSION, adminSession.getSession())
-                .post(Entity.entity(CreateTournament.builder()
-                        .name(name)
-                        .placeId(daoGenerator.genPlace(0))
-                        .opensAt(opensAt)
-                        .previousTid(Optional.empty())
-                        .rules(RULES_G2Q1_S1A2G11)
-                        .ticketPrice(Optional.empty())
-                        .build(), APPLICATION_JSON));
+        final Response response = createTournament(name, opensAt, daoGenerator.genPlace(0));
         final int tid = response.readEntity(Integer.class);
 
         final List<TournamentDigest> digest = request().path(EDITABLE_TOURNAMENTS)
@@ -117,6 +145,20 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                 hasProperty("tid", is(tid)),
                 hasProperty("name", is(name)),
                 hasProperty("opensAt", is(opensAt)))));
+    }
+
+    private Response createTournament(String name, Instant opensAt, int placeId) {
+        return request().path(TOURNAMENT_CREATE)
+                .request(APPLICATION_JSON)
+                .header(SESSION, adminSession.getSession())
+                .post(Entity.entity(CreateTournament.builder()
+                        .name(name)
+                        .placeId(placeId)
+                        .opensAt(opensAt)
+                        .previousTid(Optional.empty())
+                        .rules(RULES_G2Q1_S1A2G11)
+                        .ticketPrice(Optional.empty())
+                        .build(), APPLICATION_JSON));
     }
 
     @Inject

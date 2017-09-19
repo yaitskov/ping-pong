@@ -8,6 +8,7 @@ import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.place.PlaceMemState.PID;
 import static org.dan.ping.pong.app.tournament.CumulativeScore.BEST_ORDER;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
@@ -36,6 +37,8 @@ import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.match.Pid;
+import org.dan.ping.pong.app.place.PlaceDao;
+import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.table.TableDao;
@@ -64,12 +67,19 @@ public class TournamentService {
     private static final ImmutableSet<TournamentState> EDITABLE_STATES = ImmutableSet.of(Hidden, Announce, Draft);
     private static final ImmutableSet<TournamentState> CONFIGURABLE_STATES = EDITABLE_STATES;
     private static final int DAYS_TO_SHOW_COMPLETE_BIDS = 30;
+    public static final String UNKNOWN_PLACE = "unknown place";
 
     @Inject
     private TournamentDao tournamentDao;
 
+    @Inject
+    private PlaceDao placeDao;
+
     @Transactional(TRANSACTION_MANAGER)
     public int create(int uid, CreateTournament newTournament) {
+        final PlaceMemState place = placeDao.load(new Pid(newTournament.getPlaceId()))
+                .orElseThrow(() -> badRequest(UNKNOWN_PLACE, PID, newTournament.getPlaceId()));
+        place.checkAdmin(uid);
         return tournamentDao.create(uid, newTournament);
     }
 

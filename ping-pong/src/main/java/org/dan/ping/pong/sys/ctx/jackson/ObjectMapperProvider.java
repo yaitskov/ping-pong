@@ -19,7 +19,6 @@ public class ObjectMapperProvider {
     public static ObjectMapper get() {
         return new ObjectMapper()
                 .setSerializationInclusion(NON_EMPTY)
-                .enable(USE_BIG_INTEGER_FOR_INTS)
                 .enable(ALLOW_UNQUOTED_FIELD_NAMES)
                 .enable(ALLOW_FINAL_FIELDS_AS_MUTATORS)
                 .disable(WRITE_DATES_AS_TIMESTAMPS)

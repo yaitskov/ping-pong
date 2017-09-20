@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.tournament.rules;
 
 import com.google.common.collect.Multimap;
-import org.dan.ping.pong.app.castinglots.rank.ProvidedRankValidator;
+import org.dan.ping.pong.app.castinglots.rank.CastingLotsRuleValidator;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 
 import javax.inject.Inject;
@@ -17,7 +17,7 @@ public class TournamentRulesValidator {
     private MatchRuleValidator matchRuleValidator;
 
     @Inject
-    private ProvidedRankValidator rankValidator;
+    private CastingLotsRuleValidator rankValidator;
 
     public void validate(TournamentRules rules, Multimap<String, ValidationError> errors) {
         rankValidator.validate(errors, rules.getCasting());

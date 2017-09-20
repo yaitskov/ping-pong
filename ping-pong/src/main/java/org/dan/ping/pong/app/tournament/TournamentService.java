@@ -29,7 +29,6 @@ import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
-import org.dan.ping.pong.app.castinglots.rank.ProvidedRankValidator;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.category.CategoryService;

@@ -96,7 +96,7 @@ public class CastingLotsService {
     }
 
     private void checkAtLeast(List<ParticipantMemState> readyBids) {
-        if (readyBids.size() < 3) {
+        if (readyBids.size() < 2) {
             throw badRequest(NOT_ENOUGH_PARTICIPANTS, N, readyBids.size());
         }
     }

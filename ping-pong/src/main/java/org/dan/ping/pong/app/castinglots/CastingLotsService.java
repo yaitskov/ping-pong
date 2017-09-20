@@ -1,9 +1,6 @@
 package org.dan.ping.pong.app.castinglots;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.lang.Math.ceil;
-import static java.lang.Math.max;
-import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.bid.BidState.Here;
@@ -20,11 +17,10 @@ import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
+import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.user.UserLink;
-import org.dan.ping.pong.util.collection.SetUtil;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -53,10 +49,14 @@ public class CastingLotsService {
     @Inject
     private ParticipantRankingService rankingService;
 
+    @Inject
+    private GroupDivider groupDivider;
+
     @Transactional(TRANSACTION_MANAGER)
     public void makeGroups(OpenTournamentMemState tournament) {
         final int tid = tournament.getTid();
-        final int quits = tournament.getRule().getGroup().getQuits();
+        final TournamentRules rules = tournament.getRule();
+        final int quits = rules.getGroup().getQuits();
         checkArgument(quits > 0,
                 "how much people quits group is wrong");
         log.info("Casting log tournament {}", tournament.getTid());
@@ -68,19 +68,16 @@ public class CastingLotsService {
                 throw badRequest("There is a category with 1 participant."
                         + " Expel him/her or move into another category.");
             }
-            bids = rankingService.sort(bids, tournament.getRule().getCasting());
-            final double bidsInCategory = bids.size();
-            final int groups = max(1, (int) ceil(bidsInCategory
-                    / tournament.getRule().getGroup().getMaxSize()));
-            final int groupSize = (int) ceil(bidsInCategory / groups);
-            Iterator<ParticipantMemState> bidIterator = bids.iterator();
+            final Map<Integer, List<ParticipantMemState>> bidsByGroups = groupDivider.divide(
+                    rules.getCasting(), rules.getGroup(),
+                    rankingService.sort(bids, rules.getCasting()));
             int basePlayOffPriority = 0;
-            for (int gi = 0; gi < groups; ++gi) {
+            for (int gi : bidsByGroups.keySet().stream().sorted().collect(toList())) {
                 final String groupLabel = "Group " + (1 + gi);
                 final int gid = groupDao.createGroup(tid, cid, groupLabel, quits, gi);
                 tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
                         .ordNumber(gi).label(groupLabel).build());
-                List<ParticipantMemState> groupBids = SetUtil.firstN(groupSize, bidIterator);
+                final List<ParticipantMemState> groupBids = bidsByGroups.get(gi);
                 if (groupBids.size() <= quits) {
                     throw badRequest("Category should have more participants than quits from a group");
                 }
@@ -89,7 +86,8 @@ public class CastingLotsService {
                         basePlayOffPriority);
                 bidDao.setGroupForUids(gid, tid, groupBids);
             }
-            castingLotsDao.generatePlayOffMatches(tournament, cid, groups * quits,
+            castingLotsDao.generatePlayOffMatches(tournament, cid,
+                    bidsByGroups.size() * quits,
                     basePlayOffPriority + 1);
         });
         log.info("Casting lots for tid {} is scoreSetAndCompleteIfWinOrLose", tid);

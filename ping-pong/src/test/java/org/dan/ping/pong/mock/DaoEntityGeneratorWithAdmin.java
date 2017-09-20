@@ -28,6 +28,13 @@ public class DaoEntityGeneratorWithAdmin {
             .splitPolicy(BestToBest)
             .build();
 
+    public static final CastingLotsRule INCREASE_SIGNUP_MIX
+            = CastingLotsRule.builder()
+            .policy(SignUp)
+            .direction(OrderDirection.Increase)
+            .splitPolicy(BalancedMix)
+            .build();
+
     public static final CastingLotsRule INCREASE_PROVIDED_RANKING
             = CastingLotsRule.builder()
             .policy(ProvidedRating)

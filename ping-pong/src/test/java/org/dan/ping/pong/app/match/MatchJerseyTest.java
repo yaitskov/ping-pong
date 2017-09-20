@@ -21,6 +21,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
 import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_PROVIDED_RANKING;
 import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
+import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_MIX;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -110,6 +111,14 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .match(S1A2G11)
             .group(G2Q1)
             .casting(INCREASE_SIGNUP_CASTING)
+            .prizeWinningPlaces(3)
+            .build();
+
+    public static final TournamentRules RULES_G2Q1_S1A2G11_MIX = TournamentRules
+            .builder()
+            .match(S1A2G11)
+            .group(G2Q1)
+            .casting(INCREASE_SIGNUP_MIX)
             .prizeWinningPlaces(3)
             .build();
 

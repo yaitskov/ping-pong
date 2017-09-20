@@ -6,6 +6,6 @@ import org.springframework.context.annotation.Import;
 
 @Import({CastingLotsDao.class, CastingLotsService.class,
         CastingLotsResource.class, ParticipantRankingService.class,
-        CastingLotsRuleValidator.class})
+        CastingLotsRuleValidator.class, GroupDivider.class})
 public class CastingLotsCtx {
 }

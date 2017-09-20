@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.castinglots;
 
 import static java.util.Arrays.asList;
+import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -11,8 +12,8 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.tournament.GroupRules;
-import org.dan.ping.pong.app.tournament.GroupSchedule;
+import org.dan.ping.pong.app.group.GroupRules;
+import org.dan.ping.pong.app.group.GroupSchedule;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.tournament.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.TournamentRules;
@@ -82,6 +83,7 @@ public class MatchScheduleInGroupJerseyTest extends AbstractSpringJerseyTest {
                                         .size2Schedule(
                                                 ImmutableMap.of(3, asList(2, 1, 1, 0, 2, 0)))
                                         .build())))
+                        .casting(INCREASE_SIGNUP_CASTING)
                         .match(S1A2G11)
                         .prizeWinningPlaces(1)
                         .thirdPlaceMatch(0)
@@ -111,6 +113,7 @@ public class MatchScheduleInGroupJerseyTest extends AbstractSpringJerseyTest {
                         .group(G8Q1)
                         .match(S1A2G11)
                         .prizeWinningPlaces(1)
+                        .casting(INCREASE_SIGNUP_CASTING)
                         .thirdPlaceMatch(0)
                         .build())
                 .onBeforeMatch((s, minfo) -> matchOrder.add(minfo.getPlayers()))

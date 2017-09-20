@@ -1,10 +1,15 @@
 package org.dan.ping.pong.mock;
 
+import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BalancedMix;
+import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BestToBest;
+import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.SignUp;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.mock.Generators.genStr;
 
 import lombok.RequiredArgsConstructor;
-import org.dan.ping.pong.app.tournament.GroupRules;
+import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
+import org.dan.ping.pong.app.castinglots.rank.OrderDirection;
+import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.tournament.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
@@ -13,6 +18,13 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 public class DaoEntityGeneratorWithAdmin {
+    public static final CastingLotsRule INCREASE_SIGNUP_CASTING
+            = CastingLotsRule.builder()
+            .policy(SignUp)
+            .direction(OrderDirection.Increase)
+            .splitPolicy(BestToBest)
+            .build();
+
     private final TestAdmin testAdmin;
     private final DaoEntityGenerator daoEntityGenerator;
 
@@ -45,6 +57,7 @@ public class DaoEntityGeneratorWithAdmin {
                         .maxSize(8)
                         .quits(quits)
                         .build())
+                .casting(INCREASE_SIGNUP_CASTING)
                 .prizeWinningPlaces(3)
                 .build();
     }

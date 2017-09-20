@@ -4,8 +4,8 @@ import static org.dan.ping.pong.app.tournament.rules.ValidationError.ofTemplate;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
-import org.dan.ping.pong.app.tournament.GroupRules;
-import org.dan.ping.pong.app.tournament.GroupSchedule;
+import org.dan.ping.pong.app.group.GroupRules;
+import org.dan.ping.pong.app.group.GroupSchedule;
 
 import java.util.HashSet;
 import java.util.List;

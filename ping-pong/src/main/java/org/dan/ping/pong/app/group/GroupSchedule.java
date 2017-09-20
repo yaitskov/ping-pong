@@ -1,8 +1,6 @@
-package org.dan.ping.pong.app.tournament;
+package org.dan.ping.pong.app.group;
 
 import static com.google.common.primitives.Ints.asList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.reverse;
 import static java.util.stream.Collectors.toList;
 
 import lombok.AllArgsConstructor;

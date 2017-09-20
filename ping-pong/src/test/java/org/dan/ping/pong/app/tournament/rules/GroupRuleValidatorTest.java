@@ -13,8 +13,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
-import org.dan.ping.pong.app.tournament.GroupRules;
-import org.dan.ping.pong.app.tournament.GroupSchedule;
+import org.dan.ping.pong.app.group.GroupRules;
+import org.dan.ping.pong.app.group.GroupSchedule;
 import org.junit.Before;
 import org.junit.Test;
 

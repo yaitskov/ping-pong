@@ -7,7 +7,7 @@ import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.match.MatchType.POff;
-import static org.dan.ping.pong.app.tournament.GroupSchedule.DEFAULT_SCHEDULE;
+import static org.dan.ping.pong.app.group.GroupSchedule.DEFAULT_SCHEDULE;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.collect.ImmutableMap;
@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
-import org.dan.ping.pong.app.tournament.GroupSchedule;
+import org.dan.ping.pong.app.group.GroupSchedule;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.jooq.DSLContext;

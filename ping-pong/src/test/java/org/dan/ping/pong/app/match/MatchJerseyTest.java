@@ -19,6 +19,7 @@ import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.table.TableState.Free;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
+import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -85,6 +86,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .builder()
             .match(S3A2G11)
             .group(G8Q1)
+            .casting(INCREASE_SIGNUP_CASTING)
             .prizeWinningPlaces(3)
             .build();
 
@@ -92,12 +94,14 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .builder()
             .match(S1A2G11)
             .group(G8Q1)
+            .casting(INCREASE_SIGNUP_CASTING)
             .build();
 
     public static final TournamentRules RULES_G2Q1_S1A2G11 = TournamentRules
             .builder()
             .match(S1A2G11)
             .group(G2Q1)
+            .casting(INCREASE_SIGNUP_CASTING)
             .prizeWinningPlaces(3)
             .build();
 
@@ -105,6 +109,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .builder()
             .match(S1A2G11)
             .group(G2Q1)
+            .casting(INCREASE_SIGNUP_CASTING)
             .thirdPlaceMatch(1)
             .prizeWinningPlaces(3)
             .build();
@@ -113,18 +118,21 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .builder()
             .match(S1A2G11)
             .group(G8Q2)
+            .casting(INCREASE_SIGNUP_CASTING)
             .build();
 
     public static final TournamentRules RULES_G8Q2_S3A2G11 = TournamentRules
             .builder()
             .match(S3A2G11)
             .group(G8Q2)
+            .casting(INCREASE_SIGNUP_CASTING)
             .build();
 
     public static final TournamentRules RULES_G2Q1_S3A2G11 = TournamentRules
             .builder()
             .match(S3A2G11)
             .group(G2Q1)
+            .casting(INCREASE_SIGNUP_CASTING)
             .prizeWinningPlaces(3)
             .build();
 

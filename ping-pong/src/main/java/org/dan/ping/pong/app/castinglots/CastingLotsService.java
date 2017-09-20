@@ -15,6 +15,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
@@ -49,6 +50,9 @@ public class CastingLotsService {
     @Inject
     private GroupDao groupDao;
 
+    @Inject
+    private ParticipantRankingService rankingService;
+
     @Transactional(TRANSACTION_MANAGER)
     public void makeGroups(OpenTournamentMemState tournament) {
         final int tid = tournament.getTid();
@@ -64,7 +68,7 @@ public class CastingLotsService {
                 throw badRequest("There is a category with 1 participant."
                         + " Expel him/her or move into another category.");
             }
-            bids = bids.stream().sorted(comparingInt(bid -> bid.getUid().getId())).collect(toList());
+            bids = rankingService.sort(bids, tournament.getRule().getCasting());
             final double bidsInCategory = bids.size();
             final int groups = max(1, (int) ceil(bidsInCategory
                     / tournament.getRule().getGroup().getMaxSize()));

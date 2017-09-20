@@ -4,25 +4,31 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.log;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static ord.dan.ping.pong.jooq.Tables.BID;
+import static org.dan.ping.pong.app.group.GroupSchedule.DEFAULT_SCHEDULE;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.match.MatchType.POff;
-import static org.dan.ping.pong.app.group.GroupSchedule.DEFAULT_SCHEDULE;
+import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.castinglots.rank.OrderDirection;
+import org.dan.ping.pong.app.group.GroupSchedule;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
-import org.dan.ping.pong.app.group.GroupSchedule;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.jooq.DSLContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -96,5 +102,16 @@ public class CastingLotsDao {
                 .build()
                 .generateTree(levels, empty(), lowestPriority,
                         TypeChain.of(Gold, POff), empty()).get();
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public List<Integer> loadRanks(Tid tid, Set<Integer> uids, OrderDirection direction) {
+        return jooq.select(BID.UID).from(BID)
+                .where(BID.TID.eq(tid.getTid()),
+                        BID.UID.in(uids),
+                        BID.PROVIDED_RANK.ne(Optional.empty()))
+                .orderBy(direction.setupOrder(BID.PROVIDED_RANK))
+                .fetch()
+                .map(r -> r.get(BID.UID));
     }
 }

@@ -568,6 +568,11 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>OptionalInteger</name>
+                                    <expression>.*bid\.(provided_rank)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
                                     <name>Instant</name>
                                     <expression>.*tournament\.(opens_at)</expression>
                                     <types>.*</types>

@@ -27,6 +27,9 @@ import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
+import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
+import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
+import org.dan.ping.pong.app.castinglots.rank.ProvidedRankValidator;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.category.CategoryService;
@@ -68,6 +71,7 @@ public class TournamentService {
     private static final ImmutableSet<TournamentState> CONFIGURABLE_STATES = EDITABLE_STATES;
     private static final int DAYS_TO_SHOW_COMPLETE_BIDS = 30;
     public static final String UNKNOWN_PLACE = "unknown place";
+    private static final String TID = "tid";
 
     @Inject
     private TournamentDao tournamentDao;
@@ -83,12 +87,28 @@ public class TournamentService {
         return tournamentDao.create(uid, newTournament);
     }
 
-    public void enlistOnline(EnlistTournament enlistment,
-            OpenTournamentMemState tournament, UserInfo user, DbUpdater batch) {
+    private void validateEnlist(OpenTournamentMemState tournament, Enlist enlist) {
         if (tournament.getState() != Draft) {
             throw badRequest("Tournament is not in Draft but "
                     + tournament.getState());
         }
+        tournament.checkCategory(enlist.getCid());
+        final CastingLotsRule casting = tournament.getRule().getCasting();
+        if (casting.getPolicy() == ParticipantRankingPolicy.ProvidedRating) {
+            final int rank = enlist.getProvidedRank()
+                    .orElseThrow(() -> badRequest("Ranking is required in", TID, tournament.getTid()));
+            casting.getProvidedRankOptions().orElseThrow(() -> internalError("no rank options"))
+                    .validate(rank);
+        } else {
+            if (enlist.getProvidedRank().isPresent()) {
+                throw badRequest("Provided ranking is not used", TID, tournament.getTid());
+            }
+        }
+    }
+
+    public void enlistOnline(EnlistTournament enlistment,
+            OpenTournamentMemState tournament, UserInfo user, DbUpdater batch) {
+        validateEnlist(tournament, enlistment);
         log.info("Uid {} enlists to tid {} in cid {}",
                 user.getUid(), tournament.getTid(), enlistment.getCategoryId());
         int uid = user.getUid();
@@ -99,15 +119,12 @@ public class TournamentService {
                 .cid(enlistment.getCategoryId())
                 .tid(new Tid(tournament.getTid()))
                 .build());
-        enlist(tournament, uid, batch);
+        enlist(tournament, uid, enlistment.getProvidedRank(), batch);
     }
 
-    private void enlist(OpenTournamentMemState tournament, int uid, DbUpdater batch) {
-        if (tournament.getState() != TournamentState.Draft) {
-            throw badRequest(BadStateError.of(tournament.getState(),
-                    "Tournament is not in a draft state"));
-        }
-        bidDao.enlist(tournament.getParticipant(uid), clocker.get(), batch);
+    private void enlist(OpenTournamentMemState tournament, int uid,
+            Optional<Integer> providedRank, DbUpdater batch) {
+        bidDao.enlist(tournament.getParticipant(uid), clocker.get(), providedRank, batch);
     }
 
     private void ensureDrafting(TournamentState state) {
@@ -427,10 +444,7 @@ public class TournamentService {
 
     public int enlistOffline(OpenTournamentMemState tournament,
             EnlistOffline enlistment, DbUpdater batch) {
-        if (tournament.getState() != Draft) {
-            throw badRequest("Tournament is not in Draft but "
-                    + tournament.getState());
-        }
+        validateEnlist(tournament, enlistment);
         final int participantUid = userDao.register(UserRegRequest.builder()
                 .name(enlistment.getName())
                 .build());
@@ -441,7 +455,7 @@ public class TournamentService {
                 .uid(new Uid(participantUid))
                 .tid(new Tid(tournament.getTid()))
                 .build());
-        enlist(tournament, participantUid, batch);
+        enlist(tournament, participantUid, enlistment.getProvidedRank(), batch);
         return participantUid;
     }
 

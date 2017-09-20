@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Optional;
+
 @Getter
 @Setter
 @Builder
@@ -22,10 +24,12 @@ public class CastingLotsRule {
     private ParticipantRankingPolicy policy;
     private OrderDirection direction;
     private GroupSplitPolicy splitPolicy;
+    private Optional<ProvidedRankOptions> providedRankOptions;
 
     public static class CastingLotsRuleBuilder {
         ParticipantRankingPolicy policy = SignUp;
         OrderDirection direction = Increase;
         GroupSplitPolicy splitPolicy = BestToBest;
+        Optional<ProvidedRankOptions> providedRankOptions = Optional.empty();
     }
 }

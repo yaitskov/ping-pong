@@ -9,15 +9,23 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.bid.BidState;
 
+import java.util.Optional;
+
 @Getter
 @Setter
 @Builder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class EnlistOffline {
+public class EnlistOffline implements Enlist {
     private int cid;
     private int tid;
     private String name;
     private BidState bidState;
+    private Optional<Integer> providedRank;
+
+    public static class EnlistOfflineBuilder {
+        BidState bidState = BidState.Here;
+        Optional<Integer> providedRank = Optional.empty();
+    }
 }

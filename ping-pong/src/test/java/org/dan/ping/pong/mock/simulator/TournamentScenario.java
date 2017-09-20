@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Getter
 @ToString(of = {"uidPlayer", "categoryDbId", "tid", "placeId", "params"})
@@ -47,6 +48,7 @@ public class TournamentScenario {
     private final Map<Set<Player>, PlayHook> hooksOnMatches = new HashMap<>();
     private final Map<Player, EnlistMode> playerPresence = new HashMap<>();
     private final List<HookCallbackPro> onBeforeAnyMatch = new ArrayList<>();
+    private final Map<Player, ProvidedRank> providedRanks = new HashMap<>();
 
     private boolean begin = true;
     @Setter
@@ -62,6 +64,11 @@ public class TournamentScenario {
     private boolean ignoreUnexpectedGames;
 
     private Optional<AutoResolution> autoResolution = Optional.empty();
+
+    public TournamentScenario rank(ProvidedRank rank, Player... players) {
+        Stream.of(players).forEach(player -> providedRanks.put(player, rank));
+        return this;
+    }
 
     public TournamentScenario autoResolution(AutoResolution resolution) {
         this.autoResolution = Optional.of(resolution);

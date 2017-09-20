@@ -1,5 +1,6 @@
 package org.dan.ping.pong.mock;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.auth.AuthResource.AUTH_GENERATE_SIGN_IN_LINK;
 import static org.dan.ping.pong.app.bid.BidResource.BID_PAID;
@@ -16,9 +17,11 @@ import org.dan.ping.pong.app.match.CompleteMatch;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
 import org.dan.ping.pong.mock.simulator.EnlistMode;
+import org.dan.ping.pong.mock.simulator.ProvidedRank;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -35,13 +38,16 @@ public class RestEntityGenerator {
             int tid, int cid, List<TestUserSession> participants) {
         enlistParticipants(rest, adminSession, tid, cid, participants);
     }
+
     public void enlistParticipants(MyRest myRest, SessionAware adminSession,
             int tid, int cid, List<TestUserSession> participants) {
-        for (TestUserSession userSession : participants) {
+        for (int i = 0; i < participants.size(); ++i) {
+            TestUserSession userSession = participants.get(i);
             myRest.voidPost(TOURNAMENT_ENLIST, userSession,
                     EnlistTournament.builder()
                             .tid(tid)
                             .categoryId(cid)
+                            .providedRank(empty())
                             .build());
             myRest.voidPost(BID_PAID, adminSession,
                     BidId.builder()
@@ -56,16 +62,25 @@ public class RestEntityGenerator {
         }
     }
 
+    private Optional<Integer> getProvidedRank(List<Optional<ProvidedRank>> ranks, int i) {
+        return ranks == null
+                ? empty()
+                : ranks.get(i).map(ProvidedRank::getValue);
+    }
+
     public void enlistParticipants(MyRest myRest, SessionAware adminSession,
             Map<TestUserSession, EnlistMode> enlistModes,
-            int tid, int cid, List<TestUserSession> participants) {
-        for (TestUserSession userSession : participants) {
+            int tid, int cid, List<TestUserSession> participants,
+            List<Optional<ProvidedRank>> ranks) {
+        for (int i = 0; i < participants.size(); ++i) {
+            TestUserSession userSession = participants.get(i);
             EnlistMode enlistMode = ofNullable(enlistModes.get(userSession)).orElse(EnlistMode.Pass);
             if (enlistMode.compareTo(EnlistMode.Enlist) >= 0) {
                 myRest.voidPost(TOURNAMENT_ENLIST, userSession,
                         EnlistTournament.builder()
                                 .tid(tid)
                                 .categoryId(cid)
+                                .providedRank(getProvidedRank(ranks, i))
                                 .build());
             }
             if (enlistMode.compareTo(EnlistMode.Pay) >= 0) {

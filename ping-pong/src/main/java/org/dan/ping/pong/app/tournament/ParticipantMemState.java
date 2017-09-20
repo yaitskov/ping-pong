@@ -19,6 +19,10 @@ public class ParticipantMemState {
     private int cid;
     private String name;
 
+    public String toString() {
+        return "bid(" + uid + ", " + tid + ", " + cid + ")";
+    }
+
     public BidState getState() {
         return bidState;
     }

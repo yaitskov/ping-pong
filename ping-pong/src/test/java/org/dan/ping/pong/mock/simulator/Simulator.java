@@ -361,14 +361,23 @@ public class Simulator {
         for (PlayerCategory category : scenario.getCategoryDbId().keySet()) {
             final int catId = daoGenerator.genCategory(prefix + " " + category, tid);
             scenario.getCategoryDbId().put(category, catId);
+        }
+        for (PlayerCategory category : scenario.getCategoryDbId().keySet()) {
+            final int catId = scenario.getCategoryDbId().get(category);
             Map<TestUserSession, EnlistMode> m = scenario.getPlayerPresence().keySet()
                     .stream().collect(Collectors.toMap(
                             player -> scenario.getPlayersSessions().get(player),
                             player -> scenario.getPlayerPresence().get(player)));
             restGenerator.enlistParticipants(rest, testAdmin,
                     m, tid,
-                    catId, scenario.getPlayersByCategories().get(category)
-                            .stream().map(player -> scenario.getPlayersSessions().get(player))
+                    catId,
+                    scenario.getPlayersByCategories().get(category)
+                            .stream()
+                            .map(player -> scenario.getPlayersSessions().get(player))
+                            .collect(toList()),
+                    scenario.getPlayersByCategories().get(category)
+                            .stream()
+                            .map(player -> ofNullable(scenario.getProvidedRanks().get(player)))
                             .collect(toList()));
         }
     }

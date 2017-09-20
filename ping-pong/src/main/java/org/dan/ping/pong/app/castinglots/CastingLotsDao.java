@@ -109,7 +109,7 @@ public class CastingLotsDao {
         return jooq.select(BID.UID).from(BID)
                 .where(BID.TID.eq(tid.getTid()),
                         BID.UID.in(uids),
-                        BID.PROVIDED_RANK.ne(Optional.empty()))
+                        BID.PROVIDED_RANK.isNotNull())
                 .orderBy(direction.setupOrder(BID.PROVIDED_RANK))
                 .fetch()
                 .map(r -> r.get(BID.UID));

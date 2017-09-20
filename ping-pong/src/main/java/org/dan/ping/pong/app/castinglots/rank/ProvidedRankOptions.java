@@ -26,7 +26,7 @@ public class ProvidedRankOptions {
     private int minValue;
 
     public void validate(int rank) {
-        if (rank < minValue || rank < maxValue) {
+        if (rank < minValue || rank > maxValue) {
             throw badRequest("rank out of range",
                     ImmutableMap.of(V, rank, MIN, minValue, MAX, maxValue));
         }

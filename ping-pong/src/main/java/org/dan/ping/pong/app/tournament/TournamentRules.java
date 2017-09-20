@@ -7,12 +7,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Wither;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.group.GroupRules;
 
 @Getter
 @Setter
 @Builder
+@Wither
 @NoArgsConstructor
 @AllArgsConstructor
 public class TournamentRules {

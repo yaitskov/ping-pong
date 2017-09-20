@@ -22,7 +22,7 @@ public class EnlistOffline implements Enlist {
     private int tid;
     private String name;
     private BidState bidState;
-    private Optional<Integer> providedRank;
+    private Optional<Integer> providedRank = Optional.empty();
 
     public static class EnlistOfflineBuilder {
         BidState bidState = BidState.Here;

@@ -217,7 +217,8 @@ public class MatchDao {
     public void markAsSchedule(MatchInfo match, DbUpdater batch) {
         batch.exec(
                 DbUpdate.builder()
-                        .logBefore(() -> log.info("Match {} began", match.getMid()))
+                        .logBefore(() -> log.info("Match {} between {} began",
+                                match.getMid(), match.getParticipantIdScore().keySet()))
                         .onFailure(u -> internalError("Match "
                                 + match.getMid() + " is not in place state"))
                         .query(jooq.update(MATCHES)
@@ -312,12 +313,12 @@ public class MatchDao {
                 .fetch()
                 .map(r -> {
                     final Map<Integer, List<Integer>> uids = new HashMap<>();
-                    if (r.get(MATCHES.UID_LESS) > 0) {
-                        uids.put(r.get(MATCHES.UID_LESS), new ArrayList<>());
-                    }
-                    if (r.get(MATCHES.UID_MORE) > 0) {
-                        uids.put(r.get(MATCHES.UID_MORE), new ArrayList<>());
-                    }
+                    ofNullable(r.get(MATCHES.UID_LESS))
+                            .filter(uid -> uid > 0)
+                            .ifPresent(uid -> uids.put(uid, new ArrayList<>()));
+                    ofNullable(r.get(MATCHES.UID_MORE))
+                            .filter(uid -> uid > 0)
+                            .ifPresent(uid -> uids.put(uid, new ArrayList<>()));
                     return MatchInfo.builder()
                             .mid(r.get(MATCHES.MID))
                             .cid(r.get(MATCHES.CID))

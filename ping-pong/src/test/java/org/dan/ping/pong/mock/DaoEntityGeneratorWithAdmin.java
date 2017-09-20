@@ -2,6 +2,7 @@ package org.dan.ping.pong.mock;
 
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BalancedMix;
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BestToBest;
+import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.ProvidedRating;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.SignUp;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.mock.Generators.genStr;
@@ -9,11 +10,13 @@ import static org.dan.ping.pong.mock.Generators.genStr;
 import lombok.RequiredArgsConstructor;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.castinglots.rank.OrderDirection;
+import org.dan.ping.pong.app.castinglots.rank.ProvidedRankOptions;
 import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.tournament.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -23,6 +26,19 @@ public class DaoEntityGeneratorWithAdmin {
             .policy(SignUp)
             .direction(OrderDirection.Increase)
             .splitPolicy(BestToBest)
+            .build();
+
+    public static final CastingLotsRule INCREASE_PROVIDED_RANKING
+            = CastingLotsRule.builder()
+            .policy(ProvidedRating)
+            .direction(OrderDirection.Increase)
+            .splitPolicy(BestToBest)
+            .providedRankOptions(Optional.of(ProvidedRankOptions
+                    .builder()
+                    .label("TEST")
+                    .minValue(1)
+                    .maxValue(10)
+                    .build()))
             .build();
 
     private final TestAdmin testAdmin;

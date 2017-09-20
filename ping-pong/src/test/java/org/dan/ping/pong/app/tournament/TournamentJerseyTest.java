@@ -249,6 +249,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final int tid = daoGenerator.genTournament(
                 daoGenerator.genPlace(0), Draft);
         final int cid1 = daoGenerator.genCategory(tid);
+        final int cid2 = daoGenerator.genCategory(tid);
         myRest().voidPost(TOURNAMENT_ENLIST, userSession, EnlistTournament.builder()
                 .tid(tid)
                 .categoryId(cid1)
@@ -268,7 +269,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
         myRest().voidPost(TOURNAMENT_ENLIST, userSession, EnlistTournament.builder()
                 .tid(tid)
-                .categoryId(daoGenerator.genCategory(tid))
+                .categoryId(cid2)
                 .build());
         assertThat(myRest().get(TOURNAMENT_ENLISTED,
                 userSession, DigestList.class),

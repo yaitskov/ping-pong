@@ -34,8 +34,10 @@ import org.dan.ping.pong.app.match.SetScoreResult;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.SetScoreResultName;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentInfo;
+import org.dan.ping.pong.app.tournament.TournamentRow;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.app.user.UserType;
@@ -135,8 +137,8 @@ public class Simulator {
                             .collect(toSet()));
         }
         assertEquals(Optional.of(Close),
-                tournamentDao.getById(scenario.getTid())
-                        .map(TournamentInfo::getState));
+                tournamentDao.getRow(new Tid(scenario.getTid()))
+                        .map(TournamentRow::getState));
     }
 
     private void showUnHeldMatches(String label, Map<Set<Player>, GameEnd> matches) {

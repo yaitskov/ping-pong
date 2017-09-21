@@ -16,6 +16,8 @@ import static org.dan.ping.pong.app.match.MatchResource.MATCH_WATCH_LIST_OPEN;
 import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
+import static org.dan.ping.pong.app.playoff.PlayOffRule.L0_3P;
+import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing0;
 import static org.dan.ping.pong.app.table.TableState.Free;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
@@ -40,11 +42,14 @@ import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableInfo;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentInfo;
+import org.dan.ping.pong.app.tournament.TournamentRow;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin;
@@ -87,69 +92,77 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
     public static final TournamentRules RULES_G8Q1_S3A2G11 = TournamentRules
             .builder()
             .match(S3A2G11)
-            .group(G8Q1)
+            .group(Optional.of(G8Q1))
             .casting(INCREASE_SIGNUP_CASTING)
             .prizeWinningPlaces(3)
+            .playOff(Optional.of(Losing0))
             .build();
 
     public static final TournamentRules RULES_G8Q1_S1A2G11 = TournamentRules
             .builder()
             .match(S1A2G11)
-            .group(G8Q1)
+            .group(Optional.of(G8Q1))
             .casting(INCREASE_SIGNUP_CASTING)
+            .playOff(Optional.of(Losing0))
             .build();
 
     public static final TournamentRules RULES_G2Q1_S1A2G11_PRNK = TournamentRules
             .builder()
             .match(S1A2G11)
-            .group(G2Q1)
+            .group(Optional.of(G2Q1))
             .casting(INCREASE_PROVIDED_RANKING)
+            .playOff(Optional.of(Losing0))
             .build();
 
     public static final TournamentRules RULES_G2Q1_S1A2G11 = TournamentRules
             .builder()
             .match(S1A2G11)
-            .group(G2Q1)
+            .group(Optional.of(G2Q1))
             .casting(INCREASE_SIGNUP_CASTING)
+            .playOff(Optional.of(Losing0))
             .prizeWinningPlaces(3)
             .build();
 
     public static final TournamentRules RULES_G2Q1_S1A2G11_MIX = TournamentRules
             .builder()
             .match(S1A2G11)
-            .group(G2Q1)
+            .group(Optional.of(G2Q1))
             .casting(INCREASE_SIGNUP_MIX)
+            .playOff(Optional.of(Losing0))
             .prizeWinningPlaces(3)
             .build();
 
     public static final TournamentRules RULES_G2Q1_S1A2G11_3P = TournamentRules
             .builder()
             .match(S1A2G11)
-            .group(G2Q1)
+            .group(Optional.of(G2Q1))
             .casting(INCREASE_SIGNUP_CASTING)
-            .thirdPlaceMatch(1)
+            .playOff(Optional.of(L0_3P))
             .prizeWinningPlaces(3)
             .build();
 
     public static final TournamentRules RULES_G8Q2_S1A2G11 = TournamentRules
             .builder()
             .match(S1A2G11)
-            .group(G8Q2)
+            .group(Optional.of(G8Q2))
             .casting(INCREASE_SIGNUP_CASTING)
+            .playOff(Optional.of(Losing0))
             .build();
 
     public static final TournamentRules RULES_G8Q2_S3A2G11 = TournamentRules
             .builder()
             .match(S3A2G11)
-            .group(G8Q2)
+            .group(Optional.of(G8Q2))
             .casting(INCREASE_SIGNUP_CASTING)
+            .playOff(Optional.of(Losing0))
             .build();
 
     public static final TournamentRules RULES_G2Q1_S3A2G11 = TournamentRules
             .builder()
             .match(S3A2G11)
-            .group(G2Q1)
+            .group(Optional.of(G2Q1))
             .casting(INCREASE_SIGNUP_CASTING)
+            .playOff(Optional.of(Losing0))
             .prizeWinningPlaces(3)
             .build();
 
@@ -228,7 +241,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
         assertEquals(Stream.of(Over, Close).map(Optional::of).collect(toList()),
                 asList(forTestMatchDao.getById(adminOpenMatches.get(0).getMid())
                                 .map(MatchInfo::getState),
-                        tournamentDao.getById(tid).map(TournamentInfo::getState)));
+                        tournamentDao.getRow(new Tid(tid)).map(TournamentRow::getState)));
 
         List<TableInfo> tables = tableDao.findFreeTables(tid);
         assertEquals(singletonList(Free), tables.stream().map(TableInfo::getState).collect(toList()));

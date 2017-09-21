@@ -1,5 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
+import static org.dan.ping.pong.app.bid.BidState.Lost;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +33,16 @@ public class ParticipantMemState {
         return UserLink.builder()
                 .uid(uid.getId())
                 .name(name)
+                .build();
+    }
+
+    public static ParticipantMemState createLoserBid(Tid tid, int cid) {
+        return ParticipantMemState.builder()
+                .tid(tid)
+                .cid(cid)
+                .name(" - ")
+                .bidState(Lost)
+                .uid(new Uid(1))
                 .build();
     }
 }

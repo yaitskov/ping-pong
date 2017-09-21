@@ -174,23 +174,6 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<TournamentInfo> getById(int tid) {
-        return ofNullable(jooq.select(TOURNAMENT.RULES, TOURNAMENT.STATE)
-                .from(TOURNAMENT)
-                .where(TOURNAMENT.TID.eq(tid))
-                .fetchOne())
-                .map(r -> {
-                    final TournamentRules rules = r.get(TOURNAMENT.RULES);
-                    return TournamentInfo.builder()
-                            .tid(tid)
-                        .state(r.get(TOURNAMENT.STATE))
-                        .maxGroupSize(rules.getGroup().getMaxSize())
-                        .quitesFromGroup(rules.getGroup().getQuits())
-                        .build();
-                });
-    }
-
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public boolean isAdminOf(int uid, int tid) {
         return jooq.select(TOURNAMENT.TID)
                 .from(TOURNAMENT).innerJoin(TOURNAMENT_ADMIN)

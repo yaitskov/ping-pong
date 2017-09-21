@@ -42,7 +42,7 @@ public class CastingLotsDao {
 
     private List<Integer> pickSchedule(OpenTournamentMemState tournament,
             List<ParticipantMemState> groupBids) {
-        final GroupSchedule groupSchedules = tournament.getRule().getGroup()
+        final GroupSchedule groupSchedules = tournament.getRule().getGroup().get()
                 .getSchedule().orElse(DEFAULT_SCHEDULE);
         return ofNullable(groupSchedules.getSize2Schedule().get(groupBids.size()))
                 .orElseGet(() -> ofNullable(DEFAULT_SCHEDULE.getSize2Schedule().get(groupBids.size()))
@@ -83,7 +83,7 @@ public class CastingLotsDao {
     public int generatePlayOffMatches(OpenTournamentMemState tinfo, Integer cid,
             int playOffStartPositions, int basePlayOffPriority) {
         final int tid = tinfo.getTid();
-        CastingLotsDao.log.info("Generate play off matches for {} groups in tournament {}",
+        CastingLotsDao.log.info("Generate play off matches for {} bids in tid {}",
                 playOffStartPositions, tid);
         if (playOffStartPositions == 1) {
             CastingLotsDao.log.info("Tournament {}:{} will be without play off", tid, cid);
@@ -97,7 +97,7 @@ public class CastingLotsDao {
         return PlayOffGenerator.builder()
                 .tournament(tinfo)
                 .cid(cid)
-                .thirdPlaceMatch(tinfo.getRule().getThirdPlaceMatch() == 1)
+                .thirdPlaceMatch(tinfo.getRule().getPlayOff().get().getThirdPlaceMatch() == 1)
                 .matchDao(matchDao)
                 .build()
                 .generateTree(levels, empty(), lowestPriority,

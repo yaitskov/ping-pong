@@ -3,7 +3,6 @@ package org.dan.ping.pong.app.castinglots.rank;
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BestToBest;
 import static org.dan.ping.pong.app.castinglots.rank.OrderDirection.Increase;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.SignUp;
-import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BalancedMix;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

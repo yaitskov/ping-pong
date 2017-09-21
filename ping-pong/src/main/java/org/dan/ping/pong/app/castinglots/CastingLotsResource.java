@@ -46,7 +46,7 @@ public class CastingLotsResource {
                 uid, doCastingLots.getTid());
         sequentialExecutor.execute(new Tid(doCastingLots.getTid()), () -> {
             try {
-                castingLotsService.makeGroups(tournamentCache.load(doCastingLots.getTid()));
+                castingLotsService.seed(tournamentCache.load(doCastingLots.getTid()));
                 response.resume("");
             } catch (Exception e) {
                 tournamentCache.invalidate(doCastingLots.getTid());

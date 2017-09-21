@@ -160,7 +160,7 @@ public class TournamentService {
                     + " is not in draft state but "
                     + tournament.getState());
         }
-        castingLotsService.makeGroups(tournament);
+        castingLotsService.seed(tournament);
         tournament.setState(TournamentState.Open);
         tournamentDao.setState(tournament, batch);
         final Instant now = clocker.get();
@@ -274,7 +274,7 @@ public class TournamentService {
         List<MatchInfo> incompleteMy = matchService.bidIncompleteGroupMatches(uid, tournament);
         log.info("activeParticipantLeave uid {} incomplete {}", uid, incompleteMy.size());
         if (incompleteMy.isEmpty()) {
-            leaveFromPlayOff(bid, tournament, batch);
+            matchService.leaveFromPlayOff(bid, tournament, batch);
             if (bid.getBidState() != Win2 || target == Expl) {
                 bidService.setBidState(bid, target, singletonList(bid.getBidState()), batch);
             }
@@ -288,14 +288,6 @@ public class TournamentService {
                 place -> {
                     batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
                     return tableService.scheduleFreeTables(tournament, place, now, batch);
-                });
-    }
-
-    private void leaveFromPlayOff(ParticipantMemState bid, OpenTournamentMemState tournament, DbUpdater batch) {
-        matchService.playOffMatchForResign(bid.getUid().getId(), tournament)
-                .ifPresent(match -> {
-                    matchService.walkOver(tournament, bid.getUid().getId(), match, batch);
-                    leaveFromPlayOff(bid, tournament, batch);
                 });
     }
 

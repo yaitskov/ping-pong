@@ -10,6 +10,9 @@ import lombok.Setter;
 import lombok.experimental.Wither;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.group.GroupRules;
+import org.dan.ping.pong.app.playoff.PlayOffRule;
+
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -20,9 +23,9 @@ import org.dan.ping.pong.app.group.GroupRules;
 public class TournamentRules {
     private MatchValidationRule match;
     private CastingLotsRule casting;
-    private GroupRules group;
+    private Optional<PlayOffRule> playOff;
+    private Optional<GroupRules> group;
     private int prizeWinningPlaces = 3;
-    private int thirdPlaceMatch;
 
     public static class TournamentRulesBuilder {
         int prizeWinningPlaces = 3;

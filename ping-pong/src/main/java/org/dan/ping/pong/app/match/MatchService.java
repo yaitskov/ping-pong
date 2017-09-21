@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.min;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -281,7 +282,7 @@ public class MatchService {
     private List<Integer> completeGroup(Integer gid, OpenTournamentMemState tournament,
             List<MatchInfo> matches, DbUpdater batch) {
         log.info("Pick bids for playoff from gid {} in tid {}", gid, tournament.getTid());
-        final int quits = tournament.getRule().getGroup().getQuits();
+        final int quits = tournament.getRule().getGroup().get().getQuits();
         final List<Integer> orderUids = groupService.orderUidsInGroup(tournament, matches);
         final List<Integer> quitUids = orderUids.subList(0, quits);
         log.info("{} quit group {}", quitUids, gid);
@@ -311,7 +312,7 @@ public class MatchService {
         return orderUids.subList(quits, orderUids.size());
     }
 
-    private void assignBidToMatch(OpenTournamentMemState tournament, int mid, int uid, DbUpdater batch) {
+    public void assignBidToMatch(OpenTournamentMemState tournament, int mid, int uid, DbUpdater batch) {
         final MatchInfo matchInfo = tournament.getMatchById(mid);
         if (matchInfo.getParticipantIdScore().size() == 2) {
             throw internalError("Match " + matchInfo.getMid() + " gets 3rd participant");
@@ -414,6 +415,14 @@ public class MatchService {
                 .collect(toList());
     }
 
+    public void leaveFromPlayOff(ParticipantMemState bid, OpenTournamentMemState tournament, DbUpdater batch) {
+        playOffMatchForResign(bid.getUid().getId(), tournament)
+                .ifPresent(match -> {
+                    walkOver(tournament, bid.getUid().getId(), match, batch);
+                    leaveFromPlayOff(bid, tournament, batch);
+                });
+    }
+
     public void walkOver(OpenTournamentMemState tournament, int walkoverUid, MatchInfo matchInfo, DbUpdater batch) {
         Optional<Integer> winUid = matchInfo.getOpponentUid(walkoverUid);
         if (winUid.isPresent()) {
@@ -482,8 +491,10 @@ public class MatchService {
                 .orElse(Lists.emptyList());
 
         boolean notAllMatchesComplete = !allMatchesInGroupComplete(groupMatches);
-        final List<Integer> quitUids = groupService.orderUidsInGroup(tournament, groupMatches)
-                .subList(0, tournament.getRule().getGroup().getQuits());
+        final List<Integer> quitUids =
+                tournament.getRule().getGroup().map(groupRules ->
+                        groupService.orderUidsInGroup(tournament, groupMatches)
+                                .subList(0, groupRules.getQuits())).orElse(emptyList());
         changeStatus(batch, minfo, Game);
         truncateSets(batch, minfo, reset.getSetNumber());
         if (!groupMatches.isEmpty() && notAllMatchesComplete) {

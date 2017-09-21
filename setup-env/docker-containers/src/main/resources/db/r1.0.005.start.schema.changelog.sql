@@ -19,6 +19,9 @@ create table users(
     banned timestamp(3),
     index `email_idx` (email));
 
+-- loser user to fill empty position at seeding (expected UID = 1)
+insert into users(name, type) values(' - ', 'User');
+
 create table country (
     country_id int(11) not null auto_increment primary key,
     name varchar(80) not null unique,

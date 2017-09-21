@@ -4,6 +4,7 @@ import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BalancedMi
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BestToBest;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.ProvidedRating;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.SignUp;
+import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing0;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.mock.Generators.genStr;
 
@@ -76,10 +77,11 @@ public class DaoEntityGeneratorWithAdmin {
                         .minGamesToWin(11)
                         .minAdvanceInGames(2)
                         .build())
-                .group(GroupRules.builder()
+                .group(Optional.of(GroupRules.builder()
                         .maxSize(8)
                         .quits(quits)
-                        .build())
+                        .build()))
+                .playOff(Optional.of(Losing0))
                 .casting(INCREASE_SIGNUP_CASTING)
                 .prizeWinningPlaces(3)
                 .build();

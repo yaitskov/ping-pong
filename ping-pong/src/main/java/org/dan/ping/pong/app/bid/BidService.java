@@ -1,6 +1,5 @@
 package org.dan.ping.pong.app.bid;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.dan.ping.pong.app.bid.BidState.Here;
@@ -9,11 +8,12 @@ import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
-import com.google.common.base.Preconditions;
+import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+@Slf4j
 public class BidService {
     public static final List<BidState> WIN_STATES = asList(Win1, Win2, Win3);
 
@@ -66,9 +67,10 @@ public class BidService {
 
     public void setBidState(ParticipantMemState bid, BidState target,
             List<BidState> expected, DbUpdater batch) {
-        if (bid.getState() == target) {
+        if (bid.getUid().getId() == FILLER_LOSER_UID || bid.getState() == target) {
             return;
         }
+        log.info("Set bid {} state {}", bid.getUid(), target);
         if (!expected.contains(bid.getState())) {
             throw internalError(
                     "Bid " + bid.getUid() + " state "

@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
+import static com.spotify.hamcrest.optional.OptionalMatchers.optionalWithValue;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RULES;
@@ -34,7 +35,7 @@ public class TournamentUpdateRulesJerseyTest extends AbstractSpringJerseyTest {
 
         assertThat(myRest().get(TOURNAMENT_RULES + "/" + scenario.getTid(),
                 TournamentRules.class),
-                hasProperty("group", hasProperty("maxSize", is(8))));
+                hasProperty("group", optionalWithValue(hasProperty("maxSize", is(8)))));
 
         myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
                 TidIdentifiedRules.builder()
@@ -44,6 +45,6 @@ public class TournamentUpdateRulesJerseyTest extends AbstractSpringJerseyTest {
 
         assertThat(myRest().get(TOURNAMENT_RULES + "/" + scenario.getTid(),
                 TournamentRules.class),
-                hasProperty("group", hasProperty("maxSize", is(2))));
+                hasProperty("group", optionalWithValue(hasProperty("maxSize", is(2)))));
     }
 }

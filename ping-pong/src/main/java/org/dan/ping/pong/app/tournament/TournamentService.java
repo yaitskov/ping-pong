@@ -164,9 +164,9 @@ public class TournamentService {
         tournament.setState(TournamentState.Open);
         tournamentDao.setState(tournament, batch);
         final Instant now = clocker.get();
-        findReadyToStartTournamentBid(tournament).forEach(bid -> {
-            bidService.setBidState(bid, BidState.Wait, singletonList(bid.getBidState()), batch);
-        });
+        findReadyToStartTournamentBid(tournament).forEach(bid ->
+                bidService.setBidState(bid, BidState.Wait,
+                        singletonList(bid.getBidState()), batch));
         sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
                 place -> {
                     batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));

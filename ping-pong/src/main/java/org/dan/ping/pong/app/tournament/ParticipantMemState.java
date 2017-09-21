@@ -14,6 +14,7 @@ import java.util.Optional;
 @Setter
 @Builder
 public class ParticipantMemState {
+    public static final int FILLER_LOSER_UID = 1;
     private final Tid tid;
     private final Uid uid;
     private BidState bidState;
@@ -42,7 +43,7 @@ public class ParticipantMemState {
                 .cid(cid)
                 .name(" - ")
                 .bidState(Lost)
-                .uid(new Uid(1))
+                .uid(new Uid(FILLER_LOSER_UID))
                 .build();
     }
 }

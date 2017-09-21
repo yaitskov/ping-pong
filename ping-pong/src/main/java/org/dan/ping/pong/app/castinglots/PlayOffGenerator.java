@@ -26,7 +26,7 @@ public class PlayOffGenerator {
             .<Integer, List<Integer>>builder()
             .put(2, asList(0, 1))
             .put(4, asList(0, 3, 1, 2))
-            .put(8, oneBased(1, 8,  5, 4,  3, 6,  7, 2))
+            .put(8, oneBased(1, 8, 5, 4, 3, 6, 7, 2))
             .put(16, oneBased(
                     1, 16, 8, 9, 5, 12, 4, 13,
                     3, 14, 6, 11, 7, 10, 2, 15))

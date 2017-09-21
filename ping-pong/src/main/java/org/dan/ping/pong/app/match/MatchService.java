@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.match;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.min;
@@ -22,6 +23,7 @@ import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.app.tournament.SetScoreResultName.MatchContinues;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
@@ -172,10 +174,18 @@ public class MatchService {
         assignBidToMatch(tournament, matchInfo.getWinnerMid().get(), winUid, batch);
         final int lostUid = matchInfo.getOpponentUid(winUid).get();
         final ParticipantMemState lostBid = tournament.getParticipants().get(lostUid);
+        if (lostBid == null) {
+            checkArgument(lostUid == FILLER_LOSER_UID);
+        }
         if (matchInfo.getLoserMid().isPresent()) {
-            bidService.setBidState(lostBid, Wait, asList(Play, Rest), batch);
+            if (lostBid != null) {
+                bidService.setBidState(lostBid, Wait, asList(Play, Rest), batch);
+            }
             assignBidToMatch(tournament, matchInfo.getLoserMid().get(), lostUid, batch);
         } else {
+            if (lostBid == null) {
+                return;
+            }
             bidService.setBidState(lostBid, Lost, asList(Play, Wait, Rest), batch);
         }
     }
@@ -313,6 +323,7 @@ public class MatchService {
     }
 
     public void assignBidToMatch(OpenTournamentMemState tournament, int mid, int uid, DbUpdater batch) {
+        log.info("Assign uid {} to mid {} in tid {}", uid, mid, tournament.getTid());
         final MatchInfo matchInfo = tournament.getMatchById(mid);
         if (matchInfo.getParticipantIdScore().size() == 2) {
             throw internalError("Match " + matchInfo.getMid() + " gets 3rd participant");
@@ -341,6 +352,9 @@ public class MatchService {
         completeMatch(matchInfo, uid, batch);
         matchInfo.getWinnerMid()
                 .ifPresent(wmid -> assignBidToMatch(tournament, wmid, uid, batch));
+        if (uid == FILLER_LOSER_UID) {
+            return;
+        }
         switch (matchInfo.getType()) {
             case Brnz:
                 bidService.setBidState(tournament.getBid(uid), Win3, asList(Play, Wait, Rest), batch);
@@ -424,6 +438,7 @@ public class MatchService {
     }
 
     public void walkOver(OpenTournamentMemState tournament, int walkoverUid, MatchInfo matchInfo, DbUpdater batch) {
+        log.info("Uid {} walkovers mid {}", walkoverUid, matchInfo.getMid());
         Optional<Integer> winUid = matchInfo.getOpponentUid(walkoverUid);
         if (winUid.isPresent()) {
             matchWinnerDetermined(tournament, matchInfo, winUid.get(), batch);

@@ -7,6 +7,7 @@ import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
+import static org.dan.ping.pong.mock.simulator.Player.p5;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 
 import org.dan.ping.pong.JerseySpringTest;
@@ -48,6 +49,36 @@ public class JustPlayOffJerseyTest extends AbstractSpringJerseyTest {
                 .win(p1, p2)
                 .champions(c1, p1, p2)
                 .name("noAutoLoosers4");
+
+        simulator.simulate(scenario);
+    }
+
+    @Test
+    public void oneAutoLoosers3() {
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .rules(RULES_PO_S1A2G11)
+                .category(c1, p1, p2, p3)
+                .quitsGroup(p1, p2, p3)
+                .win(p2, p3)
+                .win(p1, p2)
+                .champions(c1, p1, p2)
+                .name("oneAutoLoosers3");
+
+        simulator.simulate(scenario);
+    }
+
+    @Test
+    public void threeAutoLoosers5() {
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .rules(RULES_PO_S1A2G11)
+                .category(c1, p1, p2, p3, p4, p5)
+                .quitsGroup(p1, p2, p3, p4, p5)
+                .win(p5, p4)
+                .win(p3, p2)
+                .win(p1, p5)
+                .win(p3, p1)
+                .champions(c1, p3, p1)
+                .name("3AutoLoosers5");
 
         simulator.simulate(scenario);
     }

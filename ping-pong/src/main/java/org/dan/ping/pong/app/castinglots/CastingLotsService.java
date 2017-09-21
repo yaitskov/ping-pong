@@ -1,10 +1,12 @@
 package org.dan.ping.pong.app.castinglots;
 
+import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
+import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.PLAY_OFF_SEEDS;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.createLoserBid;
@@ -15,6 +17,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
@@ -106,10 +109,13 @@ public class CastingLotsService {
     @Inject
     private MatchService matchService;
 
+    @Inject
+    private BidService bidService;
+
     private void assignBidsToBaseMatches(Integer cid, int basePositions,
             List<ParticipantMemState> orderedBids,
             OpenTournamentMemState tournament, DbUpdater batch) {
-        final List<Integer> seeds = ofNullable(PLAY_OFF_SEEDS.get(orderedBids.size()))
+        final List<Integer> seeds = ofNullable(PLAY_OFF_SEEDS.get(basePositions))
                 .orElseThrow(() -> internalError("No seeding for "
                         + orderedBids.size() + " participants"));
 
@@ -125,12 +131,14 @@ public class CastingLotsService {
             final int iBid2 = seeds.get(iMatch * 2 + 1);
             final int iStrongBid = Math.min(iBid1, iBid2);
             final int iWeakBid = Math.max(iBid1, iBid2);
+
             matchService.assignBidToMatch(tournament, match.getMid(),
                     orderedBids.get(iStrongBid).getUid().getId(), batch);
 
             if (iWeakBid >= orderedBids.size()) {
                 final ParticipantMemState fakeLoser = createLoserBid(
                         new Tid(tournament.getTid()), cid);
+                bidService.setBidState(orderedBids.get(iStrongBid), Play, singletonList(Here), batch);
                 matchService.assignBidToMatch(tournament, match.getMid(),
                         fakeLoser.getUid().getId(), batch);
                 matchService.leaveFromPlayOff(fakeLoser, tournament, batch);

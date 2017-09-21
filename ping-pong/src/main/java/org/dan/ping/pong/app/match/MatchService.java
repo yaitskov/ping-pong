@@ -3,7 +3,6 @@ package org.dan.ping.pong.app.match;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.min;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -46,9 +45,9 @@ import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
-import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
+import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.TournamentCache;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentService;
@@ -276,7 +275,10 @@ public class MatchService {
         if (iGru.getOrdNumber() == 0) {
             for (int i = 0; i < quitUids.size(); ++i) {
                 bidService.setBidState(tournament.getParticipant(quitUids.get(i)),
-                        WIN_STATES.get(i), asList(Play, Wait, Quit, Lost, Rest), batch);
+                        i < WIN_STATES.size()
+                                ? WIN_STATES.get(i)
+                                : Lost,
+                        asList(Play, Wait, Quit, Lost, Rest), batch);
             }
             tournamentService.endOfTournamentCategory(tournament, iGru.getCid(), batch);
         } else {

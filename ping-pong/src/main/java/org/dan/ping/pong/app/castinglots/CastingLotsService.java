@@ -149,7 +149,6 @@ public class CastingLotsService {
         }
     }
 
-
     private int roundPlayOffBase(int bids) {
         int places = 2;
         while (places < bids) {
@@ -162,7 +161,22 @@ public class CastingLotsService {
             OpenTournamentMemState tournament,
             List<ParticipantMemState> readyBids) {
         log.info("Seed tid {} as group", tournament.getTid());
-        throw internalError("mini tournament is not implemented");
+        final int tid = tournament.getTid();
+        final int quits = rules.getGroup().get().getQuits();
+        groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
+            if (bids.size() < 2) {
+                throw badRequest("There is a category with 1 participant."
+                        + " Expel him/her or move into another category.");
+            }
+            final List<ParticipantMemState> orderedBids = rankingService.sort(bids, rules.getCasting());
+            final String groupLabel = "Group 1";
+            final int groupIdx = 0;
+            final int gid = groupDao.createGroup(tid, cid, groupLabel, quits, groupIdx);
+            tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
+                    .ordNumber(groupIdx).label(groupLabel).build());
+            castingLotsDao.generateGroupMatches(tournament, gid, orderedBids, groupIdx);
+            bidDao.setGroupForUids(gid, tid, orderedBids);
+        });
     }
 
     private void seedTournamentWithGroupsAndPlayOff(TournamentRules rules,

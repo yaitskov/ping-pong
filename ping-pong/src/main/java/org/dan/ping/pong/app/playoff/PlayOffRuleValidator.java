@@ -17,7 +17,7 @@ public class PlayOffRuleValidator {
             errors.put(PLAYOFF_RULE, ofTemplate(VALUE_NULL));
             return;
         }
-        if (playOff.getLosings() < 0 || playOff.getLosings() > 2) {
+        if (playOff.getLosings() < 1 || playOff.getLosings() > 2) {
             errors.put(PLAYOFF_RULE + LOSINGS, ofTemplate(OUT_OF_RANGE));
         }
         if (playOff.getThirdPlaceMatch() < 0 || playOff.getThirdPlaceMatch() > 1) {

@@ -102,8 +102,8 @@ public class PlayOffGenerator {
                 .loserMid(loserMid)
                 .cid(cid)
                 .build());
-        log.info("Play off match {}:{} of tournament {} in category {}",
-                type, omid, tournament.getTid(), cid);
+        log.info("playoff {} mid {} of tid {} in cid {}",
+                type, omid.orElse(0), tournament.getTid(), cid);
         return omid;
     }
 
@@ -130,28 +130,38 @@ public class PlayOffGenerator {
             level -= 1;
             for (int i = 0; i < nextMidLevel.size(); ++i) {
                 createMatch(Optional.of(lostRefMids.get(i / 2)),
-                        Optional.of(nextMidLevel.get(i)),
+                        Optional.of(nextMidLevel.get(nextMidLevel.size() - 1 - i)),
                         priority, level, POff)
                         .ifPresent(favorites::add);
+                log.info("{} => {}  | {} => {}",
+                        favorites.get(favorites.size() - 1), lostRefMids.get(i / 2),
+                        favorites.get(favorites.size() - 1), nextMidLevel.get(nextMidLevel.size() - 1 - i));
                 createMatch(Optional.of(nextMidLevel.get(nextMidLevel.size() - 1 - i)),
-                        Optional.empty(),
-                        priority, level, POff)
+                        Optional.empty(), priority, level, POff)
                         .ifPresent(newLostRefs::add);
+                log.info("{} => {}  | ",
+                        newLostRefs.get(newLostRefs.size() - 1), nextMidLevel.get(nextMidLevel.size() - 1 - i));
             }
             if (level == 0) {
+                log.info("base");
                 createBaseMatches(level, priority, favorites, newLostRefs);
                 break;
             }
             nextMidLevel.clear();
-            for (int lostMid : newLostRefs) {
+            for (int i = newLostRefs.size() - 1;  i >= 0; --i) {
+                final int lostMid = newLostRefs.get(i);
                 createMatch(Optional.of(lostMid),
                         Optional.empty(),
                         priority, level, POff)
                         .ifPresent(nextMidLevel::add);
+                log.info("{} => {}  | ",
+                        nextMidLevel.get(nextMidLevel.size() - 1), lostMid);
                 createMatch(Optional.of(lostMid),
                         Optional.empty(),
                         priority, level, POff)
                         .ifPresent(nextMidLevel::add);
+                log.info("{} => {}  | ",
+                        nextMidLevel.get(nextMidLevel.size() - 1), lostMid);
             }
             lostRefMids = favorites;
         }
@@ -161,13 +171,21 @@ public class PlayOffGenerator {
     private void createBaseMatches(int level, int priority,
             List<Integer> favorites, List<Integer> newLostRefs) {
         for (int i = 0; i < newLostRefs.size(); ++i) {
-            final int lostMid = newLostRefs.get(i);
+            final int lostMid = newLostRefs.get(newLostRefs.size() - i - 1);
+            final int jj = i;
             createMatch(Optional.of(favorites.get(i)),
                     Optional.of(lostMid),
-                    priority, level, POff);
+                    priority, level, POff)
+                    .ifPresent(mid -> log.info("{} => {}  | {} => {}",
+                            mid, favorites.get(jj),
+                            mid, lostMid));
+
             createMatch(Optional.of(favorites.get(i)),
                     Optional.of(lostMid),
-                    priority, level, POff);
+                    priority, level, POff)
+                    .ifPresent(mid -> log.info("{} => {}  | {} => {}",
+                            mid, favorites.get(jj),
+                            mid, lostMid));
         }
     }
 }

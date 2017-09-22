@@ -11,7 +11,7 @@ import static org.dan.ping.pong.mock.simulator.Player.p6;
 import static org.dan.ping.pong.mock.simulator.Player.p7;
 import static org.dan.ping.pong.mock.simulator.Player.p8;
 import static org.dan.ping.pong.mock.simulator.Player.p9;
-import static org.dan.ping.pong.mock.simulator.Player.pa;
+import static org.dan.ping.pong.mock.simulator.Player.p10;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c2;
 
@@ -56,11 +56,11 @@ public class TwoCategoriesSim {
                 .rules(RULES_G2Q1_S1A2G11)
                 .ignoreUnexpectedGames()
                 .category(c1, p1, p2)
-                .category(c2, p3, p4, p5, p6, p7, p8, p9, pa)
+                .category(c2, p3, p4, p5, p6, p7, p8, p9, p10)
                 .win(p3, p4)
                 .win(p5, p6)
                 .win(p7, p8)
-                .win(p9, pa)
+                .win(p9, p10)
                 .quitsGroup(p3, p5, p7, p9)
                 .win(p3, p5)
                 .win(p7, p9));

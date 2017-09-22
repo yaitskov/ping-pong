@@ -28,10 +28,12 @@ import org.dan.ping.pong.mock.TestUserSession;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 @Getter
@@ -45,7 +47,7 @@ public class TournamentScenario {
     private final Set<Player> playOffPlayers = new HashSet<>();
     private final Map<PlayerCategory, List<Player>> champions = new HashMap<>();
     private final Map<Player, TestUserSession> playersSessions = new HashMap<>();
-    private final Map<Integer, Player> uidPlayer = new HashMap<>();
+    private final Map<Integer, Player> uidPlayer = new LinkedHashMap<>();
     private final Map<PlayerCategory, Integer> categoryDbId = new HashMap<>();
     private final Map<Set<Player>, PlayHook> hooksOnMatches = new HashMap<>();
     private final Map<Player, EnlistMode> playerPresence = new HashMap<>();
@@ -63,9 +65,16 @@ public class TournamentScenario {
 
     private TournamentRules rules;
 
+    private Optional<Consumer<TournamentScenario>> onFailure = empty();
+
     private boolean ignoreUnexpectedGames;
 
     private Optional<AutoResolution> autoResolution = Optional.empty();
+
+    public TournamentScenario onFailure(Consumer<TournamentScenario> cb){
+        this.onFailure = Optional.of(cb);
+        return this;
+    }
 
     public TournamentScenario rank(ProvidedRank rank, Player... players) {
         Stream.of(players).forEach(player -> providedRanks.put(player, rank));

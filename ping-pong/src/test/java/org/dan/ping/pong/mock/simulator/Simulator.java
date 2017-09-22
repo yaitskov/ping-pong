@@ -37,7 +37,6 @@ import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentDao;
-import org.dan.ping.pong.app.tournament.TournamentInfo;
 import org.dan.ping.pong.app.tournament.TournamentRow;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.user.UserLink;
@@ -107,6 +106,7 @@ public class Simulator {
             }
         } catch (IllegalStateException|AssertionError e) {
             log.info("Scenario {} failed", scenario, e);
+            scenario.getOnFailure().ifPresent(cb -> cb.accept(scenario));
             throw e;
         }
     }

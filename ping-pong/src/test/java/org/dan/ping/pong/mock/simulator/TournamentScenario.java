@@ -1,5 +1,6 @@
 package org.dan.ping.pong.mock.simulator;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
@@ -12,6 +13,7 @@ import static org.dan.ping.pong.mock.simulator.MatchOutcome.W30;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.W31;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.W32;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
@@ -36,8 +38,8 @@ import java.util.stream.Stream;
 @ToString(of = {"uidPlayer", "categoryDbId", "tid", "placeId", "params"})
 public class TournamentScenario {
     private Optional<String> name = empty();
-    private final Map<Set<Player>, GameEnd> groupMatches = new HashMap<>();
-    private final Map<Set<Player>, GameEnd> playOffMatches = new HashMap<>();
+    private final Multimap<Set<Player>, GameEnd> groupMatches = ArrayListMultimap.create();
+    private final Multimap<Set<Player>, GameEnd> playOffMatches = ArrayListMultimap.create();
     private final Multimap<PlayerCategory, Player> playersByCategories = HashMultimap.create();
     private final Map<Player, PlayerCategory> playersCategory = new HashMap<>();
     private final Set<Player> playOffPlayers = new HashSet<>();
@@ -94,7 +96,7 @@ public class TournamentScenario {
         return this;
     }
 
-    public Map<Set<Player>, GameEnd> chooseMatchMap(OpenMatchForJudge openMatch) {
+    public Multimap<Set<Player>, GameEnd> chooseMatchMap(OpenMatchForJudge openMatch) {
         return openMatch.getType() == Grup
                 ? getGroupMatches()
                 : getPlayOffMatches();
@@ -111,17 +113,14 @@ public class TournamentScenario {
         playersSessions.put(pb, null);
         GameEnd match = GameEnd.game(pa, outcome, pb, setGenerator);
         if (!playOffPlayers.contains(pa) && !playOffPlayers.contains(pb)) {
-            if (groupMatches.putIfAbsent(new HashSet<>(match.getParticipants()), match) != null) {
-                throw new IllegalStateException("Multiple matches between " +
-                        "the same participants are not supported. Check "
-                        + pa + " and " + pb);
-            }
+            final HashSet<Player> key = new HashSet<>(match.getParticipants());
+            checkArgument(!groupMatches.containsKey(key),
+                    "Multiple matches between "
+                    + "the same participants are not supported. Check "
+                    + "%s and %s", pa ,pb);
+            groupMatches.put(key, match);
         } else if (playOffPlayers.contains(pa) && playOffPlayers.contains(pb)) {
-             if (playOffMatches.putIfAbsent(new HashSet<>(match.getParticipants()), match) != null) {
-                 throw new IllegalStateException("Multiple matches between " +
-                         "the same participants are not supported. Check "
-                         + pa + " and " + pb);
-             };
+             playOffMatches.put(new HashSet<>(match.getParticipants()), match);
         } else {
             throw new IllegalStateException("players " + pa + " and "
                     + pb + " are not both in a group or play off");

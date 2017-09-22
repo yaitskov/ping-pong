@@ -97,6 +97,14 @@ public class MatchService {
     @Inject
     private PlaceService placeService;
 
+    public int roundPlayOffBase(int bids) {
+        int places = 1;
+        while (places < bids) {
+            places *= 2;
+        }
+        return places;
+    }
+
     public SetScoreResult scoreSet(OpenTournamentMemState tournament, int uid,
             FinalMatchScore score, Instant now, DbUpdater batch) {
         tournament.getRule().getMatch().validateSet(score.getScores());
@@ -185,7 +193,10 @@ public class MatchService {
             if (lostBid == null) {
                 return;
             }
-            bidService.setBidState(lostBid, Lost, asList(Play, Wait, Rest), batch);
+            bidService.setBidState(lostBid,
+                    matchInfo.getType() == MatchType.Brnz
+                            ? Win3
+                            : Lost, asList(Play, Wait, Rest), batch);
         }
     }
 
@@ -307,7 +318,7 @@ public class MatchService {
             completeMiniTournamentGroup(tournament, iGru, quitUids, batch);
         } else {
             final List<GroupInfo> groups = tournament.getGroupsByCategory(iGru.getCid());
-            final int expectedPlayOffMatches = quits * groups.size() / 2;
+            final int expectedPlayOffMatches = roundPlayOffBase(quits * groups.size()) / 2;
             if (playOffMatches.size() != expectedPlayOffMatches) {
                 throw internalError("Mismatch in number of play off matches "
                         + expectedPlayOffMatches + " !=" + playOffMatches.size()

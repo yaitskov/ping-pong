@@ -93,17 +93,24 @@ public class CastingLotsService {
             List<ParticipantMemState> readyBids) {
         log.info("Seed tid {} as playoff", tournament.getTid());
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
-            if (bids.size() < 2) {
-                throw badRequest("There is a category with 1 participant."
-                        + " Expel him/her or move into another category.");
-            }
+            validateBidsNumberInACategory(bids);
             final List<ParticipantMemState> orderedBids = rankingService.sort(bids, rules.getCasting());
-            final int basePositions = roundPlayOffBase(orderedBids.size());
+            final int basePositions = matchService.roundPlayOffBase(orderedBids.size());
             castingLotsDao.generatePlayOffMatches(tournament, cid, basePositions, 1);
             final DbUpdater updater = dbUpdaterFactory.create();
             assignBidsToBaseMatches(cid, basePositions, orderedBids, tournament, updater);
             updater.flush();
         });
+    }
+
+    private void validateBidsNumberInACategory(List<ParticipantMemState> bids) {
+        if (bids.size() < 2) {
+            throw badRequest("There is a category with 1 participant."
+                    + " Expel him/her or move into another category.");
+        }
+        if (bids.size() > 128) {
+            throw badRequest("Category has more than 128 participants");
+        }
     }
 
     @Inject
@@ -149,14 +156,6 @@ public class CastingLotsService {
         }
     }
 
-    private int roundPlayOffBase(int bids) {
-        int places = 2;
-        while (places < bids) {
-            places *= 2;
-        }
-        return places;
-    }
-
     private void seedJustGroupTournament(TournamentRules rules,
             OpenTournamentMemState tournament,
             List<ParticipantMemState> readyBids) {
@@ -164,10 +163,7 @@ public class CastingLotsService {
         final int tid = tournament.getTid();
         final int quits = rules.getGroup().get().getQuits();
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
-            if (bids.size() < 2) {
-                throw badRequest("There is a category with 1 participant."
-                        + " Expel him/her or move into another category.");
-            }
+            validateBidsNumberInACategory(bids);
             final List<ParticipantMemState> orderedBids = rankingService.sort(bids, rules.getCasting());
             final String groupLabel = "Group 1";
             final int groupIdx = 0;
@@ -184,10 +180,7 @@ public class CastingLotsService {
         final int tid = tournament.getTid();
         final int quits = rules.getGroup().get().getQuits();
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
-            if (bids.size() < 2) {
-                throw badRequest("There is a category with 1 participant."
-                        + " Expel him/her or move into another category.");
-            }
+            validateBidsNumberInACategory(bids);
             final Map<Integer, List<ParticipantMemState>> bidsByGroups = groupDivider.divide(
                     rules.getCasting(), rules.getGroup().get(),
                     rankingService.sort(bids, rules.getCasting()));
@@ -207,7 +200,7 @@ public class CastingLotsService {
                 bidDao.setGroupForUids(gid, tid, groupBids);
             }
             castingLotsDao.generatePlayOffMatches(tournament, cid,
-                    bidsByGroups.size() * quits,
+                    matchService.roundPlayOffBase(bidsByGroups.size() * quits),
                     basePlayOffPriority + 1);
         });
     }

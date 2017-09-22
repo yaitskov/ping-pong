@@ -22,6 +22,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.match.FinalMatchScore;
@@ -50,6 +51,7 @@ import org.dan.ping.pong.mock.UserSessionGenerator;
 import org.dan.ping.pong.mock.ValueGenerator;
 import org.hamcrest.Matchers;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -141,10 +143,10 @@ public class Simulator {
                         .map(TournamentRow::getState));
     }
 
-    private void showUnHeldMatches(String label, Map<Set<Player>, GameEnd> matches) {
+    private void showUnHeldMatches(String label, Set<Set<Player>> matches) {
         if (!matches.isEmpty()) {
             log.error("Unheld {} matches: {}", label,
-                    Joiner.on(", ").join(matches.keySet()));
+                    Joiner.on(", ").join(matches));
         }
     }
 
@@ -163,8 +165,8 @@ public class Simulator {
                 return openMatches.isEmpty();
             }
             if (openMatches.isEmpty()) {
-                showUnHeldMatches("groups", scenario.getGroupMatches());
-                showUnHeldMatches("playOff", scenario.getPlayOffMatches());
+                showUnHeldMatches("groups", scenario.getGroupMatches().keySet());
+                showUnHeldMatches("playOff", scenario.getPlayOffMatches().keySet());
                 if (!scenario.getGroupMatches().isEmpty()
                         || !scenario.getPlayOffMatches().isEmpty()) {
                     throw new IllegalStateException("Some of matches are not held: left in group "
@@ -173,7 +175,8 @@ public class Simulator {
                 }
                 return true;
             } else if (completedMatches[0] == 0) {
-                if (scenario.getPlayOffMatches().isEmpty() && scenario.getGroupMatches().isEmpty()) {
+                if (scenario.getPlayOffMatches().isEmpty()
+                        && scenario.getGroupMatches().isEmpty()) {
                     return false;
                 }
                 throw new IllegalStateException("Scenario stuck at matches "
@@ -190,7 +193,7 @@ public class Simulator {
             int[] completedMatches, List<OpenMatchForJudge> openMatches) {
         for (OpenMatchForJudge openMatch : openMatches) {
             final Set<Player> players = matchToPlayers(scenario, openMatch);
-            final Map<Set<Player>, GameEnd> matchMap = scenario.chooseMatchMap(openMatch);
+            final Multimap<Set<Player>, GameEnd> matchMap = scenario.chooseMatchMap(openMatch);
             findGame(matchMap, scenario, openMatch, players).ifPresent(game -> {
                 game.getSetGenerator().setMid(openMatch.getMid());
                 final PlayHook hook = scenario.getHooksOnMatches().getOrDefault(players,
@@ -205,16 +208,19 @@ public class Simulator {
                 final HookDecision hookDecision = hook.pauseBefore(scenario, matchMetaInfo);
                 ++completedMatches[0];
                 log.info("Match id {} outcome {}", openMatch.getMid(), game);
-                final Optional<SetScoreResultName> result = completeMatch(players, scenario, openMatch, game, hookDecision);
-                if (hook.getType() == AfterScore ||
-                        hook.getType() == AfterMatch && result.equals(Optional.of(SetScoreResultName.MatchComplete))) {
+                final Optional<SetScoreResultName> result = completeMatch(players, scenario,
+                        openMatch, game, hookDecision);
+                if (hook.getType() == AfterScore
+                        || hook.getType() == AfterMatch
+                                && result.equals(Optional.of(SetScoreResultName.MatchComplete))) {
                     hook.pauseAfter(scenario, matchMetaInfo);
                 }
             });
         }
     }
 
-    private Optional<SetScoreResultName> completeMatch(Set<Player> players, TournamentScenario scenario,
+    private Optional<SetScoreResultName> completeMatch(Set<Player> players,
+            TournamentScenario scenario,
             OpenMatchForJudge openMatch,
             GameEnd game, HookDecision hookDecision) {
         switch (hookDecision) {
@@ -236,7 +242,7 @@ public class Simulator {
             rest.voidPost(TOURNAMENT_RESIGN, scenario.getPlayersSessions().get(resigningPlayer),
                     scenario.getTid());
             log.info("Player {} resigned in match with {}", resigningPlayer, players);
-            scenario.chooseMatchMap(openMatch).remove(players);
+            scenario.chooseMatchMap(openMatch).remove(players, game);
             return SetScoreResultName.MatchComplete;
         }
         final Response response = rest.post(SCORE_SET, testAdmin,
@@ -267,7 +273,7 @@ public class Simulator {
                 assertTrue("Match " + openMatch.getMid()
                                 + " ended before its set generator",
                         game.getSetGenerator().isEmpty());
-                scenario.chooseMatchMap(openMatch).remove(players);
+                scenario.chooseMatchMap(openMatch).remove(players, game);
                 return SetScoreResultName.MatchComplete;
             case MatchContinues:
                 assertFalse("Match " + openMatch.getMid()
@@ -279,12 +285,12 @@ public class Simulator {
         }
     }
 
-    private Optional<GameEnd> findGame(Map<Set<Player>, GameEnd> matchMap,
+    private Optional<GameEnd> findGame(Multimap<Set<Player>, GameEnd> matchMap,
             TournamentScenario scenario,
             OpenMatchForJudge openMatch,
             Set<Player> players) {
-        final GameEnd gameEnd = matchMap.get(players);
-        if (gameEnd == null) {
+        final Collection<GameEnd> gameEnd = matchMap.get(players);
+        if (gameEnd.isEmpty()) {
             if (scenario.getAutoResolution().isPresent()) {
                 Iterator<Player> iterator = players.iterator();
                 return Optional.of(GameEnd.game(iterator.next(),
@@ -299,7 +305,10 @@ public class Simulator {
                         + openMatch.getType() + " stage");
             }
         }
-        return Optional.of(gameEnd);
+        final Optional<GameEnd> game = gameEnd.stream().limit(1).findAny();
+        game.ifPresent(g ->
+                log.info("Pick game {} out of {}", gameEnd.size(), g.getParticipants()));
+        return game;
     }
 
     private Set<Player> matchToPlayers(TournamentScenario scenario, OpenMatchForJudge match) {

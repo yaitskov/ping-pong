@@ -19,6 +19,7 @@ import org.dan.ping.pong.app.group.GroupSchedule;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
+import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
@@ -52,7 +53,7 @@ public class CastingLotsDao {
     public int generateGroupMatches(OpenTournamentMemState tournament, int gid,
             List<ParticipantMemState> groupBids, int priorityGroup) {
         final int tid = tournament.getTid();
-        CastingLotsDao.log.info("Generate matches for group {} in tournament {}", gid, tid);
+        log.info("Generate matches for group {} in tournament {}", gid, tid);
         final List<Integer> schedule = pickSchedule(tournament, groupBids);
         for (int i = 0; i < schedule.size();) {
             final int bidIdxA = schedule.get(i++);
@@ -74,7 +75,7 @@ public class CastingLotsDao {
                     .type(Grup)
                     .cid(tournament.getGroups().get(gid).getCid())
                     .build());
-            CastingLotsDao.log.info("New match {} between {} and {}", mid,
+            log.info("New match {} between {} and {}", mid,
                     bid1.getUid(), bid2.getUid());
         }
         return priorityGroup;
@@ -83,25 +84,37 @@ public class CastingLotsDao {
     public int generatePlayOffMatches(OpenTournamentMemState tinfo, Integer cid,
             int playOffStartPositions, int basePlayOffPriority) {
         final int tid = tinfo.getTid();
-        CastingLotsDao.log.info("Generate play off matches for {} bids in tid {}",
+        log.info("Generate play off matches for {} bids in tid {}",
                 playOffStartPositions, tid);
         if (playOffStartPositions == 1) {
-            CastingLotsDao.log.info("Tournament {}:{} will be without play off", tid, cid);
+            log.info("Tournament {}:{} will be without play off", tid, cid);
             return 0;
         } else {
-            checkArgument(playOffStartPositions > 0, "not enough groups %s", playOffStartPositions);
-            checkArgument(playOffStartPositions % 2 == 0, "odd number groups %s", playOffStartPositions);
+            checkArgument(playOffStartPositions > 0, "not enough groups %s",
+                    playOffStartPositions);
+            checkArgument(playOffStartPositions % 2 == 0, "odd number groups %s",
+                    playOffStartPositions);
         }
         final int levels = (int) (log(playOffStartPositions) / log(2));
         final int lowestPriority = basePlayOffPriority + levels;
-        return PlayOffGenerator.builder()
+        final PlayOffRule playOffRule = tinfo.getRule().getPlayOff()
+                .orElseThrow(() -> internalError("no play off rule in " + tid));
+        final PlayOffGenerator generator = PlayOffGenerator.builder()
                 .tournament(tinfo)
                 .cid(cid)
-                .thirdPlaceMatch(tinfo.getRule().getPlayOff().get().getThirdPlaceMatch() == 1)
+                .thirdPlaceMatch(playOffRule.getThirdPlaceMatch() == 1)
                 .matchDao(matchDao)
-                .build()
-                .generateTree(levels, empty(), lowestPriority,
+                .build();
+        switch (playOffRule.getLosings()) {
+            case 1:
+                return generator.generateTree(levels, empty(), lowestPriority,
                         TypeChain.of(Gold, POff), empty()).get();
+            case 2:
+                return generator.generate2LossTree(levels, lowestPriority).get();
+            default:
+                throw internalError("unsupported number of losings "
+                        + playOffRule.getLosings() + " in " + tid + " ");
+        }
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)

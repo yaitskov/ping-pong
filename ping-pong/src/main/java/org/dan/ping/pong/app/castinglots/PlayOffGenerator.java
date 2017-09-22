@@ -4,6 +4,7 @@ import static com.google.common.primitives.Ints.asList;
 import static org.dan.ping.pong.app.group.GroupSchedule.oneBased;
 import static org.dan.ping.pong.app.match.MatchType.Brnz;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
+import static org.dan.ping.pong.app.match.MatchType.POff;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.Builder;
@@ -14,6 +15,7 @@ import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.match.MatchType;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,5 +105,69 @@ public class PlayOffGenerator {
         log.info("Play off match {}:{} of tournament {} in category {}",
                 type, omid, tournament.getTid(), cid);
         return omid;
+    }
+
+    public Optional<Integer> generate2LossTree(int level, int priority) {
+        final Optional<Integer> omid = createMatch(Optional.empty(), Optional.empty(), priority, level, Gold);
+        List<Integer> lostRefMids = new ArrayList<>();
+        omid.ifPresent(lostRefMids::add);
+        List<Integer> nextMidLevel = new ArrayList<>();
+        level -= 1;
+        for (Integer mid : lostRefMids) {
+            createMatch(Optional.of(mid),
+                    level == 0
+                            ? Optional.of(mid)
+                            : Optional.empty(),
+                    priority, level, Brnz)
+                    .ifPresent(nextMidLevel::add);
+        }
+        if (level == 0) {
+            return omid;
+        }
+        while (true) {
+            final List<Integer> favorites = new ArrayList<>();
+            final List<Integer> newLostRefs = new ArrayList<>();
+            level -= 1;
+            for (int i = 0; i < nextMidLevel.size(); ++i) {
+                createMatch(Optional.of(lostRefMids.get(i / 2)),
+                        Optional.of(nextMidLevel.get(i)),
+                        priority, level, POff)
+                        .ifPresent(favorites::add);
+                createMatch(Optional.of(nextMidLevel.get(nextMidLevel.size() - 1 - i)),
+                        Optional.empty(),
+                        priority, level, POff)
+                        .ifPresent(newLostRefs::add);
+            }
+            if (level == 0) {
+                createBaseMatches(level, priority, favorites, newLostRefs);
+                break;
+            }
+            nextMidLevel.clear();
+            for (int lostMid : newLostRefs) {
+                createMatch(Optional.of(lostMid),
+                        Optional.empty(),
+                        priority, level, POff)
+                        .ifPresent(nextMidLevel::add);
+                createMatch(Optional.of(lostMid),
+                        Optional.empty(),
+                        priority, level, POff)
+                        .ifPresent(nextMidLevel::add);
+            }
+            lostRefMids = favorites;
+        }
+        return omid;
+    }
+
+    private void createBaseMatches(int level, int priority,
+            List<Integer> favorites, List<Integer> newLostRefs) {
+        for (int i = 0; i < newLostRefs.size(); ++i) {
+            final int lostMid = newLostRefs.get(i);
+            createMatch(Optional.of(favorites.get(i)),
+                    Optional.of(lostMid),
+                    priority, level, POff);
+            createMatch(Optional.of(favorites.get(i)),
+                    Optional.of(lostMid),
+                    priority, level, POff);
+        }
     }
 }

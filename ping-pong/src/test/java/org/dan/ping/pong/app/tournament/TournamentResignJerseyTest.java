@@ -188,10 +188,10 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .w30(p5, p6)
                 .w30(p7, p8)
                 .quitsGroup(p1, p3, p5, p7)
-                .custom(game(p1, p3, -1, 0))
+                .custom(game(p1, p7, -1, 0))
+                .w32(p5, p3)
                 .w32(p5, p7)
-                .w32(p3, p5)
-                .champions(c1, p3, p5));
+                .champions(c1, p5, p7));
     }
 
     class ResignCallback implements HookCallback {
@@ -213,9 +213,9 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .w30(p5, p6)
                 .w30(p7, p8)
                 .quitsGroup(p1, p3, p5, p7)
-                .w32(p5, p7)
-                .w32(p3, p5)
-                .champions(c1, p3, p5)
+                .w32(p5, p3)
+                .w32(p7, p5)
+                .champions(c1, p7, p5)
                 .pause(p1, p2, PlayHook.builder()
                         .type(AfterMatch)
                         .callback(new ResignCallback())
@@ -233,9 +233,9 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
                 .w30(p5, p6)
                 .w30(p7, p8)
                 .quitsGroup(p1, p3, p5, p7)
-                .w32(p5, p7)
-                .w32(p3, p5)
-                .champions(c1, p3, p5)
+                .w32(p5, p3)
+                .w32(p7, p5)
+                .champions(c1, p7, p5)
                 .pause(p3, p4, PlayHook.builder()
                         .type(AfterMatch)
                         .callback((s, meta) -> {

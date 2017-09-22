@@ -42,10 +42,10 @@ public class Tournament3rdPlaceJerseyTest extends AbstractSpringJerseyTest {
                 .win(p5, p6)
                 .win(p7, p8)
                 .quitsGroup(p1, p3, p5, p7)
-                .win(p1, p3)
-                .win(p5, p7)
-                .win(p1, p5)
-                .win(p3, p7)
-                .champions(c1, p1, p5, p3));
+                .win(p1, p7)
+                .win(p3, p5)
+                .win(p7, p5)
+                .win(p3, p1)
+                .champions(c1, p3, p1, p7));
     }
 }

@@ -1,0 +1,17 @@
+@import "../base/b-toggle-btn.scss";
+
+.toggle-btn {
+    padding-left: 20px;
+    margin-bottom: 3px;
+    a {
+        margin-top: 7px;
+        padding-right: 10px;
+    }
+}
+
+.toggle-panel {
+    padding: 10px;
+    padding-bottom: 0px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}

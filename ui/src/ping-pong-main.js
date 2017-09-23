@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'clockpicker/dist/bootstrap-clockpicker.css';
 import 'angular-touchspin/dist/angular-touchspin.css';
 
-import './app.scss';
+import './css/app.scss';
 
 import jQuery from 'jquery';
 import moment from 'moment/moment.js';

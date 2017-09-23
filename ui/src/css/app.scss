@@ -9,6 +9,8 @@ $default-btn-font-color: #000;
 $medial-size: 32px;
 $info-bg-color: #d9edf7;
 $success-bg-color: #dff0d8;
+$section-panel-border-color: #d2d2d2;
+$section-panel-label-color: #666;
 
 /* begin of no side space */
 .view-container .container-fluid {
@@ -137,7 +139,9 @@ ul li a {
 
 /* end of enlist form */
 
-@import "app-desktop.scss";
+@media all and (max-resolution: 119dpi) {
+    @import "desktop/app-desktop.scss";
+}
 
 /* begin of debugging and tracing */
 .border {
@@ -195,4 +199,4 @@ td.match-state-description.text-danger {
     font-weight: bold;
 }
 
-@import "app-mobile.scss";
+@import "mobile/app-mobile.scss";

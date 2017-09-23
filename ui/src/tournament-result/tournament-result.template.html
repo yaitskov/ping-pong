@@ -29,9 +29,6 @@
       <tr>
         <td>#</td>
         <td>{{ 'Participant' | translate }}</td>
-        <td title="{{ 'count of won matches' | translate }}">
-          {{ 'Matches' | translate }}
-        </td>
         <td title="{{ 'cumulative score across all matches' | translate }}">
           {{ 'Score' | translate }}
         </td>
@@ -46,10 +43,7 @@
           </a>
         </td>
         <td>
-          {{participant.wonMatches}}
-        </td>
-        <td>
-          {{participant.score}}
+          {{participant.punkts}}
         </td>
       </tr>
     </tbody>

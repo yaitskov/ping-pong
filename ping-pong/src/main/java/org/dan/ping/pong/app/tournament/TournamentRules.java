@@ -25,10 +25,8 @@ public class TournamentRules {
     private CastingLotsRule casting;
     private Optional<PlayOffRule> playOff;
     private Optional<GroupRules> group;
-    private int prizeWinningPlaces = 3;
 
     public static class TournamentRulesBuilder {
-        int prizeWinningPlaces = 3;
         CastingLotsRule casting = CastingLotsRule.builder()
                 .splitPolicy(BalancedMix)
                 .build();

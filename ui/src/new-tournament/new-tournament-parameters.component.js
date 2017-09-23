@@ -15,7 +15,6 @@ angular.
                          self.tournament = pageCtx.get('newTournament') || {};
                          this.errors = {};
                          self.tournament.rules = self.tournament.rules || {
-                             prizeWinningPlaces: 3,
                              thirdPlaceMatch: 1,
                              group: {
                                  quits: 2,

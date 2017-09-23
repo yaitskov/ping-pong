@@ -92,7 +92,6 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .match(S3A2G11)
             .group(Optional.of(G8Q1))
             .casting(INCREASE_SIGNUP_CASTING)
-            .prizeWinningPlaces(3)
             .playOff(Optional.of(Losing1))
             .build();
 
@@ -118,7 +117,6 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .group(Optional.of(G2Q1))
             .casting(INCREASE_SIGNUP_CASTING)
             .playOff(Optional.of(Losing1))
-            .prizeWinningPlaces(3)
             .build();
 
     public static final TournamentRules RULES_G2Q1_S1A2G11_MIX = TournamentRules
@@ -127,7 +125,6 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .group(Optional.of(G2Q1))
             .casting(INCREASE_SIGNUP_MIX)
             .playOff(Optional.of(Losing1))
-            .prizeWinningPlaces(3)
             .build();
 
     public static final TournamentRules RULES_G2Q1_S1A2G11_3P = TournamentRules
@@ -136,7 +133,6 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .group(Optional.of(G2Q1))
             .casting(INCREASE_SIGNUP_CASTING)
             .playOff(Optional.of(L1_3P))
-            .prizeWinningPlaces(3)
             .build();
 
     public static final TournamentRules RULES_G8Q2_S1A2G11 = TournamentRules
@@ -161,7 +157,6 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .group(Optional.of(G2Q1))
             .casting(INCREASE_SIGNUP_CASTING)
             .playOff(Optional.of(Losing1))
-            .prizeWinningPlaces(3)
             .build();
 
     @Inject

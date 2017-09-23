@@ -83,7 +83,6 @@ public class DaoEntityGeneratorWithAdmin {
                         .build()))
                 .playOff(Optional.of(Losing1))
                 .casting(INCREASE_SIGNUP_CASTING)
-                .prizeWinningPlaces(3)
                 .build();
     }
 

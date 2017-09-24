@@ -5,6 +5,33 @@ module.exports = {
     'Add categories btn': 'Add categories',
     'View tournament btn': 'View tournament',
     'Quits from a group': 'Quits from a group',
+    'first-best': '1 best',
+    'first-2-best': '2 best',
+    'seeding-lbl': 'Seeding',
+    'rank-direction-lbl': 'Order',
+    'Sets to win a match': 'Number of sets',
+    'group-schedule-help': 'Sets up an order for playing matches in a group.'
+        + ' One line per case with a specified number of participants.'
+        + ' An example for 3 participants in a group is'
+        + ' <b>3: 1-2, 1-3, 2-3</b>.'
+        + ' If there is no schedule for a group'
+        + ' then matches will be scheduled according to the rules in PZTS 2016.',
+    'Min score to win a set': 'Min set score',
+    'min-score-to-win-set-help': 'Minimal set score to win a set',
+    'Min score advance to win a set': 'Min advance',
+    'min-score-advance-help': 'Required advance in the score to win a set',
+    'decreasing-lbl': 'Descending',
+    'increasing-lbl': 'Ascending',
+    'rank-policy-lbl': 'Rating method',
+    'provided-rating-policy': 'Provided skill',
+    'sign-up-policy': 'Sign-up order',
+    'max-losses': 'Max losses',
+    'up-to-1-loss': 'up to 1',
+    'up-to-2-losses': 'up to 2',
+    'rank-name-lbl': 'Nazwa rankingu',
+    'rank-name-length': 'Max length of rank name must be less than {{max}} letters',
+    'Minimal allowed rank value': 'Min rating value',
+    'Maximum allowed rank value': 'Max rating value',
     'quits-group-help': 'How many players quits from a group and continue participate'
         + ' in play-off tournament stage.',
     'Max group size': 'Max group size',

@@ -10,7 +10,6 @@ import org.dan.ping.pong.app.tournament.TournamentRules;
 import javax.inject.Inject;
 
 public class TournamentRulesValidator {
-    private static final String PRIZE_WINNING_PLACES = "prize-winning-places";
     private static final String TOURNAMENT_RULES = "tournament-rules";
 
     @Inject
@@ -33,10 +32,5 @@ public class TournamentRulesValidator {
         }
         rankValidator.validate(errors, rules.getCasting());
         matchRuleValidator.validate(errors, rules.getMatch());
-        if (rules.getPrizeWinningPlaces() < 1 || rules.getPrizeWinningPlaces() > 3) {
-            errors.put(PRIZE_WINNING_PLACES, ValidationError.builder()
-                    .template("out-of-range")
-                    .build());
-        }
     }
 }

@@ -5,18 +5,86 @@
         default-button-type
         ng-show="!$ctrl.published">
     <div class="form-group toggle-btn">
-      <label>Match</label>
-      <a class="pull-right"
-         data-toggle="collapse"
-         data-target="#match-parameters">
+      <label>{{ 'seeding-lbl' | translate }}</label>
+      <a class="pull-right arrow"
+         simple-toggler="#seeding-parameters">
         <span class="glyphicon glyphicon-menu-down"></span>
         <span class="glyphicon glyphicon-menu-up"></span>
       </a>
     </div>
-    <div id="match-parameters" class="toggle-panel">
+    <div id="seeding-parameters" class="toggle-panel in">
       <div class="form-group">
-        <label>{{ 'Sets to win a match' }}</label>
-        <div touch-spin options="$ctrl.options.matchScore"
+        <label class="toggle-option">
+          {{ 'rank-policy-lbl' | translate }}
+        </label>
+        <a class="btn btn-default"
+           ng-click="$ctrl.tournament.rules.casting.policy = 'ProvidedRating'"
+           ng-class="{'btn-primary': $ctrl.tournament.rules.casting.policy == 'ProvidedRating'}">
+          {{ 'provided-rating-policy' | translate }}
+        </a>
+        <a class="btn btn-default"
+           ng-click="$ctrl.tournament.rules.casting.policy = 'SignUp'"
+           ng-class="{'btn-primary': $ctrl.tournament.rules.casting.policy == 'SignUp'}">
+          {{ 'sign-up-policy' | translate }}
+        </a>
+      </div>
+      <div class="form-group"
+           ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.rankName.$dirty) && $ctrl.form.rankName.$invalid}"
+           ng-show="$ctrl.tournament.rules.casting.policy == 'ProvidedRating'">
+        <label for="rankName" class="toggle-option">
+          {{ 'rank-name-lbl' | translate }}
+        </label>
+        <input type="text" class="form-control"
+               ng-model="$ctrl.tournament.rules.casting.providedRankOptions.label"
+               ng-maxlength="100"
+               name="name"
+               id="name"
+               placeholder="{{ 'rank-name-lbl' | translate }}" />
+        <p class="help-block"
+           ng-show="$ctrl.form.rankName.$error.minlength || $ctrl.form.rankName.$error.maxlength">
+          {{ 'rank-name-length' | translate : '{max: 100}' }}
+        </p>
+      </div>
+      <div class="form-group"
+           ng-show="$ctrl.tournament.rules.casting.policy == 'ProvidedRating'">
+        <label>{{ 'Minimal allowed rank value' | translate }}</label>
+        <div touch-spin options="$ctrl.options.rank"
+             ng-model="$ctrl.tournament.rules.casting.providedRankOptions.minValue"></div>
+      </div>
+      <div class="form-group"
+           ng-show="$ctrl.tournament.rules.casting.policy == 'ProvidedRating'">
+        <label>{{ 'Maximum allowed rank value' | translate }}</label>
+        <div touch-spin options="$ctrl.options.rank"
+             ng-model="$ctrl.tournament.rules.casting.providedRankOptions.maxValue"></div>
+      </div>
+      <div class="form-group">
+        <label class="toggle-option">
+          {{ 'rank-direction-lbl' | translate }}
+        </label>
+        <a class="btn btn-default"
+           ng-click="$ctrl.tournament.rules.casting.direction = 'Decrease'"
+           ng-class="{'btn-primary': $ctrl.tournament.rules.casting.direction == 'Decrease'}">
+          {{ 'decreasing-lbl' | translate }}
+        </a>
+        <a class="btn btn-default"
+           ng-click="$ctrl.tournament.rules.casting.direction = 'Increase'"
+           ng-class="{'btn-primary': $ctrl.tournament.rules.casting.direction == 'Increase'}">
+          {{ 'increasing-lbl' | translate }}
+        </a>
+      </div>
+    </div>
+    <div class="form-group toggle-btn">
+      <label>{{ 'match-lbl' | translate }}</label>
+      <a class="pull-right arrow"
+         simple-toggler="#match-parameters">
+        <span class="glyphicon glyphicon-menu-down"></span>
+        <span class="glyphicon glyphicon-menu-up"></span>
+      </a>
+    </div>
+    <div id="match-parameters" class="toggle-panel in">
+      <div class="form-group">
+        <label>{{ 'Sets to win a match' | translate }}</label>
+        <div touch-spin options="$ctrl.options.sets"
              ng-model="$ctrl.tournament.rules.match.setsToWin"></div>
         <p class="help-block">
           {{ 'match-score-help' | translate }}
@@ -24,79 +92,120 @@
       </div>
       <div class="form-group"
            ng-class="{'has-error': $ctrl.errors['match-rule.min-games-to-win']}">
-        <label>{{ 'Min score to win a set' }}</label>
-        <div touch-spin
+        <label>{{ 'Min score to win a set' | translate }}</label>
+        <div touch-spin options="$ctrl.options.score"
              ng-model="$ctrl.tournament.rules.match.minGamesToWin"></div>
         <p class="help-block" ng-repeat="error in $ctrl.errors['match-rule.min-games-to-win']">
           {{ error.template | translate : JSON.stringify(error.templateParams) }}
         </p>
         <p class="help-block">
-          How many balls a participant should get without równowagi
-          to win a match.
+          {{ 'min-score-to-win-set-help' | translate }}
         </p>
       </div>
       <div class="form-group">
-        <label>{{ 'Min score advance to win a set' }}</label>
-        <div touch-spin
-             ng-model="$ctrl.tournament.rules.match.minGamesToWin"></div>
+        <label>{{ 'Min score advance to win a set' | translate }}</label>
+        <div touch-spin options="$ctrl.options.advance"
+             ng-model="$ctrl.tournament.rules.match.minAdvanceInGames"></div>
         <p class="help-block">
-          Minimal required difference between participants'
-          scores in a match to figure out its winner.
+          {{ 'min-score-advance-help' | translate }}
         </p>
       </div>
     </div>
-    <div class="form-group">
-      <label>{{ 'Quits from a group' | translate }}</label>
-      <div touch-spin options="$ctrl.options.quitsFromGroup"
-           ng-model="$ctrl.tournament.rules.group.quits"></div>
-      <p class="help-block">
-        {{ 'quits-group-help' | translate }}
-      </p>
+    <div class="form-group toggle-btn">
+      <label>{{ 'group-lbl' | translate }}</label>
+      <input type="checkbox"
+             data-size="small"
+             ng-model="$ctrl.useGroup"
+             bs-toggle-on="{{ 'yes-lbl' | translate }}"
+             bs-toggle-off="{{ 'no-lbl' | translate }}"
+             bs-toggle-target="#group-parameters"
+             bs-toggle/>
     </div>
-    <div class="form-group">
-      <label>{{ 'Max group size' | translate }}</label>
-      <div touch-spin options="$ctrl.options.maxGroupSize"
-           ng-model="$ctrl.tournament.rules.group.maxSize"></div>
-      <p class="help-block">
-        {{ 'max-group-size-help' | translate }}
-      </p>
+    <div id="group-parameters" class="toggle-panel">
+      <div class="form-group">
+        <label>{{ 'Quits from a group' | translate }}</label>
+        <div>
+          <a class="btn btn-default"
+             ng-click="$ctrl.tournament.rules.group.quits = 1"
+             ng-class="{'btn-primary': $ctrl.tournament.rules.group.quits == 1}">
+            {{ 'first-best' | translate }}
+          </a>
+          <a class="btn btn-default"
+             ng-click="$ctrl.tournament.rules.group.quits = 2"
+             ng-class="{'btn-success': $ctrl.tournament.rules.group.quits == 2}">
+            {{ 'first-2-best' | translate }}
+          </a>
+        </div>
+        <p class="help-block">
+          {{ 'quits-group-help' | translate }}
+        </p>
+      </div>
+      <div class="form-group">
+        <label>{{ 'Max group size' | translate }}</label>
+        <div touch-spin options="$ctrl.options.maxGroupSize"
+             ng-model="$ctrl.tournament.rules.group.maxSize"></div>
+        <p class="help-block">
+          {{ 'max-group-size-help' | translate }}
+        </p>
+      </div>
+      <div class="form-group">
+        <label>{{ 'Match schedule in a group' }}</label>
+        <textarea class="form-control" name="groupSchedule"
+                  rows="3" ng-model="$ctrl.groupSchedule"></textarea>
+        <p class="help-block alert-danger" ng-repeat="error in $ctrl.errors['group-rule.schedule']">
+          {{ error.template | translate : $ctrl.formatScheduleError(error.templateParams) }}
+        </p>
+        <p class="help-block alert-danger" ng-repeat="error in $ctrl.groupScheduleErrors">
+          {{ error.template | translate : error.templateParams }}
+        </p>
+        <p class="help-block">
+          {{ 'group-schedule-help' | translate }}
+        </p>
+      </div>
     </div>
-    <div class="form-group">
-      <label>{{ 'Match schedule in a group' }}</label>
-      <textarea class="form-control" name="groupSchedule"
-                rows="5" ng-model="$ctrl.groupSchedule"></textarea>
-      <p class="help-block alert-danger" ng-repeat="error in $ctrl.errors['group-rule.schedule']">
-        {{ error.template | translate : $ctrl.formatScheduleError(error.templateParams) }}
-      </p>
-      <p class="help-block alert-danger" ng-repeat="error in $ctrl.groupScheduleErrors">
-        {{ error.template | translate : error.templateParams }}
-      </p>
-      <p class="help-block">
-        Sets up an order for playing matches in a group.
-        One line per case with a specified number of participants.
-        An example for 3 participants in a group is
-        <b>3: 1-2, 1-3, 2-3</b>.
-        If there is no schedule for a group
-        then matches will be scheduled according to the rules in PZTS 2016.
-      </p>
+    <div class="form-group toggle-btn">
+      <label>{{ 'play-off-lbl' | translate }}</label>
+      <input type="checkbox"
+             data-size="small"
+             ng-model="$ctrl.usePlayOff"
+             bs-toggle-on="{{ 'yes-lbl' | translate }}"
+             bs-toggle-off="{{ 'no-lbl' | translate }}"
+             bs-toggle-target="#play-off-parameters"
+             bs-toggle/>
     </div>
-
-    <div class="form-group">
-      <label class="toggle-option">
-        {{ 'Match for 3rd place' | translate }}
-      </label>
-      <a class="btn btn-default"
-         ng-click="$ctrl.setThirdPlaceMatch(1)"
-         ng-class="{'btn-primary': $ctrl.tournament.rules.thirdPlaceMatch == 1}">
-        yes
-      </a>
-      <a class="btn btn-default"
-         ng-click="$ctrl.setThirdPlaceMatch(0)"
-         ng-class="{'btn-danger': $ctrl.tournament.rules.thirdPlaceMatch == 0}">
-        no
-      </a>
+    <div id="play-off-parameters" class="toggle-panel">
+      <div class="form-group">
+        <label class="toggle-option">
+          {{ 'max-losses' | translate }}
+        </label>
+        <a class="btn btn-default"
+           ng-click="$ctrl.tournament.rules.playOff.losings = 1; $ctrl.scrollBottom()"
+           ng-class="{'btn-primary': $ctrl.tournament.rules.playOff.losings == 1}">
+          {{ 'up-to-1-loss' | translate }}
+        </a>
+        <a class="btn btn-default"
+           ng-click="$ctrl.tournament.rules.playOff.losings = 2"
+           ng-class="{'btn-success': $ctrl.tournament.rules.playOff.losings == 2}">
+          {{ 'up-to-2-losses' | translate }}
+        </a>
+      </div>
+      <div class="form-group" ng-show="$ctrl.tournament.rules.playOff.losings == 1">
+        <label class="toggle-option">
+          {{ 'Match for 3rd place' | translate }}
+        </label>
+        <a class="btn btn-default"
+           ng-click="$ctrl.tournament.rules.playOff.thirdPlaceMatch = 1"
+           ng-class="{'btn-primary': $ctrl.tournament.rules.playOff.thirdPlaceMatch == 1}">
+          {{ 'yes-lbl' | translate }}
+        </a>
+        <a class="btn btn-default"
+           ng-click="$ctrl.tournament.rules.playOff.thirdPlaceMatch = 0"
+           ng-class="{'btn-danger': $ctrl.tournament.rules.playOff.thirdPlaceMatch == 0}">
+          {{ 'no-lbl' | translate }}
+        </a>
+      </div>
     </div>
-    <div class="form-group">
+    <div class="form-group top-buffer">
       <button class="btn btn-primary" type="submit">
         {{ 'Update btn' | translate }}
       </button>
@@ -104,7 +213,7 @@
         {{ 'Cancel btn' | translate }}
       </a>
     </div>
-    <div class="form-group">
+    <div id="form-bottom" class="form-group">
       <request-status></request-status>
     </div>
   </form>

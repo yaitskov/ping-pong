@@ -16,6 +16,7 @@
     "angular-route": "^1.6.4",
     "angular-touchspin": "1.4.4",
     "bootstrap": "^3.3.7",
+    "bootstrap-toggle": "2.2.2",
     "clockpicker": "0.0.7",
     "flatpickr": "3.0.6",
     "jquery": "^3.2.1",

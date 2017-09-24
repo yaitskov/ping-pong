@@ -21,7 +21,7 @@ angular.
             this.parseText = function (txt) {
                 var result = {};
                 if (!txt) {
-                   return result;
+                   return null;
                 }
                 var lines = txt.split("\n").
                    map(function (l) { return l.trim(); }).

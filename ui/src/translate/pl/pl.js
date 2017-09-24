@@ -3,6 +3,7 @@ var merge = require('merge');
 module.exports = merge.apply(
     null,
     [{},
+     require('./pl.common.js'),
      require('./pl.copy-tournament.js'),
      require('./drafting.js'),
      require('./main-menu.js'),
@@ -22,7 +23,7 @@ module.exports = merge.apply(
      require('./open-tournament-list.js'),
      require('./open-tournament-page.js'),
      require('./new-tournament.js'),
-     require('./new-tournament-parameters.js'),
+     require('./pl.new-tournament-parameters.js'),
      require('./new-place.js'),
      require('./my-tournament-list.js'),
      require('./my-tournament.js'),

@@ -21,6 +21,63 @@ angular.module('core.ui', ['ngResource']).
             }
         };
     }).
+    directive('simpleToggler', function () {
+        return {
+            restrict: 'A',
+            link: function (scope, element, attrs) {
+                $(element[0]).click(function () {
+                    var target = $(attrs.simpleToggler);
+                    var visiable = target.hasClass('in');
+                    target.collapse(visiable ? 'hide' : 'show');
+                    if (visiable) {
+                        $(this).addClass('collapsed');
+                    } else {
+                        $(this).removeClass('collapsed');
+                    }
+                });
+            }
+        };
+    }).
+    /**
+       input bs-toggle
+       ng-model="$ctrl.field"
+       bs-toggle-on="Tak"
+       bs-toggle-off="Nie"
+       [ bs-toggle-target="#anchor" ]
+       [ bs-toggle-options=="$ctrl.bsToggleOptions" ]
+    */
+    directive('bsToggle', [function () {
+        return {
+            require: 'ngModel',
+            restrict: 'A',
+            scope: {
+                bsToggleOptions: '&',
+                ngChange: '&',
+            },
+            link: function (scope, element, attrs, ngModel) {
+                function init(on, off) {
+                    var options = Object.assign({on: on, off: off},
+                                                scope.bsToggleOptions() || {});
+                    $(element[0]).bootstrapToggle(options);
+                    $(element[0]).change(function () {
+                        var checked = $(this).prop('checked');
+                        if (attrs.bsToggleTarget) {
+                            $(attrs.bsToggleTarget).collapse(checked ? 'show' : 'hide');
+                        }
+                        ngModel.$setViewValue(checked);
+                    });
+                    scope.$watch(
+                        function () {
+                            return ngModel.$modelValue;
+                        },
+                        function (checked) {
+                            $(element[0]).prop('checked', checked).change();
+                        });
+                }
+                init(attrs.bsToggleOn, attrs.bsToggleOff);
+            }
+        };
+    }]).
     directive('defaultButtonType', ['$timeout', function ($timeout) {
         return {
             restrict: 'A',
@@ -66,6 +123,10 @@ angular.module('core.ui', ['ngResource']).
             }
         };
     }]).
+    /**  input ng-flatpickr
+                 fp-opts="$ctrl.dateOpts"
+                 fp-on-setup="$ctrl.dataPickerUi"
+    */
     directive('ngFlatpickr', [function() {
         return {
             require: 'ngModel',

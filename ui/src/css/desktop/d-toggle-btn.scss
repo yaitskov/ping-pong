@@ -1,11 +1,18 @@
 @import "../base/b-toggle-btn.scss";
 
 .toggle-btn {
+    > label {
+        margin-top: 6px;
+    }
     padding-left: 20px;
     margin-bottom: 3px;
-    a {
+    a.arrow {
         margin-top: 7px;
         padding-right: 10px;
+    }
+
+    div.toggle {
+        float: right;
     }
 }
 

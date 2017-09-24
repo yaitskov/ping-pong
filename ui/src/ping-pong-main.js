@@ -1,6 +1,7 @@
 import 'flatpickr/dist/flatpickr.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'clockpicker/dist/bootstrap-clockpicker.css';
+import 'bootstrap-toggle/css/bootstrap-toggle.css';
 import 'angular-touchspin/dist/angular-touchspin.css';
 
 import './css/app.scss';
@@ -15,6 +16,7 @@ import angularMoment from 'angular-moment/angular-moment.js';
 import angularTouchSpin from 'angular-touchspin';
 import bootstrap from 'bootstrap/dist/js/bootstrap.js';
 import bootstrapClockPicker from 'clockpicker/dist/bootstrap-clockpicker.js';
+import 'bootstrap-toggle/js/bootstrap-toggle.js';
 
 import appModule from './app.module.js';
 import appConfig from './app.config.js';

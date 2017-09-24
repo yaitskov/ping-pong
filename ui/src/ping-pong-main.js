@@ -91,6 +91,7 @@ import myTournamentParticipantModule from './my-tournament/participant/participa
 import myTournamentParticipantComponent from './my-tournament/participant/participant.component.js';
 import myTournamentEditModule from './my-tournament/edit/edit.module.js';
 import myTournamentEditComponent from './my-tournament/edit/edit.component.js';
+import './tournament/tournament.import.js';
 import myTournamentParametersModule from './my-tournament/parameters/parameters.module.js';
 import myTournamentParametersComponent from './my-tournament/parameters/parameters.component.js';
 import myTournamentOfflineEnlistModule from './my-tournament/offline/enlist.module.js';

@@ -155,6 +155,11 @@ angular.
             };
         };
     }]).
+    factory('lateEvent', ['$timeout', function ($timeout) {
+        return function (callback) {
+            $timeout(callback, 0);
+        };
+    }]).
     factory('countDown', ['$interval', function ($interval) {
         return new function () {
             var self = this;

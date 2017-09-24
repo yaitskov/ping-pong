@@ -9,8 +9,8 @@ angular.
     module('tournament').
     component('tournamentParametersForm', {
         templateUrl: template,
-        controller: ['$scope', '$routeParams', 'groupSchedule', '$timeout', '$rootScope',
-                     function ($scope, $routeParams, groupSchedule, $timeout, $rootScope) {
+        controller: ['$scope', '$routeParams', 'groupSchedule', '$timeout', '$rootScope', 'binder',
+                     function ($scope, $routeParams, groupSchedule, $timeout, $rootScope, binder) {
                          this.tournamentId = $routeParams.tournamentId;
                          this.groupScheduleErrors = [];
                          this.options = {
@@ -80,18 +80,9 @@ angular.
                              self.groupSchedule = groupSchedule.convertToText(
                                  rules.group.schedule.size2Schedule);
                          };
-
-                         var unbindErrors = $rootScope.$on('event.tournament.rules.errors',
-                                                           function (event, errors) {
-                                                               self.errors = errors;
-                                                           });
-                         var unbindSet = $rootScope.$on('event.tournament.rules.set',
-                                                        function (event, rules) {
-                                                            self.onRulesSet(rules);
-                                                        });
-                         $scope.$on('destroy', function () {
-                             unbindErrors();
-                             unbindSet();
+                         binder($scope, {
+                             'event.tournament.rules.errors': (event, errors) => self.errors = errors,
+                             'event.tournament.rules.set': (event, rules) => self.onRulesSet(rules)
                          });
                          self.back = function () {
                              $rootScope.$broadcast('event.tournament.rules.back', self.rules);

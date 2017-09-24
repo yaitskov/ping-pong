@@ -160,6 +160,16 @@ angular.
             $timeout(callback, 0);
         };
     }]).
+    factory('binder', ['$rootScope', function ($rootScope) {
+        return ($scope, listenerMap) => {
+            let cleaners = [];
+            for (var topic in listenerMap) {
+                    cleaners.push($rootScope.$on(topic, listenerMap[topic]));
+            }
+            $scope.$on('$destroy', () => cleaners.forEach(cleaner => cleaner()));
+            return cleaners;
+        };
+    }]).
     factory('countDown', ['$interval', function ($interval) {
         return new function () {
             var self = this;

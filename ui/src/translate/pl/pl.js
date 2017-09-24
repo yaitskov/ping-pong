@@ -7,7 +7,7 @@ module.exports = merge.apply(
      require('./pl.copy-tournament.js'),
      require('./drafting.js'),
      require('./main-menu.js'),
-     require('./request-status.js'),
+     require('./pl.request-status.js'),
      require('./account-page.js'),
      require('./sign-up-page.js'),
      require('./sign-in-page.js'),

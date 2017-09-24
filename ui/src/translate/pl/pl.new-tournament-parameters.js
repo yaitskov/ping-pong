@@ -49,5 +49,8 @@ module.exports = {
     'missing-matches': 'Brakuje następujących meczi [{{matches}}] w wariancie dla {{participants}} uczestników',
 
     'Line has wrong match': 'Linia [{{line}}] ma błędy w meczach [{{match}}]',
-    'Line has no colon': 'Linia [{{line}}] nie ma dwukropki'
+    'Line has no colon': 'Linia [{{line}}] nie ma dwukropki',
+    'Number of participants not number': 'Linia [{{line}}] ma błąd w ilości uczestników [{{number}}]',
+    'tournament-rules-are-wrong': 'Reguły turnieju są błędny',
+    'no-group-nor-playoff': 'Turniej musi mieć grupy lub drabinkę'
 };

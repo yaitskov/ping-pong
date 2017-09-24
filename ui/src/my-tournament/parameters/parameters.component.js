@@ -89,7 +89,7 @@ angular.
                                  requestStatus.complete();
                                  self.useGroup = rules.group;
                                  self.usePlayOff = rules.playOff;
-                                 self.tournament.rules = rules.toJSON();
+                                 self.tournament.rules = rules = rules.toJSON();
                                  rules.group = rules.group || defaultGroupRules;
                                  rules.playOff = rules.playOff || defaultPlayOffRules;
                                  rules.casting.providedRankOptions = (rules.casting.providedRankOptions

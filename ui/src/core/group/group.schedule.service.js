@@ -30,12 +30,13 @@ angular.
                    var line = lines[i];
                    var colonIdx = line.indexOf(":");
                    if (colonIdx < 1) {
-                      throw {template: "Line has no colon",
-                             templateParams: {line: line}};
+                      throw {message: "Line has no colon",
+                             params: {line: line}};
                    }
                    var numOfParticipants = line.substr(0, colonIdx);
                    if (!numOfParticipants.match(/^ *[0-9]+ *$/)) {
-                      throw {}
+                      throw {message: "Number of participants not number",
+                             params: {line: line, number: numOfParticipants}};
                    }
                    var indexes = [];
                    var pairs = line.substr(colonIdx + 1).split(',').

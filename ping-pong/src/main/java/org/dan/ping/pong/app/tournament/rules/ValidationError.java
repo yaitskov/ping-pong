@@ -18,24 +18,24 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ValidationError {
-    private String template;
-    private Map<String, Object> templateParams;
+    private String message;
+    private Map<String, Object> params;
 
     public static ValidationError ofTemplate(String template) {
-        return ValidationError.builder().template(template).build();
+        return ValidationError.builder().message(template).build();
     }
 
     public static ValidationError ofTemplate(String template, String key, int value) {
-        return ValidationError.builder().template(template)
-                .templateParams(ImmutableMap.of(key, value))
+        return ValidationError.builder().message(template)
+                .params(ImmutableMap.of(key, value))
                 .build();
     }
 
     public static ValidationError ofTemplate(String template,
             String key, Set<Set<Integer>> value,
             int participants) {
-        return ValidationError.builder().template(template)
-                .templateParams(ImmutableMap.of(key, value, "participants", participants))
+        return ValidationError.builder().message(template)
+                .params(ImmutableMap.of(key, value, "participants", participants))
                 .build();
     }
 }

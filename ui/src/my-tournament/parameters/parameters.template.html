@@ -96,7 +96,7 @@
         <div touch-spin options="$ctrl.options.score"
              ng-model="$ctrl.tournament.rules.match.minGamesToWin"></div>
         <p class="help-block" ng-repeat="error in $ctrl.errors['match-rule.min-games-to-win']">
-          {{ error.template | translate : JSON.stringify(error.templateParams) }}
+          {{ error.message | translate : error.params }}
         </p>
         <p class="help-block">
           {{ 'min-score-to-win-set-help' | translate }}
@@ -121,7 +121,7 @@
              bs-toggle-target="#group-parameters"
              bs-toggle/>
     </div>
-    <div id="group-parameters" class="toggle-panel">
+    <div id="group-parameters" class="toggle-panel" ng-show="$ctrl.useGroup">
       <div class="form-group">
         <label>{{ 'Quits from a group' | translate }}</label>
         <div>
@@ -153,10 +153,10 @@
         <textarea class="form-control" name="groupSchedule"
                   rows="3" ng-model="$ctrl.groupSchedule"></textarea>
         <p class="help-block alert-danger" ng-repeat="error in $ctrl.errors['group-rule.schedule']">
-          {{ error.template | translate : $ctrl.formatScheduleError(error.templateParams) }}
+          {{ error.message | translate : $ctrl.formatScheduleError(error.params) }}
         </p>
         <p class="help-block alert-danger" ng-repeat="error in $ctrl.groupScheduleErrors">
-          {{ error.template | translate : error.templateParams }}
+          {{ error.message | translate : error.params }}
         </p>
         <p class="help-block">
           {{ 'group-schedule-help' | translate }}
@@ -173,7 +173,7 @@
              bs-toggle-target="#play-off-parameters"
              bs-toggle/>
     </div>
-    <div id="play-off-parameters" class="toggle-panel">
+    <div id="play-off-parameters" class="toggle-panel" ng-show="$ctrl.usePlayOff">
       <div class="form-group">
         <label class="toggle-option">
           {{ 'max-losses' | translate }}

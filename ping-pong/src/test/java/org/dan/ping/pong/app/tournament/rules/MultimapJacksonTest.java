@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.tournament.rules;
 
 import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -32,8 +31,8 @@ public class MultimapJacksonTest {
     @SneakyThrows
     public void serializeDeserializeFull() {
         HashMultimap<String, ValidationError> errors = HashMultimap.create();
-        final List<ValidationError> values = asList(ValidationError.builder().template("a").build()
-                , ValidationError.builder().template("b").build());
+        final List<ValidationError> values = asList(ValidationError.builder().message("a").build()
+                , ValidationError.builder().message("b").build());
         errors.putAll("k", values);
         final ValidationErrors m = om.readValue(om.writeValueAsString(
                 new ValidationErrors("msg", errors)),
@@ -41,10 +40,10 @@ public class MultimapJacksonTest {
         assertEquals("msg", m.getMessage());
         assertEquals(
                 values.stream()
-                        .map(ValidationError::getTemplate)
+                        .map(ValidationError::getMessage)
                         .collect(toSet()),
                 m.getField2Errors().get("k").stream()
-                        .map(ValidationError::getTemplate)
+                        .map(ValidationError::getMessage)
                         .collect(toSet()));
     }
 }

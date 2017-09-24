@@ -6,110 +6,96 @@ angular.
     component('requestStatus', {
         templateUrl: template,
         controller: [
-            'requestStatus', '$rootScope', '$anchorScroll', '$timeout', '$route', '$translate',
-            function (requestStatus, $scope, $anchorScroll, $timeout, $route, $translate) {
+            'requestStatus', '$rootScope', '$anchorScroll', '$timeout',
+            '$route', '$translate', 'syncTranslate', '$sce', 'auth',
+            function (requestStatus, $scope, $anchorScroll, $timeout,
+                      $route, $translate, syncTranslate, $sce, auth) {
                 var self = this;
                 this.reset = function () {
-                    this.error = null;
-                    this.loading = null;
+                    this.error = {};
+                    this.loading = {};
                 };
-                this.refresh = function () {
-                    $route.reload();
-                }
+                this.convertMsg = function (msg) {
+                    if (typeof msg == 'string') {
+                        return {message: msg, params: {}};
+                    } else if (msg instanceof Array) {
+                        return {message: msg[0], params: msg[1]};
+                    } else {
+                        if (!msg.params) {
+                            msg.params = {};
+                        }
+                        return msg;
+                    }
+                };
                 this.scrollToError = function () {
                     $timeout(function () {
                         $anchorScroll('errorOutput');
                     }, 1);
                 };
+                this.strToErr = function (msg) {
+                    return {message: msg, params: {}};
+                };
+                this.logout = function () {
+                    auth.logout();
+                };
+                this.responseToErr = function (responseData, prefix) {
+                    prefix = self.convertMsg(prefix);
+                    if (typeof responseData == 'object') {
+                        if (typeof responseData.message == 'string') {
+                            var result = {};
+                            result.message = responseData.message;
+                            result.params = responseData.params || {};
+                            result.causes = [];
+                            if (responseData.field2Errors instanceof Object) {
+                                for(var key in responseData.field2Errors) {
+                                    var list = responseData.field2Errors[key];
+                                    for (var k2 in list) {
+                                        result.causes.push(self.convertMsg(list[k2]));
+                                    }
+                                }
+                            }
+                            return result;
+                        } else {
+                            return Object.assign(prefix, {verb: JSON.stringify(response.data)});
+                        }
+                    } else {
+                        return Object.assign(prefix, {verb: $sce.trustAsHtml(responseData)});
+                    }
+                };
                 self.reset();
                 $scope.$on('event.request.started', function (event, msg) {
                     self.reset();
-                    if (msg) {
-                        self.loading = msg;
-                    } else {
-                        $translate('Loading').then(function (loading) { self.loading = loading; });
-                    }
+                    self.loading = self.convertMsg(msg ? msg : 'Loading');
                 });
                 $scope.$on('event.request.validation', function (event, msg) {
                     self.reset();
-                    self.error = msg;
+                    self.error = self.convertMsg(msg);
                     self.scrollToError();
                 });
                 $scope.$on('event.request.failed', function (event, response) {
                     self.reset();
+                    self.error.status = response.status;
                     if (response.status == 502 || response.status == -1) {
-                        $translate("Server is not available").then(function (err) {
-                            self.error = err;
-                        });
+                        self.error = self.responseToErr(response.data, "Server is not available");
                     } else if (response.status == 401) {
-                        $translate('session-expired').then(function (err) {
-                            self.error = err;
-                        });
+                        self.error = self.responseToErr(response.data, 'authentication-error');
                     } else if (response.status == 403) {
-                        if (typeof response.data == 'object') {
-                            if (response.data.message) {
-                                $translate('no-permissions').then(function (err) {
-                                    self.error = err + ": " + response.data.message;
-                                });
-                            } else {
-                                $translate('application-error').then(function (err) {
-                                    self.error = err + ": " + JSON.stringify(response.data);
-                                });
-                            }
-                        } else {
-                            self.error = "Bad request: " + response.data;
-                        }
+                        self.error = self.responseToErr(response.data, 'authorization-error');
                     } else if (response.status == 404) {
-                        if (typeof response.data == 'object') {
-                            if (response.data.message) {
-                                self.error = response.data.message;
-                            } else {
-                                self.error = "Entity not found: " + JSON.stringify(response.data);
-                            }
-                        } else {
-                            self.error = "API method doesn't exist: " + response.data;
-                        }
+                        self.error = self.responseToErr(response.data, 'entity-not-found');
                     } else if (response.status == 400) {
-                        if (typeof response.data == 'object') {
-                            if (response.data.message) {
-                                self.error = response.data.message;
-                            } else {
-                                self.error = "An application error happened: " + JSON.stringify(response.data);
-                            }
-                        } else {
-                            self.error = "Bad request: " + response.data;
-                        }
+                        self.error = self.responseToErr(response.data, 'bad-request');
                     } else if (response.status == 500) {
-                        if (typeof response.data == 'string') {
-                            self.error = "An application error happened:\n" + response.data;
-                        } else if (typeof response.data == 'object') {
-                            if (response.data.message) {
-                                self.error = response.data.message;
-                            } else {
-                                self.error = "An application error happened: " + JSON.stringify(response.data);
-                            }
-                        } else {
-                            self.error = "An application error happened.";
-                        }
+                        self.error = self.responseToErr(response.data, 'application-error');
                     } else if (response.status < 299) {
-                        self.error = "Status " + response.status +
-                            " looks good, but request failed.";
+                        self.error = self.responseToErr(response.data,
+                                                        ['no-error-but-failed',
+                                                         {status: response.status}]);
                     } else if (!response.status) {
-                        self.error = "Status is missing";
+                        self.error = self.responseToErr(response.data, 'status-is-missing');
                     } else {
-                        self.error = "Failed with unexpected status " + response.status;
-                        if (typeof response.data == 'string') {
-                            self.error = self.error + ": " + response.data;
-                            console.log("Failed with " + response.status + ": " + response.data);
-                        } else if (typeof response.data == 'object') {
-                            if (response.data.message) {
-                                self.error = self.error + ": " + response.data.message;
-                            } else {
-                                self.error = self.error + ":\n " + JSON.stringify(response.data);
-                            }
-                            console.log("Failed with " + response.status + ": "
-                                        + JSON.stringify(response.data));
-                        }
+                        self.error = self.responseToErr(response.data,
+                                                        ['unexpected-status', {status: response.status}]);
                     }
                     self.scrollToError();
                 });

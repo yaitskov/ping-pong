@@ -37,8 +37,8 @@ public class GroupRuleValidatorTest {
                 .stream().findFirst().get();
         assertEquals(
                 ImmutableSet.of(ImmutableSet.of(0, 2)),
-                validationError.getTemplateParams().get(MATCHES));
-        assertEquals(MISSING_MATCHES, validationError.getTemplate());
+                validationError.getParams().get(MATCHES));
+        assertEquals(MISSING_MATCHES, validationError.getMessage());
     }
 
     @Test
@@ -48,8 +48,8 @@ public class GroupRuleValidatorTest {
                 .stream().findFirst().get();
         assertEquals(
                 ImmutableSet.of(ImmutableSet.of(1, 2)),
-                validationError.getTemplateParams().get(MATCHES));
-        assertEquals(UNEXPECTED_MATCHES, validationError.getTemplate());
+                validationError.getParams().get(MATCHES));
+        assertEquals(UNEXPECTED_MATCHES, validationError.getMessage());
     }
 
     @Test

@@ -39,10 +39,10 @@
             <label>{{ 'Match schedule in a group' }}</label>
             <textarea class="form-control" rows="5" ng-model="$ctrl.groupSchedule"></textarea>
             <p class="help-block alert-danger" ng-repeat="error in $ctrl.errors['group-rule.schedule']">
-                {{ error.template | translate : $ctrl.formatScheduleError(error.templateParams) }}
+                {{ error.message | translate : $ctrl.formatScheduleError(error.params) }}
            </p>
             <p class="help-block alert-danger" ng-repeat="error in $ctrl.groupScheduleErrors">
-                {{ error.template | translate : error.templateParams }}
+                {{ error.message | translate : error.params }}
             </p>
             <p class="help-block">
                 Sets up an order for playing matches in a group.
@@ -67,7 +67,7 @@
             <div touch-spin
                  ng-model="$ctrl.tournament.rules.match.minGamesToWin"></div>
             <p class="help-block" ng-repeat="error in $ctrl.errors['match-rule.min-games-to-win']">
-                {{ error.template | translate : JSON.stringify(error.templateParams) }}
+                {{ error.message | translate : error.params }}
             </p>
             <p class="help-block">
                 How many balls a participant should get without równowagi

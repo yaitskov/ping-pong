@@ -46,7 +46,7 @@ angular.module('core.ui', ['ngResource']).
        [ bs-toggle-target="#anchor" ]
        [ bs-toggle-options=="$ctrl.bsToggleOptions" ]
     */
-    directive('bsToggle', [function () {
+    directive('bsToggle', ['$timeout', function ($timeout) {
         return {
             require: 'ngModel',
             restrict: 'A',
@@ -61,9 +61,6 @@ angular.module('core.ui', ['ngResource']).
                     $(element[0]).bootstrapToggle(options);
                     $(element[0]).change(function () {
                         var checked = $(this).prop('checked');
-                        if (attrs.bsToggleTarget) {
-                            $(attrs.bsToggleTarget).collapse(checked ? 'show' : 'hide');
-                        }
                         ngModel.$setViewValue(checked);
                     });
                     scope.$watch(

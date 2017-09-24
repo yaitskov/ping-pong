@@ -1,18 +1,41 @@
 <div class="container request-status" ng-show="$ctrl.loading || $ctrl.error">
-  <div class="alert alert-info" ng-show="$ctrl.loading">
-    {{$ctrl.loading}} ...
+  <div class="alert alert-info" ng-show="$ctrl.loading.message">
+    {{ $ctrl.loading.message | translate : $ctrl.loading.params }} ...
   </div>
   <div id="errorOutput">
-    <div ng-show="$ctrl.error">
+    <div ng-show="$ctrl.error.message">
       <div  class="alert alert-danger">
-        <a class="btn btn-primary refresh-btn" ng-click="$ctrl.refresh()">
-          <span class="glyphicon glyphicon-refresh"</span>
-        </a>
-        {{$ctrl.error}}
+        <div>
+          {{ $ctrl.error.message | translate : $ctrl.error.params }}
+        </div>
+        <div ng-show="$ctrl.error.causes.length">
+          <ul>
+            <li ng-repeat="cause in $ctrl.error.causes">
+              {{ cause.message | translate : cause.params }}
+            </li>
+          </ul>
+        </div>
+        <pre ng-show="$ctrl.error.verb" ng-bind-html="$ctrl.error.verb"></pre>
       </div>
-      <div class="alert alert-info" translate="if-you-think-an-error"
-           translate-values="{url: '<a href=\'https://github.com/yaitskov/ping-pong/issues\'>GitHub</a>'}">
-      </div>
+    </div>
+  </div>
+  <div ng-show="$ctrl.error.status == 401">
+    <div class="alert alert-info">
+      {{ 'authentication-hint' | translate }}
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary" ng-click="$ctrl.logout()">
+        {{ 'Logout' | translate }}
+      </button>
+    </div>
+  </div>
+  <div ng-show="$ctrl.error.status == 502 || $ctrl.error.status == -1">
+    <div class="alert alert-info" translate="connectivity-hint">
+    </div>
+  </div>
+  <div ng-show="$ctrl.error.status == 500">
+    <div class="alert alert-info" translate="application-error-hint"
+         translate-values="{url: '<a href=\'https://github.com/yaitskov/ping-pong/issues\'>GitHub</a>'}">
     </div>
   </div>
 </div>

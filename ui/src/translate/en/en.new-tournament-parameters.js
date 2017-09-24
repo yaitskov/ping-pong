@@ -51,5 +51,8 @@ module.exports = {
     'missing-matches': 'Following matches are missing [{{matches}}] in the case for {{participants}} participants',
 
     'Line has wrong match': 'Line [{{line}}] has wrong match [{{match}}]',
-    'Line has no colon': 'Line [{{line}}] has no colon'
+    'Line has no colon': 'Line [{{line}}] has no colon',
+    'Number of participants not number': 'Line [{{line}}] has an error at the number of participants [{{number}}]',
+    'tournament-rules-are-wrong': 'Tournament rules have errors',
+    'no-group-nor-playoff': 'Tournament should have at least group or playoff'
 };

@@ -92,8 +92,6 @@ import myTournamentEditComponent from './my-tournament/edit/edit.component.js';
 import './tournament/tournament.import.js';
 import myTournamentParametersModule from './my-tournament/parameters/parameters.module.js';
 import myTournamentParametersComponent from './my-tournament/parameters/parameters.component.js';
-import myTournamentOfflineEnlistModule from './my-tournament/offline/enlist.module.js';
-import myTournamentOfflineEnlistComponent from './my-tournament/offline/enlist.component.js';
 import tournamentDetailModule from './tournament-detail/tournament-detail.module.js';
 import tournamentDetailComponent from './tournament-detail/tournament-detail.component.js';
 import placeDetailModule from './place-detail/place-detail.module.js';

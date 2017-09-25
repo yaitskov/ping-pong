@@ -36,7 +36,8 @@
         {{ 'first-name-length-range' | translate : '{min: 2, max: 20}' }}
       </p>
     </div>
-    <div class="form-group" ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.lastName.$dirty) && $ctrl.form.lastName.$invalid}">
+    <div class="form-group"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.lastName.$dirty) && $ctrl.form.lastName.$invalid}">
       <label for="lastName">{{ 'Last name' | translate }}</label>
       <input type="text" class="form-control"
              name="lastName"
@@ -53,6 +54,12 @@
          ng-show="$ctrl.form.lastName.$error.minlength || $ctrl.form.lastName.$error.maxlength">
         {{ 'last-name-length-range' | translate : '{min: 2, max: 20}' }}
       </p>
+    </div>
+    <div class="form-group" default-button-type
+         ng-show="$ctrl.rules.casting.policy == 'ProvidedRating'"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.rank.$dirty) && $ctrl.form.rank.$invalid}">
+      <label>{{ $ctrl.rules.casting.providedRankOptions.label }}</label>
+      <div touch-spin options="$ctrl.rankRange" ng-model="$ctrl.rank"></div>
     </div>
     <div class="form-group">
       <a title="Enlist participant, mark him as paid and ready to participate"

@@ -25,7 +25,6 @@ angular.module('pingPong', [
     'copyTournament',
     'newTournament',
     'tournamentEdit',
-    'enlistOffline',
     'tournamentParameters',
     'tournament',
     'myTournament',

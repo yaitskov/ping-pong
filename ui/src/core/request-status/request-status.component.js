@@ -74,7 +74,6 @@ angular.
                 });
                 $scope.$on('event.request.failed', function (event, response) {
                     self.reset();
-                    self.error.status = response.status;
                     if (response.status == 502 || response.status == -1) {
                         self.error = self.responseToErr(response.data, "Server is not available");
                     } else if (response.status == 401) {
@@ -97,6 +96,7 @@ angular.
                         self.error = self.responseToErr(response.data,
                                                         ['unexpected-status', {status: response.status}]);
                     }
+                    self.error.status = response.status;
                     self.scrollToError();
                 });
                 $scope.$on('event.request.complete', function (event, response) {

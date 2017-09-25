@@ -85,8 +85,6 @@ import myTournamentMembersModule from './my-tournament/categories/members/member
 import myTournamentMembersComponent from './my-tournament/categories/members/members.component.js';
 import myTournamentChangeModule from './my-tournament/categories/change/change.module.js';
 import myTournamentChangeComponent from './my-tournament/categories/change/change.component.js';
-import myTournamentParticipantModule from './my-tournament/participant/participant.module.js';
-import myTournamentParticipantComponent from './my-tournament/participant/participant.component.js';
 import myTournamentEditModule from './my-tournament/edit/edit.module.js';
 import myTournamentEditComponent from './my-tournament/edit/edit.component.js';
 import './tournament/tournament.import.js';

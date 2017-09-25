@@ -1,8 +1,8 @@
 import angular from 'angular';
-import template from './participant.template.html';
+import template from './manage-one.template.html';
 
 angular.module('participant').
-    component('participant', {
+    component('manageOneParticipant', {
         templateUrl: template,
         controller: ['$http', 'mainMenu', '$routeParams', 'auth', 'requestStatus',
                      'pageCtx', 'Participant',

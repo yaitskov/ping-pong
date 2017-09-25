@@ -116,7 +116,7 @@ angular.module('pingPong').
                         template: '<participant-presence></participant-presence>'
                     }).
                     when('/my/tournament/:tournamentId/participant/:userId', {
-                        template: '<participant></participant>'
+                        template: '<manage-one-participant></manage-one-participant>'
                     }).
                     when('/my/tournament/categories/:tournamentId', {
                         template: '<tournament-categories></tournament-categories>'

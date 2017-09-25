@@ -34,7 +34,6 @@ angular.module('pingPong', [
     'adminScoreSet',
     'matchScoreConflict',
     'reviewMatchScore',
-    'participant',
     'participantPresence',
     'categoryMemberList',
     'tournamentCategories',

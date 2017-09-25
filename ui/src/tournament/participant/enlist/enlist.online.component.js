@@ -57,10 +57,13 @@ angular.
                                  return;
                              }
                              if (auth.isAuthenticated()) {
+                                 var req = {tid: self.tournament.tid,
+                                            categoryId: self.myCategory.cid};
+                                 if (self.tournament.rules.casting.providedRankOptions) {
+                                     req.providedRank = self.rank;
+                                 }
                                  $http.post('/api/tournament/enlist',
-                                            {tid: self.tournament.tid,
-                                             categoryId: self.myCategory.cid} ,
-                                            {headers: {session: auth.mySession()}}).
+                                            req, {headers: {session: auth.mySession()}}).
                                      then(
                                          function (okResp) {
                                              requestStatus.complete();
@@ -85,6 +88,7 @@ angular.
                                  },
                                  requestStatus.failed);
                          };
+
                          requestStatus.startLoading('Loading');
                          mainMenu.setTitle('Drafting');
                          Tournament.aDrafting(
@@ -93,6 +97,11 @@ angular.
                                  requestStatus.complete();
                                  mainMenu.setTitle(['Drafting to', {name: tournament.name}]);
                                  self.tournament = tournament;
+                                 var rnkOptions = tournament.rules.casting.providedRankOptions;
+                                 if (tournament.rules.casting.providedRankOptions) {
+                                     self.rankRange = {min: rnkOptions.minValue, max: rnkOptions.maxValue};
+                                     self.rank = rnkOptions.minValue;
+                                 }
                                  if (self.tournament.myCategoryId) {
                                      self.myCategory = {cid: tournament.myCategoryId,
                                                         name: cutil.findValBy(self.tournament.categories,

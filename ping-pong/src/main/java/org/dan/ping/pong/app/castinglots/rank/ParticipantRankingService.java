@@ -21,6 +21,8 @@ public class ParticipantRankingService {
                 return sortBySignUp(bids, rule.getDirection());
             case ProvidedRating:
                 return sortByProvidedRating(bids, rule.getDirection());
+            case Manual:
+                return sortedManually(bids, rule.getDirection());
             default:
                 throw internalError("Ranking policy " + rule.getPolicy() + " is not implemented");
         }
@@ -34,6 +36,19 @@ public class ParticipantRankingService {
         Map<Integer, ParticipantMemState> participantIdx =
                 bids.stream().collect(toMap(o -> o.getUid().getId(), o -> o));
         final List<ParticipantMemState> orderedBids = castingLotsDao.loadRanks(bids.get(0).getTid(),
+                participantIdx.keySet(), direction)
+                .stream()
+                .map(participantIdx::remove)
+                .collect(toList());
+        orderedBids.addAll(participantIdx.values());
+        return orderedBids;
+    }
+
+    private List<ParticipantMemState> sortedManually(List<ParticipantMemState> bids,
+            OrderDirection direction) {
+        Map<Integer, ParticipantMemState> participantIdx =
+                bids.stream().collect(toMap(o -> o.getUid().getId(), o -> o));
+        final List<ParticipantMemState> orderedBids = castingLotsDao.loadSeed(bids.get(0).getTid(),
                 participantIdx.keySet(), direction)
                 .stream()
                 .map(participantIdx::remove)

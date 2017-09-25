@@ -227,4 +227,12 @@ public class CastingLotsService {
         }
         throw badRequest(new UncheckedParticipantsError(notHere));
     }
+
+    public void orderCategoryBidsManually(OrderCategoryBidsManually order) {
+        castingLotsDao.orderCategoryBidsManually(order);
+    }
+
+    public List<RankedBid> loadManualBidsOrder(int tid, int cid) {
+        return castingLotsDao.loadManualBidsOrder(tid, cid);
+    }
 }

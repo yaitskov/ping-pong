@@ -5,11 +5,13 @@ import static java.lang.Math.log;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
+import static ord.dan.ping.pong.jooq.Tables.USERS;
 import static org.dan.ping.pong.app.group.GroupSchedule.DEFAULT_SCHEDULE;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.match.MatchType.POff;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
+import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.collect.ImmutableMap;
@@ -23,7 +25,9 @@ import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
+import org.jooq.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -126,5 +130,60 @@ public class CastingLotsDao {
                 .orderBy(direction.setupOrder(BID.PROVIDED_RANK))
                 .fetch()
                 .map(r -> r.get(BID.UID));
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public List<Integer> loadSeed(Tid tid, Set<Integer> uids, OrderDirection direction) {
+        return jooq.select(BID.UID).from(BID)
+                .where(BID.TID.eq(tid.getTid()),
+                        BID.UID.in(uids),
+                        BID.SEED.isNotNull())
+                .orderBy(direction.setupOrder(BID.SEED))
+                .fetch()
+                .map(r -> r.get(BID.UID));
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public void orderCategoryBidsManually(OrderCategoryBidsManually order) {
+        final List<Query> batch = new ArrayList();
+        batch.add(jooq.update(BID).set(BID.SEED, Optional.empty())
+                .where(BID.TID.eq(order.getTid()),
+                        BID.CID.eq(order.getCid())));
+        for (int uid : order.getUids()) {
+             batch.add(jooq.update(BID)
+                     .set(BID.SEED, Optional.of(batch.size()))
+                     .where(BID.TID.eq(order.getTid()), BID.UID.eq(uid)));
+        }
+        jooq.batch(batch).execute();
+        final List<Integer> unseededUids = jooq.select(BID.UID).from(BID)
+                .where(BID.TID.eq(order.getTid()),
+                        BID.CID.eq(order.getCid()),
+                        BID.SEED.isNull())
+                .fetch()
+                .map(r -> r.get(BID.UID));
+        if (unseededUids.isEmpty()) {
+            return;
+        }
+        throw badRequest("unseeded-uids-in-cid",
+                ImmutableMap.of("cid", order.getCid(), "uids", unseededUids));
+    }
+
+    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
+    public List<RankedBid> loadManualBidsOrder(int tid, int cid) {
+        return jooq.select(USERS.NAME, USERS.UID, BID.PROVIDED_RANK, BID.SEED)
+                .from(BID)
+                .innerJoin(USERS)
+                .on(BID.UID.eq(USERS.UID))
+                .where(BID.TID.eq(tid), BID.CID.eq(cid))
+                .orderBy(BID.SEED.desc())
+                .fetch()
+                .map(r -> RankedBid.builder()
+                        .user(UserLink.builder()
+                                .name(r.get(USERS.NAME))
+                                .uid(r.get(USERS.UID))
+                                .build())
+                        .providedRank(r.get(BID.PROVIDED_RANK))
+                        .seed(r.get(BID.SEED))
+                        .build());
     }
 }

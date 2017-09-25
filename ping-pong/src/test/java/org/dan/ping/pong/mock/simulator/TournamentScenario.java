@@ -23,6 +23,7 @@ import lombok.ToString;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.tournament.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.TournamentRules;
+import org.dan.ping.pong.mock.SessionAware;
 import org.dan.ping.pong.mock.TestUserSession;
 
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ import java.util.stream.Stream;
 
 @Getter
 @ToString(of = {"uidPlayer", "categoryDbId", "tid", "placeId", "params"})
-public class TournamentScenario {
+public class TournamentScenario implements SessionAware {
     private Optional<String> name = empty();
     private final Multimap<Set<Player>, GameEnd> groupMatches = ArrayListMultimap.create();
     private final Multimap<Set<Player>, GameEnd> playOffMatches = ArrayListMultimap.create();
@@ -62,6 +63,10 @@ public class TournamentScenario {
     private int tables = 1;
     @Setter
     private TestUserSession testAdmin;
+
+    public String getSession() {
+        return testAdmin.getSession();
+    }
 
     private TournamentRules rules;
 

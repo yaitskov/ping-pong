@@ -576,7 +576,7 @@
                                 </forcedType>
                                 <forcedType>
                                     <name>OptionalInteger</name>
-                                    <expression>.*bid\.(provided_rank)</expression>
+                                    <expression>.*bid\.(provided_rank|seed)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

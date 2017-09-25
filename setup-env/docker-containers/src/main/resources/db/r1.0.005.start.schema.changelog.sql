@@ -114,6 +114,7 @@ create table bid(
     updated timestamp(3) null,
     state char(4) not null,
     provided_rank int(11) null,
+    seed int(11) null,
     primary key (uid, tid));
 
 alter table bid add constraint bid_uid_idx

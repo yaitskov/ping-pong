@@ -189,7 +189,7 @@ public class TournamentDao {
         return ofNullable(jooq.select(TOURNAMENT.NAME, TOURNAMENT.OPENS_AT,
                 BID.CID, TOURNAMENT_ADMIN.UID, TOURNAMENT.TICKET_PRICE,
                 TOURNAMENT.PREVIOUS_TID, PLACE.PID, PLACE.POST_ADDRESS,
-                PLACE.CITY_ID, CITY.NAME,
+                PLACE.CITY_ID, CITY.NAME, TOURNAMENT.RULES,
                 PLACE.NAME, PLACE.PHONE, TOURNAMENT.STATE, BID.STATE)
                 .from(TOURNAMENT)
                 .innerJoin(PLACE).on(TOURNAMENT.PID.eq(PLACE.PID))
@@ -204,6 +204,7 @@ public class TournamentDao {
                 .fetchOne())
                 .map(r -> DraftingTournamentInfo.builder()
                         .tid(tid)
+                        .rules(r.get(TOURNAMENT.RULES))
                         .name(r.get(TOURNAMENT.NAME))
                         .state(r.get(TOURNAMENT.STATE))
                         .ticketPrice(r.get(TOURNAMENT.TICKET_PRICE))

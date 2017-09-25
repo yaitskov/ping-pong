@@ -33,4 +33,5 @@ public class DraftingTournamentInfo {
     private List<CategoryInfo> categories;
     private TournamentState state;
     private Optional<BidState> bidState = Optional.empty();
+    private TournamentRules rules;
 }

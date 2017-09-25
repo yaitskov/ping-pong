@@ -133,12 +133,11 @@ public class CastingLotsDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<Integer> loadSeed(Tid tid, Set<Integer> uids, OrderDirection direction) {
+    public List<Integer> loadSeed(Tid tid, Set<Integer> uids) {
         return jooq.select(BID.UID).from(BID)
                 .where(BID.TID.eq(tid.getTid()),
                         BID.UID.in(uids),
                         BID.SEED.isNotNull())
-                .orderBy(direction.setupOrder(BID.SEED))
                 .fetch()
                 .map(r -> r.get(BID.UID));
     }
@@ -175,7 +174,7 @@ public class CastingLotsDao {
                 .innerJoin(USERS)
                 .on(BID.UID.eq(USERS.UID))
                 .where(BID.TID.eq(tid), BID.CID.eq(cid))
-                .orderBy(BID.SEED.desc())
+                .orderBy(BID.SEED)
                 .fetch()
                 .map(r -> RankedBid.builder()
                         .user(UserLink.builder()

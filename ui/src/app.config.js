@@ -145,6 +145,9 @@ angular.module('pingPong').
                     when('/tournaments/:tournamentId', {
                         template: '<enlist-online></enlist-online>'
                     }).
+                    when('/tournament/:tournamentId/rank/manually/cid/:categoryId', {
+                        template: '<rank-bid-manually></rank-bid-manually>'
+                    }).
                     when('/tournament/result/:tournamentId', {
                         template: '<tournament-result></tournament-result>'
                     }).

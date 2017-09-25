@@ -10,6 +10,7 @@ angular.module('categoryMemberList').
                          ctxMenu['#!/my/tournament/' + $routeParams.tournamentId] = 'Tournament';
                          mainMenu.setTitle('Category Members', ctxMenu);
                          this.tournamentId = $routeParams.tournamentId;
+                         this.categoryId = $routeParams.categoryId;
                          this.members = null;
                          this.newCategoryName = '';
                          var self = this;

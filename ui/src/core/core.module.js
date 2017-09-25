@@ -42,11 +42,14 @@ import tournamentService from './tournament/tournament.service.js';
 import categoryModule from './category/category.module.js';
 import categoryService from './category/category.service.js';
 
+import './casting/casting.module.js';
+import './casting/casting.service.js';
+
 import participantModule from './participant/participant.module.js';
 import participantService from './participant/participant.service.js';
 
 angular.module('core', ['core.tournament', 'core.match',
-                        'core.util', 'core.group',
+                        'core.util', 'core.group', 'core.casting',
                         'localStorage', 'core.place',
                         'core.table', 'core.city', 'core.country',
                         'core.participant', 'core.user',

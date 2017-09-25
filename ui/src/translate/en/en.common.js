@@ -3,5 +3,6 @@ module.exports = {
     'no-lbl': 'No',
     'group-lbl': 'Group',
     'match-lbl': 'Match',
-    'play-off-lbl': 'Play Off'
+    'play-off-lbl': 'Play Off',
+    'saving': 'Saving'
 };

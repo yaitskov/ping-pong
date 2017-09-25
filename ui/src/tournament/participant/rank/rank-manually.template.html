@@ -1,0 +1,55 @@
+<main-menu></main-menu>
+<div class="container" ng-show="$ctrl.rankedBids.length == 0">
+  <div class="alert alert-info" >
+    {{ 'empty-category' | translate : {name: $ctrl.categoryName} }}
+  </div>
+</div>
+<div class="container list">
+  <div ng-show="$ctrl.rankedBids.length">
+    <div class="form-group">
+      <label class="toggle-option">{{ 'sort-by' | translate }}</label>
+      <a class="btn"
+         ng-click="$ctrl.sortMode = 'manual'"
+         ng-class="{'btn-primary': $ctrl.sortMode == 'manual'}">
+        {{ 'manual' | translate }}
+      </a>
+      <a class="btn"
+         ng-click="$ctrl.sortMode = 'random'"
+         ng-class="{'btn-primary': $ctrl.sortMode == 'random'}">
+        {{ 'random' | translate }}
+      </a>
+      <a class="btn"
+         ng-click="$ctrl.sortMode = 'providedRank'"
+         ng-class="{'btn-primary': $ctrl.sortMode == 'providedRank'}">
+        {{ 'provided rank' | translate }}
+      </a>
+      <p class="help-block">
+        {{ 'sort-bids-method-hint' | translate }}
+      </p>
+    </div>
+    <div class="form-group">
+      <a class="btn btn-primary"
+         ng-click="$ctrl.saveOrder()">
+        {{ 'save-lbl' | translate }}
+      </a>
+      <p class="help-block">
+        {{ 'save-order-hint' | translate }}
+      </p>
+    </div>
+    <div class="form-group">
+      <request-status></request-status>
+    </div>
+  </div>
+  <div ng-repeat="bid in $ctrl.rankedBids"
+       class="clearfix list-item">
+    <div class="name pull-left">
+      <span>{{$index}}. </span>
+      <a href="#!/my/tournament/{{$ctrl.tournament.tid}}/participant/{{bid.user.uid}}">
+        {{bid.user.name}}
+      </a>
+    </div>
+    <div class="pull-right">
+      {{bid.providedRank}}
+    </div>
+  </div>
+</div>

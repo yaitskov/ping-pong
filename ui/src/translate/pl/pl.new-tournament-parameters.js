@@ -23,6 +23,7 @@ module.exports = {
     'increasing-lbl': 'Rosnąco',
     'rank-policy-lbl': 'Sposób rankingu',
     'provided-rating-policy': 'Podany poziom',
+    'manual-rating-policy': 'Ręczne',
     'sign-up-policy': 'Kolejność rejestracji',
     'max-losses': 'Ilość porażek',
     'up-to-1-loss': 'Do jednej',

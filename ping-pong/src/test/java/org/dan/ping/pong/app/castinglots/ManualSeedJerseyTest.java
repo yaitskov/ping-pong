@@ -1,6 +1,5 @@
 package org.dan.ping.pong.app.castinglots;
 
-import static com.google.common.collect.Lists.reverse;
 import static com.google.common.primitives.Ints.asList;
 import static org.dan.ping.pong.app.castinglots.CastingLotsResource.CID_IN;
 import static org.dan.ping.pong.app.castinglots.CastingLotsResource.GET_MANUAL_BIDS_ORDER;
@@ -24,7 +23,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,8 +60,7 @@ public class ManualSeedJerseyTest extends AbstractSpringJerseyTest {
         final List<RankedBid> result = myRest()
                 .get(GET_MANUAL_BIDS_ORDER + scenario.getTid() + CID_IN + cid,
                         new GenericType<List<RankedBid>>(){});
-        assertEquals(asList(3, 2, 1), result.stream().map(r -> r.getSeed().get()).collect(Collectors.toList()));
-        Collections.reverse(uids);
+        assertEquals(asList(1, 2, 3), result.stream().map(r -> r.getSeed().get()).collect(Collectors.toList()));
         assertEquals(uids, result.stream().map(r -> r.getUser().getUid()).collect(Collectors.toList()));
     }
 }

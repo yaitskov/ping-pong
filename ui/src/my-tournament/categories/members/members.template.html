@@ -5,6 +5,11 @@
     <a class="btn btn-primary" back-button>
       {{ 'Back btn' | translate }}
     </a>
+    <a class="btn"
+       title="Order participants in the category manually"
+       href="#!/tournament/{{$ctrl.tournamentId}}/rank/manually/cid/{{$ctrl.categoryId}}">
+      <span class="glyphicon glyphicon-sort-by-attributes-alt"></span>
+    </a>
   </div>
   <div class="form-group" ng-show="$ctrl.members.length == 0">
     <div class="alert alert-info" >

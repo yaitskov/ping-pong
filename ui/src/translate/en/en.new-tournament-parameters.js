@@ -24,6 +24,7 @@ module.exports = {
     'increasing-lbl': 'Ascending',
     'rank-policy-lbl': 'Rating method',
     'provided-rating-policy': 'Provided skill',
+    'manual-rating-policy': 'Manually',
     'sign-up-policy': 'Sign-up order',
     'max-losses': 'Max losses',
     'up-to-1-loss': 'up to 1',

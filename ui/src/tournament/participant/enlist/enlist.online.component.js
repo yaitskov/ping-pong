@@ -1,11 +1,10 @@
 import angular from 'angular';
-import template from './tournament-detail.template.html';
+import template from './enlist.online.template.html';
 
 angular.
-    module('tournamentDetail').
-    component('tournamentDetail', {
+    module('participant').
+    component('enlistOnline', {
         templateUrl: template,
-        cache: false,
         controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu',
                      '$http', '$location', 'requestStatus', 'cutil', 'pageCtx',
                      function ($routeParams, Tournament, auth, mainMenu,

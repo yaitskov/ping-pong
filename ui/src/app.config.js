@@ -143,7 +143,7 @@ angular.module('pingPong').
                         template: '<account-edit></account-edit>'
                     }).
                     when('/tournaments/:tournamentId', {
-                        template: '<tournament-detail></tournament-detail>'
+                        template: '<enlist-online></enlist-online>'
                     }).
                     when('/tournament/result/:tournamentId', {
                         template: '<tournament-result></tournament-result>'

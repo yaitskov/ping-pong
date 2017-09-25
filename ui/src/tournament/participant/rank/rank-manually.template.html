@@ -1,10 +1,8 @@
 <main-menu></main-menu>
-<div class="container" ng-show="$ctrl.rankedBids.length == 0">
-  <div class="alert alert-info" >
+<div class="container">
+  <div class="alert alert-info" ng-show="$ctrl.rankedBids.length == 0">
     {{ 'empty-category' | translate : {name: $ctrl.categoryName} }}
   </div>
-</div>
-<div class="container list">
   <div ng-show="$ctrl.rankedBids.length">
     <div class="form-group">
       <label class="toggle-option">{{ 'sort-by' | translate }}</label>
@@ -40,8 +38,9 @@
       <request-status></request-status>
     </div>
   </div>
-  <div ng-repeat="bid in $ctrl.rankedBids"
-       class="clearfix list-item">
+</div>
+<div class="container list" ui-sortable ng-model="$ctrl.rankedBids">
+  <div ng-repeat="bid in $ctrl.rankedBids" class="clearfix list-item">
     <div class="name pull-left">
       <span>{{$index}}. </span>
       <a href="#!/my/tournament/{{$ctrl.tournament.tid}}/participant/{{bid.user.uid}}">

@@ -48,8 +48,6 @@ import copyTournamentModule from './new-tournament/copy-tournament.module.js';
 import copyTournamentComponent from './new-tournament/copy-tournament.component.js';
 import newTournamentModule from './new-tournament/new-tournament.module.js';
 import newTournamentComponent from './new-tournament/new-tournament.component.js';
-import newTournamentParamsModule from './new-tournament/new-tournament-parameters.module.js';
-import newTournamentParamsComponent from './new-tournament/new-tournament-parameters.component.js';
 import completeMyMatchModule from './complete-my-match/complete-my-match.module.js';
 import completeMyMatchComponent from './complete-my-match/complete-my-match.component.js';
 import adminScoreSet from './complete-match/admin-score-set.module.js';

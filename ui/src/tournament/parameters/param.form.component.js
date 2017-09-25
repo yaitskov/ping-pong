@@ -9,8 +9,8 @@ angular.
     module('tournament').
     component('tournamentParametersForm', {
         templateUrl: template,
-        controller: ['$scope', '$routeParams', 'groupSchedule', '$timeout', '$rootScope', 'binder',
-                     function ($scope, $routeParams, groupSchedule, $timeout, $rootScope, binder) {
+        controller: ['$scope', '$routeParams', 'groupSchedule', '$timeout', '$rootScope', 'binder', 'requestStatus',
+                     function ($scope, $routeParams, groupSchedule, $timeout, $rootScope, binder, requestStatus) {
                          this.tournamentId = $routeParams.tournamentId;
                          this.groupScheduleErrors = [];
                          this.options = {
@@ -56,6 +56,10 @@ angular.
                              }
                              if (!self.usePlayOff) {
                                  delete rules.playOff;
+                             }
+                             if (rules.group && rules.group.maxSize <= rules.quits) {
+                                 requestStatus.validationFailed('group-size-less-quits');
+                                 return;
                              }
                              rules.casting = Object.assign({}, rules.casting);
                              if (rules.casting.policy != 'ProvidedRating') {

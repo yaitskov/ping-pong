@@ -9,6 +9,7 @@ import com.google.common.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.util.time.Clocker;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,13 +34,16 @@ public class UserResource {
     @Inject
     private AuthService authService;
 
+    @Value("${default.user.type}")
+    private UserType defaultUserType;
+
     @POST
     @Path(USER_REGISTER)
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public UserRegistration registerUser(UserRegRequest regRequest,
             @HeaderParam("User-Agent") String agent) {
-        regRequest.setUserType(User);
+        regRequest.setUserType(defaultUserType);
         final int uid = userDao.register(regRequest);
         log.info("Register user [{}] with uid {}",
                 regRequest.getName(), uid);

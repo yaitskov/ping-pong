@@ -21,6 +21,9 @@ import java.util.Optional;
 public class GroupRules {
     private int quits;
     private int maxSize;
+    /**
+     * Default means {@link GroupSchedule#DEFAULT_SCHEDULE}
+     */
     private Optional<GroupSchedule> schedule = Optional.empty();
 
     public static class GroupRulesBuilder {

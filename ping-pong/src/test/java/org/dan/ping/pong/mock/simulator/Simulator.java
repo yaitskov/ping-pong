@@ -138,7 +138,7 @@ public class Simulator {
                             .stream().map(uid -> scenario.getUidPlayer().get(uid))
                             .collect(toSet()));
         }
-        assertEquals(Optional.of(Close),
+        assertEquals(Optional.of(scenario.getExpectedTerminalState()),
                 tournamentDao.getRow(new Tid(scenario.getTid()))
                         .map(TournamentRow::getState));
     }

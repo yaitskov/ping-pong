@@ -23,6 +23,7 @@ import lombok.ToString;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.tournament.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.TournamentRules;
+import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.mock.SessionAware;
 import org.dan.ping.pong.mock.TestUserSession;
 
@@ -54,6 +55,13 @@ public class TournamentScenario implements SessionAware {
     private final Map<Player, EnlistMode> playerPresence = new HashMap<>();
     private final List<HookCallbackPro> onBeforeAnyMatch = new ArrayList<>();
     private final Map<Player, ProvidedRank> providedRanks = new HashMap<>();
+
+    private TournamentState expectedTerminalState = TournamentState.Close;
+
+    public TournamentScenario terminalState(TournamentState state) {
+        expectedTerminalState = state;
+        return this;
+    }
 
     private boolean begin = true;
     @Setter

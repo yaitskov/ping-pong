@@ -311,6 +311,7 @@ public class TournamentResource {
             @HeaderParam(SESSION) String session,
             int tid) {
         final int uid = authService.userInfoBySession(session).getUid();
+        log.info("User {} tried to cancel tournament {}", uid, tid);
         tournamentAccessor.update(new Tid(tid), response, (tournament, batch) -> {
             tournament.checkAdmin(uid);
             tournamentService.cancel(tournament, batch);

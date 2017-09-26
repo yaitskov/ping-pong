@@ -168,6 +168,7 @@ public class BidDao {
                         .mustAffectRows(empty())
                         .query(jooq.update(BID)
                                 .set(BID.STATE, BidState.Want)
+                                .set(BID.GID, Optional.empty())
                                 .set(BID.UPDATED, Optional.of(now))
                                 .where(BID.TID.eq(tid), BID.STATE.ne(Quit))).build());
     }

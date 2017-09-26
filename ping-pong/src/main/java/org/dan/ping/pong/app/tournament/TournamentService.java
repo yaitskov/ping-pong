@@ -350,26 +350,27 @@ public class TournamentService {
     private GroupDao groupDao;
 
     public void cancel(OpenTournamentMemState tournament, DbUpdater batch) {
+        final Instant now = clocker.get();
+
         final int tid = tournament.getTid();
         tournament.setState(Canceled);
         setTournamentState(tournament, batch);
         setTournamentCompleteAt(tournament, clocker.get(), batch);
-        matchDao.deleteAllByTid(tournament, batch, tournament.getMatches().size());
         final Set<Integer> mids = new HashSet<>(tournament.getMatches().keySet());
-        tournament.getMatches().clear();
-        tournament.getGroups().clear();
-        groupDao.deleteAllByTid(tournament.getTid(), batch, tournament.getGroups().size());
-        final Instant now = clocker.get();
-        tournament.getParticipants().values().stream()
-                .filter(bid -> bid.getState() != Quit)
-                .forEach(bid -> bid.setBidState(Want));
-        bidDao.resetStateByTid(tid, now, batch);
         sequentialExecutor.executeSync(placeCache.load(tournament.getPid()), place -> {
             batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
             tableService.unbindPlace(place, batch);
             tableService.freeTables(place, mids, batch);
             return null;
         });
+        matchDao.deleteAllByTid(tournament, batch, tournament.getMatches().size());
+        tournament.getParticipants().values().stream()
+                .filter(bid -> bid.getState() != Quit)
+                .forEach(bid -> bid.setBidState(Want));
+        bidDao.resetStateByTid(tid, now, batch);
+        groupDao.deleteAllByTid(tournament.getTid(), batch, tournament.getGroups().size());
+        tournament.getMatches().clear();
+        tournament.getGroups().clear();
     }
 
     @Inject

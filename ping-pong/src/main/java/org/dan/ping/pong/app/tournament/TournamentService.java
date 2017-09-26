@@ -9,6 +9,7 @@ import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
+import static org.dan.ping.pong.app.table.TableService.STATE;
 import static org.dan.ping.pong.app.tournament.CumulativeScore.BEST_ORDER;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
@@ -21,6 +22,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
@@ -156,9 +158,9 @@ public class TournamentService {
 
     public void begin(OpenTournamentMemState tournament, DbUpdater batch) {
         if (tournament.getState() != TournamentState.Draft) {
-            throw badRequest("Tournament " + tournament.getTid()
-                    + " is not in draft state but "
-                    + tournament.getState());
+            throw badRequest("tournament-not-in-draft",
+                    ImmutableMap.of(TID, tournament.getTid(),
+                            STATE, tournament.getState()));
         }
         castingLotsService.seed(tournament);
         tournament.setState(TournamentState.Open);
@@ -169,7 +171,10 @@ public class TournamentService {
                         singletonList(bid.getBidState()), batch));
         sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
                 place -> {
+                    place.getHostingTid().ifPresent(busyTid -> { throw badRequest("place-is-busy", TID, busyTid); });
                     batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
+                    place.setHostingTid(Optional.of(tournament.getTid()));
+                    tableService.unbindPlace(place, batch);
                     return tableService.scheduleFreeTables(tournament, place, now, batch);
                 });
     }
@@ -361,6 +366,7 @@ public class TournamentService {
         bidDao.resetStateByTid(tid, now, batch);
         sequentialExecutor.executeSync(placeCache.load(tournament.getPid()), place -> {
             batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
+            tableService.unbindPlace(place, batch);
             tableService.freeTables(place, mids, batch);
             return null;
         });

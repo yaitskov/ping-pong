@@ -67,6 +67,7 @@ create table place(
     post_address varchar(200) not null,
     phone varchar(40),
     email varchar(40),
+    hosting_tid int(11) null,
     foreign key (city_id) references city(city_id));
 
 create table place_admin(

@@ -27,6 +27,7 @@ public class PlaceMemState {
     private String name;
     private Map<Integer, TableInfo> tables;
     private Set<Integer> adminIds;
+    private Optional<Integer> hostingTid;
 
     public TableInfo getTableByMid(int mid) {
         return tables.values().stream()

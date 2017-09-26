@@ -14,10 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.records.PlaceRecord;
 import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.match.Pid;
+import org.dan.ping.pong.app.tournament.DbUpdate;
+import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.jooq.DSLContext;
 import org.jooq.UpdateSetMoreStep;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
+import org.quartz.simpl.HostnameInstanceIdGenerator;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -149,14 +152,26 @@ public class PlaceDao {
     }
 
     public Optional<PlaceMemState> load(Pid pid) {
-        return ofNullable(jooq.select(PLACE.NAME)
+        return ofNullable(jooq.select(PLACE.NAME, PLACE.HOSTING_TID)
                 .from(PLACE)
                 .where(PLACE.PID.eq(pid.getPid()))
                 .fetchOne())
                 .map(r -> PlaceMemState.builder()
                         .pid(pid)
+                        .hostingTid(r.get(PLACE.HOSTING_TID))
                         .name(r.get(PLACE.NAME))
                         .adminIds(loadAdmins(pid))
+                        .build());
+    }
+
+    public void setHostingTid(PlaceMemState place, DbUpdater batch) {
+
+        batch.exec(
+                DbUpdate
+                        .builder()
+                        .query(jooq.update(PLACE)
+                                .set(PLACE.HOSTING_TID, place.getHostingTid())
+                                .where(PLACE.PID.eq(place.getPid().getPid())))
                         .build());
     }
 }

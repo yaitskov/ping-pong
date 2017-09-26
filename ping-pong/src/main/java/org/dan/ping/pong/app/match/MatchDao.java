@@ -22,6 +22,7 @@ import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_A_ROW;
 import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
+import static org.springframework.transaction.annotation.Isolation.READ_UNCOMMITTED;
 
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.Users;

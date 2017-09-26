@@ -24,6 +24,9 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.app.tournament.SetScoreResultName.MatchContinues;
+import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
+import static org.dan.ping.pong.app.tournament.TournamentState.Close;
+import static org.dan.ping.pong.app.tournament.TournamentState.Replaced;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -51,6 +54,7 @@ import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.TournamentCache;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentService;
+import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.beans.factory.annotation.Value;
@@ -105,6 +109,8 @@ public class MatchService {
         return places;
     }
 
+    private static final Set<TournamentState> TERMINAL_STATE = ImmutableSet.of(Close, Canceled, Replaced);
+
     public SetScoreResult scoreSet(OpenTournamentMemState tournament, int uid,
             FinalMatchScore score, Instant now, DbUpdater batch) {
         tournament.getRule().getMatch().validateSet(score.getScores());
@@ -124,6 +130,9 @@ public class MatchService {
         return sequentialExecutor.executeSync(placeService.load(tournament.getPid()),
                 place -> {
                     batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
+                    if (TERMINAL_STATE.contains(tournament.getState())) {
+                        tableService.unbindPlace(place, batch);
+                    }
                     return setScoreResult(
                             tournament,
                             freeTableAndSchedule(place, batch, tournament, now, winUidO),

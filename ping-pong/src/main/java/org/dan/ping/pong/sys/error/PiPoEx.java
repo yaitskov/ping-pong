@@ -9,6 +9,7 @@ import static org.eclipse.jetty.http.HttpStatus.UNAUTHORIZED_401;
 import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
@@ -70,6 +71,18 @@ public class PiPoEx extends RuntimeException {
     }
 
     public static PiPoEx internalError(String clientMessage) {
-        return new PiPoEx(INTERNAL_SERVER_ERROR_500, new Error(clientMessage), null);
+        return internalError(clientMessage, Collections.emptyMap());
+    }
+
+    public static PiPoEx internalError(String messageTemplate, Map<String, Object> params) {
+        return badRequest(new TemplateError(messageTemplate, params));
+    }
+
+    public static PiPoEx internalError(String messageTemplate, String param, Object value) {
+        return badRequest(messageTemplate, ImmutableMap.of(param, value));
+    }
+
+    public static PiPoEx internalError(Error error) {
+        return new PiPoEx(INTERNAL_SERVER_ERROR_500, error, null);
     }
 }

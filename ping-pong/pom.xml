@@ -560,6 +560,11 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>OptionalInteger</name>
+                                    <expression>.*place\.(hosting_tid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
                                     <name>OptionalInstant</name>
                                     <expression>.*matches\.(started|ended)</expression>
                                     <types>.*</types>

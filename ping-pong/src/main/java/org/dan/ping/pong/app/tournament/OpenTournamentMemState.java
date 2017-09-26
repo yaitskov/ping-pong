@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.groupingByConcurrent;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
@@ -15,7 +14,6 @@ import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.Pid;
-import org.dan.ping.pong.app.match.SetScoreResult;
 
 import java.time.Instant;
 import java.util.List;
@@ -38,9 +36,13 @@ public class OpenTournamentMemState {
     private TournamentState state;
     private Optional<Instant> completeAt;
 
+    public Optional<MatchInfo> maybeMatchById(int mid) {
+        return ofNullable(matches.get(mid));
+    }
+
     public MatchInfo getMatchById(int mid) {
-        return ofNullable(matches.get(mid))
-                .orElseThrow(() -> notFound("Match " + mid + " doesn't exist"));
+        return maybeMatchById(mid)
+                .orElseThrow(() -> badRequest("match-not-in-tournament", "mid", mid));
     }
 
     public boolean isAdminOf(int uid) {

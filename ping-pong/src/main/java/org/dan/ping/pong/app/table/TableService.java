@@ -14,7 +14,9 @@ import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
+import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
+import org.dan.ping.pong.app.tournament.DbUpdate;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 
@@ -28,6 +30,8 @@ import javax.inject.Inject;
 
 @Slf4j
 public class TableService {
+    public static final String STATE = "state";
+
     @Inject
     private TableDao tableDao;
     @Inject
@@ -82,12 +86,12 @@ public class TableService {
                             break;
                         case Draft:
                         case Place:
-                            throw internalError("Unexpected state " + match.getState());
+                            throw internalError("unexpected-match-state", STATE, match.getState());
                         case Game:
                             // ok keep
                             break;
                         default:
-                            throw internalError("Unknown state " + match.getState());
+                            throw internalError("unknown-match-state", STATE, match.getState());
                     }
                 });
     }
@@ -151,5 +155,16 @@ public class TableService {
         tableInfo.setMid(Optional.empty());
         tableInfo.setState(Free);
         tableDao.freeTable(tableInfo.getTableId(), batch);
+    }
+
+    @Inject
+    private PlaceDao placeDao;
+
+    public void unbindPlace(PlaceMemState place, DbUpdater batch) {
+        log.info("Unbind tid {} from pid {}", place.getHostingTid(), place.getPid());
+        place.getHostingTid().ifPresent(hostingTid -> {
+            place.setHostingTid(Optional.empty());
+            placeDao.setHostingTid(place, batch);
+        });
     }
 }

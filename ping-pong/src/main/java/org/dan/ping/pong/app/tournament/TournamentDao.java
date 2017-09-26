@@ -34,6 +34,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Replaced;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
+import static org.springframework.transaction.annotation.Isolation.READ_UNCOMMITTED;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.city.CityLink;
@@ -46,6 +47,7 @@ import org.jooq.Record;
 import org.jooq.SelectField;
 import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;

@@ -3,6 +3,7 @@ var merge = require('merge');
 module.exports = merge.apply(
     null,
     [{},
+     require('./en.errors.js'),
      require('./en.rank.manual.js'),
      require('./en.common.js'),
      require('./drafting.js'),

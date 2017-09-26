@@ -1,7 +1,7 @@
 import angular from 'angular';
 import template from './param.form.template.html';
 
-const defaultGroupRules = {quits: 1, maxSize: 8, schedule: {size2Schedule: {2: [0,1]}}};
+const defaultGroupRules = {quits: 1, groupSize: 8, schedule: {size2Schedule: {2: [0,1]}}};
 const defaultPlayOffRules = {thirdPlaceMatch: 0, losings: 1};
 const defaultProvidedRankOptions = {maxValue: 10000, minValue: 0, label: 'rating'};
 
@@ -57,7 +57,7 @@ angular.
                              if (!self.usePlayOff) {
                                  delete rules.playOff;
                              }
-                             if (rules.group && rules.group.maxSize <= rules.quits) {
+                             if (rules.group && rules.group.groupSize <= rules.quits) {
                                  requestStatus.validationFailed('group-size-less-quits');
                                  return;
                              }

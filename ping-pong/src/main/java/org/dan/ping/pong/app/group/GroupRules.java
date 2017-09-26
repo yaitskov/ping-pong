@@ -20,7 +20,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class GroupRules {
     private int quits;
-    private int maxSize;
+    private int groupSize;
     /**
      * Default means {@link GroupSchedule#DEFAULT_SCHEDULE}
      */

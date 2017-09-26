@@ -35,7 +35,7 @@ public class TournamentUpdateRulesJerseyTest extends AbstractSpringJerseyTest {
 
         assertThat(myRest().get(TOURNAMENT_RULES + "/" + scenario.getTid(),
                 TournamentRules.class),
-                hasProperty("group", optionalWithValue(hasProperty("maxSize", is(8)))));
+                hasProperty("group", optionalWithValue(hasProperty("groupSize", is(8)))));
 
         myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
                 TidIdentifiedRules.builder()
@@ -45,6 +45,6 @@ public class TournamentUpdateRulesJerseyTest extends AbstractSpringJerseyTest {
 
         assertThat(myRest().get(TOURNAMENT_RULES + "/" + scenario.getTid(),
                 TournamentRules.class),
-                hasProperty("group", optionalWithValue(hasProperty("maxSize", is(2)))));
+                hasProperty("group", optionalWithValue(hasProperty("groupSize", is(2)))));
     }
 }

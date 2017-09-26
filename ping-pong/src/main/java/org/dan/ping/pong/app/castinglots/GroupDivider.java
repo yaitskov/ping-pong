@@ -24,7 +24,7 @@ public class GroupDivider {
             GroupRules grouping,
             List<ParticipantMemState> bids) {
         Map<Integer, List<ParticipantMemState>> result = new HashMap<>();
-        final int groups = max(1, (int) ceil(bids.size() / grouping.getMaxSize()));
+        final int groups = max(1, (int) ceil(bids.size() / grouping.getGroupSize()));
 
         switch (casting.getSplitPolicy()) {
             case BalancedMix:

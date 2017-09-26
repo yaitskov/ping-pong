@@ -38,17 +38,17 @@ import javax.inject.Inject;
 @ContextConfiguration(classes = JerseyWithSimulator.class)
 public class MatchScheduleInGroupJerseyTest extends AbstractSpringJerseyTest {
     public static final GroupRules G8Q1 = GroupRules.builder()
-            .maxSize(8)
+            .groupSize(8)
             .quits(1)
             .build();
 
     public static final GroupRules G8Q2 = GroupRules.builder()
-            .maxSize(8)
+            .groupSize(8)
             .quits(2)
             .build();
 
     public static final GroupRules G2Q1 = GroupRules.builder()
-            .maxSize(2)
+            .groupSize(2)
             .quits(1)
             .build();
 

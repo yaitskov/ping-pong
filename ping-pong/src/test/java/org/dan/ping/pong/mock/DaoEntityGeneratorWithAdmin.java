@@ -78,7 +78,7 @@ public class DaoEntityGeneratorWithAdmin {
                         .minAdvanceInGames(2)
                         .build())
                 .group(Optional.of(GroupRules.builder()
-                        .maxSize(8)
+                        .groupSize(8)
                         .quits(quits)
                         .build()))
                 .playOff(Optional.of(Losing1))

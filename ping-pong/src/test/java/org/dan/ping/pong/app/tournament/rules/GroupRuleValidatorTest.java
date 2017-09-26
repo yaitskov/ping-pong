@@ -55,14 +55,14 @@ public class GroupRuleValidatorTest {
     @Test
     public void passWithoutSchedule() {
         sut.validate(errors, GroupRules.builder()
-                .quits(2).maxSize(8).build());
+                .quits(2).groupSize(8).build());
         assertEquals(errors, EMPTY_MMAP);
     }
 
     @Test
     public void passWithDefaultSchedule() {
         sut.validate(errors, GroupRules.builder()
-                .quits(1).maxSize(2)
+                .quits(1).groupSize(2)
                 .schedule(Optional.of(GroupSchedule.DEFAULT_SCHEDULE))
                 .build());
         assertEquals(errors, EMPTY_MMAP);
@@ -71,7 +71,7 @@ public class GroupRuleValidatorTest {
     @Test
     public void passWithSchedule() {
         sut.validate(errors, GroupRules.builder()
-                .quits(2).maxSize(8)
+                .quits(2).groupSize(8)
                 .schedule(Optional.of(GroupSchedule.builder()
                         .size2Schedule(ImmutableMap.of(2, asList(0, 1)))
                         .build()))

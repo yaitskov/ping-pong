@@ -20,7 +20,7 @@ const defaultRules = {
     },
     group: {
         quits: 2,
-        maxSize: 8,
+        groupSize: 8,
         schedule: {
             size2Schedule: {
                 2: [0, 1],

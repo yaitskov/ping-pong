@@ -27,10 +27,10 @@ public class GroupRuleValidator {
             errors.put(GROUP_RULE, ofTemplate(VALUE_NULL));
             return;
         }
-        if (group.getMaxSize() < 2 || group.getMaxSize() > 20) {
+        if (group.getGroupSize() < 2 || group.getGroupSize() > 20) {
             errors.put(GROUP_RULE + MAX_SIZE, ofTemplate(OUT_OF_RANGE));
         }
-        if (group.getQuits() < 1 || group.getQuits() >= group.getMaxSize()) {
+        if (group.getQuits() < 1 || group.getQuits() >= group.getGroupSize()) {
             errors.put(GROUP_RULE + QUITS, ofTemplate(OUT_OF_RANGE));
         }
         group.getSchedule().ifPresent(schedule -> validateSchedule(schedule, errors));

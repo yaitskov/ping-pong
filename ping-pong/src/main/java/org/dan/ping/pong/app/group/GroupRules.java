@@ -21,6 +21,9 @@ import java.util.Optional;
 public class GroupRules {
     private int quits;
     private int groupSize;
+    private int overflow;
+    private int underflow;
+
     /**
      * Default means {@link GroupSchedule#DEFAULT_SCHEDULE}
      */

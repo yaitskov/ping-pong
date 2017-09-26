@@ -27,6 +27,12 @@ public class GroupRuleValidator {
             errors.put(GROUP_RULE, ofTemplate(VALUE_NULL));
             return;
         }
+        if (group.getOverflow() < 0) {
+            errors.put(GROUP_RULE + ".overflow", ofTemplate(OUT_OF_RANGE));
+        }
+        if (group.getUnderflow() < 0) {
+            errors.put(GROUP_RULE + ".underflow", ofTemplate(OUT_OF_RANGE));
+        }
         if (group.getGroupSize() < 2 || group.getGroupSize() > 20) {
             errors.put(GROUP_RULE + MAX_SIZE, ofTemplate(OUT_OF_RANGE));
         }

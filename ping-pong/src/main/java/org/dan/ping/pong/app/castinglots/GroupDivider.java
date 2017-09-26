@@ -49,13 +49,11 @@ public class GroupDivider {
         return result;
     }
 
-    private void bestToBest(List<ParticipantMemState> bids,
-            Map<Integer, List<ParticipantMemState>> result,
-            List<Integer> groups) {
-        final Iterator<ParticipantMemState> bidIterator = bids.iterator();
+    <T> void bestToBest(List<T> bids, Map<Integer, List<T>> result, List<Integer> groups) {
+        final Iterator<T> bidIterator = bids.iterator();
         for (int gi = 0; gi < groups.size(); ++gi) {
             final int groupSize = groups.get(gi);
-            final List<ParticipantMemState> groupBids = new ArrayList<>();
+            final List<T> groupBids = new ArrayList<>();
             for (int ibid = 0; ibid < groupSize && bidIterator.hasNext(); ++ibid) {
                 groupBids.add(bidIterator.next());
                 bidIterator.remove();
@@ -64,21 +62,20 @@ public class GroupDivider {
         }
     }
 
-    private void balancedMix(List<ParticipantMemState> bids,
-            Map<Integer, List<ParticipantMemState>> result, List<Integer> groups) {
+    <T> void balancedMix(List<T> bids, Map<Integer, List<T>> result, List<Integer> groups) {
         int gi = 0;
         int delta = 1;
         final int[] allocationVector = new int[groups.size()];
         int allocations = 0;
         while (!bids.isEmpty()) {
-            final Iterator<ParticipantMemState> bidIterator = bids.iterator();
+            final Iterator<T> bidIterator = bids.iterator();
             for (; gi >= 0 && gi < groups.size(); gi += delta) {
                 if (bidIterator.hasNext()) {
-                    List<ParticipantMemState> groupBids = result.get(gi);
+                    List<T> groupBids = result.get(gi);
                     if (groupBids == null) {
                         result.put(gi, groupBids = new ArrayList<>());
                     }
-                    if (allocationVector[gi] < groupBids.size()) {
+                    if (allocationVector[gi] < groups.get(gi)) {
                         groupBids.add(bidIterator.next());
                         bidIterator.remove();
                         ++allocationVector[gi];

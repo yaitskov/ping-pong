@@ -8,6 +8,8 @@ import static org.dan.ping.pong.app.castinglots.CastingLotsService.NOT_ENOUGH_PA
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
+import static org.dan.ping.pong.app.tournament.TournamentService.PLACE_IS_BUSY;
+import static org.dan.ping.pong.app.tournament.TournamentService.TID;
 import static org.dan.ping.pong.mock.simulator.EnlistMode.Enlist;
 import static org.dan.ping.pong.mock.simulator.EnlistMode.Pay;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
@@ -59,7 +61,8 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
         final int uid1 = session1.getUid();
         TestUserSession session2 = scenario.getPlayersSessions().get(p2);
         final int uid2 = session2.getUid();
-        final Response re = myRest().post(BEGIN_TOURNAMENT, scenario.getTestAdmin().getSession(), scenario.getTid());
+        final Response re = myRest().post(BEGIN_TOURNAMENT,
+                scenario.getTestAdmin().getSession(), scenario.getTid());
         assertEquals(400, re.getStatus());
         assertThat(
                 re.readEntity(UncheckedParticipantsError.class),
@@ -103,5 +106,34 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
                 allOf(
                         hasProperty("message", is(NOT_ENOUGH_PARTICIPANTS)),
                         hasProperty("params", hasEntry(N, 1))));
+    }
+
+    @Test
+    public void failDuePlaceIsBusy() {
+        final TournamentScenario scenario1 = TournamentScenario.begin()
+                .doNotBegin()
+                .rules(RULES_G8Q1_S1A2G11)
+                .name("failDuePlaceIsBusy1")
+                .category(c1, p1, p2);
+        simulator.simulate(scenario1);
+
+        final TournamentScenario scenario2 = TournamentScenario.begin()
+                .doNotBegin()
+                .rules(RULES_G8Q1_S1A2G11)
+                .name("failDuePlaceIsBusy2")
+                .category(c1, p1, p2);
+        scenario2.setTestAdmin(scenario1.getTestAdmin());
+        scenario2.setPlaceId(scenario1.getPlaceId());
+        simulator.simulate(scenario2);
+
+        myRest().voidPost(BEGIN_TOURNAMENT, scenario1, scenario1.getTid());
+        final Response response = myRest().post(BEGIN_TOURNAMENT,
+                scenario1.getTestAdmin().getSession(), scenario2.getTid());
+        assertEquals(400, response.getStatus());
+        assertThat(
+                response.readEntity(TemplateError.class),
+                allOf(
+                        hasProperty("message", is(PLACE_IS_BUSY)),
+                        hasProperty("params", hasEntry(TID, scenario1.getTid()))));
     }
 }

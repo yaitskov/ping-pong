@@ -131,7 +131,7 @@ public class MatchService {
                 place -> {
                     batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
                     if (TERMINAL_STATE.contains(tournament.getState())) {
-                        tableService.unbindPlace(place, batch);
+                        tableService.bindPlace(place, batch, Optional.empty());
                     }
                     return setScoreResult(
                             tournament,

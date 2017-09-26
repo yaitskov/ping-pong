@@ -9,4 +9,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class Pid {
     private final int pid;
+
+    public String toString() {
+        return "pid(" + pid + ")";
+    }
 }

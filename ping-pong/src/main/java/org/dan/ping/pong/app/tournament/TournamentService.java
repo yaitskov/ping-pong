@@ -72,7 +72,8 @@ public class TournamentService {
     private static final ImmutableSet<TournamentState> CONFIGURABLE_STATES = EDITABLE_STATES;
     private static final int DAYS_TO_SHOW_COMPLETE_BIDS = 30;
     public static final String UNKNOWN_PLACE = "unknown place";
-    private static final String TID = "tid";
+    public static final String TID = "tid";
+    public static final String PLACE_IS_BUSY = "place-is-busy";
 
     @Inject
     private TournamentDao tournamentDao;
@@ -171,10 +172,9 @@ public class TournamentService {
                         singletonList(bid.getBidState()), batch));
         sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
                 place -> {
-                    place.getHostingTid().ifPresent(busyTid -> { throw badRequest("place-is-busy", TID, busyTid); });
+                    place.getHostingTid().ifPresent(busyTid -> { throw badRequest(PLACE_IS_BUSY, TID, busyTid); });
                     batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
-                    place.setHostingTid(Optional.of(tournament.getTid()));
-                    tableService.unbindPlace(place, batch);
+                    tableService.bindPlace(place, batch, Optional.of(tournament.getTid()));
                     return tableService.scheduleFreeTables(tournament, place, now, batch);
                 });
     }
@@ -359,7 +359,7 @@ public class TournamentService {
         final Set<Integer> mids = new HashSet<>(tournament.getMatches().keySet());
         sequentialExecutor.executeSync(placeCache.load(tournament.getPid()), place -> {
             batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
-            tableService.unbindPlace(place, batch);
+            tableService.bindPlace(place, batch, Optional.empty());
             tableService.freeTables(place, mids, batch);
             return null;
         });

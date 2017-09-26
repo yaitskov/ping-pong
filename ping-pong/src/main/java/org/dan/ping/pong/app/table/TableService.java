@@ -160,11 +160,13 @@ public class TableService {
     @Inject
     private PlaceDao placeDao;
 
-    public void unbindPlace(PlaceMemState place, DbUpdater batch) {
-        log.info("Unbind tid {} from pid {}", place.getHostingTid(), place.getPid());
-        place.getHostingTid().ifPresent(hostingTid -> {
-            place.setHostingTid(Optional.empty());
-            placeDao.setHostingTid(place, batch);
-        });
+    public void bindPlace(PlaceMemState place, DbUpdater batch, Optional<Integer> tid) {
+        log.info("Rebind  pid {} from tid {} to {}",
+                place.getPid(), place.getHostingTid(), tid);
+        if (place.getHostingTid().equals(tid)) {
+            return;
+        }
+        place.setHostingTid(tid);
+        placeDao.setHostingTid(place, batch);
     }
 }

@@ -13,7 +13,6 @@ import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
-import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.mock.simulator.Hook.AfterMatch;
 import static org.dan.ping.pong.mock.simulator.Hook.AfterScore;
 import static org.junit.Assert.assertEquals;
@@ -337,11 +336,12 @@ public class Simulator {
         restGenerator.generateSignInLinks(singletonList(testAdmin));
         final int countryId = daoGenerator.genCountry(prefix, testAdmin.getUid());
         final int cityId = daoGenerator.genCity(countryId, prefix, testAdmin.getUid());
-        final int placeId = daoGenerator.genPlace(cityId, prefix,
-                testAdmin.getUid(), scenario.getTables());
-        scenario.setPlaceId(placeId);
+        if (scenario.getPlaceId() <= 0) {
+            scenario.setPlaceId(daoGenerator.genPlace(cityId, prefix, testAdmin.getUid(),
+                    scenario.getTables()));
+        }
         final int tid = daoGenerator.genTournament(prefix, testAdmin.getUid(),
-                placeId, TournamentProps.builder()
+                scenario.getPlaceId(), TournamentProps.builder()
                         .rules(scenario.getRules())
                         .state(TournamentState.Draft)
                         .build());

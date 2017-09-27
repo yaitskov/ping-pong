@@ -10,6 +10,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.sys.error.PiPoEx;
 import org.jooq.DSLContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -23,6 +24,15 @@ public class UserDao {
 
     @Inject
     private DSLContext jooq;
+
+    @Value("${default.user.type}")
+    private UserType defaultUserType;
+
+    @Transactional(transactionManager = TRANSACTION_MANAGER)
+    public int registerDefaultType(UserRegRequest regRequest) throws PiPoEx {
+        regRequest.setUserType(defaultUserType);
+        return register(regRequest);
+    }
 
     @Transactional(transactionManager = TRANSACTION_MANAGER)
     public int register(UserRegRequest regRequest) throws PiPoEx {

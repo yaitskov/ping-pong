@@ -458,7 +458,7 @@
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.jdbc.Driver</driver>
-                        <url>jdbc:mysql://127.0.0.1:3306/ping_pong</url>
+                        <url>jdbc:mysql://127.0.0.1:${mysql.port}/ping_pong</url>
                         <user>root</user>
                         <password>root</password>
                     </jdbc>

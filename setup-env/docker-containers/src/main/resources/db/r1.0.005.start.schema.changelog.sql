@@ -13,10 +13,10 @@ create table users(
     name varchar(40) not null,
     type varchar(5) not null,
     phone varchar(20),
-    want_admin timestamp(3),
+    want_admin timestamp(3) null,
     email varchar(60),
     created timestamp(3) default current_timestamp(3),
-    banned timestamp(3),
+    banned timestamp(3) null,
     index `email_idx` (email));
 
 -- loser user to fill empty position at seeding (expected UID = 1)
@@ -80,7 +80,7 @@ create table place_admin(
 create table tournament(
     tid int(11) not null auto_increment primary key,
     name varchar(120) not null,
-    opens_at timestamp(3),
+    opens_at timestamp(3) null,
     previous_tid int(11) null,
     ticket_price float null,
     state varchar(10) not null, -- hidden, announce, draft, open, close, canceled

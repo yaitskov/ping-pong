@@ -29,7 +29,7 @@
         <http.port>8080</http.port>
         <debug.port>5008</debug.port>
         <jacoco.version>0.7.6.201602180812</jacoco.version>
-        <mysql.port>3307</mysql.port>
+        <mysql.port>3306</mysql.port>
         <sandbox.env.prop.file>docker-env.properties</sandbox.env.prop.file>
         <simulationProfile>false</simulationProfile>
         <sure.fire.version>2.20</sure.fire.version>

@@ -43,6 +43,7 @@ public class UserResource {
         return UserRegistration.builder()
                 .session(authService.authUser(uid, regRequest.getSessionPart(), agent))
                 .uid(uid)
+                .type(regRequest.getUserType())
                 .build();
     }
 

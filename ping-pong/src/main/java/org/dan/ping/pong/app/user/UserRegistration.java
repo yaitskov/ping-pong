@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class UserRegistration {
     private int uid;
     private String session;
+    private UserType type;
 }

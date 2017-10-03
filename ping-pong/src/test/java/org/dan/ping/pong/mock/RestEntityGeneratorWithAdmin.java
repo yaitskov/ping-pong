@@ -1,7 +1,7 @@
 package org.dan.ping.pong.mock;
 
-import org.dan.ping.pong.app.match.CompleteMatch;
-import org.dan.ping.pong.app.match.OpenMatchForJudge;
+import org.dan.ping.pong.app.server.match.CompleteMatch;
+import org.dan.ping.pong.app.server.match.OpenMatchForJudge;
 
 import java.util.List;
 

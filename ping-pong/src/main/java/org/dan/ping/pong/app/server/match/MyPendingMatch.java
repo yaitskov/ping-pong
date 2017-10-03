@@ -1,0 +1,28 @@
+package org.dan.ping.pong.app.server.match;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.dan.ping.pong.app.server.table.TableLink;
+import org.dan.ping.pong.app.server.user.UserLink;
+
+import java.util.Optional;
+
+@Getter
+@Setter
+@Builder
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class MyPendingMatch {
+    private int tid;
+    private int mid;
+    private MatchState state;
+    private Optional<UserLink> enemy;
+    private MatchType matchType;
+    private Optional<TableLink> table;
+    private int matchScore;
+}

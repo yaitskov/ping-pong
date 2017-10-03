@@ -3,8 +3,8 @@ package org.dan.ping.pong.mock;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.Wither;
-import org.dan.ping.pong.app.tournament.TournamentRules;
-import org.dan.ping.pong.app.tournament.TournamentState;
+import org.dan.ping.pong.app.server.tournament.TournamentRules;
+import org.dan.ping.pong.app.server.tournament.TournamentState;
 
 import java.time.Instant;
 import java.util.Optional;

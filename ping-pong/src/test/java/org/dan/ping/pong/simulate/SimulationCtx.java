@@ -3,10 +3,10 @@ package org.dan.ping.pong.simulate;
 import static org.dan.ping.pong.sys.ctx.PropertiesContext.DEFAULT_PROPERTY_PRIORITY;
 import static org.junit.Assert.assertTrue;
 
-import org.dan.ping.pong.app.match.ForTestBidDao;
-import org.dan.ping.pong.app.match.ForTestMatchDao;
-import org.dan.ping.pong.app.match.MatchDao;
-import org.dan.ping.pong.app.score.MatchScoreDao;
+import org.dan.ping.pong.app.server.match.ForTestBidDao;
+import org.dan.ping.pong.app.server.match.ForTestMatchDao;
+import org.dan.ping.pong.app.server.match.MatchDao;
+import org.dan.ping.pong.app.server.score.MatchScoreDao;
 import org.dan.ping.pong.mock.MyRest;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.sys.ctx.BaseContextWithoutJersey;

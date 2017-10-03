@@ -2,7 +2,7 @@ package org.dan.ping.pong.mock;
 
 import static org.dan.ping.pong.mock.Generators.genStr;
 
-import org.dan.ping.pong.app.auth.SysAdmin;
+import org.dan.ping.pong.app.server.auth.SysAdmin;
 import org.dan.ping.pong.sys.sadmin.SysAdminDao;
 import org.springframework.context.annotation.Bean;
 

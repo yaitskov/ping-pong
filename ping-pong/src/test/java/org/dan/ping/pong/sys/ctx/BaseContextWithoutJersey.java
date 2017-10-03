@@ -1,9 +1,9 @@
 package org.dan.ping.pong.sys.ctx;
 
-import org.dan.ping.pong.app.auth.AuthCtx;
-import org.dan.ping.pong.app.city.CityCtx;
-import org.dan.ping.pong.app.country.CountryCtx;
-import org.dan.ping.pong.app.user.UserCtx;
+import org.dan.ping.pong.app.server.auth.AuthCtx;
+import org.dan.ping.pong.app.server.city.CityCtx;
+import org.dan.ping.pong.app.server.country.CountryCtx;
+import org.dan.ping.pong.app.server.user.UserCtx;
 import org.dan.ping.pong.mock.GeneratorCtxWithoutAdmin;
 import org.dan.ping.pong.sys.ctx.jackson.JacksonContext;
 import org.dan.ping.pong.sys.db.DbContext;

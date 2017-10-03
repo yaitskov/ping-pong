@@ -1,21 +1,21 @@
 package org.dan.ping.pong.mock;
 
-import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BalancedMix;
-import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BestToBest;
-import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.ProvidedRating;
-import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.SignUp;
-import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
-import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
+import static org.dan.ping.pong.app.server.castinglots.rank.GroupSplitPolicy.BalancedMix;
+import static org.dan.ping.pong.app.server.castinglots.rank.GroupSplitPolicy.BestToBest;
+import static org.dan.ping.pong.app.server.castinglots.rank.ParticipantRankingPolicy.ProvidedRating;
+import static org.dan.ping.pong.app.server.castinglots.rank.ParticipantRankingPolicy.SignUp;
+import static org.dan.ping.pong.app.server.playoff.PlayOffRule.Losing1;
+import static org.dan.ping.pong.app.server.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.mock.Generators.genStr;
 
 import lombok.RequiredArgsConstructor;
-import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
-import org.dan.ping.pong.app.castinglots.rank.OrderDirection;
-import org.dan.ping.pong.app.castinglots.rank.ProvidedRankOptions;
-import org.dan.ping.pong.app.group.GroupRules;
-import org.dan.ping.pong.app.tournament.MatchValidationRule;
-import org.dan.ping.pong.app.tournament.TournamentRules;
-import org.dan.ping.pong.app.tournament.TournamentState;
+import org.dan.ping.pong.app.server.castinglots.rank.CastingLotsRule;
+import org.dan.ping.pong.app.server.castinglots.rank.OrderDirection;
+import org.dan.ping.pong.app.server.castinglots.rank.ProvidedRankOptions;
+import org.dan.ping.pong.app.server.group.GroupRules;
+import org.dan.ping.pong.app.server.tournament.MatchValidationRule;
+import org.dan.ping.pong.app.server.tournament.TournamentRules;
+import org.dan.ping.pong.app.server.tournament.TournamentState;
 
 import java.util.Optional;
 import java.util.UUID;

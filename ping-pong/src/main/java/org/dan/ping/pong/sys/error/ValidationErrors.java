@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.Setter;
-import org.dan.ping.pong.app.tournament.rules.MultimapJsonSerializer;
-import org.dan.ping.pong.app.tournament.rules.ValidationError;
-import org.dan.ping.pong.app.tournament.rules.ValidationErrorsDeserializer;
+import org.dan.ping.pong.app.server.tournament.rules.MultimapJsonSerializer;
+import org.dan.ping.pong.app.server.tournament.rules.ValidationError;
+import org.dan.ping.pong.app.server.tournament.rules.ValidationErrorsDeserializer;
 
 @Getter
 @Setter

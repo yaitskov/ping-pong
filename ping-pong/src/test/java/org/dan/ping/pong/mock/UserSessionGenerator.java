@@ -4,8 +4,8 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.user.UserInfo;
-import org.dan.ping.pong.app.user.UserType;
+import org.dan.ping.pong.app.server.user.UserInfo;
+import org.dan.ping.pong.app.server.user.UserType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 

@@ -16,8 +16,8 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
-import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.time.Instant;
 import java.util.HashSet;

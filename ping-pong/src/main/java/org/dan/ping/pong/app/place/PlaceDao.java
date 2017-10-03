@@ -13,8 +13,8 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.records.PlaceRecord;
 import org.dan.ping.pong.app.city.CityLink;
-import org.dan.ping.pong.app.tournament.DbUpdate;
-import org.dan.ping.pong.app.tournament.DbUpdater;
+import org.dan.ping.pong.sys.db.DbUpdateSql;
+import org.dan.ping.pong.sys.db.DbUpdater;
 import org.jooq.DSLContext;
 import org.jooq.UpdateSetMoreStep;
 import org.jooq.exception.DataAccessException;
@@ -163,9 +163,8 @@ public class PlaceDao {
     }
 
     public void setHostingTid(PlaceMemState place, DbUpdater batch) {
-
         batch.exec(
-                DbUpdate
+                DbUpdateSql
                         .builder()
                         .query(jooq.update(PLACE)
                                 .set(PLACE.HOSTING_TID, place.getHostingTid())

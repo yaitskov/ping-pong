@@ -9,22 +9,22 @@ import static ord.dan.ping.pong.jooq.Tables.USERS;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
-import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_2_ROWS;
-import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_A_ROW;
-import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
+import static org.dan.ping.pong.sys.db.DbUpdateSql.JUST_2_ROWS;
+import static org.dan.ping.pong.sys.db.DbUpdateSql.JUST_A_ROW;
+import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.category.CategoryInfo;
-import org.dan.ping.pong.app.tournament.DbUpdate;
-import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.app.user.UserLink;
+import org.dan.ping.pong.sys.db.DbUpdateSql;
+import org.dan.ping.pong.sys.db.DbUpdater;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,13 +38,14 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 @Slf4j
-public class BidDao {
+public class BidDaoServer implements BidDao {
     @Inject
     private DSLContext jooq;
 
+    @Override
     public void setBidState(int tid, int uid, BidState target,
             List<BidState> expected, Instant now, DbUpdater batch) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .logBefore(() -> log.info("Set bid status {} for {} if {}",
                         target, uid, expected))
                 .onFailure(u -> badRequest("Participant status was not " + expected))
@@ -58,11 +59,12 @@ public class BidDao {
                 .build());
     }
 
+    @Override
     public void markParticipantsBusy(OpenTournamentMemState tournament,
             Collection<Integer> uids, Instant now, DbUpdater batch) {
         uids.stream().map(tournament::getBid)
                 .forEach(bid -> bid.setBidState(Play));
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(JUST_2_ROWS)
                 .onFailure(u -> internalError("One of uids " + uids + " was busy"))
                 .query(jooq.update(BID)
@@ -74,6 +76,7 @@ public class BidDao {
                 .build());
     }
 
+    @Override
     public void setGroupForUids(int gid, int tid, List<ParticipantMemState> groupBids) {
         groupBids.forEach(bid -> bid.setGid(Optional.of(gid)));
         jooq.update(BID)
@@ -86,8 +89,10 @@ public class BidDao {
                 .execute();
     }
 
-    public void enlist(ParticipantMemState bid, Instant now, Optional<Integer> providedRank, DbUpdater batch) {
-        batch.exec(DbUpdate.builder()
+    @Override
+    public void enlist(ParticipantMemState bid, Instant now,
+            Optional<Integer> providedRank, DbUpdater batch) {
+        batch.exec(DbUpdateSql.builder()
                 .logBefore(() -> log.info("User {} enlisted to tournament {}", bid.getUid(), bid.getTid()))
                 .mustAffectRows(NON_ZERO_ROWS)
                 .query(jooq.insertInto(BID, BID.CID, BID.TID, BID.UID,
@@ -102,6 +107,7 @@ public class BidDao {
                 .build());
     }
 
+    @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<ParticipantState> findEnlisted(int tid) {
         return jooq.select(BID.UID, USERS.NAME, BID.STATE, CATEGORY.NAME, CATEGORY.CID)
@@ -125,6 +131,7 @@ public class BidDao {
                         .build());
     }
 
+    @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public Optional<DatedParticipantState> getParticipantInfo(int tid, int uid) {
         return ofNullable(jooq.select(BID.UID, USERS.NAME, BID.STATE,
@@ -150,8 +157,9 @@ public class BidDao {
                         .build());
     }
 
+    @Override
     public void setCategory(SetCategory setCategory, Instant now, DbUpdater batch) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(BID)
                         .set(BID.CID, setCategory.getCid())
                         .set(BID.UPDATED, Optional.of(now))
@@ -160,9 +168,10 @@ public class BidDao {
                 .build());
     }
 
+    @Override
     public void resetStateByTid(int tid, Instant now, DbUpdater batch) {
         batch.exec(
-                DbUpdate.builder()
+                DbUpdateSql.builder()
                         .mustAffectRows(empty())
                         .query(jooq.update(BID)
                                 .set(BID.STATE, BidState.Want)
@@ -171,6 +180,7 @@ public class BidDao {
                                 .where(BID.TID.eq(tid), BID.STATE.ne(Quit))).build());
     }
 
+    @Override
     public Map<Integer, ParticipantMemState> loadParticipants(Tid tid) {
         return jooq.select(BID.UID, BID.STATE, USERS.NAME, BID.GID, BID.CID)
                 .from(BID)

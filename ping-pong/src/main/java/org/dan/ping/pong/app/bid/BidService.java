@@ -9,16 +9,14 @@ import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
-import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
+import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,12 +29,10 @@ public class BidService {
     @Inject
     private BidDao bidDao;
 
-    @Transactional(TRANSACTION_MANAGER)
     public void paid(OpenTournamentMemState tournament, int uid, DbUpdater batch) {
         setBidState(tournament.getParticipant(uid), Paid, singletonList(Want), batch);
     }
 
-    @Transactional(TRANSACTION_MANAGER)
     public void readyToPlay(OpenTournamentMemState tournament, int uid, DbUpdater batch) {
         setBidState(tournament.getParticipant(uid), Here, asList(Paid, Want), batch);
     }
@@ -53,7 +49,6 @@ public class BidService {
     @Inject
     private Clocker clocker;
 
-    @Transactional(TRANSACTION_MANAGER)
     public void setCategory(OpenTournamentMemState tournament, SetCategory setCategory, DbUpdater batch) {
         tournament.checkCategory(setCategory.getCid());
         tournament.getParticipant(setCategory.getUid()).setCid(setCategory.getCid());

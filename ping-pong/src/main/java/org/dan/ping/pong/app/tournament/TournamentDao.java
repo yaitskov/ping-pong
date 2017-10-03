@@ -23,7 +23,7 @@ import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
-import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
+import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
@@ -41,6 +41,9 @@ import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceLink;
+import org.dan.ping.pong.sys.db.DbUpdateSql;
+import org.dan.ping.pong.sys.db.DbUpdater;
+import org.dan.ping.pong.sys.db.DbUpdaterSql;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectField;
@@ -162,7 +165,7 @@ public class TournamentDao {
     }
 
     public void setState(OpenTournamentMemState tournament, DbUpdater batch) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .logBefore(() -> log.info("Switch tournament {} into {} state.",
                         tournament.getTid(), tournament.getState()))
                 .mustAffectRows(NON_ZERO_ROWS)
@@ -413,7 +416,7 @@ public class TournamentDao {
     }
 
     public void update(TournamentUpdate update, DbUpdater batch) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(TOURNAMENT)
                         .set(TOURNAMENT.TICKET_PRICE, update.getPrice())
                         .set(TOURNAMENT.PID, update.getPlaceId())
@@ -435,7 +438,7 @@ public class TournamentDao {
 
     @Transactional(TRANSACTION_MANAGER)
     public void updateParams(int tid, TournamentRules rules, DbUpdater batch) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(TOURNAMENT)
                         .set(TOURNAMENT.RULES, rules)
                         .where(TOURNAMENT.TID.eq(tid)))
@@ -493,7 +496,7 @@ public class TournamentDao {
     }
 
     public void setCompleteAt(int tid, Optional<Instant> now, DbUpdater batch) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(TOURNAMENT)
                         .set(TOURNAMENT.COMPLETE_AT, now)
                         .where(TOURNAMENT.TID.eq(tid)))

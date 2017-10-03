@@ -24,8 +24,8 @@ import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.playoff.PlayOffService;
-import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
+import org.dan.ping.pong.sys.db.DbUpdaterSql;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
@@ -97,7 +97,7 @@ public class CastingLotsService {
             final List<ParticipantMemState> orderedBids = rankingService.sort(bids, rules.getCasting());
             final int basePositions = matchService.roundPlayOffBase(orderedBids.size());
             castingLotsDao.generatePlayOffMatches(tournament, cid, basePositions, 1);
-            final DbUpdater updater = dbUpdaterFactory.create();
+            final DbUpdaterSql updater = dbUpdaterFactory.create();
             assignBidsToBaseMatches(cid, basePositions, orderedBids, tournament, updater);
             updater.flush();
         });
@@ -121,7 +121,7 @@ public class CastingLotsService {
 
     private void assignBidsToBaseMatches(Integer cid, int basePositions,
             List<ParticipantMemState> orderedBids,
-            OpenTournamentMemState tournament, DbUpdater batch) {
+            OpenTournamentMemState tournament, DbUpdaterSql batch) {
         final List<Integer> seeds = ofNullable(PLAY_OFF_SEEDS.get(basePositions))
                 .orElseThrow(() -> internalError("No seeding for "
                         + orderedBids.size() + " participants"));

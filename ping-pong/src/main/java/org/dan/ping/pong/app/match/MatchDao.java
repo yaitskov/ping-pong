@@ -18,20 +18,20 @@ import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
-import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_A_ROW;
-import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
+import static org.dan.ping.pong.sys.db.DbUpdateSql.JUST_A_ROW;
+import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.Users;
 import org.dan.ping.pong.app.table.TableLink;
-import org.dan.ping.pong.app.tournament.DbUpdate;
-import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.user.UserLink;
+import org.dan.ping.pong.sys.db.DbUpdateSql;
+import org.dan.ping.pong.sys.db.DbUpdater;
 import org.jooq.DSLContext;
 import org.jooq.Record11;
 import org.springframework.transaction.annotation.Transactional;
@@ -176,7 +176,7 @@ public class MatchDao {
     }
 
     public void changeStatus(int mid, MatchState state, DbUpdater batch) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(NON_ZERO_ROWS)
                 .logBefore(() -> log.info("Put match {} into {}", mid, state))
                 .query(jooq.update(MATCHES)
@@ -194,7 +194,7 @@ public class MatchDao {
     }
 
     public void completeMatch(int mid, int winUid, Instant now, DbUpdater batch, MatchState... expected) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(JUST_A_ROW)
                 .logBefore(() -> log.info("Match {} won uid {} if {}", mid, winUid, expected))
                 .query(jooq.update(MATCHES)
@@ -208,14 +208,16 @@ public class MatchDao {
 
     private void insertSetScore(DbUpdater batch, FinalMatchScore matchScore) {
         matchScore.getScores().forEach(score -> batch.exec(
-                jooq.insertInto(SET_SCORE, SET_SCORE.MID,
-                        SET_SCORE.UID, SET_SCORE.GAMES)
-                        .values(matchScore.getMid(), score.getUid(), score.getScore())));
+                DbUpdateSql.builder()
+                        .query(jooq.insertInto(SET_SCORE, SET_SCORE.MID,
+                                SET_SCORE.UID, SET_SCORE.GAMES)
+                                .values(matchScore.getMid(), score.getUid(), score.getScore()))
+                        .build()));
     }
 
     public void markAsSchedule(MatchInfo match, DbUpdater batch) {
         batch.exec(
-                DbUpdate.builder()
+                DbUpdateSql.builder()
                         .logBefore(() -> log.info("Match {} between {} began",
                                 match.getMid(), match.getParticipantIdScore().keySet()))
                         .onFailure(u -> internalError("Match "
@@ -279,12 +281,12 @@ public class MatchDao {
 
     public void deleteAllByTid(OpenTournamentMemState tournament, DbUpdater batch, int size) {
         batch
-                .exec(DbUpdate.builder()
+                .exec(DbUpdateSql.builder()
                         .mustAffectRows(empty())
                         .query(jooq.deleteFrom(SET_SCORE)
                                 .where(SET_SCORE.MID.in(tournament.getMatches().keySet())))
                         .build())
-                .exec(DbUpdate.builder()
+                .exec(DbUpdateSql.builder()
                         .mustAffectRows(Optional.of(size))
                         .query(jooq.deleteFrom(MATCHES)
                         .where(MATCHES.TID.eq(tournament.getTid())))
@@ -292,7 +294,7 @@ public class MatchDao {
     }
 
     public void setParticipant(int n, int mid, int uid, DbUpdater batch) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(NON_ZERO_ROWS)
                 .query(jooq.update(MATCHES)
                         .set(n == 0
@@ -336,7 +338,7 @@ public class MatchDao {
 
     public void deleteSets(DbUpdater batch, MatchInfo minfo, int setNumber) {
         minfo.getParticipantIdScore().keySet().forEach(uid -> {
-            batch.exec(DbUpdate.builder()
+            batch.exec(DbUpdateSql.builder()
                     .mustAffectRows(NON_ZERO_ROWS)
                     .logBefore(() -> log.info("Delete sets after {} in mid {}",
                             setNumber, minfo.getMid()))
@@ -351,7 +353,7 @@ public class MatchDao {
     }
 
     public void removeSecondParticipant(DbUpdater batch, int mid, int uidKeep) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(MATCHES)
                         .set(MATCHES.UID_LESS, uidKeep)
                         .set(MATCHES.UID_MORE, (Integer) null)
@@ -360,7 +362,7 @@ public class MatchDao {
     }
 
     public void removeParticipants(DbUpdater batch, int mid) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(MATCHES)
                         .set(MATCHES.UID_LESS, (Integer) null)
                         .set(MATCHES.UID_MORE, (Integer) null)
@@ -369,7 +371,7 @@ public class MatchDao {
     }
 
     public void removeScores(DbUpdater batch, int mid, int uid) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .query(jooq.deleteFrom(SET_SCORE)
                         .where(SET_SCORE.MID.eq(mid), SET_SCORE.UID.eq(uid)))
                 .build());

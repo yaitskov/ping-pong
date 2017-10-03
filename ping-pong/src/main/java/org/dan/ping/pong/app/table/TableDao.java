@@ -1,12 +1,13 @@
 package org.dan.ping.pong.app.table;
 
+import static com.google.common.primitives.Ints.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static ord.dan.ping.pong.jooq.tables.Tables.TABLES;
-import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_A_ROW;
-import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
+import static org.dan.ping.pong.sys.db.DbUpdateSql.JUST_A_ROW;
+import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -16,8 +17,9 @@ import static org.dan.ping.pong.app.table.TableState.Free;
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.Tables;
 import org.dan.ping.pong.app.place.Pid;
-import org.dan.ping.pong.app.tournament.DbUpdate;
-import org.dan.ping.pong.app.tournament.DbUpdater;
+import org.dan.ping.pong.sys.db.DbUpdateSql;
+import org.dan.ping.pong.sys.db.DbUpdater;
+import org.dan.ping.pong.sys.db.DbUpdaterSql;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,7 +87,7 @@ public class TableDao {
     public void locateMatch(TableInfo tableInfo, int mid, DbUpdater batch) {
         tableInfo.setState(Busy);
         tableInfo.setMid(Optional.of(mid));
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .logBefore(() -> log.info("Mid {} will be hold on table {}",
                         mid, tableInfo.getTableId()))
                 .onFailure(u -> internalError("Failed placing mid "
@@ -101,7 +103,7 @@ public class TableDao {
 
     @Transactional(TRANSACTION_MANAGER)
     public void freeTable(int tableId, DbUpdater batch) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(NON_ZERO_ROWS)
                 .logBefore(() -> log.info("Return table of table {}", tableId))
                 .onFailure((u) -> internalError("Table " + tableId + " doesn't have a match"))
@@ -128,7 +130,7 @@ public class TableDao {
     }
 
     public void setStatus(SetTableState update, DbUpdater batch) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(JUST_A_ROW)
                 .onFailure(u -> badRequest("Table state changed"))
                 .query(jooq.update(TABLES)

@@ -1,4 +1,4 @@
-package org.dan.ping.pong.app.tournament;
+package org.dan.ping.pong.sys.db;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newArrayList;
@@ -17,13 +17,13 @@ import java.util.List;
 @Slf4j
 @Getter
 @RequiredArgsConstructor
-public class DbUpdater {
+public class DbUpdaterSql implements DbUpdater {
     private final DSLContext jooq;
-    private final List<DbUpdate> updates;
+    private final List<DbUpdateSql> updates;
     private final List<Runnable> failureCallbacks;
 
-    public static DbUpdater create(DSLContext jooq) {
-        return new DbUpdater(jooq, newArrayList(), newArrayList());
+    public static DbUpdaterSql create(DSLContext jooq) {
+        return new DbUpdaterSql(jooq, newArrayList(), newArrayList());
     }
 
     public DbUpdater onFailure(Runnable r) {
@@ -32,14 +32,15 @@ public class DbUpdater {
     }
 
     public DbUpdater exec(DbUpdate u) {
+        return exec((DbUpdateSql) u);
+    }
+
+    public DbUpdater exec(DbUpdateSql u) {
         updates.add(u);
         return this;
     }
 
-    public DbUpdater exec(Query q) {
-        return exec(DbUpdate.builder().query(q).build());
-    }
-
+    @Override
     public void flush() {
         final List<Query> queries = updates.stream()
                 .map(u -> {
@@ -50,7 +51,7 @@ public class DbUpdater {
         checkArgument(updateRows.size() == queries.size());
         for (int i = 0; i < updateRows.size(); ++i) {
             final int rowsUpdates = updateRows.get(i);
-            final DbUpdate update = updates.get(i);
+            final DbUpdateSql update = updates.get(i);
             update.getMustAffectRows()
                     .ifPresent(rowsExpected
                             -> checkAffectedRows(rowsExpected, rowsUpdates, update));
@@ -59,7 +60,7 @@ public class DbUpdater {
     }
 
     @SneakyThrows
-    private void checkAffectedRows(int expectedRows, int affectedRows, DbUpdate update) {
+    private void checkAffectedRows(int expectedRows, int affectedRows, DbUpdateSql update) {
         if (expectedRows >= 0 && affectedRows != expectedRows) {
             log.error("Batch query {} failed due expected rows {} but affected {}",
                     update.getQuery().getSQL(), expectedRows, affectedRows);
@@ -78,6 +79,7 @@ public class DbUpdater {
         failureCallbacks.clear();
     }
 
+    @Override
     public void rollback() {
         failureCallbacks.forEach(r -> {
             try {

@@ -1,4 +1,4 @@
-package org.dan.ping.pong.app.match;
+package org.dan.ping.pong.app.place;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

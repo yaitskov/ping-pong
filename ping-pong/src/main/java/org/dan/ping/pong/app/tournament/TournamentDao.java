@@ -38,7 +38,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.match.MatchState;
-import org.dan.ping.pong.app.match.Pid;
+import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceLink;
 import org.jooq.DSLContext;

@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dan.ping.pong.app.tournament.MatchValidationRule;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -68,7 +67,7 @@ public class MatchInfo {
 
     public Optional<Integer> addSetScore(List<IdentifiedScore> scores, MatchValidationRule rule) {
         scores.forEach(score -> participantIdScore.get(score.getUid()).add(score.getScore()));
-        return rule.findWinnerId(rule.calcWonSets(this));
+        return rule.findWinnerId(rule.calcWonSets(getParticipantIdScore()));
     }
 
     public Set<Integer> getUids() {

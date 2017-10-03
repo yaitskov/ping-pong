@@ -8,7 +8,6 @@ import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.dan.ping.pong.app.match.Pid;
 import org.dan.ping.pong.app.table.TableInfo;
 
 import java.util.Map;

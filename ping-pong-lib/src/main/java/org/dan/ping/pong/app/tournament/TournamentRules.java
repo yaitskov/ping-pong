@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.experimental.Wither;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.group.GroupRules;
+import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.playoff.PlayOffRule;
 
 import java.util.Optional;

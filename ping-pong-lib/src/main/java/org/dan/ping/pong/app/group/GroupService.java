@@ -6,7 +6,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.tournament.MatchValidationRule;
+import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 
 import java.util.Collection;
@@ -58,7 +58,7 @@ public class GroupService {
         minfo.getParticipantIdScore().get(lostUid)
                 .forEach(winner::lostBalls);
 
-        final Map<Integer, Integer> uid2Sets = matchRule.calcWonSets(minfo);
+        final Map<Integer, Integer> uid2Sets = matchRule.calcWonSets(minfo.getParticipantIdScore());
 
         loser.wonSets(uid2Sets.get(lostUid));
         loser.lostSets(uid2Sets.get(winUid));

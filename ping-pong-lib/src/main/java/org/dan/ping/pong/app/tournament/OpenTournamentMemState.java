@@ -13,7 +13,7 @@ import lombok.Setter;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.match.Pid;
+import org.dan.ping.pong.app.place.Pid;
 
 import java.time.Instant;
 import java.util.List;

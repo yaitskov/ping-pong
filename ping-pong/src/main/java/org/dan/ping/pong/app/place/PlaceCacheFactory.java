@@ -4,7 +4,6 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
-import org.dan.ping.pong.app.match.Pid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Transactional;

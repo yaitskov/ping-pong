@@ -17,15 +17,12 @@
         <httpcomponents.version>4.5.2</httpcomponents.version>
         <jooq.version>3.8.4</jooq.version>
         <aspectj.version>1.8.8</aspectj.version>
-        <jackson.version>2.8.7</jackson.version>
         <jersey.version>2.22.2</jersey.version>
         <logback.version>1.2.1</logback.version>
-        <lombok.version>1.16.12</lombok.version>
         <mysql-connector-java.version>5.1.38</mysql-connector-java.version>
         <slf4j.version>1.7.21</slf4j.version>
         <restassured.version>3.0.1</restassured.version>
         <spring.version>4.3.2.RELEASE</spring.version>
-        <jetty.version>9.3.8.v20160314</jetty.version>
         <http.port>8080</http.port>
         <debug.port>5008</debug.port>
         <jacoco.version>0.7.6.201602180812</jacoco.version>
@@ -52,11 +49,6 @@
             <version>${jetty.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-        </dependency>
-        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
@@ -77,11 +69,6 @@
             <artifactId>setup-env</artifactId>
             <version>${project.parent.version}</version>
             <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
@@ -152,11 +139,6 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql-connector-java.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

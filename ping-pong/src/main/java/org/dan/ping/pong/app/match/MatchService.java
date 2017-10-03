@@ -437,7 +437,8 @@ public class MatchService {
                 .tid(matchInfo.getTid())
                 .winUid(matchInfo.getWinnerId())
                 .sets(matchInfo.getParticipantIdScore())
-                .wonSets(tournament.getRule().getMatch().calcWonSets(matchInfo))
+                .wonSets(tournament.getRule().getMatch()
+                        .calcWonSets(matchInfo.getParticipantIdScore()))
                 .build();
     }
 
@@ -490,7 +491,9 @@ public class MatchService {
                         .map(m -> OpenMatchForWatch.builder()
                                 .mid(m.getMid())
                                 .started(m.getStartedAt().get())
-                                .score(tournament.getRule().getMatch().calcWonSets(m).values()
+                                .score(tournament.getRule().getMatch()
+                                        .calcWonSets(m.getParticipantIdScore())
+                                        .values()
                                         .stream().collect(toList()))
                                 .category(tournament.getCategory(m.getCid()))
                                 .table(place.getTableByMid(m.getMid()).toLink())

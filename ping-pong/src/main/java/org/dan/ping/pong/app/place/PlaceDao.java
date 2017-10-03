@@ -13,7 +13,6 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.records.PlaceRecord;
 import org.dan.ping.pong.app.city.CityLink;
-import org.dan.ping.pong.app.match.Pid;
 import org.dan.ping.pong.app.tournament.DbUpdate;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.jooq.DSLContext;

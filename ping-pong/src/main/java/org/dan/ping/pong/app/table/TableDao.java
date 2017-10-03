@@ -15,7 +15,7 @@ import static org.dan.ping.pong.app.table.TableState.Free;
 
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.Tables;
-import org.dan.ping.pong.app.match.Pid;
+import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.tournament.DbUpdate;
 import org.dan.ping.pong.app.tournament.DbUpdater;
 import org.jooq.DSLContext;

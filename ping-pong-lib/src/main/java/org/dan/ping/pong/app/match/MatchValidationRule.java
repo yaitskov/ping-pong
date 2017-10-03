@@ -1,4 +1,4 @@
-package org.dan.ping.pong.app.tournament;
+package org.dan.ping.pong.app.match;
 
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
@@ -8,8 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dan.ping.pong.app.match.IdentifiedScore;
-import org.dan.ping.pong.app.match.MatchInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +46,12 @@ public class MatchValidationRule {
         }
     }
 
-    public Map<Integer, Integer> calcWonSets(MatchInfo matchInfo) {
-        final List<Integer> uids = new ArrayList<>(
-                matchInfo.getParticipantIdScore().keySet());
+    public Map<Integer, Integer> calcWonSets(Map<Integer, List<Integer>> participantScores) {
+        final List<Integer> uids = new ArrayList<>(participantScores.keySet());
         final int uidA = uids.get(0);
-        final List<Integer> setsA = matchInfo.getParticipantIdScore().get(uidA);
+        final List<Integer> setsA = participantScores.get(uidA);
         final int uidB = uids.get(1);
-        final List<Integer> setsB = matchInfo.getParticipantIdScore().get(uidB);
+        final List<Integer> setsB = participantScores.get(uidB);
         int wonsA = 0;
         int wonsB = 0;
         for (int i = 0; i < setsA.size(); ++i) {

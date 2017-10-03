@@ -46,7 +46,6 @@ import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
-import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.SetScoreResultName;
@@ -91,12 +90,6 @@ public class MatchService {
 
     @Inject
     private SequentialExecutor sequentialExecutor;
-
-    @Value("${match.score.timeout}")
-    private int matchScoreTimeout;
-
-    @Inject
-    private DbUpdaterFactory dbUpdaterFactory;
 
     @Inject
     private PlaceService placeService;

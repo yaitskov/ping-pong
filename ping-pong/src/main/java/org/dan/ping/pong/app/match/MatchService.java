@@ -56,7 +56,6 @@ import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -501,12 +500,6 @@ public class MatchService {
                                                 .collect(toList()))
                                 .build())
                         .collect(toList()));
-    }
-
-    public void markAsSchedule(MatchInfo match, Instant now, DbUpdater batch) {
-        match.setState(Game);
-        match.setStartedAt(Optional.of(now));
-        matchDao.markAsSchedule(match, batch);
     }
 
     public void resetMatchScore(OpenTournamentMemState tournament, ResetSetScore reset, DbUpdater batch) {

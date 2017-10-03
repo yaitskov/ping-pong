@@ -62,28 +62,6 @@ public class TableDao {
                 .execute()));
     }
 
-    public List<TableInfo> findFreeTables(int tid) {
-        return findTournamentTablesByState(tid, Free);
-    }
-
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<TableInfo> findTournamentTablesByState(int tid, TableState state) {
-        return jooq.select(TABLES.TABLE_ID, TABLES.LABEL, TABLES.PID, TABLES.MID)
-                .from(TABLES)
-                .innerJoin(TOURNAMENT)
-                .on(TABLES.PID.eq(TOURNAMENT.PID))
-                .where(TOURNAMENT.TID.eq(tid),
-                        TABLES.STATE.eq(state))
-                .fetch()
-                .map(r -> TableInfo.builder()
-                        .pid(r.get(TABLES.PID))
-                        .tableId(r.get(TABLES.TABLE_ID))
-                        .state(state)
-                        .mid(r.get(TABLES.MID))
-                        .label(r.get(TABLES.LABEL))
-                        .build());
-    }
-
     public void locateMatch(TableInfo tableInfo, int mid, DbUpdater batch) {
         tableInfo.setState(Busy);
         tableInfo.setMid(Optional.of(mid));

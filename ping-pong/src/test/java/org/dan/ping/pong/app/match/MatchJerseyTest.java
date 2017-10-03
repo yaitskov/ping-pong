@@ -42,8 +42,8 @@ import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.place.ForTestPlaceDao;
 import org.dan.ping.pong.app.score.MatchScoreDao;
-import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentDao;
@@ -194,7 +194,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
     private TournamentDao tournamentDao;
 
     @Inject
-    private TableDao tableDao;
+    private ForTestPlaceDao placeDao;
 
     @Test
     public void adminCompleteOnlyMatchIn1Group() {
@@ -236,7 +236,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                                 .map(MatchInfo::getState),
                         tournamentDao.getRow(new Tid(tid)).map(TournamentRow::getState)));
 
-        List<TableInfo> tables = tableDao.findFreeTables(tid);
+        List<TableInfo> tables = placeDao.findFreeTables(tid);
         assertEquals(singletonList(Free), tables.stream().map(TableInfo::getState).collect(toList()));
         assertEquals(singletonList(Optional.empty()),
                 tables.stream().map(TableInfo::getMid).collect(toList()));

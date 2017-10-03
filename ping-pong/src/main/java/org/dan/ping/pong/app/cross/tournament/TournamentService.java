@@ -1,4 +1,4 @@
-package org.dan.ping.pong.app.server.tournament;
+package org.dan.ping.pong.app.cross.tournament;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Collections.singletonList;
@@ -47,9 +47,37 @@ import org.dan.ping.pong.app.server.place.PlaceService;
 import org.dan.ping.pong.app.server.playoff.PlayOffService;
 import org.dan.ping.pong.app.server.table.TableDao;
 import org.dan.ping.pong.app.server.table.TableService;
+import org.dan.ping.pong.app.server.tournament.BadStateError;
+import org.dan.ping.pong.app.server.tournament.CopyTournament;
+import org.dan.ping.pong.app.server.tournament.CreateTournament;
+import org.dan.ping.pong.app.server.tournament.CumulativeScore;
+import org.dan.ping.pong.app.server.tournament.DatedTournamentDigest;
+import org.dan.ping.pong.app.server.tournament.DbUpdater;
+import org.dan.ping.pong.app.server.tournament.DraftingTournamentInfo;
+import org.dan.ping.pong.app.server.tournament.Enlist;
+import org.dan.ping.pong.app.server.tournament.EnlistOffline;
+import org.dan.ping.pong.app.server.tournament.EnlistTournament;
+import org.dan.ping.pong.app.server.tournament.MatchValidationRule;
+import org.dan.ping.pong.app.server.tournament.MyRecentJudgedTournaments;
+import org.dan.ping.pong.app.server.tournament.MyRecentTournaments;
+import org.dan.ping.pong.app.server.tournament.MyTournamentInfo;
+import org.dan.ping.pong.app.server.tournament.OpenTournamentDigest;
+import org.dan.ping.pong.app.server.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.server.tournament.ParticipantMemState;
+import org.dan.ping.pong.app.server.tournament.Tid;
+import org.dan.ping.pong.app.server.tournament.TidIdentifiedRules;
+import org.dan.ping.pong.app.server.tournament.TournamentComplete;
+import org.dan.ping.pong.app.server.tournament.TournamentDao;
+import org.dan.ping.pong.app.server.tournament.TournamentDigest;
+import org.dan.ping.pong.app.server.tournament.TournamentResultEntry;
+import org.dan.ping.pong.app.server.tournament.TournamentRules;
+import org.dan.ping.pong.app.server.tournament.TournamentState;
+import org.dan.ping.pong.app.server.tournament.TournamentUpdate;
+import org.dan.ping.pong.app.server.tournament.Uid;
 import org.dan.ping.pong.app.server.user.UserDao;
 import org.dan.ping.pong.app.server.user.UserInfo;
 import org.dan.ping.pong.app.server.user.UserRegRequest;
+import org.dan.ping.pong.sys.error.PiPoEx;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.beans.factory.annotation.Value;
@@ -131,7 +159,7 @@ public class TournamentService {
 
     private void ensureDrafting(TournamentState state) {
         if (state != TournamentState.Draft && state != Open) {
-            throw badRequest(BadStateError.of(state,
+            throw PiPoEx.badRequest(BadStateError.of(state,
                     "Tournament is not in a valid state"));
         }
     }

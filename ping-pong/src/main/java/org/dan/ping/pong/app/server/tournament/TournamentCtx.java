@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.server.tournament;
 
+import org.dan.ping.pong.app.cross.tournament.TournamentService;
 import org.dan.ping.pong.app.server.tournament.rules.GroupRuleValidator;
 import org.dan.ping.pong.app.server.tournament.rules.MatchRuleValidator;
 import org.dan.ping.pong.app.server.tournament.rules.TournamentRulesValidator;

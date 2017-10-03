@@ -53,7 +53,7 @@ import org.dan.ping.pong.app.server.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.server.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.server.tournament.TournamentCache;
 import org.dan.ping.pong.app.server.tournament.TournamentDao;
-import org.dan.ping.pong.app.server.tournament.TournamentService;
+import org.dan.ping.pong.app.cross.tournament.TournamentService;
 import org.dan.ping.pong.app.server.tournament.TournamentState;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;

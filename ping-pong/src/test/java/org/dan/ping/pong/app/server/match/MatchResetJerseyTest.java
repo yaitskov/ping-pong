@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.server.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.server.tournament.TournamentResultEntry;
-import org.dan.ping.pong.app.server.tournament.TournamentService;
+import org.dan.ping.pong.app.cross.tournament.TournamentService;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;

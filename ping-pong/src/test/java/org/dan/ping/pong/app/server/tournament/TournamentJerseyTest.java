@@ -22,7 +22,7 @@ import static org.dan.ping.pong.app.server.tournament.TournamentResource.TOURNAM
 import static org.dan.ping.pong.app.server.tournament.TournamentResource.TOURNAMENT_ENLIST_OFFLINE;
 import static org.dan.ping.pong.app.server.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.app.server.tournament.TournamentResource.TOURNAMENT_STATE;
-import static org.dan.ping.pong.app.server.tournament.TournamentService.UNKNOWN_PLACE;
+import static org.dan.ping.pong.app.cross.tournament.TournamentService.UNKNOWN_PLACE;
 import static org.dan.ping.pong.app.server.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.server.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.server.tournament.TournamentState.Open;

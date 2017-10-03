@@ -18,7 +18,7 @@ import org.dan.ping.pong.app.server.group.GroupSchedule;
 import org.dan.ping.pong.app.server.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.server.tournament.MatchValidationRule;
 import org.dan.ping.pong.app.server.tournament.TournamentRules;
-import org.dan.ping.pong.app.server.tournament.TournamentService;
+import org.dan.ping.pong.app.cross.tournament.TournamentService;
 import org.dan.ping.pong.mock.simulator.Player;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;

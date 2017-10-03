@@ -12,6 +12,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.cross.tournament.TournamentService;
 import org.dan.ping.pong.app.server.auth.AuthService;
 import org.dan.ping.pong.app.server.bid.BidState;
 import org.dan.ping.pong.app.server.tournament.rules.TournamentRulesValidator;

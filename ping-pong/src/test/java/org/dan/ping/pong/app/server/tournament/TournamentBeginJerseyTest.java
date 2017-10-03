@@ -8,8 +8,8 @@ import static org.dan.ping.pong.app.server.castinglots.CastingLotsService.NOT_EN
 import static org.dan.ping.pong.app.server.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.server.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.server.tournament.TournamentResource.TOURNAMENT_RESIGN;
-import static org.dan.ping.pong.app.server.tournament.TournamentService.PLACE_IS_BUSY;
-import static org.dan.ping.pong.app.server.tournament.TournamentService.TID;
+import static org.dan.ping.pong.app.cross.tournament.TournamentService.PLACE_IS_BUSY;
+import static org.dan.ping.pong.app.cross.tournament.TournamentService.TID;
 import static org.dan.ping.pong.mock.simulator.EnlistMode.Enlist;
 import static org.dan.ping.pong.mock.simulator.EnlistMode.Pay;
 import static org.dan.ping.pong.mock.simulator.Player.p1;

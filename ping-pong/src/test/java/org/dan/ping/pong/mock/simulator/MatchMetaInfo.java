@@ -2,7 +2,7 @@ package org.dan.ping.pong.mock.simulator;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.dan.ping.pong.app.server.match.OpenMatchForJudge;
+import org.dan.ping.pong.app.match.OpenMatchForJudge;
 
 import java.util.Set;
 

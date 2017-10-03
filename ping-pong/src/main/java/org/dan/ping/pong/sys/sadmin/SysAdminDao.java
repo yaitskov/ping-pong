@@ -6,7 +6,7 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.Tables;
-import org.dan.ping.pong.app.server.auth.SysAdmin;
+import org.dan.ping.pong.app.auth.SysAdmin;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 

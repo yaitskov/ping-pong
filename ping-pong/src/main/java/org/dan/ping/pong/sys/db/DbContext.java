@@ -6,7 +6,7 @@ import static org.jooq.impl.DSL.using;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.server.tournament.DbUpdaterFactory;
+import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.jooq.DSLContext;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;

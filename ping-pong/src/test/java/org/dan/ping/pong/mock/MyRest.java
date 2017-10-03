@@ -1,7 +1,7 @@
 package org.dan.ping.pong.mock;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.dan.ping.pong.app.server.auth.AuthService.SESSION;
+import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertThat;
 

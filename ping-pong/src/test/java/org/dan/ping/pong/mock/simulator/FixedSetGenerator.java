@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.server.match.MatchResource;
-import org.dan.ping.pong.app.server.match.ResetSetScore;
+import org.dan.ping.pong.app.match.MatchResource;
+import org.dan.ping.pong.app.match.ResetSetScore;
 import org.dan.ping.pong.mock.MyRest;
 
 import java.io.IOException;

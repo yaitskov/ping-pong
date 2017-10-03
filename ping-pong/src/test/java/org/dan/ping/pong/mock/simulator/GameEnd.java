@@ -5,7 +5,7 @@ import static org.dan.ping.pong.mock.simulator.TournamentScenario.createRndGen;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dan.ping.pong.app.server.tournament.MatchValidationRule;
+import org.dan.ping.pong.app.tournament.MatchValidationRule;
 
 import java.util.List;
 

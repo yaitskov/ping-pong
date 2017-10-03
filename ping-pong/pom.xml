@@ -460,8 +460,8 @@
                             <customTypes>
                                 <customType>
                                     <name>TournamentRule</name>
-                                    <type>org.dan.ping.pong.app.server.tournament.TournamentRules</type>
-                                    <binding>org.dan.ping.pong.app.server.tournament.TournamentRulesConverter</binding>
+                                    <type>org.dan.ping.pong.app.tournament.TournamentRules</type>
+                                    <binding>org.dan.ping.pong.app.tournament.TournamentRulesConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>OptionalString</name>
@@ -490,38 +490,38 @@
                                 </customType>
                                 <customType>
                                     <name>MatchType</name>
-                                    <type>org.dan.ping.pong.app.server.match.MatchType</type>
-                                    <binding>org.dan.ping.pong.app.server.match.MatchTypeConverter</binding>
+                                    <type>org.dan.ping.pong.app.match.MatchType</type>
+                                    <binding>org.dan.ping.pong.app.match.MatchTypeConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>MatchState</name>
-                                    <type>org.dan.ping.pong.app.server.match.MatchState</type>
-                                    <binding>org.dan.ping.pong.app.server.match.MatchStateConverter</binding>
+                                    <type>org.dan.ping.pong.app.match.MatchState</type>
+                                    <binding>org.dan.ping.pong.app.match.MatchStateConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>GroupState</name>
-                                    <type>org.dan.ping.pong.app.server.castinglots.GroupState</type>
-                                    <binding>org.dan.ping.pong.app.server.castinglots.GroupStateConverter</binding>
+                                    <type>org.dan.ping.pong.app.castinglots.GroupState</type>
+                                    <binding>org.dan.ping.pong.app.castinglots.GroupStateConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>TableState</name>
-                                    <type>org.dan.ping.pong.app.server.table.TableState</type>
-                                    <binding>org.dan.ping.pong.app.server.table.TableStateConverter</binding>
+                                    <type>org.dan.ping.pong.app.table.TableState</type>
+                                    <binding>org.dan.ping.pong.app.table.TableStateConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>UserType</name>
-                                    <type>org.dan.ping.pong.app.server.user.UserType</type>
-                                    <binding>org.dan.ping.pong.app.server.user.UserTypeConverter</binding>
+                                    <type>org.dan.ping.pong.app.user.UserType</type>
+                                    <binding>org.dan.ping.pong.app.user.UserTypeConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>BidState</name>
-                                    <type>org.dan.ping.pong.app.server.bid.BidState</type>
-                                    <binding>org.dan.ping.pong.app.server.bid.BidStateConverter</binding>
+                                    <type>org.dan.ping.pong.app.bid.BidState</type>
+                                    <binding>org.dan.ping.pong.app.bid.BidStateConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>TournamentState</name>
-                                    <type>org.dan.ping.pong.app.server.tournament.TournamentState</type>
-                                    <binding>org.dan.ping.pong.app.server.tournament.TournamentStateConverter</binding>
+                                    <type>org.dan.ping.pong.app.tournament.TournamentState</type>
+                                    <binding>org.dan.ping.pong.app.tournament.TournamentStateConverter</binding>
                                 </customType>
                             </customTypes>
                             <forcedTypes>

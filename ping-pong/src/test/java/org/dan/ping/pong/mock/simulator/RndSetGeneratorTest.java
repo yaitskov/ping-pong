@@ -1,6 +1,6 @@
 package org.dan.ping.pong.mock.simulator;
 
-import static org.dan.ping.pong.app.server.tournament.MatchValidationRuleUnitTest.PING_PONG_RULE;
+import static org.dan.ping.pong.app.tournament.MatchValidationRuleUnitTest.PING_PONG_RULE;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.W30;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;

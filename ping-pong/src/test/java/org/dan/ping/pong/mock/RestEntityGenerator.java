@@ -2,20 +2,20 @@ package org.dan.ping.pong.mock;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static org.dan.ping.pong.app.server.auth.AuthResource.AUTH_GENERATE_SIGN_IN_LINK;
-import static org.dan.ping.pong.app.server.bid.BidResource.BID_PAID;
-import static org.dan.ping.pong.app.server.bid.BidResource.BID_READY_TO_PLAY;
-import static org.dan.ping.pong.app.server.castinglots.CastingLotsResource.CASTING_LOTS;
-import static org.dan.ping.pong.app.server.match.MatchResource.COMPLETE_MATCHES;
-import static org.dan.ping.pong.app.server.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
-import static org.dan.ping.pong.app.server.tournament.TournamentResource.BEGIN_TOURNAMENT;
-import static org.dan.ping.pong.app.server.tournament.TournamentResource.TOURNAMENT_ENLIST;
+import static org.dan.ping.pong.app.auth.AuthResource.AUTH_GENERATE_SIGN_IN_LINK;
+import static org.dan.ping.pong.app.bid.BidResource.BID_PAID;
+import static org.dan.ping.pong.app.bid.BidResource.BID_READY_TO_PLAY;
+import static org.dan.ping.pong.app.castinglots.CastingLotsResource.CASTING_LOTS;
+import static org.dan.ping.pong.app.match.MatchResource.COMPLETE_MATCHES;
+import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
+import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST;
 
-import org.dan.ping.pong.app.server.bid.BidId;
-import org.dan.ping.pong.app.server.castinglots.DoCastingLots;
-import org.dan.ping.pong.app.server.match.CompleteMatch;
-import org.dan.ping.pong.app.server.match.OpenMatchForJudge;
-import org.dan.ping.pong.app.server.tournament.EnlistTournament;
+import org.dan.ping.pong.app.bid.BidId;
+import org.dan.ping.pong.app.castinglots.DoCastingLots;
+import org.dan.ping.pong.app.match.CompleteMatch;
+import org.dan.ping.pong.app.match.OpenMatchForJudge;
+import org.dan.ping.pong.app.tournament.EnlistTournament;
 import org.dan.ping.pong.mock.simulator.EnlistMode;
 import org.dan.ping.pong.mock.simulator.ProvidedRank;
 

@@ -1,8 +1,8 @@
 package org.dan.ping.pong.simulate;
 
-import static org.dan.ping.pong.app.server.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
-import static org.dan.ping.pong.app.server.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
-import static org.dan.ping.pong.app.server.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
 import static org.dan.ping.pong.mock.simulator.AutoResolution.RANDOM;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Hook.BeforeScore;

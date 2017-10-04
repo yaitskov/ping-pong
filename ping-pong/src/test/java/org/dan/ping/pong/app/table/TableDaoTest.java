@@ -25,7 +25,7 @@ import javax.inject.Inject;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {PropertiesContext.class, DbContext.class,
         PlaceDao.class, CityDao.class, CountryDao.class,
-        UserDao.class, TableDao.class, TestTableDao.class})
+        UserDao.class, TableDaoServer.class, TestTableDao.class})
 public class TableDaoTest {
     private static final int NUMBER_OF_NEW_TABLES = 10;
     @Inject

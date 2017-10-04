@@ -4,22 +4,20 @@ import static com.google.common.primitives.Ints.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
-import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static ord.dan.ping.pong.jooq.tables.Tables.TABLES;
+import static org.dan.ping.pong.app.table.TableState.Busy;
+import static org.dan.ping.pong.app.table.TableState.Free;
+import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.JUST_A_ROW;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
-import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
-import static org.dan.ping.pong.app.table.TableState.Busy;
-import static org.dan.ping.pong.app.table.TableState.Free;
 
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.Tables;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.sys.db.DbUpdateSql;
 import org.dan.ping.pong.sys.db.DbUpdater;
-import org.dan.ping.pong.sys.db.DbUpdaterSql;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,10 +31,11 @@ import java.util.stream.IntStream;
 import javax.inject.Inject;
 
 @Slf4j
-public class TableDao {
+public class TableDaoServer implements TableDao {
     @Inject
     private DSLContext jooq;
 
+    @Override
     @Transactional(TRANSACTION_MANAGER)
     public void createTables(int pid, int numberOfNewTables) {
         log.info("Add {} tables to place {}", numberOfNewTables, pid);
@@ -62,6 +61,7 @@ public class TableDao {
                 .execute()));
     }
 
+    @Override
     public void locateMatch(TableInfo tableInfo, int mid, DbUpdater batch) {
         tableInfo.setState(Busy);
         tableInfo.setMid(Optional.of(mid));
@@ -79,6 +79,7 @@ public class TableDao {
                 .build());
     }
 
+    @Override
     @Transactional(TRANSACTION_MANAGER)
     public void freeTable(int tableId, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
@@ -93,6 +94,7 @@ public class TableDao {
                 .build());
     }
 
+    @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<TableStatedLink> findByPlaceId(int placeId) {
         return jooq.select(TABLES.TABLE_ID, TABLES.LABEL, TABLES.STATE)
@@ -107,6 +109,7 @@ public class TableDao {
                         .build());
     }
 
+    @Override
     public void setStatus(SetTableState update, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(JUST_A_ROW)
@@ -118,6 +121,7 @@ public class TableDao {
                 .build());
     }
 
+    @Override
     public Map<Integer, TableInfo> load(Pid pid) {
         return jooq.select().from(TABLES)
                 .where(TABLES.PID.eq(pid.getPid()))

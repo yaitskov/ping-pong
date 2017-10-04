@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.records.BidRecord;
 import org.dan.ping.pong.app.castinglots.rank.OrderDirection;
 import org.dan.ping.pong.app.group.GroupSchedule;
-import org.dan.ping.pong.app.match.MatchDao;
+import org.dan.ping.pong.app.match.MatchDaoServer;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.playoff.PlayOffRule;
@@ -46,7 +46,7 @@ public class CastingLotsDao {
     private DSLContext jooq;
 
     @Inject
-    private MatchDao matchDao;
+    private MatchDaoServer matchDao;
 
     private List<Integer> pickSchedule(OpenTournamentMemState tournament,
             List<ParticipantMemState> groupBids) {

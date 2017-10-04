@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.dan.ping.pong.app.match.ForTestBidDao;
 import org.dan.ping.pong.app.match.ForTestMatchDao;
-import org.dan.ping.pong.app.match.MatchDao;
+import org.dan.ping.pong.app.match.MatchDaoServer;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.dan.ping.pong.mock.MyRest;
 import org.dan.ping.pong.mock.simulator.Simulator;
@@ -20,7 +20,7 @@ import java.net.URI;
 
 import javax.ws.rs.client.Client;
 
-@Import({BaseContextWithoutJersey.class, MatchDao.class,
+@Import({BaseContextWithoutJersey.class, MatchDaoServer.class,
         MatchScoreDao.class, ForTestMatchDao.class,
         ForTestBidDao.class, Simulator.class})
 public class SimulationCtx {

@@ -64,6 +64,7 @@ public class PlayOffGenerator {
                     2, 127, 63, 66, 31, 98, 34, 95,
                     15, 114, 50, 79, 18, 111, 47, 82))
             .build();
+    private static final int FIRST_PLAY_OFF_MATCH_LEVEL = 1;
 
     private final OpenTournamentMemState tournament;
     private final int cid;
@@ -72,7 +73,7 @@ public class PlayOffGenerator {
 
     public Optional<Integer> generateTree(int level, Optional<Integer> parentMid,
             int priority, TypeChain types, Optional<Integer> loserMid) {
-        if (level < MatchDao.FIRST_PLAY_OFF_MATCH_LEVEL) {
+        if (level < FIRST_PLAY_OFF_MATCH_LEVEL) {
             return Optional.empty();
         }
         final Optional<Integer> omid = createMatch(parentMid, loserMid, priority, level, types.getType());

@@ -46,13 +46,13 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 @Slf4j
-public class MatchDao {
+public class MatchDaoServer implements MatchDao {
     private static final Users ENEMY_USER = USERS.as("enemy_user");
-    public static final int FIRST_PLAY_OFF_MATCH_LEVEL = 1;
 
     @Inject
     private DSLContext jooq;
 
+    @Override
     public int createGroupMatch(int tid, int gid, int cid, int priorityGroup, int uid1, int uid2) {
         log.info("Create a match in group {} of tournament {}", gid, tid);
         return jooq.insertInto(MATCHES, MATCHES.TID,
@@ -65,6 +65,7 @@ public class MatchDao {
                 .getMid();
     }
 
+    @Override
     @Transactional(TRANSACTION_MANAGER)
     public int createPlayOffMatch(int tid, Integer cid,
             Optional<Integer> winMid, Optional<Integer> loseMid,
@@ -78,6 +79,7 @@ public class MatchDao {
                 .getMid();
     }
 
+    @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<OpenMatchForJudge> findOpenMatchesFurJudge(int adminUid) {
         return jooq.select(MATCHES.MID, MATCHES.TID, MATCHES.STARTED,
@@ -121,6 +123,7 @@ public class MatchDao {
                         .build());
     }
 
+    @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<MyPendingMatch> findPendingMatches(int uid) {
         return jooq.select(MATCHES.MID, MATCHES.TID, TABLES.TABLE_ID,
@@ -175,6 +178,7 @@ public class MatchDao {
         return empty();
     }
 
+    @Override
     public void changeStatus(int mid, MatchState state, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(NON_ZERO_ROWS)
@@ -185,6 +189,7 @@ public class MatchDao {
                 .build());
     }
 
+    @Override
     public Optional<Integer> scoreSet(OpenTournamentMemState tournament, MatchInfo matchInfo,
             DbUpdater batch, FinalMatchScore matchScore) {
         final Optional<Integer> winUidO = matchInfo.addSetScore(
@@ -193,6 +198,7 @@ public class MatchDao {
         return winUidO;
     }
 
+    @Override
     public void completeMatch(int mid, int winUid, Instant now, DbUpdater batch, MatchState... expected) {
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(JUST_A_ROW)
@@ -215,6 +221,7 @@ public class MatchDao {
                         .build()));
     }
 
+    @Override
     public void markAsSchedule(MatchInfo match, DbUpdater batch) {
         batch.exec(
                 DbUpdateSql.builder()
@@ -230,6 +237,7 @@ public class MatchDao {
                         .build());
     }
 
+    @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<CompleteMatch> findCompleteMatches(Integer tid) {
         return jooq
@@ -264,6 +272,7 @@ public class MatchDao {
                         .build());
     }
 
+    @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<UserLink> findWinners(int tid) {
         return jooq.select(USERS.NAME, BID.UID)
@@ -279,6 +288,7 @@ public class MatchDao {
                         .build());
     }
 
+    @Override
     public void deleteAllByTid(OpenTournamentMemState tournament, DbUpdater batch, int size) {
         batch
                 .exec(DbUpdateSql.builder()
@@ -293,6 +303,7 @@ public class MatchDao {
                         .build());
     }
 
+    @Override
     public void setParticipant(int n, int mid, int uid, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(NON_ZERO_ROWS)
@@ -304,6 +315,7 @@ public class MatchDao {
                 .build());
     }
 
+    @Override
     public List<MatchInfo> load(Tid tid) {
         return jooq.select(MATCHES.MID, MATCHES.GID, MATCHES.CID,
                 MATCHES.WIN_MID, MATCHES.LOSE_MID, MATCHES.PRIORITY,
@@ -336,6 +348,7 @@ public class MatchDao {
                 });
     }
 
+    @Override
     public void deleteSets(DbUpdater batch, MatchInfo minfo, int setNumber) {
         minfo.getParticipantIdScore().keySet().forEach(uid -> {
             batch.exec(DbUpdateSql.builder()
@@ -352,6 +365,7 @@ public class MatchDao {
         });
     }
 
+    @Override
     public void removeSecondParticipant(DbUpdater batch, int mid, int uidKeep) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(MATCHES)
@@ -361,6 +375,7 @@ public class MatchDao {
                 .build());
     }
 
+    @Override
     public void removeParticipants(DbUpdater batch, int mid) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(MATCHES)
@@ -370,6 +385,7 @@ public class MatchDao {
                 .build());
     }
 
+    @Override
     public void removeScores(DbUpdater batch, int mid, int uid) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.deleteFrom(SET_SCORE)

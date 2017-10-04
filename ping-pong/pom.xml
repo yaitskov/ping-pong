@@ -18,9 +18,7 @@
         <jooq.version>3.8.4</jooq.version>
         <aspectj.version>1.8.8</aspectj.version>
         <jersey.version>2.22.2</jersey.version>
-        <logback.version>1.2.1</logback.version>
         <mysql-connector-java.version>5.1.38</mysql-connector-java.version>
-        <slf4j.version>1.7.21</slf4j.version>
         <restassured.version>3.0.1</restassured.version>
         <spring.version>4.3.2.RELEASE</spring.version>
         <http.port>8080</http.port>

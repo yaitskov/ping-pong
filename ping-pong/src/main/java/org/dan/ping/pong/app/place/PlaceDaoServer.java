@@ -29,13 +29,14 @@ import java.util.Set;
 import javax.inject.Inject;
 
 @Slf4j
-public class PlaceDao {
-    public static final String AUTHOR = "author";
+public class PlaceDaoServer implements PlaceDao {
+    private static final String AUTHOR = "author";
     private static final String TBL_COUNT = "tbl-count";
 
     @Inject
     private DSLContext jooq;
 
+    @Override
     @Transactional(TRANSACTION_MANAGER)
     public int create(String name, PlaceAddress address) {
         try {
@@ -58,6 +59,7 @@ public class PlaceDao {
         }
     }
 
+    @Override
     @Transactional(TRANSACTION_MANAGER)
     public int createAndGrant(int author, String name, PlaceAddress address) {
         final int pid = create(name, address);
@@ -68,6 +70,7 @@ public class PlaceDao {
         return pid;
     }
 
+    @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<PlaceLink> findEditableByUid(int uid) {
         return jooq
@@ -94,6 +97,7 @@ public class PlaceDao {
                 .collect(toList());
     }
 
+    @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public Optional<PlaceInfoCountTables> getPlaceById(int pid) {
         return ofNullable(
@@ -126,6 +130,7 @@ public class PlaceDao {
                         .build());
     }
 
+    @Override
     @Transactional(TRANSACTION_MANAGER)
     public void update(int uid, PlaceLink place) {
         log.info("User {} updates place {}", uid, place.getPid());
@@ -149,6 +154,7 @@ public class PlaceDao {
                 .collect(toSet());
     }
 
+    @Override
     public Optional<PlaceMemState> load(Pid pid) {
         return ofNullable(jooq.select(PLACE.NAME, PLACE.HOSTING_TID)
                 .from(PLACE)
@@ -162,6 +168,7 @@ public class PlaceDao {
                         .build());
     }
 
+    @Override
     public void setHostingTid(PlaceMemState place, DbUpdater batch) {
         batch.exec(
                 DbUpdateSql

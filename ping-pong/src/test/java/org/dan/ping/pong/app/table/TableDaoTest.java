@@ -10,6 +10,7 @@ import org.dan.ping.pong.app.country.CountryDao;
 import org.dan.ping.pong.app.country.NewCountry;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
+import org.dan.ping.pong.app.place.PlaceDaoServer;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserRegRequest;
 import org.dan.ping.pong.app.user.UserType;
@@ -24,7 +25,7 @@ import javax.inject.Inject;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {PropertiesContext.class, DbContext.class,
-        PlaceDao.class, CityDao.class, CountryDao.class,
+        PlaceDaoServer.class, CityDao.class, CountryDao.class,
         UserDao.class, TableDaoServer.class, TestTableDao.class})
 public class TableDaoTest {
     private static final int NUMBER_OF_NEW_TABLES = 10;

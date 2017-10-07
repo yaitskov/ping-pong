@@ -22,7 +22,6 @@ import static org.dan.ping.pong.app.tournament.DbUpdate.JUST_A_ROW;
 import static org.dan.ping.pong.app.tournament.DbUpdate.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
-import static org.springframework.transaction.annotation.Isolation.READ_UNCOMMITTED;
 
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.Users;
@@ -35,7 +34,6 @@ import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
 import org.jooq.Record11;
-import org.jooq.impl.DSL;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -308,7 +306,8 @@ public class MatchDao {
         return jooq.select(MATCHES.MID, MATCHES.GID, MATCHES.CID,
                 MATCHES.WIN_MID, MATCHES.LOSE_MID, MATCHES.PRIORITY,
                 MATCHES.STATE, MATCHES.TYPE, MATCHES.ENDED,
-                MATCHES.UID_LESS, MATCHES.UID_MORE, MATCHES.UID_WIN)
+                MATCHES.UID_LESS, MATCHES.UID_MORE, MATCHES.UID_WIN,
+                MATCHES.STARTED)
                 .from(MATCHES)
                 .where(MATCHES.TID.eq(tid.getTid()))
                 .fetch()
@@ -330,6 +329,7 @@ public class MatchDao {
                             .priority(r.get(MATCHES.PRIORITY))
                             .winnerMid(r.get(MATCHES.WIN_MID))
                             .winnerId(r.get(MATCHES.UID_WIN))
+                            .startedAt(r.get(MATCHES.STARTED))
                             .participantIdScore(uids)
                             .tid(tid.getTid())
                             .build();

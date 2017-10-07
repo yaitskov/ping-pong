@@ -1,10 +1,8 @@
 package org.dan.ping.pong.app.match;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -48,6 +46,7 @@ public class MatchInfo {
         Optional<Integer> loserMid = Optional.empty();
         Optional<Integer> winnerMid = Optional.empty();
         Optional<Integer> winnerId = Optional.empty();
+        Optional<Instant> startedAt = Optional.empty();
     }
 
     public String toString() {

@@ -31,7 +31,7 @@ public class MatchResource {
     public static final String OPEN_MATCHES_FOR_JUDGE = "/match/judge/list/open";
     public static final String COMPLETE_MATCHES = "/match/list/completed/";
     public static final String SCORE_SET = "/match/participant/score";
-    public static final String MATCH_WATCH_LIST_OPEN = "/match/watch/list/open";
+    public static final String MATCH_WATCH_LIST_OPEN = "/match/watch/list/open/";
     public static final String MATCH_RESET_SET_SCORE = "/match/reset-set-score";
 
     @Inject
@@ -115,7 +115,7 @@ public class MatchResource {
     }
 
     @GET
-    @Path(MATCH_WATCH_LIST_OPEN + "/{tid}")
+    @Path(MATCH_WATCH_LIST_OPEN + "{tid}")
     public void findOpenMatchesForWatching(
             @Suspended AsyncResponse response,
             @PathParam("tid") Tid tid) {

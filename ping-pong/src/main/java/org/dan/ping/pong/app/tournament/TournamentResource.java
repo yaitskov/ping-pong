@@ -6,9 +6,11 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Want;
+import static org.dan.ping.pong.app.tournament.TournamentCacheFactory.TOURNAMENT_CACHE;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ import org.dan.ping.pong.sys.error.ValidationErrors;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -49,6 +52,7 @@ public class TournamentResource {
     public static final String GET_TOURNAMENT_RULES = TOURNAMENT_RULES + "/{tid}";
     public static final String EDITABLE_TOURNAMENTS = TOURNAMENT + "editable/by/me";
     public static final String TOURNAMENT_CREATE = TOURNAMENT + "create";
+    public static final String TOURNAMENT_INVALIDATE_CACHE = TOURNAMENT + "invalidate/cache";
     public static final String TOURNAMENT_COPY = TOURNAMENT + "copy";
     public static final String TOURNAMENT_ENLIST = TOURNAMENT + "enlist";
     public static final String TOURNAMENT_ENLIST_OFFLINE = TOURNAMENT + "enlist-offline";
@@ -138,6 +142,26 @@ public class TournamentResource {
         final UserInfo user = authService.userInfoBySession(session);
         tournamentAccessor.update(new Tid(enlistment.getTid()), response, (tournament, batch) -> {
             tournamentService.enlistOnline(enlistment, tournament, user, batch);
+        });
+    }
+
+    @Inject
+    @Named(TOURNAMENT_CACHE)
+    private LoadingCache<Tid, OpenTournamentMemState> tournamentCache;
+
+    @POST
+    @Path(TOURNAMENT_INVALIDATE_CACHE)
+    @Consumes(APPLICATION_JSON)
+    public void invalidateCache(
+            @Suspended AsyncResponse response,
+            @HeaderParam(SESSION) String session,
+            int tid) {
+
+        final int adminUid = authService.userInfoBySession(session).getUid();
+        tournamentAccessor.update(new Tid(tid), response, (tournament, batch) -> {
+            tournament.checkAdmin(adminUid);
+            log.info("invalidate tournament cache {}", tid);
+            tournamentCache.invalidate(new Tid(tid));
         });
     }
 

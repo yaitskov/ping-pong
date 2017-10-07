@@ -251,7 +251,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 .ignoreUnexpectedGames();
 
         simulator.simulate(scenario);
-        List<OpenMatchForWatch> result = rest.get(MATCH_WATCH_LIST_OPEN + "/" + scenario.getTid(),
+        List<OpenMatchForWatch> result = rest.get(MATCH_WATCH_LIST_OPEN + scenario.getTid(),
                 new GenericType<List<OpenMatchForWatch>>() {});
         assertThat(result, hasItem(allOf(
                 hasProperty("mid", greaterThan(0)),

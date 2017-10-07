@@ -6,6 +6,7 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import com.google.common.cache.CacheLoader;
+import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryInfo;
@@ -21,6 +22,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 
+@Slf4j
 public class TournamentCacheLoader extends CacheLoader<Tid, OpenTournamentMemState> {
     @Inject
     private TournamentDao tournamentDao;
@@ -43,6 +45,7 @@ public class TournamentCacheLoader extends CacheLoader<Tid, OpenTournamentMemSta
     @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public OpenTournamentMemState load(Tid tid) throws Exception {
+        log.info("Loading tournament {}", tid);
         final TournamentRow row = tournamentDao.getRow(tid).orElseThrow(() -> notFound("tournament " + tid));
         return OpenTournamentMemState.builder()
                 .participants(bidDao.loadParticipants(tid))

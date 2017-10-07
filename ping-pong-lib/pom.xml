@@ -10,9 +10,8 @@
     </parent>
     <artifactId>ping-pong-lib</artifactId>
     <packaging>jar</packaging>
-    <name>ping-pong-lib</name>
     <description>Cross platform part of the ournament engine translatable to java-script</description>
-    <url>http://maven.apache.org</url>
+    <url>http://cloud-sport.org</url>
 
     <dependencies>
         <dependency>

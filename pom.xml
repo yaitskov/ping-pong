@@ -32,6 +32,7 @@
         <module>setup-env</module>
         <module>ping-pong-lib</module>
         <module>ping-pong</module>
+        <module>ping-pong-mobile</module>
         <module>ui</module>
         <module>docker-image</module>
     </modules>

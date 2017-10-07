@@ -20,7 +20,6 @@ import org.jooq.DSLContext;
 import org.jooq.UpdateSetMoreStep;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.quartz.simpl.HostnameInstanceIdGenerator;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -108,8 +107,6 @@ public class PlaceDao {
                                         .asField(TBL_COUNT))
                         .from(PLACE)
                         .innerJoin(CITY).on(PLACE.CITY_ID.eq(CITY.CITY_ID))
-                        .leftJoin(TABLES)
-                        .on(PLACE.PID.eq(TABLES.PID))
                         .where(PLACE.PID.eq(pid))
                         .fetchOne())
                 .map(r -> PlaceInfoCountTables.builder()

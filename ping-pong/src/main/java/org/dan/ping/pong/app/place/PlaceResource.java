@@ -22,6 +22,7 @@ import javax.ws.rs.Produces;
 public class PlaceResource {
     static final String PLACE_CREATE = "/place/create";
     static final String PLACES = "/places";
+    public static final String PLACE_INFO = "/place/";
 
     @Inject
     private PlaceDao placeDao;
@@ -46,7 +47,7 @@ public class PlaceResource {
     }
 
     @GET
-    @Path("/place/{pid}")
+    @Path(PLACE_INFO + "{pid}")
     @Produces(APPLICATION_JSON)
     public PlaceInfoCountTables getPlaceById(@PathParam("pid") int pid) {
         return placeDao.getPlaceById(pid)

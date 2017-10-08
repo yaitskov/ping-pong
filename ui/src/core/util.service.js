@@ -162,7 +162,7 @@ angular.
     }]).
     factory('binder', ['$rootScope', function ($rootScope) {
         return ($scope, listenerMap) => {
-            let cleaners = [];
+            var cleaners = [];
             for (var topic in listenerMap) {
                     cleaners.push($rootScope.$on(topic, listenerMap[topic]));
             }

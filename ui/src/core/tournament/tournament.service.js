@@ -44,11 +44,6 @@ angular.
                                        },
                                        isArray: true
                                    },
-                                   // info: {
-                                   //     url: '/api/tournament/:tournamentId',
-                                   //     method: 'GET',
-                                   //     cache: false
-                                   // },
                                    enlistOffline: {
                                        url: '/api/tournament/enlist-offline',
                                        method: 'POST',

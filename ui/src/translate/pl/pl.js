@@ -42,5 +42,5 @@ module.exports = merge.apply(
      require('./my-match-play-list.js'),
      require('./match-state-description.js'),
      require('./my-match-judge-list.js'),
-     require('./complete-match.js'),
+     require('./pl.complete-match.js'),
      require('./complete-my-match.js')]);

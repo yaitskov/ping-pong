@@ -5,20 +5,21 @@
       <div class="alert alert-info" translate="match-is-complete-info"/>
     </div>
     <div class="form-group">
-      <table>
+      <table class="table">
         <tr>
           <td>Sets</td>
           <td ng-repeat="participant in $ctrl.participants">
             {{participant.name | compactName}}
           </td>
         </tr>
-        <tr ng-repeat="set in $ctrl.sets()"
-            ng-class="{'won-set': $ctrl.isWon(set), 'lost-set': !$ctrl.isWon(set)}">
+        <tr ng-repeat="set in $ctrl.sets">
           <td>{{$index + 1}}</td>
-          <td>
+          <td class="alert"
+              ng-class="{'alert-success': set.a > set.b, 'alert-danger': set.a < set.b}">
             {{set.a}}
           </td>
-          <td>
+          <td class="alert"
+              ng-class="{'alert-success': set.a < set.b, 'alert-danger': set.a > set.b}">
             {{set.b}}
           </td>
         </tr>

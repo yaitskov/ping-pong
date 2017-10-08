@@ -28,7 +28,7 @@
           <td class="alert" ng-class="{'alert-success': $ctrl.participants[0].uid == $ctrl.matchScore.winUid, 'alert-danger': $ctrl.participants[1].uid == $ctrl.matchScore.winUid}">
             {{$ctrl.matchScore.wonSets[$ctrl.participants[0].uid]}}
           </td>
-          <td class="alert" ng-class="{'alert-success': $ctrl.participants[1].uid == $ctrl.matchScore.winUid, 'alert-danger': $ctrl.participants[0].uid == $ctrl.matchScore.winUid}"
+          <td class="alert" ng-class="{'alert-success': $ctrl.participants[1].uid == $ctrl.matchScore.winUid, 'alert-danger': $ctrl.participants[0].uid == $ctrl.matchScore.winUid}">
             {{$ctrl.matchScore.wonSets[$ctrl.participants[1].uid]}}
           </td>
         </tr>

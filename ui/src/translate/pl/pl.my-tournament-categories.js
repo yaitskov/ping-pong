@@ -1,5 +1,6 @@
 module.exports = {
-        // my-tournament-categories
+    'tournament has no categories': 'Turniej nie ma kategorii',
+    'add category btn': 'Dodać kategorię',
     'Begin Draft': 'Zacząć rekrutację',
     'No categories': 'Nie ma katorii',
     'Category Name': 'Nazwa katorii',

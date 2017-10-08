@@ -12,6 +12,7 @@ import static org.dan.ping.pong.mock.simulator.MatchOutcome.W10;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.W30;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.W31;
 import static org.dan.ping.pong.mock.simulator.MatchOutcome.W32;
+import static org.junit.Assert.assertNull;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
@@ -261,5 +262,12 @@ public class TournamentScenario implements SessionAware {
     public TournamentScenario doNotBegin() {
         begin = false;
         return this;
+    }
+
+    public void addPlayer(int uid, Player player) {
+        assertNull(getUidPlayer().put(uid, player));
+        playersSessions.put(player, TestUserSession.builder()
+                .uid(uid)
+                .build());
     }
 }

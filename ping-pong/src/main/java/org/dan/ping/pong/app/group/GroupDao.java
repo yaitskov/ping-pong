@@ -7,7 +7,6 @@ import static org.dan.ping.pong.app.castinglots.GroupState.Open;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.sys.db.DbUpdateSql;
 import org.dan.ping.pong.sys.db.DbUpdater;
-import org.dan.ping.pong.sys.db.DbUpdaterSql;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.jooq.DSLContext;
 

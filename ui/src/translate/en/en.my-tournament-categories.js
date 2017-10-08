@@ -1,5 +1,6 @@
 module.exports = {
-        // my tournament categories
+    'tournament has no categories': 'Tournament has no a category',
+    'add category btn': 'Add category',
     'Begin Draft': 'Begin Draft',
     'No categories': 'No categories',
     'Category Name': 'Category Name',

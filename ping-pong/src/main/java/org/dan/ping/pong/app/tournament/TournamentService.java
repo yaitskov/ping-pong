@@ -1,11 +1,14 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.time.temporal.ChronoUnit.DAYS;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
+import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
+import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
@@ -77,6 +80,7 @@ public class TournamentService {
     public static final String UNKNOWN_PLACE = "unknown place";
     public static final String TID = "tid";
     public static final String PLACE_IS_BUSY = "place-is-busy";
+    private static final List<BidState> VALID_ENLIST_BID_STATES = asList(Want, Paid, Here);
 
     @Inject
     private TournamentDao tournamentDao;
@@ -92,11 +96,40 @@ public class TournamentService {
         return tournamentDao.create(uid, newTournament);
     }
 
-    private void validateEnlist(OpenTournamentMemState tournament, Enlist enlist) {
+    private void validateEnlistOnline(OpenTournamentMemState tournament, Enlist enlist) {
         if (tournament.getState() != Draft) {
-            throw badRequest("Tournament is not in Draft but "
-                    + tournament.getState());
+            throw notDraftError(tournament);
         }
+        validateEnlist(tournament, enlist);
+    }
+
+    private void validateEnlistOffline(OpenTournamentMemState tournament, EnlistOffline enlist) {
+        if (tournament.getState() == Draft) {
+            if (!VALID_ENLIST_BID_STATES.contains(enlist.getBidState())) {
+                throw badRequest("Bid state could be " + VALID_ENLIST_BID_STATES);
+            }
+            enlist.getGroupId().ifPresent(gid -> { throw badRequest("group is not expected"); });
+        } else if (tournament.getState() == Open) {
+            if (enlist.getBidState() != Wait) {
+                throw badRequest("Bid state should be Wait");
+            }
+            int gid = enlist.getGroupId().orElseThrow(() -> badRequest("group is no set"));
+            if (!groupService.isNotCompleteGroup(tournament, gid)) {
+                throw badRequest("group is complete");
+            }
+        } else {
+            throw notDraftError(tournament);
+        }
+        validateEnlist(tournament, enlist);
+    }
+
+    private PiPoEx notDraftError(OpenTournamentMemState tournament) {
+        return badRequest("tournament-not-in-draft",
+                ImmutableMap.of(STATE, tournament.getState(),
+                        TID, tournament.getTid()));
+    }
+
+    private void validateEnlist(OpenTournamentMemState tournament, Enlist enlist) {
         tournament.checkCategory(enlist.getCid());
         final CastingLotsRule casting = tournament.getRule().getCasting();
         if (casting.getPolicy() == ParticipantRankingPolicy.ProvidedRating) {
@@ -113,7 +146,7 @@ public class TournamentService {
 
     public void enlistOnline(EnlistTournament enlistment,
             OpenTournamentMemState tournament, UserInfo user, DbUpdater batch) {
-        validateEnlist(tournament, enlistment);
+        validateEnlistOnline(tournament, enlistment);
         log.info("Uid {} enlists to tid {} in cid {}",
                 user.getUid(), tournament.getTid(), enlistment.getCategoryId());
         int uid = user.getUid();
@@ -155,9 +188,7 @@ public class TournamentService {
 
     public void begin(OpenTournamentMemState tournament, DbUpdater batch) {
         if (tournament.getState() != TournamentState.Draft) {
-            throw badRequest("tournament-not-in-draft",
-                    ImmutableMap.of(TID, tournament.getTid(),
-                            STATE, tournament.getState()));
+            throw notDraftError(tournament);
         }
         castingLotsService.seed(tournament);
         tournament.setState(TournamentState.Open);
@@ -437,7 +468,7 @@ public class TournamentService {
 
     public int enlistOffline(OpenTournamentMemState tournament,
             EnlistOffline enlistment, DbUpdater batch) {
-        validateEnlist(tournament, enlistment);
+        validateEnlistOffline(tournament, enlistment);
         final int participantUid = userDao.register(UserRegRequest.builder()
                 .name(enlistment.getName())
                 .build());
@@ -446,9 +477,15 @@ public class TournamentService {
                 .name(enlistment.getName())
                 .cid(enlistment.getCid())
                 .uid(new Uid(participantUid))
+                .gid(enlistment.getGroupId())
                 .tid(new Tid(tournament.getTid()))
                 .build());
         enlist(tournament, participantUid, enlistment.getProvidedRank(), batch);
+
+        if (tournament.getState() == Open) {
+            enlistment.getGroupId().ifPresent(gid ->
+                    castingLotsService.addParticipant(participantUid, tournament));
+        }
         return participantUid;
     }
 

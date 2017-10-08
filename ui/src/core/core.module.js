@@ -15,6 +15,7 @@ import localStorageModule from './local-storage/local-storage.module.js';
 import localStorageService from './local-storage/local-storage.service.js';
 
 import groupModule from './group/group.module.js';
+import './group/group.service.js';
 import groupScheduleService from './group/group.schedule.service.js';
 
 import placeModule from './place/place.module.js';

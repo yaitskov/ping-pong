@@ -11,6 +11,7 @@ import org.dan.ping.pong.app.castinglots.CastingLotsResource;
 import org.dan.ping.pong.app.category.CategoryResource;
 import org.dan.ping.pong.app.city.CityResource;
 import org.dan.ping.pong.app.country.CountryResource;
+import org.dan.ping.pong.app.group.GroupResource;
 import org.dan.ping.pong.sys.error.JerseyExceptionMapper;
 import org.dan.ping.pong.sys.error.JooqExceptionMapper;
 import org.dan.ping.pong.sys.error.PiPoExMapper;
@@ -42,6 +43,7 @@ public class JerseyConfig extends ResourceConfig {
         packages(false,
                 asList(UserResource.class, SysAdminSignInResource.class,
                         PlaceResource.class, TournamentResource.class,
+                        GroupResource.class,
                         BidResource.class, CategoryResource.class,
                         MatchResource.class, AuthResource.class,
                         CountryResource.class, CityResource.class,

@@ -4,14 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Setter;
+
+import java.util.List;
 
 @Getter
+@Setter
 @Builder
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupLink {
-    private int gid;
-    private String label;
+public class GroupPopulations {
+    private List<GroupLink> links;
+    private List<Long> populations;
 }

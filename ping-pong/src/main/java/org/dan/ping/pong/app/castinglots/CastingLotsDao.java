@@ -67,24 +67,29 @@ public class CastingLotsDao {
             final int bidIdxB = schedule.get(i++);
             final ParticipantMemState bid1 = groupBids.get(bidIdxA);
             final ParticipantMemState bid2 = groupBids.get(bidIdxB);
-            final int mid = matchDao.createGroupMatch(tid,
-                    gid, bid1.getCid(), ++priorityGroup,
-                    bid1.getUid().getId(), bid2.getUid().getId());
-            tournament.getMatches().put(mid, MatchInfo.builder()
-                    .tid(tid)
-                    .mid(mid)
-                    .priority(priorityGroup)
-                    .state(MatchState.Place)
-                    .gid(Optional.of(gid))
-                    .participantIdScore(ImmutableMap.of(
-                            bid1.getUid().getId(), new ArrayList<>(),
-                            bid2.getUid().getId(), new ArrayList<>()))
-                    .type(Grup)
-                    .cid(tournament.getGroups().get(gid).getCid())
-                    .build());
-            log.info("New match {} between {} and {}", mid,
-                    bid1.getUid(), bid2.getUid());
+            priorityGroup = addGroupMatch(tournament, priorityGroup, bid1, bid2);
         }
+        return priorityGroup;
+    }
+
+    public int addGroupMatch(OpenTournamentMemState tournament, int priorityGroup,
+            ParticipantMemState bid1, ParticipantMemState bid2) {
+        final int mid = matchDao.createGroupMatch(bid1.getTid().getTid(),
+                bid1.getGid().get(), bid1.getCid(), ++priorityGroup,
+                bid1.getUid().getId(), bid2.getUid().getId());
+        tournament.getMatches().put(mid, MatchInfo.builder()
+                .tid(bid1.getTid().getTid())
+                .mid(mid)
+                .priority(priorityGroup)
+                .state(MatchState.Place)
+                .gid(bid1.getGid())
+                .participantIdScore(ImmutableMap.of(
+                        bid1.getUid().getId(), new ArrayList<>(),
+                        bid2.getUid().getId(), new ArrayList<>()))
+                .type(Grup)
+                .cid(bid1.getCid())
+                .build());
+        log.info("New match {} between {} and {}", mid, bid1.getUid(), bid2.getUid());
         return priorityGroup;
     }
 

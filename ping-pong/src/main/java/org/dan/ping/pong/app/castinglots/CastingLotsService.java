@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -170,6 +171,7 @@ public class CastingLotsService {
             final int gid = groupDao.createGroup(tid, cid, groupLabel, quits, groupIdx);
             tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
                     .ordNumber(groupIdx).label(groupLabel).build());
+            orderedBids.forEach(bid -> bid.setGid(Optional.of(gid)));
             castingLotsDao.generateGroupMatches(tournament, gid, orderedBids, groupIdx);
             bidDao.setGroupForUids(gid, tid, orderedBids);
         });
@@ -194,6 +196,7 @@ public class CastingLotsService {
                 if (groupBids.size() <= quits) {
                     throw badRequest("Category should have more participants than quits from a group");
                 }
+                groupBids.forEach(bid -> bid.setGid(Optional.of(gid)));
                 basePlayOffPriority = Math.max(
                         castingLotsDao.generateGroupMatches(tournament, gid, groupBids, 0),
                         basePlayOffPriority);
@@ -234,5 +237,18 @@ public class CastingLotsService {
 
     public List<RankedBid> loadManualBidsOrder(int tid, int cid) {
         return castingLotsDao.loadManualBidsOrder(tid, cid);
+    }
+
+    public void addParticipant(int uid, OpenTournamentMemState tournament) {
+        final ParticipantMemState participant = tournament.getParticipant(uid);
+        log.info("Add participant {} to group", uid, participant.getGid());
+        int[] priority = new int[1];
+        tournament.getParticipants().values().stream()
+                .filter(p -> p.getGid().equals(participant.getGid())
+                        && !p.getUid().equals(participant.getUid()))
+                .sorted(Comparator.comparingInt(p -> p.getUid().getId()))
+                .forEach(
+                        p -> priority[0] = castingLotsDao.addGroupMatch(
+                                tournament, priority[0], participant, p));
     }
 }

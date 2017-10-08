@@ -60,7 +60,7 @@
       <a class="btn btn-primary"
          title="{{ 'Add offline participant, who does not have internet and a good phone' | translate }}"
          href="#!/tournament/enlist/offline/{{$ctrl.tournament.tid}}"
-         ng-show="$ctrl.tournament.state == 'Draft'">
+         ng-show="$ctrl.tournament.state == 'Draft' || $ctrl.tournament.state == 'Open'">
         <span class="glyphicon glyphicon-plus-sign"></span>
       </a>
       <a class="btn btn-primary"

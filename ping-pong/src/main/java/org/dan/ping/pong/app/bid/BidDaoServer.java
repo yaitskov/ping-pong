@@ -78,7 +78,6 @@ public class BidDaoServer implements BidDao {
 
     @Override
     public void setGroupForUids(int gid, int tid, List<ParticipantMemState> groupBids) {
-        groupBids.forEach(bid -> bid.setGid(Optional.of(gid)));
         jooq.update(BID)
                 .set(BID.GID, Optional.of(gid))
                 .where(BID.TID.eq(tid),

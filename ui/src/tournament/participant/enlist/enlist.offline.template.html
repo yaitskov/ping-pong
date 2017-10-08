@@ -1,6 +1,6 @@
 <main-menu></main-menu>
 <div class="container enlist-form">
-  <div class="form-group clearfix" ng-show="$ctrl.categories">
+  <div class="form-group clearfix" ng-show="$ctrl.categories.length > 1">
     <div class="pull-left category-label">
       {{ 'Categories' | translate }}
     </div>
@@ -15,7 +15,42 @@
     </div>
   </div>
 
-  <form novalidate name="$ctrl.form" ng-submit="$ctrl.enlist('Here')">
+  <div class="form-group clearfix" ng-show="$ctrl.categoryGroups.links.length > 1">
+    <div class="pull-left category-label">
+      {{ 'Groups' | translate }}
+    </div>
+    <div class="pull-left category-value">
+      <table class="table">
+        <tr>
+          <td ng-repeat="link in $ctrl.categoryGroups.links">
+            <a class="btn btn-default category"
+               ng-click="$ctrl.activateGroup(link.gid)"
+               ng-class="{'btn-primary': link.gid == $ctrl.groupId}">
+              {{link.label}}
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td ng-repeat="pop in $ctrl.categoryGroups.populations">
+            {{ pop }}
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="form-group" ng-show="!$ctrl.categoryId">
+    <div class="alert alert-info">
+      {{ 'trounament has no categories' | translate }}
+    </div>
+    <div>
+      <a class="btn btn-primary" href="#!/my/tournament/categories/{{$ctrl.tournament.tid}}">
+        {{ 'add category btn' | translate }}
+      </a>
+    </div>
+  </div>
+
+  <form novalidate name="$ctrl.form" ng-show="$ctrl.categoryId" ng-submit="$ctrl.enlist('Here')">
     <div class="form-group"
          ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.firstName.$dirty) && $ctrl.form.firstName.$invalid}">
       <label for="firstName">{{ 'First name' | translate }}</label>
@@ -64,13 +99,21 @@
     <div class="form-group">
       <a title="Enlist participant, mark him as paid and ready to participate"
          ng-click="$ctrl.enlist('Here')"
+         ng-show="$ctrl.tournament.state == 'Draft'"
          class="btn btn-primary">
         {{ 'Ready to Play' | translate }}
       </a>
       <a title="Just enlist participant"
          ng-click="$ctrl.enlist('Want')"
+         ng-show="$ctrl.tournament.state == 'Draft'"
          class="btn btn-default">
         {{ 'Just Enlist' | translate }}
+      </a>
+      <a title="Just enlist participant"
+         ng-click="$ctrl.enlist('Wait')"
+         ng-show="$ctrl.tournament.state == 'Open'"
+         class="btn btn-primary">
+        {{ 'Ready to Play' | translate }}
       </a>
       <a title="Return to tournament control panel"
          back-button

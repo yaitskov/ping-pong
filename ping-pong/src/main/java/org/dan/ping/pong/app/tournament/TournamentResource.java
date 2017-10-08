@@ -175,9 +175,6 @@ public class TournamentResource {
         if (enlistment.getCid() < 1) {
             throw badRequest("Category id is missing");
         }
-        if (!asList(Want, Paid, Here).contains(enlistment.getBidState())) {
-            throw badRequest("Bid state could be " + asList(Want, Paid, Here));
-        }
         final int adminUid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(new Tid(enlistment.getTid()), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);

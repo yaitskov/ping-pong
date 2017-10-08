@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.category;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
+import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
@@ -10,6 +11,7 @@ import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 public class CategoryService {
     public Set<Integer> findIncompleteCategories(OpenTournamentMemState tournament) {
         return tournament.getMatches().values().stream()

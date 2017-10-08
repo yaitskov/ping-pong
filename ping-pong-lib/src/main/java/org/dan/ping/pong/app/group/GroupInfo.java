@@ -14,4 +14,8 @@ public class GroupInfo {
     private int cid;
     private int ordNumber;
     private String label;
+
+    public GroupLink toLink() {
+        return GroupLink.builder().label(label).gid(gid).build();
+    }
 }

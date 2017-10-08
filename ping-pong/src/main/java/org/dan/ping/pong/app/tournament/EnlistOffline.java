@@ -23,9 +23,11 @@ public class EnlistOffline implements Enlist {
     private String name;
     private BidState bidState;
     private Optional<Integer> providedRank = Optional.empty();
+    private Optional<Integer> groupId = Optional.empty();
 
     public static class EnlistOfflineBuilder {
         BidState bidState = BidState.Here;
         Optional<Integer> providedRank = Optional.empty();
+        Optional<Integer> groupId = Optional.empty();
     }
 }

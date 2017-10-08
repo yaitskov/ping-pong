@@ -5,20 +5,39 @@ angular.
     module('participant').
     component('enlistOffline', {
         templateUrl: template,
-        controller: ['$routeParams', 'Tournament', 'mainMenu', '$q',
+        controller: ['$routeParams', 'Tournament', 'mainMenu', '$q', 'Group',
                      'requestStatus', 'Participant', '$http', 'auth', 'pageCtx',
-                     function ($routeParams, Tournament, mainMenu, $q,
+                     function ($routeParams, Tournament, mainMenu, $q, Group,
                                requestStatus, Participant, $http, auth, pageCtx) {
                          mainMenu.setTitle('Offline enlist');
                          var self = this;
+                         self.groupId = null;
                          self.categoryId = null;
                          self.tournamentId = $routeParams.tournamentId;
                          self.categories = null;
+                         self.categoryGroups = null;
                          self.rank = 1;
                          self.rankRange = {};
                          self.enlisted = [];
                          self.form = {};
                          requestStatus.startLoading('Loading');
+                         self.loadGroupPopulations = function (tid, cid) {
+                             requestStatus.startLoading('Loading');
+                             self.groupId = null;
+                             Group.populations(
+                                 {
+                                     tournamentId: tid,
+                                     categoryId: cid},
+                                 function (ok) {
+                                     self.categoryGroups = ok;
+                                     for (var i in self.categoryGroups.links) {
+                                         self.groupId = self.categoryGroups.links[i].gid;
+                                             break;
+                                     }
+                                     requestStatus.complete();
+                                 },
+                                 requestStatus.failed);
+                         };
                          var req = {tournamentId: $routeParams.tournamentId};
                          $q.all([
                              Tournament.aDrafting(req).$promise,
@@ -48,12 +67,20 @@ angular.
                                              break;
                                          }
                                      }
+                                     if (self.tournament.state == 'Open' && self.categoryId) {
+                                         self.loadGroupPopulations($routeParams.tournamentId, self.categoryId);
+                                     }
                                  },
                                  requestStatus.failed);
 
                          this.activate = function (cid) {
                              self.categoryId = cid;
+                             self.loadGroupPopulations($routeParams.tournamentId, self.categoryId);
                              pageCtx.put('offline-category-' + $routeParams.tournamentId, self.categoryId);
+                         };
+                         this.activateGroup = function (gid) {
+                             self.groupId = gid;
+                             pageCtx.put('offline-group-' + $routeParams.tournamentId, self.groupId);
                          };
 
                          this.enlist = function (bidState) {
@@ -75,6 +102,9 @@ angular.
                              if (self.rules.casting.providedRankOptions) {
                                  req.providedRank = self.rank;
                              }
+                             if (self.groupId) {
+                                 req.groupId = self.groupId;
+                             }
                              $http.post('/api/tournament/enlist-offline',
                                         req,
                                         {headers: {session: auth.mySession()}}).
@@ -88,7 +118,6 @@ angular.
                                          jQuery(self.form.firstName.$$element).focus();
                                      },
                                      requestStatus.failed);
-
                          };
                      }
                     ]

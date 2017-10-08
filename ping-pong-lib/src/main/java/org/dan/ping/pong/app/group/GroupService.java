@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.group;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.dan.ping.pong.app.match.MatchState.Auto;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -10,8 +11,11 @@ import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class GroupService {
     public Map<Integer, BidSuccessInGroup> emptyMatchesState(
@@ -68,5 +72,33 @@ public class GroupService {
         winner.win();
         matchRule.findWinnerId(uid2Sets)
                 .ifPresent(uid -> loser.lost()); // walkover = 0
+    }
+
+    public GroupPopulations populations(OpenTournamentMemState tournament, int cid) {
+        final List<GroupLink> groupLinks = tournament.getGroupsByCategory(cid).stream()
+                .sorted(Comparator.comparingInt(GroupInfo::getOrdNumber))
+                .map(GroupInfo::toLink)
+                .collect(toList());
+        final Map<Integer, Long> gidNumMatches = tournament.getParticipants()
+                .values().stream()
+                .filter(p -> p.getCid() == cid)
+                .filter(p -> p.getGid().isPresent())
+                .collect(Collectors.groupingBy(p -> p.getGid().get(),
+                        Collectors.counting()));
+        return GroupPopulations.builder()
+                .links(groupLinks)
+                .populations(groupLinks.stream()
+                        .map(g -> gidNumMatches.getOrDefault(g.getGid(), 0L))
+                        .collect(toList()))
+                .build();
+    }
+
+    public boolean isNotCompleteGroup(OpenTournamentMemState tournament, int gid) {
+        final Optional<Integer> ogid = Optional.of(gid);
+        return tournament.getMatches()
+                .values()
+                .stream()
+                .anyMatch(m -> ogid.equals(m.getGid())
+                        && m.getState() != Over);
     }
 }

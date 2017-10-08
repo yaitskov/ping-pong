@@ -34,7 +34,7 @@ module.exports = merge.apply(
      require('./my-tournament-offline-enlist.js'),
      require('./my-place.js'),
      require('./my-place-edit.js'),
-     require('./my-tournament-categories.js'),
+     require('./pl.my-tournament-categories.js'),
      require('./my-tournament-categories-change.js'),
      require('./my-tournament-categories-members.js'),
      require('./my-place-tables.js'),

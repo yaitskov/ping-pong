@@ -19,7 +19,7 @@
   <div class="form-group tables" ng-show="$ctrl.matches.length > 0">
     <button class="btn btn-primary"
             ng-repeat="match in $ctrl.matches | orderBy : 'table.label'"
-            ng-click="$ctrl.completeMatch(match.mid, $index)"
+            ng-click="$ctrl.completeMatch(match)"
             ng-show="$ctrl.matches.length > 0">
       T{{match.table.label}}
     </button>
@@ -58,7 +58,7 @@
         </td>
         <td>
           <a class="btn btn-primary"
-             ng-click="$ctrl.completeMatch(match.mid, $index)">
+             ng-click="$ctrl.completeMatch(match)">
             {{ 'Score' | translate }}
           </a>
         </td>

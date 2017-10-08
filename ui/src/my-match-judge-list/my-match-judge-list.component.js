@@ -30,11 +30,11 @@ angular.module('myMatchJudgeList').
                                      && self.tournament.previous
                                      && pageCtx.get('last-admin-scoring-tournament-id') == self.tournament.previous.tid);
                          };
-                         this.completeMatch = function (mid, idx) {
-                             pageCtx.put('last-admin-scoring-tournament-id', this.matches[idx].tid);
-                             pageCtx.put('match-max-score-' + mid, this.matches[idx].matchScore);
-                             pageCtx.putMatchParticipants(mid, this.matches[idx].participants);
-                             $location.path('/complete/match/' + mid);
+                         this.completeMatch = function (match) {
+                             pageCtx.put('last-admin-scoring-tournament-id', match.tid);
+                             pageCtx.put('match-max-score-' + match.mid, match.matchScore);
+                             pageCtx.putMatchParticipants(match.mid, match.participants);
+                             $location.path('/complete/match/' + match.mid);
                          };
                          self.iSawTournamentEnd = function () {
                              pageCtx.put('last-admin-scoring-tournament-id', null);

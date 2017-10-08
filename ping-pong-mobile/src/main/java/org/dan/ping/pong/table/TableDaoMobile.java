@@ -10,8 +10,6 @@ import org.dan.ping.pong.sys.db.DbUpdater;
 import java.util.List;
 import java.util.Map;
 
-import def.dom.
-import def.dom4.
 public class TableDaoMobile implements TableDao {
     @Override
     public void createTables(int pid, int numberOfNewTables) {

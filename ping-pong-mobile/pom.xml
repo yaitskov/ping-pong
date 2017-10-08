@@ -13,19 +13,6 @@
     <description>Mobile part solely translatable to java-script</description>
     <url>http://cloud-sport.org</url>
 
-    <repositories>
-        <repository>
-            <id>jsweet-release</id>
-            <url>http://repository.jsweet.org/artifactory/libs-release-local</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -36,12 +23,6 @@
             <groupId>org.dan.ping.pong</groupId>
             <artifactId>ping-pong-lib</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jsweet</groupId>
-            <artifactId>jsweet-core</artifactId>
-            <version>5-20170726</version>
         </dependency>
     </dependencies>
 </project>

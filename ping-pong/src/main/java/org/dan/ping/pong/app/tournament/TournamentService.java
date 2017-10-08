@@ -132,13 +132,6 @@ public class TournamentService {
         bidDao.enlist(tournament.getParticipant(uid), clocker.get(), providedRank, batch);
     }
 
-    private void ensureDrafting(TournamentState state) {
-        if (state != TournamentState.Draft && state != Open) {
-            throw PiPoEx.badRequest(BadStateError.of(state,
-                    "Tournament is not in a valid state"));
-        }
-    }
-
     public List<TournamentDigest> findInWithEnlisted(int uid, int days) {
         return tournamentDao.findEnlistedIn(uid,
                 clocker.get().minus(days, DAYS));
@@ -198,7 +191,6 @@ public class TournamentService {
         final DraftingTournamentInfo result = tournamentDao
                 .getDraftingTournament(tid, participantId)
                 .orElseThrow(() -> notFound("Tournament " + tid + " not found"));
-        ensureDrafting(result.getState());
         result.setCategories(categories);
         return result;
     }

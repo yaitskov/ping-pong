@@ -46,7 +46,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
@@ -77,7 +76,6 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
@@ -282,13 +280,9 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         assertThat(myRest().get(DRAFTING + tid, DraftingTournamentInfo.class),
                 hasProperty("state", is(Open)));
         setTournamentState(tid, Close);
-        try {
-            myRest().get(DRAFTING + tid, DraftingTournamentInfo.class);
-            fail();
-        } catch (WebApplicationException e) {
-            BadTournamentState error = e.getResponse().readEntity(BadTournamentState.class);
-            assertThat(error.getState(), is(Close));
-        }
+        assertThat(
+                myRest().get(DRAFTING + tid, DraftingTournamentInfo.class).getState(),
+                is(Close));
     }
 
     @Inject

@@ -15,7 +15,7 @@ angular.
 
                          this.sets = function () {
                              var result = [];
-                             var l = self.matchScore.sets[self.participants[i].uid].length;
+                             var l = self.matchScore.sets[self.participants[0].uid].length;
                              for (var i = 0; i < l; ++i) {
                                  result.push({a: self.matchScore.sets[self.participants[0].uid][i],
                                               b: self.matchScore.sets[self.participants[1].uid][i]});

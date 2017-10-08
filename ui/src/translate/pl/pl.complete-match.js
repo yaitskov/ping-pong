@@ -1,6 +1,8 @@
 module.exports = {
     // complete-match
     'Match Review': 'Recenzja meczu',
+    'Judge next': 'Sądzić dalej',
+    'match-is-complete-info': 'Ten mecz jest zakończony. Sprawdź wynik i przechodź do kolejnego meczu.',
     'Set n scored. Match continues': 'Set {{n}} is scored. Match continues',
     'Match score response unknown': 'Match score response {{name}} is unknown',
     'Load match rules': 'Load match rules',

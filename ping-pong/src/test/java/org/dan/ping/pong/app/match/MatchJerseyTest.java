@@ -80,7 +80,7 @@ import javax.ws.rs.core.Response;
 
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = {TestCtx.class, ForTestMatchDao.class,
-        ForTestBidDao.class, Simulator.class})
+        ForTestBidDao.class, ForTestPlaceDao.class, Simulator.class})
 public class MatchJerseyTest extends AbstractSpringJerseyTest {
     private static final int LOSER = 0;
     private static final int WINER = 1;

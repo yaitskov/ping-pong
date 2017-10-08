@@ -8,6 +8,7 @@ import org.dan.ping.pong.app.group.GroupCtx;
 import org.dan.ping.pong.app.match.ForTestBidDao;
 import org.dan.ping.pong.app.match.ForTestMatchDao;
 import org.dan.ping.pong.app.match.MatchCtx;
+import org.dan.ping.pong.app.place.ForTestPlaceDao;
 import org.dan.ping.pong.app.place.PlaceCtx;
 import org.dan.ping.pong.app.score.MatchScoreCtx;
 import org.dan.ping.pong.app.score.MatchScoreDao;
@@ -20,5 +21,5 @@ import org.springframework.context.annotation.Import;
         TournamentCtx.class, BidCtx.class, CastingLotsCtx.class,
         MatchCtx.class, MatchScoreCtx.class, TableCtx.class,
         GroupCtx.class, MatchScoreDao.class, ForTestMatchDao.class,
-        ForTestBidDao.class, Simulator.class})
+        ForTestBidDao.class, ForTestPlaceDao.class, Simulator.class})
 public class JerseyWithSimulator {}

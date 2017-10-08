@@ -3,18 +3,16 @@ package org.dan.ping.pong.app.group;
 import static java.util.stream.Collectors.toMap;
 import static ord.dan.ping.pong.jooq.Tables.GROUPS;
 import static org.dan.ping.pong.app.castinglots.GroupState.Open;
-import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.tournament.DbUpdate;
-import org.dan.ping.pong.app.tournament.DbUpdater;
+import org.dan.ping.pong.sys.db.DbUpdateSql;
+import org.dan.ping.pong.sys.db.DbUpdater;
+import org.dan.ping.pong.sys.db.DbUpdaterSql;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.jooq.DSLContext;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -52,7 +50,7 @@ public class GroupDao {
     }
 
     public void deleteAllByTid(int tid, DbUpdater batch, int size) {
-        batch.exec(DbUpdate.builder()
+        batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(Optional.of(size))
                 .query(jooq.deleteFrom(GROUPS)
                         .where(GROUPS.TID.eq(tid))).build());

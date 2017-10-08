@@ -40,7 +40,8 @@ import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
-import org.dan.ping.pong.app.match.Pid;
+import org.dan.ping.pong.app.match.MatchValidationRule;
+import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.place.PlaceService;
@@ -50,6 +51,8 @@ import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserRegRequest;
+import org.dan.ping.pong.sys.db.DbUpdater;
+import org.dan.ping.pong.sys.error.PiPoEx;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.beans.factory.annotation.Value;
@@ -131,7 +134,7 @@ public class TournamentService {
 
     private void ensureDrafting(TournamentState state) {
         if (state != TournamentState.Draft && state != Open) {
-            throw badRequest(BadStateError.of(state,
+            throw PiPoEx.badRequest(BadStateError.of(state,
                     "Tournament is not in a valid state"));
         }
     }

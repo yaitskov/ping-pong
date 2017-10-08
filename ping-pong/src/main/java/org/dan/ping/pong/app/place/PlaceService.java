@@ -4,7 +4,6 @@ import static org.dan.ping.pong.app.place.PlaceCacheFactory.PLACE_CACHE;
 
 import com.google.common.cache.LoadingCache;
 import lombok.SneakyThrows;
-import org.dan.ping.pong.app.match.Pid;
 import org.dan.ping.pong.app.tournament.Cache;
 
 import java.util.concurrent.ExecutionException;

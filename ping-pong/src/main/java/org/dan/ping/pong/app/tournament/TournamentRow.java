@@ -3,7 +3,7 @@ package org.dan.ping.pong.app.tournament;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.dan.ping.pong.app.match.Pid;
+import org.dan.ping.pong.app.place.Pid;
 
 import java.time.Instant;
 import java.util.Optional;

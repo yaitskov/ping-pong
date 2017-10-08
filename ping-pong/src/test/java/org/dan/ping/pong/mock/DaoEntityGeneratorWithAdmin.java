@@ -13,7 +13,7 @@ import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.castinglots.rank.OrderDirection;
 import org.dan.ping.pong.app.castinglots.rank.ProvidedRankOptions;
 import org.dan.ping.pong.app.group.GroupRules;
-import org.dan.ping.pong.app.tournament.MatchValidationRule;
+import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
 

@@ -5,7 +5,7 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
-import org.dan.ping.pong.app.match.Pid;
+import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceAccessor;
 import org.dan.ping.pong.util.time.Clocker;
 

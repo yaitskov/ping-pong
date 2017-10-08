@@ -5,7 +5,7 @@ import static org.dan.ping.pong.app.tournament.rules.GroupRuleValidator.VALUE_NU
 import static org.dan.ping.pong.app.tournament.rules.ValidationError.ofTemplate;
 
 import com.google.common.collect.Multimap;
-import org.dan.ping.pong.app.tournament.MatchValidationRule;
+import org.dan.ping.pong.app.match.MatchValidationRule;
 
 public class MatchRuleValidator {
     private static final String MATCH_RULE = "match-rule";

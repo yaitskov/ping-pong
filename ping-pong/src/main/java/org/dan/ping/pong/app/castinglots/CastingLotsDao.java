@@ -16,9 +16,10 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
+import ord.dan.ping.pong.jooq.tables.records.BidRecord;
 import org.dan.ping.pong.app.castinglots.rank.OrderDirection;
 import org.dan.ping.pong.app.group.GroupSchedule;
-import org.dan.ping.pong.app.match.MatchDao;
+import org.dan.ping.pong.app.match.MatchDaoServer;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.playoff.PlayOffRule;
@@ -28,6 +29,8 @@ import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
 import org.jooq.Query;
+import org.jooq.SortField;
+import org.jooq.TableField;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -43,7 +46,7 @@ public class CastingLotsDao {
     private DSLContext jooq;
 
     @Inject
-    private MatchDao matchDao;
+    private MatchDaoServer matchDao;
 
     private List<Integer> pickSchedule(OpenTournamentMemState tournament,
             List<ParticipantMemState> groupBids) {
@@ -127,9 +130,22 @@ public class CastingLotsDao {
                 .where(BID.TID.eq(tid.getTid()),
                         BID.UID.in(uids),
                         BID.PROVIDED_RANK.isNotNull())
-                .orderBy(direction.setupOrder(BID.PROVIDED_RANK))
+                .orderBy(setupOrder( direction, BID.PROVIDED_RANK))
                 .fetch()
                 .map(r -> r.get(BID.UID));
+    }
+
+    private SortField<Optional<Integer>> setupOrder(
+            OrderDirection direction,
+            TableField<BidRecord, Optional<Integer>> field) {
+        switch (direction) {
+            case Decrease:
+                return field.desc();
+            case Increase:
+                return field.asc();
+            default:
+                throw internalError("unknown direction " + direction);
+        }
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)

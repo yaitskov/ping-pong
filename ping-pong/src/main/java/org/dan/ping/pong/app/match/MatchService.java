@@ -46,8 +46,6 @@ import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
-import org.dan.ping.pong.app.tournament.DbUpdater;
-import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.SetScoreResultName;
@@ -55,9 +53,9 @@ import org.dan.ping.pong.app.tournament.TournamentCache;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.app.tournament.TournamentState;
+import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -91,12 +89,6 @@ public class MatchService {
 
     @Inject
     private SequentialExecutor sequentialExecutor;
-
-    @Value("${match.score.timeout}")
-    private int matchScoreTimeout;
-
-    @Inject
-    private DbUpdaterFactory dbUpdaterFactory;
 
     @Inject
     private PlaceService placeService;
@@ -226,7 +218,10 @@ public class MatchService {
         tournamentService.endOfTournamentCategory(tournament, matchInfo.getCid(), batch);
     }
 
-    private void setMedalMatchBidStatuses(OpenTournamentMemState tournament, MatchInfo matchInfo, int winUid, DbUpdater batch,
+    private void setMedalMatchBidStatuses(
+            OpenTournamentMemState tournament,
+            MatchInfo matchInfo,
+            int winUid, DbUpdater batch,
             BidState win, BidState lost) {
         matchInfo.getParticipantIdScore().keySet().forEach(uid ->
                 bidService.setBidState(tournament.getParticipant(uid),
@@ -437,7 +432,8 @@ public class MatchService {
                 .tid(matchInfo.getTid())
                 .winUid(matchInfo.getWinnerId())
                 .sets(matchInfo.getParticipantIdScore())
-                .wonSets(tournament.getRule().getMatch().calcWonSets(matchInfo))
+                .wonSets(tournament.getRule().getMatch()
+                        .calcWonSets(matchInfo.getParticipantIdScore()))
                 .build();
     }
 
@@ -490,7 +486,9 @@ public class MatchService {
                         .map(m -> OpenMatchForWatch.builder()
                                 .mid(m.getMid())
                                 .started(m.getStartedAt().get())
-                                .score(tournament.getRule().getMatch().calcWonSets(m).values()
+                                .score(tournament.getRule().getMatch()
+                                        .calcWonSets(m.getParticipantIdScore())
+                                        .values()
                                         .stream().collect(toList()))
                                 .category(tournament.getCategory(m.getCid()))
                                 .table(place.getTableByMid(m.getMid()).toLink())
@@ -502,12 +500,6 @@ public class MatchService {
                                                 .collect(toList()))
                                 .build())
                         .collect(toList()));
-    }
-
-    public void markAsSchedule(MatchInfo match, Instant now, DbUpdater batch) {
-        match.setState(Game);
-        match.setStartedAt(Optional.of(now));
-        matchDao.markAsSchedule(match, batch);
     }
 
     public void resetMatchScore(OpenTournamentMemState tournament, ResetSetScore reset, DbUpdater batch) {

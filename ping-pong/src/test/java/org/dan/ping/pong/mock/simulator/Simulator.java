@@ -31,7 +31,7 @@ import org.dan.ping.pong.app.match.IdentifiedScore;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.match.SetScoreResult;
-import org.dan.ping.pong.app.table.TableDao;
+import org.dan.ping.pong.app.place.ForTestPlaceDao;
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.Tid;
@@ -83,7 +83,7 @@ public class Simulator {
     private ForTestMatchDao testMatchDao;
 
     @Inject
-    private TableDao tableDao;
+    private ForTestPlaceDao placeDao;
 
     @Inject
     private ForTestBidDao forTestBidDao;
@@ -113,7 +113,7 @@ public class Simulator {
     private void validateCompleteTournament(TournamentScenario scenario) {
         assertEquals(emptyList(),
                 testMatchDao.findIncompleteTournamentMatches(scenario.getTid()));
-        List<TableInfo> tables = tableDao.findFreeTables(scenario.getTid());
+        List<TableInfo> tables = placeDao.findFreeTables(scenario.getTid());
         assertThat(tables, Matchers.hasSize(scenario.getTables()));
         assertEquals(emptyList(),
                 tables.stream().map(TableInfo::getMid)
@@ -155,7 +155,7 @@ public class Simulator {
             completedMatches[0] = 0;
             final List<OpenMatchForJudge> openMatches = matchDao.findOpenMatchesFurJudge(
                     testAdmin.getUid());
-            assertThat(tableDao.findFreeTables(scenario.getTid()),
+            assertThat(placeDao.findFreeTables(scenario.getTid()),
                     Matchers.hasSize(scenario.getTables() - openMatches.size()));
             completeOpenMatches(scenario, completedMatches, openMatches);
             if (scenario.isIgnoreUnexpectedGames()

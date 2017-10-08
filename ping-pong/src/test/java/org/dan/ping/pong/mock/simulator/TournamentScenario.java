@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
-import org.dan.ping.pong.app.tournament.MatchValidationRule;
+import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.mock.SessionAware;

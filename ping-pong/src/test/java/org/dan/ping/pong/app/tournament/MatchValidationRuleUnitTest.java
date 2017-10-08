@@ -11,6 +11,7 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.ImmutableMap;
 import org.dan.ping.pong.app.match.IdentifiedScore;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -104,12 +105,12 @@ public class MatchValidationRuleUnitTest {
 
     private void cannotFindWinner(List<Integer> a, List<Integer> b) {
         assertEquals(Optional.empty(),
-                PING_PONG_RULE.findWinnerId(PING_PONG_RULE.calcWonSets(match(a, b))));
+                PING_PONG_RULE.findWinnerId(PING_PONG_RULE.calcWonSets(match(a, b).getParticipantIdScore())));
     }
 
     private void findWinner(int uid, List<Integer> a, List<Integer> b) {
         assertEquals(Optional.of(uid),
-                PING_PONG_RULE.findWinnerId(PING_PONG_RULE.calcWonSets(match(a, b))));
+                PING_PONG_RULE.findWinnerId(PING_PONG_RULE.calcWonSets(match(a, b).getParticipantIdScore())));
     }
 
     private MatchInfo match(List<Integer> a, List<Integer> b) {

@@ -4,7 +4,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toMap;
 
 import com.google.common.collect.ImmutableMap;
-import org.dan.ping.pong.app.tournament.MatchValidationRule;
+import org.dan.ping.pong.app.match.MatchValidationRule;
 
 import java.util.Comparator;
 import java.util.List;

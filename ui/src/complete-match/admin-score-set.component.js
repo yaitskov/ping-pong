@@ -15,13 +15,16 @@ angular.
                          var self = this;
                          self.winnerIdx = 0;
                          this.activate = function (idx) {
-                             self.scores.reverse();
-                             self.winnerIdx = idx;
+                             if (self.winnerIdx != idx) {
+                                 self.scores.reverse();
+                                 self.winnerIdx = idx;
+                             }
                          };
                          this.reset = function () {
                              self.possibleWinScores = [self.rules.minGamesToWin];
                              self.possibleLostScores = [];
                              self.scores = [-1, -1];
+                             self.pick(self.winnerIdx, self.rules.minGamesToWin);
                              for (var i = 0 ; i <= self.rules.minGamesToWin; ++i) {
                                  self.possibleLostScores.push(i);
                              }

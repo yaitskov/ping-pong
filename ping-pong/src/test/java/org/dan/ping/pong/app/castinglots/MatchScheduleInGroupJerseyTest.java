@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.castinglots;
 
 import static java.util.Arrays.asList;
+import static org.dan.ping.pong.app.group.DisambiguationPolicy.CMP_WIN_AND_LOSE;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
 import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
@@ -13,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.JerseySpringTest;
+import org.dan.ping.pong.app.group.DisambiguationPolicy;
 import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.group.GroupSchedule;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
@@ -40,16 +42,19 @@ public class MatchScheduleInGroupJerseyTest extends AbstractSpringJerseyTest {
     public static final GroupRules G8Q1 = GroupRules.builder()
             .groupSize(8)
             .quits(1)
+            .disambiguation(CMP_WIN_AND_LOSE)
             .build();
 
     public static final GroupRules G8Q2 = GroupRules.builder()
             .groupSize(8)
             .quits(2)
+            .disambiguation(CMP_WIN_AND_LOSE)
             .build();
 
     public static final GroupRules G2Q1 = GroupRules.builder()
             .groupSize(2)
             .quits(1)
+            .disambiguation(CMP_WIN_AND_LOSE)
             .build();
 
     public static final MatchValidationRule S1A2G11 = MatchValidationRule.builder()

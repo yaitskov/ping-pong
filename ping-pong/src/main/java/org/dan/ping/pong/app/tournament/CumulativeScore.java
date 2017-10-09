@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.util.Comparator.comparing;
-import static org.dan.ping.pong.app.group.BidSuccessInGroup.BEST_COMPARATOR;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,8 +17,10 @@ import java.util.Comparator;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CumulativeScore {
-    public static final Comparator<CumulativeScore> BEST_ORDER
-            = comparing(CumulativeScore::getWeighted, BEST_COMPARATOR);
+    public static Comparator<CumulativeScore> createComparator(
+            Comparator<BidSuccessInGroup> bidSuccessComparator) {
+        return comparing(CumulativeScore::getWeighted, bidSuccessComparator);
+    }
 
     private BidSuccessInGroup rating;
     private BidSuccessInGroup weighted;

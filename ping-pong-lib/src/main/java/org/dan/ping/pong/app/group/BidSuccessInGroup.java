@@ -1,8 +1,6 @@
 package org.dan.ping.pong.app.group;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Comparator.comparing;
-import static java.util.Comparator.comparingInt;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
@@ -13,8 +11,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.bid.BidState;
 
-import java.util.Comparator;
-
 @Setter
 @Getter
 @Builder
@@ -22,14 +18,6 @@ import java.util.Comparator;
 @ToString(of={"uid","finalState","punkts"})
 @NoArgsConstructor(onConstructor = @__(@JsonCreator))
 public class BidSuccessInGroup {
-    public static final Comparator<BidSuccessInGroup> BEST_COMPARATOR
-            = comparingInt((BidSuccessInGroup o) -> o.getFinalState().score())
-            .thenComparing(Comparator.comparingInt(BidSuccessInGroup::getPunkts).reversed())
-            .thenComparing(comparingInt(BidSuccessInGroup::getWinSets).reversed())
-            .thenComparingInt(BidSuccessInGroup::getLostSets)
-            .thenComparing(comparingInt(BidSuccessInGroup::getWinBalls).reversed())
-            .thenComparingInt(BidSuccessInGroup::getLostBalls);
-
     private int uid;
     private BidState finalState;
     private int punkts;

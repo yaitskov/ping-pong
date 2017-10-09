@@ -11,9 +11,10 @@ import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.group.DisambiguationPolicy.WIN_AND_LOSE_COMPARATOR;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
 import static org.dan.ping.pong.app.table.TableService.STATE;
-import static org.dan.ping.pong.app.tournament.CumulativeScore.BEST_ORDER;
+import static org.dan.ping.pong.app.tournament.CumulativeScore.createComparator;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
@@ -38,7 +39,9 @@ import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.group.BidSuccessInGroup;
+import org.dan.ping.pong.app.group.DisambiguationPolicy;
 import org.dan.ping.pong.app.group.GroupDao;
+import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -421,7 +424,11 @@ public class TournamentService {
             baseMatches = nextLevel;
         }
         ranksLevelMatches(tournament, 0, uidLevel, playOffService.findGroupMatches(cidMatches), matchRules);
-        return uidLevel.values().stream().sorted(BEST_ORDER)
+        return uidLevel.values().stream().sorted(createComparator(
+                tournament.getRule().getGroup()
+                        .map(GroupRules::getDisambiguation)
+                        .map(DisambiguationPolicy::getComparator)
+                        .orElse(WIN_AND_LOSE_COMPARATOR)))
                 .map(cuScore -> {
                     final ParticipantMemState participant = tournament.getParticipant(cuScore.getRating().getUid());
                     return TournamentResultEntry.builder()

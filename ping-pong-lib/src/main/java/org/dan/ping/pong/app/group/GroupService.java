@@ -3,7 +3,6 @@ package org.dan.ping.pong.app.group;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.dan.ping.pong.app.match.MatchState.Auto;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -37,13 +36,17 @@ public class GroupService {
         final Map<Integer, BidSuccessInGroup> uid2Stat = emptyMatchesState(tournament, allMatchesInGroup);
         final MatchValidationRule matchRule = tournament.getRule().getMatch();
         allMatchesInGroup.forEach(minfo -> aggMatch(uid2Stat, minfo, matchRule));
-        return order(uid2Stat.values())
+        return order(uid2Stat.values(), tournament.getRule().getGroup().get().getDisambiguation())
                 .stream().map(BidSuccessInGroup::getUid)
                 .collect(toList());
     }
 
-    public Collection<BidSuccessInGroup> order(Collection<BidSuccessInGroup> bidSuccess) {
-        return bidSuccess.stream().sorted(BidSuccessInGroup.BEST_COMPARATOR).collect(toList());
+    public Collection<BidSuccessInGroup> order(
+            Collection<BidSuccessInGroup> bidSuccess,
+            DisambiguationPolicy disambiguation) {
+        return bidSuccess.stream()
+                .sorted(disambiguation.getComparator())
+                .collect(toList());
     }
 
     public void aggMatch(Map<Integer, BidSuccessInGroup> uid2Stat,

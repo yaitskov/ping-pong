@@ -1,8 +1,12 @@
 package org.dan.ping.pong.app.tournament;
 
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.dan.ping.pong.app.match.DisambiguateGroupScoreJerseyTest.RULES_G8Q2_S1A2G11_M;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S3A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.RESULT_CATEGORY;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
+import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -56,9 +60,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
                 .champions(c2, p4, p5);
 
         simulator.simulate(scenario);
-        final List<TournamentResultEntry> result = myRest()
-                .get(TOURNAMENT_RESULT + scenario.getTid() + RESULT_CATEGORY + scenario.getCategoryDbId().get(c1),
-                        new GenericType<List<TournamentResultEntry>>() {});
+        final List<TournamentResultEntry> result = result(scenario);
 
         TournamentResultEntry p1Result = result.get(0);
         assertEquals(6, p1Result.getPunkts());
@@ -74,5 +76,34 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
         assertEquals(2, p3Result.getPunkts());
         assertEquals(scenario.getPlayersSessions().get(p3).getUid(),
                 p3Result.getUser().getUid());
+    }
+
+    @Test
+    public void winMinusLose() {
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .name("ResultWinMinusLose")
+                .rules(RULES_G8Q2_S1A2G11_M)
+                .category(c1, p1, p2, p3)
+                .custom(game(p1, p2, 11, 0))
+                .custom(game(p2, p3, 11, 1))
+                .custom(game(p3, p1, 14, 12))
+                .quitsGroup(p1, p2)
+                .champions(c1, p1, p2);
+
+        simulator.simulate(scenario);
+
+        final List<TournamentResultEntry> result = result(scenario);
+
+        assertEquals(asList(p1, p2, p3),
+                result.stream()
+                        .map(e -> scenario.getUidPlayer()
+                                .get(e.getUser().getUid()))
+                        .collect(toList()));
+    }
+
+    private List<TournamentResultEntry> result(TournamentScenario scenario) {
+        return myRest()
+                .get(TOURNAMENT_RESULT + scenario.getTid() + RESULT_CATEGORY + scenario.getCategoryDbId().get(c1),
+                        new GenericType<List<TournamentResultEntry>>() {});
     }
 }

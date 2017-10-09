@@ -1,5 +1,14 @@
 module.exports = {
-        // new tournament parameters
+    'disambiguation-group-lbl': 'On same # of matches win',
+    'CMP_WIN_AND_LOSE': 'Compare won and defeat scores',
+    'CMP_WIN_MINUS_LOSE': 'Compare won minus defeat scores',
+    'disambiguation-group-help': 'Decides how to order participants in a group'
+        + ' having the same number of won matches. In case of won and defeat '
+        + ' sum of gained scores across all matches are compared.'
+        + ' If they are also the same'
+        + ' then sums of lost scores across all matches are compared.'
+        + ' In case of win minus defeat sum lost scores is subtracted from the sum of gained scores'
+        + ' and then results are compared.',
     'thank-tournament-created-info': 'Thanks, tournament <a href="{{url}}">{{name}}</a>'
         + ' has been created and announced. Add categories to the tournament and begin drafting.',
     'Add categories btn': 'Add categories',

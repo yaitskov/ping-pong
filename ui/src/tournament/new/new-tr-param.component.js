@@ -19,6 +19,7 @@ const defaultRules = {
         setsToWin: 3
     },
     group: {
+        disambiguation: 'CMP_WIN_AND_LOSE',
         quits: 2,
         groupSize: 8,
         schedule: {

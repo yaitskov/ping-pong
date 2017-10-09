@@ -21,11 +21,15 @@ public class GroupRuleValidator {
     static final String UNEXPECTED_MATCHES = "unexpected-matches";
     public static final String MISSING_MATCHES = "missing-matches";
     static final String MATCHES = "matches";
+    private static final String DISAMBIGUATION = ".disambiguation";
 
     public void validate(Multimap<String, ValidationError> errors, GroupRules group) {
         if (group == null) {
             errors.put(GROUP_RULE, ofTemplate(VALUE_NULL));
             return;
+        }
+        if (group.getDisambiguation() == null) {
+            errors.put(GROUP_RULE + DISAMBIGUATION, ofTemplate(VALUE_NULL));
         }
         if (group.getGroupSize() < 2 || group.getGroupSize() > 20) {
             errors.put(GROUP_RULE + MAX_SIZE, ofTemplate(OUT_OF_RANGE));

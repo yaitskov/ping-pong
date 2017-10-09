@@ -1,7 +1,14 @@
 import angular from 'angular';
 import template from './param.form.template.html';
 
-const defaultGroupRules = {quits: 1, groupSize: 8, schedule: {size2Schedule: {2: [0,1]}}};
+const defaultGroupRules = {
+    quits: 1,
+    groupSize: 8,
+    disambiguation: 'CMP_WIN_AND_LOSE',
+    schedule: {
+        size2Schedule: {2: [0,1]}
+    }
+};
 const defaultPlayOffRules = {thirdPlaceMatch: 0, losings: 1};
 const defaultProvidedRankOptions = {maxValue: 10000, minValue: 0, label: 'rating'};
 
@@ -73,7 +80,8 @@ angular.
                              self.useGroup = rules.group;
                              self.usePlayOff = rules.playOff;
                              self.rules = rules;
-                             rules.group = rules.group || defaultGroupRules;
+                             rules.group = Object.assign({}, defaultGroupRules,
+                                                         rules.group || defaultGroupRules);
                              rules.playOff = rules.playOff || defaultPlayOffRules;
                              rules.casting.providedRankOptions = (rules.casting.providedRankOptions
                                                                   || defaultProvidedRankOptions);

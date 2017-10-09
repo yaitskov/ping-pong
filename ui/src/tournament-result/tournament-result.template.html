@@ -13,7 +13,7 @@
        ng-show="$ctrl.tournament.state == 'Draft' || $ctrl.tournament.state == 'Announce'">
     {{ 'tournament not started' | translate : '{name: $ctrl.tournament.name}' }}
   </div>
-  <div class="form-group" ng-show="$ctrl.tournament">
+  <div class="form-group" ng-show="$ctrl.tournament.categories.length > 1">
     <label>{{ 'Categories' | translate }}</label>
     <div class="btn-group">
       <a ng-click="$ctrl.pickCategory(category.cid)"

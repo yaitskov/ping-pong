@@ -1,0 +1,22 @@
+module.exports = {
+    'watch tournament': 'Watch tournament',
+    'Average match time': 'Average match time',
+    'Total match time': 'Total match time',
+    'Beated lbl': 'Beated',
+    'Conceded to lbl': 'Conceded to',
+    'Complete-at lbl': 'Complete at',
+    'Enlisted-at lbl': 'Enlisted at',
+    'Total games lost lbl': 'Total games lost lbl',
+    'Total games won lbl': 'Total games won lbl',
+    'Total sets lost lbl': 'Total sets lost lbl',
+    'Total sets won lbl': 'Total sets won lbl',
+    'Complete matches lbl': 'Complete matches lbl',
+    'Total matches lbl': 'Total matches lbl',
+    'Lost matches lbl': 'Lost matches lbl',
+    'Won matches lbl': 'Won matches lbl',
+    'Punkts lbl': 'Punkts lbl',
+    'Position lbl': 'Position lbl',
+    'Tournament lbl': 'Tournament lbl',
+    'Participant lbl': 'Participant lbl',
+    'Participant results': 'Participant results'
+};

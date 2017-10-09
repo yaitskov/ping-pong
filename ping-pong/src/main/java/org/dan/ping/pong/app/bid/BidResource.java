@@ -5,6 +5,7 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
+import org.dan.ping.pong.app.bid.result.BidResultService;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
 
@@ -28,6 +29,8 @@ public class BidResource {
     public static final String BID_PAID = "/bid/paid";
     public static final String BID_READY_TO_PLAY = "/bid/ready-to-play";
     public static final String BID_SET_STATE = "/bid/set-state";
+    private static final String BID_RESULTS = "/bid/results/";
+    private static final String TID_SLASH_UID = "/";
 
     @Inject
     private AuthService authService;
@@ -94,6 +97,19 @@ public class BidResource {
             tournament.checkAdmin(adminUid);
             bidService.setBidState(tournament, setState, batch);
         });
+    }
+
+    @Inject
+    private BidResultService bidResultService;
+
+    @GET
+    @Path(BID_RESULTS + "{tid}" + TID_SLASH_UID + "{uid}")
+    public void getResults(
+            @Suspended AsyncResponse response,
+            @PathParam("tid") Tid tid,
+            @PathParam("uid") int uid) {
+        tournamentAccessor.read(tid, response,
+                tournament -> bidResultService.getResults(tournament, uid));
     }
 
     @GET

@@ -1,5 +1,13 @@
 package org.dan.ping.pong.app.bid;
 
+import static org.dan.ping.pong.app.bid.BidState.Expl;
+import static org.dan.ping.pong.app.bid.BidState.Lost;
+import static org.dan.ping.pong.app.bid.BidState.Quit;
+import static org.dan.ping.pong.app.bid.BidState.Win1;
+import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.bid.BidState.Win3;
+
+import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
@@ -10,8 +18,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public interface BidDao {
+    Set<BidState> TERMINAL_BID_STATES = ImmutableSet.of(Win1, Win2, Win3,
+            Expl, Lost, Quit);
+
     void setBidState(int tid, int uid, BidState target,
             List<BidState> expected, Instant now, DbUpdater batch);
 

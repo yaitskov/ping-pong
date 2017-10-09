@@ -20,12 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
 @Builder
 public class OpenTournamentMemState {
     private int tid;
+    private String name;
     private Pid pid;
     private Set<Integer> adminIds;
     private Map<Integer, ParticipantMemState> participants;
@@ -91,5 +93,17 @@ public class OpenTournamentMemState {
             return;
         }
         throw badRequest("Category " + cid + " is not in tournament " + tid);
+    }
+
+    public TournamentLink toLink() {
+        return TournamentLink.builder()
+                .name(name)
+                .tid(tid)
+                .build();
+    }
+
+    public Stream<MatchInfo> participantMatches(int uid) {
+        return matches.values().stream()
+                .filter(m -> m.getParticipantIdScore().containsKey(uid));
     }
 }

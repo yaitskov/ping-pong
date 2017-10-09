@@ -11,19 +11,14 @@ import static ord.dan.ping.pong.jooq.Tables.MATCHES;
 import static ord.dan.ping.pong.jooq.Tables.PLACE;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT_ADMIN;
-import static org.dan.ping.pong.app.bid.BidState.Expl;
+import static org.dan.ping.pong.app.bid.BidDao.TERMINAL_BID_STATES;
 import static org.dan.ping.pong.app.bid.BidState.Here;
-import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Rest;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
-import static org.dan.ping.pong.app.bid.BidState.Win1;
-import static org.dan.ping.pong.app.bid.BidState.Win2;
-import static org.dan.ping.pong.app.bid.BidState.Win3;
-import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
@@ -32,6 +27,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.app.tournament.TournamentState.Replaced;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
+import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
@@ -43,7 +39,6 @@ import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceLink;
 import org.dan.ping.pong.sys.db.DbUpdateSql;
 import org.dan.ping.pong.sys.db.DbUpdater;
-import org.dan.ping.pong.sys.db.DbUpdaterSql;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectField;
@@ -319,7 +314,7 @@ public class TournamentDao {
                 .innerJoin(TOURNAMENT).on(BID.TID.eq(TOURNAMENT.TID))
                 .where(BID.UID.eq(uid),
                         BID.UPDATED.ge(Optional.of(since)),
-                        BID.STATE.in(Win1, Win2, Win3, Expl, Lost, Quit))
+                        BID.STATE.in(TERMINAL_BID_STATES))
                 .orderBy(BID.UPDATED.desc())
                 .limit(1)
                 .fetchOne())

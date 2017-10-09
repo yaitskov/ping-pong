@@ -1,4 +1,5 @@
 import angular from 'angular';
+var humanizeDuration = require('humanize-duration');
 
 angular.
     module('core.util', []).
@@ -48,6 +49,16 @@ angular.
                 }
                 throw "no item with pattern " + pattern;
             };
+        };
+    }]).
+    filter('humanDuration', ['LocalStorage', function (LocalStorage) {
+        return function (dt) {
+            if (!dt) {
+                return "";
+            }
+            return humanizeDuration(dt, {
+                language: LocalStorage.get('myLang') || 'pl'
+            });
         };
     }]).
     filter('shortDate', ['$filter', function ($filter) {

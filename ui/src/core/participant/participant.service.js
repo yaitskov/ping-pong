@@ -13,6 +13,13 @@ angular.
                                             session: 1
                                         }
                                     },
+                                    getResults: {
+                                        url: '/api/bid/results/:tournamentId/:uid',
+                                        method: 'GET',
+                                        headers: {
+                                            session: 1
+                                        }
+                                    },
                                     setCategory: {
                                         url: '/api/bid/set-category',
                                         method: 'POST',

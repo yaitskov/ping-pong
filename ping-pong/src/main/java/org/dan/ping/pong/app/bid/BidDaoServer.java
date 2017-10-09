@@ -181,7 +181,8 @@ public class BidDaoServer implements BidDao {
 
     @Override
     public Map<Integer, ParticipantMemState> loadParticipants(Tid tid) {
-        return jooq.select(BID.UID, BID.STATE, USERS.NAME, BID.GID, BID.CID)
+        return jooq.select(BID.UID, BID.STATE, USERS.NAME, BID.GID, BID.CID,
+                BID.CREATED, BID.UPDATED)
                 .from(BID)
                 .innerJoin(USERS).on(BID.UID.eq(USERS.UID))
                 .where(BID.TID.eq(tid.getTid()))
@@ -192,6 +193,8 @@ public class BidDaoServer implements BidDao {
                                 .tid(tid)
                                 .cid(r.get(BID.CID))
                                 .gid(r.get(BID.GID))
+                                .enlistedAt(r.get(BID.CREATED))
+                                .updatedAt(r.get(BID.UPDATED).orElse(r.get(BID.CREATED)))
                                 .name(r.get(USERS.NAME))
                                 .uid(new Uid(r.get(BID.UID)))
                                 .bidState(r.get(BID.STATE))

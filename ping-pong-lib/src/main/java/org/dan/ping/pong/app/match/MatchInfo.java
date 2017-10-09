@@ -1,5 +1,7 @@
 package org.dan.ping.pong.app.match;
 
+import static java.time.Duration.between;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +34,7 @@ public class MatchInfo {
     private Optional<Integer> winnerId;
     private Map<Integer, List<Integer>> participantIdScore;
     private Optional<Instant> startedAt;
+    private Optional<Instant> endedAt;
     private int priority;
 
     public int getNumberOfSets() {
@@ -46,6 +50,7 @@ public class MatchInfo {
         Optional<Integer> winnerMid = Optional.empty();
         Optional<Integer> winnerId = Optional.empty();
         Optional<Instant> startedAt = Optional.empty();
+        Optional<Instant> endedAt = Optional.empty();
     }
 
     public String toString() {
@@ -83,5 +88,10 @@ public class MatchInfo {
 
     public boolean hasParticipant(int uid) {
         return participantIdScore.containsKey(uid);
+    }
+
+    public Optional<Duration> duration(Instant now) {
+        return startedAt.map(s -> endedAt.map(e -> between(s, e))
+                .orElseGet(() -> between(s, now)));
     }
 }

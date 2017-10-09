@@ -344,6 +344,7 @@ public class MatchDaoServer implements MatchDao {
                             .winnerMid(r.get(MATCHES.WIN_MID))
                             .winnerId(r.get(MATCHES.UID_WIN))
                             .startedAt(r.get(MATCHES.STARTED))
+                            .endedAt(r.get(MATCHES.ENDED))
                             .participantIdScore(uids)
                             .tid(tid.getTid())
                             .build();

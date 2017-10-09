@@ -48,6 +48,7 @@ public class TournamentCacheLoader extends CacheLoader<Tid, OpenTournamentMemSta
         log.info("Loading tournament {}", tid);
         final TournamentRow row = tournamentDao.getRow(tid).orElseThrow(() -> notFound("tournament " + tid));
         return OpenTournamentMemState.builder()
+                .name(row.getName())
                 .participants(bidDao.loadParticipants(tid))
                 .categories(categoryDao.listCategoriesByTid(tid.getTid()).stream()
                         .collect(toMap(CategoryInfo::getCid, o -> o)))

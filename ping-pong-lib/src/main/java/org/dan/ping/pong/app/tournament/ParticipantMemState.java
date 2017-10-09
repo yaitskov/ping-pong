@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.user.UserLink;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @Getter
@@ -21,6 +22,8 @@ public class ParticipantMemState {
     private Optional<Integer> gid = Optional.empty();
     private int cid;
     private String name;
+    private Instant enlistedAt;
+    private Instant updatedAt;
 
     public String toString() {
         return "bid(" + uid + ", " + tid + ", " + cid + ")";

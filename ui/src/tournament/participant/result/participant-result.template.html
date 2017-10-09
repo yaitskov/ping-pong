@@ -1,0 +1,98 @@
+<main-menu></main-menu>
+<div class="container" ng-show="$ctrl.results">
+  <div class="form-group">
+    <label translate="Participant lbl"/>
+    <a class="btn btn-default form-control"
+       href="#!/user/{{ $ctrl.results.user.uid }}">
+        {{ $ctrl.results.user.name }}
+    </a>
+  </div>
+  <div class="form-group">
+    <label translate="Tournament lbl"/>
+    <a class="btn btn-default form-control"
+       href="#!/tournament/result/{{ $ctrl.results.tournament.tid }}">
+      {{ $ctrl.results.tournament.name }}
+    </a>
+  </div>
+  <div class="form-group">
+    <label for="position" translate="Position lbl"/>
+    <input id="position" readonly ng-value="$ctrl.results.position + 1" class="form-control"/>
+  </div>
+  <div class="form-group">
+    <label for="punkts" translate="Punkts lbl"/>
+    <input id="punkts" readonly ng-value="$ctrl.results.normal.punkts" class="form-control"/>
+  </div>
+  <div class="form-group">
+    <label for="won-matches" translate="Won matches lbl"/>
+    <input id="won-matches" readonly ng-value="$ctrl.results.matches.won" class="form-control"/>
+  </div>
+  <div class="form-group">
+    <label for="lost-matches" translate="Lost matches lbl"/>
+    <input id="lost-matches" readonly ng-value="$ctrl.results.matches.lost" class="form-control"/>
+  </div>
+  <div class="form-group">
+    <label for="total-matches" translate="Total matches lbl"/>
+    <input id="total-matches" readonly ng-value="$ctrl.results.matches.total" class="form-control"/>
+  </div>
+  <div class="form-group">
+    <label for="complete-matches" translate="Complete matches lbl"/>
+    <input id="complete-matches" readonly
+           ng-value="$ctrl.results.matches.won + $ctrl.results.matches.lost" class="form-control"/>
+  </div>
+  <div class="form-group">
+    <label for="total-sets-won" translate="Total sets won lbl"/>
+    <input id="total-sets-won" readonly ng-value="$ctrl.results.normal.winSets" class="form-control"/>
+  </div>
+  <div class="form-group">
+    <label for="total-sets-lost" translate="Total sets lost lbl"/>
+    <input id="total-sets-lost" readonly ng-value="$ctrl.results.normal.lostSets" class="form-control"/>
+  </div>
+  <div class="form-group">
+    <label for="total-games-won" translate="Total games won lbl"/>
+    <input id="total-games-won" readonly ng-value="$ctrl.results.normal.winBalls" class="form-control"/>
+  </div>
+  <div class="form-group">
+    <label for="total-games-lost" translate="Total games lost lbl"/>
+    <input id="total-games-lost" readonly ng-value="$ctrl.results.normal.lostBalls" class="form-control"/>
+  </div>
+  <div class="form-group">
+    <label for="enlisted-at" translate="Enlisted-at lbl"/>
+    <input id="enlisted-at" readonly ng-value="$ctrl.results.time.enlistedAt" class="form-control"/>
+  </div>
+  <div class="form-group" ng-show="$ctrl.results.time.completeAt">
+    <label for="complete-at" translate="Complete-at lbl"/>
+    <input id="complete-at" readonly ng-value="$ctrl.results.time.completeAt" class="form-control"/>
+  </div>
+  <div class="form-group" ng-show="$ctrl.results.conceded">
+    <label translate="Conceded to lbl"/>
+    <a class="btn btn-default form-control"
+       href="#!/participant/result/{{ $ctrl.results.tournament.tid }}/{{ $ctrl.results.conceded.uid }}">
+      {{ $ctrl.results.conceded.name }}
+    </a>
+  </div>
+  <div class="form-group" ng-show="$ctrl.results.beated">
+    <label translate="Beated lbl"/>
+    <a class="btn btn-default form-control"
+       href="#!/participant/result/{{ $ctrl.results.tournament.tid }}/{{ $ctrl.results.beated.uid }}">
+      {{ $ctrl.results.beated.name }}
+    </a>
+  </div>
+  <div class="form-group">
+    <label for="total-match-time" translate="Total match time"/>
+    <input id="total-match-time" readonly
+           value="{{ $ctrl.results.time.totalMs | humanDuration }}"
+           class="form-control"/>
+  </div>
+  <div class="form-group">
+    <label for="avg-match-time" translate="Average match time"/>
+    <input id="avg-match-time" readonly
+           value="{{ $ctrl.results.time.avgMs | humanDuration }}"
+           class="form-control"/>
+  </div>
+  <div class="form-group">
+    <a class="btn btn-primary"
+       translate="watch tournament"
+       href="#!/tournament/result/{{$ctrl.results.tournament.tid}}">
+    </a>
+  </div>
+</div>

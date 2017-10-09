@@ -76,6 +76,9 @@ angular.module('pingPong').
                     when('/my/tournament/parameters/:tournamentId', {
                         template: '<tournament-parameters></tournament-parameters>'
                     }).
+                    when('/participant/result/:tournamentId/:participantId', {
+                        template: '<participant-result></participant-result>'
+                    }).
                     when('/my/tournament/:tournamentId/change-category/:participantId', {
                         template: '<change-category></change-category>'
                     }).

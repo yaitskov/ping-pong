@@ -40,7 +40,6 @@ angular.module('pingPong', [
     'myMatchPlayList',
     'myMatchJudgeList',
     'openTournamentList',
-    'tournamentResult',
     'openTournament',
     'tournamentList'
 ]);

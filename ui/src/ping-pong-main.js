@@ -63,8 +63,6 @@ import reviewMatchScoreComponent from './complete-match/review-match-score.compo
 
 import openTournamentModule from './open-tournament/open-tournament.module.js';
 import openTournamentComponent from './open-tournament/open-tournament.component.js';
-import tournamentResultModule from './tournament-result/tournament-result.module.js';
-import tournamentResultComponent from './tournament-result/tournament-result.component.js';
 import tournamentListModule from './tournament-list/tournament-list.module.js';
 import tournamentListComponent from './tournament-list/tournament-list.component.js';
 import openTournamentListModule from './open-tournament-list/open-tournament-list.module.js';

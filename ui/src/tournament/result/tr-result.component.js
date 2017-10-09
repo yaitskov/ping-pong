@@ -1,8 +1,8 @@
 import angular from 'angular';
-import template from './tournament-result.template.html';
+import template from './tr-result.template.html';
 
 angular.
-    module('tournamentResult').
+    module('tournament').
     component('tournamentResult', {
         templateUrl: template,
         controller: ['Tournament', 'mainMenu', '$routeParams', 'requestStatus',

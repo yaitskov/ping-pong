@@ -22,12 +22,15 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TournamentRules {
+    public static final int FIRST_VERSION = 1;
+    private int version = FIRST_VERSION;
     private MatchValidationRule match;
     private CastingLotsRule casting;
     private Optional<PlayOffRule> playOff;
     private Optional<GroupRules> group;
 
     public static class TournamentRulesBuilder {
+        int version = FIRST_VERSION;
         CastingLotsRule casting = CastingLotsRule.builder()
                 .splitPolicy(BalancedMix)
                 .build();

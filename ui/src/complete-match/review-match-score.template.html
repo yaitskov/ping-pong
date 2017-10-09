@@ -35,7 +35,7 @@
         <tr ng-show="$ctrl.matchScore.winUid">
           <td>Winner</td>
           <td colspan="2">
-            <span ng-repeat="participant in $ctrl.pariticipants">
+            <span ng-repeat="participant in $ctrl.participants">
               <a href="#!/my/tournament/{{$ctrl.matchScore.tid}}/participant/{{participant.uid}}"
                  ng-if="participant.uid == $ctrl.matchScore.winUid">
                 {{participant.name}}

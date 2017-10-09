@@ -2,9 +2,7 @@
 <form>
   <div class="container admin-score">
     <div class="form-group">
-      <label>
-        Set won name
-      </label>
+      <label translate="Set won name"/>
       <div class="row" ng-repeat="participant in $ctrl.participants">
         <a ng-click="$ctrl.activate($index)"
            class="btn btn-default"
@@ -15,9 +13,7 @@
       </div>
     </div>
     <div class="form-group">
-      <label>
-        Win set score
-      </label>
+      <label translate="Win set score"/>
       <div>
         <a class="btn btn-default score"
            ng-repeat="score in $ctrl.possibleWinScores"
@@ -32,9 +28,7 @@
       </div>
     </div>
     <div class="form-group">
-      <label>
-        Lost set score
-      </label>
+      <label translate="Lost set score"/>
       <div>
         <a class="btn btn-default score"
            ng-repeat="score in $ctrl.possibleLostScores"

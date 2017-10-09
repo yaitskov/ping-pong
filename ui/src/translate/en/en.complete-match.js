@@ -1,5 +1,7 @@
 module.exports = {
-        // complete match
+    'Set won name': 'Winner',
+    'Win set score': 'Won games',
+    'Lost set score': 'Lost games',
     'Match Review': 'Match Review',
     'Judge next': 'Judge next',
     'match-is-complete-info': 'The match is complete. Review outcome and proceed with next match.',

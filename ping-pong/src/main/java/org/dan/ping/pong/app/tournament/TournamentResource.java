@@ -1,11 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
-import static java.util.Arrays.asList;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
-import static org.dan.ping.pong.app.bid.BidState.Here;
-import static org.dan.ping.pong.app.bid.BidState.Paid;
-import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.tournament.TournamentCacheFactory.TOURNAMENT_CACHE;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;

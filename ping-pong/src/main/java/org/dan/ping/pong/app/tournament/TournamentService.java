@@ -50,16 +50,13 @@ import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
-import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.playoff.PlayOffService;
-import org.dan.ping.pong.app.table.TableDao;
-import org.dan.ping.pong.app.table.TableService;
+import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserRegRequest;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.sys.error.PiPoEx;
-import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
@@ -184,10 +181,10 @@ public class TournamentService {
     private CastingLotsService castingLotsService;
 
     @Inject
-    private TableService tableService;
+    private Clocker clocker;
 
     @Inject
-    private Clocker clocker;
+    private ScheduleService scheduleService;
 
     public void begin(OpenTournamentMemState tournament, DbUpdater batch) {
         if (tournament.getState() != TournamentState.Draft) {
@@ -200,13 +197,7 @@ public class TournamentService {
         findReadyToStartTournamentBid(tournament).forEach(bid ->
                 bidService.setBidState(bid, BidState.Wait,
                         singletonList(bid.getBidState()), batch));
-        sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
-                place -> {
-                    place.getHostingTid().ifPresent(busyTid -> { throw badRequest(PLACE_IS_BUSY, TID, busyTid); });
-                    batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
-                    tableService.bindPlace(place, batch, Optional.of(tournament.getTid()));
-                    return tableService.scheduleFreeTables(tournament, place, now, batch);
-                });
+        scheduleService.beginTournament(tournament, batch, now);
     }
 
     private List<ParticipantMemState> findReadyToStartTournamentBid(OpenTournamentMemState tournament) {
@@ -288,15 +279,6 @@ public class TournamentService {
     private MatchService matchService;
 
     @Inject
-    private TableDao tableDao;
-
-    @Inject
-    private SequentialExecutor sequentialExecutor;
-
-    @Inject
-    private PlaceService placeCache;
-
-    @Inject
     private BidService bidService;
 
     @Value("${match.score.timeout}")
@@ -318,11 +300,7 @@ public class TournamentService {
             }
             bidService.setBidState(bid, target, singletonList(bid.getBidState()), batch);
         }
-        sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
-                place -> {
-                    batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
-                    return tableService.scheduleFreeTables(tournament, place, now, batch);
-                });
+        scheduleService.participantLeave(tournament, batch, now);
     }
 
     public void setTournamentState(OpenTournamentMemState tournament, DbUpdater batch) {
@@ -386,12 +364,7 @@ public class TournamentService {
         setTournamentState(tournament, batch);
         setTournamentCompleteAt(tournament, clocker.get(), batch);
         final Set<Integer> mids = new HashSet<>(tournament.getMatches().keySet());
-        sequentialExecutor.executeSync(placeCache.load(tournament.getPid()), place -> {
-            batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
-            tableService.bindPlace(place, batch, Optional.empty());
-            tableService.freeTables(place, mids, batch);
-            return null;
-        });
+        scheduleService.cancelTournament(tournament, batch, mids);
         matchDao.deleteAllByTid(tournament, batch, tournament.getMatches().size());
         tournament.getParticipants().values().stream()
                 .filter(bid -> bid.getState() != Quit)

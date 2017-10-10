@@ -24,9 +24,6 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.app.tournament.SetScoreResultName.MatchContinues;
-import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
-import static org.dan.ping.pong.app.tournament.TournamentState.Close;
-import static org.dan.ping.pong.app.tournament.TournamentState.Replaced;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -40,21 +37,14 @@ import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.group.PlayOffMatcherFromGroup;
-import org.dan.ping.pong.app.place.PlaceMemState;
-import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.playoff.PlayOffService;
-import org.dan.ping.pong.app.table.TableDao;
-import org.dan.ping.pong.app.table.TableService;
+import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.SetScoreResultName;
-import org.dan.ping.pong.app.tournament.TournamentCache;
-import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentService;
-import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.sys.db.DbUpdater;
-import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
 
 import java.time.Instant;
@@ -73,25 +63,7 @@ public class MatchService {
     private MatchDao matchDao;
 
     @Inject
-    private TournamentDao tournamentDao;
-
-    @Inject
     private Clocker clocker;
-
-    @Inject
-    private TableDao tableDao;
-
-    @Inject
-    private TableService tableService;
-
-    @Inject
-    private TournamentCache tournamentCache;
-
-    @Inject
-    private SequentialExecutor sequentialExecutor;
-
-    @Inject
-    private PlaceService placeService;
 
     public int roundPlayOffBase(int bids) {
         int places = 1;
@@ -101,7 +73,8 @@ public class MatchService {
         return places;
     }
 
-    private static final Set<TournamentState> TERMINAL_STATE = ImmutableSet.of(Close, Canceled, Replaced);
+    @Inject
+    private ScheduleService scheduleService;
 
     public SetScoreResult scoreSet(OpenTournamentMemState tournament, int uid,
             FinalMatchScore score, Instant now, DbUpdater batch) {
@@ -119,17 +92,12 @@ public class MatchService {
         }
         final Optional<Integer> winUidO = matchDao.scoreSet(tournament, matchInfo, batch, score);
         winUidO.ifPresent(winUid -> matchWinnerDetermined(tournament, matchInfo, winUid, batch));
-        return sequentialExecutor.executeSync(placeService.load(tournament.getPid()),
-                place -> {
-                    batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
-                    if (TERMINAL_STATE.contains(tournament.getState())) {
-                        tableService.bindPlace(place, batch, Optional.empty());
-                    }
-                    return setScoreResult(
-                            tournament,
-                            freeTableAndSchedule(place, batch, tournament, now, winUidO),
-                            matchInfo);
-                });
+
+        scheduleService.afterMatchComplete(tournament, batch, now);
+        return setScoreResult(tournament,
+                winUidO.map(u -> tournament.matchScoreResult())
+                        .orElse(SetScoreResultName.MatchContinues),
+                matchInfo);
     }
 
     SetScoreResult setScoreResult(OpenTournamentMemState tournament, SetScoreResultName name, MatchInfo matchInfo) {
@@ -148,15 +116,6 @@ public class MatchService {
             default:
                 throw internalError("Unknown state " + name);
         }
-    }
-
-    SetScoreResultName freeTableAndSchedule(PlaceMemState place, DbUpdater batch,
-            OpenTournamentMemState tournament,
-            Instant now, Optional<Integer> winUidO) {
-        batch.onFailure(() -> placeService.invalidate(tournament.getPid()));
-        tableService.scheduleFreeTables(tournament, place, now, batch);
-        return winUidO.map(u -> tournament.matchScoreResult())
-                .orElse(SetScoreResultName.MatchContinues);
     }
 
     private void matchWinnerDetermined(OpenTournamentMemState tournament, MatchInfo matchInfo,
@@ -476,11 +435,8 @@ public class MatchService {
                 .findAny();
     }
 
-    @Inject
-    private PlaceService placeCache;
-
     public List<OpenMatchForWatch> findOpenMatchesForWatching(OpenTournamentMemState tournament) {
-        return sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
+        return scheduleService.withPlace(tournament.getPid(),
                 place -> tournament.getMatches().values().stream()
                         .filter(m -> m.getState() == Game)
                         .map(m -> OpenMatchForWatch.builder()

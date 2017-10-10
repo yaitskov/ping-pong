@@ -22,6 +22,7 @@ import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
+import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.app.tournament.SetScoreResultName.MatchContinues;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
@@ -56,6 +57,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 @Slf4j
 public class MatchService {
@@ -74,6 +76,7 @@ public class MatchService {
     }
 
     @Inject
+    @Named(SCHEDULE_SELECTOR)
     private ScheduleService scheduleService;
 
     public SetScoreResult scoreSet(OpenTournamentMemState tournament, int uid,
@@ -436,8 +439,8 @@ public class MatchService {
     }
 
     public List<OpenMatchForWatch> findOpenMatchesForWatching(OpenTournamentMemState tournament) {
-        return scheduleService.withPlace(tournament.getPid(),
-                place -> tournament.getMatches().values().stream()
+        return scheduleService.withPlace(tournament,
+                tablesDiscovery -> tournament.getMatches().values().stream()
                         .filter(m -> m.getState() == Game)
                         .map(m -> OpenMatchForWatch.builder()
                                 .mid(m.getMid())
@@ -447,7 +450,7 @@ public class MatchService {
                                         .values()
                                         .stream().collect(toList()))
                                 .category(tournament.getCategory(m.getCid()))
-                                .table(place.getTableByMid(m.getMid()).toLink())
+                                .table(tablesDiscovery.discover(m.getMid()).toLink())
                                 .type(m.getType())
                                 .participants(
                                         m.getUids().stream()

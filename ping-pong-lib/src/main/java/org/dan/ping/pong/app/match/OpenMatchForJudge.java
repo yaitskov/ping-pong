@@ -10,6 +10,7 @@ import org.dan.ping.pong.app.user.UserLink;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Builder
@@ -19,7 +20,7 @@ import java.util.List;
 public class OpenMatchForJudge {
     private int mid;
     private int tid;
-    private TableLink table;
+    private Optional<TableLink> table;
     private List<UserLink> participants;
     private Instant started;
     private int matchScore;

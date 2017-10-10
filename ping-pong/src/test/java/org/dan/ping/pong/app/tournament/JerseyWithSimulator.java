@@ -20,7 +20,8 @@ import org.springframework.context.annotation.Import;
 
 @Import({BaseTestContext.class, PlaceCtx.class, CategoryCtx.class,
         TournamentCtx.class, BidCtx.class, CastingLotsCtx.class,
-        MatchCtx.class, MatchScoreCtx.class, TableCtx.class, ScheduleCtx.class,
+        MatchCtx.class, MatchScoreCtx.class, TableCtx.class,
+        ScheduleCtx.class,
         GroupCtx.class, MatchScoreDao.class, ForTestMatchDao.class,
         ForTestBidDao.class, ForTestPlaceDao.class, Simulator.class})
 public class JerseyWithSimulator {}

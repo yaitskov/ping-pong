@@ -3,7 +3,7 @@ package org.dan.ping.pong.app.sched;
 import org.dan.ping.pong.app.table.TableInfo;
 
 public class NoTablesDiscovery implements TablesDiscovery {
-    private static final TableInfo STUB_TABLE = TableInfo.builder()
+    public static final TableInfo STUB_TABLE = TableInfo.builder()
             .label(" - ")
             .build();
 

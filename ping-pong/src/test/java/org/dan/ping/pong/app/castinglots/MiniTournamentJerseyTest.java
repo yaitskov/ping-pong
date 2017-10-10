@@ -42,6 +42,7 @@ public class MiniTournamentJerseyTest extends AbstractSpringJerseyTest {
             .group(Optional.of(G8Q1))
             .casting(INCREASE_SIGNUP_CASTING)
             .playOff(Optional.empty())
+            .place(Optional.of(GLOBAL))
             .build();
 
     @Inject

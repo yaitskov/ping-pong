@@ -155,8 +155,10 @@ public class Simulator {
             completedMatches[0] = 0;
             final List<OpenMatchForJudge> openMatches = matchDao.findOpenMatchesFurJudge(
                     testAdmin.getUid());
-            assertThat(placeDao.findFreeTables(scenario.getTid()),
-                    Matchers.hasSize(scenario.getTables() - openMatches.size()));
+            if (scenario.getTables() > 0) {
+                assertThat(placeDao.findFreeTables(scenario.getTid()),
+                        Matchers.hasSize(scenario.getTables() - openMatches.size()));
+            }
             completeOpenMatches(scenario, completedMatches, openMatches);
             if (scenario.isIgnoreUnexpectedGames()
                     && scenario.getGroupMatches().isEmpty()

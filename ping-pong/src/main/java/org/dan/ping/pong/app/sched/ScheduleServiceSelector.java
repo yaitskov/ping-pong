@@ -1,20 +1,17 @@
 package org.dan.ping.pong.app.sched;
 
 import static java.util.Optional.ofNullable;
-import static org.dan.ping.pong.app.place.ArenaDistributionPolicy.*;
+import static org.dan.ping.pong.app.place.ArenaDistributionPolicy.NO;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.RequiredArgsConstructor;
 import org.dan.ping.pong.app.place.ArenaDistributionPolicy;
-import org.dan.ping.pong.app.place.Pid;
-import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.place.PlaceRules;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
@@ -27,8 +24,8 @@ public class ScheduleServiceSelector implements ScheduleService {
     }
 
     @Override
-    public void cancelTournament(OpenTournamentMemState tournament, DbUpdater batch, Set<Integer> mids) {
-        dispatch(tournament).cancelTournament(tournament, batch, mids);
+    public void cancelTournament(OpenTournamentMemState tournament, DbUpdater batch, Instant now) {
+        dispatch(tournament).cancelTournament(tournament, batch, now);
     }
 
     @Override

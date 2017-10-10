@@ -13,6 +13,7 @@ import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.group.DisambiguationPolicy.WIN_AND_LOSE_COMPARATOR;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
+import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.table.TableService.STATE;
 import static org.dan.ping.pong.app.tournament.CumulativeScore.createComparator;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
@@ -70,6 +71,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 @Slf4j
 public class TournamentService {
@@ -183,6 +185,7 @@ public class TournamentService {
     private Clocker clocker;
 
     @Inject
+    @Named(SCHEDULE_SELECTOR)
     private ScheduleService scheduleService;
 
     public void begin(OpenTournamentMemState tournament, DbUpdater batch) {

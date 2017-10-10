@@ -93,6 +93,6 @@ public class Kw04FirstTournamentJerseyTest extends AbstractSpringJerseyTest {
         final List<OpenMatchForWatch> openMatches = myRest()
                 .get(MATCH_WATCH_LIST_OPEN + scenario.getTid(),
                 scenario, new GenericType<List<OpenMatchForWatch>>() {});
-        assertEquals(openMatches.size(), 3);
+        assertEquals(openMatches.size(), 15);
     }
 }

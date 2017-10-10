@@ -18,6 +18,7 @@ import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
+import static org.dan.ping.pong.app.sched.NoTablesDiscovery.STUB_TABLE;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.JUST_A_ROW;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
@@ -95,7 +96,7 @@ public class MatchDaoServer implements MatchDao {
                 .on(MATCHES.UID_LESS.eq(USERS.UID))
                 .innerJoin(ENEMY_USER)
                 .on(MATCHES.UID_MORE.eq(ENEMY_USER.UID))
-                .innerJoin(TABLES)
+                .leftJoin(TABLES)
                 .on(MATCHES.MID.eq(TABLES.MID.cast(Integer.class)))
                 .where(TOURNAMENT_ADMIN.UID.eq(adminUid),
                         MATCHES.STATE.eq(Game))
@@ -107,10 +108,12 @@ public class MatchDaoServer implements MatchDao {
                         .matchScore(r.get(TOURNAMENT.RULES).getMatch().getMinGamesToWin())
                         .started(r.get(MATCHES.STARTED).get())
                         .type(r.get(MATCHES.TYPE))
-                        .table(TableLink.builder()
-                                .id(r.get(TABLES.TABLE_ID))
-                                .label(r.get(TABLES.LABEL))
-                                .build())
+                        .table(ofNullable(r.get(TABLES.TABLE_ID))
+                                .map(tableId ->
+                                        TableLink.builder()
+                                                .id(tableId)
+                                                .label(r.get(TABLES.LABEL))
+                                        .build()))
                         .participants(asList(
                                 UserLink.builder()
                                         .name(r.get(USERS.NAME))

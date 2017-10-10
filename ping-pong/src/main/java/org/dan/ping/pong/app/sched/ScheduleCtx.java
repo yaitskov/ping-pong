@@ -18,11 +18,13 @@ public class ScheduleCtx {
                 NO, noScheduleService));
     }
 
+    @Bean
     protected GlobalScheduleService globalScheduleService() {
         return new GlobalScheduleService();
     }
 
-    private NoScheduleService noScheduleService() {
+    @Bean
+    protected NoScheduleService noScheduleService() {
         return new NoScheduleService();
     }
 }

@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.castinglots;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q1;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q2;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.GLOBAL;
 import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -33,6 +34,7 @@ public class MiniTournamentJerseyTest extends AbstractSpringJerseyTest {
             .group(Optional.of(G8Q2))
             .casting(INCREASE_SIGNUP_CASTING)
             .playOff(Optional.empty())
+            .place(Optional.of(GLOBAL))
             .build();
     public static final TournamentRules RULES_G8Q1_S1A2G11_MINI = TournamentRules
             .builder()

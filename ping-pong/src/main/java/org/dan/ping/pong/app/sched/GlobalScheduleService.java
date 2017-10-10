@@ -8,8 +8,6 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Replaced;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import com.google.common.collect.ImmutableSet;
-import org.dan.ping.pong.app.place.Pid;
-import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
@@ -18,6 +16,7 @@ import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -52,11 +51,12 @@ public class GlobalScheduleService implements ScheduleService {
 
     @Override
     public void cancelTournament(OpenTournamentMemState tournament,
-            DbUpdater batch, Set<Integer> mids) {
+            DbUpdater batch, Instant now) {
         sequentialExecutor.executeSync(placeCache.load(tournament.getPid()), place -> {
             batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
             tableService.bindPlace(place, batch, Optional.empty());
-            tableService.freeTables(place, mids, batch);
+            tableService.freeTables(place,
+                    new HashSet<>(tournament.getMatches().keySet()), batch);
             return null;
         });
     }
@@ -86,7 +86,8 @@ public class GlobalScheduleService implements ScheduleService {
     }
 
     @Override
-    public <T> T withPlace(Pid pid, Function<PlaceMemState, T> f) {
-        return sequentialExecutor.executeSync(placeCache.load(pid), f);
+    public <T> T withPlace(OpenTournamentMemState tournament, Function<TablesDiscovery, T> f) {
+        return sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
+                place -> f.apply(new GlobalTablesDiscovery(place)));
     }
 }

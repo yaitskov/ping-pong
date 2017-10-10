@@ -93,7 +93,7 @@ public class TableService {
                 });
     }
 
-    private void markAsSchedule(MatchInfo match, Instant now, DbUpdater batch) {
+    public void markAsSchedule(MatchInfo match, Instant now, DbUpdater batch) {
         match.setState(Game);
         match.setStartedAt(Optional.of(now));
         matchDao.markAsSchedule(match, batch);

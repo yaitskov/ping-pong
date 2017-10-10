@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.castinglots;
 
 import static java.util.Arrays.asList;
 import static org.dan.ping.pong.app.group.DisambiguationPolicy.CMP_WIN_AND_LOSE;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.GLOBAL;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
 import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
@@ -91,6 +92,7 @@ public class MatchScheduleInGroupJerseyTest extends AbstractSpringJerseyTest {
                                         .build()))))
                         .casting(INCREASE_SIGNUP_CASTING)
                         .playOff(Optional.of(Losing1))
+                        .place(Optional.of(GLOBAL))
                         .match(S1A2G11)
                         .build())
                 .onBeforeMatch((s, minfo) -> matchOrder.add(minfo.getPlayers()))
@@ -119,6 +121,7 @@ public class MatchScheduleInGroupJerseyTest extends AbstractSpringJerseyTest {
                         .playOff(Optional.of(Losing1))
                         .match(S1A2G11)
                         .casting(INCREASE_SIGNUP_CASTING)
+                        .place(Optional.of(GLOBAL))
                         .build())
                 .onBeforeMatch((s, minfo) -> matchOrder.add(minfo.getPlayers()))
                 .w10(p1, p2)

@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.castinglots;
 
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.GLOBAL;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing2;
 import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
@@ -60,6 +61,7 @@ public class JustPlayOff2LossesJerseyTest extends AbstractSpringJerseyTest {
             .group(Optional.empty())
             .casting(INCREASE_SIGNUP_CASTING)
             .playOff(Optional.of(Losing2))
+            .place(Optional.of(GLOBAL))
             .build();
 
     @Inject

@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.match;
 
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S1A2G11;
 import static org.dan.ping.pong.app.group.DisambiguationPolicy.CMP_WIN_MINUS_LOSE;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.GLOBAL;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S1A2G11;
 import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
@@ -40,6 +41,7 @@ public class DisambiguateGroupScoreJerseyTest extends AbstractSpringJerseyTest {
             .group(Optional.of(G8Q2_MINUS))
             .casting(INCREASE_SIGNUP_CASTING)
             .playOff(Optional.empty())
+            .place(Optional.of(GLOBAL))
             .build();
 
     @Inject

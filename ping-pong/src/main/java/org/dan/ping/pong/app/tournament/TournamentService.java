@@ -64,7 +64,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -363,8 +362,7 @@ public class TournamentService {
         tournament.setState(Canceled);
         setTournamentState(tournament, batch);
         setTournamentCompleteAt(tournament, clocker.get(), batch);
-        final Set<Integer> mids = new HashSet<>(tournament.getMatches().keySet());
-        scheduleService.cancelTournament(tournament, batch, mids);
+        scheduleService.cancelTournament(tournament, batch, now);
         matchDao.deleteAllByTid(tournament, batch, tournament.getMatches().size());
         tournament.getParticipants().values().stream()
                 .filter(bid -> bid.getState() != Quit)

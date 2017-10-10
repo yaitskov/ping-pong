@@ -9,6 +9,7 @@ import org.dan.ping.pong.app.country.CountryCtx;
 import org.dan.ping.pong.app.group.GroupCtx;
 import org.dan.ping.pong.app.match.MatchCtx;
 import org.dan.ping.pong.app.place.PlaceCtx;
+import org.dan.ping.pong.app.sched.ScheduleCtx;
 import org.dan.ping.pong.app.score.MatchScoreCtx;
 import org.dan.ping.pong.app.table.TableCtx;
 import org.dan.ping.pong.app.tournament.TournamentCtx;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         GroupCtx.class,
         BidCtx.class,
         TableCtx.class,
+        ScheduleCtx.class,
         CityCtx.class,
         CountryCtx.class,
         TournamentCtx.class,

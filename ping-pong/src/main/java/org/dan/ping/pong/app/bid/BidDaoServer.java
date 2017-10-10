@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.bid;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
@@ -62,16 +63,20 @@ public class BidDaoServer implements BidDao {
     @Override
     public void markParticipantsBusy(OpenTournamentMemState tournament,
             Collection<Integer> uids, Instant now, DbUpdater batch) {
-        uids.stream().map(tournament::getBid)
-                .forEach(bid -> bid.setBidState(Play));
+        final List<Integer> finalUids = uids.stream()
+                .map(tournament::getBid)
+                .filter(bid -> bid.getBidState() != Play)
+                .peek(bid -> bid.setBidState(Play))
+                .map(bid -> bid.getUid().getId())
+                .collect(toList());
         batch.exec(DbUpdateSql.builder()
-                .mustAffectRows(JUST_2_ROWS)
-                .onFailure(u -> internalError("One of uids " + uids + " was busy"))
+                .mustAffectRows(Optional.of(finalUids.size()))
+                .onFailure(u -> internalError("One of uids " + finalUids + " was busy"))
                 .query(jooq.update(BID)
                         .set(BID.STATE, Play)
                         .set(BID.UPDATED, Optional.of(now))
                         .where(BID.TID.eq(tournament.getTid()),
-                                BID.UID.in(uids),
+                                BID.UID.in(finalUids),
                                 BID.STATE.eq(Wait)))
                 .build());
     }

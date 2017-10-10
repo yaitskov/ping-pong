@@ -17,6 +17,7 @@ import org.dan.ping.pong.app.group.GroupCtx;
 import org.dan.ping.pong.app.match.MatchCtx;
 import org.dan.ping.pong.app.match.MyPendingMatch;
 import org.dan.ping.pong.app.place.PlaceCtx;
+import org.dan.ping.pong.app.sched.ScheduleCtx;
 import org.dan.ping.pong.app.score.MatchScoreCtx;
 import org.dan.ping.pong.app.table.TableCtx;
 import org.dan.ping.pong.app.tournament.TournamentCtx;
@@ -42,7 +43,7 @@ import javax.ws.rs.core.GenericType;
 
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = {BaseTestContext.class,
-        TournamentCtx.class, BidCtx.class, TableCtx.class,
+        TournamentCtx.class, BidCtx.class, TableCtx.class, ScheduleCtx.class,
         CastingLotsCtx.class, MatchCtx.class, MatchScoreCtx.class,
         GroupCtx.class, PlaceCtx.class, CategoryCtx.class})
 public class CastingLotsJerseyTest extends AbstractSpringJerseyTest {

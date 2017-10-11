@@ -103,7 +103,7 @@ public class Simulator {
                     && !scenario.getAutoResolution().isPresent()) {
                 validateCompleteTournament(scenario);
             }
-        } catch (Exception e) {
+        } catch (AssertionError|Exception e) {
             log.info("Scenario {} failed", scenario, e);
             scenario.getOnFailure().ifPresent(cb -> cb.accept(scenario));
             throw e;

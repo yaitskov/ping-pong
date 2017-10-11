@@ -466,7 +466,7 @@ public class TournamentService {
 
         if (tournament.getState() == Open) {
             enlistment.getGroupId().ifPresent(gid ->
-                    castingLotsService.addParticipant(participantUid, tournament));
+                    castingLotsService.addParticipant(participantUid, tournament, batch));
         }
         return participantUid;
     }

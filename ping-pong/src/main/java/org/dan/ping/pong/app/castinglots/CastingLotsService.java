@@ -9,6 +9,7 @@ import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.PLAY_OFF_SEEDS;
+import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.createLoserBid;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
@@ -24,14 +25,17 @@ import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.playoff.PlayOffService;
+import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.sys.db.DbUpdaterSql;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.user.UserLink;
+import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
@@ -40,6 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 @Slf4j
 public class CastingLotsService {
@@ -240,7 +245,14 @@ public class CastingLotsService {
         return castingLotsDao.loadManualBidsOrder(tid, cid);
     }
 
-    public void addParticipant(Uid uid, OpenTournamentMemState tournament) {
+    @Inject
+    @Named(SCHEDULE_SELECTOR)
+    private ScheduleService scheduleService;
+
+    @Inject
+    private Clocker clocker;
+
+    public void addParticipant(Uid uid, OpenTournamentMemState tournament, DbUpdater batch) {
         final ParticipantMemState participant = tournament.getParticipant(uid);
         log.info("Add participant {} to group", uid, participant.getGid());
         int[] priority = new int[1];
@@ -251,5 +263,6 @@ public class CastingLotsService {
                 .forEach(
                         p -> priority[0] = castingLotsDao.addGroupMatch(
                                 tournament, priority[0], participant, p));
+        scheduleService.afterMatchComplete(tournament, batch,  clocker.get());
     }
 }

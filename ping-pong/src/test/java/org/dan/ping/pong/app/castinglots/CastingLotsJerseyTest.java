@@ -21,6 +21,7 @@ import org.dan.ping.pong.app.sched.ScheduleCtx;
 import org.dan.ping.pong.app.score.MatchScoreCtx;
 import org.dan.ping.pong.app.table.TableCtx;
 import org.dan.ping.pong.app.tournament.TournamentCtx;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin;
 import org.dan.ping.pong.mock.RestEntityGenerator;
@@ -71,7 +72,7 @@ public class CastingLotsJerseyTest extends AbstractSpringJerseyTest {
         final int tid = daoGenerator.genTournament(placeId, Draft, 1);
         final List<TestUserSession> participants =  restEntityGenerator.generateGroupsOf(
                 myRest(), adminSession, userSessionGenerator, tid, 2);
-        final Set<Integer> participantIds = participants.stream()
+        final Set<Uid> participantIds = participants.stream()
                 .map(TestUserSession::getUid).collect(toSet());
         for (TestUserSession userSession : participants) {
             final List<MyPendingMatch> matches = myRest().get(MY_PENDING_MATCHES,

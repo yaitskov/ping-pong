@@ -45,6 +45,7 @@ import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.TournamentService;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
@@ -79,7 +80,7 @@ public class MatchService {
     @Named(SCHEDULE_SELECTOR)
     private ScheduleService scheduleService;
 
-    public SetScoreResult scoreSet(OpenTournamentMemState tournament, int uid,
+    public SetScoreResult scoreSet(OpenTournamentMemState tournament, Uid uid,
             FinalMatchScore score, Instant now, DbUpdater batch) {
         tournament.getRule().getMatch().validateSet(score.getScores());
         final MatchInfo matchInfo = tournament.getMatchById(score.getMid());
@@ -93,7 +94,7 @@ public class MatchService {
                             : MatchContinues,
                     matchInfo);
         }
-        final Optional<Integer> winUidO = matchDao.scoreSet(tournament, matchInfo, batch, score);
+        final Optional<Uid> winUidO = matchDao.scoreSet(tournament, matchInfo, batch, score);
         winUidO.ifPresent(winUid -> matchWinnerDetermined(tournament, matchInfo, winUid, batch));
 
         scheduleService.afterMatchComplete(tournament, batch, now);
@@ -122,7 +123,7 @@ public class MatchService {
     }
 
     private void matchWinnerDetermined(OpenTournamentMemState tournament, MatchInfo matchInfo,
-            int winUid, DbUpdater batch) {
+            Uid winUid, DbUpdater batch) {
         completeMatch(matchInfo, winUid, batch);
         if (matchInfo.getGid().isPresent()) {
             tryToCompleteGroup(tournament, matchInfo, batch);
@@ -131,21 +132,21 @@ public class MatchService {
         }
     }
 
-    private void completeMatch(MatchInfo matchInfo, int winUid, DbUpdater batch) {
+    private void completeMatch(MatchInfo matchInfo, Uid winUid, DbUpdater batch) {
         matchInfo.setState(Over);
         matchInfo.setWinnerId(Optional.of(winUid));
         matchDao.completeMatch(matchInfo.getMid(), winUid, clocker.get(), batch, Game, Place, Auto);
     }
 
     private void completeNoLastPlayOffMatch(OpenTournamentMemState tournament, MatchInfo matchInfo,
-            int winUid, DbUpdater batch) {
+            Uid winUid, DbUpdater batch) {
         ParticipantMemState winBid = tournament.getParticipants().get(winUid);
         bidService.setBidState(winBid, Wait, singletonList(Play), batch);
         assignBidToMatch(tournament, matchInfo.getWinnerMid().get(), winUid, batch);
-        final int lostUid = matchInfo.getOpponentUid(winUid).get();
+        final Uid lostUid = matchInfo.getOpponentUid(winUid).get();
         final ParticipantMemState lostBid = tournament.getParticipants().get(lostUid);
         if (lostBid == null) {
-            checkArgument(lostUid == FILLER_LOSER_UID);
+            checkArgument(FILLER_LOSER_UID.equals(lostUid));
         }
         if (matchInfo.getLoserMid().isPresent()) {
             if (lostBid != null) {
@@ -164,7 +165,7 @@ public class MatchService {
     }
 
     private void completeLastPlayOffMatch(OpenTournamentMemState tournament, MatchInfo matchInfo,
-            int winUid, DbUpdater batch) {
+            Uid winUid, DbUpdater batch) {
         switch (matchInfo.getType()) {
             case Gold:
                 setMedalMatchBidStatuses(tournament, matchInfo, winUid, batch, Win1, Win2);
@@ -183,15 +184,15 @@ public class MatchService {
     private void setMedalMatchBidStatuses(
             OpenTournamentMemState tournament,
             MatchInfo matchInfo,
-            int winUid, DbUpdater batch,
+            Uid winUid, DbUpdater batch,
             BidState win, BidState lost) {
         matchInfo.getParticipantIdScore().keySet().forEach(uid ->
                 bidService.setBidState(tournament.getParticipant(uid),
-                        winUid == uid ? win : lost, asList(Play, Rest), batch));
+                        winUid.equals(uid) ? win : lost, asList(Play, Rest), batch));
     }
 
     private void completePlayOffMatch(OpenTournamentMemState tournament, MatchInfo matchInfo,
-            int winUid, DbUpdater batch) {
+            Uid winUid, DbUpdater batch) {
         if (matchInfo.getWinnerMid().isPresent()) {
             completeNoLastPlayOffMatch(tournament, matchInfo, winUid, batch);
         } else {
@@ -213,7 +214,7 @@ public class MatchService {
 
     public void tryToCompleteGroup(OpenTournamentMemState tournament, MatchInfo matchInfo, DbUpdater batch) {
         final int gid = matchInfo.getGid().get();
-        final Set<Integer> uids = matchInfo.getParticipantIdScore().keySet();
+        final Set<Uid> uids = matchInfo.getParticipantIdScore().keySet();
         final List<MatchInfo> matches = findMatchesInGroup(tournament, gid);
         final long completedMatches = matches.stream()
                 .map(MatchInfo::getState)
@@ -230,7 +231,7 @@ public class MatchService {
     }
 
     private void completeParticipationLeftBids(OpenTournamentMemState tournament,
-            List<Integer> leftUids, DbUpdater batch) {
+            List<Uid> leftUids, DbUpdater batch) {
         leftUids.forEach(uid -> {
             final ParticipantMemState participant = tournament.getParticipant(uid);
             if (participant.getState() == Quit || participant.getState() == Expl) {
@@ -248,7 +249,7 @@ public class MatchService {
 
     private void completeMiniTournamentGroup(
             OpenTournamentMemState tournament, GroupInfo iGru,
-            List<Integer> quitUids, DbUpdater batch) {
+            List<Uid> quitUids, DbUpdater batch) {
         if (iGru.getOrdNumber() == 0) {
             for (int i = 0; i < quitUids.size(); ++i) {
                 bidService.setBidState(tournament.getParticipant(quitUids.get(i)),
@@ -268,12 +269,12 @@ public class MatchService {
     @Inject
     private PlayOffService playOffService;
 
-    private List<Integer> completeGroup(Integer gid, OpenTournamentMemState tournament,
+    private List<Uid> completeGroup(Integer gid, OpenTournamentMemState tournament,
             List<MatchInfo> matches, DbUpdater batch) {
         log.info("Pick bids for playoff from gid {} in tid {}", gid, tournament.getTid());
         final int quits = tournament.getRule().getGroup().get().getQuits();
-        final List<Integer> orderUids = groupService.orderUidsInGroup(tournament, matches);
-        final List<Integer> quitUids = orderUids.subList(0, quits);
+        final List<Uid> orderUids = groupService.orderUidsInGroup(tournament, matches);
+        final List<Uid> quitUids = orderUids.subList(0, quits);
         log.info("{} quit group {}", quitUids, gid);
         final GroupInfo iGru = tournament.getGroups().get(gid);
         final List<MatchInfo> playOffMatches = playOffService.findBaseMatches(
@@ -301,7 +302,7 @@ public class MatchService {
         return orderUids.subList(quits, orderUids.size());
     }
 
-    public void assignBidToMatch(OpenTournamentMemState tournament, int mid, int uid, DbUpdater batch) {
+    public void assignBidToMatch(OpenTournamentMemState tournament, int mid, Uid uid, DbUpdater batch) {
         log.info("Assign uid {} to mid {} in tid {}", uid, mid, tournament.getTid());
         final MatchInfo matchInfo = tournament.getMatchById(mid);
         if (matchInfo.getParticipantIdScore().size() == 2) {
@@ -325,13 +326,14 @@ public class MatchService {
         }
     }
 
-    private void autoWinComplete(OpenTournamentMemState tournament, MatchInfo matchInfo, int uid, DbUpdater batch) {
+    private void autoWinComplete(OpenTournamentMemState tournament, MatchInfo matchInfo,
+            Uid uid, DbUpdater batch) {
         log.info("Auto complete mid {} due {} quit and {} detected",
                 matchInfo.getMid(), matchInfo.getOpponentUid(uid), uid);
         completeMatch(matchInfo, uid, batch);
         matchInfo.getWinnerMid()
                 .ifPresent(wmid -> assignBidToMatch(tournament, wmid, uid, batch));
-        if (uid == FILLER_LOSER_UID) {
+        if (FILLER_LOSER_UID.equals(uid)) {
             return;
         }
         switch (matchInfo.getType()) {
@@ -358,11 +360,11 @@ public class MatchService {
         matchDao.changeStatus(matchInfo.getMid(), state, batch);
     }
 
-    private void checkPermissions(OpenTournamentMemState tournament, int senderUid,
+    private void checkPermissions(OpenTournamentMemState tournament, Uid senderUid,
             MatchInfo matchInfo, FinalMatchScore score) {
-        final Set<Integer> scoreUids = score.getScores().stream()
+        final Set<Uid> scoreUids = score.getScores().stream()
                 .map(IdentifiedScore::getUid).collect(toSet());
-        final Set<Integer> participantIds = matchInfo.getParticipantIdScore().keySet();
+        final Set<Uid> participantIds = matchInfo.getParticipantIdScore().keySet();
         if (!participantIds.equals(scoreUids)) {
             throw badRequest("Some of participants don't play match "
                     + matchInfo.getMid());
@@ -373,14 +375,14 @@ public class MatchService {
                     + " neither admin of the tournament"
                     + " nor a participant of the match");
         }
-        final Map<Integer, Integer> newSetScore = score.getScores().stream()
+        final Map<Uid, Integer> newSetScore = score.getScores().stream()
                 .collect(toMap(IdentifiedScore::getUid, IdentifiedScore::getScore));
         final int playedSets = matchInfo.getPlayedSets();
         if (playedSets < score.getSetOrdNumber()) {
             throw badRequest("Set " + playedSets + " needs to be scored first");
         }
         if (playedSets > score.getSetOrdNumber()) {
-            final Map<Integer, Integer> setScore = matchInfo.getSetScore(score.getSetOrdNumber());
+            final Map<Uid, Integer> setScore = matchInfo.getSetScore(score.getSetOrdNumber());
             if (newSetScore.equals(setScore)) {
                 throw new ConfirmSetScore();
             }
@@ -401,7 +403,7 @@ public class MatchService {
 
     private static final Set<MatchState> incompleteStates = ImmutableSet.of(Draft, Place, Game);
 
-    public List<MatchInfo> bidIncompleteGroupMatches(int uid, OpenTournamentMemState tournament) {
+    public List<MatchInfo> bidIncompleteGroupMatches(Uid uid, OpenTournamentMemState tournament) {
         return tournament.getMatches().values().stream()
                 .filter(minfo -> minfo.getParticipantIdScore().containsKey(uid))
                 .filter(minfo -> minfo.getGid().isPresent())
@@ -410,16 +412,16 @@ public class MatchService {
     }
 
     public void leaveFromPlayOff(ParticipantMemState bid, OpenTournamentMemState tournament, DbUpdater batch) {
-        playOffMatchForResign(bid.getUid().getId(), tournament)
+        playOffMatchForResign(bid.getUid(), tournament)
                 .ifPresent(match -> {
-                    walkOver(tournament, bid.getUid().getId(), match, batch);
+                    walkOver(tournament, bid.getUid(), match, batch);
                     leaveFromPlayOff(bid, tournament, batch);
                 });
     }
 
-    public void walkOver(OpenTournamentMemState tournament, int walkoverUid, MatchInfo matchInfo, DbUpdater batch) {
+    public void walkOver(OpenTournamentMemState tournament, Uid walkoverUid, MatchInfo matchInfo, DbUpdater batch) {
         log.info("Uid {} walkovers mid {}", walkoverUid, matchInfo.getMid());
-        Optional<Integer> winUid = matchInfo.getOpponentUid(walkoverUid);
+        Optional<Uid> winUid = matchInfo.getOpponentUid(walkoverUid);
         if (winUid.isPresent()) {
             matchWinnerDetermined(tournament, matchInfo, winUid.get(), batch);
         } else {
@@ -429,7 +431,7 @@ public class MatchService {
         }
     }
 
-    public Optional<MatchInfo> playOffMatchForResign(int uid, OpenTournamentMemState tournament) {
+    public Optional<MatchInfo> playOffMatchForResign(Uid uid, OpenTournamentMemState tournament) {
         return tournament.getMatches().values()
                 .stream()
                 .filter(minfo -> minfo.hasParticipant(uid))
@@ -479,7 +481,7 @@ public class MatchService {
                 .orElse(Lists.emptyList());
 
         boolean notAllMatchesComplete = !allMatchesInGroupComplete(groupMatches);
-        final List<Integer> quitUids =
+        final List<Uid> quitUids =
                 tournament.getRule().getGroup().map(groupRules ->
                         groupService.orderUidsInGroup(tournament, groupMatches)
                                 .subList(0, groupRules.getQuits())).orElse(emptyList());
@@ -499,19 +501,19 @@ public class MatchService {
     }
 
     private void resetMatches(OpenTournamentMemState tournament, DbUpdater batch,
-            List<MatchInfo> affectedMatches, List<Integer> quitUids) {
+            List<MatchInfo> affectedMatches, List<Uid> quitUids) {
         affectedMatches.forEach(minfo ->
                 quitUids.forEach(uid -> removeParticipant(tournament, batch, minfo, uid)));
     }
 
     private void removeParticipant(OpenTournamentMemState tournament,
-            DbUpdater batch, MatchInfo minfo, int uid) {
+            DbUpdater batch, MatchInfo minfo, Uid uid) {
         if (minfo.getParticipantIdScore().remove(uid) == null) {
             return;
         }
         matchDao.removeScores(batch, minfo.getMid(), uid);
         if (minfo.getParticipantIdScore().size() == 1) {
-            final int opUid = minfo.getOpponentUid(uid).get();
+            final Uid opUid = minfo.getOpponentUid(uid).get();
             final BidState opoState = tournament.getParticipant(opUid).getState();
             switch (opoState) {
                 case Expl:
@@ -530,7 +532,7 @@ public class MatchService {
     }
 
     private List<MatchInfo> findAffectedMatches(OpenTournamentMemState tournament,
-            MatchInfo minfo, List<Integer> quitUids) {
+            MatchInfo minfo, List<Uid> quitUids) {
         if (minfo.getGid().isPresent()) {
             return findPlayOffMatches(tournament, quitUids);
         } else {
@@ -553,14 +555,17 @@ public class MatchService {
         findFollowingMatches(tournament, follows, result);
     }
 
-    private List<MatchInfo> findPlayOffMatches(OpenTournamentMemState tournament, List<Integer> quitUids) {
+    private List<MatchInfo> findPlayOffMatches(
+            OpenTournamentMemState tournament,
+            List<Uid> quitUids) {
         return tournament.getMatches().values().stream()
                 .filter(minfo -> quitUids.stream()
                         .anyMatch(uid -> minfo.getParticipantIdScore().containsKey(uid)))
                 .collect(toList());
     }
 
-    private List<MatchInfo> getWinLoseMatches(OpenTournamentMemState tournament, MatchInfo minfo) {
+    private List<MatchInfo> getWinLoseMatches(
+            OpenTournamentMemState tournament, MatchInfo minfo) {
         final List<MatchInfo> result = new ArrayList<>();
         minfo.getWinnerMid().map(tournament::getMatchById).ifPresent(result::add);
         minfo.getLoserMid().map(tournament::getMatchById).ifPresent(result::add);

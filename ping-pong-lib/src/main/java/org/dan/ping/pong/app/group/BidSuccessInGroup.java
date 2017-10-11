@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.tournament.Uid;
 
 @Setter
 @Getter
@@ -18,7 +19,7 @@ import org.dan.ping.pong.app.bid.BidState;
 @ToString(of={"uid","finalState","punkts"})
 @NoArgsConstructor(onConstructor = @__(@JsonCreator))
 public class BidSuccessInGroup {
-    private int uid;
+    private Uid uid;
     private BidState finalState;
     private int punkts;
     private int winSets;
@@ -26,7 +27,7 @@ public class BidSuccessInGroup {
     private int winBalls;
     private int lostBalls;
 
-    public BidSuccessInGroup(int uid, BidState finalState) {
+    public BidSuccessInGroup(Uid uid, BidState finalState) {
         this.uid = uid;
         this.finalState = finalState;
     }

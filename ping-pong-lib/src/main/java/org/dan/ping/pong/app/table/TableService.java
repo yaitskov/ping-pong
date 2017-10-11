@@ -9,6 +9,7 @@ import static org.dan.ping.pong.app.table.TableState.Free;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
+import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidState;
@@ -17,6 +18,7 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.time.Instant;
@@ -50,7 +52,7 @@ public class TableService {
 
     private List<MatchInfo> selectForScheduling(
             int matchesToSchedule, OpenTournamentMemState tournament) {
-        final Set<Integer> pickedUids = new HashSet<>();
+        final Set<Uid> pickedUids = new HashSet<>();
         return tournament.getMatches().values().stream()
                 .filter(minfo -> minfo.getState() == Place)
                 .filter(minfo -> minfo.getParticipantIdScore().size() == 2)

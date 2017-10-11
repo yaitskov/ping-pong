@@ -7,6 +7,7 @@ import static org.dan.ping.pong.mock.Generators.genEmail;
 import static org.dan.ping.pong.mock.Generators.genFirstLastName;
 import static org.dan.ping.pong.mock.Generators.genPhone;
 import static org.dan.ping.pong.mock.Generators.genStr;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -42,7 +43,7 @@ public class UserJerseyTest extends AbstractSpringJerseyTest {
                         .phone(phone)
                         .build())
                 .readEntity(UserRegistration.class);
-        assertThat(response.getUid(), Matchers.greaterThan(0));
+        assertThat(response.getUid(), hasProperty("id", Matchers.greaterThan(0)));
         assertThat(response.getSession(), containsString(sessionPart));
         final UserInfo userInfo = request().path(USER_INFO_BY_SESSION
                 + "/" + response.getSession())

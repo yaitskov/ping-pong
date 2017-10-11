@@ -58,9 +58,9 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
 
         simulator.simulate(scenario);
         TestUserSession session1 = scenario.getPlayersSessions().get(p1);
-        final int uid1 = session1.getUid();
+        final Uid uid1 = session1.getUid();
         TestUserSession session2 = scenario.getPlayersSessions().get(p2);
-        final int uid2 = session2.getUid();
+        final Uid uid2 = session2.getUid();
         final Response re = myRest().post(BEGIN_TOURNAMENT,
                 scenario.getTestAdmin().getSession(), scenario.getTid());
         assertEquals(400, re.getStatus());

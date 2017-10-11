@@ -74,7 +74,7 @@ public class Kw04FirstTournamentJerseyTest extends AbstractSpringJerseyTest {
                 OrderCategoryBidsManually
                         .builder()
                         .uids(scenario.getUidPlayer().keySet().stream()
-                                .sorted(Comparator.reverseOrder())
+                                .sorted(Comparator.comparing(Uid::getId).reversed())
                                 .collect(Collectors.toList()))
                         .cid(scenario.getCategoryDbId().get(c1))
                         .tid(scenario.getTid())

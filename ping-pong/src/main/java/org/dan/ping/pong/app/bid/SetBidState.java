@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dan.ping.pong.app.tournament.Uid;
 
 @Getter
 @Setter
@@ -13,7 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SetBidState {
     private int tid;
-    private int uid;
+    private Uid uid;
     private BidState expected;
     private BidState target;
 }

@@ -67,7 +67,7 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
         simulator.simulate(scenario);
         final Map<Player, TestUserSession> session = scenario.getPlayersSessions();
         myRest().voidPost(TOURNAMENT_RESIGN, session.get(p1), scenario.getTid());
-        final int uid = session.get(p1).getUid();
+        final Uid uid = session.get(p1).getUid();
         assertEquals(Optional.of(Quit), bidDao.getState(scenario.getTid(), uid));
     }
 

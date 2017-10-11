@@ -8,11 +8,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dan.ping.pong.app.tournament.Uid;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.swing.UIDefaults;
 
 @Getter
 @Setter
@@ -46,11 +49,11 @@ public class MatchValidationRule {
         }
     }
 
-    public Map<Integer, Integer> calcWonSets(Map<Integer, List<Integer>> participantScores) {
-        final List<Integer> uids = new ArrayList<>(participantScores.keySet());
-        final int uidA = uids.get(0);
+    public Map<Uid, Integer> calcWonSets(Map<Uid, List<Integer>> participantScores) {
+        final List<Uid> uids = new ArrayList<>(participantScores.keySet());
+        final Uid uidA = uids.get(0);
         final List<Integer> setsA = participantScores.get(uidA);
-        final int uidB = uids.get(1);
+        final Uid uidB = uids.get(1);
         final List<Integer> setsB = participantScores.get(uidB);
         int wonsA = 0;
         int wonsB = 0;
@@ -64,7 +67,7 @@ public class MatchValidationRule {
         return ImmutableMap.of(uidA, wonsA, uidB, wonsB);
     }
 
-    public Optional<Integer> findWinnerId(Map<Integer, Integer> wonSets) {
+    public Optional<Uid> findWinnerId(Map<Uid, Integer> wonSets) {
         return wonSets.entrySet().stream()
                 .filter(e -> e.getValue() >= setsToWin)
                 .map(Map.Entry::getKey)

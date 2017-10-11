@@ -34,8 +34,8 @@ public class MatchValidationRuleUnitTest {
             .minAdvanceInGames(2)
             .setsToWin(2)
             .build();
-    private static final int UID_A = 1;
-    private static final int UID_B = 2;
+    private static final Uid UID_A = new Uid(1);
+    private static final Uid UID_B = new Uid(2);
 
 
     @Test
@@ -74,7 +74,7 @@ public class MatchValidationRuleUnitTest {
 
     private List<IdentifiedScore> scores(int scoreA, int scoreB) {
         return Stream.of(scoreA, scoreB)
-                .map(s -> IdentifiedScore.builder().uid(1).score(s).build())
+                .map(s -> IdentifiedScore.builder().uid(UID_A).score(s).build())
                 .collect(toList());
     }
 
@@ -108,7 +108,7 @@ public class MatchValidationRuleUnitTest {
                 PING_PONG_RULE.findWinnerId(PING_PONG_RULE.calcWonSets(match(a, b).getParticipantIdScore())));
     }
 
-    private void findWinner(int uid, List<Integer> a, List<Integer> b) {
+    private void findWinner(Uid uid, List<Integer> a, List<Integer> b) {
         assertEquals(Optional.of(uid),
                 PING_PONG_RULE.findWinnerId(PING_PONG_RULE.calcWonSets(match(a, b).getParticipantIdScore())));
     }
@@ -122,7 +122,8 @@ public class MatchValidationRuleUnitTest {
 
     @Test
     public void findWinnerId3To1() {
-        assertEquals(Optional.of(111),
-                PING_PONG_RULE.findWinnerId(ImmutableMap.of(111, 3, 222, 1)));
+        assertEquals(Optional.of(new Uid(111)),
+                PING_PONG_RULE.findWinnerId(ImmutableMap.of(
+                        new Uid(111), 3, new Uid(222), 1)));
     }
 }

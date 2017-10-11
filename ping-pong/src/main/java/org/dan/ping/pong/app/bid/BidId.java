@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.tournament.Uid;
 
 @Getter
 @Setter
@@ -16,6 +17,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class BidId {
-    private int uid;
+    private Uid uid;
     private int tid;
 }

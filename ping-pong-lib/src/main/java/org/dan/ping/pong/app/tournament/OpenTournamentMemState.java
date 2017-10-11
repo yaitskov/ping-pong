@@ -29,8 +29,8 @@ public class OpenTournamentMemState {
     private int tid;
     private String name;
     private Pid pid;
-    private Set<Integer> adminIds;
-    private Map<Integer, ParticipantMemState> participants;
+    private Set<Uid> adminIds;
+    private Map<Uid, ParticipantMemState> participants;
     private Map<Integer, MatchInfo> matches;
     private Map<Integer, GroupInfo> groups;
     private Map<Integer, CategoryInfo> categories;
@@ -47,11 +47,11 @@ public class OpenTournamentMemState {
                 .orElseThrow(() -> badRequest("match-not-in-tournament", "mid", mid));
     }
 
-    public boolean isAdminOf(int uid) {
+    public boolean isAdminOf(Uid uid) {
         return adminIds.contains(uid);
     }
 
-    public ParticipantMemState getParticipant(int uid) {
+    public ParticipantMemState getParticipant(Uid uid) {
         return ofNullable(participants.get(uid))
                 .orElseThrow(() -> notFound("User " + uid
                         + " does participate in the tournament " + tid));
@@ -67,7 +67,7 @@ public class OpenTournamentMemState {
         }
     }
 
-    public ParticipantMemState getBid(int bid) {
+    public ParticipantMemState getBid(Uid bid) {
         return participants.get(bid);
     }
 
@@ -77,7 +77,7 @@ public class OpenTournamentMemState {
                 .collect(toList());
     }
 
-    public void checkAdmin(int uid) {
+    public void checkAdmin(Uid uid) {
         if (isAdminOf(uid)) {
             return;
         }
@@ -102,7 +102,7 @@ public class OpenTournamentMemState {
                 .build();
     }
 
-    public Stream<MatchInfo> participantMatches(int uid) {
+    public Stream<MatchInfo> participantMatches(Uid uid) {
         return matches.values().stream()
                 .filter(m -> m.getParticipantIdScore().containsKey(uid));
     }

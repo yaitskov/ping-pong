@@ -13,6 +13,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.records.PlaceRecord;
 import org.dan.ping.pong.app.city.CityLink;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.sys.db.DbUpdateSql;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.jooq.DSLContext;
@@ -61,7 +62,7 @@ public class PlaceDaoServer implements PlaceDao {
 
     @Override
     @Transactional(TRANSACTION_MANAGER)
-    public int createAndGrant(int author, String name, PlaceAddress address) {
+    public int createAndGrant(Uid author, String name, PlaceAddress address) {
         final int pid = create(name, address);
         jooq.insertInto(PLACE_ADMIN, PLACE_ADMIN.PID, PLACE_ADMIN.UID, PLACE_ADMIN.TYPE)
                 .values(pid, author, AUTHOR)
@@ -72,7 +73,7 @@ public class PlaceDaoServer implements PlaceDao {
 
     @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<PlaceLink> findEditableByUid(int uid) {
+    public List<PlaceLink> findEditableByUid(Uid uid) {
         return jooq
                 .select(PLACE.PID, PLACE.NAME,
                         PLACE.POST_ADDRESS,
@@ -130,7 +131,7 @@ public class PlaceDaoServer implements PlaceDao {
 
     @Override
     @Transactional(TRANSACTION_MANAGER)
-    public void update(int uid, PlaceLink place) {
+    public void update(Uid uid, PlaceLink place) {
         log.info("User {} updates place {}", uid, place.getPid());
         final UpdateSetMoreStep<PlaceRecord> request = jooq.update(PLACE)
                 .set(PLACE.NAME, place.getName())
@@ -143,7 +144,7 @@ public class PlaceDaoServer implements PlaceDao {
                 .execute();
     }
 
-    private Set<Integer> loadAdmins(Pid pid) {
+    private Set<Uid> loadAdmins(Pid pid) {
         return jooq.select(PLACE_ADMIN.UID)
                 .from(PLACE_ADMIN).where(PLACE_ADMIN.PID.eq(pid.getPid()))
                 .fetch()

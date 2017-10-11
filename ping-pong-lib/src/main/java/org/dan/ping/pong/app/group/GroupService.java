@@ -8,6 +8,7 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.Uid;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -16,8 +17,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.swing.UIDefaults;
+
 public class GroupService {
-    public Map<Integer, BidSuccessInGroup> emptyMatchesState(
+    public Map<Uid, BidSuccessInGroup> emptyMatchesState(
             OpenTournamentMemState tournament,
             Collection<MatchInfo> allMatchesInGroup) {
         checkArgument(allMatchesInGroup.stream()
@@ -31,9 +34,9 @@ public class GroupService {
                         (a, b) -> a));
     }
 
-    public List<Integer> orderUidsInGroup(OpenTournamentMemState tournament,
+    public List<Uid> orderUidsInGroup(OpenTournamentMemState tournament,
             List<MatchInfo> allMatchesInGroup) {
-        final Map<Integer, BidSuccessInGroup> uid2Stat = emptyMatchesState(tournament, allMatchesInGroup);
+        final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(tournament, allMatchesInGroup);
         final MatchValidationRule matchRule = tournament.getRule().getMatch();
         allMatchesInGroup.forEach(minfo -> aggMatch(uid2Stat, minfo, matchRule));
         return order(uid2Stat.values(), tournament.getRule().getGroup().get().getDisambiguation())
@@ -49,11 +52,11 @@ public class GroupService {
                 .collect(toList());
     }
 
-    public void aggMatch(Map<Integer, BidSuccessInGroup> uid2Stat,
+    public void aggMatch(Map<Uid, BidSuccessInGroup> uid2Stat,
             MatchInfo minfo, MatchValidationRule matchRule) {
-        final int winUid = minfo.getWinnerId().get();
+        final Uid winUid = minfo.getWinnerId().get();
         final BidSuccessInGroup winner = uid2Stat.get(winUid);
-        final int lostUid = minfo.getOpponentUid(winUid).get();
+        final Uid lostUid = minfo.getOpponentUid(winUid).get();
         final BidSuccessInGroup loser = uid2Stat.get(lostUid);
 
         minfo.getParticipantIdScore().get(winUid)
@@ -65,7 +68,7 @@ public class GroupService {
         minfo.getParticipantIdScore().get(lostUid)
                 .forEach(winner::lostBalls);
 
-        final Map<Integer, Integer> uid2Sets = matchRule.calcWonSets(minfo.getParticipantIdScore());
+        final Map<Uid, Integer> uid2Sets = matchRule.calcWonSets(minfo.getParticipantIdScore());
 
         loser.wonSets(uid2Sets.get(lostUid));
         loser.lostSets(uid2Sets.get(winUid));

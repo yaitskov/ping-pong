@@ -21,7 +21,7 @@ import java.util.Optional;
 public class GroupServiceTest {
     private static final int CID = 1;
     private static final int GID = 1;
-    private static final int UID1 = 1;
+    private static final Uid UID1 = new Uid(1);
     GroupService sut;
 
     @Before
@@ -32,10 +32,10 @@ public class GroupServiceTest {
     @Test
     public void zeroPopulationsNoGroups() {
         assertThat(sut.populations(OpenTournamentMemState.builder()
-                        .participants(ImmutableMap.of(1,
+                        .participants(ImmutableMap.of(UID1,
                                 ParticipantMemState.builder()
                                         .gid(Optional.empty())
-                                        .uid(new Uid(1))
+                                        .uid(UID1)
                                         .cid(CID)
                                         .tid(new Tid(1))
                                         .build()))
@@ -50,7 +50,7 @@ public class GroupServiceTest {
         assertThat(sut.populations(OpenTournamentMemState.builder()
                         .participants(ImmutableMap.of(UID1, ParticipantMemState.builder()
                                 .gid(Optional.of(GID))
-                                .uid(new Uid(UID1))
+                                .uid(UID1)
                                 .cid(CID)
                                 .tid(new Tid(1))
                                 .build()))

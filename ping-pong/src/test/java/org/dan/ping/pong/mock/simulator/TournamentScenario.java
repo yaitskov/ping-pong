@@ -25,6 +25,7 @@ import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.mock.SessionAware;
 import org.dan.ping.pong.mock.TestUserSession;
 
@@ -50,7 +51,7 @@ public class TournamentScenario implements SessionAware {
     private final Set<Player> playOffPlayers = new HashSet<>();
     private final Map<PlayerCategory, List<Player>> champions = new HashMap<>();
     private final Map<Player, TestUserSession> playersSessions = new HashMap<>();
-    private final Map<Integer, Player> uidPlayer = new LinkedHashMap<>();
+    private final Map<Uid, Player> uidPlayer = new LinkedHashMap<>();
     private final Map<PlayerCategory, Integer> categoryDbId = new HashMap<>();
     private final Map<Set<Player>, PlayHook> hooksOnMatches = new HashMap<>();
     private final Map<Player, EnlistMode> playerPresence = new HashMap<>();
@@ -75,6 +76,12 @@ public class TournamentScenario implements SessionAware {
 
     public String getSession() {
         return testAdmin.getSession();
+    }
+
+    public Uid player2Uid(Player p) {
+        return ofNullable(playersSessions.get(p))
+                .map(TestUserSession::getUid)
+                .orElseThrow(() -> new RuntimeException("No uid for player " + p));
     }
 
     private TournamentRules rules;
@@ -264,7 +271,7 @@ public class TournamentScenario implements SessionAware {
         return this;
     }
 
-    public void addPlayer(int uid, Player player) {
+    public void addPlayer(Uid uid, Player player) {
         assertNull(getUidPlayer().put(uid, player));
         playersSessions.put(player, TestUserSession.builder()
                 .uid(uid)

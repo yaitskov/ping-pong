@@ -8,6 +8,7 @@ import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 import org.dan.ping.pong.app.tournament.TournamentService;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.util.collection.CounterInt;
 import org.dan.ping.pong.util.time.Clocker;
@@ -24,14 +25,14 @@ public class BidResultService {
     @Inject
     private TournamentService tournamentService;
 
-    public BidResult getResults(OpenTournamentMemState tournament, int uid) {
+    public BidResult getResults(OpenTournamentMemState tournament, Uid uid) {
         final ParticipantMemState participant = tournament.getParticipant(uid);
         final List<TournamentResultEntry> resultEntries = tournamentService
                 .tournamentResult(tournament, participant.getCid());
 
         for (int iPos = 0 ;iPos < resultEntries.size(); ++iPos) {
             final TournamentResultEntry entry = resultEntries.get(iPos);
-            if (entry.getUser().getUid() == uid) {
+            if (entry.getUser().getUid().equals(uid)) {
                 return BidResult.builder()
                         .normal(entry.getScore().getRating())
                         .user(entry.getUser())
@@ -67,7 +68,7 @@ public class BidResultService {
 
     private LongSummaryStatistics matchTimes(OpenTournamentMemState tournament,
             ParticipantMemState participant, Instant now) {
-        return tournament.participantMatches(participant.getUid().getId())
+        return tournament.participantMatches(participant.getUid())
                 .map(m -> m.duration(now))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -75,7 +76,7 @@ public class BidResultService {
                 .summaryStatistics();
     }
 
-    private BidMatchesStat matches(OpenTournamentMemState tournament, int uid) {
+    private BidMatchesStat matches(OpenTournamentMemState tournament, Uid uid) {
         final CounterInt total = new CounterInt();
         final CounterInt won = new CounterInt();
         final CounterInt lost = new CounterInt();

@@ -458,6 +458,11 @@
                                     <binding>org.dan.ping.pong.sys.db.converters.OptionalIntegerConverter</binding>
                                 </customType>
                                 <customType>
+                                    <name>Uid</name>
+                                    <type>org.dan.ping.pong.app.tournament.Uid</type>
+                                    <binding>org.dan.ping.pong.sys.db.converters.UidConverter</binding>
+                                </customType>
+                                <customType>
                                     <name>OptionalDouble</name>
                                     <type>java.util.Optional&lt;java.lang.Double&gt;</type>
                                     <binding>org.dan.ping.pong.sys.db.converters.OptionalDoubleConverter</binding>
@@ -601,7 +606,7 @@
                                 </forcedType>
                                 <forcedType>
                                     <name>OptionalInteger</name>
-                                    <expression>.*matches\.(win_mid|lose_mid|uid_win)</expression>
+                                    <expression>.*matches\.(win_mid|lose_mid)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
@@ -627,6 +632,61 @@
                                 <forcedType>
                                     <name>TableState</name>
                                     <expression>.*tables\.(state)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Uid</name>
+                                    <expression>.*bid\.(uid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Uid</name>
+                                    <expression>.*users\.(uid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Uid</name>
+                                    <expression>.*country\.(author_id)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Uid</name>
+                                    <expression>.*city\.(author_id)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Uid</name>
+                                    <expression>.*admin\.(uid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Uid</name>
+                                    <expression>.*sessions\.(uid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Uid</name>
+                                    <expression>.*session_key\.(uid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Uid</name>
+                                    <expression>.*place_admin\.(uid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Uid</name>
+                                    <expression>.*tournament_admin\.(uid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Uid</name>
+                                    <expression>.*matches\.(uid_less|uid_more|uid_win)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Uid</name>
+                                    <expression>.*set_score\.(uid)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

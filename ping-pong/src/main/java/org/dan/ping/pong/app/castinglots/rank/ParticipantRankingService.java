@@ -7,6 +7,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import org.dan.ping.pong.app.castinglots.CastingLotsDao;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
+import org.dan.ping.pong.app.tournament.Uid;
 
 import java.util.List;
 import java.util.Map;
@@ -33,8 +34,8 @@ public class ParticipantRankingService {
 
     private List<ParticipantMemState> sortByProvidedRating(List<ParticipantMemState> bids,
             OrderDirection direction) {
-        Map<Integer, ParticipantMemState> participantIdx =
-                bids.stream().collect(toMap(o -> o.getUid().getId(), o -> o));
+        Map<Uid, ParticipantMemState> participantIdx =
+                bids.stream().collect(toMap(ParticipantMemState::getUid, o -> o));
         final List<ParticipantMemState> orderedBids = castingLotsDao.loadRanks(bids.get(0).getTid(),
                 participantIdx.keySet(), direction)
                 .stream()
@@ -45,8 +46,8 @@ public class ParticipantRankingService {
     }
 
     private List<ParticipantMemState> sortedManually(List<ParticipantMemState> bids) {
-        Map<Integer, ParticipantMemState> participantIdx =
-                bids.stream().collect(toMap(o -> o.getUid().getId(), o -> o));
+        Map<Uid, ParticipantMemState> participantIdx =
+                bids.stream().collect(toMap(ParticipantMemState::getUid, o -> o));
         final List<ParticipantMemState> orderedBids = castingLotsDao
                 .loadSeed(bids.get(0).getTid(), participantIdx.keySet())
                 .stream()

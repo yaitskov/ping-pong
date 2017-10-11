@@ -5,6 +5,7 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
+import org.dan.ping.pong.app.tournament.Uid;
 
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class CountryResource {
     public int create(
             @HeaderParam(SESSION) String session,
             NewCountry newCountry) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         return countryService.create(uid, newCountry);
     }
 }

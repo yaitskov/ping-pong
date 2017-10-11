@@ -6,6 +6,7 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import org.dan.ping.pong.app.auth.AuthService;
+import org.dan.ping.pong.app.tournament.Uid;
 
 import java.util.List;
 
@@ -59,7 +60,7 @@ public class PlaceResource {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public void update(@HeaderParam(SESSION) String session, PlaceLink place) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         placeDao.update(uid, place);
     }
 }

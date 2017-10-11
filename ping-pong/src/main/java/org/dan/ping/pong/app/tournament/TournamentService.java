@@ -72,6 +72,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.swing.UIDefaults;
 
 @Slf4j
 public class TournamentService {
@@ -90,7 +91,7 @@ public class TournamentService {
     private PlaceDao placeDao;
 
     @Transactional(TRANSACTION_MANAGER)
-    public int create(int uid, CreateTournament newTournament) {
+    public int create(Uid uid, CreateTournament newTournament) {
         final PlaceMemState place = placeDao.load(new Pid(newTournament.getPlaceId()))
                 .orElseThrow(() -> badRequest(UNKNOWN_PLACE, PID, newTournament.getPlaceId()));
         place.checkAdmin(uid);
@@ -150,10 +151,10 @@ public class TournamentService {
         validateEnlistOnline(tournament, enlistment);
         log.info("Uid {} enlists to tid {} in cid {}",
                 user.getUid(), tournament.getTid(), enlistment.getCategoryId());
-        int uid = user.getUid();
+        Uid uid = user.getUid();
         tournament.getParticipants().put(uid, ParticipantMemState.builder()
                 .bidState(Want)
-                .uid(new Uid(uid))
+                .uid(uid)
                 .name(user.getName())
                 .cid(enlistment.getCategoryId())
                 .tid(new Tid(tournament.getTid()))
@@ -161,12 +162,12 @@ public class TournamentService {
         enlist(tournament, uid, enlistment.getProvidedRank(), batch);
     }
 
-    private void enlist(OpenTournamentMemState tournament, int uid,
+    private void enlist(OpenTournamentMemState tournament, Uid uid,
             Optional<Integer> providedRank, DbUpdater batch) {
         bidDao.enlist(tournament.getParticipant(uid), clocker.get(), providedRank, batch);
     }
 
-    public List<TournamentDigest> findInWithEnlisted(int uid, int days) {
+    public List<TournamentDigest> findInWithEnlisted(Uid uid, int days) {
         return tournamentDao.findEnlistedIn(uid,
                 clocker.get().minus(days, DAYS));
     }
@@ -213,7 +214,7 @@ public class TournamentService {
     private CategoryDao categoryDao;
 
     public DraftingTournamentInfo getDraftingTournament(int tid,
-            Optional<Integer> participantId) {
+            Optional<Uid> participantId) {
         final List<CategoryInfo> categories = categoryDao.listCategoriesByTid(tid);
         final DraftingTournamentInfo result = tournamentDao
                 .getDraftingTournament(tid, participantId)
@@ -288,7 +289,7 @@ public class TournamentService {
 
     public void activeParticipantLeave(ParticipantMemState bid, OpenTournamentMemState tournament,
             Instant now, BidState target, DbUpdater batch) {
-        final int uid = bid.getUid().getId();
+        final Uid uid = bid.getUid();
         List<MatchInfo> incompleteMy = matchService.bidIncompleteGroupMatches(uid, tournament);
         log.info("activeParticipantLeave uid {} incomplete {}", uid, incompleteMy.size());
         if (incompleteMy.isEmpty()) {
@@ -319,13 +320,13 @@ public class TournamentService {
                 clocker.get().minus(completeInLastDays, DAYS));
     }
 
-    public MyRecentTournaments findMyRecentTournaments(int uid) {
+    public MyRecentTournaments findMyRecentTournaments(Uid uid) {
         return tournamentDao.findMyRecentTournaments(
                 clocker.get().minus(DAYS_TO_SHOW_COMPLETE_BIDS, DAYS),
                 uid);
     }
 
-    public MyRecentJudgedTournaments findMyRecentJudgedTournaments(int uid) {
+    public MyRecentJudgedTournaments findMyRecentJudgedTournaments(Uid uid) {
         return tournamentDao.findMyRecentJudgedTournaments(clocker.get(), uid);
     }
 
@@ -385,7 +386,7 @@ public class TournamentService {
     public List<TournamentResultEntry> tournamentResult(OpenTournamentMemState tournament, int cid) {
         final List<MatchInfo> cidMatches = categoryService.findMatchesInCategory(tournament, cid);
         int level = 1;
-        final Map<Integer, CumulativeScore> uidLevel = new HashMap<>();
+        final Map<Uid, CumulativeScore> uidLevel = new HashMap<>();
         Collection<MatchInfo> baseMatches = playOffService.findBaseMatches(cidMatches);
         final MatchValidationRule matchRules = tournament.getRule().getMatch();
         while (true) {
@@ -416,9 +417,9 @@ public class TournamentService {
     }
 
     private void ranksLevelMatches(OpenTournamentMemState tournament, int level,
-            Map<Integer, CumulativeScore> uidLevel,
+            Map<Uid, CumulativeScore> uidLevel,
             Collection<MatchInfo> matches, MatchValidationRule rules) {
-        final Map<Integer, BidSuccessInGroup> uid2Stat = groupService.emptyMatchesState(tournament, matches);
+        final Map<Uid, BidSuccessInGroup> uid2Stat = groupService.emptyMatchesState(tournament, matches);
         matches.forEach(m -> groupService.aggMatch(uid2Stat, m, rules));
         uid2Stat.forEach((uid, stat) ->
                 uidLevel.merge(uid,
@@ -439,7 +440,7 @@ public class TournamentService {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<TournamentDigest> findWritableForAdmin(int uid, int days) {
+    public List<TournamentDigest> findWritableForAdmin(Uid uid, int days) {
         return tournamentDao.findWritableForAdmin(uid,
                 clocker.get().minus(days, DAYS));
     }
@@ -447,17 +448,17 @@ public class TournamentService {
     @Inject
     private UserDao userDao;
 
-    public int enlistOffline(OpenTournamentMemState tournament,
+    public Uid enlistOffline(OpenTournamentMemState tournament,
             EnlistOffline enlistment, DbUpdater batch) {
         validateEnlistOffline(tournament, enlistment);
-        final int participantUid = userDao.register(UserRegRequest.builder()
+        final Uid participantUid = userDao.register(UserRegRequest.builder()
                 .name(enlistment.getName())
                 .build());
         tournament.getParticipants().put(participantUid, ParticipantMemState.builder()
                 .bidState(enlistment.getBidState())
                 .name(enlistment.getName())
                 .cid(enlistment.getCid())
-                .uid(new Uid(participantUid))
+                .uid(participantUid)
                 .gid(enlistment.getGroupId())
                 .tid(new Tid(tournament.getTid()))
                 .build());

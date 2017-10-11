@@ -4,13 +4,14 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.dan.ping.pong.app.tournament.Uid;
 
 @Getter
 @Builder
 @ToString
 @EqualsAndHashCode
 public class ScoreInfo {
-    private int uid;
+    private Uid uid;
     private int tid;
     private int score;
     private int won;

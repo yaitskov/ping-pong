@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.time.Instant;
@@ -24,11 +25,11 @@ public interface BidDao {
     Set<BidState> TERMINAL_BID_STATES = ImmutableSet.of(Win1, Win2, Win3,
             Expl, Lost, Quit);
 
-    void setBidState(int tid, int uid, BidState target,
+    void setBidState(int tid, Uid uid, BidState target,
             List<BidState> expected, Instant now, DbUpdater batch);
 
     void markParticipantsBusy(OpenTournamentMemState tournament,
-            Collection<Integer> uids, Instant now, DbUpdater batch);
+            Collection<Uid> uids, Instant now, DbUpdater batch);
 
     void setGroupForUids(int gid, int tid, List<ParticipantMemState> groupBids);
 
@@ -36,11 +37,11 @@ public interface BidDao {
 
     List<ParticipantState> findEnlisted(int tid);
 
-    Optional<DatedParticipantState> getParticipantInfo(int tid, int uid);
+    Optional<DatedParticipantState> getParticipantInfo(int tid, Uid uid);
 
     void setCategory(SetCategory setCategory, Instant now, DbUpdater batch);
 
     void resetStateByTid(int tid, Instant now, DbUpdater batch);
 
-    Map<Integer, ParticipantMemState> loadParticipants(Tid tid);
+    Map<Uid, ParticipantMemState> loadParticipants(Tid tid);
 }

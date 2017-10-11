@@ -18,6 +18,7 @@ import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.tournament.CreateTournament;
 import org.dan.ping.pong.app.tournament.ForTestTournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentDao;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserRegRequest;
@@ -43,8 +44,8 @@ public class DaoEntityGenerator {
     public DaoEntityGenerator() {
     }
 
-    public int genAdmin(int said) {
-        final int uid = genUser().getUid();
+    public Uid genAdmin(int said) {
+        final Uid uid = genUser().getUid();
         userDao.promoteToAdmins(said, uid);
         return uid;
     }
@@ -72,34 +73,34 @@ public class DaoEntityGenerator {
     @Inject
     private AuthDao authDao;
 
-    public String genUserSession(int uid) {
-        final String token = "test-session-for-uid-" + uid + genStr(11);
-        authDao.saveSession(uid, token, "test-device-info-for-uid-" + uid);
+    public String genUserSession(Uid uid) {
+        final String token = "test-session-for-uid-" + uid.getId() + genStr(11);
+        authDao.saveSession(uid, token, "test-device-info-for-uid-" + uid.getId());
         return token;
     }
 
     @Inject
     private CountryDao countryDao;
 
-    public int genCountry(String name, int admin) {
+    public int genCountry(String name, Uid admin) {
         return countryDao.create(admin, NewCountry.builder().name(name).build());
     }
 
     @Inject
     private CityDao cityDao;
 
-    public int genCity(String name, int admin) {
+    public int genCity(String name, Uid admin) {
         return genCity(genCountry(name, admin), name, admin);
     }
 
-    public int genCity(int countryId, String name, int admin) {
+    public int genCity(int countryId, String name, Uid admin) {
         return cityDao.create(admin, NewCity.builder().countryId(countryId).name(name).build());
     }
 
     @Inject
     private PlaceDao placeDao;
 
-    public int genPlace(int cityId, String name, int admin) {
+    public int genPlace(int cityId, String name, Uid admin) {
         return placeDao.createAndGrant(admin, name,
                 PlaceAddress.builder()
                         .city(CityLink.builder().id(cityId).build())
@@ -111,13 +112,13 @@ public class DaoEntityGenerator {
     @Inject
     private TableDao tableDao;
 
-    public int genPlace(int cityId, String name, int admin, int tables) {
+    public int genPlace(int cityId, String name, Uid admin, int tables) {
         final int placeId = genPlace(cityId, name, admin);
         tableDao.createTables(placeId, tables);
         return placeId;
     }
 
-    public int genPlace(int admin, int tables) {
+    public int genPlace(Uid admin, int tables) {
         return genPlace(genCity(genCountry(genStr(), admin), genStr(), admin),
                 genStr(), admin, tables);
     }
@@ -131,11 +132,11 @@ public class DaoEntityGenerator {
     @Inject
     private Clocker clocker;
 
-    public int genTournament(int adminId, int placeId, TournamentProps props) {
+    public int genTournament(Uid adminId, int placeId, TournamentProps props) {
         return genTournament(genTournamentName(), adminId, placeId, props);
     }
 
-    public int genTournament(String name, int adminId, int placeId, TournamentProps props) {
+    public int genTournament(String name, Uid adminId, int placeId, TournamentProps props) {
         final int tid = tournamentDao.create(adminId, CreateTournament.builder()
                 .opensAt(props.getOpensAt()
                         .orElseGet(() -> clocker.get().plus(1, ChronoUnit.DAYS)))

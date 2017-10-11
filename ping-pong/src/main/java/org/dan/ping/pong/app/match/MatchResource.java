@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.util.time.Clocker;
 
@@ -48,7 +49,7 @@ public class MatchResource {
     @Consumes(APPLICATION_JSON)
     public List<MyPendingMatch> findPendingMatches(
             @HeaderParam(SESSION) String session) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         return matchDao.findPendingMatches(uid);
     }
 
@@ -66,7 +67,7 @@ public class MatchResource {
             @HeaderParam(SESSION) String session,
             FinalMatchScore score) {
         //response.setTimeout(30, TimeUnit.SECONDS);
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("User {} sets scores {} for match {}",
                 uid, score.getScores(), score.getMid());
         tournamentAccessor.update(new Tid(score.getTid()), response,
@@ -81,7 +82,7 @@ public class MatchResource {
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             ResetSetScore reset) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("User {} reset scores in min {} of tid {}",
                 uid, reset.getMid(), reset.getTid());
         tournamentAccessor.update(new Tid(reset.getTid()), response,
@@ -110,7 +111,7 @@ public class MatchResource {
     @Consumes(APPLICATION_JSON)
     public List<OpenMatchForJudge> findOpenMatchesForJudge(
             @HeaderParam(SESSION) String session) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         return matchDao.findOpenMatchesFurJudge(uid);
     }
 

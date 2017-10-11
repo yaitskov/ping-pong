@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dan.ping.pong.app.place.Pid;
 
 import java.io.IOException;
 
@@ -24,6 +23,10 @@ public class Tid {
     // jax-rsp
     public static Tid valueOf(String s) {
         return new Tid(Integer.valueOf(s));
+    }
+
+    public static Tid of(int id) {
+        return new Tid(id);
     }
 
     public String toString() {

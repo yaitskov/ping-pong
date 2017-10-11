@@ -11,7 +11,6 @@ import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
-import static org.dan.ping.pong.sys.db.DbUpdateSql.JUST_2_ROWS;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.JUST_A_ROW;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
@@ -44,7 +43,7 @@ public class BidDaoServer implements BidDao {
     private DSLContext jooq;
 
     @Override
-    public void setBidState(int tid, int uid, BidState target,
+    public void setBidState(int tid, Uid uid, BidState target,
             List<BidState> expected, Instant now, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .logBefore(() -> log.info("Set bid status {} for {} if {}",
@@ -62,12 +61,12 @@ public class BidDaoServer implements BidDao {
 
     @Override
     public void markParticipantsBusy(OpenTournamentMemState tournament,
-            Collection<Integer> uids, Instant now, DbUpdater batch) {
-        final List<Integer> finalUids = uids.stream()
+            Collection<Uid> uids, Instant now, DbUpdater batch) {
+        final List<Uid> finalUids = uids.stream()
                 .map(tournament::getBid)
-                .filter(bid -> bid.getBidState() != Play)
+                .filter(bid -> bid.getState() != Play)
                 .peek(bid -> bid.setBidState(Play))
-                .map(bid -> bid.getUid().getId())
+                .map(ParticipantMemState::getUid)
                 .collect(toList());
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(Optional.of(finalUids.size()))
@@ -101,7 +100,7 @@ public class BidDaoServer implements BidDao {
                 .mustAffectRows(NON_ZERO_ROWS)
                 .query(jooq.insertInto(BID, BID.CID, BID.TID, BID.UID,
                         BID.STATE, BID.PROVIDED_RANK)
-                        .values(bid.getCid(), bid.getTid().getTid(), bid.getUid().getId(),
+                        .values(bid.getCid(), bid.getTid().getTid(), bid.getUid(),
                                 bid.getBidState(), providedRank)
                         .onDuplicateKeyUpdate()
                         .set(BID.STATE, bid.getBidState())
@@ -137,7 +136,7 @@ public class BidDaoServer implements BidDao {
 
     @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<DatedParticipantState> getParticipantInfo(int tid, int uid) {
+    public Optional<DatedParticipantState> getParticipantInfo(int tid, Uid uid) {
         return ofNullable(jooq.select(BID.UID, USERS.NAME, BID.STATE,
                 BID.CREATED, CATEGORY.NAME, CATEGORY.CID)
                 .from(BID)
@@ -185,7 +184,7 @@ public class BidDaoServer implements BidDao {
     }
 
     @Override
-    public Map<Integer, ParticipantMemState> loadParticipants(Tid tid) {
+    public Map<Uid, ParticipantMemState> loadParticipants(Tid tid) {
         return jooq.select(BID.UID, BID.STATE, USERS.NAME, BID.GID, BID.CID,
                 BID.CREATED, BID.UPDATED)
                 .from(BID)
@@ -201,7 +200,7 @@ public class BidDaoServer implements BidDao {
                                 .enlistedAt(r.get(BID.CREATED))
                                 .updatedAt(r.get(BID.UPDATED).orElse(r.get(BID.CREATED)))
                                 .name(r.get(USERS.NAME))
-                                .uid(new Uid(r.get(BID.UID)))
+                                .uid(r.get(BID.UID))
                                 .bidState(r.get(BID.STATE))
                                 .build()));
     }

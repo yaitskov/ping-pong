@@ -10,6 +10,7 @@
  import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
  import org.dan.ping.pong.app.place.Pid;
  import org.dan.ping.pong.app.tournament.Tid;
+ import org.dan.ping.pong.app.tournament.Uid;
  import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
  import org.springframework.context.annotation.Bean;
  import org.springframework.http.converter.json.SpringHandlerInstantiator;
@@ -25,6 +26,7 @@ public class ObjectMapperProvider {
                 .disable(WRITE_DATES_AS_TIMESTAMPS)
                 .registerModule(Pid.jacksonMarshal())
                 .registerModule(Tid.jacksonMarshal())
+                .registerModule(Uid.jacksonMarshal())
                 .registerModule(new Jdk8Module())
                 .registerModule(new JavaTimeModule());
     }

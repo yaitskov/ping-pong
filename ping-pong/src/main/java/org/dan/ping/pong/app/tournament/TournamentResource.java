@@ -99,7 +99,7 @@ public class TournamentResource {
     public int copy(
             @HeaderParam(SESSION) String session,
             CopyTournament copyTournament) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         if (tournamentDao.isAdminOf(uid, copyTournament.getOriginTid())) {
             return tournamentService.copy(copyTournament);
         } else {
@@ -153,7 +153,7 @@ public class TournamentResource {
             @HeaderParam(SESSION) String session,
             int tid) {
 
-        final int adminUid = authService.userInfoBySession(session).getUid();
+        final Uid adminUid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(new Tid(tid), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
             log.info("invalidate tournament cache {}", tid);
@@ -171,7 +171,7 @@ public class TournamentResource {
         if (enlistment.getCid() < 1) {
             throw badRequest("Category id is missing");
         }
-        final int adminUid = authService.userInfoBySession(session).getUid();
+        final Uid adminUid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(new Tid(enlistment.getTid()), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
             return tournamentService.enlistOffline(tournament, enlistment, batch);
@@ -185,7 +185,7 @@ public class TournamentResource {
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             TournamentUpdate update) {
-        final int adminUid = authService.userInfoBySession(session).getUid();
+        final Uid adminUid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(new Tid(update.getTid()), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
             tournamentService.update(tournament, update, batch);
@@ -200,7 +200,7 @@ public class TournamentResource {
             @HeaderParam(SESSION) String session,
             @Suspended AsyncResponse response,
             int tid) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(new Tid(tid), response, (tournament, batch) -> {
             tournamentService.leaveTournament(tournament.getParticipant(uid),
                     tournament, BidState.Quit, batch);
@@ -217,7 +217,7 @@ public class TournamentResource {
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             ExpelParticipant expelParticipant) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(new Tid(expelParticipant.getTid()), response, (tournament, batch) -> {
             tournament.checkAdmin(uid);
             tournamentService.leaveTournament(
@@ -298,7 +298,7 @@ public class TournamentResource {
             @HeaderParam(SESSION) String session,
             TidIdentifiedRules parameters) {
         validate(parameters.getRules());
-        int uid = authService.userInfoBySession(session).getUid();
+        Uid uid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(new Tid(parameters.getTid()), response, (tournament, batch) -> {
             tournament.checkAdmin(uid);
             tournamentService.updateTournamentParams(tournament, parameters, batch);
@@ -312,7 +312,7 @@ public class TournamentResource {
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             int tid) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("Uid {} begins tid {}", uid, tid);
         tournamentAccessor.update(new Tid(tid), response, (tournament, batch) -> {
             tournament.checkAdmin(uid);
@@ -327,7 +327,7 @@ public class TournamentResource {
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             int tid) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("User {} tried to cancel tournament {}", uid, tid);
         tournamentAccessor.update(new Tid(tid), response, (tournament, batch) -> {
             tournament.checkAdmin(uid);
@@ -342,7 +342,7 @@ public class TournamentResource {
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             SetTournamentState stateUpdate) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("Uid {} sets status {} for tid {}", uid,
                 stateUpdate.getState(), stateUpdate.getTid());
         tournamentAccessor.update(new Tid(stateUpdate.getTid()), response, (tournament, batch) -> {
@@ -355,7 +355,7 @@ public class TournamentResource {
     @Path(MY_RECENT_TOURNAMENT)
     public MyRecentTournaments findMyRecentPlayedTournaments(
             @HeaderParam(SESSION) String session) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         return tournamentService.findMyRecentTournaments(uid);
     }
 
@@ -363,7 +363,7 @@ public class TournamentResource {
     @Path(MY_RECENT_TOURNAMENT_JUDGEMENT)
     public MyRecentJudgedTournaments findMyRecentJudgedTournaments(
             @HeaderParam(SESSION) String session) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         return tournamentService.findMyRecentJudgedTournaments(uid);
     }
 

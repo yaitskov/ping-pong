@@ -11,6 +11,7 @@ import org.dan.ping.pong.app.country.NewCountry;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceDaoServer;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserRegRequest;
 import org.dan.ping.pong.app.user.UserType;
@@ -49,7 +50,7 @@ public class TableDaoTest {
 
     @Test
     public void delete() {
-        final int uid = userDao.register(UserRegRequest.builder().name(genStr()).userType(UserType.User)
+        final Uid uid = userDao.register(UserRegRequest.builder().name(genStr()).userType(UserType.User)
                 .sessionPart("asdf").build());
         final int countryId = countryDao.create(uid, NewCountry.builder().name(genStr()).build());
         final int cityId = cityDao.create(uid, NewCity.builder().countryId(countryId).name(genStr()).build());

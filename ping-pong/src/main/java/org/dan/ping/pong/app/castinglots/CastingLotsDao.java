@@ -26,6 +26,7 @@ import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
 import org.jooq.Query;
@@ -76,7 +77,7 @@ public class CastingLotsDao {
             ParticipantMemState bid1, ParticipantMemState bid2) {
         final int mid = matchDao.createGroupMatch(bid1.getTid().getTid(),
                 bid1.getGid().get(), bid1.getCid(), ++priorityGroup,
-                bid1.getUid().getId(), bid2.getUid().getId());
+                bid1.getUid(), bid2.getUid());
         tournament.getMatches().put(mid, MatchInfo.builder()
                 .tid(bid1.getTid().getTid())
                 .mid(mid)
@@ -84,8 +85,8 @@ public class CastingLotsDao {
                 .state(MatchState.Place)
                 .gid(bid1.getGid())
                 .participantIdScore(ImmutableMap.of(
-                        bid1.getUid().getId(), new ArrayList<>(),
-                        bid2.getUid().getId(), new ArrayList<>()))
+                        bid1.getUid(), new ArrayList<>(),
+                        bid2.getUid(), new ArrayList<>()))
                 .type(Grup)
                 .cid(bid1.getCid())
                 .build());
@@ -130,7 +131,7 @@ public class CastingLotsDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<Integer> loadRanks(Tid tid, Set<Integer> uids, OrderDirection direction) {
+    public List<Uid> loadRanks(Tid tid, Set<Uid> uids, OrderDirection direction) {
         return jooq.select(BID.UID).from(BID)
                 .where(BID.TID.eq(tid.getTid()),
                         BID.UID.in(uids),
@@ -154,7 +155,7 @@ public class CastingLotsDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<Integer> loadSeed(Tid tid, Set<Integer> uids) {
+    public List<Uid> loadSeed(Tid tid, Set<Uid> uids) {
         return jooq.select(BID.UID).from(BID)
                 .where(BID.TID.eq(tid.getTid()),
                         BID.UID.in(uids),
@@ -169,13 +170,13 @@ public class CastingLotsDao {
         batch.add(jooq.update(BID).set(BID.SEED, Optional.empty())
                 .where(BID.TID.eq(order.getTid()),
                         BID.CID.eq(order.getCid())));
-        for (int uid : order.getUids()) {
+        for (Uid uid : order.getUids()) {
              batch.add(jooq.update(BID)
                      .set(BID.SEED, Optional.of(batch.size()))
                      .where(BID.TID.eq(order.getTid()), BID.UID.eq(uid)));
         }
         jooq.batch(batch).execute();
-        final List<Integer> unseededUids = jooq.select(BID.UID).from(BID)
+        final List<Uid> unseededUids = jooq.select(BID.UID).from(BID)
                 .where(BID.TID.eq(order.getTid()),
                         BID.CID.eq(order.getCid()),
                         BID.SEED.isNull())

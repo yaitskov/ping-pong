@@ -9,6 +9,7 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.notAuthorized;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +38,7 @@ public class AuthDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void saveSession(int uid, String token, String deviceInfo) {
+    public void saveSession(Uid uid, String token, String deviceInfo) {
         jooq.insertInto(SESSIONS, SESSIONS.TOKEN, SESSIONS.UID, SESSIONS.DEVICE_INFO)
                 .values(token, uid, deviceInfo)
                 .execute();
@@ -81,8 +82,8 @@ public class AuthDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void saveOneTimeToken(String oneTimeToken, Integer uid) {
-        log.info("Persist one time sign in token for uid {}", uid);
+    public void saveOneTimeToken(String oneTimeToken, Uid uid) {
+        log.info("Persist one time sign in token for {}", uid);
         jooq.insertInto(SESSION_KEY, SESSION_KEY.UID, SESSION_KEY.TOKEN)
                 .values(uid, oneTimeToken)
                 .execute();

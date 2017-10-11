@@ -2,11 +2,12 @@ package org.dan.ping.pong.mock;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.dan.ping.pong.app.tournament.Uid;
 
 @Getter
 @Builder
 public class TestAdmin implements SessionAware {
     private String session;
-    private int uid;
+    private Uid uid;
     private int said;
 }

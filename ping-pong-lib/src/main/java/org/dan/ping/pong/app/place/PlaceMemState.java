@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.dan.ping.pong.app.table.TableInfo;
+import org.dan.ping.pong.app.tournament.Uid;
 
 import java.util.Map;
 import java.util.Optional;
@@ -24,7 +25,7 @@ public class PlaceMemState {
     private final Pid pid;
     private String name;
     private Map<Integer, TableInfo> tables;
-    private Set<Integer> adminIds;
+    private Set<Uid> adminIds;
     private Optional<Integer> hostingTid;
 
     public TableInfo getTableByMid(int mid) {
@@ -41,7 +42,7 @@ public class PlaceMemState {
                         + " is not in place " + pid));
     }
 
-    public void checkAdmin(int uid) {
+    public void checkAdmin(Uid uid) {
         if (adminIds.contains(uid)) {
             return;
         }

@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.auth;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.dan.ping.pong.app.tournament.Uid;
 
 import java.util.Optional;
 
@@ -10,6 +11,6 @@ import java.util.Optional;
 @Builder
 @ToString
 public class OneTimeSignInToken {
-    private int uid;
+    private Uid uid;
     private Optional<String> token;
 }

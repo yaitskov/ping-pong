@@ -50,14 +50,14 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                             final GroupPopulations populations = myRest()
                                     .get(GROUP_POPULATIONS + s.getTid() + CID + cid,
                                             GroupPopulations.class);
-                            final int uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, s,
+                            final Uid uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, s,
                                     EnlistOffline.builder()
                                             .groupId(Optional.of(populations.getLinks().get(0).getGid()))
                                             .tid(s.getTid())
                                             .cid(cid)
                                             .bidState(BidState.Wait)
                                             .name("p4")
-                                            .build()).readEntity(Integer.class);
+                                            .build()).readEntity(Uid.class);
                             s.addPlayer(uid, Player.p4);
                             return HookDecision.Skip;
                         })
@@ -90,14 +90,14 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                             final GroupPopulations populations = myRest()
                                     .get(GROUP_POPULATIONS + s.getTid() + CID + cid,
                                             GroupPopulations.class);
-                            final int uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, s,
+                            final Uid uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, s,
                                     EnlistOffline.builder()
                                             .groupId(Optional.of(populations.getLinks().get(0).getGid()))
                                             .tid(s.getTid())
                                             .cid(cid)
                                             .bidState(BidState.Wait)
                                             .name("p4")
-                                            .build()).readEntity(Integer.class);
+                                            .build()).readEntity(Uid.class);
                             s.addPlayer(uid, Player.p4);
                             return HookDecision.Skip;
                         })

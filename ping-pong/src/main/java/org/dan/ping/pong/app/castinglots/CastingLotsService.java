@@ -25,6 +25,7 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.sys.db.DbUpdaterSql;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -141,18 +142,18 @@ public class CastingLotsService {
             final int iWeakBid = Math.max(iBid1, iBid2);
 
             matchService.assignBidToMatch(tournament, match.getMid(),
-                    orderedBids.get(iStrongBid).getUid().getId(), batch);
+                    orderedBids.get(iStrongBid).getUid(), batch);
 
             if (iWeakBid >= orderedBids.size()) {
                 final ParticipantMemState fakeLoser = createLoserBid(
                         new Tid(tournament.getTid()), cid);
                 bidService.setBidState(orderedBids.get(iStrongBid), Play, singletonList(Here), batch);
                 matchService.assignBidToMatch(tournament, match.getMid(),
-                        fakeLoser.getUid().getId(), batch);
+                        fakeLoser.getUid(), batch);
                 matchService.leaveFromPlayOff(fakeLoser, tournament, batch);
             } else {
                 matchService.assignBidToMatch(tournament, match.getMid(),
-                        orderedBids.get(iWeakBid).getUid().getId(), batch);
+                        orderedBids.get(iWeakBid).getUid(), batch);
             }
         }
     }
@@ -239,7 +240,7 @@ public class CastingLotsService {
         return castingLotsDao.loadManualBidsOrder(tid, cid);
     }
 
-    public void addParticipant(int uid, OpenTournamentMemState tournament) {
+    public void addParticipant(Uid uid, OpenTournamentMemState tournament) {
         final ParticipantMemState participant = tournament.getParticipant(uid);
         log.info("Add participant {} to group", uid, participant.getGid());
         int[] priority = new int[1];

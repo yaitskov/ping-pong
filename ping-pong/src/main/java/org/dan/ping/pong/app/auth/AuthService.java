@@ -16,6 +16,7 @@ import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableMap;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.sys.EmailService;
@@ -74,7 +75,7 @@ public class AuthService {
                 .digest((password + salt).getBytes()));
     }
 
-    public String authUser(int uid, String userSessionPart, String deviceInfo) {
+    public String authUser(Uid uid, String userSessionPart, String deviceInfo) {
         if (userSessionPart.length() != USER_PART_SESSION_LEN) {
             throw badRequest("user session part should have length 20");
         }

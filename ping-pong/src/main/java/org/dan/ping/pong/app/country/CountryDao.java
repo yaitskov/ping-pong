@@ -4,6 +4,7 @@ import static ord.dan.ping.pong.jooq.Tables.COUNTRY;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,7 @@ public class CountryDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public int countByAuthor(int uid) {
+    public int countByAuthor(Uid uid) {
         return jooq.selectCount()
                 .from(COUNTRY)
                 .where(COUNTRY.AUTHOR_ID.eq(uid))
@@ -37,7 +38,7 @@ public class CountryDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public int create(int uid, NewCountry newCountry) {
+    public int create(Uid uid, NewCountry newCountry) {
         return jooq.insertInto(COUNTRY, COUNTRY.NAME, COUNTRY.AUTHOR_ID)
                 .values(newCountry.getName(), uid)
                 .returning(COUNTRY.COUNTRY_ID)

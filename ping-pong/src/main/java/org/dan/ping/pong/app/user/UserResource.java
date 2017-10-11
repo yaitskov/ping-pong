@@ -8,6 +8,7 @@ import static org.dan.ping.pong.app.user.UserType.User;
 import com.google.common.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.util.time.Clocker;
 
 import javax.inject.Inject;
@@ -38,7 +39,7 @@ public class UserResource {
     @Produces(APPLICATION_JSON)
     public UserRegistration registerUser(UserRegRequest regRequest,
             @HeaderParam("User-Agent") String agent) {
-        final int uid = userDao.registerDefaultType(regRequest);
+        final Uid uid = userDao.registerDefaultType(regRequest);
         log.info("Register user [{}] with uid {}", regRequest.getName(), uid);
         return UserRegistration.builder()
                 .session(authService.authUser(uid, regRequest.getSessionPart(), agent))

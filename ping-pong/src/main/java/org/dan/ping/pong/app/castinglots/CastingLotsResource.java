@@ -8,6 +8,7 @@ import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentCache;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class CastingLotsResource {
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             DoCastingLots doCastingLots) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("User {} does casting lots in tournament {}",
                 uid, doCastingLots.getTid());
         sequentialExecutor.execute(new Tid(doCastingLots.getTid()), () -> {
@@ -68,7 +69,7 @@ public class CastingLotsResource {
     public void orderBidsManually(
             @HeaderParam(SESSION) String session,
             OrderCategoryBidsManually order) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         tournamentCache.load(order.getTid()).checkAdmin(uid);
         castingLotsService.orderCategoryBidsManually(order);
     }

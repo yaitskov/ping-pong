@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceAccessor;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.util.time.Clocker;
 
 import java.util.List;
@@ -51,7 +52,7 @@ public class TableResource {
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             SetTableState update) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("Admin {} uid set table {}", uid, update);
         placeAccessor.update(new Pid(update.getPid()), response, (place, batch) -> {
             tableService.setStatus(place, update, batch);
@@ -62,7 +63,7 @@ public class TableResource {
     @Path("/table/create")
     @Consumes(APPLICATION_JSON)
     public void addTables(@HeaderParam(SESSION) String session, CreateTables create) {
-        final int uid = authService.userInfoBySession(session).getUid();
+        final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("Admin {} uid add tables {}", uid, create);
         tableService.create(create);
     }

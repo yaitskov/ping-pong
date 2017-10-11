@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
@@ -48,7 +49,7 @@ public class ManualSeedJerseyTest extends AbstractSpringJerseyTest {
 
         simulator.simulate(scenario);
         final int cid = scenario.getCategoryDbId().get(c1);
-        final List<Integer> uids = scenario.getUidPlayer().keySet().stream().sorted().collect(Collectors.toList());
+        final List<Uid> uids = scenario.getUidPlayer().keySet().stream().sorted().collect(Collectors.toList());
         myRest().voidPost(ORDER_BIDS_MANUALLY, scenario,
                 OrderCategoryBidsManually
                         .builder()

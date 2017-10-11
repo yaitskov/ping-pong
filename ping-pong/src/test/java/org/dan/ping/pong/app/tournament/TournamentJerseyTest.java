@@ -332,14 +332,14 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                 daoGenerator.genPlace(0), Draft);
         final int cid = daoGenerator.genCategory(tid);
         final String name = UUID.randomUUID().toString();
-        final int uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, adminSession.getSession(),
+        final Uid uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, adminSession.getSession(),
                 EnlistOffline.builder()
                         .tid(tid)
                         .cid(cid)
                         .bidState(Here)
                         .name(name)
                         .build())
-                .readEntity(Integer.class);
+                .readEntity(Uid.class);
         final List<UserInfo> digests = myRest().get(CATEGORY_MEMBERS + cid, UserInfoList.class);
         assertThat(digests,
                 hasItem(allOf(

@@ -8,6 +8,7 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.sys.error.PiPoEx;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,14 +30,14 @@ public class UserDao {
     private UserType defaultUserType;
 
     @Transactional(transactionManager = TRANSACTION_MANAGER)
-    public int registerDefaultType(UserRegRequest regRequest) throws PiPoEx {
+    public Uid registerDefaultType(UserRegRequest regRequest) throws PiPoEx {
         regRequest.setUserType(defaultUserType);
         return register(regRequest);
     }
 
     @Transactional(transactionManager = TRANSACTION_MANAGER)
-    public int register(UserRegRequest regRequest) throws PiPoEx {
-        final int uid = jooq
+    public Uid register(UserRegRequest regRequest) throws PiPoEx {
+        final Uid uid = jooq
                 .insertInto(USERS, USERS.NAME, USERS.PHONE,
                         USERS.EMAIL, USERS.TYPE)
                 .values(regRequest.getName(),
@@ -62,7 +63,7 @@ public class UserDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<UserInfo> getUserByUid(int uid) {
+    public Optional<UserInfo> getUserByUid(Uid uid) {
         return ofNullable(jooq.select(USERS.NAME, USERS.PHONE, USERS.EMAIL, USERS.TYPE)
                 .from(USERS)
                 .where(USERS.UID.eq(uid))
@@ -91,7 +92,7 @@ public class UserDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void promoteToAdmins(int said, int uid) {
+    public void promoteToAdmins(int said, Uid uid) {
         log.info("Sys admin {} promoted user {} to admins", said, uid);
         jooq.insertInto(ADMIN, ADMIN.UID, ADMIN.SAID)
                 .values(uid, said)
@@ -100,7 +101,7 @@ public class UserDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void requestAdminAccess(int uid, Instant now) {
+    public void requestAdminAccess(Uid uid, Instant now) {
         jooq.update(USERS)
                 .set(USERS.WANT_ADMIN, Optional.of(now))
                 .where(USERS.UID.eq(uid))

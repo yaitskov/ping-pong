@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.tournament.Uid;
 
 import java.util.List;
 
@@ -18,5 +19,5 @@ import java.util.List;
 public class OrderCategoryBidsManually {
     private int tid;
     private int cid;
-    private List<Integer> uids;
+    private List<Uid> uids;
 }

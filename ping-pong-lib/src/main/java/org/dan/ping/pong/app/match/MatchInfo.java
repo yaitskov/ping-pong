@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dan.ping.pong.app.tournament.Uid;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.swing.UIDefaults;
 
 @Getter
 @Setter
@@ -31,8 +34,8 @@ public class MatchInfo {
     private MatchState state;
     private Optional<Integer> loserMid;
     private Optional<Integer> winnerMid;
-    private Optional<Integer> winnerId;
-    private Map<Integer, List<Integer>> participantIdScore;
+    private Optional<Uid> winnerId;
+    private Map<Uid, List<Integer>> participantIdScore;
     private Optional<Instant> startedAt;
     private Optional<Instant> endedAt;
     private int priority;
@@ -48,7 +51,7 @@ public class MatchInfo {
         Optional<Integer> gid = Optional.empty();
         Optional<Integer> loserMid = Optional.empty();
         Optional<Integer> winnerMid = Optional.empty();
-        Optional<Integer> winnerId = Optional.empty();
+        Optional<Uid> winnerId = Optional.empty();
         Optional<Instant> startedAt = Optional.empty();
         Optional<Instant> endedAt = Optional.empty();
     }
@@ -64,29 +67,29 @@ public class MatchInfo {
         return 0;
     }
 
-    public Map<Integer, Integer> getSetScore(int setOrdNumber) {
-        final Map<Integer, Integer> setScore = new HashMap<>();
+    public Map<Uid, Integer> getSetScore(int setOrdNumber) {
+        final Map<Uid, Integer> setScore = new HashMap<>();
         participantIdScore.forEach(
                 (uid, sets) -> setScore.put(uid, sets.get(setOrdNumber)));
         return setScore;
     }
 
-    public Optional<Integer> addSetScore(List<IdentifiedScore> scores, MatchValidationRule rule) {
+    public Optional<Uid> addSetScore(List<IdentifiedScore> scores, MatchValidationRule rule) {
         scores.forEach(score -> participantIdScore.get(score.getUid()).add(score.getScore()));
         return rule.findWinnerId(rule.calcWonSets(getParticipantIdScore()));
     }
 
-    public Set<Integer> getUids() {
+    public Set<Uid> getUids() {
         return participantIdScore.keySet();
     }
 
-    public Optional<Integer> getOpponentUid(int uid) {
+    public Optional<Uid> getOpponentUid(Uid uid) {
         return participantIdScore.keySet().stream()
-                .filter(participantUid -> participantUid != uid)
+                .filter(participantUid -> !participantUid.equals(uid))
                 .findFirst();
     }
 
-    public boolean hasParticipant(int uid) {
+    public boolean hasParticipant(Uid uid) {
         return participantIdScore.containsKey(uid);
     }
 

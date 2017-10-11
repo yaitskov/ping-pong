@@ -66,12 +66,13 @@ public class TournamentDao {
     private static final String GAMES_COMPLETE = "gamesComplete";
     private static final int DAYS_TO_SHOW_PAST_TOURNAMENT = 30;
     private static final String CATEGORIES = "categories";
+    private static final Uid UID0 = new Uid(0);
 
     @Inject
     private DSLContext jooq;
 
     @Transactional(TRANSACTION_MANAGER)
-    public int create(int uid, CreateTournament newTournament) {
+    public int create(Uid uid, CreateTournament newTournament) {
         final int tid = justCreate(newTournament, Hidden);
         log.info("User {} created tournament {}", uid, tid);
 
@@ -103,7 +104,7 @@ public class TournamentDao {
     }
 
     @Transactional(transactionManager = TRANSACTION_MANAGER)
-    public List<TournamentDigest> findWritableForAdmin(int uid, Instant after) {
+    public List<TournamentDigest> findWritableForAdmin(Uid uid, Instant after) {
         return jooq.select(TOURNAMENT.NAME, TOURNAMENT.OPENS_AT, TOURNAMENT.TID, TOURNAMENT.STATE)
                 .from(TOURNAMENT)
                 .innerJoin(TOURNAMENT_ADMIN)
@@ -129,7 +130,7 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<TournamentDigest> findEnlistedIn(int uid, Instant before) {
+    public List<TournamentDigest> findEnlistedIn(Uid uid, Instant before) {
         return jooq.select(TOURNAMENT.NAME, TOURNAMENT.OPENS_AT, TOURNAMENT.TID, TOURNAMENT.STATE)
                 .from(TOURNAMENT)
                 .innerJoin(BID)
@@ -172,7 +173,7 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public boolean isAdminOf(int uid, int tid) {
+    public boolean isAdminOf(Uid uid, int tid) {
         return jooq.select(TOURNAMENT.TID)
                 .from(TOURNAMENT).innerJoin(TOURNAMENT_ADMIN)
                 .on(TOURNAMENT.TID.eq(TOURNAMENT_ADMIN.TID))
@@ -183,7 +184,7 @@ public class TournamentDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public Optional<DraftingTournamentInfo> getDraftingTournament(int tid,
-            Optional<Integer> participantId) {
+            Optional<Uid> participantId) {
         return ofNullable(jooq.select(TOURNAMENT.NAME, TOURNAMENT.OPENS_AT,
                 BID.CID, TOURNAMENT_ADMIN.UID, TOURNAMENT.TICKET_PRICE,
                 TOURNAMENT.PREVIOUS_TID, PLACE.PID, PLACE.POST_ADDRESS,
@@ -194,10 +195,10 @@ public class TournamentDao {
                 .innerJoin(CITY).on(CITY.CITY_ID.eq(PLACE.CITY_ID))
                 .leftJoin(TOURNAMENT_ADMIN)
                 .on(TOURNAMENT.TID.eq(TOURNAMENT_ADMIN.TID),
-                        TOURNAMENT_ADMIN.UID.eq(participantId.orElse(0)))
+                        TOURNAMENT_ADMIN.UID.eq(participantId.orElse(new Uid(0))))
                 .leftJoin(BID)
                 .on(TOURNAMENT.TID.eq(BID.TID),
-                        BID.UID.eq(participantId.orElse(0)))
+                        BID.UID.eq(participantId.orElse(UID0)))
                 .where(TOURNAMENT.TID.eq(tid))
                 .fetchOne())
                 .map(r -> DraftingTournamentInfo.builder()
@@ -290,7 +291,7 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<DatedTournamentDigest> findMyNextTournament(int uid) {
+    public Optional<DatedTournamentDigest> findMyNextTournament(Uid uid) {
         return ofNullable(jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
                 .from(BID)
                 .innerJoin(TOURNAMENT).on(BID.TID.eq(TOURNAMENT.TID))
@@ -308,7 +309,7 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<CompleteTournamentDigest> findMyPreviousTournament(Instant since, int uid) {
+    public Optional<CompleteTournamentDigest> findMyPreviousTournament(Instant since, Uid uid) {
         return ofNullable(jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, BID.STATE)
                 .from(BID)
                 .innerJoin(TOURNAMENT).on(BID.TID.eq(TOURNAMENT.TID))
@@ -326,7 +327,7 @@ public class TournamentDao {
                         .build());
     }
 
-    private List<DatedTournamentDigest> findCurrentTournaments(int uid) {
+    private List<DatedTournamentDigest> findCurrentTournaments(Uid uid) {
         return jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
                 .from(BID)
                 .innerJoin(TOURNAMENT).on(BID.TID.eq(TOURNAMENT.TID))
@@ -340,7 +341,7 @@ public class TournamentDao {
                         .build());
     }
 
-    private List<DatedTournamentDigest> findCurrentJudgeTournaments(int uid) {
+    private List<DatedTournamentDigest> findCurrentJudgeTournaments(Uid uid) {
         return jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
                 .from(TOURNAMENT_ADMIN)
                 .innerJoin(TOURNAMENT).on(TOURNAMENT_ADMIN.TID.eq(TOURNAMENT.TID))
@@ -355,7 +356,7 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public MyRecentTournaments findMyRecentTournaments(Instant since, int uid) {
+    public MyRecentTournaments findMyRecentTournaments(Instant since, Uid uid) {
         return MyRecentTournaments.builder()
                 .next(findMyNextTournament(uid))
                 .current(findCurrentTournaments(uid))
@@ -365,7 +366,7 @@ public class TournamentDao {
 
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<DatedTournamentDigest> findMyNextJudgeTournament(int uid) {
+    public Optional<DatedTournamentDigest> findMyNextJudgeTournament(Uid uid) {
         return ofNullable(jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
                 .from(TOURNAMENT_ADMIN)
                 .leftJoin(TOURNAMENT).on(TOURNAMENT_ADMIN.TID.eq(TOURNAMENT.TID))
@@ -383,7 +384,7 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<DatedTournamentDigest> findMyPreviousJudgeTournament(Instant now, int uid) {
+    public Optional<DatedTournamentDigest> findMyPreviousJudgeTournament(Instant now, Uid uid) {
         return ofNullable(jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
                 .from(TOURNAMENT_ADMIN)
                 .leftJoin(TOURNAMENT).on(TOURNAMENT_ADMIN.TID.eq(TOURNAMENT.TID))
@@ -402,7 +403,7 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public MyRecentJudgedTournaments findMyRecentJudgedTournaments(Instant now, int uid) {
+    public MyRecentJudgedTournaments findMyRecentJudgedTournaments(Instant now, Uid uid) {
         return MyRecentJudgedTournaments.builder()
                 .next(findMyNextJudgeTournament(uid))
                 .current(findCurrentJudgeTournaments(uid))
@@ -498,7 +499,7 @@ public class TournamentDao {
                 .build());
     }
 
-    public Set<Integer> loadAdmins(Tid tid) {
+    public Set<Uid> loadAdmins(Tid tid) {
         return jooq.select(TOURNAMENT_ADMIN.UID)
                 .from(TOURNAMENT_ADMIN)
                 .where(TOURNAMENT_ADMIN.TID.eq(tid.getTid()))

@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dan.ping.pong.app.tournament.Uid;
 
 @Getter
 @Setter
@@ -14,10 +15,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IdentifiedScore {
-    private int uid;
+    private Uid uid;
     private int score;
 
     public String toString() {
-        return format("(uid=%d, score=%d", uid, score);
+        return format("(uid=%d, score=%d", uid.getId(), score);
     }
 }

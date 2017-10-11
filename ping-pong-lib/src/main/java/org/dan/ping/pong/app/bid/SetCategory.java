@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dan.ping.pong.app.tournament.Uid;
 
 @Getter
 @Setter
@@ -13,6 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SetCategory {
     private int tid;
-    private int uid;
+    private Uid uid;
     private int cid;
 }

@@ -64,7 +64,7 @@ public class TournamentCacheLoader extends CacheLoader<Tid, OpenTournamentMemSta
     }
 
     private Map<Integer, MatchInfo> combineMatchesAndSets(List<MatchInfo> matches,
-            Map<Integer, Map<Integer, List<Integer>>> sets) {
+            Map<Integer, Map<Uid, List<Integer>>> sets) {
         return matches.stream().collect(
                 toMap(MatchInfo::getMid,
                         m -> {

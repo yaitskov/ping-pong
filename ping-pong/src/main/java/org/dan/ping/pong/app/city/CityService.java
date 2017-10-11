@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.city;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
+import org.dan.ping.pong.app.tournament.Uid;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class CityService {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public int create(int uid, NewCity newCity) {
+    public int create(Uid uid, NewCity newCity) {
         final int hasDefined = cityDao.countByAuthor(uid);
         if (hasDefined > 3) {
             throw badRequest("You reached the limited of custom cities");

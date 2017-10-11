@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -436,7 +437,7 @@ public class MatchService {
                 .stream()
                 .filter(minfo -> minfo.hasParticipant(uid))
                 .filter(minfo -> !minfo.getGid().isPresent())
-                .filter(minfo -> ImmutableSet.of(Game, Place, Draft).contains(minfo.getState()))
+                .filter(minfo -> incompleteStates.contains(minfo.getState()))
                 .findAny();
     }
 
@@ -585,5 +586,23 @@ public class MatchService {
         minfo.getParticipantIdScore().values()
                 .forEach(scores -> scores.subList(setNumber, scores.size()).clear());
 
+    }
+
+    public List<MyPendingMatch> findPendingMatches(
+            OpenTournamentMemState tournament, Uid uid) {
+        return tournament.participantMatches(uid)
+                .filter(m -> m.getState() == Game)
+                .map(m -> MyPendingMatch.builder()
+                        .mid(m.getMid())
+                        .table(Optional.empty())
+                        .state(m.getState())
+                        .tid(tournament.getTid())
+                        .matchType(m.getType())
+                        .matchScore(tournament.getRule().getMatch().getMinGamesToWin())
+                        .enemy(Optional.ofNullable(tournament.getBid(m.getOpponentUid(uid)
+                                .orElseThrow(() -> internalError("no opponent for " + uid + " in " + m))))
+                                .map(ParticipantMemState::toLink))
+                        .build())
+                .collect(toList());
     }
 }

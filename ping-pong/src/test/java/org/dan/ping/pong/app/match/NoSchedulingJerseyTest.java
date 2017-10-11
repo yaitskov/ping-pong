@@ -8,7 +8,6 @@ import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
-import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
@@ -25,9 +24,6 @@ import javax.inject.Inject;
 public class NoSchedulingJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     private Simulator simulator;
-
-    @Inject
-    private TournamentService tournamentService;
 
     @Test
     public void noScheduling() {

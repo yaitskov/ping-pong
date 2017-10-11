@@ -2,6 +2,8 @@ package org.dan.ping.pong.app.match;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
+import static org.dan.ping.pong.app.bid.BidResource.TID_SLASH_UID;
+import static org.dan.ping.pong.app.tournament.TournamentService.TID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
@@ -29,11 +31,15 @@ import javax.ws.rs.container.Suspended;
 @Produces(APPLICATION_JSON)
 public class MatchResource {
     public static final String MY_PENDING_MATCHES = "/match/list/my/pending";
+    public static final String BID_PENDING_MATCHES = "/match/list/bid/pending/";
     public static final String OPEN_MATCHES_FOR_JUDGE = "/match/judge/list/open";
     public static final String COMPLETE_MATCHES = "/match/list/completed/";
     public static final String SCORE_SET = "/match/participant/score";
     public static final String MATCH_WATCH_LIST_OPEN = "/match/watch/list/open/";
     public static final String MATCH_RESET_SET_SCORE = "/match/reset-set-score";
+    public static final String TID_JP = "{tid}";
+    public static final String UID_JP = "{uid}";
+    public static final String UID = "uid";
 
     @Inject
     private AuthService authService;
@@ -51,6 +57,17 @@ public class MatchResource {
             @HeaderParam(SESSION) String session) {
         final Uid uid = authService.userInfoBySession(session).getUid();
         return matchDao.findPendingMatches(uid);
+    }
+
+    @GET
+    @Path(BID_PENDING_MATCHES + TID_JP + TID_SLASH_UID + UID_JP)
+    @Consumes(APPLICATION_JSON)
+    public void findBidPendingMatches(
+            @Suspended AsyncResponse response,
+            @PathParam(TID) Tid tid,
+            @PathParam(UID) Uid uid) {
+        tournamentAccessor.read(tid, response,
+                tournament -> matchService.findPendingMatches(tournament, uid));
     }
 
     @Inject

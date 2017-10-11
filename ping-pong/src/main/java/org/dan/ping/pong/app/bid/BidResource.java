@@ -2,6 +2,10 @@ package org.dan.ping.pong.app.bid;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
+import static org.dan.ping.pong.app.match.MatchResource.TID_JP;
+import static org.dan.ping.pong.app.match.MatchResource.UID;
+import static org.dan.ping.pong.app.match.MatchResource.UID_JP;
+import static org.dan.ping.pong.app.tournament.TournamentService.TID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
@@ -33,7 +37,7 @@ public class BidResource {
     public static final String BID_READY_TO_PLAY = BID + "ready-to-play";
     public static final String BID_SET_STATE = BID + "set-state";
     private static final String BID_RESULTS = BID + "results/";
-    private static final String TID_SLASH_UID = "/";
+    public static final String TID_SLASH_UID = "/";
 
     @Inject
     private AuthService authService;
@@ -106,20 +110,20 @@ public class BidResource {
     private BidResultService bidResultService;
 
     @GET
-    @Path(BID_RESULTS + "{tid}" + TID_SLASH_UID + "{uid}")
+    @Path(BID_RESULTS + TID_JP + TID_SLASH_UID + UID_JP)
     public void getResults(
             @Suspended AsyncResponse response,
-            @PathParam("tid") Tid tid,
-            @PathParam("uid") Uid uid) {
+            @PathParam(TID) Tid tid,
+            @PathParam(UID) Uid uid) {
         tournamentAccessor.read(tid, response,
                 tournament -> bidResultService.getResults(tournament, uid));
     }
 
     @GET
-    @Path(BID + "enlisted-to-be-checked/{tid}")
+    @Path(BID + "enlisted-to-be-checked/" + TID_JP)
     public List<ParticipantState> enlistedToBeChecked(
             @HeaderParam(SESSION) String session,
-            @PathParam("tid") int tid) {
+            @PathParam(TID) int tid) {
         return bidService.findEnlisted(tid);
     }
 

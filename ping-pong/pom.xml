@@ -20,7 +20,6 @@
         <jersey.version>2.22.2</jersey.version>
         <mysql-connector-java.version>5.1.38</mysql-connector-java.version>
         <restassured.version>3.0.1</restassured.version>
-        <spring.version>4.3.2.RELEASE</spring.version>
         <http.port>8080</http.port>
         <debug.port>5008</debug.port>
         <jacoco.version>0.7.6.201602180812</jacoco.version>

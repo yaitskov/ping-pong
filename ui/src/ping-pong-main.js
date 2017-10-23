@@ -71,10 +71,6 @@ import myTournamentListModule from './my-tournament-list/my-tournament-list.modu
 import myTournamentListComponent from './my-tournament-list/my-tournament-list.component.js';
 import myMatchJudgeListModule from './my-match-judge-list/my-match-judge-list.module.js';
 import myMatchJudgeListComponent from './my-match-judge-list/my-match-judge-list.component.js';
-import myMatchPlayListModule from './my-match-play-list/my-match-play-list.module.js';
-import myMatchPlayListComponent from './my-match-play-list/my-match-play-list.component.js';
-import myMatchStateDescriptionModule from './my-match-play-list/match-state-description.module.js';
-import myMatchStateDescriptionComponent from './my-match-play-list/match-state-description.component.js';
 import participantPresenceModule from './participant-presence/participant-presence.module.js';
 import participantPresenceComponent from './participant-presence/participant-presence.component.js';
 import myTournamentModule from './my-tournament/my-tournament.module.js';

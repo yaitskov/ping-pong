@@ -1,7 +1,7 @@
 import angular from 'angular';
 import template from './my-match-play-list.template.html';
 
-angular.module('myMatchPlayList').
+angular.module('tournament').
     component('myMatchPlayList', {
         templateUrl: template,
         controller: ['Match', 'Tournament', 'mainMenu', '$q', 'cutil',

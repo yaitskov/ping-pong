@@ -1,7 +1,7 @@
 import angular from 'angular';
 import template from './match-state-description.template.html';
 
-angular.module('matchStateDescription').
+angular.module('tournament').
     component('matchStateDescription', {
         templateUrl: template,
         controller: ['mainMenu',

@@ -2,7 +2,7 @@ import angular from 'angular';
 import template from './play-in-tournament-list.template.html';
 
 angular.module('playInTournamentList').
-    component('playInTournamentList', {
+    component('tournament', {
         templateUrl: template,
         cache: false,
         controller: ['Tournament', 'mainMenu', 'requestStatus',

@@ -67,8 +67,6 @@ import tournamentListModule from './tournament-list/tournament-list.module.js';
 import tournamentListComponent from './tournament-list/tournament-list.component.js';
 import openTournamentListModule from './open-tournament-list/open-tournament-list.module.js';
 import openTournamentListComponent from './open-tournament-list/open-tournament-list.component.js';
-import playInTournamentListModule from './play-in-tournament-list/play-in-tournament-list.module.js';
-import playInTournamentListComponent from './play-in-tournament-list/play-in-tournament-list.component.js';
 import myTournamentListModule from './my-tournament-list/my-tournament-list.module.js';
 import myTournamentListComponent from './my-tournament-list/my-tournament-list.component.js';
 import myMatchJudgeListModule from './my-match-judge-list/my-match-judge-list.module.js';

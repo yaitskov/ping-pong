@@ -19,28 +19,15 @@
           {{ 'Watch Games' | translate }}
         </a>
       </li>
-      <li role="separator" ng-show="$ctrl.isAuthenticated()" class="divider"></li>
-      <li>
-        <a href="#!/my/matches/play" ng-show="$ctrl.isAuthenticated()">
-          <span class="glyphicon glyphicon-calendar"></span>
-          {{ 'My Schedule' | translate }}
-        </a>
-      </li>
       <li>
         <a href="#!/play/in/tournaments" ng-show="$ctrl.isAuthenticated()">
-          <span class="glyphicon glyphicon-th-list"></span>
+          <span class="glyphicon glyphicon-play-circle"></span>
           {{ 'Participation' | translate }}
         </a>
       </li>
       <li role="separator" ng-show="$ctrl.isAdmin()" class="divider"></li>
       <li>
         <a href="#!/my/tournaments" ng-show="$ctrl.isAdmin()">
-          <span class="glyphicon glyphicon-thumbs-down"></span>
-          {{ 'Administration' | translate }}
-        </a>
-      </li>
-      <li>
-        <a href="#!/my/matches/judgement" ng-show="$ctrl.isAdmin()">
           <span class="glyphicon glyphicon-bullhorn"></span>
           {{ 'My Judgement' | translate }}
         </a>

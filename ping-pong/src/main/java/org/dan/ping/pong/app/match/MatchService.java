@@ -74,6 +74,16 @@ public class MatchService {
             .thenComparing(MatchInfo::getPriority)
             .thenComparing(MatchInfo::getMid);
 
+    private static Comparator<MatchInfo> noTablesParticipantMatchComparator(
+            OpenTournamentMemState tournament, Uid uid) {
+        return Comparator
+                .comparing(MatchInfo::getState).reversed()
+                .thenComparing(m -> m.getOpponentUid(uid)
+                        .map(ouid -> tournament.getParticipant(ouid).getName())
+                        .orElse(""))
+                .thenComparing(MatchInfo::getMid);
+    }
+
     @Inject
     private MatchDao matchDao;
 
@@ -604,7 +614,10 @@ public class MatchService {
                 MyPendingMatchList.builder()
                         .matches(tournament.participantMatches(uid)
                                 .filter(incompleteStates::contains)
-                                .sorted(PARTICIPANT_MATCH_COMPARATOR)
+                                .sorted(tournament.getRule().getPlace()
+                                        .map(PlaceRules::getArenaDistribution).orElse(NO) == NO
+                                        ? noTablesParticipantMatchComparator(tournament, uid)
+                                        : PARTICIPANT_MATCH_COMPARATOR)
                                 .map(m -> MyPendingMatch.builder()
                                         .mid(m.getMid())
                                         .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))

@@ -13,7 +13,6 @@ angular.
                               myMatchesNeedToPlay: {
                                   url: '/api/match/list/my/pending/:tournamentId',
                                   method: 'GET',
-                                  isArray: true,
                                   headers: {
                                       session: 1
                                   }

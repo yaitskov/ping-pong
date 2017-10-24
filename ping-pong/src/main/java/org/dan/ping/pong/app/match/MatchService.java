@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -68,6 +69,11 @@ import javax.inject.Named;
 
 @Slf4j
 public class MatchService {
+    private static final Comparator<MatchInfo> PARTICIPANT_MATCH_COMPARATOR = Comparator
+            .comparing(MatchInfo::getState).reversed()
+            .thenComparing(MatchInfo::getPriority)
+            .thenComparing(MatchInfo::getMid);
+
     @Inject
     private MatchDao matchDao;
 
@@ -597,7 +603,8 @@ public class MatchService {
         return scheduleService.withPlace(tournament, tablesDiscovery ->
                 MyPendingMatchList.builder()
                         .matches(tournament.participantMatches(uid)
-                                .filter(m -> m.getState() == Game)
+                                .filter(incompleteStates::contains)
+                                .sorted(PARTICIPANT_MATCH_COMPARATOR)
                                 .map(m -> MyPendingMatch.builder()
                                         .mid(m.getMid())
                                         .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
@@ -605,9 +612,10 @@ public class MatchService {
                                         .tid(tournament.getTid())
                                         .matchType(m.getType())
                                         .matchScore(tournament.getRule().getMatch().getMinGamesToWin())
-                                        .enemy(Optional.ofNullable(tournament.getBid(m.getOpponentUid(uid)
-                                                .orElseThrow(() -> internalError("no opponent for "
-                                                        + uid + " in " + m))))
+                                        .enemy(m.getOpponentUid(uid).map(ouid ->
+                                                ofNullable(tournament.getBid(ouid))
+                                                        .orElseThrow(() -> internalError("no opponent for "
+                                                        + uid + " in " + m)))
                                                 .map(ParticipantMemState::toLink))
                                         .build())
                                 .collect(toList()))
@@ -617,6 +625,7 @@ public class MatchService {
                                 .map(MatchInfo::getState)
                                 .filter(incompleteStates::contains)
                                 .count())
+                        .bidState(tournament.getParticipant(uid).getState())
                         .build());
     }
 }

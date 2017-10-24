@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.match.MyPendingMatch;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin;
 import org.dan.ping.pong.mock.RestEntityGenerator;
 import org.dan.ping.pong.mock.TestAdmin;
@@ -58,7 +59,7 @@ public class TableJerseyTest extends AbstractSpringJerseyTest {
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
         restEntityGenerator.enlistParticipants(myRest(), adminSession, tid, cid, participants);
         myRest().voidPost(BEGIN_TOURNAMENT, adminSession, tid);
-        final List<MyPendingMatch> c = participants.stream().map(this::findMatch)
+        final List<MyPendingMatch> c = participants.stream().map(p -> findMatch(tid, p))
                 .flatMap(List::stream)
                 .collect(toList());
         assertThat(c.stream().map(MyPendingMatch::getTable).collect(toSet()),
@@ -80,8 +81,8 @@ public class TableJerseyTest extends AbstractSpringJerseyTest {
         assertThat(response.readEntity(String.class), containsString("doesn't have any table"));
     }
 
-    private List<MyPendingMatch> findMatch(TestUserSession participant) {
-        return myRest().get(MY_PENDING_MATCHES,
+    private List<MyPendingMatch> findMatch(int tid, TestUserSession participant) {
+        return myRest().get(MY_PENDING_MATCHES + tid,
                 participant,
                 new GenericType<List<MyPendingMatch>>(){});
     }

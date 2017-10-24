@@ -19,8 +19,6 @@ public interface MatchDao {
 
     List<OpenMatchForJudge> findOpenMatchesFurJudge(Uid adminUid);
 
-    List<MyPendingMatch> findPendingMatches(Uid uid);
-
     void changeStatus(int mid, MatchState state, DbUpdater batch);
 
     Optional<Uid> scoreSet(OpenTournamentMemState tournament, MatchInfo matchInfo,

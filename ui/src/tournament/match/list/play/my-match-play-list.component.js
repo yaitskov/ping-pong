@@ -4,9 +4,9 @@ import template from './my-match-play-list.template.html';
 angular.module('tournament').
     component('myMatchPlayList', {
         templateUrl: template,
-        controller: ['Match', 'Tournament', 'mainMenu', '$q', 'cutil',
+        controller: ['Match', 'Tournament', 'mainMenu', '$q', 'cutil', '$routeParams',
                      'pageCtx', 'auth', 'requestStatus', '$location', 'longDateTime',
-                     function (Match, Tournament, mainMenu, $q, cutil,
+                     function (Match, Tournament, mainMenu, $q, cutil, $routeParams,
                                pageCtx, auth, requestStatus, $location, longDateTime) {
                          mainMenu.setTitle('My matches to be played');
                          this.matches = null;
@@ -51,7 +51,7 @@ angular.module('tournament').
                          };
                          requestStatus.startLoading();
                          $q.all([Tournament.myRecent({}).$promise,
-                                 Match.myMatchesNeedToPlay({}).$promise]).
+                                 Match.myMatchesNeedToPlay({tournamentId: $routeParams.tournamentId}).$promise]).
                              then(
                                  function (responses) {
                                      self.tournament = responses[0];

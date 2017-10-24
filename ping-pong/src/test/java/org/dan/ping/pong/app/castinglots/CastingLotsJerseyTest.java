@@ -75,7 +75,7 @@ public class CastingLotsJerseyTest extends AbstractSpringJerseyTest {
         final Set<Uid> participantIds = participants.stream()
                 .map(TestUserSession::getUid).collect(toSet());
         for (TestUserSession userSession : participants) {
-            final List<MyPendingMatch> matches = myRest().get(MY_PENDING_MATCHES,
+            final List<MyPendingMatch> matches = myRest().get(MY_PENDING_MATCHES + tid,
                     userSession, new GenericType<List<MyPendingMatch>>(){});
             assertThat(matches.stream().map(MyPendingMatch::getState).collect(toSet()),
                     is(ImmutableSet.of(Place)));

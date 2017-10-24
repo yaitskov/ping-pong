@@ -18,7 +18,6 @@ import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
-import static org.dan.ping.pong.app.sched.NoTablesDiscovery.STUB_TABLE;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.JUST_A_ROW;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
@@ -29,14 +28,11 @@ import ord.dan.ping.pong.jooq.tables.Users;
 import org.dan.ping.pong.app.table.TableLink;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdateSql;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.jooq.DSLContext;
-import org.jooq.Record11;
-import org.jooq.UDT;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -126,61 +122,6 @@ public class MatchDaoServer implements MatchDao {
                                         .uid(r.get(ENEMY_USER.UID))
                                         .build()))
                         .build());
-    }
-
-    @Override
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<MyPendingMatch> findPendingMatches(Uid uid) {
-        return jooq.select(MATCHES.MID, MATCHES.TID, TABLES.TABLE_ID,
-                TABLES.LABEL, MATCHES.TYPE, USERS.UID, USERS.NAME,
-                ENEMY_USER.UID, ENEMY_USER.NAME,
-                MATCHES.STATE, TOURNAMENT.RULES)
-                .from(MATCHES)
-                .innerJoin(TOURNAMENT)
-                .on(TOURNAMENT.TID.eq(MATCHES.TID))
-                .innerJoin(USERS)
-                .on(MATCHES.UID_LESS.eq(USERS.UID))
-                .leftJoin(ENEMY_USER)
-                .on(MATCHES.UID_MORE.eq(ENEMY_USER.UID))
-                .leftJoin(TABLES)
-                .on(MATCHES.MID.eq(TABLES.TABLE_ID))
-                .where(MATCHES.UID_MORE.eq(uid).or(MATCHES.UID_LESS.eq(uid)),
-                        MATCHES.STATE.in(Place, Game))
-                .orderBy(MATCHES.STATE.asc(), MATCHES.MID.asc())
-                .fetch()
-                .map(r -> MyPendingMatch.builder()
-                        .tid(r.get(MATCHES.TID))
-                        .mid(r.get(MATCHES.MID))
-                        .matchScore(r.get(TOURNAMENT.RULES).getMatch().getMinGamesToWin())
-                        .state(r.get(MATCHES.STATE))
-                        .matchType(r.get(MATCHES.TYPE))
-                        .table(ofNullable(r.get(TABLES.TABLE_ID))
-                                .map(tableId -> TableLink.builder()
-                                        .id(tableId)
-                                        .label(r.get(TABLES.LABEL))
-                                        .build()))
-                        .enemy(enemy(uid, r))
-                        .build());
-    }
-
-    private Optional<UserLink> enemy(Uid uid,
-            Record11<Integer, Integer, Integer, String, MatchType, Uid,
-                    String, Uid, String, MatchState, TournamentRules> r) {
-        final Optional<Uid> enemId = ofNullable(r.get(ENEMY_USER.UID));
-        final Optional<Uid> userId = ofNullable(r.get(USERS.UID));
-
-        if (Optional.of(uid).equals(enemId)) {
-            return userId.map(id -> UserLink.builder()
-                    .name(r.get(USERS.NAME))
-                    .uid(id)
-                    .build());
-        } else if (Optional.of(uid).equals(userId)) {
-            return enemId.map(id -> UserLink.builder()
-                    .name(r.get(ENEMY_USER.NAME))
-                    .uid(id)
-                    .build());
-        }
-        return empty();
     }
 
     @Override

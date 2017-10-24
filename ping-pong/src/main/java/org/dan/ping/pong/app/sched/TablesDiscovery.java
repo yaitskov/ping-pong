@@ -2,6 +2,8 @@ package org.dan.ping.pong.app.sched;
 
 import org.dan.ping.pong.app.table.TableInfo;
 
+import java.util.Optional;
+
 public interface TablesDiscovery {
-    TableInfo discover(int tableId);
+    Optional<TableInfo> discover(int mid);
 }

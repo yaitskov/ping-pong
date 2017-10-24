@@ -2,7 +2,6 @@ package org.dan.ping.pong.app.place;
 
 import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
-import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import lombok.Builder;
@@ -28,12 +27,10 @@ public class PlaceMemState {
     private Set<Uid> adminIds;
     private Optional<Integer> hostingTid;
 
-    public TableInfo getTableByMid(int mid) {
+    public Optional<TableInfo> findTableByMid(int mid) {
         return tables.values().stream()
                 .filter(tbl -> tbl.getMid().equals(Optional.of(mid)))
-                .findAny()
-                .orElseThrow(() -> internalError("Match "
-                        + mid + " is not bound to any table in " + pid));
+                .findAny();
     }
 
     public TableInfo getTable(int tableId) {

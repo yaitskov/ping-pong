@@ -23,6 +23,8 @@ import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
+import static org.dan.ping.pong.app.place.ArenaDistributionPolicy.NO;
+import static org.dan.ping.pong.app.sched.NoTablesDiscovery.STUB_TABLE;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.app.tournament.SetScoreResultName.MatchContinues;
@@ -39,8 +41,11 @@ import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.group.PlayOffMatcherFromGroup;
+import org.dan.ping.pong.app.place.ArenaDistributionPolicy;
+import org.dan.ping.pong.app.place.PlaceRules;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
+import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -453,7 +458,7 @@ public class MatchService {
                                         .values()
                                         .stream().collect(toList()))
                                 .category(tournament.getCategory(m.getCid()))
-                                .table(tablesDiscovery.discover(m.getMid()).toLink())
+                                .table(tablesDiscovery.discover(m.getMid()).orElse(STUB_TABLE).toLink())
                                 .type(m.getType())
                                 .participants(
                                         m.getUids().stream()
@@ -582,27 +587,36 @@ public class MatchService {
         cutTrailingSets(minfo, setNumber);
     }
 
-    public void cutTrailingSets(MatchInfo minfo, int setNumber) {
+    private void cutTrailingSets(MatchInfo minfo, int setNumber) {
         minfo.getParticipantIdScore().values()
                 .forEach(scores -> scores.subList(setNumber, scores.size()).clear());
-
     }
 
-    public List<MyPendingMatch> findPendingMatches(
+    public MyPendingMatchList findPendingMatches(
             OpenTournamentMemState tournament, Uid uid) {
-        return tournament.participantMatches(uid)
-                .filter(m -> m.getState() == Game)
-                .map(m -> MyPendingMatch.builder()
-                        .mid(m.getMid())
-                        .table(Optional.empty())
-                        .state(m.getState())
-                        .tid(tournament.getTid())
-                        .matchType(m.getType())
-                        .matchScore(tournament.getRule().getMatch().getMinGamesToWin())
-                        .enemy(Optional.ofNullable(tournament.getBid(m.getOpponentUid(uid)
-                                .orElseThrow(() -> internalError("no opponent for " + uid + " in " + m))))
-                                .map(ParticipantMemState::toLink))
-                        .build())
-                .collect(toList());
+        return scheduleService.withPlace(tournament, tablesDiscovery ->
+                MyPendingMatchList.builder()
+                        .matches(tournament.participantMatches(uid)
+                                .filter(m -> m.getState() == Game)
+                                .map(m -> MyPendingMatch.builder()
+                                        .mid(m.getMid())
+                                        .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
+                                        .state(m.getState())
+                                        .tid(tournament.getTid())
+                                        .matchType(m.getType())
+                                        .matchScore(tournament.getRule().getMatch().getMinGamesToWin())
+                                        .enemy(Optional.ofNullable(tournament.getBid(m.getOpponentUid(uid)
+                                                .orElseThrow(() -> internalError("no opponent for "
+                                                        + uid + " in " + m))))
+                                                .map(ParticipantMemState::toLink))
+                                        .build())
+                                .collect(toList()))
+                        .showTables(tournament.getRule().getPlace().map(PlaceRules::getArenaDistribution)
+                                .orElse(NO) != NO)
+                        .totalLeft(tournament.participantMatches(uid)
+                                .map(MatchInfo::getState)
+                                .filter(incompleteStates::contains)
+                                .count())
+                        .build());
     }
 }

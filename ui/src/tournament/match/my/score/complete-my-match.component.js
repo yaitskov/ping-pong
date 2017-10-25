@@ -2,7 +2,7 @@ import angular from 'angular';
 import template from './complete-my-match.template.html';
 
 angular.
-    module('completeMyMatch').
+    module('tournament').
     component('completeMyMatch', {
         templateUrl: template,
         controller: ['auth', 'mainMenu', 'Match', '$routeParams',
@@ -10,8 +10,8 @@ angular.
                      function (auth, mainMenu, Match, $routeParams,
                                pageCtx, requestStatus, $scope) {
                          mainMenu.setTitle('Match Scoring');
-                         this.match = pageCtx.get('last-scoring-match') || {};
-                         var maxScore = pageCtx.get('match-max-score-' + $routeParams.matchId);
+                         this.match = pageCtx.get('last-scoring-match');
+                         var maxScore = this.match.matchScore;
                          var self = this;
                          this.possibleScores = [];
                          for (var i =0 ; i <= maxScore; ++i) {
@@ -39,7 +39,7 @@ angular.
                                  {mid: $routeParams.matchId,
                                   tid: self.match.tid,
                                   scores: [{uid: auth.myUid(), score: self.scores[0]},
-                                           {uid: pageCtx.getEnemyUid(auth.myUid(), $routeParams.matchId),
+                                           {uid: self.match.enemy.uid,
                                             score: self.scores[1]}]},
                                  function (okResp) {
                                      requestStatus.complete();

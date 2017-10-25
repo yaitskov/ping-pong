@@ -72,7 +72,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.swing.UIDefaults;
 
 @Slf4j
 public class TournamentService {
@@ -398,7 +397,7 @@ public class TournamentService {
             }
             baseMatches = nextLevel;
         }
-        ranksLevelMatches(tournament, 0, uidLevel, playOffService.findGroupMatches(cidMatches), matchRules);
+        ranksLevelMatches(tournament, 0, uidLevel, playOffService.findCompleteGroupMatches(cidMatches), matchRules);
         return uidLevel.values().stream().sorted(createComparator(
                 tournament.getRule().getGroup()
                         .map(GroupRules::getDisambiguation)

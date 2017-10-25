@@ -613,7 +613,7 @@ public class MatchService {
         return scheduleService.withPlace(tournament, tablesDiscovery ->
                 MyPendingMatchList.builder()
                         .matches(tournament.participantMatches(uid)
-                                .filter(incompleteStates::contains)
+                                .filter(m -> incompleteStates.contains(m.getState()))
                                 .sorted(tournament.getRule().getPlace()
                                         .map(PlaceRules::getArenaDistribution).orElse(NO) == NO
                                         ? noTablesParticipantMatchComparator(tournament, uid)

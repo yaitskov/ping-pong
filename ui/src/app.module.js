@@ -27,7 +27,6 @@ angular.module('pingPong', [
     'tournamentParameters',
     'tournament',
     'myTournament',
-    'completeMyMatch',
     'changeCategory',
     'adminScoreSet',
     'matchScoreConflict',

@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.playoff;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.dan.ping.pong.app.match.MatchState.Over;
 
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
@@ -40,8 +41,10 @@ public class PlayOffService {
                 .values();
     }
 
-    public Collection<MatchInfo> findGroupMatches(List<MatchInfo> matches) {
-        return matches.stream().filter(m -> m.getGid().isPresent()).collect(toList());
+    public Collection<MatchInfo> findCompleteGroupMatches(List<MatchInfo> matches) {
+        return matches.stream().filter(m -> m.getGid().isPresent())
+                .filter(m -> m.getState() == Over)
+                .collect(toList());
     }
 
     public List<MatchInfo> findPlayOffMatches(OpenTournamentMemState tournament, int cid) {

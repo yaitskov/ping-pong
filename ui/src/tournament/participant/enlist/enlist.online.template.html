@@ -122,14 +122,22 @@
       {{ 'Enlist Me btn' | translate }}
     </button>
     <button type="button" class="btn btn-primary"
+            title="{{ 'Resign btn' | translate }}"
             ng-click="$ctrl.resign()"
             ng-show="$ctrl.canResignFutureTournament()">
-      {{ 'Resign btn' | translate }}
+      <span class="glyphicon glyphicon-stop"></span>
     </button>
     <button type="button" class="btn btn-danger"
+            title="{{ 'Resign btn' | translate }}"
             ng-click="$ctrl.ensureResign()"
-            ng-show="canResignActiveTournament()">
-      {{ 'Resign btn' | translate }}
+            ng-show="$ctrl.canResignActiveTournament()">
+      <span class="glyphicon glyphicon-stop"></span>
+    </button>
+    <a href="#!/my/matches/play/{{$ctrl.tournament.tid}}"
+       class="btn btn-success"
+       title="look at list of my matches"
+       ng-show="$ctrl.showScheduleLink()">
+      <span class="glyphicon glyphicon-play"></span>
     </button>
     <a class="btn btn-primary label-info" role="button"
        ng-show="$ctrl.tournament.previousTid"
@@ -141,11 +149,6 @@
   <div class="form-group" ng-show="$ctrl.tournament.bidState == 'Want'">
     <p translate="thanks-for-enlistment-info"
        translate-values="{url: '#!/my/matches/play/' + $ctrl.tournament.tid, name: $ctrl.tournament.name, time: $ctrl.tournament.opensAt}">
-    </p>
-  </div>
-  <div class="form-group" ng-show="$ctrl.showScheduleLink()">
-    <p translate="info-link-to-matches"
-       translate-values="{url: '#!/my/matches/play'}">
     </p>
   </div>
 </div>

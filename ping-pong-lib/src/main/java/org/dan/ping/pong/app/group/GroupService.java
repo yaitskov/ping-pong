@@ -1,6 +1,5 @@
 package org.dan.ping.pong.app.group;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.match.MatchState.Over;
@@ -17,14 +16,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.UIDefaults;
 
 public class GroupService {
     public Map<Uid, BidSuccessInGroup> emptyMatchesState(
             OpenTournamentMemState tournament,
             Collection<MatchInfo> allMatchesInGroup) {
-        checkArgument(allMatchesInGroup.stream()
-                .allMatch(minfo -> minfo.getState() == Over));
         return allMatchesInGroup.stream()
                 .map(MatchInfo::getParticipantIdScore)
                 .map(Map::keySet)

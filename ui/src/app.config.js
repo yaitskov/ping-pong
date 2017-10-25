@@ -61,7 +61,7 @@ angular.module('pingPong').
                     when('/review/scored-match/:matchId', {
                         template: '<review-match-score></review-match-score>'
                     }).
-                    when('/my/matches/play', {
+                    when('/my/matches/play/:tournamentId', {
                         template: '<my-match-play-list></my-match-play-list>'
                     }).
                     when('/match/state/description', {

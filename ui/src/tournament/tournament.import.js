@@ -6,3 +6,4 @@ import './result/tr-result.component.js';
 import './list/play/play-in-tournament-list.component.js';
 import './match/list/play/my-match-play-list.component.js';
 import './match/state/match-state-description.component.js';
+import './match/my/score/complete-my-match.component.js';

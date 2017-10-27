@@ -1,0 +1,18 @@
+<main-menu></main-menu>
+<form>
+  <div class="container admin-score">
+    <match-score-conflict></match-score-conflict>
+    <div class="form-group">
+      <a href="#!/review/admin-scored-match/{{$ctrl.tournamentId}}/{{$ctrl.matchId}}"
+         ng-show="$ctrl.matchScore.winUid" class="btn btn-success">
+        Accept score
+      </a>
+      <a ng-click="$ctrl.continuePlayMatch()" ng-show="!$ctrl.matchScore.winUid" class="btn btn-success">
+        Accept score
+      </a>
+      <a href="#!/my/match/open-dispute/{{$ctrl.matchId}}" class="btn btn-danger">
+        Open Dispute
+      </a>
+    </div>
+  </div>
+</div>

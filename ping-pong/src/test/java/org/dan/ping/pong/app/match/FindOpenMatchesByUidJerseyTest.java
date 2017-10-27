@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.match;
 
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidResource.TID_SLASH_UID;
+import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.BID_PENDING_MATCHES;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
@@ -22,11 +23,9 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.ws.rs.core.GenericType;
 
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = JerseyWithSimulator.class)
@@ -44,12 +43,14 @@ public class FindOpenMatchesByUidJerseyTest extends AbstractSpringJerseyTest {
                 .category(c1, p1, p2, p3);
         simulator.simulate(scenario);
 
-        final List<MyPendingMatch> matches = myRest()
+        final MyPendingMatchList matches = myRest()
                 .get(BID_PENDING_MATCHES + scenario.getTid()
                         + TID_SLASH_UID + scenario.player2Uid(p1).getId(),
-                        new GenericType<List<MyPendingMatch>>() {});
+                        MyPendingMatchList.class);
+        assertThat(matches.isShowTables(), is(false));
+        assertThat(matches.getBidState(), is(Play));
         assertThat(
-                matches.stream()
+                matches.getMatches().stream()
                         .map(MyPendingMatch::getEnemy)
                         .filter(Optional::isPresent)
                         .map(Optional::get)

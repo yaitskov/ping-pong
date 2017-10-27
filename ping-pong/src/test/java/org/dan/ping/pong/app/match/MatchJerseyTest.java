@@ -218,10 +218,10 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
         final int cid = daoGenerator.genCategory(tid);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
         restGenerator.enlistParticipants(tid, cid, participants);
-        assertEquals(emptyList(), restGenerator.listOpenMatches());
+        assertEquals(emptyList(), restGenerator.listOpenMatches(tid));
         restGenerator.beginTournament(tid);
 
-        final List<OpenMatchForJudge> adminOpenMatches = restGenerator.listOpenMatches();
+        final List<OpenMatchForJudge> adminOpenMatches = restGenerator.listOpenMatches(tid);
 
         assertEquals(
                 participants.stream().map(TestUserSession::getUid).collect(toSet()),
@@ -254,7 +254,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
         assertEquals(singletonList(Free), tables.stream().map(TableInfo::getState).collect(toList()));
         assertEquals(singletonList(Optional.empty()),
                 tables.stream().map(TableInfo::getMid).collect(toList()));
-        assertEquals(emptyList(), restGenerator.listOpenMatches());
+        assertEquals(emptyList(), restGenerator.listOpenMatches(tid));
     }
 
     @Test

@@ -28,6 +28,11 @@ angular.
                                             session: 1
                                         }
                                     },
+                                    findByState: {
+                                        url: '/api/bid/find-by-state',
+                                        method: 'POST',
+                                        isArray: true
+                                    }
                                     setState: {
                                         url: '/api/bid/set-state',
                                         method: 'POST',

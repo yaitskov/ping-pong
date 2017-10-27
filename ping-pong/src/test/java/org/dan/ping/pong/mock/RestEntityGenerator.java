@@ -14,6 +14,7 @@ import org.dan.ping.pong.app.bid.BidId;
 import org.dan.ping.pong.app.match.CompleteMatch;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.mock.simulator.EnlistMode;
 import org.dan.ping.pong.mock.simulator.ProvidedRank;
 
@@ -101,8 +102,8 @@ public class RestEntityGenerator {
         rest.voidPost(BEGIN_TOURNAMENT, testAdmin, tid);
     }
 
-    public List<OpenMatchForJudge> listOpenMatchesForJudge(TestAdmin testAdmin) {
-        return rest.get(OPEN_MATCHES_FOR_JUDGE, testAdmin, new GenericType<List<OpenMatchForJudge>>(){});
+    public List<OpenMatchForJudge> listOpenMatchesForJudge(int tid) {
+        return rest.get(OPEN_MATCHES_FOR_JUDGE + tid, new GenericType<List<OpenMatchForJudge>>(){});
     }
 
     public List<CompleteMatch> listCompleteMatches(int tid) {

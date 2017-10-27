@@ -1,13 +1,12 @@
-<main-menu></main-menu>
 <form>
   <div class="container admin-score">
     <div class="form-group">
       <label translate="Set won name"/>
-      <div class="row" ng-repeat="participant in $ctrl.participants">
+      <div class="row" ng-repeat="participant in $ctrl.match.participants">
         <a ng-click="$ctrl.activate($index)"
            class="btn btn-default"
            ng-class="{'btn-primary': $ctrl.winnerIdx == $index}"
-           holdLink="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}">
+           holdLink="#!/my/tournament/{{$ctrl.match.tid}}/participant/{{participant.uid}}">
           {{participant.name}}
         </a>
       </div>

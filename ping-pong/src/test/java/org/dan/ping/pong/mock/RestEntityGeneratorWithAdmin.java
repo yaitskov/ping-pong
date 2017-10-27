@@ -21,8 +21,8 @@ public class RestEntityGeneratorWithAdmin {
         restEntityGenerator.beginTournament(testAdmin, tid);
     }
 
-    public List<OpenMatchForJudge> listOpenMatches() {
-        return restEntityGenerator.listOpenMatchesForJudge(testAdmin);
+    public List<OpenMatchForJudge> listOpenMatches(int tid) {
+        return restEntityGenerator.listOpenMatchesForJudge(tid);
     }
 
     public List<CompleteMatch> listCompleteMatches(int tid) {

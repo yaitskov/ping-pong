@@ -1,0 +1,92 @@
+<main-menu></main-menu>
+<div class="container-fluid admin-judgement">
+  <request-status></request-status>
+  <div class="container" ng-show="!$ctrl.showTables && $ctrl.bids.length == 0 || $ctrl.showTables && $ctrl.matches.length == 0">
+    <div class="alert alert-info" translate="tournament is complete"
+         translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId, name: 'tournament'}">
+    </div>
+    <div class="form-group">
+      <div class="alert alert-info" ng-show="">
+        There is no matches to judge. Tournament is not open yet or it's
+        already complete.
+      </div>
+      <a class="btn btn-default"
+         href="#!/tournament/result/{{$ctrl.tournamentId}}">
+        {{ 'Watch Ratings' | translate }}
+      </a>
+    </div>
+  </div>
+  <div class="form-group tables" ng-show="$ctrl.showTables && $ctrl.matches.length">
+    <button class="btn btn-primary"
+            ng-repeat="match in $ctrl.matches | orderBy : 'table.label'"
+            ng-click="$ctrl.completeMatch(match)"
+            ng-show="$ctrl.matches.length > 0">
+      T{{match.table.label}}
+    </button>
+  </div>
+  <div class="form-group" ng-show="!$ctrl.showTables && $ctrl.bids.length">
+    <label for="bids">Playing participants</label>
+    <select class="form-control"
+            ng-model="$ctrl.bid"
+            ng-change="$ctrl.bidChange()"
+            required name="bids" id="bids">
+      <option ng-repeat="bid in $ctrl.bids | orderBy : 'name'" value="{{bid.uid}}">
+        {{bid.name}}
+      </option>
+    </select>
+  </div>
+  <div class="form-group" ng-show="$ctrl.matches.length == 0">
+    <div class="alert alert-info" ng-show="!$ctrl.showTables">
+      Player has no matches to play.
+    </div>
+  </div>
+  <table class="table" ng-show="$ctrl.matches.length > 0">
+    <thead>
+      <tr>
+        <td class="match-cell">
+          {{ 'the match' | translate }}
+        </td>
+        <td ng-show="$ctrl.showTables">
+          {{ 'the table' | translate }}
+        </td>
+        <td>
+          {{ 'Opponents' | translate }}
+        </td>
+        <td>
+          {{ 'Score' | translate }}
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="match in $ctrl.matches | orderBy : $ctrl.orderField">
+        <td class="match-cell">{{match.type}}</td>
+        <td ng-show="$ctrl.showTables">
+          <a href="#!/place/tables/{{match.table.id}}">
+            <span class="glyphicon glyphicon-map-marker"></span>
+            T{{match.table.label}}
+          </a>
+        </td>
+        <td class="participant-names" ng-show="$ctrl.showTables">
+          <a ng-repeat="participant in match.participants"
+             class="btn btn-default"
+             href="#!/my/tournament/{{match.tid}}/participant/{{participant.uid}}">
+            {{participant.name}}
+          </a>
+        </td>
+        <td class="participant-names" ng-show="!$ctrl.showTables">
+          <a class="btn btn-default"
+             href="#!/my/tournament/{{match.tid}}/participant/{{match.enemy.uid}}">
+            {{match.enemy.name}}
+          </a>
+        </td>
+        <td>
+          <a class="btn btn-primary"
+             title="{{ 'Score' | translate }}"
+             ng-click="$ctrl.completeMatch(match)">
+            <span class="glyphicon glyphicon-bullhorn"></span>
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

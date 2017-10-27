@@ -338,11 +338,6 @@ public class TournamentService {
         tournamentDao.update(update, batch);
     }
 
-    public TournamentRules getTournamentRules(int tid) {
-        return tournamentDao.getTournamentRules(tid)
-                .orElseThrow(() -> notFound("Tournament does not exist"));
-    }
-
     public void updateTournamentParams(OpenTournamentMemState tournament,
             TidIdentifiedRules parameters, DbUpdater batch) {
         if (!CONFIGURABLE_STATES.contains(tournament.getState())) {

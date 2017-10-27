@@ -28,13 +28,9 @@ angular.module('pingPong', [
     'tournament',
     'myTournament',
     'changeCategory',
-    'adminScoreSet',
-    'matchScoreConflict',
-    'reviewMatchScore',
     'participantPresence',
     'categoryMemberList',
     'tournamentCategories',
-    'myMatchJudgeList',
     'openTournamentList',
     'openTournament',
     'tournamentList'

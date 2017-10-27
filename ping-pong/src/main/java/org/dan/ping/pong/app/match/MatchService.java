@@ -9,6 +9,9 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static ord.dan.ping.pong.jooq.Tables.TABLES;
+import static ord.dan.ping.pong.jooq.Tables.USERS;
+import static ord.dan.ping.pong.jooq.tables.Matches.MATCHES;
 import static org.dan.ping.pong.app.bid.BidService.WIN_STATES;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
@@ -42,17 +45,18 @@ import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.group.PlayOffMatcherFromGroup;
-import org.dan.ping.pong.app.place.ArenaDistributionPolicy;
 import org.dan.ping.pong.app.place.PlaceRules;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.table.TableInfo;
+import org.dan.ping.pong.app.table.TableLink;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
@@ -137,7 +141,7 @@ public class MatchService {
             case MatchContinues:
                 return SetScoreResult.builder()
                         .scoreOutcome(name)
-                        .nextSetNumberToScore(Optional.of(matchInfo.getNumberOfSets()))
+                        .nextSetNumberToScore(Optional.of(matchInfo.getPlayedSets()))
                         .build();
             default:
                 throw internalError("Unknown state " + name);
@@ -487,7 +491,7 @@ public class MatchService {
 
     public void resetMatchScore(OpenTournamentMemState tournament, ResetSetScore reset, DbUpdater batch) {
         final MatchInfo minfo = tournament.getMatchById(reset.getMid());
-        final int numberOfSets = minfo.getNumberOfSets();
+        final int numberOfSets = minfo.getPlayedSets();
         if (numberOfSets < reset.getSetNumber()) {
             throw badRequest("Match has just " + numberOfSets + " sets");
         }
@@ -622,9 +626,10 @@ public class MatchService {
                                         .mid(m.getMid())
                                         .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
                                         .state(m.getState())
+                                        .playedSets(m.getPlayedSets())
                                         .tid(tournament.getTid())
                                         .matchType(m.getType())
-                                        .matchScore(tournament.getRule().getMatch().getMinGamesToWin())
+                                        .minGamesToWin(tournament.getRule().getMatch().getMinGamesToWin())
                                         .enemy(m.getOpponentUid(uid).map(ouid ->
                                                 ofNullable(tournament.getBid(ouid))
                                                         .orElseThrow(() -> internalError("no opponent for "
@@ -640,5 +645,24 @@ public class MatchService {
                                 .count())
                         .bidState(tournament.getParticipant(uid).getState())
                         .build());
+    }
+
+    public List<OpenMatchForJudge> findOpenMatchesFurJudge(OpenTournamentMemState tournament) {
+        return scheduleService.withPlace(tournament, (tablesDiscovery -> tournament.getMatches()
+                .values().stream()
+                .filter(m -> m.getState() == Game)
+                .map(m -> OpenMatchForJudge.builder()
+                        .mid(m.getMid())
+                        .tid(tournament.getTid())
+                        .minGamesToWin(tournament.getRule().getMatch().getMinGamesToWin())
+                        .playedSets(m.getPlayedSets())
+                        .started(m.getStartedAt().get())
+                        .type(m.getType())
+                        .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
+                        .participants(m.getParticipantIdScore().keySet().stream()
+                                .map(uid -> tournament.getParticipant(uid).toLink())
+                                .collect(toList()))
+                        .build())
+                .collect(toList())));
     }
 }

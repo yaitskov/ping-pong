@@ -15,7 +15,7 @@ angular.module('tournament').
                          var self = this;
                          this.matchScoring = function (match) {
                              pageCtx.put('last-scoring-match', match);
-                             $location.path("/complete/my/match/" + match.mid);
+                             $location.path('/complete/my/match/' + match.mid);
                          };
                          requestStatus.startLoading();
                          Match.myMatchesNeedToPlay(

@@ -5,16 +5,13 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.SET_SCORE;
-import static ord.dan.ping.pong.jooq.Tables.TABLES;
 import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
-import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT_ADMIN;
 import static ord.dan.ping.pong.jooq.Tables.USERS;
 import static ord.dan.ping.pong.jooq.tables.Matches.MATCHES;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.match.MatchState.Draft;
-import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
@@ -25,7 +22,6 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.Users;
-import org.dan.ping.pong.app.table.TableLink;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.Uid;
@@ -76,52 +72,6 @@ public class MatchDaoServer implements MatchDao {
                 .returning()
                 .fetchOne()
                 .getMid();
-    }
-
-    @Override
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<OpenMatchForJudge> findOpenMatchesFurJudge(Uid adminUid) {
-        return jooq.select(MATCHES.MID, MATCHES.TID, MATCHES.STARTED,
-                TABLES.TABLE_ID, TABLES.LABEL, TOURNAMENT.RULES,
-                MATCHES.TYPE, USERS.UID, USERS.NAME,
-                ENEMY_USER.UID, ENEMY_USER.NAME)
-                .from(TOURNAMENT_ADMIN)
-                .innerJoin(TOURNAMENT)
-                .on(TOURNAMENT_ADMIN.TID.eq(TOURNAMENT.TID))
-                .innerJoin(MATCHES)
-                .on(TOURNAMENT.TID.eq(MATCHES.TID))
-                .innerJoin(USERS)
-                .on(MATCHES.UID_LESS.eq(USERS.UID))
-                .innerJoin(ENEMY_USER)
-                .on(MATCHES.UID_MORE.eq(ENEMY_USER.UID))
-                .leftJoin(TABLES)
-                .on(MATCHES.MID.eq(TABLES.MID.cast(Integer.class)))
-                .where(TOURNAMENT_ADMIN.UID.eq(adminUid),
-                        MATCHES.STATE.eq(Game))
-                .orderBy(MATCHES.STARTED)
-                .fetch()
-                .map(r -> OpenMatchForJudge.builder()
-                        .mid(r.get(MATCHES.MID))
-                        .tid(r.get(MATCHES.TID))
-                        .matchScore(r.get(TOURNAMENT.RULES).getMatch().getMinGamesToWin())
-                        .started(r.get(MATCHES.STARTED).get())
-                        .type(r.get(MATCHES.TYPE))
-                        .table(ofNullable(r.get(TABLES.TABLE_ID))
-                                .map(tableId ->
-                                        TableLink.builder()
-                                                .id(tableId)
-                                                .label(r.get(TABLES.LABEL))
-                                        .build()))
-                        .participants(asList(
-                                UserLink.builder()
-                                        .name(r.get(USERS.NAME))
-                                        .uid(r.get(USERS.UID))
-                                        .build(),
-                                UserLink.builder()
-                                        .name(r.get(ENEMY_USER.NAME))
-                                        .uid(r.get(ENEMY_USER.UID))
-                                        .build()))
-                        .build());
     }
 
     @Override
@@ -309,7 +259,7 @@ public class MatchDaoServer implements MatchDao {
                                     + " where " + SET_SCORE.MID.getName() + " = ? and "
                                     + SET_SCORE.UID.getName() + " = ? order by "
                                     + SET_SCORE.SET_ID.getName() + " desc limit ?",
-                            minfo.getMid(), uid, minfo.getNumberOfSets() - setNumber))
+                            minfo.getMid(), uid, minfo.getPlayedSets() - setNumber))
                     .build());
         });
     }

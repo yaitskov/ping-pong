@@ -17,6 +17,11 @@ angular.
                                       session: 1
                                   }
                               },
+                              bidMatchesNeedToPlay: {
+                                  isArray: true,
+                                  method: 'GET',
+                                  url: '/api/match/list/bid/pending/:tournamentId/:bid'
+                              },
                               getRules: {
                                   url: '/api/match/rules/:tournamentId',
                                   method: 'GET'
@@ -29,9 +34,8 @@ angular.
                                   }
                               },
                               myMatchesNeedToJudge: {
-                                  url: '/api/match/judge/list/open',
+                                  url: '/api/match/judge/list/open/:tournamentId',
                                   method: 'GET',
-                                  isArray: true,
                                   headers: {
                                       session: 1
                                   }

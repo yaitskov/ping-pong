@@ -17,8 +17,6 @@ public interface MatchDao {
             Optional<Integer> winMid, Optional<Integer> loseMid,
             int priority, int level, MatchType type);
 
-    List<OpenMatchForJudge> findOpenMatchesFurJudge(Uid adminUid);
-
     void changeStatus(int mid, MatchState state, DbUpdater batch);
 
     Optional<Uid> scoreSet(OpenTournamentMemState tournament, MatchInfo matchInfo,

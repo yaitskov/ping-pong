@@ -16,7 +16,7 @@ import static org.junit.Assert.assertThat;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.group.GroupPopulations;
-import org.dan.ping.pong.app.match.MyPendingMatch;
+import org.dan.ping.pong.app.match.MyPendingMatchList;
 import org.dan.ping.pong.mock.simulator.HookDecision;
 import org.dan.ping.pong.mock.simulator.PlayHook;
 import org.dan.ping.pong.mock.simulator.Player;
@@ -28,11 +28,9 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.ws.rs.core.GenericType;
 
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = JerseyWithSimulator.class)
@@ -66,7 +64,7 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                                             .build()).readEntity(Uid.class);
                             s.addPlayer(uid, Player.p4);
                             assertThat(myRest().get(BID_PENDING_MATCHES + s.getTid() + "/" + uid.getId(),
-                                    new GenericType<List<MyPendingMatch>>() {}),
+                                    MyPendingMatchList.class).getMatches(),
                                     Matchers.hasSize(3));
                             return HookDecision.Skip;
                         })

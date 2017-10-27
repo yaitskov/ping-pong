@@ -11,6 +11,7 @@ import static org.dan.ping.pong.app.auth.AuthResource.DEV_CLEAN_SIGN_IN_TOKEN_TA
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
+import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
 import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.mock.simulator.Hook.AfterMatch;
@@ -58,6 +59,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 @Slf4j
@@ -153,8 +155,9 @@ public class Simulator {
         final int[] completedMatches = new int[1];
         while (true) {
             completedMatches[0] = 0;
-            final List<OpenMatchForJudge> openMatches = matchDao.findOpenMatchesFurJudge(
-                    testAdmin.getUid());
+            final List<OpenMatchForJudge> openMatches = rest.get(
+                    OPEN_MATCHES_FOR_JUDGE + scenario.getTid(),
+                    new GenericType<List<OpenMatchForJudge>>() {});
             if (scenario.getTables() > 0) {
                 assertThat(placeDao.findFreeTables(scenario.getTid()),
                         Matchers.hasSize(scenario.getTables() - openMatches.size()));

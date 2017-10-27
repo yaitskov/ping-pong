@@ -2,7 +2,9 @@ package org.dan.ping.pong.app.tournament;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
+import static org.dan.ping.pong.app.match.MatchResource.TID_JP;
 import static org.dan.ping.pong.app.tournament.TournamentCacheFactory.TOURNAMENT_CACHE;
+import static org.dan.ping.pong.app.tournament.TournamentService.TID;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 
@@ -45,7 +47,7 @@ public class TournamentResource {
     public static final String DRAFTING_INFO = DRAFTING + "{" + DRAFTING_PARAM + "}";
     public static final String MY_TOURNAMENT = TOURNAMENT + "mine/{tid}";
     public static final String TOURNAMENT_RULES = TOURNAMENT + "rules";
-    public static final String GET_TOURNAMENT_RULES = TOURNAMENT_RULES + "/{tid}";
+    public static final String GET_TOURNAMENT_RULES = TOURNAMENT_RULES + "/";
     public static final String EDITABLE_TOURNAMENTS = TOURNAMENT + "editable/by/me";
     public static final String TOURNAMENT_CREATE = TOURNAMENT + "create";
     public static final String TOURNAMENT_INVALIDATE_CACHE = TOURNAMENT + "invalidate/cache";
@@ -279,15 +281,17 @@ public class TournamentResource {
     @GET
     @Path(MY_TOURNAMENT)
     @Consumes(APPLICATION_JSON)
-    public MyTournamentInfo getMyTournamentInfo(@PathParam("tid") int tid) {
+    public MyTournamentInfo getMyTournamentInfo(@PathParam(TID) int tid) {
         return tournamentService.getMyTournamentInfo(tid);
     }
 
     @GET
-    @Path(GET_TOURNAMENT_RULES)
+    @Path(GET_TOURNAMENT_RULES + TID_JP)
     @Consumes(APPLICATION_JSON)
-    public TournamentRules getTournamentRules(@PathParam("tid") int tid) {
-        return tournamentService.getTournamentRules(tid);
+    public void getTournamentRules(
+            @Suspended AsyncResponse response,
+            @PathParam(TID) Tid tid) {
+        tournamentAccessor.read(tid, response, OpenTournamentMemState::getRule);
     }
 
     @POST

@@ -55,11 +55,17 @@ angular.module('pingPong').
                     when('/complete/match/:matchId', {
                         template: '<admin-score-set></admin-score-set>'
                     }).
-                    when('/match/conflict-review/:matchId', {
-                        template: '<match-score-conflict></match-score-conflict>'
+                    when('/match/admin-conflict-review/:tournamentId/:matchId', {
+                        template: '<match-score-conflict-admin></match-score-conflict-admin>'
                     }).
-                    when('/review/scored-match/:matchId', {
-                        template: '<review-match-score></review-match-score>'
+                    when('/match/user-conflict-review/:tournamentId/:matchId', {
+                        template: '<match-score-conflict-user></match-score-conflict-user>'
+                    }).
+                    when('/review/admin-scored-match/:tournamentId/:matchId', {
+                        template: '<review-match-score-for-admin></review-match-score-for-admin>'
+                    }).
+                    when('/review/user-scored-match/:tournamentId/:matchId', {
+                        template: '<review-match-score-for-user></review-match-score-for-user>'
                     }).
                     when('/my/matches/play/:tournamentId', {
                         template: '<my-match-play-list></my-match-play-list>'
@@ -82,7 +88,7 @@ angular.module('pingPong').
                     when('/my/tournament/:tournamentId/change-category/:participantId', {
                         template: '<change-category></change-category>'
                     }).
-                    when('/my/matches/judgement', {
+                    when('/my/matches/judgement/:tournamentId', {
                         template: '<my-match-judge-list></my-match-judge-list>'
                     }).
                     when('/watch/tournament/:tournamentId', {

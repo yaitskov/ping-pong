@@ -23,6 +23,7 @@ public class OpenMatchForJudge {
     private Optional<TableLink> table;
     private List<UserLink> participants;
     private Instant started;
-    private int matchScore;
+    private int minGamesToWin;
+    private int playedSets;
     private MatchType type;
 }

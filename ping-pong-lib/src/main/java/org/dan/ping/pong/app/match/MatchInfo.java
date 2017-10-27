@@ -38,7 +38,7 @@ public class MatchInfo {
     private Optional<Instant> endedAt;
     private int priority;
 
-    public int getNumberOfSets() {
+    public int getPlayedSets() {
         for (List<Integer> l : participantIdScore.values()) {
             return l.size();
         }
@@ -56,13 +56,6 @@ public class MatchInfo {
 
     public String toString() {
         return "Mid(" + mid + ")";
-    }
-
-    public int getPlayedSets() {
-        for (List<Integer> sets : participantIdScore.values()) {
-            return sets.size();
-        }
-        return 0;
     }
 
     public Map<Uid, Integer> getSetScore(int setOrdNumber) {

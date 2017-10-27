@@ -32,7 +32,7 @@ import javax.ws.rs.container.Suspended;
 public class MatchResource {
     public static final String MY_PENDING_MATCHES = "/match/list/my/pending/";
     public static final String BID_PENDING_MATCHES = "/match/list/bid/pending/";
-    public static final String OPEN_MATCHES_FOR_JUDGE = "/match/judge/list/open";
+    public static final String OPEN_MATCHES_FOR_JUDGE = "/match/judge/list/open/";
     public static final String COMPLETE_MATCHES = "/match/list/completed/";
     public static final String SCORE_SET = "/match/participant/score";
     public static final String MATCH_WATCH_LIST_OPEN = "/match/watch/list/open/";
@@ -127,12 +127,15 @@ public class MatchResource {
     }
 
     @GET
-    @Path(OPEN_MATCHES_FOR_JUDGE)
+    @Path(OPEN_MATCHES_FOR_JUDGE + TID_JP)
     @Consumes(APPLICATION_JSON)
-    public List<OpenMatchForJudge> findOpenMatchesForJudge(
-            @HeaderParam(SESSION) String session) {
-        final Uid uid = authService.userInfoBySession(session).getUid();
-        return matchDao.findOpenMatchesFurJudge(uid);
+    public void findOpenMatchesForJudge(
+            @PathParam(TID) Tid tid,
+            @Suspended AsyncResponse response) {
+        tournamentAccessor.update(tid, response,
+                (tournament, batch) -> {
+                    return matchService.findOpenMatchesFurJudge(tournament);
+                });
     }
 
     @GET

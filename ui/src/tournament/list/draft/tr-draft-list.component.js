@@ -1,11 +1,11 @@
 import angular from 'angular';
-import template from './tournament-list.template.html';
+import template from './tr-draft-list.template.html';
 
-angular.module('tournamentList').
-    component('tournamentList', {
+angular.module('tournament').
+    component('tournamentDraftList', {
         templateUrl: template,
-        controller: ['Tournament', 'mainMenu', '$location', 'requestStatus',
-                     function (Tournament, mainMenu, $location, requestStatus) {
+        controller: ['Tournament', 'auth', 'mainMenu', '$location', 'requestStatus',
+                     function (Tournament, auth, mainMenu, $location, requestStatus) {
                          mainMenu.setTitle('Drafting');
                          this.tournaments = null;
                          var self = this;

@@ -38,9 +38,7 @@ import accountModule from './account/account.module.js';
 import accountComponent from './account/account.component.js';
 import accountEditModule from './account/edit.module.js';
 import accountEditComponent from './account/edit.component.js';
-import mainmenuModule from './main-menu/main-menu.module.js';
-import mainmenuService from './main-menu/main-menu.service.js';
-import mainmenuComponent from './main-menu/main-menu.component.js';
+import './ui/ui.import.js';
 import placepickerModule from './place-picker/place-picker.module.js';
 import placepickerService from './place-picker/place-picker.service.js';
 import placepickerComponent from './place-picker/place-picker.component.js';
@@ -55,8 +53,6 @@ import newTournamentComponent from './new-tournament/new-tournament.component.js
 
 import openTournamentModule from './open-tournament/open-tournament.module.js';
 import openTournamentComponent from './open-tournament/open-tournament.component.js';
-import tournamentListModule from './tournament-list/tournament-list.module.js';
-import tournamentListComponent from './tournament-list/tournament-list.component.js';
 import openTournamentListModule from './open-tournament-list/open-tournament-list.module.js';
 import openTournamentListComponent from './open-tournament-list/open-tournament-list.component.js';
 import myTournamentListModule from './my-tournament-list/my-tournament-list.module.js';

@@ -6,7 +6,7 @@ angular.module('pingPong', [
     'ngRoute',
     'nk.touchspin',
     'pascalprecht.translate',
-    'mainMenu',
+    'ui',
     'core',
     'signUp',
     'signIn',
@@ -32,6 +32,5 @@ angular.module('pingPong', [
     'categoryMemberList',
     'tournamentCategories',
     'openTournamentList',
-    'openTournament',
-    'tournamentList'
+    'openTournament'
 ]);

@@ -40,8 +40,8 @@ angular.module('pingPong').
                     .preferredLanguage(localStorage.getItem('myLang') || 'pl');
                 $locationProvider.hashPrefix('!');
                 $routeProvider.
-                    when('/tournaments', {
-                        template: '<tournament-list></tournament-list>'
+                    when('/tournament/draft/list', {
+                        template: '<tournament-draft-list></tournament-draft-list>'
                     }).
                     when('/watch/tournaments', {
                         template: '<open-tournament-list></open-tournament-list>'
@@ -166,6 +166,9 @@ angular.module('pingPong').
                     when('/tournament/enlist/offline/:tournamentId', {
                         template: '<enlist-offline></enlist-offline>'
                     }).
-                    otherwise('/tournaments');
+                    when('/default/route', {
+                        template: '<default-route></default-route>'
+                    }).
+                    otherwise('/default/route');
             }
            ]);

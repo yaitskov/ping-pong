@@ -88,7 +88,7 @@ angular.
                              },
                              'event.tournament.rules.cancel': (event, rules) => {
                                  pageCtx.put('newTournament', null);
-                                 $location.path('/tournaments');
+                                 $location.path('/tournament/draft/list');
                              },
                              'event.tournament.rules.back': (event, rules) => {
                                  pageCtx.put('newTournament', self.tournament);

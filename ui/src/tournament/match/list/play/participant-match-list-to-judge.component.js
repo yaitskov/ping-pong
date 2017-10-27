@@ -1,8 +1,8 @@
 import angular from 'angular';
-import template from './my-match-play-list.template.html';
+import template from './participant-match-list-to-judge.template.html';
 
 angular.module('tournament').
-    component('myMatchPlayList', {
+    component('participantMatchListToJudge', {
         templateUrl: template,
         controller: ['Match', 'mainMenu', 'cutil', '$routeParams',
                      'pageCtx', 'auth', 'requestStatus', '$location',
@@ -15,7 +15,7 @@ angular.module('tournament').
                          var self = this;
                          this.matchScoring = function (match) {
                              pageCtx.put('last-scoring-match', match);
-                             $location.path('/complete/my/match/' + match.mid);
+                             $location.path('/participant/score/set/' + match.mid);
                          };
                          requestStatus.startLoading();
                          Match.myMatchesNeedToPlay(

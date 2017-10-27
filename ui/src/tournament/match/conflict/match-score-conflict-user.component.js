@@ -21,6 +21,6 @@ angular.
                                  break;
                              }
                              pageCtx.put('last-scoring-match', match);
-                             $location.path('/complete/my/match/' + self.matchId);
+                             $location.path('/participant/score/set/' + self.matchId);
                          }
                      }]});

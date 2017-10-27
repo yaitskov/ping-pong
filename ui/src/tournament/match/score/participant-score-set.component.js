@@ -1,9 +1,9 @@
 import angular from 'angular';
-import template from './complete-my-match.template.html';
+import template from './participant-score-set.template.html';
 
 angular.
     module('tournament').
-    component('completeMyMatch', {
+    component('participantScoreSet', {
         templateUrl: template,
         controller: ['auth', 'mainMenu', 'Match', '$routeParams',
                      'pageCtx', 'requestStatus', '$scope', '$rootScope', 'binder', 'lateEvent',
@@ -23,7 +23,7 @@ angular.
                              'event.match.scored': (event, matchScore) => {
                                  pageCtx.put('match-score-review-' + $routeParams.matchId,
                                              {score: okResp.matchScore,
-                                              participants: this.match.participants
+                                              participants: self.match.participants
                                              });
                                  $location.path('/review/user-scored-match/' + self.match.tid + '/' + $routeParams.matchId);
                              }

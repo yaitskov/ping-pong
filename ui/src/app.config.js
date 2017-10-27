@@ -49,8 +49,8 @@ angular.module('pingPong').
                     when('/play/in/tournaments', {
                         template: '<play-in-tournament-list></play-in-tournament-list>'
                     }).
-                    when('/complete/my/match/:matchId', {
-                        template: '<complete-my-match></complete-my-match>'
+                    when('/participant/score/set/:matchId', {
+                        template: '<participant-score-set></participant-score-set>'
                     }).
                     when('/complete/match/:matchId', {
                         template: '<admin-score-set></admin-score-set>'
@@ -68,7 +68,7 @@ angular.module('pingPong').
                         template: '<review-match-score-for-user></review-match-score-for-user>'
                     }).
                     when('/my/matches/play/:tournamentId', {
-                        template: '<my-match-play-list></my-match-play-list>'
+                        template: '<participant-match-list-to-judge></participant-match-list-to-judge>'
                     }).
                     when('/match/state/description', {
                         template: '<match-state-description></match-state-description>'

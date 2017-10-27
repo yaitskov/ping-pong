@@ -224,12 +224,6 @@ angular.
             };
         };
     }]).
-    factory('escHash', function (s) {
-        return encodeURIComponent(btoa(s));
-    }).
-    factory('unhash', function (s) {
-        return atob(decodeURIComponent(s));
-    }.
     factory('pageCtx', [function () {
         return new function () {
             var map = sessionStorage;

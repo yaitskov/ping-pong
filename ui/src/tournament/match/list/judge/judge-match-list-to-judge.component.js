@@ -1,5 +1,5 @@
 import angular from 'angular';
-import template from './my-match-judge-list.template.html';
+import template from './judge-match-list-to-judge.template.html';
 
 angular.module('tournament').
     component('myMatchJudgeList', {
@@ -65,6 +65,6 @@ angular.module('tournament').
                                  }
                              },
                              requestStatus.failed);
-                     }
-                    ]
+                         }
+                     }]
     });

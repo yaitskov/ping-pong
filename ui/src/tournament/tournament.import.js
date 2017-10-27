@@ -12,7 +12,7 @@ import './match/review/review-match-score-admin.component.js';
 import './match/review/review-match-score-user.component.js';
 import './match/score/admin-score-set.component.js';
 import './match/score/complete-my-match.component.js';
-import './match/list/judge/my-match-judge-list.component.js';
+import './match/list/judge/judge-match-list-to-judge.component.js';
 import './match/conflict/match-score-conflict.component.js';
 import './match/conflict/match-score-conflict-admin.component.js';
 import './match/conflict/match-score-conflict-user.component.js';

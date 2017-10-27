@@ -657,7 +657,7 @@ public class MatchService {
                         .minGamesToWin(tournament.getRule().getMatch().getMinGamesToWin())
                         .playedSets(m.getPlayedSets())
                         .started(m.getStartedAt().get())
-                        .type(m.getType())
+                        .matchType(m.getType())
                         .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
                         .participants(m.getParticipantIdScore().keySet().stream()
                                 .map(uid -> tournament.getParticipant(uid).toLink())

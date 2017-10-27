@@ -306,7 +306,7 @@ public class Simulator {
             } else {
                 throw new IllegalStateException("Match between "
                         + players + " is not expected at "
-                        + openMatch.getType() + " stage");
+                        + openMatch.getMatchType() + " stage");
             }
         }
         final Optional<GameEnd> game = gameEnd.stream().limit(1).findAny();

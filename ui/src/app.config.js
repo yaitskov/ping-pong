@@ -89,7 +89,7 @@ angular.module('pingPong').
                         template: '<change-category></change-category>'
                     }).
                     when('/my/matches/judgement/:tournamentId', {
-                        template: '<my-match-judge-list></my-match-judge-list>'
+                        template: '<judge-match-list-to-judge></judge-match-list-to-judge>'
                     }).
                     when('/watch/tournament/:tournamentId', {
                         template: '<open-tournament></open-tournament>'
@@ -161,7 +161,7 @@ angular.module('pingPong').
                         template: '<tournament-result></tournament-result>'
                     }).
                     when('/my/tournament/:tournamentId', {
-                        template: '<my-tournament></my-tournament>'
+                        template: '<tournament-management></tournament-management>'
                     }).
                     when('/tournament/enlist/offline/:tournamentId', {
                         template: '<enlist-offline></enlist-offline>'

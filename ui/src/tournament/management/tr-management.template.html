@@ -10,7 +10,7 @@
         <span class="glyphicon glyphicon-play-circle"></span>
       </a>
       <a class="btn btn-primary"
-         href="#!/my/matches/judgement"
+         href="#!/my/matches/judgement/{{$ctrl.tournament.tid}}"
          ng-show="$ctrl.tournament.state == 'Open'"
          title="{{ 'Judge and score open matches in the tournament' | translate }}">
         <img ng-src="{{$ctrl.whistle}}" class="icon-image"/>

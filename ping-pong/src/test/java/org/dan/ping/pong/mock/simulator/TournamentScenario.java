@@ -127,7 +127,7 @@ public class TournamentScenario implements SessionAware {
     }
 
     public Multimap<Set<Player>, GameEnd> chooseMatchMap(OpenMatchForJudge openMatch) {
-        return openMatch.getType() == Grup
+        return openMatch.getMatchType() == Grup
                 ? getGroupMatches()
                 : getPlayOffMatches();
     }

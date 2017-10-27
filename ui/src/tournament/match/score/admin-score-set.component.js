@@ -5,8 +5,8 @@ angular.
     module('tournament').
     component('adminScoreSet', {
         templateUrl: template,
-        controller: ['mainMenu', 'Match', '$routeParams', 'pageCtx', 'requestStatus', '$scope', '$location', 'syncTranslate',
-                     function (mainMenu, Match, $routeParams, pageCtx, requestStatus, $scope, $location, syncTranslate) {
+        controller: ['mainMenu', '$routeParams', 'pageCtx', '$scope', '$location', 'lateEvent', '$rootScope',
+                     function (mainMenu, $routeParams, pageCtx, $scope, $location, lateEvent, $rootScope) {
                          mainMenu.setTitle('Match Scoring');
                          this.match = pageCtx.get('last-scoring-match');
                          var self = this;

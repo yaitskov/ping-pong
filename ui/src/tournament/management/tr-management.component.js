@@ -1,10 +1,10 @@
 import angular from 'angular';
-import template from './my-tournament.template.html';
+import template from './tr-management.template.html';
 import whistle from './whistle.png';
 
 angular.
-    module('myTournament').
-    component('myTournament', {
+    module('tournament').
+    component('tournamentManagement', {
         templateUrl: template,
         controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu',
                      '$http', 'pageCtx', 'requestStatus', '$location',
@@ -90,7 +90,7 @@ angular.
                                      function (okResp) {
                                          self.tournament.state = 'Open';
                                          requestStatus.complete();
-                                         $location.path("/my/matches/judgement");
+                                         $location.path('/my/matches/judgement/' + self.tournament.tid);
                                      },
                                      function (error) {
                                          if (error.data.error == 'uncheckedUsers') {

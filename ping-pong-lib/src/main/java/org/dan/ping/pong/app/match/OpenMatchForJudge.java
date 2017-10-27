@@ -25,5 +25,5 @@ public class OpenMatchForJudge {
     private Instant started;
     private int minGamesToWin;
     private int playedSets;
-    private MatchType type;
+    private MatchType matchType;
 }

@@ -18,7 +18,6 @@ angular.
                                   }
                               },
                               bidMatchesNeedToPlay: {
-                                  isArray: true,
                                   method: 'GET',
                                   url: '/api/match/list/bid/pending/:tournamentId/:bid'
                               },

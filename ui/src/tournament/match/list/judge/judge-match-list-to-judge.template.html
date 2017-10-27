@@ -49,8 +49,11 @@
         <td ng-show="$ctrl.showTables">
           {{ 'the table' | translate }}
         </td>
-        <td>
+        <td ng-show="$ctrl.showTables">
           {{ 'Opponents' | translate }}
+        </td>
+        <td ng-show="!$ctrl.showTables">
+          {{ 'Opponent' | translate }}
         </td>
         <td>
           {{ 'Score' | translate }}
@@ -59,7 +62,7 @@
     </thead>
     <tbody>
       <tr ng-repeat="match in $ctrl.matches | orderBy : $ctrl.orderField">
-        <td class="match-cell">{{match.type}}</td>
+        <td class="match-cell">{{match.matchType}}</td>
         <td ng-show="$ctrl.showTables">
           <a href="#!/place/tables/{{match.table.id}}">
             <span class="glyphicon glyphicon-map-marker"></span>

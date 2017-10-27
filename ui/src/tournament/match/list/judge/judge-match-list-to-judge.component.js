@@ -2,7 +2,7 @@ import angular from 'angular';
 import template from './judge-match-list-to-judge.template.html';
 
 angular.module('tournament').
-    component('myMatchJudgeList', {
+    component('judgeMatchListToJudge', {
         templateUrl: template,
         controller: ['Match', 'Tournament', 'Participant', 'mainMenu', '$location',
                      'pageCtx', 'requestStatus', '$routeParams',
@@ -27,9 +27,10 @@ angular.module('tournament').
                                  },
                                  function (matches) {
                                      requestStatus.complete();
-                                     self.matches = matches;
+                                     self.matches = matches.matches;
                                  },
                                  requestStatus.failed);
+                         };
 
                          requestStatus.startLoading();
                          Tournament.parameters(
@@ -57,7 +58,8 @@ angular.module('tournament').
                                              requestStatus.complete();
                                              self.bids = bids;
                                              for (var i in bids) {
-                                                 self.bid = bids[i].uid;
+                                                 self.bid = "" + bids[i].uid;
+                                                 self.bidChange();
                                                  break;
                                              }
                                          },
@@ -65,6 +67,6 @@ angular.module('tournament').
                                  }
                              },
                              requestStatus.failed);
-                         }
-                     }]
+                     }
+                    ]
     });

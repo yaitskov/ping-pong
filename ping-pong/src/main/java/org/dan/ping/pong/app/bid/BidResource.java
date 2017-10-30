@@ -138,7 +138,7 @@ public class BidResource {
 
     @POST
     @Path(FIND_BIDS_BY_STATE)
-    public void findbyState(
+    public void findByState(
             @Suspended AsyncResponse response,
             FindByState request) {
         tournamentAccessor.read(request.getTid(), response,

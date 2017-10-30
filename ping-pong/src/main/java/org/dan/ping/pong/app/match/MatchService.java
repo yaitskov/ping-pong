@@ -9,9 +9,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
-import static ord.dan.ping.pong.jooq.Tables.TABLES;
-import static ord.dan.ping.pong.jooq.Tables.USERS;
-import static ord.dan.ping.pong.jooq.tables.Matches.MATCHES;
 import static org.dan.ping.pong.app.bid.BidService.WIN_STATES;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
@@ -49,14 +46,12 @@ import org.dan.ping.pong.app.place.PlaceRules;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.table.TableInfo;
-import org.dan.ping.pong.app.table.TableLink;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.app.tournament.Uid;
-import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
@@ -427,13 +422,13 @@ public class MatchService {
                 .build();
     }
 
-    private static final Set<MatchState> incompleteStates = ImmutableSet.of(Draft, Place, Game);
+    public static final Set<MatchState> incompleteMatchStates = ImmutableSet.of(Draft, Place, Game);
 
     public List<MatchInfo> bidIncompleteGroupMatches(Uid uid, OpenTournamentMemState tournament) {
         return tournament.getMatches().values().stream()
                 .filter(minfo -> minfo.getParticipantIdScore().containsKey(uid))
                 .filter(minfo -> minfo.getGid().isPresent())
-                .filter(minfo -> incompleteStates.contains(minfo.getState()))
+                .filter(minfo -> incompleteMatchStates.contains(minfo.getState()))
                 .collect(toList());
     }
 
@@ -462,7 +457,7 @@ public class MatchService {
                 .stream()
                 .filter(minfo -> minfo.hasParticipant(uid))
                 .filter(minfo -> !minfo.getGid().isPresent())
-                .filter(minfo -> incompleteStates.contains(minfo.getState()))
+                .filter(minfo -> incompleteMatchStates.contains(minfo.getState()))
                 .findAny();
     }
 
@@ -617,7 +612,7 @@ public class MatchService {
         return scheduleService.withPlace(tournament, tablesDiscovery ->
                 MyPendingMatchList.builder()
                         .matches(tournament.participantMatches(uid)
-                                .filter(m -> incompleteStates.contains(m.getState()))
+                                .filter(m -> incompleteMatchStates.contains(m.getState()))
                                 .sorted(tournament.getRule().getPlace()
                                         .map(PlaceRules::getArenaDistribution).orElse(NO) == NO
                                         ? noTablesParticipantMatchComparator(tournament, uid)
@@ -641,7 +636,7 @@ public class MatchService {
                                 .orElse(NO) != NO)
                         .totalLeft(tournament.participantMatches(uid)
                                 .map(MatchInfo::getState)
-                                .filter(incompleteStates::contains)
+                                .filter(incompleteMatchStates::contains)
                                 .count())
                         .bidState(tournament.getParticipant(uid).getState())
                         .build());

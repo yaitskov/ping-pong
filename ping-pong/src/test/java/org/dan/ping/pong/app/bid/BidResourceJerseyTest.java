@@ -1,11 +1,11 @@
 package org.dan.ping.pong.app.bid;
 
-import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidResource.FIND_BIDS_BY_STATE;
-import static org.dan.ping.pong.app.bid.BidState.Want;
+import static org.dan.ping.pong.app.bid.BidState.Play;
+import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
-import static org.dan.ping.pong.mock.simulator.EnlistMode.Enlist;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
@@ -37,10 +37,9 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void findByState() {
         final TournamentScenario scenario = TournamentScenario.begin()
-                .doNotBegin()
+                .ignoreUnexpectedGames()
                 .name("findByState")
                 .rules(RULES_G8Q1_S3A2G11)
-                .presence(Enlist,  p1)
                 .category(c1, p1, p2);
 
         simulator.simulate(scenario);
@@ -49,11 +48,11 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
                 FIND_BIDS_BY_STATE,
                 scenario.getTestAdmin(),
                 FindByState.builder().tid(Tid.of(scenario.getTid()))
-                        .states(singletonList(Want)).build())
+                        .states(asList(Wait, Play)).build())
                 .readEntity(
                         new GenericType<List<UserLink>>() {});
 
         assertThat(result.stream().map(UserLink::getUid)
-                .collect(toList()), is(singletonList(scenario.player2Uid(p1))));
+                .collect(toSet()), is(scenario.getUidPlayer().keySet()));
     }
 }

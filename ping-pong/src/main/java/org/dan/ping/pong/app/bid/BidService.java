@@ -9,6 +9,7 @@ import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
+import static org.dan.ping.pong.app.match.MatchService.incompleteMatchStates;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
@@ -83,6 +84,8 @@ public class BidService {
     public List<UserLink> findByState(OpenTournamentMemState tournament, List<BidState> states) {
         return tournament.getParticipants().values().stream()
                 .filter(p -> states.contains(p.getState()))
+                .filter(p -> tournament.participantMatches(p.getUid())
+                        .anyMatch(m -> incompleteMatchStates.contains(m.getState())))
                 .map(ParticipantMemState::toLink)
                 .sorted(Comparator.comparing(UserLink::getName))
                 .collect(toList());

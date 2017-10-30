@@ -35,6 +35,7 @@ angular.
                               myMatchesNeedToJudge: {
                                   url: '/api/match/judge/list/open/:tournamentId',
                                   method: 'GET',
+                                  isArray: true,
                                   headers: {
                                       session: 1
                                   }

@@ -21,6 +21,10 @@ angular.
                              return self.tournament &&
                                  cutil.has(self.tournament.bidState, ['Paid', 'Here', 'Play', 'Wait']);
                          };
+                         this.showResultLink = function () {
+                             return self.tournament &&
+                                 cutil.has(self.tournament.bidState, ['Quit', 'Win1', 'Win2', 'Win3', 'Lost', 'Expl']);
+                         };
                          this.canResignFutureTournament = function () {
                              return self.tournament &&
                                  cutil.has(self.tournament.bidState,

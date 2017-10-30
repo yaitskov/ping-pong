@@ -66,6 +66,11 @@
        href="#!/tournament/result/{{$ctrl.tournamentId}}">
       <span class="glyphicon glyphicon-stats"></span>
     </a>
+    <a class="btn btn-default"
+       back-button
+       title="back">
+      <span class="glyphicon glyphicon-circle-arrow-left"></span>
+    </a>
   </div>
   <div ng-show="$ctrl.openMatch" class="form-group">
     <a class="btn btn-primary wrap-long" ng-click="$ctrl.matchScoring($ctrl.openMatch)">

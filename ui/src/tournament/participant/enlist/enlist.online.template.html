@@ -138,7 +138,13 @@
        title="look at list of my matches"
        ng-show="$ctrl.showScheduleLink()">
       <span class="glyphicon glyphicon-play"></span>
-    </button>
+    </a>
+    <a href="#!/tournament/result/{{$ctrl.tournament.tid}}"
+       class="btn btn-primary"
+       title="show match results"
+       ng-show="$ctrl.showResultLink()">
+      <span class="glyphicon glyphicon-stats"></span>
+    </a>
     <a class="btn btn-primary label-info" role="button"
        ng-show="$ctrl.tournament.previousTid"
        href="#!/tournament/drafting/{{$ctrl.tournament.previousTid}}">

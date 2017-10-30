@@ -81,7 +81,7 @@ angular.
                                          $rootScope.$broadcast('event.match.scored', okResp.matchScore);
                                      } else if (okResp.scoreOutcome == 'MatchContinues') {
                                          requestStatus.startLoading(['Set n scored. Match continues', {n: 1 + self.match.playedSets}]);
-                                         self.matc.playedSets = okResp.nextSetNumberToScore;
+                                         self.match.playedSets = okResp.nextSetNumberToScore;
                                          self.nextScoreUpdated();
                                          self.reset();
                                      } else {

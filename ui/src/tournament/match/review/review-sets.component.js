@@ -5,8 +5,8 @@ angular.
     module('tournament').
     component('reviewSets', {
         templateUrl: template,
-        controller: ['$routeParams',
-                     function ($routeParams) {
+        controller: ['$routeParams', 'pageCtx',
+                     function ($routeParams, pageCtx) {
                          var self = this;
                          self.matchReview = pageCtx.get('match-score-review-' + $routeParams.matchId);
                          self.matchScore = self.matchReview.score;

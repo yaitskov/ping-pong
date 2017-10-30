@@ -5,8 +5,8 @@ angular.
     module('scoreSet').
     component('scoreSet', {
         templateUrl: template,
-        controller: ['Match', 'pageCtx', 'requestStatus', '$scope', '$location', 'syncTranslate', '$rootScope', 'binder',
-                     function (Match, pageCtx, requestStatus, $scope, $location, syncTranslate, $rootScope, binder) {
+        controller: ['Match', 'pageCtx', 'requestStatus', '$scope', '$location', 'syncTranslate', '$rootScope', 'binder', '$routeParams',
+                     function (Match, pageCtx, requestStatus, $scope, $location, syncTranslate, $rootScope, binder, $routeParams) {
                          var sBtnTrans = syncTranslate.create();
                          var self = this;
                          console.log("bind event.match.set");

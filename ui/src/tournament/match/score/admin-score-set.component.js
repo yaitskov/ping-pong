@@ -19,7 +19,7 @@ angular.
                              'event.match.score.conflict': (event, conflict) => self.showConflict(conflict),
                              'event.match.scored': (event, matchScore) => {
                                  pageCtx.put('match-score-review-' + $routeParams.matchId,
-                                             {score: okResp.matchScore,
+                                             {score: matchScore,
                                               participants: self.match.participants
                                              });
                                  $location.path('/review/admin-scored-match/' + self.match.tid + '/' + $routeParams.matchId);

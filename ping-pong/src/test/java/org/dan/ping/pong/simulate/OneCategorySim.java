@@ -3,6 +3,8 @@ package org.dan.ping.pong.simulate;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S3A2G11;
 import static org.dan.ping.pong.mock.simulator.AutoResolution.RANDOM;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Hook.BeforeScore;
@@ -89,13 +91,13 @@ public class OneCategorySim {
     public void quits2Of3() {
         simulator.simulate(TournamentScenario.begin()
                 .name("quits2Of3")
-                .rules(RULES_G8Q1_S3A2G11)
+                .rules(RULES_G8Q2_S1A2G11)
                 .category(c1, p1, p2, p3)
-                .w31(p1, p2)
-                .w30(p1, p3)
-                .w32(p2, p3)
+                .win(p1, p2)
+                .win(p1, p3)
+                .win(p2, p3)
                 .quitsGroup(p1, p2)
-                .w31(p1, p2)
+                .win(p1, p2)
                 .champions(c1, p1, p2));
     }
 
@@ -103,8 +105,17 @@ public class OneCategorySim {
     public void quits2Of2() {
         simulator.simulate(TournamentScenario.begin()
                 .ignoreUnexpectedGames()
-                .rules(RULES_G8Q1_S1A2G11)
+                .rules(RULES_G8Q2_S1A2G11)
                 .name("quits2Of2")
+                .category(c1, p1, p2));
+    }
+
+    @Test
+    public void tournamentOf2() {
+        simulator.simulate(TournamentScenario.begin()
+                .ignoreUnexpectedGames()
+                .rules(RULES_G8Q1_S1A2G11)
+                .name("tournamentOf2")
                 .category(c1, p1, p2));
     }
 

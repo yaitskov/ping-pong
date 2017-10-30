@@ -91,6 +91,7 @@ angular.
                                                         ['no-error-but-failed',
                                                          {status: response.status}]);
                     } else if (!response.status) {
+                        console.log("no status message: " + response.message);
                         self.error = self.responseToErr(response.data, 'status-is-missing');
                     } else {
                         self.error = self.responseToErr(response.data,

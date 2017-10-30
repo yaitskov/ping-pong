@@ -93,18 +93,18 @@ public class BidDaoServer implements BidDao {
     }
 
     @Override
-    public void enlist(ParticipantMemState bid, Instant now,
-            Optional<Integer> providedRank, DbUpdater batch) {
+    public void enlist(ParticipantMemState bid, Optional<Integer> providedRank, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .logBefore(() -> log.info("User {} enlisted to tournament {}", bid.getUid(), bid.getTid()))
                 .mustAffectRows(NON_ZERO_ROWS)
                 .query(jooq.insertInto(BID, BID.CID, BID.TID, BID.UID,
-                        BID.STATE, BID.PROVIDED_RANK)
+                        BID.STATE, BID.PROVIDED_RANK, BID.CREATED, BID.UPDATED)
                         .values(bid.getCid(), bid.getTid().getTid(), bid.getUid(),
-                                bid.getBidState(), providedRank)
+                                bid.getBidState(), providedRank, bid.getEnlistedAt(),
+                                Optional.of(bid.getUpdatedAt()))
                         .onDuplicateKeyUpdate()
                         .set(BID.STATE, bid.getBidState())
-                        .set(BID.UPDATED, Optional.of(now))
+                        .set(BID.UPDATED, Optional.of(bid.getUpdatedAt()))
                         .set(BID.PROVIDED_RANK, providedRank)
                         .set(BID.CID, bid.getCid()))
                 .build());

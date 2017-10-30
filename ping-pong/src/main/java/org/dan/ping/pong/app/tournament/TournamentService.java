@@ -150,11 +150,14 @@ public class TournamentService {
         validateEnlistOnline(tournament, enlistment);
         log.info("Uid {} enlists to tid {} in cid {}",
                 user.getUid(), tournament.getTid(), enlistment.getCategoryId());
-        Uid uid = user.getUid();
+        final Uid uid = user.getUid();
+        final Instant now = clocker.get();
         tournament.getParticipants().put(uid, ParticipantMemState.builder()
                 .bidState(Want)
                 .uid(uid)
                 .name(user.getName())
+                .updatedAt(now)
+                .enlistedAt(now)
                 .cid(enlistment.getCategoryId())
                 .tid(new Tid(tournament.getTid()))
                 .build());
@@ -163,7 +166,7 @@ public class TournamentService {
 
     private void enlist(OpenTournamentMemState tournament, Uid uid,
             Optional<Integer> providedRank, DbUpdater batch) {
-        bidDao.enlist(tournament.getParticipant(uid), clocker.get(), providedRank, batch);
+        bidDao.enlist(tournament.getParticipant(uid), providedRank, batch);
     }
 
     public List<TournamentDigest> findInWithEnlisted(Uid uid, int days) {
@@ -448,8 +451,11 @@ public class TournamentService {
         final Uid participantUid = userDao.register(UserRegRequest.builder()
                 .name(enlistment.getName())
                 .build());
+        final Instant now = clocker.get();
         tournament.getParticipants().put(participantUid, ParticipantMemState.builder()
                 .bidState(enlistment.getBidState())
+                .enlistedAt(now)
+                .updatedAt(now)
                 .name(enlistment.getName())
                 .cid(enlistment.getCid())
                 .uid(participantUid)

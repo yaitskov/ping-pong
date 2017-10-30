@@ -19,7 +19,7 @@ angular.
                          };
                          this.showScheduleLink = function () {
                              return self.tournament &&
-                                 cutil.has(self.tournament.bidState, ['Paid', 'Here', 'Play']);
+                                 cutil.has(self.tournament.bidState, ['Paid', 'Here', 'Play', 'Wait']);
                          };
                          this.canResignFutureTournament = function () {
                              return self.tournament &&

@@ -63,10 +63,9 @@ angular.module('tournament').
                                          (bids) => {
                                              requestStatus.complete();
                                              self.bids = bids;
-                                             for (var i in bids) {
-                                                 self.bid = "" + bids[i].uid;
+                                             if (bids.length) {
+                                                 self.bid = "" + bids[0].uid;
                                                  self.bidChange();
-                                                 break;
                                              }
                                          },
                                          requestStatus.failed);

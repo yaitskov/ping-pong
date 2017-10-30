@@ -1,7 +1,5 @@
 package org.dan.ping.pong.app.bid.result;
 
-import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
-
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
@@ -34,19 +32,29 @@ public class BidResultService {
             final TournamentResultEntry entry = resultEntries.get(iPos);
             if (entry.getUser().getUid().equals(uid)) {
                 return BidResult.builder()
-                        .normal(entry.getScore().getRating())
+                        .normal(Optional.of(entry.getScore().getRating()))
                         .user(entry.getUser())
-                        .position(iPos)
+                        .position(Optional.of(iPos))
                         .state(participant.getState())
                         .tournament(tournament.toLink())
                         .beated(neighbour(resultEntries, iPos + 1))
                         .conceded(neighbour(resultEntries, iPos - 1))
-                        .matches(matches(tournament, uid))
-                        .time(time(tournament, participant))
+                        .matches(Optional.of(matches(tournament, uid)))
+                        .time(Optional.of(time(tournament, participant)))
                         .build();
             }
         }
-        throw internalError("User not found");
+        return BidResult.builder()
+                .normal(Optional.empty())
+                .user(participant.toLink())
+                .position(Optional.empty())
+                .state(participant.getState())
+                .tournament(tournament.toLink())
+                .beated(Optional.empty())
+                .conceded(Optional.empty())
+                .matches(Optional.empty())
+                .time(Optional.empty())
+                .build();
     }
 
     @Inject

@@ -21,10 +21,10 @@ public class BidResult {
     private TournamentLink tournament;
     private UserLink user;
     private BidState state;
-    private int position;
-    private BidSuccessInGroup normal;
-    private BidMatchesStat matches;
-    private BidTimeStats time;
+    private Optional<Integer> position;
+    private Optional<BidSuccessInGroup> normal;
+    private Optional<BidMatchesStat> matches;
+    private Optional<BidTimeStats> time;
     private Optional<UserLink> beated = Optional.empty();
     private Optional<UserLink> conceded = Optional.empty();
 

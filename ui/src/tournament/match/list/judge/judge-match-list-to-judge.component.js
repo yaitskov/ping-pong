@@ -27,6 +27,7 @@ angular.module('tournament').
                          };
                          self.bidChange = () => {
                              self.matches = null;
+                             pageCtx.put('last-bid', self.bid);
                              Match.bidMatchesNeedToPlay(
                                  {tournamentId: $routeParams.tournamentId,
                                   bid: self.bid
@@ -64,7 +65,7 @@ angular.module('tournament').
                                              requestStatus.complete();
                                              self.bids = bids;
                                              if (bids.length) {
-                                                 self.bid = "" + bids[0].uid;
+                                                 self.bid = "" + cutil.findValByO(bids, {uid: +pageCtx.get('last-bid')}, bids[0]).uid;
                                                  self.bidChange();
                                              }
                                          },

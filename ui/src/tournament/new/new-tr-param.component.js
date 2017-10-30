@@ -41,10 +41,10 @@ angular.
         templateUrl: template,
         controller: ['auth', 'mainMenu', '$http', '$location',
                      'pageCtx', 'requestStatus', 'moment', 'groupSchedule',
-                     '$scope', '$rootScope', 'binder', 'lateEvent',
+                     '$scope', '$rootScope', 'binder',
                      function (auth, mainMenu, $http, $location,
                       pageCtx, requestStatus, $moment, groupSchedule,
-                      $scope, $rootScope, binder, lateEvent) {
+                      $scope, $rootScope, binder) {
                          mainMenu.setTitle('Tournament Parameters');
                          var self = this;
                          self.tournament = pageCtx.get('newTournament') || {};
@@ -93,10 +93,9 @@ angular.
                              'event.tournament.rules.back': (event, rules) => {
                                  pageCtx.put('newTournament', self.tournament);
                                  window.history.back();
-                             }
+                             },
+                             'event.tournament.rules.ready': (event) => $rootScope.$broadcast('event.tournament.rules.set',
+                                                               self.tournament.rules),
                          });
-
-                         lateEvent(() => $rootScope.$broadcast('event.tournament.rules.set',
-                                                               self.tournament.rules));
                      }
                     ]});

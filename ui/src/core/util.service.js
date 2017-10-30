@@ -175,7 +175,7 @@ angular.
         return ($scope, listenerMap) => {
             var cleaners = [];
             for (var topic in listenerMap) {
-                    cleaners.push($rootScope.$on(topic, listenerMap[topic]));
+                cleaners.push($scope.$on(topic, listenerMap[topic]));
             }
             $scope.$on('$destroy', () => cleaners.forEach(cleaner => cleaner()));
             return cleaners;

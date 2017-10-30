@@ -102,4 +102,5 @@ angular.
                          self.cancel = function () {
                              $rootScope.$broadcast('event.tournament.rules.cancel', self.rules);
                          };
+                         $rootScope.$broadcast('event.tournament.rules.ready');
                      }]});

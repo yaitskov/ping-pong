@@ -2,14 +2,19 @@ import angular from 'angular';
 import template from './score-set.template.html';
 
 angular.
-    module('tournament').
+    module('scoreSet').
     component('scoreSet', {
         templateUrl: template,
         controller: ['Match', 'pageCtx', 'requestStatus', '$scope', '$location', 'syncTranslate', '$rootScope', 'binder',
                      function (Match, pageCtx, requestStatus, $scope, $location, syncTranslate, $rootScope, binder) {
                          var sBtnTrans = syncTranslate.create();
                          var self = this;
+                         console.log("bind event.match.set");
+                         binder($scope, {
+                             'event.match.set': (event, match) => self.onMatchSet(match)
+                         });
                          self.winnerIdx = 0;
+
                          this.activate = function (idx) {
                              if (self.winnerIdx != idx) {
                                  self.scores.reverse();
@@ -43,20 +48,18 @@ angular.
                                       score: self.scores[1 - self.winnerIdx]}];
                          }
                          this.onMatchSet = function (match) {
+                             console.log("caught event.match.set");
                              self.match = match;
                              self.participants = match.participants;
                              self.tournamentId = match.tid;
+                             self.nextScoreUpdated();
                              self.reset();
                          };
-                         binder($scope, {
-                             'event.match.set': (event, match) => self.onMatchSet(match)
-                         });
                          this.nextScoreUpdated = function () {
                              sBtnTrans.trans(['Score Set', {n: 1 + self.match.playedSets}], function (v) {
                                  self.setScoreBtn = v;
                              });
                          };
-                         self.nextScoreUpdated();
                          this.scoreMatchSet = function () {
                              requestStatus.startLoading("Documenting the score");
                              if (self.scores[0] < 0 || self.scores[1] < 0) {
@@ -103,4 +106,5 @@ angular.
                                      }
                                  });
                          };
+                         $rootScope.$broadcast('event.match.set.ready');
                      }]});

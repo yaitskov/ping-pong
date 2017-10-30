@@ -6,9 +6,9 @@ angular.
     component('tournamentParameters', {
         templateUrl: template,
         controller: ['mainMenu', '$scope', 'Tournament', 'requestStatus',
-                     '$routeParams', '$rootScope', 'lateEvent', 'binder',
+                     '$routeParams', '$rootScope', 'binder',
                      function (mainMenu, $scope, Tournament, requestStatus,
-                               $routeParams, $rootScope, lateEvent, binder) {
+                               $routeParams, $rootScope, binder) {
                          mainMenu.setTitle('Tournament Modification');
                          var self = this;
                          binder($scope, {
@@ -30,10 +30,8 @@ angular.
                              },
                              'event.tournament.rules.cancel': function (event, rules) {
                                  window.history.back();
-                             }
-                         });
-                         lateEvent(
-                             function () {
+                             },
+                             'event.tournament.rules.ready': function () {
                                  requestStatus.startLoading();
                                  Tournament.parameters(
                                      {tournamentId: $routeParams.tournamentId},
@@ -42,5 +40,6 @@ angular.
                                          $rootScope.$broadcast('event.tournament.rules.set', rules.toJSON());
                                      },
                                      requestStatus.failed);
-                             });
+                             }
+                         });
                      }]});

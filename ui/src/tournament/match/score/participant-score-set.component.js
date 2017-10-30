@@ -6,9 +6,9 @@ angular.
     component('participantScoreSet', {
         templateUrl: template,
         controller: ['auth', 'mainMenu', 'Match', '$routeParams',
-                     'pageCtx', 'requestStatus', '$scope', '$rootScope', 'binder', 'lateEvent',
+                     'pageCtx', 'requestStatus', '$scope', '$rootScope', 'binder',
                      function (auth, mainMenu, Match, $routeParams,
-                               pageCtx, requestStatus, $scope, $rootScope, binder, lateEvent) {
+                               pageCtx, requestStatus, $scope, $rootScope, binder) {
                          mainMenu.setTitle('Match Scoring');
                          this.match = pageCtx.get('last-scoring-match');
                          this.match.participants = [this.match.enemy,
@@ -19,6 +19,7 @@ angular.
                              $location.path('/match/user-conflict-review/' + self.match.tid + '/' + $routeParams.matchId);
                          };
                          binder($scope, {
+                             'event.match.set.ready': (event) => $rootScope.$broadcast('event.match.set', self.match),
                              'event.match.score.conflict': (event, conflict) => self.showConflict(conflict),
                              'event.match.scored': (event, matchScore) => {
                                  pageCtx.put('match-score-review-' + $routeParams.matchId,
@@ -28,5 +29,4 @@ angular.
                                  $location.path('/review/user-scored-match/' + self.match.tid + '/' + $routeParams.matchId);
                              }
                          });
-                         lateEvent(() => $rootScope.broadcast('event.match.set', self.match));
                      }]});

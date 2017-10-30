@@ -1,3 +1,6 @@
+import './match/set/score/score-set.module.js';
+import './match/set/score/score-set.component.js';
+
 import './tournament.module.js';
 import './parameters/param.form.component.js';
 import './new/new-tr-param.component.js';
@@ -6,7 +9,6 @@ import './result/tr-result.component.js';
 import './list/play/play-in-tournament-list.component.js';
 import './match/list/play/participant-match-list-to-judge.component.js';
 import './match/state/match-state-description.component.js';
-import './match/set/score/score-set.component.js';
 import './match/review/review-sets.component.js';
 import './match/review/review-match-score-admin.component.js';
 import './match/review/review-match-score-user.component.js';

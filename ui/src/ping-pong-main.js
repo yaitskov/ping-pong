@@ -1,3 +1,8 @@
+document.getElementById("body").addEventListener("noupdate", function() {
+    console.log("My NoUpdate hook");
+    //document.getElementById("demo").innerHTML = "Hello World";
+});
+
 import 'flatpickr/dist/flatpickr.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'jquery-ui-dist/jquery-ui.css';

@@ -5,9 +5,9 @@ angular.module('tournament').
     component('judgeMatchListToJudge', {
         templateUrl: template,
         controller: ['Match', 'Tournament', 'Participant', 'mainMenu', '$location',
-                     'pageCtx', 'requestStatus', '$routeParams',
+                     'pageCtx', 'requestStatus', '$routeParams', 'cutil',
                      function (Match, Tournament, Participant, mainMenu, $location,
-                               pageCtx, requestStatus, $routeParams) {
+                               pageCtx, requestStatus, $routeParams, cutil) {
                          mainMenu.setTitle('Match Judgement');
                          var self = this;
                          self.matches = null;
@@ -16,6 +16,12 @@ angular.module('tournament').
                          self.bid = null;
                          self.bids = null;
                          self.completeMatch = function (match) {
+                             if (self.bid) {
+                                 match.participants = [
+                                     match.enemy,
+                                     {uid: self.bid,
+                                      name: cutil.findValBy(self.bids, {uid: +self.bid}).name}];
+                             }
                              pageCtx.put('last-scoring-match', match);
                              $location.path('/complete/match/' + match.mid);
                          };

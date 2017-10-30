@@ -13,6 +13,7 @@ module.exports = {
     'Match scoring conflict': 'Match scoring conflict',
     'Reset match score': 'Reset match score',
     'Setting your set score': 'Setting your set score',
+    'Next match': 'Kolejny mecz',
 
     'Score of': 'Ocena dla',
     'Between': 'Między',

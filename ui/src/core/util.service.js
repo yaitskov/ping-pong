@@ -95,6 +95,9 @@ angular.
     }]).
     filter('compactName',  function () {
         return function (name) {
+            if (name.indexOf(' ') < 0) {
+                return name.substr(0, 9);
+            }
             return name.split(' ').map(function (part) { return part.substr(0, 4); }).join(' ');
         };
     }).

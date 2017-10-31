@@ -8,7 +8,12 @@
              class="btn btn-default"
              ng-class="{'btn-primary': $ctrl.winnerIdx == $index}"
              holdLink="#!/my/tournament/{{$ctrl.match.tid}}/participant/{{participant.uid}}">
-            {{participant.name}}
+            <span ng-show="participant.name == '*you*'">
+              {{participant.name | translate}}
+            </span>
+            <span ng-show="participant.name != '*you*'">
+              {{participant.name}}
+            </span>
           </a>
         </div>
       </div>

@@ -143,6 +143,20 @@ angular.module('core.ui', ['ngResource']).
             }
         };
     }]).
+    directive('you', [function () {
+        return {
+            template: '<span ng-show="name == \'*you*\'">' +
+                '{{name | translate}}' +
+                '</span>' +
+                '<span ng-show="name != \'*you*\'">' +
+                '{{name}}' +
+                '</span>',
+            restrict: 'E',
+            scope: {
+                name: '='
+            }
+        };
+    }]).
     directive('clickable', ['$location', function ($location) {
         return {
             scope: {},

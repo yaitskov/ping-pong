@@ -9,5 +9,6 @@ module.exports = {
     'you-enlisted-pay': 'You\'ve just enlisted. Pay for participantion.',
     'you-paid-check': 'You\'ve paid for participation. Find a judge and prove that you ' +
         'arrived to the tournament.',
-    'you-ready-wait-begin': 'You are ready to start. Wait until the tournament begin.'
+    'you-ready-wait-begin': 'You are ready to start. Wait until the tournament begin.',
+    '*you*': 'You'
 };

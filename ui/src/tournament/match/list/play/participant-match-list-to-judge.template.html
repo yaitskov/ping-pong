@@ -94,7 +94,7 @@
             title="{{ 'match-state-descr-in-row' | translate }}"
             ng-show="$ctrl.matches.showTables"
             ng-class="{'text-danger': match.state == 'Game'}">
-          {{match.state}}
+          {{match.state | translate}}
         </td>
         <td title="{{ 'match-type-descr-in-row' | translate }}">
           {{match.matchType | translate}}

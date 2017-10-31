@@ -13,10 +13,17 @@ module.exports = {
     'Watch Ratings': 'Zobaczyć oceny',
     'score-match': 'Oceń mecz',
 
-    'Grup': 'w grupie',
+    'Grup': 'W grupie',
     'POff': 'Play Off',
     'Brnz': 'Za bronze',
     'Gold': 'Za złoto',
+
+    'Draft': 'Pobór',
+    'Place': 'Miejsce',
+    'Game': 'Gra',
+    'Auto': 'Auto',
+    'Over': 'Koniec',
+
     'Wait for a free table.': 'Poczekaj na wolny stół.',
     'match state': 'Stan',
     'the match': 'Mecz',

@@ -56,7 +56,7 @@
     </thead>
     <tbody>
       <tr ng-repeat="match in $ctrl.matches | orderBy : $ctrl.orderField">
-        <td class="match-cell">{{match.matchType}}</td>
+        <td class="match-cell">{{match.matchType | translate}}</td>
         <td ng-show="$ctrl.showTables">
           <a href="#!/place/tables/{{match.table.id}}">
             <span class="glyphicon glyphicon-map-marker"></span>

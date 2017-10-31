@@ -19,6 +19,12 @@ module.exports = {
     'Brnz': 'For bronze',
     'Gold': 'For gold',
 
+    'Draft': 'Draft',
+    'Place': 'Place',
+    'Game': 'Game',
+    'Auto': 'Auto',
+    'Over': 'Over',
+
     'Wait for a free table.': 'Wait for a free table.',
     'match state': 'State',
     'the match': 'Match',

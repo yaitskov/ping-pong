@@ -1,5 +1,4 @@
 module.exports = {
-        // tournament-details-page
     'tournament name': 'Nazwa',
     'tournament city': 'Miasto',
     'tournament place': 'Miejsce',
@@ -14,7 +13,7 @@ module.exports = {
     'you-have-been-expelled': 'Przykro mi powiedzieć, ale zostałeś wydalony z turneja.'
         + ' Poproś administratora o wyjaśnienie.',
     'open-tournament-resign-warn': 'Turniej jest już otwarty. Bierzesz w nim udział.'
-        + ' Gdy teraz zrezygnujesz, nie możesz zmienić dania!',
+        + ' Gdy teraz zrezygnujesz, nie możesz zmienić zdania!',
     'Resign btn': 'Zresygnować',
     'Enlist Me btn': 'Zapisać mnie',
     'previous tournament': 'Powszedni turniej w serii',

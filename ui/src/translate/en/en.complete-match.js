@@ -14,6 +14,9 @@ module.exports = {
     'Reset match score': 'Reset match score',
     'Setting your set score': 'Setting your set score',
     'Next match': 'Next match',
+    'player-has-no-matches-to-play': 'Player has no matches to play.',
+    'playing-participants': 'Playing participants',
+    'table-short-cut': 'T',
 
     'Score of': 'Score of',
     'Between': 'Between',

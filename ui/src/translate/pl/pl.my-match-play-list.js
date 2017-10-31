@@ -1,14 +1,13 @@
 module.exports = {
-        // my-match-play-list
-    'congrat-1st-place': 'Gratulacje! Zostałeś zwycięncą w turnieju'
-        + ' <a href="{{url}}">{{name}}</a>. Przejdź po linku, żeby zobaczyć oceny.',
+    'congrat-1st-place': 'Gratulacje! Zostałeś zwycięncą w '
+        + ' <a href="{{url}}">turnieju</a>. Przejdź po linku, żeby zobaczyć oceny.',
     'congrat-2st-place': 'Gratulacje! Trafiłeś do drugiego miejsca w'
-        + ' turnieju <a href="{{url}}">{{name}}</a>. Przejdź po linku, żeby zobaczyć oceny.',
+        + ' <a href="{{url}}">turnieju</a>. Przejdź po linku, żeby zobaczyć oceny.',
     'congrat-3rd-place': 'Gratulacje! Trafiłeś do trzeciego miejsca w'
-        + ' turnieju <a href="{{url}}">{{name}}</a>. Przejdź po linku, żeby zobaczyć oceny.',
-    'congrat-lost': 'Przegrałeś w turnieju <a href="{{url}}">{{name}}</a>. Przejdź po linku, żeby zobaczyć oceny.',
-    'congrat-quit': 'Zrezygnowałeś z dalszego uczestnictwa w turnieju <a href="{{url}}">{{name}}</a>.',
-    'congrat-expelled': 'Zostałeś wydaliony z turnieju <a href="{{url}}">{{name}}</a>. Następnym razem trzymaj się reguł.',
+        + ' <a href="{{url}}">turnieju</a>. Przejdź po linku, żeby zobaczyć oceny.',
+    'congrat-lost': 'Przegrałeś w <a href="{{url}}">turnieju</a>. Przejdź po linku, żeby zobaczyć oceny.',
+    'congrat-quit': 'Zrezygnowałeś z dalszego uczestnictwa w <a href="{{url}}">turnieju</a>.',
+    'congrat-expelled': 'Zostałeś wydaliony z <a href="{{url}}">turnieju</a>. Następnym razem trzymaj się reguł.',
     'unsupported-player-state': 'Nieznany stan zawodnika {{name}}. Prosze powiadomić tym błądzie.',
     'Ok, I see': 'Ok, rozumiem',
     'Watch Ratings': 'Zobaczyć oceny',

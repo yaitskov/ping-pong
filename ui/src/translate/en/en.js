@@ -39,7 +39,7 @@ module.exports = merge.apply(
      require('./my tournament categories members.js'),
      require('./my place tables.js'),
      require('./ my place edit.js'),
-     require('./my match play list.js'),
+     require('./en.my-match-play-list.js'),
      require('./match state description.js'),
      require('./en.my-match-judge-list.js'),
      require('./en.complete-match.js'),

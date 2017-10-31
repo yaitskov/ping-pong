@@ -1,15 +1,11 @@
 <main-menu></main-menu>
 <div class="container-fluid admin-judgement">
   <request-status></request-status>
-  <div class="container" ng-show="!$ctrl.showTables && $ctrl.bids.length == 0 || $ctrl.showTables && $ctrl.matches.length == 0">
+  <div ng-show="!$ctrl.showTables && $ctrl.bids.length == 0 || $ctrl.showTables && $ctrl.matches.length == 0">
     <div class="alert alert-info" translate="tournament is complete"
          translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
     </div>
     <div class="form-group">
-      <div class="alert alert-info" ng-show="">
-        There is no matches to judge. Tournament is not open yet or it's
-        already complete.
-      </div>
       <a class="btn btn-default"
          href="#!/tournament/result/{{$ctrl.tournamentId}}">
         {{ 'Watch Ratings' | translate }}
@@ -21,11 +17,11 @@
             ng-repeat="match in $ctrl.matches | orderBy : 'table.label'"
             ng-click="$ctrl.completeMatch(match)"
             ng-show="$ctrl.matches.length > 0">
-      T{{match.table.label}}
+      {{ 'table-short-cut' | translate }}{{match.table.label}}
     </button>
   </div>
   <div class="form-group" ng-show="!$ctrl.showTables && $ctrl.bids.length">
-    <label for="bids">Playing participants</label>
+    <label for="bids" translate="playing-participants"/>
     <select class="form-control"
             ng-model="$ctrl.bid"
             ng-change="$ctrl.bidChange()"
@@ -35,10 +31,8 @@
       </option>
     </select>
   </div>
-  <div class="form-group" ng-show="$ctrl.matches.length == 0">
-    <div class="alert alert-info" ng-show="!$ctrl.showTables">
-      Player has no matches to play.
-    </div>
+  <div class="form-group" ng-show="$ctrl.bids.length && !$ctrl.matches && !$ctrl.showTables">
+    <div class="alert alert-info" translate="player-has-no-matches-to-play"/>
   </div>
   <table class="table" ng-show="$ctrl.matches.length > 0">
     <thead>
@@ -66,7 +60,7 @@
         <td ng-show="$ctrl.showTables">
           <a href="#!/place/tables/{{match.table.id}}">
             <span class="glyphicon glyphicon-map-marker"></span>
-            T{{match.table.label}}
+            {{ 'table-short-cut' | translate }}{{match.table.label}}
           </a>
         </td>
         <td class="participant-names" ng-show="$ctrl.showTables">

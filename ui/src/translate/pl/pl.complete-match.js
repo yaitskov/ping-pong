@@ -14,6 +14,9 @@ module.exports = {
     'Reset match score': 'Reset match score',
     'Setting your set score': 'Setting your set score',
     'Next match': 'Kolejny mecz',
+    'playing-participants': 'Aktywny uczestniki',
+    'player-has-no-matches-to-play': 'Uczestnik nie ma meczów do zagrania.',
+    'table-short-cut': 'S',
 
     'Score of': 'Ocena dla',
     'Between': 'Między',

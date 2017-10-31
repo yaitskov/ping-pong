@@ -55,8 +55,8 @@
     </a>
   </div>
   <div ng-show="$ctrl.openMatch" class="form-group">
-    <a class="btn btn-primary wrap-long" ng-click="$ctrl.matchScoring($ctrl.openMatch)">
-      {{ 'complete-match-with' | translate : '{name: $ctrl.openMatch.enemy.name}' }}
+    <a class="btn btn-primary wrap-long" ng-click="$ctrl.matchScoring($ctrl.openMatch)"
+       translate="score-match"/>
     </a>
   </div>
   <div ng-show="!$ctrl.openMatch && $ctrl.matches.showTables && $ctrl.matches.matches.length > 0"
@@ -97,7 +97,7 @@
           {{match.state}}
         </td>
         <td title="{{ 'match-type-descr-in-row' | translate }}">
-          {{match.matchType}}
+          {{match.matchType | translate}}
         </td>
         <td class="table-number" ng-show="$ctrl.matches.showTables">
           <a href="#!/place/tables/{{match.table.id}}"

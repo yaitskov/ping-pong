@@ -12,7 +12,13 @@ module.exports = {
     'unsupported-player-state': 'Unsupported player state {{name}}. Report about this bug.',
     'Ok, I see': 'Ok, I see',
     'Watch Ratings': 'Watch Ratings',
-    'complete-match-with': 'Complete match with {{name}}',
+    'score-match': 'Score match',
+
+    'Grup': 'In group',
+    'POff': 'Play Off',
+    'Brnz': 'For bronze',
+    'Gold': 'For gold',
+
     'Wait for a free table.': 'Wait for a free table.',
     'match state': 'State',
     'the match': 'Match',

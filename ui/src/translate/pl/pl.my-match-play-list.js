@@ -11,7 +11,12 @@ module.exports = {
     'unsupported-player-state': 'Nieznany stan zawodnika {{name}}. Prosze powiadomić tym błądzie.',
     'Ok, I see': 'Ok, rozumiem',
     'Watch Ratings': 'Zobaczyć oceny',
-    'complete-match-with': 'Zakończyć mecz z {{name}}',
+    'score-match': 'Oceń mecz',
+
+    'Grup': 'w grupie',
+    'POff': 'Play Off',
+    'Brnz': 'Za bronze',
+    'Gold': 'Za złoto',
     'Wait for a free table.': 'Poczekaj na wolny stół.',
     'match state': 'Stan',
     'the match': 'Mecz',

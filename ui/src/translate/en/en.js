@@ -44,4 +44,4 @@ module.exports = merge.apply(
      require('./en.my-match-judge-list.js'),
      require('./en.complete-match.js'),
      require('./en.copy-tournament.js'),
-     require('./complete my match.js')]);
+     require('./en.complete-my-match.js')]);

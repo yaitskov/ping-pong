@@ -24,38 +24,15 @@
          translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId, name: 'tournament'}">
     </div>
     <div ng-switch-when="Wait">
-      <div ng-show="$ctrl.matches.matches.length">
-        <span ng-show="$ctrl.matches.showTables">
-          Wait for a free place to place.
-        </span>
-        <span ng-show="!$ctrl.matches.showTables">
-          Pick a match, you are playing, below and score it.
-        </span>
-      </div>
-      <div ng-show="$ctrl.matches.matches.length == 0">
-        There is no matches left to play.  Normally it happens if
-        participants from your group haven't played all matches.
-      </div>
+      <div ng-show="$ctrl.matches.matches.length" translate="wait-for-free-place-to-place"/>
+      <div ng-show="!$ctrl.matches.matches" translate="no-matches-left-to-play"/>
     </div>
     <div ng-switch-when="Play">
-      <div ng-show="$ctrl.matches.matches.length">
-        Pick a match, you are playing, below and score it.
-      </div>
-      <div ng-show="$ctrl.matches.matches.length == 0">
-        There is no matches left to play.  Normally it happens if
-        participants from your group haven't played all matches.
-      </div>
+      <div ng-show="$ctrl.matches.matches.length" translate="pick-your-match-to-score"/>
     </div>
-    <div ng-switch-when="Want">
-      You've just enlisted. Pay for participantion.
-    </div>
-    <div ng-switch-when="Paid">
-      You've paid for participation. Find a judge and prove that you
-      arrived to the tournament.
-    </div>
-    <div ng-switch-when="Here">
-      You are ready to start. Wait until the tournament begin.
-    </div>
+    <div ng-switch-when="Want" translate="you-enlisted-pay"/>
+    <div ng-switch-when="Paid" translate="you-paid-check"/>
+    <div ng-switch-when="Here" translate="you-ready-wait-begin"/>
     <div ng-switch-default>
       {{ 'unsupported-player-state' | translate : '{name: $ctrl.matches.bidState}' }}
     </div>
@@ -65,6 +42,11 @@
        title="{{ 'Watch Ratings' | translate }}"
        href="#!/tournament/result/{{$ctrl.tournamentId}}">
       <span class="glyphicon glyphicon-stats"></span>
+    </a>
+    <a class="btn btn-default"
+       title="{{ 'Watch Games' | translate }}"
+       href="#!/watch/tournament/{{$ctrl.tournamentId}}">
+      <span class="glyphicon glyphicon-eye-open"></span>
     </a>
     <a class="btn btn-default"
        back-button

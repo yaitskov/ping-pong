@@ -51,7 +51,7 @@ public class PlayerPendingMatchesJerseyTest extends AbstractSpringJerseyTest {
                     MY_PENDING_MATCHES + scenario.getTid(),
                     userSession,
                     MyPendingMatchList.class);
-            assertThat(matches.getTotalLeft(), is(1L));
+            assertThat(matches.getProgress().getLeftMatches(), is(1L));
             assertThat(matches.isShowTables(), is(false));
             assertThat(matches.getMatches().stream().map(MyPendingMatch::getState).collect(toSet()),
                     is(ImmutableSet.of(Game)));

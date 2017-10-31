@@ -35,6 +35,7 @@ angular.module('tournament').
                                  function (matches) {
                                      requestStatus.complete();
                                      self.matches = matches.matches;
+                                     self.progress = matches.progress;
                                  },
                                  requestStatus.failed);
                          };
@@ -50,7 +51,8 @@ angular.module('tournament').
                                          {tournamentId: $routeParams.tournamentId},
                                          (matches) => {
                                              requestStatus.complete();
-                                             self.matches = matches;
+                                             self.matches = matches.matches;
+                                             self.progress = matches.progress;
                                              self.tournamentNotOpen = !matches.length;
                                          },
                                          requestStatus.failed);

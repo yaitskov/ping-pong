@@ -31,6 +31,7 @@ import org.dan.ping.pong.app.match.ForTestMatchDao;
 import org.dan.ping.pong.app.match.IdentifiedScore;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
+import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
 import org.dan.ping.pong.app.match.SetScoreResult;
 import org.dan.ping.pong.app.place.ForTestPlaceDao;
 import org.dan.ping.pong.app.table.TableInfo;
@@ -157,7 +158,7 @@ public class Simulator {
             completedMatches[0] = 0;
             final List<OpenMatchForJudge> openMatches = rest.get(
                     OPEN_MATCHES_FOR_JUDGE + scenario.getTid(),
-                    new GenericType<List<OpenMatchForJudge>>() {});
+                    OpenMatchForJudgeList.class).getMatches();
             if (scenario.getTables() > 0) {
                 assertThat(placeDao.findFreeTables(scenario.getTid()),
                         Matchers.hasSize(scenario.getTables() - openMatches.size()));

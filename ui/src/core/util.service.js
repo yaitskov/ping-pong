@@ -77,6 +77,14 @@ angular.
             return $filter('date')(dt, 'EEE h:mm a').replace(/:00 /, ' ');
         };
     }]).
+    filter('percent', [function () {
+        return function (left, full) {
+            if (!full) {
+                return '0%';
+            }
+            return ((full - left) / full * 100.0).toFixed(2) + "%";
+        };
+    }]).
     filter('longDateTime', ['$filter', function ($filter) {
         return function (dt) {
             if (!dt) {

@@ -134,7 +134,7 @@ public class MatchResource {
             @Suspended AsyncResponse response) {
         tournamentAccessor.update(tid, response,
                 (tournament, batch) -> {
-                    return matchService.findOpenMatchesFurJudge(tournament);
+                    return matchService.findOpenMatchesForJudgeList(tournament);
                 });
     }
 

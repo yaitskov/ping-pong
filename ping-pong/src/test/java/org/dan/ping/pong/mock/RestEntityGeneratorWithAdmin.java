@@ -1,7 +1,6 @@
 package org.dan.ping.pong.mock;
 
-import org.dan.ping.pong.app.match.CompleteMatch;
-import org.dan.ping.pong.app.match.OpenMatchForJudge;
+import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
 
 import java.util.List;
 
@@ -21,15 +20,7 @@ public class RestEntityGeneratorWithAdmin {
         restEntityGenerator.beginTournament(testAdmin, tid);
     }
 
-    public List<OpenMatchForJudge> listOpenMatches(int tid) {
+    public OpenMatchForJudgeList listOpenMatches(int tid) {
         return restEntityGenerator.listOpenMatchesForJudge(tid);
-    }
-
-    public List<CompleteMatch> listCompleteMatches(int tid) {
-        return restEntityGenerator.listCompleteMatches(tid);
-    }
-
-    public void generateSignInLinks(List<TestUserSession> users) {
-        restEntityGenerator.generateSignInLinks(users);
     }
 }

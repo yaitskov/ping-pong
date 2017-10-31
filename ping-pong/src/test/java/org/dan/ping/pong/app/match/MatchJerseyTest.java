@@ -16,7 +16,6 @@ import static org.dan.ping.pong.app.match.MatchResource.MATCH_WATCH_LIST_OPEN;
 import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
-import static org.dan.ping.pong.app.place.ArenaDistributionPolicy.GLOBAL;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.L1_3P;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
 import static org.dan.ping.pong.app.table.TableState.Free;
@@ -218,10 +217,10 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
         final int cid = daoGenerator.genCategory(tid);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
         restGenerator.enlistParticipants(tid, cid, participants);
-        assertEquals(emptyList(), restGenerator.listOpenMatches(tid));
+        assertEquals(emptyList(), restGenerator.listOpenMatches(tid).getMatches());
         restGenerator.beginTournament(tid);
 
-        final List<OpenMatchForJudge> adminOpenMatches = restGenerator.listOpenMatches(tid);
+        final List<OpenMatchForJudge> adminOpenMatches = restGenerator.listOpenMatches(tid).getMatches();
 
         assertEquals(
                 participants.stream().map(TestUserSession::getUid).collect(toSet()),
@@ -254,7 +253,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
         assertEquals(singletonList(Free), tables.stream().map(TableInfo::getState).collect(toList()));
         assertEquals(singletonList(Optional.empty()),
                 tables.stream().map(TableInfo::getMid).collect(toList()));
-        assertEquals(emptyList(), restGenerator.listOpenMatches(tid));
+        assertEquals(emptyList(), restGenerator.listOpenMatches(tid).getMatches());
     }
 
     @Test

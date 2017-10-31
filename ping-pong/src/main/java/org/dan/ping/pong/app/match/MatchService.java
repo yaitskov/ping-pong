@@ -50,6 +50,7 @@ import org.dan.ping.pong.app.tournament.ConfirmSetScore;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.SetScoreResultName;
+import org.dan.ping.pong.app.tournament.TournamentProgress;
 import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.sys.db.DbUpdater;
@@ -634,12 +635,29 @@ public class MatchService {
                                 .collect(toList()))
                         .showTables(tournament.getRule().getPlace().map(PlaceRules::getArenaDistribution)
                                 .orElse(NO) != NO)
-                        .totalLeft(tournament.participantMatches(uid)
-                                .map(MatchInfo::getState)
-                                .filter(incompleteMatchStates::contains)
-                                .count())
+                        .progress(tournamentProgress(tournament, uid))
                         .bidState(tournament.getParticipant(uid).getState())
                         .build());
+    }
+
+    private TournamentProgress tournamentProgress(OpenTournamentMemState tournament, Uid uid) {
+        return TournamentProgress.builder()
+                .leftMatches(tournament.participantMatches(uid)
+                        .map(MatchInfo::getState)
+                        .filter(incompleteMatchStates::contains)
+                        .count())
+                .totalMatches(tournament.getMatches().size())
+                .build();
+    }
+
+    private TournamentProgress tournamentProgress(OpenTournamentMemState tournament) {
+        return TournamentProgress.builder()
+                .leftMatches(tournament.getMatches().values().stream()
+                        .map(MatchInfo::getState)
+                        .filter(incompleteMatchStates::contains)
+                        .count())
+                .totalMatches(tournament.getMatches().size())
+                .build();
     }
 
     public List<OpenMatchForJudge> findOpenMatchesFurJudge(OpenTournamentMemState tournament) {
@@ -659,5 +677,12 @@ public class MatchService {
                                 .collect(toList()))
                         .build())
                 .collect(toList())));
+    }
+
+    public OpenMatchForJudgeList findOpenMatchesForJudgeList(OpenTournamentMemState tournament) {
+        return OpenMatchForJudgeList.builder()
+                .matches(findOpenMatchesFurJudge(tournament))
+                .progress(tournamentProgress(tournament))
+                .build();
     }
 }

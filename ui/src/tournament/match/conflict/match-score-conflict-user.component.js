@@ -14,6 +14,14 @@ angular.
                          self.conflict = pageCtx.get('match-score-conflict-' + $routeParams.matchId);
                          self.matchScore = self.conflict.matchScore;
 
+                         self.showReview = function () {
+                             pageCtx.put('match-score-review-' + $routeParams.matchId,
+                                         {score: self.matchScore,
+                                          participants: self.conflict.participants
+                                         });
+                             $location.path('/review/user-scored-match/' + self.tournamentId + '/' + self.matchId);
+                         };
+
                          self.continuePlayMatch = function () {
                              var match = pageCtx.get('last-scoring-match');
                              for (var k in self.matchScore.sets) {

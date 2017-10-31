@@ -12,7 +12,7 @@ angular.
                          self.matchScore = self.conflict.matchScore;
                          self.yourSet = self.conflict.yourSet;
                          self.yourSetScore = self.conflict.yourSetScore;
-                         self.participants = self.participants;
+                         self.participants = self.conflict.participants;
                          var result = [];
                          var l = self.matchScore.sets[self.participants[0].uid].length;
                          for (var i = 0; i < l; ++i) {

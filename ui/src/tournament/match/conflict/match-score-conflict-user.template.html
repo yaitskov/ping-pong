@@ -3,7 +3,7 @@
   <div class="container admin-score">
     <match-score-conflict></match-score-conflict>
     <div class="form-group">
-      <a href="#!/review/admin-scored-match/{{$ctrl.tournamentId}}/{{$ctrl.matchId}}"
+      <a ng-click="$ctrl.showReview()"
          ng-show="$ctrl.matchScore.winUid" class="btn btn-success">
         Accept score
       </a>

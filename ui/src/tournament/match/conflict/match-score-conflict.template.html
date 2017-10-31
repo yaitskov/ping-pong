@@ -10,7 +10,7 @@
       <td>Set</td>
       <td ng-repeat="participant in $ctrl.participants">
         <a href="#!/my/tournament/{{$ctrl.matchScore.tid}}/participant/{{participant.uid}}">
-          {{participant.name | compactName}}
+          <you name="participant.name | compactName"/>
         </a>
       </td>
     </tr>
@@ -45,7 +45,7 @@
         <span ng-repeat="participant in $ctrl.participants">
           <a href="#!/my/tournament/{{$ctrl.matchScore.tid}}/participant/{{participant.uid}}"
              ng-if="participant.uid == $ctrl.matchScore.winUid">
-            {{participant.name}}
+            <you name="participant.name"/>
           </a>
         </span>
       </td>

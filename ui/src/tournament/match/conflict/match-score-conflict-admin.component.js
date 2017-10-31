@@ -5,14 +5,22 @@ angular.
     module('tournament').
     component('matchScoreConflictAdmin', {
         templateUrl: template,
-        controller: ['mainMenu', 'pageCtx', '$routeParams', 'Match', 'requestStatus',
-                     function (mainMenu, pageCtx, $routeParams, Match, requestStatus) {
+        controller: ['mainMenu', 'pageCtx', '$routeParams', 'Match', 'requestStatus', '$location',
+                     function (mainMenu, pageCtx, $routeParams, Match, requestStatus, $location) {
                          var self = this;
                          mainMenu.setTitle('Match scoring conflict');
                          self.conflict = pageCtx.get('match-score-conflict-' + $routeParams.matchId);
                          self.matchScore = self.conflict.matchScore;
                          self.matchId = $route.matchId;
                          self.tournamentId = $routeParams.tournamentId;
+
+                         self.showReview = function () {
+                             pageCtx.put('match-score-review-' + $routeParams.matchId,
+                                         {score: self.matchScore,
+                                          participants: self.conflict.participants
+                                         });
+                             $location.path('/review/admin-scored-match/' + self.tournamentId + '/' + self.matchId);
+                         };
 
                          self.continueJudgeMatch = function () {
                              var match = pageCtx.get('last-scoring-match');

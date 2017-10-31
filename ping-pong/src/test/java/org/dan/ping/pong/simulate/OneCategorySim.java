@@ -89,6 +89,17 @@ public class OneCategorySim {
 
     @Test
     @SneakyThrows
+    public void justBeginTournamentOf2To1() {
+        simulator.simulate(
+                TournamentScenario.begin()
+                        .rules(RULES_G8Q1_S1A2G11)
+                        .ignoreUnexpectedGames()
+                        .name("justBeginTourOf2To1")
+                        .category(c1, p1, p2));
+    }
+
+    @Test
+    @SneakyThrows
     public void justBeginTournamentOf3() {
         simulator.simulate(
                 TournamentScenario.begin()

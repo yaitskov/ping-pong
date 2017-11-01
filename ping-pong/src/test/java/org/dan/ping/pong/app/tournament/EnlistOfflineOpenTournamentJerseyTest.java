@@ -52,7 +52,7 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                             final int cid = s.getCategoryDbId().get(c1);
 
                             final GroupPopulations populations = myRest()
-                                    .get(GROUP_POPULATIONS + s.getTid() + CID + cid,
+                                    .get(GROUP_POPULATIONS + s.getTid().getTid() + CID + cid,
                                             GroupPopulations.class);
                             final Uid uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, s,
                                     EnlistOffline.builder()
@@ -63,7 +63,7 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                                             .name("p4")
                                             .build()).readEntity(Uid.class);
                             s.addPlayer(uid, Player.p4);
-                            assertThat(myRest().get(BID_PENDING_MATCHES + s.getTid() + "/" + uid.getId(),
+                            assertThat(myRest().get(BID_PENDING_MATCHES + s.getTid().getTid() + "/" + uid.getId(),
                                     MyPendingMatchList.class).getMatches(),
                                     Matchers.hasSize(3));
                             return HookDecision.Skip;
@@ -95,7 +95,7 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                             final int cid = s.getCategoryDbId().get(c1);
 
                             final GroupPopulations populations = myRest()
-                                    .get(GROUP_POPULATIONS + s.getTid() + CID + cid,
+                                    .get(GROUP_POPULATIONS + s.getTid().getTid() + CID + cid,
                                             GroupPopulations.class);
                             final Uid uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, s,
                                     EnlistOffline.builder()

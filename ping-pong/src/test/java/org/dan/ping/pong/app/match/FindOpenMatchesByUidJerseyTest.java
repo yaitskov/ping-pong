@@ -44,7 +44,7 @@ public class FindOpenMatchesByUidJerseyTest extends AbstractSpringJerseyTest {
         simulator.simulate(scenario);
 
         final MyPendingMatchList matches = myRest()
-                .get(BID_PENDING_MATCHES + scenario.getTid()
+                .get(BID_PENDING_MATCHES + scenario.getTid().getTid()
                         + TID_SLASH_UID + scenario.player2Uid(p1).getId(),
                         MyPendingMatchList.class);
         assertThat(matches.isShowTables(), is(false));

@@ -86,7 +86,7 @@ public class GlobalScheduleService implements ScheduleService {
     }
 
     @Override
-    public <T> T withPlace(OpenTournamentMemState tournament, Function<TablesDiscovery, T> f) {
+    public <T> T withPlaceTables(OpenTournamentMemState tournament, Function<TablesDiscovery, T> f) {
         return sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
                 place -> f.apply(new GlobalTablesDiscovery(place)));
     }

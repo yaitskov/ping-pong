@@ -8,6 +8,7 @@ import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.city.NewCity;
 import org.dan.ping.pong.app.country.CountryDao;
 import org.dan.ping.pong.app.country.NewCountry;
+import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceDaoServer;
@@ -54,7 +55,7 @@ public class TableDaoTest {
                 .sessionPart("asdf").build());
         final int countryId = countryDao.create(uid, NewCountry.builder().name(genStr()).build());
         final int cityId = cityDao.create(uid, NewCity.builder().countryId(countryId).name(genStr()).build());
-        final int pid = placeDao.create(genStr(),
+        final Pid pid = placeDao.create(genStr(),
                 PlaceAddress.builder()
                         .city(CityLink.builder()
                                 .id(cityId).build())

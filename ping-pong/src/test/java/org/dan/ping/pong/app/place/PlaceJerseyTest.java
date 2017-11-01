@@ -43,7 +43,7 @@ public class PlaceJerseyTest extends AbstractSpringJerseyTest {
         final String address = genStr();
         final String cityName = genStr();
         final int cityId = generator.genCity(cityName, session.getUid());
-        final int placeId = myRest().post(PLACE_CREATE, session,
+        final Pid placeId = myRest().post(PLACE_CREATE, session,
                 CreatePlace.builder()
                         .name(name)
                         .address(PlaceAddress.builder()
@@ -51,9 +51,9 @@ public class PlaceJerseyTest extends AbstractSpringJerseyTest {
                                 .city(CityLink.builder().id(cityId).build())
                                 .build())
                         .build())
-                .readEntity(Integer.class);
+                .readEntity(Pid.class);
 
-        assertThat(placeId, Matchers.greaterThan(0));
+        assertThat(placeId.getPid(), Matchers.greaterThan(0));
         final List<PlaceLink> placeLink = myRest().get(PLACES,
                  session, new GenericType<List<PlaceLink>>(){});
         assertThat(placeLink, hasItems(

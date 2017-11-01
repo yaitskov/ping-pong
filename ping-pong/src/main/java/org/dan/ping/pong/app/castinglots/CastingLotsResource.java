@@ -78,7 +78,7 @@ public class CastingLotsResource {
     @Path(GET_MANUAL_BIDS_ORDER + "{tid}" + CID_IN + "{cid}")
     @Consumes(APPLICATION_JSON)
     public List<RankedBid> getManualBidsOrder(
-            @PathParam("tid") int tid,
+            @PathParam("tid") Tid tid,
             @PathParam("cid") int cid) {
         return castingLotsService.loadManualBidsOrder(tid, cid);
     }

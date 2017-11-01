@@ -151,7 +151,7 @@ public class CastingLotsService {
 
             if (iWeakBid >= orderedBids.size()) {
                 final ParticipantMemState fakeLoser = createLoserBid(
-                        new Tid(tournament.getTid()), cid);
+                        tournament.getTid(), cid);
                 bidService.setBidState(orderedBids.get(iStrongBid), Play, singletonList(Here), batch);
                 matchService.assignBidToMatch(tournament, match.getMid(),
                         fakeLoser.getUid(), batch);
@@ -167,7 +167,7 @@ public class CastingLotsService {
             OpenTournamentMemState tournament,
             List<ParticipantMemState> readyBids) {
         log.info("Seed tid {} as group", tournament.getTid());
-        final int tid = tournament.getTid();
+        final Tid tid = tournament.getTid();
         final int quits = rules.getGroup().get().getQuits();
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
             validateBidsNumberInACategory(bids);
@@ -185,7 +185,7 @@ public class CastingLotsService {
 
     private void seedTournamentWithGroupsAndPlayOff(TournamentRules rules,
             OpenTournamentMemState tournament, List<ParticipantMemState> readyBids) {
-        final int tid = tournament.getTid();
+        final Tid tid = tournament.getTid();
         final int quits = rules.getGroup().get().getQuits();
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
             validateBidsNumberInACategory(bids);
@@ -241,7 +241,7 @@ public class CastingLotsService {
         castingLotsDao.orderCategoryBidsManually(order);
     }
 
-    public List<RankedBid> loadManualBidsOrder(int tid, int cid) {
+    public List<RankedBid> loadManualBidsOrder(Tid tid, int cid) {
         return castingLotsDao.loadManualBidsOrder(tid, cid);
     }
 

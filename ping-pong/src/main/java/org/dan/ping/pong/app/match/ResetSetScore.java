@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dan.ping.pong.app.tournament.Tid;
 
 @Getter
 @Setter
@@ -13,7 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResetSetScore {
-    private int tid;
+    private Tid tid;
     private int mid;
     private int setNumber;
 }

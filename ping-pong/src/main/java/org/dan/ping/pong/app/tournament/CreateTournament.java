@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.place.Pid;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -21,8 +22,13 @@ import java.util.Optional;
 public class CreateTournament {
     private Instant opensAt;
     private String name;
-    private Optional<Integer> previousTid;
-    private int placeId;
+    private Optional<Tid> previousTid = Optional.empty();
+    private Pid placeId;
     private TournamentRules rules;
-    private Optional<Double> ticketPrice;
+    private Optional<Double> ticketPrice = Optional.empty();
+
+    public static class CreateTournamentBuilder {
+        Optional<Double> ticketPrice = Optional.empty();
+        Optional<Tid> previousTid = Optional.empty();
+    }
 }

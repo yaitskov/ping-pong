@@ -39,8 +39,8 @@ public class ScheduleServiceSelector implements ScheduleService {
     }
 
     @Override
-    public <T> T withPlace(OpenTournamentMemState tournament, Function<TablesDiscovery, T> f) {
-        return dispatch(tournament).withPlace(tournament, f);
+    public <T> T withPlaceTables(OpenTournamentMemState tournament, Function<TablesDiscovery, T> f) {
+        return dispatch(tournament).withPlaceTables(tournament, f);
     }
 
     private ScheduleService dispatch(OpenTournamentMemState tournament) {

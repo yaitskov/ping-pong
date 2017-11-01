@@ -7,6 +7,7 @@ import static ord.dan.ping.pong.jooq.tables.Category.CATEGORY;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +33,7 @@ public class CategoryDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<CategoryInfo> listCategoriesByTid(int tid) {
+    public List<CategoryInfo> listCategoriesByTid(Tid tid) {
         return jooq.select(CATEGORY.CID, CATEGORY.NAME)
                 .from(CATEGORY)
                 .where(CATEGORY.TID.eq(tid))
@@ -69,7 +70,7 @@ public class CategoryDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void copy(int originTid, int tid) {
+    public void copy(Tid originTid, Tid tid) {
         final List<CategoryInfo> categories = listCategoriesByTid(originTid);
         jooq.batch(
                 categories.stream().map(cinfo ->

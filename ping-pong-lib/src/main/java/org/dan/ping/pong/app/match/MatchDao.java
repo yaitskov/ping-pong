@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MatchDao {
-    int createGroupMatch(int tid, int gid, int cid, int priorityGroup, Uid uid1, Uid uid2);
+    int createGroupMatch(Tid tid, int gid, int cid, int priorityGroup, Uid uid1, Uid uid2);
 
-    int createPlayOffMatch(int tid, Integer cid,
+    int createPlayOffMatch(Tid tid, Integer cid,
             Optional<Integer> winMid, Optional<Integer> loseMid,
             int priority, int level, MatchType type);
 
@@ -26,9 +26,9 @@ public interface MatchDao {
 
     void markAsSchedule(MatchInfo match, DbUpdater batch);
 
-    List<CompleteMatch> findCompleteMatches(Integer tid);
+    List<CompleteMatch> findCompleteMatches(Tid tid);
 
-    List<UserLink> findWinners(int tid);
+    List<UserLink> findWinners(Tid tid);
 
     void deleteAllByTid(OpenTournamentMemState tournament, DbUpdater batch, int size);
 

@@ -90,7 +90,7 @@ public class MatchResource {
         final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("User {} sets scores {} for match {}",
                 uid, score.getScores(), score.getMid());
-        tournamentAccessor.update(new Tid(score.getTid()), response,
+        tournamentAccessor.update(score.getTid(), response,
                 (tournament, batch) -> {
                     return matchService.scoreSet(tournament, uid, score, clocker.get(), batch);
                 });
@@ -105,7 +105,7 @@ public class MatchResource {
         final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("User {} reset scores in min {} of tid {}",
                 uid, reset.getMid(), reset.getTid());
-        tournamentAccessor.update(new Tid(reset.getTid()), response,
+        tournamentAccessor.update(reset.getTid(), response,
                 (tournament, batch) -> {
                     tournament.checkAdmin(uid);
                     matchService.resetMatchScore(tournament, reset, batch);
@@ -122,7 +122,7 @@ public class MatchResource {
 
     @GET
     @Path("/match/tournament-winners/{tid}")
-    public List<UserLink> findWinners(@PathParam("tid") int tid) {
+    public List<UserLink> findWinners(@PathParam("tid") Tid tid) {
         return matchDao.findWinners(tid);
     }
 
@@ -152,7 +152,7 @@ public class MatchResource {
     @GET
     @Path(COMPLETE_MATCHES + "{tid}")
     @Consumes(APPLICATION_JSON)
-    public List<CompleteMatch> findCompleteMatches(@PathParam("tid") Integer tid) {
+    public List<CompleteMatch> findCompleteMatches(@PathParam("tid") Tid tid) {
         return matchDao.findCompleteMatches(tid);
     }
 }

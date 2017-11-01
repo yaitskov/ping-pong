@@ -37,7 +37,6 @@ import org.dan.ping.pong.app.castinglots.CastingLotsService;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.category.CategoryDao;
-import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.group.BidSuccessInGroup;
 import org.dan.ping.pong.app.group.DisambiguationPolicy;
@@ -51,6 +50,7 @@ import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
+import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.user.UserDao;
@@ -58,6 +58,7 @@ import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserRegRequest;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.sys.error.PiPoEx;
+import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,6 +68,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -90,8 +92,8 @@ public class TournamentService {
     private PlaceDao placeDao;
 
     @Transactional(TRANSACTION_MANAGER)
-    public int create(Uid uid, CreateTournament newTournament) {
-        final PlaceMemState place = placeDao.load(new Pid(newTournament.getPlaceId()))
+    public Tid create(Uid uid, CreateTournament newTournament) {
+        final PlaceMemState place = placeDao.load(newTournament.getPlaceId())
                 .orElseThrow(() -> badRequest(UNKNOWN_PLACE, PID, newTournament.getPlaceId()));
         place.checkAdmin(uid);
         return tournamentDao.create(uid, newTournament);
@@ -159,7 +161,7 @@ public class TournamentService {
                 .updatedAt(now)
                 .enlistedAt(now)
                 .cid(enlistment.getCategoryId())
-                .tid(new Tid(tournament.getTid()))
+                .tid(tournament.getTid())
                 .build());
         enlist(tournament, uid, enlistment.getProvidedRank(), batch);
     }
@@ -215,17 +217,38 @@ public class TournamentService {
     @Inject
     private CategoryDao categoryDao;
 
-    public DraftingTournamentInfo getDraftingTournament(int tid,
+    @Inject
+    private SequentialExecutor sequentialExecutor;
+
+    @Inject
+    private PlaceService placeCache;
+
+    public DraftingTournamentInfo getDraftingTournament(OpenTournamentMemState tournament,
             Optional<Uid> participantId) {
-        final List<CategoryInfo> categories = categoryDao.listCategoriesByTid(tid);
-        final DraftingTournamentInfo result = tournamentDao
-                .getDraftingTournament(tid, participantId)
-                .orElseThrow(() -> notFound("Tournament " + tid + " not found"));
-        result.setCategories(categories);
-        return result;
+        return sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
+                place -> DraftingTournamentInfo.builder()
+                        .tid(tournament.getTid())
+                        .rules(tournament.getRule())
+                        .name(tournament.getName())
+                        .state(tournament.getState())
+                        .enlisted(tournament.getParticipants().size())
+                        .ticketPrice(tournament.getTicketPrice())
+                        .previousTid(tournament.getPreviousTid())
+                        .bidState(participantId.map(tournament::getBid)
+                                .filter(Objects::nonNull)
+                                .map(ParticipantMemState::getBidState))
+                        .place(place.toLink())
+                        .categories(tournament.getCategories().values())
+                        .opensAt(tournament.getOpensAt())
+                        .myCategoryId(participantId.map(tournament::getBid)
+                                .filter(Objects::nonNull)
+                                .map(ParticipantMemState::getCid))
+                        .iAmAdmin(participantId.filter(tournament::isAdminOf).isPresent())
+                        .rules(tournament.getRule())
+                        .build());
     }
 
-    public MyTournamentInfo getMyTournamentInfo(int tid) {
+    public MyTournamentInfo getMyTournamentInfo(Tid tid) {
         return tournamentDao.getMyTournamentInfo(tid)
                 .orElseThrow(() -> notFound("Tournament "
                         + tid + " not found"));
@@ -233,7 +256,7 @@ public class TournamentService {
 
     public void leaveTournament(ParticipantMemState bid, OpenTournamentMemState tournament,
             BidState targetState, DbUpdater batch) {
-        final int tid = tournament.getTid();
+        final Tid tid = tournament.getTid();
         log.info("User {} leaves tournament {} as {}", bid.getUid(), tid, targetState);
         final TournamentState state = tournament.getState();
         switch (state) {
@@ -256,7 +279,7 @@ public class TournamentService {
 
     private void leaveOpenTournament(ParticipantMemState bid, OpenTournamentMemState tournament,
             BidState targetState, DbUpdater batch) {
-        final int tid = tournament.getTid();
+        final Tid tid = tournament.getTid();
         log.info("User {} leaves open tournament {}", bid.getUid(), tid);
         switch (bid.getBidState()) {
             case Play:
@@ -337,7 +360,7 @@ public class TournamentService {
         if (!EDITABLE_STATES.contains(tournament.getState())) {
             throw badRequest("Tournament could be modified until it's open");
         }
-        tournament.setPid(new Pid(update.getPlaceId()));
+        tournament.setPid(update.getPlaceId());
         tournamentDao.update(update, batch);
     }
 
@@ -359,7 +382,7 @@ public class TournamentService {
     public void cancel(OpenTournamentMemState tournament, DbUpdater batch) {
         final Instant now = clocker.get();
 
-        final int tid = tournament.getTid();
+        final Tid tid = tournament.getTid();
         tournament.setState(Canceled);
         setTournamentState(tournament, batch);
         setTournamentCompleteAt(tournament, clocker.get(), batch);
@@ -429,7 +452,7 @@ public class TournamentService {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public TournamentComplete completeInfo(int tid) {
+    public TournamentComplete completeInfo(Tid tid) {
         TournamentComplete result = tournamentDao.completeInfo(tid)
                 .orElseThrow(() -> notFound("Tournament has been not found"));
         result.setCategories(categoryDao.listCategoriesByTid(tid));
@@ -460,7 +483,7 @@ public class TournamentService {
                 .cid(enlistment.getCid())
                 .uid(participantUid)
                 .gid(enlistment.getGroupId())
-                .tid(new Tid(tournament.getTid()))
+                .tid(tournament.getTid())
                 .build());
         enlist(tournament, participantUid, enlistment.getProvidedRank(), batch);
 
@@ -472,8 +495,8 @@ public class TournamentService {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public int copy(CopyTournament copyTournament) {
-        final int tid = tournamentDao.copy(copyTournament);
+    public Tid copy(CopyTournament copyTournament) {
+        final Tid tid = tournamentDao.copy(copyTournament);
         categoryDao.copy(copyTournament.getOriginTid(), tid);
         return tid;
     }
@@ -482,7 +505,7 @@ public class TournamentService {
     private CategoryService categoryService;
 
     public boolean endOfTournamentCategory(OpenTournamentMemState tournament, int cid, DbUpdater batch) {
-        int tid = tournament.getTid();
+        final Tid tid = tournament.getTid();
         log.info("Tid {} complete in cid {}", tid, cid);
         Set<Integer> incompleteCids = categoryService.findIncompleteCategories(tournament);
         if (incompleteCids.isEmpty()) {

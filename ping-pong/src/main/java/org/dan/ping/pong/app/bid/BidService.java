@@ -17,6 +17,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdater;
@@ -42,11 +43,11 @@ public class BidService {
         setBidState(tournament.getParticipant(uid), Here, asList(Paid, Want), batch);
     }
 
-    public List<ParticipantState> findEnlisted(int tid) {
+    public List<ParticipantState> findEnlisted(Tid tid) {
         return bidDao.findEnlisted(tid);
     }
 
-    public DatedParticipantState getParticipantState(int tid, Uid uid) {
+    public DatedParticipantState getParticipantState(Tid tid, Uid uid) {
         return bidDao.getParticipantInfo(tid, uid)
                 .orElseThrow(() -> notFound("Participant has not been found"));
     }
@@ -77,7 +78,7 @@ public class BidService {
                             + bid.getState() + " but expected " + expected);
         }
         bid.setBidState(target);
-        bidDao.setBidState(bid.getTid().getTid(), bid.getUid(),
+        bidDao.setBidState(bid.getTid(), bid.getUid(),
                 target, expected, clocker.get(), batch);
     }
 

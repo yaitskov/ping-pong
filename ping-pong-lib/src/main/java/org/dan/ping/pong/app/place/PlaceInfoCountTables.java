@@ -15,7 +15,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlaceInfoCountTables {
-    private int pid;
+    private Pid pid;
     private String name;
     private PlaceAddress address;
     private int tables;

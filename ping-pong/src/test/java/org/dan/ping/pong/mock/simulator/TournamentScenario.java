@@ -23,6 +23,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.match.MatchValidationRule;
+import org.dan.ping.pong.app.place.Pid;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.tournament.Uid;
@@ -67,9 +69,9 @@ public class TournamentScenario implements SessionAware {
 
     private boolean begin = true;
     @Setter
-    private int tid;
+    private Tid tid;
     @Setter
-    private int placeId;
+    private Pid placeId;
     private int tables = 1;
     @Setter
     private TestUserSession testAdmin;

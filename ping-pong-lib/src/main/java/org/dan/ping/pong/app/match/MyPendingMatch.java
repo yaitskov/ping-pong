@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.table.TableLink;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserLink;
 
 import java.util.Optional;
@@ -18,7 +19,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MyPendingMatch {
-    private int tid;
+    private Tid tid;
     private int mid;
     private MatchState state;
     private Optional<UserLink> enemy;

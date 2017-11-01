@@ -14,6 +14,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExpelParticipant {
-    private int tid;
+    private Tid tid;
     private Uid uid;
 }

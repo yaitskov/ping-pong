@@ -15,6 +15,8 @@ import org.dan.ping.pong.app.castinglots.rank.OrderDirection;
 import org.dan.ping.pong.app.castinglots.rank.ProvidedRankOptions;
 import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.match.MatchValidationRule;
+import org.dan.ping.pong.app.place.Pid;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
 
@@ -53,18 +55,18 @@ public class DaoEntityGeneratorWithAdmin {
     private final TestAdmin testAdmin;
     private final DaoEntityGenerator daoEntityGenerator;
 
-    public int genTournament(int placeId) {
+    public Tid genTournament(Pid placeId) {
         return genTournament(placeId, Draft);
     }
 
-    public int genTournament(int placeId, TournamentState state) {
+    public Tid genTournament(Pid placeId, TournamentState state) {
         return genTournament(placeId, TournamentProps.builder()
                 .state(state)
                 .rules(rules(2))
                 .build());
     }
 
-    public int genTournament(int placeId, TournamentState state, int quits) {
+    public Tid genTournament(Pid placeId, TournamentState state, int quits) {
         return genTournament(placeId, TournamentProps.builder()
                 .state(state)
                 .rules(rules(quits))
@@ -88,15 +90,15 @@ public class DaoEntityGeneratorWithAdmin {
                 .build();
     }
 
-    public int genTournament(int placeId, TournamentProps props) {
+    public Tid genTournament(Pid placeId, TournamentProps props) {
         return daoEntityGenerator.genTournament(testAdmin.getUid(), placeId, props);
     }
 
-    public int genPlace(int tables) {
+    public Pid genPlace(int tables) {
         return daoEntityGenerator.genPlace(testAdmin.getUid(), tables);
     }
 
-    public int genCategory(int tid) {
+    public int genCategory(Tid tid) {
         return daoEntityGenerator.genCategory(UUID.randomUUID().toString(), tid);
     }
 

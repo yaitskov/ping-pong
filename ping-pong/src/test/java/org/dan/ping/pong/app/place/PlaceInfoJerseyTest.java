@@ -34,7 +34,8 @@ public class PlaceInfoJerseyTest extends AbstractSpringJerseyTest {
                 .name("count6Tables");
         simulator.simulate(scenario);
 
-        final PlaceInfoCountTables placeInfo = myRest().get(PLACE_INFO + scenario.getPlaceId(),
+        final PlaceInfoCountTables placeInfo = myRest()
+                .get(PLACE_INFO + scenario.getPlaceId().getPid(),
                 scenario, PlaceInfoCountTables.class);
         assertThat(placeInfo.getTables(), is(6));
     }

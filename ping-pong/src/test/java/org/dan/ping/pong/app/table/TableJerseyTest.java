@@ -17,6 +17,8 @@ import static org.junit.Assert.assertEquals;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.match.MyPendingMatch;
 import org.dan.ping.pong.app.match.MyPendingMatchList;
+import org.dan.ping.pong.app.place.Pid;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin;
 import org.dan.ping.pong.mock.RestEntityGenerator;
 import org.dan.ping.pong.mock.TestAdmin;
@@ -52,8 +54,8 @@ public class TableJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void locateOneGameOnOneTable() {
-        final int placeId = daoGenerator.genPlace(1);
-        final int tid = daoGenerator.genTournament(placeId, Draft, 1);
+        final Pid placeId = daoGenerator.genPlace(1);
+        final Tid tid = daoGenerator.genTournament(placeId, Draft, 1);
         final int cid = daoGenerator.genCategory(tid);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
         restEntityGenerator.enlistParticipants(myRest(), adminSession, tid, cid, participants);
@@ -70,8 +72,8 @@ public class TableJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void locateOneGameWithoutTables() {
-        final int placeId = daoGenerator.genPlace(0);
-        final int tid = daoGenerator.genTournament(placeId, Draft, 1);
+        final Pid placeId = daoGenerator.genPlace(0);
+        final Tid tid = daoGenerator.genTournament(placeId, Draft, 1);
         final int cid = daoGenerator.genCategory(tid);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
         restEntityGenerator.enlistParticipants(myRest(), adminSession, tid, cid, participants);
@@ -80,8 +82,8 @@ public class TableJerseyTest extends AbstractSpringJerseyTest {
         assertThat(response.readEntity(String.class), containsString("doesn't have any table"));
     }
 
-    private MyPendingMatchList findMatch(int tid, TestUserSession participant) {
-        return myRest().get(MY_PENDING_MATCHES + tid,
+    private MyPendingMatchList findMatch(Tid tid, TestUserSession participant) {
+        return myRest().get(MY_PENDING_MATCHES + tid.getTid(),
                 participant,
                 MyPendingMatchList.class);
     }

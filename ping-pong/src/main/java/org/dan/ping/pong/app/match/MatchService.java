@@ -463,7 +463,7 @@ public class MatchService {
     }
 
     public List<OpenMatchForWatch> findOpenMatchesForWatching(OpenTournamentMemState tournament) {
-        return scheduleService.withPlace(tournament,
+        return scheduleService.withPlaceTables(tournament,
                 tablesDiscovery -> tournament.getMatches().values().stream()
                         .filter(m -> m.getState() == Game)
                         .map(m -> OpenMatchForWatch.builder()
@@ -610,7 +610,7 @@ public class MatchService {
 
     public MyPendingMatchList findPendingMatches(
             OpenTournamentMemState tournament, Uid uid) {
-        return scheduleService.withPlace(tournament, tablesDiscovery ->
+        return scheduleService.withPlaceTables(tournament, tablesDiscovery ->
                 MyPendingMatchList.builder()
                         .matches(tournament.participantMatches(uid)
                                 .filter(m -> incompleteMatchStates.contains(m.getState()))
@@ -661,7 +661,7 @@ public class MatchService {
     }
 
     public List<OpenMatchForJudge> findOpenMatchesFurJudge(OpenTournamentMemState tournament) {
-        return scheduleService.withPlace(tournament, (tablesDiscovery -> tournament.getMatches()
+        return scheduleService.withPlaceTables(tournament, (tablesDiscovery -> tournament.getMatches()
                 .values().stream()
                 .filter(m -> m.getState() == Game)
                 .map(m -> OpenMatchForJudge.builder()

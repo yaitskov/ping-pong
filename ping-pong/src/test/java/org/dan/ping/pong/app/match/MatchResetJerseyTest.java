@@ -49,7 +49,8 @@ public class MatchResetJerseyTest extends AbstractSpringJerseyTest {
         simulator.simulate(scenario);
 
         final List<TournamentResultEntry> result = myRest().get(
-                TOURNAMENT_RESULT + scenario.getTid() + RESULT_CATEGORY + scenario.getCategoryDbId().get(c1),
+                TOURNAMENT_RESULT + scenario.getTid().getTid()
+                        + RESULT_CATEGORY + scenario.getCategoryDbId().get(c1),
                 scenario.getTestAdmin(),
                 new GenericType<List<TournamentResultEntry>>() {});
 

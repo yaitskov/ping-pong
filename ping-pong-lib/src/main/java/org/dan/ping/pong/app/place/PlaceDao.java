@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PlaceDao {
-    int create(String name, PlaceAddress address);
+    Pid create(String name, PlaceAddress address);
 
-    int createAndGrant(Uid author, String name, PlaceAddress address);
+    Pid createAndGrant(Uid author, String name, PlaceAddress address);
 
     List<PlaceLink> findEditableByUid(Uid uid);
 
-    Optional<PlaceInfoCountTables> getPlaceById(int pid);
+    Optional<PlaceInfoCountTables> getPlaceById(Pid pid);
 
     void update(Uid uid, PlaceLink place);
 

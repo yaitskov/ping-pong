@@ -5,6 +5,7 @@ import static ord.dan.ping.pong.jooq.Tables.MATCHES;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import ord.dan.ping.pong.jooq.tables.Matches;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,7 @@ public class ForTestMatchDao {
     private DSLContext jooq;
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<Integer> findIncompleteTournamentMatches(int tid) {
+    public List<Integer> findIncompleteTournamentMatches(Tid tid) {
         return jooq.select(MATCHES.MID).from(MATCHES)
                 .where(MATCHES.TID.eq(tid), MATCHES.STATE.ne(MatchState.Over))
                 .fetch()

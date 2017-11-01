@@ -8,6 +8,7 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.table.TableState;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.Uid;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,18 +22,18 @@ public class ForTestPlaceDao {
     private DSLContext jooq;
 
     @Transactional(TRANSACTION_MANAGER)
-    public void revokeAdmin(int pid, Uid uid) {
+    public void revokeAdmin(Pid pid, Uid uid) {
         jooq.deleteFrom(PLACE_ADMIN)
                 .where(PLACE_ADMIN.PID.eq(pid), PLACE_ADMIN.UID.eq(uid))
                 .execute();
     }
 
-    public List<TableInfo> findFreeTables(int tid) {
+    public List<TableInfo> findFreeTables(Tid tid) {
         return findTournamentTablesByState(tid, Free);
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    private List<TableInfo> findTournamentTablesByState(int tid, TableState state) {
+    private List<TableInfo> findTournamentTablesByState(Tid tid, TableState state) {
         return jooq.select(TABLES.TABLE_ID, TABLES.LABEL, TABLES.PID, TABLES.MID)
                 .from(TABLES)
                 .innerJoin(TOURNAMENT)

@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.sched;
 
+import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
@@ -19,5 +20,5 @@ public interface ScheduleService {
     void afterMatchComplete(OpenTournamentMemState tournament,
             DbUpdater batch, Instant now);
 
-    <T> T withPlace(OpenTournamentMemState tournament, Function<TablesDiscovery, T> f);
+    <T> T withPlaceTables(OpenTournamentMemState tournament, Function<TablesDiscovery, T> f);
 }

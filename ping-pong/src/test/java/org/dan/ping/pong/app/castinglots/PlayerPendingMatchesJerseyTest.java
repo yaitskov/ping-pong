@@ -48,7 +48,7 @@ public class PlayerPendingMatchesJerseyTest extends AbstractSpringJerseyTest {
 
         for (TestUserSession userSession : scenario.getPlayersSessions().values()) {
             final MyPendingMatchList matches = myRest().get(
-                    MY_PENDING_MATCHES + scenario.getTid(),
+                    MY_PENDING_MATCHES + scenario.getTid().getTid(),
                     userSession,
                     MyPendingMatchList.class);
             assertThat(matches.getProgress().getLeftMatches(), is(1L));

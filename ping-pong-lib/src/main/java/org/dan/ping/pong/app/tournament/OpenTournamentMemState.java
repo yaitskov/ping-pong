@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 @Setter
 @Builder
 public class OpenTournamentMemState {
-    private int tid;
+    private Tid tid;
     private String name;
     private Pid pid;
     private Set<Uid> adminIds;
@@ -37,6 +37,9 @@ public class OpenTournamentMemState {
     private TournamentRules rule;
     private TournamentState state;
     private Optional<Instant> completeAt;
+    private Optional<Double> ticketPrice;
+    private Optional<Tid> previousTid;
+    private Instant opensAt;
 
     public Optional<MatchInfo> maybeMatchById(int mid) {
         return ofNullable(matches.get(mid));

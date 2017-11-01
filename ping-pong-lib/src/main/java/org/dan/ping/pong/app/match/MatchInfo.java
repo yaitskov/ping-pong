@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.Uid;
 
 import java.time.Duration;
@@ -25,7 +26,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class MatchInfo {
     private int mid;
-    private int tid;
+    private Tid tid;
     private int cid;
     private MatchType type;
     private Optional<Integer> gid;

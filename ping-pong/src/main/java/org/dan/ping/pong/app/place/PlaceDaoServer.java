@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.place;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -11,8 +12,10 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import lombok.extern.slf4j.Slf4j;
+import ord.dan.ping.pong.jooq.tables.Place;
 import ord.dan.ping.pong.jooq.tables.records.PlaceRecord;
 import org.dan.ping.pong.app.city.CityLink;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.sys.db.DbUpdateSql;
 import org.dan.ping.pong.sys.db.DbUpdater;
@@ -39,7 +42,7 @@ public class PlaceDaoServer implements PlaceDao {
 
     @Override
     @Transactional(TRANSACTION_MANAGER)
-    public int create(String name, PlaceAddress address) {
+    public Pid create(String name, PlaceAddress address) {
         try {
             return jooq.insertInto(PLACE, PLACE.NAME, PLACE.CITY_ID,
                     PLACE.POST_ADDRESS, PLACE.PHONE, PLACE.EMAIL)
@@ -62,8 +65,8 @@ public class PlaceDaoServer implements PlaceDao {
 
     @Override
     @Transactional(TRANSACTION_MANAGER)
-    public int createAndGrant(Uid author, String name, PlaceAddress address) {
-        final int pid = create(name, address);
+    public Pid createAndGrant(Uid author, String name, PlaceAddress address) {
+        final Pid pid = create(name, address);
         jooq.insertInto(PLACE_ADMIN, PLACE_ADMIN.PID, PLACE_ADMIN.UID, PLACE_ADMIN.TYPE)
                 .values(pid, author, AUTHOR)
                 .execute();
@@ -100,7 +103,7 @@ public class PlaceDaoServer implements PlaceDao {
 
     @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<PlaceInfoCountTables> getPlaceById(int pid) {
+    public Optional<PlaceInfoCountTables> getPlaceById(Pid pid) {
         return ofNullable(
                 jooq
                         .select(PLACE.PID, PLACE.NAME, PLACE.POST_ADDRESS,
@@ -146,7 +149,7 @@ public class PlaceDaoServer implements PlaceDao {
 
     private Set<Uid> loadAdmins(Pid pid) {
         return jooq.select(PLACE_ADMIN.UID)
-                .from(PLACE_ADMIN).where(PLACE_ADMIN.PID.eq(pid.getPid()))
+                .from(PLACE_ADMIN).where(PLACE_ADMIN.PID.eq(pid))
                 .fetch()
                 .stream()
                 .map(r -> r.get(PLACE_ADMIN.UID))
@@ -155,15 +158,28 @@ public class PlaceDaoServer implements PlaceDao {
 
     @Override
     public Optional<PlaceMemState> load(Pid pid) {
-        return ofNullable(jooq.select(PLACE.NAME, PLACE.HOSTING_TID)
+        return ofNullable(jooq.select(PLACE.NAME, PLACE.HOSTING_TID,
+                PLACE.PHONE, PLACE.EMAIL, PLACE.GPS, PLACE.POST_ADDRESS,
+                CITY.NAME, CITY.CITY_ID)
                 .from(PLACE)
-                .where(PLACE.PID.eq(pid.getPid()))
+                .innerJoin(CITY).on(CITY.CITY_ID.eq(PLACE.CITY_ID))
+                .where(PLACE.PID.eq(pid))
                 .fetchOne())
                 .map(r -> PlaceMemState.builder()
                         .pid(pid)
-                        .hostingTid(r.get(PLACE.HOSTING_TID))
+                        .hostingTid(r.get(PLACE.HOSTING_TID).map(Tid::new))
                         .name(r.get(PLACE.NAME))
                         .adminIds(loadAdmins(pid))
+                        .address(PlaceAddress.builder()
+                                .city(CityLink.builder()
+                                        .id(r.get(CITY.CITY_ID))
+                                        .name(r.get(CITY.NAME))
+                                        .build())
+                                .phone(r.get(PLACE.PHONE))
+                                .address(r.get(PLACE.POST_ADDRESS))
+                                .email(r.get(PLACE.EMAIL))
+                                .gps(empty())
+                                .build())
                         .build());
     }
 
@@ -173,8 +189,9 @@ public class PlaceDaoServer implements PlaceDao {
                 DbUpdateSql
                         .builder()
                         .query(jooq.update(PLACE)
-                                .set(PLACE.HOSTING_TID, place.getHostingTid())
-                                .where(PLACE.PID.eq(place.getPid().getPid())))
+                                .set(PLACE.HOSTING_TID, place.getHostingTid()
+                                        .map(Tid::getTid))
+                                .where(PLACE.PID.eq(place.getPid())))
                         .build());
     }
 }

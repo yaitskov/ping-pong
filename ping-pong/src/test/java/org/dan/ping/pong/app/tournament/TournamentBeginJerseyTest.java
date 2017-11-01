@@ -134,6 +134,6 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
                 response.readEntity(TemplateError.class),
                 allOf(
                         hasProperty("message", is(PLACE_IS_BUSY)),
-                        hasProperty("params", hasEntry(TID, scenario1.getTid()))));
+                        hasProperty("params", hasEntry(TID, scenario1.getTid().getTid()))));
     }
 }

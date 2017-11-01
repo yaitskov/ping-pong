@@ -12,6 +12,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SetTournamentState {
-    private int tid;
+    private Tid tid;
     private TournamentState state;
 }

@@ -12,11 +12,13 @@ import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.city.NewCity;
 import org.dan.ping.pong.app.country.CountryDao;
 import org.dan.ping.pong.app.country.NewCountry;
+import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.tournament.CreateTournament;
 import org.dan.ping.pong.app.tournament.ForTestTournamentDao;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.app.user.UserDao;
@@ -100,7 +102,7 @@ public class DaoEntityGenerator {
     @Inject
     private PlaceDao placeDao;
 
-    public int genPlace(int cityId, String name, Uid admin) {
+    public Pid genPlace(int cityId, String name, Uid admin) {
         return placeDao.createAndGrant(admin, name,
                 PlaceAddress.builder()
                         .city(CityLink.builder().id(cityId).build())
@@ -112,13 +114,13 @@ public class DaoEntityGenerator {
     @Inject
     private TableDao tableDao;
 
-    public int genPlace(int cityId, String name, Uid admin, int tables) {
-        final int placeId = genPlace(cityId, name, admin);
+    public Pid genPlace(int cityId, String name, Uid admin, int tables) {
+        final Pid placeId = genPlace(cityId, name, admin);
         tableDao.createTables(placeId, tables);
         return placeId;
     }
 
-    public int genPlace(Uid admin, int tables) {
+    public Pid genPlace(Uid admin, int tables) {
         return genPlace(genCity(genCountry(genStr(), admin), genStr(), admin),
                 genStr(), admin, tables);
     }
@@ -132,12 +134,12 @@ public class DaoEntityGenerator {
     @Inject
     private Clocker clocker;
 
-    public int genTournament(Uid adminId, int placeId, TournamentProps props) {
+    public Tid genTournament(Uid adminId, Pid placeId, TournamentProps props) {
         return genTournament(genTournamentName(), adminId, placeId, props);
     }
 
-    public int genTournament(String name, Uid adminId, int placeId, TournamentProps props) {
-        final int tid = tournamentDao.create(adminId, CreateTournament.builder()
+    public Tid genTournament(String name, Uid adminId, Pid placeId, TournamentProps props) {
+        final Tid tid = tournamentDao.create(adminId, CreateTournament.builder()
                 .opensAt(props.getOpensAt()
                         .orElseGet(() -> clocker.get().plus(1, ChronoUnit.DAYS)))
                 .placeId(placeId)
@@ -153,7 +155,7 @@ public class DaoEntityGenerator {
     @Inject
     private CategoryDao categoryDao;
 
-    public int genCategory(String name, int tid) {
+    public int genCategory(String name, Tid tid) {
         return categoryDao.create(NewCategory.builder()
                 .name(name)
                 .tid(tid)

@@ -12,7 +12,7 @@ import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.place.PlaceLink;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 @Getter
@@ -22,16 +22,17 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DraftingTournamentInfo {
-    private int tid;
+    private Tid tid;
     private String name;
     private Instant opensAt;
-    private Optional<Integer> previousTid = Optional.empty();
+    private Optional<Tid> previousTid = Optional.empty();
     private Optional<Double> ticketPrice = Optional.empty();
     private PlaceLink place;
     private Optional<Integer> myCategoryId = Optional.empty();
     private boolean iAmAdmin;
-    private List<CategoryInfo> categories;
+    private Collection<CategoryInfo> categories;
     private TournamentState state;
     private Optional<BidState> bidState = Optional.empty();
     private TournamentRules rules;
+    private int enlisted;
 }

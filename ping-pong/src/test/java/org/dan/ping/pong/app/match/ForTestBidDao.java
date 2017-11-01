@@ -6,6 +6,7 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import ord.dan.ping.pong.jooq.Tables;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.Uid;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -21,7 +22,7 @@ public class ForTestBidDao {
     private DSLContext jooq;
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<Uid> findByTidAndState(int tid, int cid, List<BidState> state) {
+    public List<Uid> findByTidAndState(Tid tid, int cid, List<BidState> state) {
         return jooq.select(BID.UID)
                 .from(BID)
                 .where(BID.TID.eq(tid), BID.CID.eq(cid), BID.STATE.in(state))
@@ -31,7 +32,7 @@ public class ForTestBidDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<BidState> getState(int tid, Uid uid) {
+    public Optional<BidState> getState(Tid tid, Uid uid) {
         return ofNullable(
                 jooq.select(Tables.BID.STATE)
                         .from(Tables.BID)

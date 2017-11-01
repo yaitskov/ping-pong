@@ -51,6 +51,7 @@ import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.place.ForTestPlaceDao;
+import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.user.UserInfo;
@@ -99,13 +100,13 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     public void failsToCreateTournamentWithUnknownPid() {
         final String name = genStr();
         final Instant opensAt = genFutureTime();
-        final int badPid = 1111111;
+        final Pid badPid = new Pid(1111111);
         final Response response = createTournament(name, opensAt, badPid);
         assertEquals(400, response.getStatus());
         final TemplateError error = response.readEntity(TemplateError.class);
         assertThat(error, allOf(
                 hasProperty("message", is(UNKNOWN_PLACE)),
-                hasProperty("params", hasEntry(PID, badPid))
+                hasProperty("params", hasEntry(PID, badPid.getPid()))
         ));
     }
 
@@ -116,14 +117,14 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     public void failsToCreateTournamentWithForeignPid() {
         final String name = genStr();
         final Instant opensAt = genFutureTime();
-        final int badPid = daoGenerator.genPlace(0);
+        final Pid badPid = daoGenerator.genPlace(0);
         forTestPlaceDao.revokeAdmin(badPid, adminSession.getUid());
         final Response response = createTournament(name, opensAt, badPid);
         assertEquals(403, response.getStatus());
         final TemplateError error = response.readEntity(TemplateError.class);
         assertThat(error, allOf(
                 hasProperty("message", is(NO_ADMIN_ACCESS_TO_PLACE)),
-                hasProperty("params", hasEntry(PID, badPid))
+                hasProperty("params", hasEntry(PID, badPid.getPid()))
         ));
     }
 
@@ -132,7 +133,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final String name = genStr();
         final Instant opensAt = genFutureTime();
         final Response response = createTournament(name, opensAt, daoGenerator.genPlace(0));
-        final int tid = response.readEntity(Integer.class);
+        final Tid tid = response.readEntity(Tid.class);
 
         final List<TournamentDigest> digest = request().path(EDITABLE_TOURNAMENTS)
                 .request(APPLICATION_JSON)
@@ -145,18 +146,17 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                 hasProperty("opensAt", is(opensAt)))));
     }
 
-    private Response createTournament(String name, Instant opensAt, int placeId) {
-        return request().path(TOURNAMENT_CREATE)
-                .request(APPLICATION_JSON)
-                .header(SESSION, adminSession.getSession())
-                .post(Entity.entity(CreateTournament.builder()
+    private Response createTournament(String name, Instant opensAt, Pid placeId) {
+        return myRest().post(TOURNAMENT_CREATE,
+                adminSession,
+                CreateTournament.builder()
                         .name(name)
                         .placeId(placeId)
                         .opensAt(opensAt)
                         .previousTid(Optional.empty())
                         .rules(RULES_G2Q1_S1A2G11)
                         .ticketPrice(Optional.empty())
-                        .build(), APPLICATION_JSON));
+                        .build());
     }
 
     @Inject
@@ -165,7 +165,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void enlist() {
-        final int tid = daoGenerator.genTournament(
+        final Tid tid = daoGenerator.genTournament(
                 daoGenerator.genPlace(0), Draft);
 
         assertEquals(OK.getStatusCode(),
@@ -194,16 +194,16 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final String address = genPlaceLocation();
         final String phone = genPhone();
         final int cityId = daoGenerator.genCity();
-        final int placeId = placeDao.createAndGrant(adminSession.getUid(), placeName,
+        final Pid placeId = placeDao.createAndGrant(adminSession.getUid(), placeName,
                 PlaceAddress.builder()
                         .address(address)
                         .city(CityLink.builder().id(cityId).build())
                         .phone(Optional.of(phone))
                         .build());
-        final int tid = daoGenerator.genTournament(placeId);
+        final Tid tid = daoGenerator.genTournament(placeId);
         final int cid = daoGenerator.genCategory(tid);
 
-        final DraftingTournamentInfo adminResult = myRest().get(DRAFTING + tid,
+        final DraftingTournamentInfo adminResult = myRest().get(DRAFTING + tid.getTid(),
                 adminSession, DraftingTournamentInfo.class);
         assertEquals(Optional.empty(), adminResult.getMyCategoryId());
         assertEquals(Optional.empty(), adminResult.getBidState());
@@ -244,7 +244,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void resign() {
-        final int tid = daoGenerator.genTournament(
+        final Tid tid = daoGenerator.genTournament(
                 daoGenerator.genPlace(0), Draft);
         final int cid1 = daoGenerator.genCategory(tid);
         final int cid2 = daoGenerator.genCategory(tid);
@@ -276,7 +276,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void draftingBadState() {
-        final int tid = daoGenerator.genTournament(daoGenerator.genPlace(0), Open);
+        final Tid tid = daoGenerator.genTournament(daoGenerator.genPlace(0), Open);
         assertThat(myRest().get(DRAFTING + tid, DraftingTournamentInfo.class),
                 hasProperty("state", is(Open)));
         setTournamentState(tid, Close);
@@ -290,8 +290,8 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void runningTournaments() {
-        final int placeId = daoGenerator.genPlace(1);
-        final int tid = daoGenerator.genTournament(placeId, Draft, 1);
+        final Pid placeId = daoGenerator.genPlace(1);
+        final Tid tid = daoGenerator.genTournament(placeId, Draft, 1);
         final int cid = daoGenerator.genCategory(tid);
 
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
@@ -316,7 +316,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     private BidDao bidDao;
 
-    private void setTournamentState(int previousTid, TournamentState state) {
+    private void setTournamentState(Tid previousTid, TournamentState state) {
         myRest().voidPost(TOURNAMENT_STATE, adminSession,
                 SetTournamentState.builder()
                         .tid(previousTid)
@@ -328,7 +328,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void enlistOffline() {
-        final int tid = daoGenerator.genTournament(
+        final Tid tid = daoGenerator.genTournament(
                 daoGenerator.genPlace(0), Draft);
         final int cid = daoGenerator.genCategory(tid);
         final String name = UUID.randomUUID().toString();

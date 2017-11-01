@@ -44,6 +44,7 @@ import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.place.ArenaDistributionPolicy;
 import org.dan.ping.pong.app.place.ForTestPlaceDao;
+import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceRules;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.dan.ping.pong.app.table.TableInfo;
@@ -211,8 +212,8 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void adminCompleteOnlyMatchIn1Group() {
-        final int placeId = daoGenerator.genPlace(1);
-        final int tid = daoGenerator.genTournament(placeId,
+        final Pid placeId = daoGenerator.genPlace(1);
+        final Tid tid = daoGenerator.genTournament(placeId,
                 TournamentProps.builder().rules(RULES_G8Q1_S1A2G11).build());
         final int cid = daoGenerator.genCategory(tid);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
@@ -247,7 +248,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
         assertEquals(Stream.of(Over, Close).map(Optional::of).collect(toList()),
                 asList(forTestMatchDao.getById(adminOpenMatches.get(0).getMid())
                                 .map(MatchInfo::getState),
-                        tournamentDao.getRow(new Tid(tid)).map(TournamentRow::getState)));
+                        tournamentDao.getRow(tid).map(TournamentRow::getState)));
 
         List<TableInfo> tables = placeDao.findFreeTables(tid);
         assertEquals(singletonList(Free), tables.stream().map(TableInfo::getState).collect(toList()));
@@ -264,7 +265,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 .ignoreUnexpectedGames();
 
         simulator.simulate(scenario);
-        List<OpenMatchForWatch> result = rest.get(MATCH_WATCH_LIST_OPEN + scenario.getTid(),
+        List<OpenMatchForWatch> result = rest.get(MATCH_WATCH_LIST_OPEN + scenario.getTid().getTid(),
                 new GenericType<List<OpenMatchForWatch>>() {});
         assertThat(result, hasItem(allOf(
                 hasProperty("mid", greaterThan(0)),

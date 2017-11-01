@@ -463,6 +463,16 @@
                                     <binding>org.dan.ping.pong.sys.db.converters.UidConverter</binding>
                                 </customType>
                                 <customType>
+                                    <name>Pid</name>
+                                    <type>org.dan.ping.pong.app.place.Pid</type>
+                                    <binding>org.dan.ping.pong.sys.db.converters.PidConverter</binding>
+                                </customType>
+                                <customType>
+                                    <name>Tid</name>
+                                    <type>org.dan.ping.pong.app.tournament.Tid</type>
+                                    <binding>org.dan.ping.pong.sys.db.converters.TidConverter</binding>
+                                </customType>
+                                <customType>
                                     <name>OptionalDouble</name>
                                     <type>java.util.Optional&lt;java.lang.Double&gt;</type>
                                     <binding>org.dan.ping.pong.sys.db.converters.OptionalDoubleConverter</binding>
@@ -540,6 +550,16 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>Pid</name>
+                                    <expression>.*place\.(pid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Pid</name>
+                                    <expression>.*tournament\.(pid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
                                     <name>OptionalInstant</name>
                                     <expression>.*matches\.(started|ended)</expression>
                                     <types>.*</types>
@@ -570,6 +590,11 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>Tid</name>
+                                    <expression>.*category\.(tid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
                                     <name>Instant</name>
                                     <expression>.*tournament\.(opens_at)</expression>
                                     <types>.*</types>
@@ -585,6 +610,11 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>Tid</name>
+                                    <expression>.*tournament\.(tid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
                                     <name>OptionalInstant</name>
                                     <expression>.*tournament\.(complete_at)</expression>
                                     <types>.*</types>
@@ -597,6 +627,11 @@
                                 <forcedType>
                                     <name>GroupState</name>
                                     <expression>.*groups\.(state)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Tid</name>
+                                    <expression>.*groups\.(tid)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
@@ -630,6 +665,11 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>Pid</name>
+                                    <expression>.*tables\.(pid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
                                     <name>TableState</name>
                                     <expression>.*tables\.(state)</expression>
                                     <types>.*</types>
@@ -637,6 +677,11 @@
                                 <forcedType>
                                     <name>Uid</name>
                                     <expression>.*bid\.(uid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Tid</name>
+                                    <expression>.*bid\.(tid)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
@@ -675,6 +720,16 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>Pid</name>
+                                    <expression>.*place_admin\.(pid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Tid</name>
+                                    <expression>.*tournament_admin\.(tid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
                                     <name>Uid</name>
                                     <expression>.*tournament_admin\.(uid)</expression>
                                     <types>.*</types>
@@ -682,6 +737,11 @@
                                 <forcedType>
                                     <name>Uid</name>
                                     <expression>.*matches\.(uid_less|uid_more|uid_win)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Tid</name>
+                                    <expression>.*matches\.(tid)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

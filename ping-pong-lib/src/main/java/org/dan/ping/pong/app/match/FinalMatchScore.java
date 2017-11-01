@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dan.ping.pong.app.tournament.Tid;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FinalMatchScore {
-    private int tid;
+    private Tid tid;
     private int mid;
     private int setOrdNumber;
     private List<IdentifiedScore> scores;

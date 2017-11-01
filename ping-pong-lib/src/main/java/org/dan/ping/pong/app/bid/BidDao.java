@@ -25,23 +25,23 @@ public interface BidDao {
     Set<BidState> TERMINAL_BID_STATES = ImmutableSet.of(Win1, Win2, Win3,
             Expl, Lost, Quit);
 
-    void setBidState(int tid, Uid uid, BidState target,
+    void setBidState(Tid tid, Uid uid, BidState target,
             List<BidState> expected, Instant now, DbUpdater batch);
 
     void markParticipantsBusy(OpenTournamentMemState tournament,
             Collection<Uid> uids, Instant now, DbUpdater batch);
 
-    void setGroupForUids(int gid, int tid, List<ParticipantMemState> groupBids);
+    void setGroupForUids(int gid, Tid tid, List<ParticipantMemState> groupBids);
 
     void enlist(ParticipantMemState bid, Optional<Integer> providedRank, DbUpdater batch);
 
-    List<ParticipantState> findEnlisted(int tid);
+    List<ParticipantState> findEnlisted(Tid tid);
 
-    Optional<DatedParticipantState> getParticipantInfo(int tid, Uid uid);
+    Optional<DatedParticipantState> getParticipantInfo(Tid tid, Uid uid);
 
     void setCategory(SetCategory setCategory, Instant now, DbUpdater batch);
 
-    void resetStateByTid(int tid, Instant now, DbUpdater batch);
+    void resetStateByTid(Tid tid, Instant now, DbUpdater batch);
 
     Map<Uid, ParticipantMemState> loadParticipants(Tid tid);
 }

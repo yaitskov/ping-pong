@@ -52,7 +52,7 @@ public class NoScheduleService implements ScheduleService {
     }
 
     @Override
-    public <T> T withPlace(OpenTournamentMemState tournament, Function<TablesDiscovery, T> f) {
+    public <T> T withPlaceTables(OpenTournamentMemState tournament, Function<TablesDiscovery, T> f) {
         return f.apply(NO_TABLES_DISCOVERY);
     }
 

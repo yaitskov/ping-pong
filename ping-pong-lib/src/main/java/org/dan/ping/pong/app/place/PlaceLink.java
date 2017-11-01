@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PlaceLink {
-    private int pid;
+    private Pid pid;
     private String name;
     private PlaceAddress address;
 }

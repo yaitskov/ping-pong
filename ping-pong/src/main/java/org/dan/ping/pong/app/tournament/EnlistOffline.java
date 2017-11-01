@@ -19,7 +19,7 @@ import java.util.Optional;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class EnlistOffline implements Enlist {
     private int cid;
-    private int tid;
+    private Tid tid;
     private String name;
     private BidState bidState;
     private Optional<Integer> providedRank = Optional.empty();

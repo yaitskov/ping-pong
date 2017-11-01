@@ -19,4 +19,6 @@ public class TournamentRow {
     private Optional<Instant> endedAt;
     private TournamentState state;
     private TournamentRules rules;
+    private Optional<Double> ticketPrice;
+    private Optional<Tid> previousTid;
 }

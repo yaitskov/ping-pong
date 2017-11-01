@@ -43,8 +43,6 @@ public class TournamentResource {
     public static final String BEGIN_TOURNAMENT = TOURNAMENT + "begin";
     public static final String CANCEL_TOURNAMENT = TOURNAMENT + "cancel";
     public static final String DRAFTING = TOURNAMENT + "drafting/";
-    private static final String DRAFTING_PARAM = "drafting";
-    public static final String DRAFTING_INFO = DRAFTING + "{" + DRAFTING_PARAM + "}";
     public static final String MY_TOURNAMENT = TOURNAMENT + "mine/{tid}";
     public static final String TOURNAMENT_RULES = TOURNAMENT + "rules";
     public static final String GET_TOURNAMENT_RULES = TOURNAMENT_RULES + "/";
@@ -75,7 +73,7 @@ public class TournamentResource {
     @POST
     @Path(TOURNAMENT_CREATE)
     @Consumes(APPLICATION_JSON)
-    public int create(
+    public Tid create(
             @HeaderParam(SESSION) String session,
             CreateTournament newTournament) {
         if (newTournament.getRules() == null) {
@@ -98,7 +96,7 @@ public class TournamentResource {
     @POST
     @Path(TOURNAMENT_COPY)
     @Consumes(APPLICATION_JSON)
-    public int copy(
+    public Tid copy(
             @HeaderParam(SESSION) String session,
             CopyTournament copyTournament) {
         final Uid uid = authService.userInfoBySession(session).getUid();
@@ -138,7 +136,7 @@ public class TournamentResource {
             throw badRequest("Category is not set");
         }
         final UserInfo user = authService.userInfoBySession(session);
-        tournamentAccessor.update(new Tid(enlistment.getTid()), response, (tournament, batch) -> {
+        tournamentAccessor.update(enlistment.getTid(), response, (tournament, batch) -> {
             tournamentService.enlistOnline(enlistment, tournament, user, batch);
         });
     }
@@ -174,7 +172,7 @@ public class TournamentResource {
             throw badRequest("Category id is missing");
         }
         final Uid adminUid = authService.userInfoBySession(session).getUid();
-        tournamentAccessor.update(new Tid(enlistment.getTid()), response, (tournament, batch) -> {
+        tournamentAccessor.update(enlistment.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
             return tournamentService.enlistOffline(tournament, enlistment, batch);
         });
@@ -188,7 +186,7 @@ public class TournamentResource {
             @HeaderParam(SESSION) String session,
             TournamentUpdate update) {
         final Uid adminUid = authService.userInfoBySession(session).getUid();
-        tournamentAccessor.update(new Tid(update.getTid()), response, (tournament, batch) -> {
+        tournamentAccessor.update(update.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
             tournamentService.update(tournament, update, batch);
         });
@@ -220,7 +218,7 @@ public class TournamentResource {
             @HeaderParam(SESSION) String session,
             ExpelParticipant expelParticipant) {
         final Uid uid = authService.userInfoBySession(session).getUid();
-        tournamentAccessor.update(new Tid(expelParticipant.getTid()), response, (tournament, batch) -> {
+        tournamentAccessor.update(expelParticipant.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(uid);
             tournamentService.leaveTournament(
                     tournament.getParticipant(expelParticipant.getUid()),
@@ -268,20 +266,22 @@ public class TournamentResource {
     }
 
     @GET
-    @Path(DRAFTING_INFO)
+    @Path(DRAFTING + TID_JP)
     @Consumes(APPLICATION_JSON)
-    public DraftingTournamentInfo getDraftingTournament(
+    public void getDraftingTournament(
+            @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
-            @PathParam(DRAFTING_PARAM) int tid) {
-        return tournamentService.getDraftingTournament(tid,
-                authService.userInfoBySessionQuite(session)
-                        .map(UserInfo::getUid));
+            @PathParam(TID) Tid tid) {
+        tournamentAccessor.read(tid, response,
+                tournament -> tournamentService.getDraftingTournament(tournament,
+                        authService.userInfoBySessionQuite(session)
+                                .map(UserInfo::getUid)));
     }
 
     @GET
     @Path(MY_TOURNAMENT)
     @Consumes(APPLICATION_JSON)
-    public MyTournamentInfo getMyTournamentInfo(@PathParam(TID) int tid) {
+    public MyTournamentInfo getMyTournamentInfo(@PathParam(TID) Tid tid) {
         return tournamentService.getMyTournamentInfo(tid);
     }
 
@@ -303,7 +303,7 @@ public class TournamentResource {
             TidIdentifiedRules parameters) {
         validate(parameters.getRules());
         Uid uid = authService.userInfoBySession(session).getUid();
-        tournamentAccessor.update(new Tid(parameters.getTid()), response, (tournament, batch) -> {
+        tournamentAccessor.update(parameters.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(uid);
             tournamentService.updateTournamentParams(tournament, parameters, batch);
         });
@@ -349,7 +349,7 @@ public class TournamentResource {
         final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("Uid {} sets status {} for tid {}", uid,
                 stateUpdate.getState(), stateUpdate.getTid());
-        tournamentAccessor.update(new Tid(stateUpdate.getTid()), response, (tournament, batch) -> {
+        tournamentAccessor.update(stateUpdate.getTid(), response, (tournament, batch) -> {
             tournament.setState(stateUpdate.getState());
             tournamentService.setTournamentState(tournament, batch);
         });
@@ -383,7 +383,7 @@ public class TournamentResource {
 
     @GET
     @Path("/tournament/complete/{tid}")
-    public TournamentComplete completeInfo(@PathParam("tid") int tid) {
+    public TournamentComplete completeInfo(@PathParam("tid") Tid tid) {
         return tournamentService.completeInfo(tid);
     }
 }

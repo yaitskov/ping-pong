@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.dan.ping.pong.app.table.TableLink;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserLink;
 
 import java.time.Instant;
@@ -19,7 +20,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class OpenMatchForJudge {
     private int mid;
-    private int tid;
+    private Tid tid;
     private Optional<TableLink> table;
     private List<UserLink> participants;
     private Instant started;

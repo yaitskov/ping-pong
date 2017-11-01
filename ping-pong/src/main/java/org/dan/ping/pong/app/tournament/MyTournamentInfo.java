@@ -14,7 +14,7 @@ import java.util.Optional;
 @Builder
 @ToString
 public class MyTournamentInfo {
-    private int tid;
+    private Tid tid;
     private String name;
     private TournamentState state;
     private PlaceLink place;

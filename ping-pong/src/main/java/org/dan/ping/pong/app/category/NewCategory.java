@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.tournament.Tid;
 
 @Setter
 @Getter
@@ -17,5 +18,5 @@ import lombok.ToString;
 public class NewCategory {
     private int cid;
     private String name;
-    private int tid;
+    private Tid tid;
 }

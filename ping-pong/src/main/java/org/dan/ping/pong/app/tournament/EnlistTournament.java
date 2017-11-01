@@ -19,7 +19,7 @@ import java.util.Optional;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class EnlistTournament implements Enlist {
     private int categoryId;
-    private int tid;
+    private Tid tid;
     private Optional<Integer> providedRank = Optional.empty();
 
     @JsonIgnore

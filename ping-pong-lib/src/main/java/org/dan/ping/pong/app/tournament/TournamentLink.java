@@ -12,6 +12,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TournamentLink {
-    private int tid;
+    private Tid tid;
     private String name;
 }

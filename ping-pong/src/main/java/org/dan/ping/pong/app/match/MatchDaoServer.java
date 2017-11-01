@@ -48,7 +48,7 @@ public class MatchDaoServer implements MatchDao {
     private DSLContext jooq;
 
     @Override
-    public int createGroupMatch(int tid, int gid, int cid, int priorityGroup, Uid uid1, Uid uid2) {
+    public int createGroupMatch(Tid tid, int gid, int cid, int priorityGroup, Uid uid1, Uid uid2) {
         log.info("Create a match in group {} of tournament {}", gid, tid);
         return jooq.insertInto(MATCHES, MATCHES.TID,
                 MATCHES.GID, MATCHES.CID,
@@ -62,7 +62,7 @@ public class MatchDaoServer implements MatchDao {
 
     @Override
     @Transactional(TRANSACTION_MANAGER)
-    public int createPlayOffMatch(int tid, Integer cid,
+    public int createPlayOffMatch(Tid tid, Integer cid,
             Optional<Integer> winMid, Optional<Integer> loseMid,
             int priority, int level, MatchType type) {
         return jooq.insertInto(MATCHES, MATCHES.TID, MATCHES.CID,
@@ -135,7 +135,7 @@ public class MatchDaoServer implements MatchDao {
 
     @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<CompleteMatch> findCompleteMatches(Integer tid) {
+    public List<CompleteMatch> findCompleteMatches(Tid tid) {
         return jooq
                 .select(MATCHES.MID, MATCHES.STARTED, MATCHES.TYPE,
                         MATCHES.ENDED, ENEMY_USER.UID,
@@ -170,7 +170,7 @@ public class MatchDaoServer implements MatchDao {
 
     @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<UserLink> findWinners(int tid) {
+    public List<UserLink> findWinners(Tid tid) {
         return jooq.select(USERS.NAME, BID.UID)
                 .from(BID)
                 .innerJoin(USERS).on(BID.UID.eq(USERS.UID))
@@ -219,7 +219,7 @@ public class MatchDaoServer implements MatchDao {
                 MATCHES.UID_LESS, MATCHES.UID_MORE, MATCHES.UID_WIN,
                 MATCHES.STARTED)
                 .from(MATCHES)
-                .where(MATCHES.TID.eq(tid.getTid()))
+                .where(MATCHES.TID.eq(tid))
                 .fetch()
                 .map(r -> {
                     final Map<Uid, List<Integer>> uids = new HashMap<>();
@@ -242,7 +242,7 @@ public class MatchDaoServer implements MatchDao {
                             .startedAt(r.get(MATCHES.STARTED))
                             .endedAt(r.get(MATCHES.ENDED))
                             .participantIdScore(uids)
-                            .tid(tid.getTid())
+                            .tid(tid)
                             .build();
                 });
     }

@@ -15,6 +15,7 @@ import org.dan.ping.pong.app.match.CompleteMatch;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.mock.simulator.EnlistMode;
 import org.dan.ping.pong.mock.simulator.ProvidedRank;
 
@@ -33,12 +34,12 @@ public class RestEntityGenerator {
     private DaoEntityGenerator daoEntityGenerator;
 
     public void enlistParticipants(SessionAware adminSession,
-            int tid, int cid, List<TestUserSession> participants) {
+            Tid tid, int cid, List<TestUserSession> participants) {
         enlistParticipants(rest, adminSession, tid, cid, participants);
     }
 
     public void enlistParticipants(MyRest myRest, SessionAware adminSession,
-            int tid, int cid, List<TestUserSession> participants) {
+            Tid tid, int cid, List<TestUserSession> participants) {
         for (int i = 0; i < participants.size(); ++i) {
             TestUserSession userSession = participants.get(i);
             myRest.voidPost(TOURNAMENT_ENLIST, userSession,
@@ -68,7 +69,7 @@ public class RestEntityGenerator {
 
     public void enlistParticipants(MyRest myRest, SessionAware adminSession,
             Map<TestUserSession, EnlistMode> enlistModes,
-            int tid, int cid, List<TestUserSession> participants,
+            Tid tid, int cid, List<TestUserSession> participants,
             List<Optional<ProvidedRank>> ranks) {
         for (int i = 0; i < participants.size(); ++i) {
             TestUserSession userSession = participants.get(i);
@@ -98,16 +99,12 @@ public class RestEntityGenerator {
         }
     }
 
-    public void beginTournament(SessionAware testAdmin, int tid) {
+    public void beginTournament(SessionAware testAdmin, Tid tid) {
         rest.voidPost(BEGIN_TOURNAMENT, testAdmin, tid);
     }
 
-    public OpenMatchForJudgeList listOpenMatchesForJudge(int tid) {
-        return rest.get(OPEN_MATCHES_FOR_JUDGE + tid, OpenMatchForJudgeList.class);
-    }
-
-    public List<CompleteMatch> listCompleteMatches(int tid) {
-        return rest.get(COMPLETE_MATCHES + tid, new GenericType<List<CompleteMatch>>(){});
+    public OpenMatchForJudgeList listOpenMatchesForJudge(Tid tid) {
+        return rest.get(OPEN_MATCHES_FOR_JUDGE + tid.getTid(), OpenMatchForJudgeList.class);
     }
 
     public void generateSignInLinks(List<TestUserSession> users) {

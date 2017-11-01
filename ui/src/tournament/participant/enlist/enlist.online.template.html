@@ -151,7 +151,12 @@
       {{ 'previous tournament' | translate }}
     </a>
   </div>
-
+  <div class="form-group" ng-show="$ctrl.tournament.state == 'Close'">
+    <div class="alert alert-info"
+         translate="tournament is complete"
+         translate-values="{url: '#!/tournament/result/' + $ctrl.tournament.tid}/">
+    </div>
+  </div>
   <div class="form-group" ng-show="$ctrl.tournament.bidState == 'Want'">
     <p translate="thanks-for-enlistment-info"
        translate-values="{url: '#!/my/matches/play/' + $ctrl.tournament.tid, name: $ctrl.tournament.name, time: $ctrl.tournament.opensAt}">

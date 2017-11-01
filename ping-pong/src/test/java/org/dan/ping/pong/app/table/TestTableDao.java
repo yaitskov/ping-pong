@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.table;
 import static ord.dan.ping.pong.jooq.Tables.TABLES;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
+import org.dan.ping.pong.app.place.Pid;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,17 +16,9 @@ public class TestTableDao {
     private DSLContext jooq;
 
     @Transactional(TRANSACTION_MANAGER)
-    public int delete(int pid) {
+    public int delete(Pid pid) {
         return jooq.deleteFrom(TABLES)
                 .where(TABLES.PID.eq(pid))
                 .execute();
-    }
-
-    @Transactional(TRANSACTION_MANAGER)
-    public List<Integer> tables(int pid) {
-        return jooq.select(TABLES.TABLE_ID).from(TABLES)
-                .where(TABLES.PID.eq(pid))
-                .fetch()
-                .map(r -> r.get(TABLES.TABLE_ID));
     }
 }

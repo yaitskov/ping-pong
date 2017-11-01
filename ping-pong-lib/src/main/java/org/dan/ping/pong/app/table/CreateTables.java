@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.place.Pid;
 
 @Getter
 @Setter
@@ -14,6 +15,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateTables {
-    private int placeId;
+    private Pid placeId;
     private int quantity;
 }

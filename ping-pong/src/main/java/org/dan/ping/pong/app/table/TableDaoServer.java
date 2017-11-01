@@ -37,7 +37,7 @@ public class TableDaoServer implements TableDao {
 
     @Override
     @Transactional(TRANSACTION_MANAGER)
-    public void createTables(int pid, int numberOfNewTables) {
+    public void createTables(Pid pid, int numberOfNewTables) {
         log.info("Add {} tables to place {}", numberOfNewTables, pid);
         final Record1<String> record = jooq.select(TABLES.LABEL)
                 .from(TABLES)
@@ -96,7 +96,7 @@ public class TableDaoServer implements TableDao {
 
     @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<TableStatedLink> findByPlaceId(int placeId) {
+    public List<TableStatedLink> findByPlaceId(Pid placeId) {
         return jooq.select(TABLES.TABLE_ID, TABLES.LABEL, TABLES.STATE)
                 .from(TABLES)
                 .where(Tables.TABLES.PID.eq(placeId))
@@ -124,13 +124,13 @@ public class TableDaoServer implements TableDao {
     @Override
     public Map<Integer, TableInfo> load(Pid pid) {
         return jooq.select().from(TABLES)
-                .where(TABLES.PID.eq(pid.getPid()))
+                .where(TABLES.PID.eq(pid))
                 .fetch()
                 .stream()
                 .collect(toMap(r -> r.get(TABLES.TABLE_ID),
                         r -> TableInfo.builder()
                                 .mid(r.get(Tables.TABLES.MID))
-                                .pid(pid.getPid())
+                                .pid(pid)
                                 .state(r.get(TABLES.STATE))
                                 .label(r.get(TABLES.LABEL))
                                 .tableId(r.get(TABLES.TABLE_ID))

@@ -57,7 +57,7 @@ public class BidResource {
             BidId bidId) {
         final Uid adminUid = authService.userInfoBySession(session).getUid();
         log.info("Admin {} took money for bid {}", adminUid, bidId);
-        tournamentAccessor.update(new Tid(bidId.getTid()), response, (tournament, batch) -> {
+        tournamentAccessor.update(bidId.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
             bidService.paid(tournament, bidId.getUid(), batch);
         });
@@ -73,7 +73,7 @@ public class BidResource {
         final Uid adminUid = authService.userInfoBySession(session).getUid();
         log.info("Admin {} checked that bid {} arrived to tournament in good fit",
                 adminUid, bidId);
-        tournamentAccessor.update(new Tid(bidId.getTid()), response, (tournament, batch) -> {
+        tournamentAccessor.update(bidId.getTid(), response, (tournament, batch) -> {
             bidService.readyToPlay(tournament, bidId.getUid(), batch);
         });
     }
@@ -86,7 +86,7 @@ public class BidResource {
             @HeaderParam(SESSION) String session,
             SetCategory setCategory) {
         final Uid adminUid = authService.userInfoBySession(session).getUid();
-        tournamentAccessor.update(new Tid(setCategory.getTid()), response, (tournament, batch) -> {
+        tournamentAccessor.update(setCategory.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
             bidService.setCategory(tournament, setCategory, batch);
         });
@@ -100,7 +100,7 @@ public class BidResource {
             @HeaderParam(SESSION) String session,
             SetBidState setState) {
         final Uid adminUid = authService.userInfoBySession(session).getUid();
-        tournamentAccessor.update(new Tid(setState.getTid()), response, (tournament, batch) -> {
+        tournamentAccessor.update(setState.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
             bidService.setBidState(tournament, setState, batch);
         });
@@ -123,7 +123,7 @@ public class BidResource {
     @Path(BID + "enlisted-to-be-checked/" + TID_JP)
     public List<ParticipantState> enlistedToBeChecked(
             @HeaderParam(SESSION) String session,
-            @PathParam(TID) int tid) {
+            @PathParam(TID) Tid tid) {
         return bidService.findEnlisted(tid);
     }
 
@@ -131,7 +131,7 @@ public class BidResource {
     @Path(BID + "state/{tid}/{uid}")
     public DatedParticipantState getParticipantState(
             @HeaderParam(SESSION) String session,
-            @PathParam("tid") int tid,
+            @PathParam("tid") Tid tid,
             @PathParam("uid") Uid uid) {
         return bidService.getParticipantState(tid, uid);
     }

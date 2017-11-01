@@ -6,6 +6,7 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import org.dan.ping.pong.app.auth.AuthService;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.Uid;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class PlaceResource {
     @Path(PLACE_CREATE)
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public int create(@HeaderParam(SESSION) String session, CreatePlace newPlace) {
+    public Pid create(@HeaderParam(SESSION) String session, CreatePlace newPlace) {
         return placeDao.createAndGrant(authService.userInfoBySession(session).getUid(),
                 newPlace.getName(), newPlace.getAddress());
     }
@@ -50,7 +51,7 @@ public class PlaceResource {
     @GET
     @Path(PLACE_INFO + "{pid}")
     @Produces(APPLICATION_JSON)
-    public PlaceInfoCountTables getPlaceById(@PathParam("pid") int pid) {
+    public PlaceInfoCountTables getPlaceById(@PathParam("pid") Pid pid) {
         return placeDao.getPlaceById(pid)
                 .orElseThrow(() -> notFound("Place " + pid + " doesn't exist"));
     }

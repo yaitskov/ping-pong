@@ -72,8 +72,8 @@ public class TournamentDao {
     private DSLContext jooq;
 
     @Transactional(TRANSACTION_MANAGER)
-    public int create(Uid uid, CreateTournament newTournament) {
-        final int tid = justCreate(newTournament, Hidden);
+    public Tid create(Uid uid, CreateTournament newTournament) {
+        final Tid tid = justCreate(newTournament, Hidden);
         log.info("User {} created tournament {}", uid, tid);
 
         jooq.insertInto(TOURNAMENT_ADMIN, TOURNAMENT_ADMIN.TID,
@@ -83,7 +83,7 @@ public class TournamentDao {
         return tid;
     }
 
-    private Integer justCreate(CreateTournament newTournament, TournamentState hidden) {
+    private Tid justCreate(CreateTournament newTournament, TournamentState hidden) {
         return jooq.insertInto(TOURNAMENT, TOURNAMENT.STATE,
                 TOURNAMENT.OPENS_AT,
                 TOURNAMENT.PID,
@@ -94,7 +94,7 @@ public class TournamentDao {
                 .values(hidden,
                         newTournament.getOpensAt(),
                         newTournament.getPlaceId(),
-                        newTournament.getPreviousTid(),
+                        newTournament.getPreviousTid().map(Tid::getTid),
                         newTournament.getRules(),
                         newTournament.getTicketPrice(),
                         newTournament.getName())
@@ -173,7 +173,7 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public boolean isAdminOf(Uid uid, int tid) {
+    public boolean isAdminOf(Uid uid, Tid tid) {
         return jooq.select(TOURNAMENT.TID)
                 .from(TOURNAMENT).innerJoin(TOURNAMENT_ADMIN)
                 .on(TOURNAMENT.TID.eq(TOURNAMENT_ADMIN.TID))
@@ -182,52 +182,7 @@ public class TournamentDao {
                 .fetchOne() != null;
     }
 
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<DraftingTournamentInfo> getDraftingTournament(int tid,
-            Optional<Uid> participantId) {
-        return ofNullable(jooq.select(TOURNAMENT.NAME, TOURNAMENT.OPENS_AT,
-                BID.CID, TOURNAMENT_ADMIN.UID, TOURNAMENT.TICKET_PRICE,
-                TOURNAMENT.PREVIOUS_TID, PLACE.PID, PLACE.POST_ADDRESS,
-                PLACE.CITY_ID, CITY.NAME, TOURNAMENT.RULES,
-                PLACE.NAME, PLACE.PHONE, TOURNAMENT.STATE, BID.STATE)
-                .from(TOURNAMENT)
-                .innerJoin(PLACE).on(TOURNAMENT.PID.eq(PLACE.PID))
-                .innerJoin(CITY).on(CITY.CITY_ID.eq(PLACE.CITY_ID))
-                .leftJoin(TOURNAMENT_ADMIN)
-                .on(TOURNAMENT.TID.eq(TOURNAMENT_ADMIN.TID),
-                        TOURNAMENT_ADMIN.UID.eq(participantId.orElse(new Uid(0))))
-                .leftJoin(BID)
-                .on(TOURNAMENT.TID.eq(BID.TID),
-                        BID.UID.eq(participantId.orElse(UID0)))
-                .where(TOURNAMENT.TID.eq(tid))
-                .fetchOne())
-                .map(r -> DraftingTournamentInfo.builder()
-                        .tid(tid)
-                        .rules(r.get(TOURNAMENT.RULES))
-                        .name(r.get(TOURNAMENT.NAME))
-                        .state(r.get(TOURNAMENT.STATE))
-                        .ticketPrice(r.get(TOURNAMENT.TICKET_PRICE))
-                        .previousTid(r.get(TOURNAMENT.PREVIOUS_TID))
-                        .bidState(ofNullable(r.get(BID.STATE)))
-                        .place(PlaceLink.builder()
-                                .name(r.get(PLACE.NAME))
-                                .address(PlaceAddress.builder()
-                                        .address(r.get(PLACE.POST_ADDRESS))
-                                        .city(CityLink.builder()
-                                                .id(r.get(PLACE.CITY_ID))
-                                                .name(r.get(CITY.NAME))
-                                                .build())
-                                        .phone(r.get(PLACE.PHONE))
-                                        .build())
-                                .pid(r.get(PLACE.PID)).build())
-                        .opensAt(r.get(TOURNAMENT.OPENS_AT))
-                        .myCategoryId(ofNullable(r.get(BID.CID)))
-                        .iAmAdmin(participantId.isPresent()
-                                && participantId.equals(ofNullable(r.get(TOURNAMENT_ADMIN.UID))))
-                        .build());
-    }
-
-    public Optional<MyTournamentInfo> getMyTournamentInfo(int tid) {
+    public Optional<MyTournamentInfo> getMyTournamentInfo(Tid tid) {
         return ofNullable(jooq.select(TOURNAMENT.NAME,
                 TOURNAMENT.STATE, TOURNAMENT.PID, PLACE.NAME,
                 TOURNAMENT.OPENS_AT, TOURNAMENT.TICKET_PRICE,
@@ -423,7 +378,7 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<TournamentRules> getTournamentRules(int tid) {
+    public Optional<TournamentRules> getTournamentRules(Tid tid) {
         return ofNullable(jooq
                 .select(TOURNAMENT.RULES)
                 .from(TOURNAMENT)
@@ -433,7 +388,7 @@ public class TournamentDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void updateParams(int tid, TournamentRules rules, DbUpdater batch) {
+    public void updateParams(Tid tid, TournamentRules rules, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(TOURNAMENT)
                         .set(TOURNAMENT.RULES, rules)
@@ -442,7 +397,7 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<TournamentComplete> completeInfo(int tid) {
+    public Optional<TournamentComplete> completeInfo(Tid tid) {
         return ofNullable(jooq.select(TOURNAMENT.NAME, TOURNAMENT.STATE)
                 .from(TOURNAMENT)
                 .where(TOURNAMENT.TID.eq(tid))
@@ -456,15 +411,15 @@ public class TournamentDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public int copy(CopyTournament copyTournament) {
-        final int originTid = copyTournament.getOriginTid();
-        final int newTid = copyTournamentRow(copyTournament);
+    public Tid copy(CopyTournament copyTournament) {
+        final Tid originTid = copyTournament.getOriginTid();
+        final Tid newTid = copyTournamentRow(copyTournament);
         copyPermissions(originTid, newTid);
         return newTid;
     }
 
-    private int copyTournamentRow(CopyTournament copyTournament) {
-        final int originTid = copyTournament.getOriginTid();
+    private Tid copyTournamentRow(CopyTournament copyTournament) {
+        final Tid originTid = copyTournament.getOriginTid();
         final MyTournamentInfo tinfo = getMyTournamentInfo(originTid)
                 .orElseThrow(() -> notFound("Tournament " + originTid + " not found"));
         final TournamentRules rules = getTournamentRules(originTid)
@@ -479,7 +434,7 @@ public class TournamentDao {
                 .build(), Draft);
     }
 
-    private void copyPermissions(int originTid, int newTid) {
+    private void copyPermissions(Tid originTid, Tid newTid) {
        jooq.batch(jooq.select(TOURNAMENT_ADMIN.TYPE, TOURNAMENT_ADMIN.UID)
                 .from(TOURNAMENT_ADMIN)
                 .where(TOURNAMENT_ADMIN.TID.eq(originTid))
@@ -491,7 +446,7 @@ public class TournamentDao {
                                         r.get(TOURNAMENT_ADMIN.TYPE)))).execute();
     }
 
-    public void setCompleteAt(int tid, Optional<Instant> now, DbUpdater batch) {
+    public void setCompleteAt(Tid tid, Optional<Instant> now, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(TOURNAMENT)
                         .set(TOURNAMENT.COMPLETE_AT, now)
@@ -502,7 +457,7 @@ public class TournamentDao {
     public Set<Uid> loadAdmins(Tid tid) {
         return jooq.select(TOURNAMENT_ADMIN.UID)
                 .from(TOURNAMENT_ADMIN)
-                .where(TOURNAMENT_ADMIN.TID.eq(tid.getTid()))
+                .where(TOURNAMENT_ADMIN.TID.eq(tid))
                 .fetch()
                 .stream()
                 .map(r -> r.get(TOURNAMENT_ADMIN.UID))
@@ -513,17 +468,20 @@ public class TournamentDao {
         return ofNullable(jooq
                 .select(TOURNAMENT.PID, TOURNAMENT.RULES,
                         TOURNAMENT.COMPLETE_AT, TOURNAMENT.OPENS_AT,
-                        TOURNAMENT.NAME, TOURNAMENT.STATE)
+                        TOURNAMENT.NAME, TOURNAMENT.STATE, TOURNAMENT.TICKET_PRICE,
+                        TOURNAMENT.PREVIOUS_TID)
                 .from(TOURNAMENT)
-                .where(TOURNAMENT.TID.eq(tid.getTid()))
+                .where(TOURNAMENT.TID.eq(tid))
                 .fetchOne())
                 .map(r -> TournamentRow.builder()
-                        .pid(new Pid(r.get(TOURNAMENT.PID)))
+                        .pid(r.get(TOURNAMENT.PID))
                         .endedAt(r.get(TOURNAMENT.COMPLETE_AT))
                         .startedAt(r.get(TOURNAMENT.OPENS_AT))
                         .name(r.get(TOURNAMENT.NAME))
                         .state(r.get(TOURNAMENT.STATE))
                         .rules(r.get(TOURNAMENT.RULES))
+                        .ticketPrice(r.get(TOURNAMENT.TICKET_PRICE))
+                        .previousTid(r.get(TOURNAMENT.PREVIOUS_TID).map(Tid::new))
                         .tid(tid)
                         .build());
     }

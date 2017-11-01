@@ -6,6 +6,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.jooq.exception.DataAccessException;
 
@@ -32,7 +33,7 @@ public class CategoryResource {
 
     @GET
     @Path(CATEGORY + "find/by/tid/{tid}")
-    public List<CategoryInfo> findByTid(@PathParam("tid") int tid) {
+    public List<CategoryInfo> findByTid(@PathParam("tid") Tid tid) {
         return categoryDao.listCategoriesByTid(tid);
     }
 

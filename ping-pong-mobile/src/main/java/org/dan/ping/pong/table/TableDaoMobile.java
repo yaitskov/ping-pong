@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class TableDaoMobile implements TableDao {
     @Override
-    public void createTables(int pid, int numberOfNewTables) {
+    public void createTables(Pid pid, int numberOfNewTables) {
 
     }
 

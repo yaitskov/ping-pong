@@ -59,7 +59,7 @@ public class ManualSeedJerseyTest extends AbstractSpringJerseyTest {
                         .build());
 
         final List<RankedBid> result = myRest()
-                .get(GET_MANUAL_BIDS_ORDER + scenario.getTid() + CID_IN + cid,
+                .get(GET_MANUAL_BIDS_ORDER + scenario.getTid().getTid() + CID_IN + cid,
                         new GenericType<List<RankedBid>>(){});
         assertEquals(asList(1, 2, 3), result.stream().map(r -> r.getSeed().get()).collect(Collectors.toList()));
         assertEquals(uids, result.stream().map(r -> r.getUser().getUid()).collect(Collectors.toList()));

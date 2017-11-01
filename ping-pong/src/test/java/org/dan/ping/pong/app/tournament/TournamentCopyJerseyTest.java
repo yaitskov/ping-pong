@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentResource.DRAFTING;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_COPY;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.mock.Generators.genStr;
@@ -35,9 +36,6 @@ public class TournamentCopyJerseyTest extends AbstractSpringJerseyTest {
     private Simulator simulator;
 
     @Inject
-    private TournamentService tournamentService;
-
-    @Inject
     private Clocker clocker;
 
     @Test
@@ -54,19 +52,18 @@ public class TournamentCopyJerseyTest extends AbstractSpringJerseyTest {
 
         final String newName = genStr();
         final Instant opensAt = clocker.get();
-        final int copyTid = myRest().post(TOURNAMENT_COPY, scenario.getTestAdmin(),
+        final Tid copyTid = myRest().post(TOURNAMENT_COPY, scenario.getTestAdmin(),
                 CopyTournament.builder()
                         .name(newName)
                         .opensAt(opensAt)
                         .originTid(scenario.getTid())
                         .build())
-                .readEntity(Integer.class);
+                .readEntity(Tid.class);
 
-        assertThat(copyTid, Matchers.greaterThan(scenario.getTid()));
+        assertThat(copyTid.getTid(), Matchers.greaterThan(scenario.getTid().getTid()));
 
-        final DraftingTournamentInfo tinfo = tournamentService
-                .getDraftingTournament(copyTid,
-                        Optional.of(scenario.getTestAdmin().getUid()));
+        final DraftingTournamentInfo tinfo = myRest().get(DRAFTING + copyTid.getTid(),
+                scenario.getTestAdmin(), DraftingTournamentInfo.class);
         assertThat(tinfo.getPreviousTid(), is(Optional.of(scenario.getTid())));
         assertThat(tinfo.getOpensAt(), is(opensAt));
         assertThat(tinfo.getName(), is(newName));

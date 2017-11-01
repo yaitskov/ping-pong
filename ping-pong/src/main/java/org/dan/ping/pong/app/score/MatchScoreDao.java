@@ -27,7 +27,7 @@ public class MatchScoreDao {
                 .from(SET_SCORE)
                 .innerJoin(MATCHES)
                 .on(SET_SCORE.MID.eq(MATCHES.MID))
-                .where(MATCHES.TID.eq(tid.getTid()))
+                .where(MATCHES.TID.eq(tid))
                 .orderBy(SET_SCORE.SET_ID)
                 .fetch()
                 .forEach(r -> {

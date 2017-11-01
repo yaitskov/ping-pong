@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.place.Pid;
 
 import java.util.Optional;
 
@@ -14,7 +15,7 @@ import java.util.Optional;
 public class TableInfo {
     private int tableId;
     private String label;
-    private int pid;
+    private Pid pid;
     private TableState state;
     private Optional<Integer> mid;
 

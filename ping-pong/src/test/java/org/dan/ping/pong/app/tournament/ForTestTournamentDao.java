@@ -13,7 +13,7 @@ public class ForTestTournamentDao {
     private DSLContext jooq;
 
     @Transactional(TRANSACTION_MANAGER)
-    public void setState(int tid, TournamentState state) {
+    public void setState(Tid tid, TournamentState state) {
         jooq.update(TOURNAMENT)
                 .set(TOURNAMENT.STATE, state)
                 .where(TOURNAMENT.TID.eq(tid))

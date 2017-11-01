@@ -11,7 +11,7 @@ import org.dan.ping.pong.app.bid.BidState;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompleteTournamentDigest {
-    private int tid;
+    private Tid tid;
     private String name;
     private BidState outcome;
 }

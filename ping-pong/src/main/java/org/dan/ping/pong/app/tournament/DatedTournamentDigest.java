@@ -17,7 +17,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DatedTournamentDigest {
-    private int tid;
+    private Tid tid;
     private String name;
     private Instant opensAt;
 }

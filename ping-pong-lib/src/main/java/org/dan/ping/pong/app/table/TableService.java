@@ -15,9 +15,11 @@ import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.Uid;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
@@ -139,7 +141,7 @@ public class TableService {
                 .forEach(table -> freeTable(batch, table));
     }
 
-    public List<TableStatedLink> findByPlaceId(int placeId) {
+    public List<TableStatedLink> findByPlaceId(Pid placeId) {
         return tableDao.findByPlaceId(placeId);
     }
 
@@ -165,7 +167,7 @@ public class TableService {
     @Inject
     private PlaceDao placeDao;
 
-    public void bindPlace(PlaceMemState place, DbUpdater batch, Optional<Integer> tid) {
+    public void bindPlace(PlaceMemState place, DbUpdater batch, Optional<Tid> tid) {
         log.info("Rebind  pid {} from tid {} to {}",
                 place.getPid(), place.getHostingTid(), tid);
         if (place.getHostingTid().equals(tid)) {

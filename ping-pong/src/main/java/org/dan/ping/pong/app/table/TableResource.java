@@ -41,7 +41,7 @@ public class TableResource {
     @Path("/tables/by-place/{" + PLACE_ID + "}")
     @Produces(APPLICATION_JSON)
     public List<TableStatedLink> tablesByPlaceId(
-            @PathParam(PLACE_ID) int placeId) {
+            @PathParam(PLACE_ID) Pid placeId) {
         return tableService.findByPlaceId(placeId);
     }
 

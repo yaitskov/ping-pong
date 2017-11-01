@@ -43,7 +43,7 @@ public class BidDaoServer implements BidDao {
     private DSLContext jooq;
 
     @Override
-    public void setBidState(int tid, Uid uid, BidState target,
+    public void setBidState(Tid tid, Uid uid, BidState target,
             List<BidState> expected, Instant now, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .logBefore(() -> log.info("Set bid status {} for {} if {}",
@@ -81,7 +81,7 @@ public class BidDaoServer implements BidDao {
     }
 
     @Override
-    public void setGroupForUids(int gid, int tid, List<ParticipantMemState> groupBids) {
+    public void setGroupForUids(int gid, Tid tid, List<ParticipantMemState> groupBids) {
         jooq.update(BID)
                 .set(BID.GID, Optional.of(gid))
                 .where(BID.TID.eq(tid),
@@ -99,7 +99,7 @@ public class BidDaoServer implements BidDao {
                 .mustAffectRows(NON_ZERO_ROWS)
                 .query(jooq.insertInto(BID, BID.CID, BID.TID, BID.UID,
                         BID.STATE, BID.PROVIDED_RANK, BID.CREATED, BID.UPDATED)
-                        .values(bid.getCid(), bid.getTid().getTid(), bid.getUid(),
+                        .values(bid.getCid(), bid.getTid(), bid.getUid(),
                                 bid.getBidState(), providedRank, bid.getEnlistedAt(),
                                 Optional.of(bid.getUpdatedAt()))
                         .onDuplicateKeyUpdate()
@@ -112,7 +112,7 @@ public class BidDaoServer implements BidDao {
 
     @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<ParticipantState> findEnlisted(int tid) {
+    public List<ParticipantState> findEnlisted(Tid tid) {
         return jooq.select(BID.UID, USERS.NAME, BID.STATE, CATEGORY.NAME, CATEGORY.CID)
                 .from(BID)
                 .innerJoin(USERS)
@@ -136,7 +136,7 @@ public class BidDaoServer implements BidDao {
 
     @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<DatedParticipantState> getParticipantInfo(int tid, Uid uid) {
+    public Optional<DatedParticipantState> getParticipantInfo(Tid tid, Uid uid) {
         return ofNullable(jooq.select(BID.UID, USERS.NAME, BID.STATE,
                 BID.CREATED, CATEGORY.NAME, CATEGORY.CID)
                 .from(BID)
@@ -172,7 +172,7 @@ public class BidDaoServer implements BidDao {
     }
 
     @Override
-    public void resetStateByTid(int tid, Instant now, DbUpdater batch) {
+    public void resetStateByTid(Tid tid, Instant now, DbUpdater batch) {
         batch.exec(
                 DbUpdateSql.builder()
                         .mustAffectRows(empty())
@@ -189,7 +189,7 @@ public class BidDaoServer implements BidDao {
                 BID.CREATED, BID.UPDATED)
                 .from(BID)
                 .innerJoin(USERS).on(BID.UID.eq(USERS.UID))
-                .where(BID.TID.eq(tid.getTid()))
+                .where(BID.TID.eq(tid))
                 .fetch()
                 .stream()
                 .collect(toMap(r -> r.get(BID.UID),

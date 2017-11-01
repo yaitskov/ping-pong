@@ -60,7 +60,7 @@ public class CastingLotsDao {
 
     public int generateGroupMatches(OpenTournamentMemState tournament, int gid,
             List<ParticipantMemState> groupBids, int priorityGroup) {
-        final int tid = tournament.getTid();
+        final Tid tid = tournament.getTid();
         log.info("Generate matches for group {} in tournament {}", gid, tid);
         final List<Integer> schedule = pickSchedule(tournament, groupBids);
         for (int i = 0; i < schedule.size();) {
@@ -75,11 +75,11 @@ public class CastingLotsDao {
 
     public int addGroupMatch(OpenTournamentMemState tournament, int priorityGroup,
             ParticipantMemState bid1, ParticipantMemState bid2) {
-        final int mid = matchDao.createGroupMatch(bid1.getTid().getTid(),
+        final int mid = matchDao.createGroupMatch(bid1.getTid(),
                 bid1.getGid().get(), bid1.getCid(), ++priorityGroup,
                 bid1.getUid(), bid2.getUid());
         tournament.getMatches().put(mid, MatchInfo.builder()
-                .tid(bid1.getTid().getTid())
+                .tid(bid1.getTid())
                 .mid(mid)
                 .priority(priorityGroup)
                 .state(MatchState.Place)
@@ -96,7 +96,7 @@ public class CastingLotsDao {
 
     public int generatePlayOffMatches(OpenTournamentMemState tinfo, Integer cid,
             int playOffStartPositions, int basePlayOffPriority) {
-        final int tid = tinfo.getTid();
+        final Tid tid = tinfo.getTid();
         log.info("Generate play off matches for {} bids in tid {}",
                 playOffStartPositions, tid);
         if (playOffStartPositions == 1) {
@@ -133,7 +133,7 @@ public class CastingLotsDao {
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<Uid> loadRanks(Tid tid, Set<Uid> uids, OrderDirection direction) {
         return jooq.select(BID.UID).from(BID)
-                .where(BID.TID.eq(tid.getTid()),
+                .where(BID.TID.eq(tid),
                         BID.UID.in(uids),
                         BID.PROVIDED_RANK.isNotNull())
                 .orderBy(setupOrder( direction, BID.PROVIDED_RANK))
@@ -157,7 +157,7 @@ public class CastingLotsDao {
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<Uid> loadSeed(Tid tid, Set<Uid> uids) {
         return jooq.select(BID.UID).from(BID)
-                .where(BID.TID.eq(tid.getTid()),
+                .where(BID.TID.eq(tid),
                         BID.UID.in(uids),
                         BID.SEED.isNotNull())
                 .fetch()
@@ -190,7 +190,7 @@ public class CastingLotsDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<RankedBid> loadManualBidsOrder(int tid, int cid) {
+    public List<RankedBid> loadManualBidsOrder(Tid tid, int cid) {
         return jooq.select(USERS.NAME, USERS.UID, BID.PROVIDED_RANK, BID.SEED)
                 .from(BID)
                 .innerJoin(USERS)

@@ -14,7 +14,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OpenTournamentDigest {
-    private int tid;
+    private Tid tid;
     private String name;
     private int gamesComplete;
     private int gamesOverall;

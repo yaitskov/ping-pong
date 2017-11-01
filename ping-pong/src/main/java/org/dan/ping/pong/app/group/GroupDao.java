@@ -20,7 +20,7 @@ public class GroupDao {
     @Inject
     private DSLContext jooq;
 
-    public int createGroup(int tid, Integer cid, String label,
+    public int createGroup(Tid tid, Integer cid, String label,
             int quits, int ordNumber) {
         final int gid = jooq.insertInto(GROUPS, GROUPS.TID, GROUPS.LABEL,
                 GROUPS.STATE, GROUPS.CID, GROUPS.QUITS, GROUPS.SORT)
@@ -35,7 +35,7 @@ public class GroupDao {
     public Map<Integer, GroupInfo> load(Tid tid) {
         return jooq.select(GROUPS.GID, GROUPS.CID, GROUPS.SORT, GROUPS.LABEL)
                 .from(GROUPS)
-                .where(GROUPS.TID.eq(tid.getTid()))
+                .where(GROUPS.TID.eq(tid))
                 .fetch()
                 .stream()
                 .collect(toMap(r -> r.get(GROUPS.GID),
@@ -48,7 +48,7 @@ public class GroupDao {
 
     }
 
-    public void deleteAllByTid(int tid, DbUpdater batch, int size) {
+    public void deleteAllByTid(Tid tid, DbUpdater batch, int size) {
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(Optional.of(size))
                 .query(jooq.deleteFrom(GROUPS)

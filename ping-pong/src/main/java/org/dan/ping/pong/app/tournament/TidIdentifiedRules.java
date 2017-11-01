@@ -12,6 +12,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TidIdentifiedRules {
-    private int tid;
+    private Tid tid;
     private TournamentRules rules;
 }

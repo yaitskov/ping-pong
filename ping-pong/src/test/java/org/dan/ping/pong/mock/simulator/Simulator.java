@@ -141,7 +141,7 @@ public class Simulator {
                             .collect(toSet()));
         }
         assertEquals(Optional.of(scenario.getExpectedTerminalState()),
-                tournamentDao.getRow(new Tid(scenario.getTid()))
+                tournamentDao.getRow(scenario.getTid())
                         .map(TournamentRow::getState));
     }
 
@@ -157,7 +157,7 @@ public class Simulator {
         while (true) {
             completedMatches[0] = 0;
             final List<OpenMatchForJudge> openMatches = rest.get(
-                    OPEN_MATCHES_FOR_JUDGE + scenario.getTid(),
+                    OPEN_MATCHES_FOR_JUDGE + scenario.getTid().getTid(),
                     OpenMatchForJudgeList.class).getMatches();
             if (scenario.getTables() > 0) {
                 assertThat(placeDao.findFreeTables(scenario.getTid()),
@@ -342,11 +342,11 @@ public class Simulator {
         restGenerator.generateSignInLinks(singletonList(testAdmin));
         final int countryId = daoGenerator.genCountry(prefix, testAdmin.getUid());
         final int cityId = daoGenerator.genCity(countryId, prefix, testAdmin.getUid());
-        if (scenario.getPlaceId() <= 0) {
+        if (scenario.getPlaceId() == null) {
             scenario.setPlaceId(daoGenerator.genPlace(cityId, prefix, testAdmin.getUid(),
                     scenario.getTables()));
         }
-        final int tid = daoGenerator.genTournament(prefix, testAdmin.getUid(),
+        final Tid tid = daoGenerator.genTournament(prefix, testAdmin.getUid(),
                 scenario.getPlaceId(), TournamentProps.builder()
                         .rules(scenario.getRules())
                         .state(TournamentState.Draft)

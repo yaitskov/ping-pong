@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dan.ping.pong.app.place.Pid;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -15,9 +16,9 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TournamentUpdate {
-    private int tid;
+    private Tid tid;
     private String name;
     private Instant opensAt;
-    private int placeId;
+    private Pid placeId;
     private Optional<Double> price;
 }

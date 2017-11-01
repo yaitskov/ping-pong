@@ -18,7 +18,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor(access = PRIVATE)
 public class CopyTournament {
-    private int originTid;
+    private Tid originTid;
     private Instant opensAt;
     private String name;
 }

@@ -47,7 +47,7 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
         final List<UserLink> result = myRest().post(
                 FIND_BIDS_BY_STATE,
                 scenario.getTestAdmin(),
-                FindByState.builder().tid(Tid.of(scenario.getTid()))
+                FindByState.builder().tid(scenario.getTid())
                         .states(asList(Wait, Play)).build())
                 .readEntity(
                         new GenericType<List<UserLink>>() {});

@@ -151,6 +151,11 @@
        ng-show="$ctrl.showResultLink()">
       <span class="glyphicon glyphicon-stats"></span>
     </a>
+    <a href="#!/tournament/rules/{{$ctrl.tournament.tid}}"
+       class="btn btn-primary"
+       title="show tournament rules">
+      <span class="glyphicon glyphicon-info-sign"></span>
+    </a>
     <a class="btn btn-primary label-info" role="button"
        ng-show="$ctrl.tournament.previousTid"
        href="#!/tournament/drafting/{{$ctrl.tournament.previousTid}}">

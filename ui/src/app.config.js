@@ -58,6 +58,9 @@ angular.module('pingPong').
                     when('/match/admin-conflict-review/:tournamentId/:matchId', {
                         template: '<match-score-conflict-admin></match-score-conflict-admin>'
                     }).
+                    when('/tournament/rules/:tournamentId', {
+                        template: '<tournament-rules></tournament-rules>'
+                    }).
                     when('/match/user-conflict-review/:tournamentId/:matchId', {
                         template: '<match-score-conflict-user></match-score-conflict-user>'
                     }).

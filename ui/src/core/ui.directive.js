@@ -63,6 +63,9 @@ angular.module('core.ui', ['ngResource']).
                         var checked = $(this).prop('checked');
                         ngModel.$setViewValue(checked);
                     });
+                    if (attrs.bsToggleDisabled) {
+                        $(element[0]).bootstrapToggle('disable');
+                    }
                     scope.$watch(
                         function () {
                             return ngModel.$modelValue;

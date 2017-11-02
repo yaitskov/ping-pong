@@ -156,6 +156,11 @@
        title="show tournament rules">
       <span class="glyphicon glyphicon-info-sign"></span>
     </a>
+    <a href="#!/tournament/played-matches/{{$ctrl.tournament.tid}}"
+       class="btn btn-primary"
+       title="list my played matches">
+      <span class="glyphicon glyphicon-book"></span>
+    </a>
     <a class="btn btn-primary label-info" role="button"
        ng-show="$ctrl.tournament.previousTid"
        href="#!/tournament/drafting/{{$ctrl.tournament.previousTid}}">

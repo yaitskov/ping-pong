@@ -24,6 +24,7 @@ import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
+import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.place.ArenaDistributionPolicy.NO;
 import static org.dan.ping.pong.app.sched.NoTablesDiscovery.STUB_TABLE;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
@@ -157,7 +158,9 @@ public class MatchService {
     private void completeMatch(MatchInfo matchInfo, Uid winUid, DbUpdater batch) {
         matchInfo.setState(Over);
         matchInfo.setWinnerId(Optional.of(winUid));
-        matchDao.completeMatch(matchInfo.getMid(), winUid, clocker.get(), batch, Game, Place, Auto);
+        final Instant now = clocker.get();
+        matchInfo.setEndedAt(Optional.of(now));
+        matchDao.completeMatch(matchInfo.getMid(), winUid, now, batch, Game, Place, Auto);
     }
 
     private void completeNoLastPlayOffMatch(OpenTournamentMemState tournament, MatchInfo matchInfo,
@@ -646,7 +649,7 @@ public class MatchService {
                         .map(MatchInfo::getState)
                         .filter(incompleteMatchStates::contains)
                         .count())
-                .totalMatches(tournament.getMatches().size())
+                .totalMatches(tournament.participantMatches(uid).count())
                 .build();
     }
 
@@ -683,6 +686,36 @@ public class MatchService {
         return OpenMatchForJudgeList.builder()
                 .matches(findOpenMatchesFurJudge(tournament))
                 .progress(tournamentProgress(tournament))
+                .build();
+    }
+
+    public PlayedMatchList findPlayedMatchesByMe(OpenTournamentMemState tournament, Uid uid) {
+        final List<MatchInfo> completeMatches = tournament.participantMatches(uid)
+                .filter(m -> m.getState() == Over)
+                .sorted(Comparator.comparing(m -> m.getEndedAt().get()))
+                .collect(toList());
+        return PlayedMatchList.builder()
+                .progress(tournamentProgress(tournament, uid))
+                .inGroup(completeMatches.stream().filter(m -> m.getType() == Grup)
+                        .map(m -> PlayedMatchLink.builder()
+                                .mid(m.getMid())
+                                .opponent(m.getOpponentUid(uid)
+                                        .map(tournament::getParticipant)
+                                        .map(ParticipantMemState::toLink)
+                                        .get())
+                                .winnerUid(m.getWinnerId().orElseThrow(() -> internalError("no winner")))
+                                .build())
+                        .collect(toList()))
+                .playOff(completeMatches.stream().filter(m -> m.getType() != Grup)
+                        .map(m -> PlayedMatchLink.builder()
+                                .mid(m.getMid())
+                                .opponent(m.getOpponentUid(uid)
+                                        .map(tournament::getParticipant)
+                                        .map(ParticipantMemState::toLink)
+                                        .get())
+                                .winnerUid(m.getWinnerId().orElseThrow(() -> internalError("no winner")))
+                                .build())
+                        .collect(toList()))
                 .build();
     }
 }

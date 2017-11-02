@@ -61,6 +61,9 @@ angular.module('pingPong').
                     when('/tournament/rules/:tournamentId', {
                         template: '<tournament-rules></tournament-rules>'
                     }).
+                    when('/tournament/played-matches/:tournamentId', {
+                        template: '<participant-played-matches></participant-played-matches>'
+                    }).
                     when('/match/user-conflict-review/:tournamentId/:matchId', {
                         template: '<match-score-conflict-user></match-score-conflict-user>'
                     }).

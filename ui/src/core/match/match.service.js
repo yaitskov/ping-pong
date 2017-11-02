@@ -39,6 +39,13 @@ angular.
                                       session: 1
                                   }
                               },
+                              myPlayedMatches: {
+                                  url: '/api/match/list/played-by-me/:tournamentId',
+                                  method: 'GET',
+                                  headers: {
+                                      session: 1
+                                  }
+                              },
                               winners: {
                                   url: '/api/match/tournament-winners/:tournamentId',
                                   method: 'GET',

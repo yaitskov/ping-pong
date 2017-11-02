@@ -63,7 +63,7 @@ public class BidSuccessInGroup {
     }
 
     public BidSuccessInGroup merge(BidSuccessInGroup b) {
-        checkArgument(uid == b.uid);
+        checkArgument(uid.equals(b.uid));
         checkArgument(finalState == b.finalState);
         return new BidSuccessInGroup(uid, finalState, punkts + b.punkts,
                 winSets + b.winSets,

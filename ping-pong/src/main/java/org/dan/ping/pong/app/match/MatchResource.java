@@ -30,16 +30,21 @@ import javax.ws.rs.container.Suspended;
 @Path("/")
 @Produces(APPLICATION_JSON)
 public class MatchResource {
-    public static final String MY_PENDING_MATCHES = "/match/list/my/pending/";
-    public static final String BID_PENDING_MATCHES = "/match/list/bid/pending/";
-    public static final String OPEN_MATCHES_FOR_JUDGE = "/match/judge/list/open/";
-    public static final String COMPLETE_MATCHES = "/match/list/completed/";
-    public static final String SCORE_SET = "/match/participant/score";
-    public static final String MATCH_WATCH_LIST_OPEN = "/match/watch/list/open/";
-    public static final String MATCH_RESET_SET_SCORE = "/match/reset-set-score";
+    private static final String MATCH = "/match/";
+    private static final String MATCH_LIST = MATCH + "list/";
+    public static final String MATCH_LIST_PLAYED_ME = MATCH_LIST + "played-by-me/";
+    public static final String MY_PENDING_MATCHES = MATCH + MATCH_LIST + "my/pending/";
+    public static final String BID_PENDING_MATCHES = MATCH + MATCH_LIST + "bid/pending/";
+    public static final String OPEN_MATCHES_FOR_JUDGE = MATCH + "judge/" + MATCH_LIST + "open/";
+    public static final String COMPLETE_MATCHES = MATCH + MATCH_LIST + "completed/";
+    public static final String SCORE_SET = MATCH + "participant/score";
+    public static final String MATCH_WATCH_LIST_OPEN = MATCH + "watch/" + MATCH_LIST + "open/";
+    public static final String MATCH_RESET_SET_SCORE = MATCH + "reset-set-score";
     public static final String TID_JP = "{tid}";
     public static final String UID_JP = "{uid}";
     public static final String UID = "uid";
+    private static final String MATCH_RULES = MATCH + "rules/";
+    private static final String MATCH_TOURNAMENT_WINNERS = MATCH + "tournament-winners/";
 
     @Inject
     private AuthService authService;
@@ -71,6 +76,18 @@ public class MatchResource {
             @PathParam(UID) Uid uid) {
         tournamentAccessor.read(tid, response,
                 tournament -> matchService.findPendingMatches(tournament, uid));
+    }
+
+    @GET
+    @Path(MATCH_LIST_PLAYED_ME + TID_JP)
+    @Consumes(APPLICATION_JSON)
+    public void findPlayedMatchesByMe(
+            @HeaderParam(SESSION) String session,
+            @Suspended AsyncResponse response,
+            @PathParam(TID) Tid tid) {
+        final Uid uid = authService.userInfoBySession(session).getUid();
+        tournamentAccessor.read(tid, response,
+                tournament -> matchService.findPlayedMatchesByMe(tournament, uid));
     }
 
     @Inject
@@ -113,16 +130,16 @@ public class MatchResource {
     }
 
     @GET
-    @Path("/match/rules/{tid}")
+    @Path(MATCH_RULES + TID_JP)
     public void getMatchRules(
             @Suspended AsyncResponse response,
-            @PathParam("tid") Tid tid) {
+            @PathParam(TID) Tid tid) {
         tournamentAccessor.read(tid, response, tournament -> tournament.getRule().getMatch());
     }
 
     @GET
-    @Path("/match/tournament-winners/{tid}")
-    public List<UserLink> findWinners(@PathParam("tid") Tid tid) {
+    @Path(MATCH_TOURNAMENT_WINNERS + TID_JP)
+    public List<UserLink> findWinners(@PathParam(TID) Tid tid) {
         return matchDao.findWinners(tid);
     }
 
@@ -139,10 +156,10 @@ public class MatchResource {
     }
 
     @GET
-    @Path(MATCH_WATCH_LIST_OPEN + "{tid}")
+    @Path(MATCH_WATCH_LIST_OPEN + TID_JP)
     public void findOpenMatchesForWatching(
             @Suspended AsyncResponse response,
-            @PathParam("tid") Tid tid) {
+            @PathParam(TID) Tid tid) {
         tournamentAccessor.update(tid, response,
                 (tournament, batch) -> {
                     return matchService.findOpenMatchesForWatching(tournament);
@@ -150,9 +167,9 @@ public class MatchResource {
     }
 
     @GET
-    @Path(COMPLETE_MATCHES + "{tid}")
+    @Path(COMPLETE_MATCHES + TID_JP)
     @Consumes(APPLICATION_JSON)
-    public List<CompleteMatch> findCompleteMatches(@PathParam("tid") Tid tid) {
+    public List<CompleteMatch> findCompleteMatches(@PathParam(TID) Tid tid) {
         return matchDao.findCompleteMatches(tid);
     }
 }

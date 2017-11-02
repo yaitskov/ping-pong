@@ -56,10 +56,6 @@ import copyTournamentComponent from './new-tournament/copy-tournament.component.
 import newTournamentModule from './new-tournament/new-tournament.module.js';
 import newTournamentComponent from './new-tournament/new-tournament.component.js';
 
-import openTournamentModule from './open-tournament/open-tournament.module.js';
-import openTournamentComponent from './open-tournament/open-tournament.component.js';
-import openTournamentListModule from './open-tournament-list/open-tournament-list.module.js';
-import openTournamentListComponent from './open-tournament-list/open-tournament-list.component.js';
 import myTournamentListModule from './my-tournament-list/my-tournament-list.module.js';
 import myTournamentListComponent from './my-tournament-list/my-tournament-list.component.js';
 import participantPresenceModule from './participant-presence/participant-presence.module.js';

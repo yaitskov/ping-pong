@@ -1,8 +1,8 @@
 import angular from 'angular';
-import template from './open-tournament-list.template.html';
+import template from './watch-tournament-list.template.html';
 
-angular.module('openTournamentList').
-    component('openTournamentList', {
+angular.module('tournament').
+    component('watchTournamentList', {
         templateUrl: template,
         controller: ['Tournament', 'mainMenu', 'requestStatus',
                      function (Tournament, mainMenu, requestStatus) {

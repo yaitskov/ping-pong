@@ -474,7 +474,7 @@ public class MatchService {
                                         .values()
                                         .stream().collect(toList()))
                                 .category(tournament.getCategory(m.getCid()))
-                                .table(tablesDiscovery.discover(m.getMid()).orElse(STUB_TABLE).toLink())
+                                .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
                                 .type(m.getType())
                                 .participants(
                                         m.getUids().stream()

@@ -62,11 +62,11 @@
             {{score}}
           </span>
         <td class="clearfix">
-          <div>
+          <div ng-show="match.table">
             <a href="#!/table/{{match.table.id}}"
                title="{{ 'Table number' | translate }}">
               <span class="glyphicon glyphicon-map-marker"></span>
-              T{{match.table.label}}
+              {{ 'table-short-cut' | translate }}{{match.table.label}}
             </a>
           </div>
           <div title="{{ 'Match start time' | translate }}">

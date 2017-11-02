@@ -1,9 +1,9 @@
 import angular from 'angular';
-import template from './open-tournament.template.html';
+import template from './watch-tournament.template.html';
 
 angular.
-    module('openTournament').
-    component('openTournament', {
+    module('tournament').
+    component('watchTournament', {
         templateUrl: template,
         controller: ['Match', 'Tournament', 'mainMenu', '$routeParams',
                      'refresher', '$q', 'requestStatus', '$scope',

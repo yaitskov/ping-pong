@@ -20,3 +20,5 @@ import './match/conflict/match-score-conflict-admin.component.js';
 import './match/conflict/match-score-conflict-user.component.js';
 import './list/draft/tr-draft-list.component.js';
 import './management/tr-management.component.js';
+import './watch/watch-tournament.component.js';
+import './list/watch/watch-tournament-list.component.js';

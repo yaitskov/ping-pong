@@ -44,7 +44,7 @@ angular.module('pingPong').
                         template: '<tournament-draft-list></tournament-draft-list>'
                     }).
                     when('/watch/tournaments', {
-                        template: '<open-tournament-list></open-tournament-list>'
+                        template: '<watch-tournament-list></watch-tournament-list>'
                     }).
                     when('/play/in/tournaments', {
                         template: '<play-in-tournament-list></play-in-tournament-list>'
@@ -95,7 +95,7 @@ angular.module('pingPong').
                         template: '<judge-match-list-to-judge></judge-match-list-to-judge>'
                     }).
                     when('/watch/tournament/:tournamentId', {
-                        template: '<open-tournament></open-tournament>'
+                        template: '<watch-tournament></watch-tournament>'
                     }).
                     when('/tournament/new', {
                         template: '<new-tournament></new-tournament>'

@@ -17,6 +17,7 @@ module.exports = merge.apply(
      require('./do-authentication-page.js'),
      require('./edit-account-page.js'),
      require('./account.js'),
+     require('./pl.participant.js'),
      require('./pl.tournament-online-draft.js'),
      require('./tournament-result.js'),
      require('./play-in-tournament-list.js'),

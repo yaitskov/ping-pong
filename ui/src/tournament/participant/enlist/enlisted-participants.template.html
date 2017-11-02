@@ -1,0 +1,28 @@
+<main-menu></main-menu>
+<div class="container tournament-result">
+  <request-status></request-status>
+  <category-switch></category-switch>
+  <div class="form-group">
+    <table class="table" ng-show="$ctrl.members">
+      <thead>
+        <tr>
+          <td>#</td>
+          <td>{{ 'Participant' | translate }}</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="participant in $ctrl.members">
+          <td>{{$index + 1}}</td>
+          <td title="{{ 'Opponents participating in the match' | translate }}">
+            <a href="#!/participant/profile/{{$ctrl.tournamentId}}/{{participant.uid}}">
+              {{participant.name}}
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="alert alert-info" ng-show="!$ctrl.members">
+      Category has no participants
+    </div>
+  </div>
+</div>

@@ -64,6 +64,9 @@ angular.module('pingPong').
                     when('/review/admin-scored-match/:tournamentId/:matchId', {
                         template: '<review-match-score-for-admin></review-match-score-for-admin>'
                     }).
+                    when('/tournament/enlisted/:tournamentId', {
+                        template: '<enlisted-participants></enlisted-participants>'
+                    }).
                     when('/review/user-scored-match/:tournamentId/:matchId', {
                         template: '<review-match-score-for-user></review-match-score-for-user>'
                     }).
@@ -150,6 +153,9 @@ angular.module('pingPong').
                     }).
                     when('/account/profile/edit', {
                         template: '<account-edit></account-edit>'
+                    }).
+                    when('/participant/profile/:tournamentId/:participantId', {
+                        template: '<participant-profile></participant-profile>'
                     }).
                     when('/tournaments/:tournamentId', {
                         template: '<enlist-online></enlist-online>'

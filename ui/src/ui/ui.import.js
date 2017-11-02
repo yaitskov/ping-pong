@@ -1,3 +1,4 @@
+import './widget/widget.import.js';
 import './ui.module.js';
 import './default-route/default-route.component.js';
 import './main-menu/main-menu.module.js';

@@ -4,7 +4,7 @@ module.exports = {
     'tournament place': 'Miejsce',
     'tournament date': 'Data',
     'participation price': 'Cena',
-    'enlisted to tournament': 'Zapisany',
+    'enlisted to tournament': 'Zapisane',
     'payment methods': 'Platność',
     'free': 'gratis',
     'cash': 'gotówka',

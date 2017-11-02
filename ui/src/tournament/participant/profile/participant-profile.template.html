@@ -1,0 +1,32 @@
+<main-menu></main-menu>
+<div class="container">
+  <request-status></request-status>
+  <div class="form-group">
+    <label for="name">{{ 'Name' | translate }}</label>
+    <input type="text" class="form-control"
+           ng-value="$ctrl.profile.name"
+           readonly
+           name="name"
+           id="name" />
+  </div>
+  <div class="form-group">
+    <label for="enlisted-at" translate="Enlisted-at lbl"/>
+    <input id="enlisted-at"
+           readonly ng-value="$ctrl.profile.enlistedAt"
+           class="form-control"/>
+  </div>
+  <div class="form-group">
+    <label for="category" translate="Category Name"/>
+    <a class="btn btn-primary">
+      {{$ctrl.profile.category.name}}
+    </a>
+  </div>
+  <div class="form-group">
+    <label for="state">{{ 'Bid state' | translate }}</label>
+    <input type="text" class="form-control"
+           ng-value="$ctrl.profile.state | translate"
+           readonly
+           name="state"
+           id="state" />
+  </div>
+</div>

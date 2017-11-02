@@ -10,6 +10,7 @@ import static org.dan.ping.pong.app.tournament.TournamentService.TID;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.bid.result.BidResultService;
+import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
 import org.dan.ping.pong.app.tournament.Uid;
@@ -32,6 +33,7 @@ import javax.ws.rs.container.Suspended;
 @Produces(APPLICATION_JSON)
 public class BidResource {
     private static final String BID = "/bid/";
+    public static final String PROFILE = BID + "profile/";
     public static final String FIND_BIDS_BY_STATE = BID + "find-by-state";
     public static final String BID_PAID = BID + "paid";
     public static final String BID_READY_TO_PLAY = BID + "ready-to-play";
@@ -60,6 +62,25 @@ public class BidResource {
         tournamentAccessor.update(bidId.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
             bidService.paid(tournament, bidId.getUid(), batch);
+        });
+    }
+
+    @GET
+    @Path(PROFILE + TID_JP + TID_SLASH_UID + UID_JP)
+    @Consumes(APPLICATION_JSON)
+    public void profile(
+            @Suspended AsyncResponse response,
+            @HeaderParam(SESSION) String session,
+            @PathParam(TID) Tid tid,
+            @PathParam(UID) Uid uid) {
+        tournamentAccessor.read(tid, response, tournament -> {
+            final ParticipantMemState participant = tournament.getParticipant(uid);
+            return BidProfile.builder()
+                    .name(participant.getName())
+                    .category(tournament.getCategory(participant.getCid()))
+                    .state(participant.getState())
+                    .enlistedAt(participant.getEnlistedAt())
+                    .build();
         });
     }
 

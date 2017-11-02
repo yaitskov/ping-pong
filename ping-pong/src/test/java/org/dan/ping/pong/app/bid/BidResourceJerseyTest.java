@@ -3,13 +3,21 @@ package org.dan.ping.pong.app.bid;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidResource.FIND_BIDS_BY_STATE;
+import static org.dan.ping.pong.app.bid.BidResource.PROFILE;
+import static org.dan.ping.pong.app.bid.BidResource.TID_SLASH_UID;
+import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
+import static org.dan.ping.pong.mock.simulator.Player.p;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
 
 import org.dan.ping.pong.JerseySpringTest;
@@ -54,5 +62,27 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
 
         assertThat(result.stream().map(UserLink::getUid)
                 .collect(toSet()), is(scenario.getUidPlayer().keySet()));
+    }
+
+    @Test
+    public void profile() {
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .doNotBegin()
+                .name("profile")
+                .rules(RULES_G8Q1_S3A2G11)
+                .category(c1, p1);
+
+        simulator.simulate(scenario);
+
+        final BidProfile profile = myRest()
+                .get(PROFILE + scenario.getTid().getTid() + TID_SLASH_UID
+                        + scenario.player2Uid(p1).getId(), BidProfile.class);
+
+        assertThat(profile, allOf(
+                hasProperty("state", is(Here)),
+                hasProperty("name", containsString("p1")),
+                hasProperty("enlistedAt"),
+                hasProperty("category",
+                        hasProperty("cid", is(scenario.getCategoryDbId().get(c1))))));
     }
 }

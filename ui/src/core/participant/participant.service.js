@@ -5,6 +5,10 @@ angular.
     factory('Participant', ['$resource',
                             function ($resource) {
                                 return $resource('/api/bid', {}, {
+                                    profile: {
+                                        url: '/api/bid/profile/:tournamentId/:participantId',
+                                        method: 'GET'
+                                    },
                                     state: {
                                         url: '/api/bid/state/:tournamentId/:uid',
                                         method: 'GET',

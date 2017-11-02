@@ -54,6 +54,11 @@ angular.
                          this.ensureResign = function () {
                              self.showQuitConfirm = true;
                          };
+                         this.showEnlisted = function () {
+                             pageCtx.put('categories', {list: self.tournament.categories,
+                                                        currentCid: self.myCategory ? self.myCategory.cid : 0});
+                             $location.path('/tournament/enlisted/' + self.tournament.tid);
+                         };
                          this.enlistMe = function () {
                              requestStatus.startLoading('Enlisting', self.tournament);
                              if (!self.myCategory.cid) {

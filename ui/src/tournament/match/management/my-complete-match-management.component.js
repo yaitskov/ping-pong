@@ -5,11 +5,24 @@ angular.
     module('tournament').
     component('myCompleteMatchManagement', {
         templateUrl: template,
-        controller: ['mainMenu', '$routeParams', 'binder', '$rootScope', '$scope',
-                     function (mainMenu, $routeParams, binder, $rootScope, $scope) {
+        controller: ['Match', 'mainMenu', '$routeParams', 'binder', '$rootScope', '$scope', 'requestStatus',
+                     function (Match, mainMenu, $routeParams, binder, $rootScope, $scope, requestStatus) {
                          mainMenu.setTitle('Match management');
                          var self = this;
                          self.tournamentId = $routeParams.tournamentId;
                          self.matchId = $routeParams.matchId;
-
+                         binder($scope, {
+                             'event.match.review.ready': (event) => {
+                                 requestStatus.startLoading();
+                                 Match.matchResult(
+                                     {tournamentId: $routeParams.tournamentId,
+                                      matchId: $routeParams.matchId},
+                                     function (match) {
+                                         requestStatus.complete();
+                                         self.match = match;
+                                         $rootScope.$broadcast('event.review.match.data', match);
+                                     },
+                                     requestStatus.failed);
+                             }
+                         });
                      }]});

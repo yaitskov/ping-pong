@@ -20,7 +20,7 @@ public class ForTestMatchDao {
     private DSLContext jooq;
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<Integer> findIncompleteTournamentMatches(Tid tid) {
+    public List<Mid> findIncompleteTournamentMatches(Tid tid) {
         return jooq.select(MATCHES.MID).from(MATCHES)
                 .where(MATCHES.TID.eq(tid), MATCHES.STATE.ne(MatchState.Over))
                 .fetch()
@@ -28,7 +28,7 @@ public class ForTestMatchDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<MatchInfo> getById(int mid) {
+    public Optional<MatchInfo> getById(Mid mid) {
         return ofNullable(jooq.select(Matches.MATCHES.TID, Matches.MATCHES.STATE, Matches.MATCHES.GID,
                 Matches.MATCHES.CID, Matches.MATCHES.LOSE_MID, Matches.MATCHES.WIN_MID, Matches.MATCHES.TYPE)
                 .from(Matches.MATCHES)

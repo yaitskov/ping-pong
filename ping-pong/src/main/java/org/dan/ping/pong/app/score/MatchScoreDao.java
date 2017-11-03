@@ -5,8 +5,9 @@ import static ord.dan.ping.pong.jooq.Tables.MATCHES;
 import static ord.dan.ping.pong.jooq.Tables.SET_SCORE;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.jooq.DSLContext;
 
 import java.util.ArrayList;
@@ -21,8 +22,8 @@ public class MatchScoreDao {
     @Inject
     private DSLContext jooq;
 
-    public Map<Integer, Map<Uid, List<Integer>>> load(Tid tid) {
-        final Map<Integer, Map<Uid, List<Integer>>> result = new HashMap<>();
+    public Map<Mid, Map<Uid, List<Integer>>> load(Tid tid) {
+        final Map<Mid, Map<Uid, List<Integer>>> result = new HashMap<>();
         jooq.select(SET_SCORE.MID, SET_SCORE.UID, SET_SCORE.GAMES)
                 .from(SET_SCORE)
                 .innerJoin(MATCHES)
@@ -31,7 +32,7 @@ public class MatchScoreDao {
                 .orderBy(SET_SCORE.SET_ID)
                 .fetch()
                 .forEach(r -> {
-                    final int mid = r.get(SET_SCORE.MID);
+                    final Mid mid = r.get(SET_SCORE.MID);
                     final Uid uid = r.get(SET_SCORE.UID);
                     final int games = r.get(SET_SCORE.GAMES);
                     Map<Uid, List<Integer>> scores = result.get(mid);

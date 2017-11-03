@@ -12,7 +12,7 @@ import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceDaoServer;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserRegRequest;
 import org.dan.ping.pong.app.user.UserType;

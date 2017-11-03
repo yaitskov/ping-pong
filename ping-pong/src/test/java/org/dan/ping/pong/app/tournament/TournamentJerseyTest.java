@@ -49,6 +49,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.place.ForTestPlaceDao;
 import org.dan.ping.pong.app.place.Pid;

@@ -7,7 +7,7 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 
 import java.util.Collection;
 import java.util.Comparator;

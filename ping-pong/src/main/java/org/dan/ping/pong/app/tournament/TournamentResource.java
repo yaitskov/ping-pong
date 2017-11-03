@@ -14,6 +14,7 @@ import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.tournament.rules.TournamentRulesValidator;
 import org.dan.ping.pong.app.tournament.rules.ValidationError;
 import org.dan.ping.pong.app.user.UserInfo;

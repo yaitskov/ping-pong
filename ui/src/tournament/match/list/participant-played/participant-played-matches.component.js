@@ -9,6 +9,7 @@ angular.
                      function (Match, mainMenu, $routeParams, requestStatus) {
                          mainMenu.setTitle('Matches played by me');
                          var self = this;
+                         self.tournamentId = $routeParams.tournamentId;
                          requestStatus.startLoading();
                          Match.myPlayedMatches(
                              {tournamentId: $routeParams.tournamentId},

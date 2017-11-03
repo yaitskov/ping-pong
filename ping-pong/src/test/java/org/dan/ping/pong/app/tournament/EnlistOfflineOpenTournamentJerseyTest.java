@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.group.GroupPopulations;
 import org.dan.ping.pong.app.match.MyPendingMatchList;
 import org.dan.ping.pong.mock.simulator.HookDecision;

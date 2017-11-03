@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 
 @Getter
 @Builder

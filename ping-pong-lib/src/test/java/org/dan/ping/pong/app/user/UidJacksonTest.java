@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.sys.ctx.jackson.ObjectMapperProvider;
 import org.junit.Test;
 

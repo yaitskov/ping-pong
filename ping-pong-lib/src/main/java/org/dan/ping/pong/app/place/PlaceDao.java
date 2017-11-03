@@ -1,6 +1,6 @@
 package org.dan.ping.pong.app.place;
 
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.util.List;

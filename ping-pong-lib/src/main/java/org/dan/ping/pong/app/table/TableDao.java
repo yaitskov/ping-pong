@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.table;
 
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
@@ -9,7 +10,7 @@ import java.util.Map;
 public interface TableDao {
     void createTables(Pid pid, int numberOfNewTables);
 
-    void locateMatch(TableInfo tableInfo, int mid, DbUpdater batch);
+    void locateMatch(TableInfo tableInfo, Mid mid, DbUpdater batch);
 
     void freeTable(int tableId, DbUpdater batch);
 

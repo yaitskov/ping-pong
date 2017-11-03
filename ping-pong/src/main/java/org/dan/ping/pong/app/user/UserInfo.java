@@ -3,7 +3,7 @@ package org.dan.ping.pong.app.user;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 
 import java.util.Optional;
 

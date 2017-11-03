@@ -16,7 +16,7 @@ public class OptionalInstantConverter implements Converter<Timestamp, Optional<I
     @Override
     public Timestamp to(Optional<Instant> s) {
         return s.map(Timestamp::from)
-                .orElseGet(()->null);
+                .orElse(null);
     }
 
     @Override

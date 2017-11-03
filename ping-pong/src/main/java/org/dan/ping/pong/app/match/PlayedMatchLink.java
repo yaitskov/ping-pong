@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 
 @Getter
@@ -14,7 +14,7 @@ import org.dan.ping.pong.app.user.UserLink;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlayedMatchLink {
-    private int mid;
+    private Mid mid;
     private UserLink opponent;
     private Uid winnerUid;
 }

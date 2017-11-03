@@ -8,7 +8,7 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.sys.error.PiPoEx;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Value;

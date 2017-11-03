@@ -1,19 +1,19 @@
 package org.dan.ping.pong.sys.db.converters;
 
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.match.Mid;
 import org.jooq.Converter;
 
-public class UidConverter implements Converter<Integer, Uid> {
+public class MidConverter implements Converter<Integer, Mid> {
     @Override
-    public Uid from(Integer uid) {
-        if (uid == null || uid == 0) {
+    public Mid from(Integer Mid) {
+        if (Mid == null || Mid == 0) {
             return null;
         }
-        return new Uid(uid);
+        return new Mid(Mid);
     }
 
     @Override
-    public Integer to(Uid u) {
+    public Integer to(Mid u) {
         if (u == null) {
             return null;
         }
@@ -26,7 +26,7 @@ public class UidConverter implements Converter<Integer, Uid> {
     }
 
     @Override
-    public Class<Uid> toType() {
-        return Uid.class;
+    public Class<Mid> toType() {
+        return Mid.class;
     }
 }

@@ -11,6 +11,7 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.match.MatchResource;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.ResetSetScore;
 import org.dan.ping.pong.mock.MyRest;
 
@@ -25,7 +26,7 @@ import java.util.function.BiConsumer;
 @RequiredArgsConstructor
 public class FixedSetGenerator implements SetGenerator {
     @Setter
-    private int mid;
+    private Mid mid;
     private int setNumber;
     private int index;
     @Getter
@@ -33,14 +34,14 @@ public class FixedSetGenerator implements SetGenerator {
     @Getter
     private final Player playerB;
     private final List<Integer> games;
-    private final Map<Integer, BiConsumer<TournamentScenario, Integer>> actionsBefore = new HashMap<>();
+    private final Map<Integer, BiConsumer<TournamentScenario, Mid>> actionsBefore = new HashMap<>();
 
     public static FixedSetGenerator game(Player a, Player b, int... games) {
         checkArgument(games.length % 2 == 0);
         return new FixedSetGenerator(a, b, new ArrayList<>(asList(games)));
     }
 
-    public FixedSetGenerator exec(BiConsumer<TournamentScenario, Integer> action) {
+    public FixedSetGenerator exec(BiConsumer<TournamentScenario, Mid> action) {
         checkArgument(actionsBefore.putIfAbsent(games.size() / 2, action) == null,
                 "Action override at set %d", games.size());
         return this;

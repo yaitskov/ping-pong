@@ -27,7 +27,7 @@ import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.mock.SessionAware;
 import org.dan.ping.pong.mock.TestUserSession;
 

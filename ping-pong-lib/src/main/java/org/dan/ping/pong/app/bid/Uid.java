@@ -1,4 +1,4 @@
-package org.dan.ping.pong.app.tournament;
+package org.dan.ping.pong.app.bid;
 
 import static java.lang.Integer.compare;
 

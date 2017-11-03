@@ -10,9 +10,11 @@ import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.place.Pid;
 
 import java.time.Instant;
@@ -31,7 +33,7 @@ public class OpenTournamentMemState {
     private Pid pid;
     private Set<Uid> adminIds;
     private Map<Uid, ParticipantMemState> participants;
-    private Map<Integer, MatchInfo> matches;
+    private Map<Mid, MatchInfo> matches;
     private Map<Integer, GroupInfo> groups;
     private Map<Integer, CategoryInfo> categories;
     private TournamentRules rule;
@@ -41,11 +43,11 @@ public class OpenTournamentMemState {
     private Optional<Tid> previousTid;
     private Instant opensAt;
 
-    public Optional<MatchInfo> maybeMatchById(int mid) {
+    public Optional<MatchInfo> maybeMatchById(Mid mid) {
         return ofNullable(matches.get(mid));
     }
 
-    public MatchInfo getMatchById(int mid) {
+    public MatchInfo getMatchById(Mid mid) {
         return maybeMatchById(mid)
                 .orElseThrow(() -> badRequest("match-not-in-tournament", "mid", mid));
     }

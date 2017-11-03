@@ -15,6 +15,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.Tables;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.sys.db.DbUpdateSql;
 import org.dan.ping.pong.sys.db.DbUpdater;
@@ -62,7 +63,7 @@ public class TableDaoServer implements TableDao {
     }
 
     @Override
-    public void locateMatch(TableInfo tableInfo, int mid, DbUpdater batch) {
+    public void locateMatch(TableInfo tableInfo, Mid mid, DbUpdater batch) {
         tableInfo.setState(Busy);
         tableInfo.setMid(Optional.of(mid));
         batch.exec(DbUpdateSql.builder()

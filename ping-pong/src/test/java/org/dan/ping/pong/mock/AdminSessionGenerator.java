@@ -1,6 +1,6 @@
 package org.dan.ping.pong.mock;
 
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.springframework.context.annotation.Bean;
 
 import javax.inject.Inject;

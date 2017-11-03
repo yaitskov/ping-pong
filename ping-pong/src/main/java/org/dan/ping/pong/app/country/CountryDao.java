@@ -4,7 +4,7 @@ import static ord.dan.ping.pong.jooq.Tables.COUNTRY;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 

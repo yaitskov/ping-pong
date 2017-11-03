@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -25,14 +25,14 @@ import java.util.Set;
 @NoArgsConstructor(onConstructor = @__(@JsonCreator))
 @AllArgsConstructor
 public class MatchInfo {
-    private int mid;
+    private Mid mid;
     private Tid tid;
     private int cid;
     private MatchType type;
     private Optional<Integer> gid;
     private MatchState state;
-    private Optional<Integer> loserMid;
-    private Optional<Integer> winnerMid;
+    private Optional<Mid> loserMid;
+    private Optional<Mid> winnerMid;
     private Optional<Uid> winnerId;
     private Map<Uid, List<Integer>> participantIdScore;
     private Optional<Instant> startedAt;
@@ -48,8 +48,8 @@ public class MatchInfo {
 
     public static class MatchInfoBuilder {
         Optional<Integer> gid = Optional.empty();
-        Optional<Integer> loserMid = Optional.empty();
-        Optional<Integer> winnerMid = Optional.empty();
+        Optional<Mid> loserMid = Optional.empty();
+        Optional<Mid> winnerMid = Optional.empty();
         Optional<Uid> winnerId = Optional.empty();
         Optional<Instant> startedAt = Optional.empty();
         Optional<Instant> endedAt = Optional.empty();

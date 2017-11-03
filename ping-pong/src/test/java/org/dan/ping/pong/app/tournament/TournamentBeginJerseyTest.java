@@ -27,6 +27,7 @@ import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.SetBidState;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.UncheckedParticipantsError;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.simulator.Simulator;

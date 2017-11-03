@@ -20,7 +20,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class MyPendingMatch {
     private Tid tid;
-    private int mid;
+    private Mid mid;
     private MatchState state;
     private Optional<UserLink> enemy;
     private MatchType matchType;

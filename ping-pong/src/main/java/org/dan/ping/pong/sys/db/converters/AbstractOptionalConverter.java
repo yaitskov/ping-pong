@@ -15,7 +15,7 @@ public abstract class AbstractOptionalConverter<T> implements Converter<T, Optio
 
     @Override
     public T to(Optional<T> t) {
-        return t.orElseGet(() -> null);
+        return t.orElse(null);
     }
 
     @Override

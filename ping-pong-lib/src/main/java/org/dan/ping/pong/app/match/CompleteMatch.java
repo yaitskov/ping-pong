@@ -18,7 +18,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompleteMatch {
-    private int mid;
+    private Mid mid;
     private Optional<GroupLink> group;
     private List<UserLink> participants;
     private Instant started;

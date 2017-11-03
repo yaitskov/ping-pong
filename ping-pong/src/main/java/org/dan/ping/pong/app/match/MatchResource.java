@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.util.time.Clocker;
 
@@ -31,6 +31,7 @@ import javax.ws.rs.container.Suspended;
 @Produces(APPLICATION_JSON)
 public class MatchResource {
     private static final String MATCH = "/match/";
+    public static final String MATCH_RESULT = MATCH + "result/";
     private static final String MATCH_LIST = MATCH + "list/";
     public static final String MATCH_LIST_PLAYED_ME = MATCH_LIST + "played-by-me/";
     public static final String MY_PENDING_MATCHES = MATCH + MATCH_LIST + "my/pending/";
@@ -45,6 +46,8 @@ public class MatchResource {
     public static final String UID = "uid";
     private static final String MATCH_RULES = MATCH + "rules/";
     private static final String MATCH_TOURNAMENT_WINNERS = MATCH + "tournament-winners/";
+    private static final String MID = "mid";
+    private static final String MID_JP = "{mid}";
 
     @Inject
     private AuthService authService;
@@ -76,6 +79,17 @@ public class MatchResource {
             @PathParam(UID) Uid uid) {
         tournamentAccessor.read(tid, response,
                 tournament -> matchService.findPendingMatches(tournament, uid));
+    }
+
+    @GET
+    @Path(MATCH_RESULT + TID_JP + TID_SLASH_UID + MID_JP)
+    @Consumes(APPLICATION_JSON)
+    public void result(
+            @Suspended AsyncResponse response,
+            @PathParam(TID) Tid tid,
+            @PathParam(MID) Mid mid) {
+        tournamentAccessor.read(tid, response,
+                tournament -> matchService.matchResult(tournament, mid));
     }
 
     @GET

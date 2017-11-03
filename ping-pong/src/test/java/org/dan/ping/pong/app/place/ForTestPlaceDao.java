@@ -9,7 +9,7 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.table.TableState;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 

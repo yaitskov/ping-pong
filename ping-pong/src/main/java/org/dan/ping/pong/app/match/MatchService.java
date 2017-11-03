@@ -26,7 +26,6 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.place.ArenaDistributionPolicy.NO;
-import static org.dan.ping.pong.app.sched.NoTablesDiscovery.STUB_TABLE;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.app.tournament.SetScoreResultName.MatchContinues;
@@ -53,7 +52,8 @@ import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.TournamentProgress;
 import org.dan.ping.pong.app.tournament.TournamentService;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
@@ -304,7 +304,7 @@ public class MatchService {
         final GroupInfo iGru = tournament.getGroups().get(gid);
         final List<MatchInfo> playOffMatches = playOffService.findBaseMatches(
                 playOffService.findPlayOffMatches(tournament, iGru.getCid())).stream()
-                .sorted(Comparator.comparingInt(MatchInfo::getMid))
+                .sorted(Comparator.comparing(MatchInfo::getMid))
                 .collect(toList());
         if (playOffMatches.isEmpty()) {
             completeMiniTournamentGroup(tournament, iGru, quitUids, batch);
@@ -327,7 +327,7 @@ public class MatchService {
         return orderUids.subList(quits, orderUids.size());
     }
 
-    public void assignBidToMatch(OpenTournamentMemState tournament, int mid, Uid uid, DbUpdater batch) {
+    public void assignBidToMatch(OpenTournamentMemState tournament, Mid mid, Uid uid, DbUpdater batch) {
         log.info("Assign uid {} to mid {} in tid {}", uid, mid, tournament.getTid());
         final MatchInfo matchInfo = tournament.getMatchById(mid);
         if (matchInfo.getParticipantIdScore().size() == 2) {
@@ -716,6 +716,16 @@ public class MatchService {
                                 .winnerUid(m.getWinnerId().orElseThrow(() -> internalError("no winner")))
                                 .build())
                         .collect(toList()))
+                .build();
+    }
+
+    public MatchResult matchResult(OpenTournamentMemState tournament, Mid mid) {
+        MatchInfo m = tournament.getMatchById(mid);
+        return MatchResult.builder()
+                .participants(m.getParticipantIdScore().keySet().stream()
+                        .map(uid -> tournament.getParticipant(uid).toLink())
+                        .collect(toMap(UserLink::getUid, o -> o)))
+                .score(matchScore(tournament, m))
                 .build();
     }
 }

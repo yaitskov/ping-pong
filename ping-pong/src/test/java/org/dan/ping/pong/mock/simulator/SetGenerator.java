@@ -1,5 +1,7 @@
 package org.dan.ping.pong.mock.simulator;
 
+import org.dan.ping.pong.app.match.Mid;
+
 import java.util.Map;
 
 public interface SetGenerator {
@@ -8,7 +10,7 @@ public interface SetGenerator {
     Map<Player, Integer> generate(TournamentScenario scenario);
     boolean isEmpty();
     int getSetNumber();
-    default void setMid(int mid) {
+    default void setMid(Mid mid) {
         // skip
     }
 }

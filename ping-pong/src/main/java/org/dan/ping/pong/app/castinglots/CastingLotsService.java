@@ -27,7 +27,7 @@ import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.sys.db.DbUpdaterSql;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
@@ -136,7 +136,7 @@ public class CastingLotsService {
         final List<MatchInfo> baseMatches = playOffService.findBaseMatches(
                 playOffService.findPlayOffMatches(tournament, cid))
                 .stream()
-                .sorted(Comparator.comparingInt(MatchInfo::getMid))
+                .sorted(Comparator.comparing(MatchInfo::getMid))
                 .collect(toList());
 
         for (int iMatch = 0; iMatch < basePositions / 2; ++iMatch) {

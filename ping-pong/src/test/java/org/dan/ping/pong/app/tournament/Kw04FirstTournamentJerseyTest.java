@@ -18,6 +18,7 @@ import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.junit.Assert.assertEquals;
 
 import org.dan.ping.pong.JerseySpringTest;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.OrderCategoryBidsManually;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy;

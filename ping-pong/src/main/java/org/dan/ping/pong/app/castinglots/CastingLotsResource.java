@@ -8,7 +8,7 @@ import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentCache;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 
 import java.util.List;

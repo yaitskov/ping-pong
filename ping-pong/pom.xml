@@ -458,9 +458,19 @@
                                     <binding>org.dan.ping.pong.sys.db.converters.OptionalIntegerConverter</binding>
                                 </customType>
                                 <customType>
+                                    <name>OptionalMid</name>
+                                    <type>java.util.Optional&lt;org.dan.ping.pong.app.match.Mid&gt;</type>
+                                    <binding>org.dan.ping.pong.sys.db.converters.OptionalMidConverter</binding>
+                                </customType>
+                                <customType>
                                     <name>Uid</name>
-                                    <type>org.dan.ping.pong.app.tournament.Uid</type>
+                                    <type>org.dan.ping.pong.app.bid.Uid</type>
                                     <binding>org.dan.ping.pong.sys.db.converters.UidConverter</binding>
+                                </customType>
+                                <customType>
+                                    <name>Mid</name>
+                                    <type>org.dan.ping.pong.app.match.Mid</type>
+                                    <binding>org.dan.ping.pong.sys.db.converters.MidConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>Pid</name>
@@ -640,7 +650,7 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
-                                    <name>OptionalInteger</name>
+                                    <name>OptionalMid</name>
                                     <expression>.*matches\.(win_mid|lose_mid)</expression>
                                     <types>.*</types>
                                 </forcedType>
@@ -660,7 +670,7 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
-                                    <name>OptionalInteger</name>
+                                    <name>OptionalMid</name>
                                     <expression>.*tables\.(mid)</expression>
                                     <types>.*</types>
                                 </forcedType>
@@ -737,6 +747,16 @@
                                 <forcedType>
                                     <name>Uid</name>
                                     <expression>.*matches\.(uid_less|uid_more|uid_win)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Mid</name>
+                                    <expression>.*matches\.(mid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Mid</name>
+                                    <expression>.*set_score\.(mid)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

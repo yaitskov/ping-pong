@@ -70,6 +70,9 @@ angular.module('pingPong').
                     when('/review/admin-scored-match/:tournamentId/:matchId', {
                         template: '<review-match-score-for-admin></review-match-score-for-admin>'
                     }).
+                    when('/tournament/my-complete-match/:tournamentId/:matchId', {
+                        template: '<my-complete-match-management></my-complete-match-management>'
+                    }).
                     when('/tournament/enlisted/:tournamentId', {
                         template: '<enlisted-participants></enlisted-participants>'
                     }).

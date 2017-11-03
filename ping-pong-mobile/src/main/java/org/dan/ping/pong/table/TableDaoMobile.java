@@ -1,5 +1,6 @@
 package org.dan.ping.pong.table;
 
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.table.SetTableState;
 import org.dan.ping.pong.app.table.TableDao;
@@ -17,7 +18,7 @@ public class TableDaoMobile implements TableDao {
     }
 
     @Override
-    public void locateMatch(TableInfo tableInfo, int mid, DbUpdater batch) {
+    public void locateMatch(TableInfo tableInfo, Mid mid, DbUpdater batch) {
 
     }
 
@@ -27,7 +28,7 @@ public class TableDaoMobile implements TableDao {
     }
 
     @Override
-    public List<TableStatedLink> findByPlaceId(int placeId) {
+    public List<TableStatedLink> findByPlaceId(Pid placeId) {
         return null;
     }
 

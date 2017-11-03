@@ -61,7 +61,7 @@ public class NoScheduleService implements ScheduleService {
                 .filter(minfo -> minfo.getState() == Place)
                 .filter(minfo -> minfo.getParticipantIdScore().size() == 2)
                 .sorted(comparingInt(MatchInfo::getPriority)
-                        .thenComparingInt(MatchInfo::getMid))
+                        .thenComparing(MatchInfo::getMid))
                 .collect(toList());
     }
 }

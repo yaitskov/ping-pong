@@ -6,6 +6,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.USERS;
+import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.MID0;
 import static org.dan.ping.pong.app.group.GroupSchedule.DEFAULT_SCHEDULE;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
@@ -22,11 +23,12 @@ import org.dan.ping.pong.app.group.GroupSchedule;
 import org.dan.ping.pong.app.match.MatchDaoServer;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.jooq.DSLContext;
 import org.jooq.Query;
@@ -75,7 +77,7 @@ public class CastingLotsDao {
 
     public int addGroupMatch(OpenTournamentMemState tournament, int priorityGroup,
             ParticipantMemState bid1, ParticipantMemState bid2) {
-        final int mid = matchDao.createGroupMatch(bid1.getTid(),
+        final Mid mid = matchDao.createGroupMatch(bid1.getTid(),
                 bid1.getGid().get(), bid1.getCid(), ++priorityGroup,
                 bid1.getUid(), bid2.getUid());
         tournament.getMatches().put(mid, MatchInfo.builder()
@@ -94,14 +96,14 @@ public class CastingLotsDao {
         return priorityGroup;
     }
 
-    public int generatePlayOffMatches(OpenTournamentMemState tinfo, Integer cid,
+    public Mid generatePlayOffMatches(OpenTournamentMemState tinfo, Integer cid,
             int playOffStartPositions, int basePlayOffPriority) {
         final Tid tid = tinfo.getTid();
         log.info("Generate play off matches for {} bids in tid {}",
                 playOffStartPositions, tid);
         if (playOffStartPositions == 1) {
             log.info("Tournament {}:{} will be without play off", tid, cid);
-            return 0;
+            return MID0;
         } else {
             checkArgument(playOffStartPositions > 0, "not enough groups %s",
                     playOffStartPositions);

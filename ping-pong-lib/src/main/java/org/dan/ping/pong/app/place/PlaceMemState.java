@@ -7,10 +7,10 @@ import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.dan.ping.pong.app.city.CityLink;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +30,7 @@ public class PlaceMemState {
     private Optional<Tid> hostingTid;
     private PlaceAddress address;
 
-    public Optional<TableInfo> findTableByMid(int mid) {
+    public Optional<TableInfo> findTableByMid(Mid mid) {
         return tables.values().stream()
                 .filter(tbl -> tbl.getMid().equals(Optional.of(mid)))
                 .findAny();

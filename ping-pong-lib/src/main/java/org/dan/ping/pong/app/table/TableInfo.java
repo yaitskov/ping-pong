@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.place.Pid;
 
 import java.util.Optional;
@@ -17,7 +18,7 @@ public class TableInfo {
     private String label;
     private Pid pid;
     private TableState state;
-    private Optional<Integer> mid;
+    private Optional<Mid> mid;
 
     public TableLink toLink() {
         return TableLink.builder()

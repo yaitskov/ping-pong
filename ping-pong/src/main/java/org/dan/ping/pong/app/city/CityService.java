@@ -3,7 +3,7 @@ package org.dan.ping.pong.app.city;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

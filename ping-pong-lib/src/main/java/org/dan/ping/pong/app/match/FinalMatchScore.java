@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class FinalMatchScore {
     private Tid tid;
-    private int mid;
+    private Mid mid;
     private int setOrdNumber;
     private List<IdentifiedScore> scores;
 }

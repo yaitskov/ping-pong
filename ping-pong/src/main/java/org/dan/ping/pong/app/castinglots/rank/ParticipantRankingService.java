@@ -7,7 +7,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import org.dan.ping.pong.app.castinglots.CastingLotsDao;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 
 import java.util.List;
 import java.util.Map;

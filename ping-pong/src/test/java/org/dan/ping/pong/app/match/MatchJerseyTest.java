@@ -268,7 +268,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
         List<OpenMatchForWatch> result = rest.get(MATCH_WATCH_LIST_OPEN + scenario.getTid().getTid(),
                 new GenericType<List<OpenMatchForWatch>>() {});
         assertThat(result, hasItem(allOf(
-                hasProperty("mid", greaterThan(0)),
+                hasProperty("mid", hasProperty("id", greaterThan(0))),
                 hasProperty("type", is(Grup)),
                 hasProperty("score", is(asList(0, 0))),
                 hasProperty("category", allOf(
@@ -282,10 +282,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         allOf(
                                 hasProperty("name", notNullValue()),
                                 hasProperty("uid", is(scenario.getPlayersSessions()
-                                        .get(p2).getUid()))))),
-                hasProperty("table",
-                        allOf(hasProperty("label", notNullValue()),
-                                hasProperty("id", greaterThan(0)))))));
+                                        .get(p2).getUid()))))))));
     }
 
     @Inject

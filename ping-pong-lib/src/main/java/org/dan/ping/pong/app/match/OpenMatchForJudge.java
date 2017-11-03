@@ -19,7 +19,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OpenMatchForJudge {
-    private int mid;
+    private Mid mid;
     private Tid tid;
     private Optional<TableLink> table;
     private List<UserLink> participants;

@@ -17,7 +17,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OpenMatchForWatch {
-    private int mid;
+    private Mid mid;
     private Optional<TableLink> table;
     private List<UserLink> participants;
     private Instant started;

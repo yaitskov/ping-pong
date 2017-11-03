@@ -8,11 +8,13 @@ import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 import com.google.common.cache.CacheLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,8 +68,8 @@ public class TournamentCacheLoader extends CacheLoader<Tid, OpenTournamentMemSta
                 .build();
     }
 
-    private Map<Integer, MatchInfo> combineMatchesAndSets(List<MatchInfo> matches,
-            Map<Integer, Map<Uid, List<Integer>>> sets) {
+    private Map<Mid, MatchInfo> combineMatchesAndSets(List<MatchInfo> matches,
+            Map<Mid, Map<Uid, List<Integer>>> sets) {
         return matches.stream().collect(
                 toMap(MatchInfo::getMid,
                         m -> {

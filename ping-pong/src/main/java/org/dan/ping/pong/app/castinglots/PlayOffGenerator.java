@@ -13,6 +13,7 @@ import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.match.MatchType;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 
 import java.util.ArrayList;
@@ -65,19 +66,20 @@ public class PlayOffGenerator {
                     15, 114, 50, 79, 18, 111, 47, 82))
             .build();
     private static final int FIRST_PLAY_OFF_MATCH_LEVEL = 1;
+    public static final Mid MID0 = new Mid(0);
 
     private final OpenTournamentMemState tournament;
     private final int cid;
     private final boolean thirdPlaceMatch;
     private final MatchDao matchDao;
 
-    public Optional<Integer> generateTree(int level, Optional<Integer> parentMid,
-            int priority, TypeChain types, Optional<Integer> loserMid) {
+    public Optional<Mid> generateTree(int level, Optional<Mid> parentMid,
+            int priority, TypeChain types, Optional<Mid> loserMid) {
         if (level < FIRST_PLAY_OFF_MATCH_LEVEL) {
             return Optional.empty();
         }
-        final Optional<Integer> omid = createMatch(parentMid, loserMid, priority, level, types.getType());
-        Optional<Integer> midBronze = Optional.empty();
+        final Optional<Mid> omid = createMatch(parentMid, loserMid, priority, level, types.getType());
+        Optional<Mid> midBronze = Optional.empty();
         if (thirdPlaceMatch && types.getType() == Gold) {
             midBronze = createMatch(Optional.empty(), Optional.empty(), priority, level, Brnz);
         }
@@ -86,11 +88,11 @@ public class PlayOffGenerator {
         return omid;
     }
 
-    private Optional<Integer> createMatch(Optional<Integer> winMid, Optional<Integer> loserMid,
+    private Optional<Mid> createMatch(Optional<Mid> winMid, Optional<Mid> loserMid,
             int priority, int level, MatchType type) {
-        final int mid = matchDao.createPlayOffMatch(
+        final Mid mid = matchDao.createPlayOffMatch(
                 tournament.getTid(), cid, winMid, loserMid, priority, level, type);
-        final Optional<Integer> omid = Optional.of(mid);
+        final Optional<Mid> omid = Optional.of(mid);
         tournament.getMatches().put(mid, MatchInfo.builder()
                 .tid(tournament.getTid())
                 .mid(mid)
@@ -104,17 +106,17 @@ public class PlayOffGenerator {
                 .cid(cid)
                 .build());
         log.info("playoff {} mid {} of tid {} in cid {}",
-                type, omid.orElse(0), tournament.getTid(), cid);
+                type, omid.orElse(MID0), tournament.getTid(), cid);
         return omid;
     }
 
-    public Optional<Integer> generate2LossTree(int level, int priority) {
-        final Optional<Integer> omid = createMatch(Optional.empty(), Optional.empty(), priority, level, Gold);
-        List<Integer> lostRefMids = new ArrayList<>();
+    public Optional<Mid> generate2LossTree(int level, int priority) {
+        final Optional<Mid> omid = createMatch(Optional.empty(), Optional.empty(), priority, level, Gold);
+        List<Mid> lostRefMids = new ArrayList<>();
         omid.ifPresent(lostRefMids::add);
-        List<Integer> nextMidLevel = new ArrayList<>();
+        List<Mid> nextMidLevel = new ArrayList<>();
         level -= 1;
-        for (Integer mid : lostRefMids) {
+        for (Mid mid : lostRefMids) {
             createMatch(Optional.of(mid),
                     level == 0
                             ? Optional.of(mid)
@@ -126,8 +128,8 @@ public class PlayOffGenerator {
             return omid;
         }
         while (true) {
-            final List<Integer> favorites = new ArrayList<>();
-            final List<Integer> newLostRefs = new ArrayList<>();
+            final List<Mid> favorites = new ArrayList<>();
+            final List<Mid> newLostRefs = new ArrayList<>();
             level -= 1;
             for (int i = 0; i < nextMidLevel.size(); ++i) {
                 createMatch(Optional.of(lostRefMids.get(i / 2)),
@@ -150,7 +152,7 @@ public class PlayOffGenerator {
             }
             nextMidLevel.clear();
             for (int i = newLostRefs.size() - 1;  i >= 0; --i) {
-                final int lostMid = newLostRefs.get(i);
+                final Mid lostMid = newLostRefs.get(i);
                 createMatch(Optional.of(lostMid),
                         Optional.empty(),
                         priority, level, POff)
@@ -170,9 +172,9 @@ public class PlayOffGenerator {
     }
 
     private void createBaseMatches(int level, int priority,
-            List<Integer> favorites, List<Integer> newLostRefs) {
+            List<Mid> favorites, List<Mid> newLostRefs) {
         for (int i = 0; i < newLostRefs.size(); ++i) {
-            final int lostMid = newLostRefs.get(newLostRefs.size() - i - 1);
+            final Mid lostMid = newLostRefs.get(newLostRefs.size() - i - 1);
             final int jj = i;
             createMatch(Optional.of(favorites.get(i)),
                     Optional.of(lostMid),

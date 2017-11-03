@@ -9,18 +9,18 @@ import static org.dan.ping.pong.app.table.TableState.Free;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
-import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.tournament.Uid;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.time.Instant;
@@ -62,7 +62,7 @@ public class TableService {
                         .map(uid -> tournament.getParticipants().get(uid).getBidState())
                         .allMatch(bidState -> bidState == BidState.Wait))
                 .sorted(comparingInt(MatchInfo::getPriority)
-                        .thenComparingInt(MatchInfo::getMid))
+                        .thenComparing(MatchInfo::getMid))
                 .collect(toList())
                 .stream()
                 .filter(minfo -> minfo.getParticipantIdScore().keySet().stream()
@@ -135,7 +135,7 @@ public class TableService {
                 .allMatch(state -> state == Free || state == Busy);
     }
 
-    public void freeTables(PlaceMemState place, Set<Integer> mids, DbUpdater batch) {
+    public void freeTables(PlaceMemState place, Set<Mid> mids, DbUpdater batch) {
         place.getTables().values().stream()
                 .filter(table -> table.getMid().map(mids::contains).orElse(false))
                 .forEach(table -> freeTable(batch, table));

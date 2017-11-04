@@ -5,19 +5,23 @@ angular.
     module('tournament').
     component('participantPlayedMatches', {
         templateUrl: template,
-        controller: ['Match', 'mainMenu', '$routeParams', 'requestStatus',
-                     function (Match, mainMenu, $routeParams, requestStatus) {
+        controller: ['Match', 'mainMenu', '$routeParams', 'requestStatus', 'binder', '$scope',
+                     function (Match, mainMenu, $routeParams, requestStatus, binder, $scope) {
                          mainMenu.setTitle('Matches played by me');
                          var self = this;
                          self.tournamentId = $routeParams.tournamentId;
-                         requestStatus.startLoading();
-                         Match.myPlayedMatches(
-                             {tournamentId: $routeParams.tournamentId},
-                             function (matches) {
-                                 requestStatus.complete();
-                                 self.matches = matches;
-                             },
-                             requestStatus.failed);
+                         binder($scope, {
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading();
+                                 Match.myPlayedMatches(
+                                     {tournamentId: $routeParams.tournamentId},
+                                     function (matches) {
+                                         requestStatus.complete();
+                                         self.matches = matches;
+                                     },
+                                     requestStatus.failed);
+                             }
+                         });
                      }
                     ]
         });

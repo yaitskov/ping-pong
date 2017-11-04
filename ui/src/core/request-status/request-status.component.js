@@ -6,10 +6,10 @@ angular.
     component('requestStatus', {
         templateUrl: template,
         controller: [
-            'requestStatus', '$rootScope', '$anchorScroll', '$timeout',
-            '$route', '$translate', 'syncTranslate', '$sce', 'auth',
+            'requestStatus', '$scope', '$anchorScroll', '$timeout',
+            '$route', '$translate', 'syncTranslate', '$sce', 'auth', 'binder', '$rootScope',
             function (requestStatus, $scope, $anchorScroll, $timeout,
-                      $route, $translate, syncTranslate, $sce, auth) {
+                      $route, $translate, syncTranslate, $sce, auth, binder, $rootScope) {
                 var self = this;
                 this.reset = function () {
                     this.error = {};
@@ -63,45 +63,48 @@ angular.
                     }
                 };
                 self.reset();
-                $scope.$on('event.request.started', function (event, msg) {
-                    self.reset();
-                    self.loading = self.convertMsg(msg ? msg : 'Loading');
-                });
-                $scope.$on('event.request.validation', function (event, msg) {
-                    self.reset();
-                    self.error = self.convertMsg(msg);
-                    self.scrollToError();
-                });
-                $scope.$on('event.request.failed', function (event, response) {
-                    self.reset();
-                    if (response.status == 502 || response.status == -1) {
-                        self.error = self.responseToErr(response.data, "Server is not available");
-                    } else if (response.status == 401) {
-                        self.error = self.responseToErr(response.data, 'authentication-error');
-                    } else if (response.status == 403) {
-                        self.error = self.responseToErr(response.data, 'authorization-error');
-                    } else if (response.status == 404) {
-                        self.error = self.responseToErr(response.data, 'entity-not-found');
-                    } else if (response.status == 400) {
-                        self.error = self.responseToErr(response.data, 'bad-request');
-                    } else if (response.status == 500) {
-                        self.error = self.responseToErr(response.data, 'application-error');
-                    } else if (response.status < 299) {
-                        self.error = self.responseToErr(response.data,
-                                                        ['no-error-but-failed',
-                                                         {status: response.status}]);
-                    } else if (!response.status) {
-                        console.log("no status message: " + response.message);
-                        self.error = self.responseToErr(response.data, 'status-is-missing');
-                    } else {
-                        self.error = self.responseToErr(response.data,
-                                                        ['unexpected-status', {status: response.status}]);
+                binder($scope, {
+                    'event.request.started': (event, msg) => {
+                        self.reset();
+                        self.loading = self.convertMsg(msg ? msg : 'Loading');
+                    },
+                    'event.request.validation': (event, msg) => {
+                        self.reset();
+                        self.error = self.convertMsg(msg);
+                        self.scrollToError();
+                    },
+                    'event.request.failed': (event, response) => {
+                        self.reset();
+                        if (response.status == 502 || response.status == -1) {
+                            self.error = self.responseToErr(response.data, "Server is not available");
+                        } else if (response.status == 401) {
+                            self.error = self.responseToErr(response.data, 'authentication-error');
+                        } else if (response.status == 403) {
+                            self.error = self.responseToErr(response.data, 'authorization-error');
+                        } else if (response.status == 404) {
+                            self.error = self.responseToErr(response.data, 'entity-not-found');
+                        } else if (response.status == 400) {
+                            self.error = self.responseToErr(response.data, 'bad-request');
+                        } else if (response.status == 500) {
+                            self.error = self.responseToErr(response.data, 'application-error');
+                        } else if (response.status < 299) {
+                            self.error = self.responseToErr(response.data,
+                                                            ['no-error-but-failed',
+                                                             {status: response.status}]);
+                        } else if (!response.status) {
+                            console.log("no status message: " + response.message);
+                            self.error = self.responseToErr(response.data, 'status-is-missing');
+                        } else {
+                            self.error = self.responseToErr(response.data,
+                                                            ['unexpected-status', {status: response.status}]);
+                        }
+                        self.error.status = response.status;
+                        self.scrollToError();
+                    },
+                    'event.request.complete': (event, response) => {
+                        self.reset();
+                        self.error = 0;
                     }
-                    self.error.status = response.status;
-                    self.scrollToError();
                 });
-                $scope.$on('event.request.complete', function (event, response) {
-                    self.reset();
-                    self.error = 0;
-                });
+                $rootScope.$broadcast('event.request.status.ready');
             }]});

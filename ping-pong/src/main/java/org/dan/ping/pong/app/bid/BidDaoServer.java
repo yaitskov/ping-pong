@@ -18,7 +18,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.category.CategoryInfo;
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserLink;
@@ -59,7 +59,7 @@ public class BidDaoServer implements BidDao {
     }
 
     @Override
-    public void markParticipantsBusy(OpenTournamentMemState tournament,
+    public void markParticipantsBusy(TournamentMemState tournament,
             Collection<Uid> uids, Instant now, DbUpdater batch) {
         final List<Uid> finalUids = uids.stream()
                 .map(tournament::getBid)

@@ -30,22 +30,20 @@ import javax.ws.rs.container.Suspended;
 @Path("/")
 @Produces(APPLICATION_JSON)
 public class MatchResource {
-    private static final String MATCH = "/match/";
-    public static final String MATCH_RESULT = MATCH + "result/";
-    private static final String MATCH_LIST = MATCH + "list/";
-    public static final String MATCH_LIST_PLAYED_ME = MATCH_LIST + "played-by-me/";
-    public static final String MY_PENDING_MATCHES = MATCH + MATCH_LIST + "my/pending/";
-    public static final String BID_PENDING_MATCHES = MATCH + MATCH_LIST + "bid/pending/";
-    public static final String OPEN_MATCHES_FOR_JUDGE = MATCH + "judge/" + MATCH_LIST + "open/";
-    public static final String COMPLETE_MATCHES = MATCH + MATCH_LIST + "completed/";
-    public static final String SCORE_SET = MATCH + "participant/score";
-    public static final String MATCH_WATCH_LIST_OPEN = MATCH + "watch/" + MATCH_LIST + "open/";
-    public static final String MATCH_RESET_SET_SCORE = MATCH + "reset-set-score";
+    public static final String MATCH_RESULT = "/match/result/";
+    public static final String MATCH_LIST_PLAYED_ME = "/match/list/played-by-me/";
+    public static final String MY_PENDING_MATCHES = "/match/list/my/pending/";
+    public static final String BID_PENDING_MATCHES = "/match/list/bid/pending/";
+    public static final String OPEN_MATCHES_FOR_JUDGE = "/match/judge/list/open/";
+    public static final String COMPLETE_MATCHES = "/match/list/completed/";
+    public static final String SCORE_SET = "/match/participant/score";
+    public static final String MATCH_WATCH_LIST_OPEN = "/match/watch/list/open/";
+    public static final String MATCH_RESET_SET_SCORE = "/match/reset-set-score";
     public static final String TID_JP = "{tid}";
     public static final String UID_JP = "{uid}";
     public static final String UID = "uid";
-    private static final String MATCH_RULES = MATCH + "rules/";
-    private static final String MATCH_TOURNAMENT_WINNERS = MATCH + "tournament-winners/";
+    private static final String MATCH_RULES = "/match/rules/";
+    private static final String MATCH_TOURNAMENT_WINNERS = "/match/tournament-winners/";
     private static final String MID = "mid";
     private static final String MID_JP = "{mid}";
 

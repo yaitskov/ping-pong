@@ -5,15 +5,32 @@
       <you name="participant.name | compactName"/>
     </td>
   </tr>
-  <tr ng-repeat="set in $ctrl.sets">
+  <tr ng-repeat="set in $ctrl.sets"
+      ng-class="{clickable: $ctrl.config.edit}"
+      ng-click="$ctrl.pickSet($index, set)">
     <td>{{$index + 1}}</td>
     <td class="alert"
-        ng-class="{'alert-success': set.a > set.b, 'alert-danger': set.a < set.b}">
+        ng-class="{'alert-success': set.a > set.b, 'alert-danger': set.a < set.b, 'badge': $ctrl.strongSet($index)}">
       {{set.a}}
     </td>
     <td class="alert"
-        ng-class="{'alert-success': set.a < set.b, 'alert-danger': set.a > set.b}">
+        ng-class="{'alert-success': set.a < set.b, 'alert-danger': set.a > set.b, 'badge': $ctrl.strongSet($index)}}">
       {{set.b}}
+    </td>
+  </tr>
+  <tr ng-show="$ctrl.config.edit">
+    <td></td>
+    <td>
+      <a ng-click="$ctrl.appendSet()" class="btn btn-success">
+        <span class="glyphicon glyphicon-plus-sign"/>
+        set
+      </a>
+    </td>
+    <td>
+      <a ng-click="$ctrl.removeLastSet()" class="btn btn-danger">
+        <span class="glyphicon glyphicon-minus-sign"/>
+        set
+      </a>
     </td>
   </tr>
   <tr>

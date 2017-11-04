@@ -8,4 +8,6 @@ public interface DbUpdater {
     DbUpdater onFailure(Runnable r);
 
     DbUpdater exec(DbUpdate u);
+
+    void markDirty();
 }

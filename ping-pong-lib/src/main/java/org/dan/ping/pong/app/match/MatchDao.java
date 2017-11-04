@@ -1,6 +1,6 @@
 package org.dan.ping.pong.app.match;
 
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.user.UserLink;
@@ -19,7 +19,7 @@ public interface MatchDao {
 
     void changeStatus(Mid mid, MatchState state, DbUpdater batch);
 
-    Optional<Uid> scoreSet(OpenTournamentMemState tournament, MatchInfo matchInfo,
+    Optional<Uid> scoreSet(TournamentMemState tournament, MatchInfo matchInfo,
             DbUpdater batch, FinalMatchScore matchScore);
 
     void completeMatch(Mid mid, Uid winUid, Instant now, DbUpdater batch, MatchState... expected);
@@ -30,7 +30,7 @@ public interface MatchDao {
 
     List<UserLink> findWinners(Tid tid);
 
-    void deleteAllByTid(OpenTournamentMemState tournament, DbUpdater batch, int size);
+    void deleteAllByTid(TournamentMemState tournament, DbUpdater batch, int size);
 
     void setParticipant(int n, Mid mid, Uid uid, DbUpdater batch);
 

@@ -5,7 +5,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.inject.Inject;
 
-public class TournamentAccessor extends SeqAccessor<Tid, OpenTournamentMemState> {
+public class TournamentAccessor extends SeqAccessor<Tid, TournamentMemState> {
     @Inject
     public TournamentAccessor(
             TournamentCache cache,

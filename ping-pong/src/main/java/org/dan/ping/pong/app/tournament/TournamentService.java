@@ -99,14 +99,14 @@ public class TournamentService {
         return tournamentDao.create(uid, newTournament);
     }
 
-    private void validateEnlistOnline(OpenTournamentMemState tournament, Enlist enlist) {
+    private void validateEnlistOnline(TournamentMemState tournament, Enlist enlist) {
         if (tournament.getState() != Draft) {
             throw notDraftError(tournament);
         }
         validateEnlist(tournament, enlist);
     }
 
-    private void validateEnlistOffline(OpenTournamentMemState tournament, EnlistOffline enlist) {
+    private void validateEnlistOffline(TournamentMemState tournament, EnlistOffline enlist) {
         if (tournament.getState() == Draft) {
             if (!VALID_ENLIST_BID_STATES.contains(enlist.getBidState())) {
                 throw badRequest("Bid state could be " + VALID_ENLIST_BID_STATES);
@@ -126,13 +126,13 @@ public class TournamentService {
         validateEnlist(tournament, enlist);
     }
 
-    private PiPoEx notDraftError(OpenTournamentMemState tournament) {
+    private PiPoEx notDraftError(TournamentMemState tournament) {
         return badRequest("tournament-not-in-draft",
                 ImmutableMap.of(STATE, tournament.getState(),
                         TID, tournament.getTid()));
     }
 
-    private void validateEnlist(OpenTournamentMemState tournament, Enlist enlist) {
+    private void validateEnlist(TournamentMemState tournament, Enlist enlist) {
         tournament.checkCategory(enlist.getCid());
         final CastingLotsRule casting = tournament.getRule().getCasting();
         if (casting.getPolicy() == ParticipantRankingPolicy.ProvidedRating) {
@@ -148,7 +148,7 @@ public class TournamentService {
     }
 
     public void enlistOnline(EnlistTournament enlistment,
-            OpenTournamentMemState tournament, UserInfo user, DbUpdater batch) {
+            TournamentMemState tournament, UserInfo user, DbUpdater batch) {
         validateEnlistOnline(tournament, enlistment);
         log.info("Uid {} enlists to tid {} in cid {}",
                 user.getUid(), tournament.getTid(), enlistment.getCategoryId());
@@ -166,7 +166,7 @@ public class TournamentService {
         enlist(tournament, uid, enlistment.getProvidedRank(), batch);
     }
 
-    private void enlist(OpenTournamentMemState tournament, Uid uid,
+    private void enlist(TournamentMemState tournament, Uid uid,
             Optional<Integer> providedRank, DbUpdater batch) {
         bidDao.enlist(tournament.getParticipant(uid), providedRank, batch);
     }
@@ -193,7 +193,7 @@ public class TournamentService {
     @Named(SCHEDULE_SELECTOR)
     private ScheduleService scheduleService;
 
-    public void begin(OpenTournamentMemState tournament, DbUpdater batch) {
+    public void begin(TournamentMemState tournament, DbUpdater batch) {
         if (tournament.getState() != TournamentState.Draft) {
             throw notDraftError(tournament);
         }
@@ -207,7 +207,7 @@ public class TournamentService {
         scheduleService.beginTournament(tournament, batch, now);
     }
 
-    private List<ParticipantMemState> findReadyToStartTournamentBid(OpenTournamentMemState tournament) {
+    private List<ParticipantMemState> findReadyToStartTournamentBid(TournamentMemState tournament) {
         return tournament.getParticipants().values()
                 .stream()
                 .filter(bid -> bid.getBidState() == Here)
@@ -223,7 +223,7 @@ public class TournamentService {
     @Inject
     private PlaceService placeCache;
 
-    public DraftingTournamentInfo getDraftingTournament(OpenTournamentMemState tournament,
+    public DraftingTournamentInfo getDraftingTournament(TournamentMemState tournament,
             Optional<Uid> participantId) {
         return sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
                 place -> DraftingTournamentInfo.builder()
@@ -254,7 +254,7 @@ public class TournamentService {
                         + tid + " not found"));
     }
 
-    public void leaveTournament(ParticipantMemState bid, OpenTournamentMemState tournament,
+    public void leaveTournament(ParticipantMemState bid, TournamentMemState tournament,
             BidState targetState, DbUpdater batch) {
         final Tid tid = tournament.getTid();
         log.info("User {} leaves tournament {} as {}", bid.getUid(), tid, targetState);
@@ -277,7 +277,7 @@ public class TournamentService {
         }
     }
 
-    private void leaveOpenTournament(ParticipantMemState bid, OpenTournamentMemState tournament,
+    private void leaveOpenTournament(ParticipantMemState bid, TournamentMemState tournament,
             BidState targetState, DbUpdater batch) {
         final Tid tid = tournament.getTid();
         log.info("User {} leaves open tournament {}", bid.getUid(), tid);
@@ -312,7 +312,7 @@ public class TournamentService {
     @Value("${match.score.timeout}")
     private int matchScoreTimeout;
 
-    public void activeParticipantLeave(ParticipantMemState bid, OpenTournamentMemState tournament,
+    public void activeParticipantLeave(ParticipantMemState bid, TournamentMemState tournament,
             Instant now, BidState target, DbUpdater batch) {
         final Uid uid = bid.getUid();
         List<MatchInfo> incompleteMy = matchService.bidIncompleteGroupMatches(uid, tournament);
@@ -331,11 +331,11 @@ public class TournamentService {
         scheduleService.participantLeave(tournament, batch, now);
     }
 
-    public void setTournamentState(OpenTournamentMemState tournament, DbUpdater batch) {
+    public void setTournamentState(TournamentMemState tournament, DbUpdater batch) {
         tournamentDao.setState(tournament, batch);
     }
 
-    public void setTournamentCompleteAt(OpenTournamentMemState tournament, Instant now, DbUpdater batch) {
+    public void setTournamentCompleteAt(TournamentMemState tournament, Instant now, DbUpdater batch) {
         tournament.setCompleteAt(Optional.of(now));
         tournamentDao.setCompleteAt(tournament.getTid(), tournament.getCompleteAt(), batch);
     }
@@ -356,7 +356,7 @@ public class TournamentService {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void update(OpenTournamentMemState tournament, TournamentUpdate update, DbUpdater batch) {
+    public void update(TournamentMemState tournament, TournamentUpdate update, DbUpdater batch) {
         if (!EDITABLE_STATES.contains(tournament.getState())) {
             throw badRequest("Tournament could be modified until it's open");
         }
@@ -364,7 +364,7 @@ public class TournamentService {
         tournamentDao.update(update, batch);
     }
 
-    public void updateTournamentParams(OpenTournamentMemState tournament,
+    public void updateTournamentParams(TournamentMemState tournament,
             TidIdentifiedRules parameters, DbUpdater batch) {
         if (!CONFIGURABLE_STATES.contains(tournament.getState())) {
             throw badRequest("Tournament could be modified until it's open");
@@ -379,7 +379,7 @@ public class TournamentService {
     @Inject
     private GroupDao groupDao;
 
-    public void cancel(OpenTournamentMemState tournament, DbUpdater batch) {
+    public void cancel(TournamentMemState tournament, DbUpdater batch) {
         final Instant now = clocker.get();
 
         final Tid tid = tournament.getTid();
@@ -403,7 +403,7 @@ public class TournamentService {
     @Inject
     private GroupService groupService;
 
-    public List<TournamentResultEntry> tournamentResult(OpenTournamentMemState tournament, int cid) {
+    public List<TournamentResultEntry> tournamentResult(TournamentMemState tournament, int cid) {
         final List<MatchInfo> cidMatches = categoryService.findMatchesInCategory(tournament, cid);
         int level = 1;
         final Map<Uid, CumulativeScore> uidLevel = new HashMap<>();
@@ -436,7 +436,7 @@ public class TournamentService {
                 .collect(toList());
     }
 
-    private void ranksLevelMatches(OpenTournamentMemState tournament, int level,
+    private void ranksLevelMatches(TournamentMemState tournament, int level,
             Map<Uid, CumulativeScore> uidLevel,
             Collection<MatchInfo> matches, MatchValidationRule rules) {
         final Map<Uid, BidSuccessInGroup> uid2Stat = groupService.emptyMatchesState(tournament, matches);
@@ -468,7 +468,7 @@ public class TournamentService {
     @Inject
     private UserDao userDao;
 
-    public Uid enlistOffline(OpenTournamentMemState tournament,
+    public Uid enlistOffline(TournamentMemState tournament,
             EnlistOffline enlistment, DbUpdater batch) {
         validateEnlistOffline(tournament, enlistment);
         final Uid participantUid = userDao.register(UserRegRequest.builder()
@@ -504,7 +504,7 @@ public class TournamentService {
     @Inject
     private CategoryService categoryService;
 
-    public boolean endOfTournamentCategory(OpenTournamentMemState tournament, int cid, DbUpdater batch) {
+    public boolean endOfTournamentCategory(TournamentMemState tournament, int cid, DbUpdater batch) {
         final Tid tid = tournament.getTid();
         log.info("Tid {} complete in cid {}", tid, cid);
         Set<Integer> incompleteCids = categoryService.findIncompleteCategories(tournament);

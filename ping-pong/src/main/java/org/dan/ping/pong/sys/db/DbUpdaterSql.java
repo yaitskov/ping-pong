@@ -21,6 +21,7 @@ public class DbUpdaterSql implements DbUpdater {
     private final DSLContext jooq;
     private final List<DbUpdateSql> updates;
     private final List<Runnable> failureCallbacks;
+    private boolean dirty;
 
     public static DbUpdaterSql create(DSLContext jooq) {
         return new DbUpdaterSql(jooq, newArrayList(), newArrayList());
@@ -33,6 +34,11 @@ public class DbUpdaterSql implements DbUpdater {
 
     public DbUpdater exec(DbUpdate u) {
         return exec((DbUpdateSql) u);
+    }
+
+    @Override
+    public void markDirty() {
+        dirty = true;
     }
 
     public DbUpdater exec(DbUpdateSql u) {
@@ -75,20 +81,23 @@ public class DbUpdaterSql implements DbUpdater {
     }
 
     private void clear() {
+        dirty = false;
         updates.clear();
         failureCallbacks.clear();
     }
 
     @Override
     public void rollback() {
-        failureCallbacks.forEach(r -> {
-            try {
-                r.run();
-            } catch (Exception e) {
-                log.error("Failure handler {}", r, e);
-                // restart node?
-            }
-        });
+        if (dirty || !updates.isEmpty()) {
+            failureCallbacks.forEach(r -> {
+                try {
+                    r.run();
+                } catch (Exception e) {
+                    log.error("Failure handler {}", r, e);
+                    // restart node?
+                }
+            });
+        }
         clear();
     }
 }

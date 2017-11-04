@@ -22,7 +22,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.Users;
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.user.UserLink;
@@ -86,7 +86,7 @@ public class MatchDaoServer implements MatchDao {
     }
 
     @Override
-    public Optional<Uid> scoreSet(OpenTournamentMemState tournament, MatchInfo matchInfo,
+    public Optional<Uid> scoreSet(TournamentMemState tournament, MatchInfo matchInfo,
             DbUpdater batch, FinalMatchScore matchScore) {
         final Optional<Uid> winUidO = matchInfo.addSetScore(
                 matchScore.getScores(), tournament.getRule().getMatch());
@@ -185,7 +185,7 @@ public class MatchDaoServer implements MatchDao {
     }
 
     @Override
-    public void deleteAllByTid(OpenTournamentMemState tournament, DbUpdater batch, int size) {
+    public void deleteAllByTid(TournamentMemState tournament, DbUpdater batch, int size) {
         batch
                 .exec(DbUpdateSql.builder()
                         .mustAffectRows(empty())

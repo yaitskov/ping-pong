@@ -14,7 +14,7 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.match.MatchType;
 import org.dan.ping.pong.app.match.Mid;
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,7 +68,7 @@ public class PlayOffGenerator {
     private static final int FIRST_PLAY_OFF_MATCH_LEVEL = 1;
     public static final Mid MID0 = new Mid(0);
 
-    private final OpenTournamentMemState tournament;
+    private final TournamentMemState tournament;
     private final int cid;
     private final boolean thirdPlaceMatch;
     private final MatchDao matchDao;

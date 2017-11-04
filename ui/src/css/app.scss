@@ -49,6 +49,9 @@ $section-panel-label-color: #666;
     background-color: $active-background-color;
     cursor: pointer;
 }
+.clickable {
+    cursor: pointer;
+}
 .clicked {
     background-color: $active-background-color - #151515;
 }

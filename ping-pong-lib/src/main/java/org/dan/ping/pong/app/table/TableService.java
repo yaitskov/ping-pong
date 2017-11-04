@@ -18,7 +18,7 @@ import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.sys.db.DbUpdater;
@@ -53,7 +53,7 @@ public class TableService {
     }
 
     private List<MatchInfo> selectForScheduling(
-            int matchesToSchedule, OpenTournamentMemState tournament) {
+            int matchesToSchedule, TournamentMemState tournament) {
         final Set<Uid> pickedUids = new HashSet<>();
         return tournament.getMatches().values().stream()
                 .filter(minfo -> minfo.getState() == Place)
@@ -75,7 +75,7 @@ public class TableService {
                 .collect(toList());
     }
 
-    void freeTablesForCompleteMatches(OpenTournamentMemState tournament, PlaceMemState place, DbUpdater batch) {
+    void freeTablesForCompleteMatches(TournamentMemState tournament, PlaceMemState place, DbUpdater batch) {
         place.getTables().values().stream()
                 .filter(t -> t.getMid().isPresent())
                 .forEach(t -> {
@@ -103,7 +103,7 @@ public class TableService {
         matchDao.markAsSchedule(match, batch);
     }
 
-    public int scheduleFreeTables(OpenTournamentMemState tournament, PlaceMemState place,
+    public int scheduleFreeTables(TournamentMemState tournament, PlaceMemState place,
             Instant now, DbUpdater batch) {
         log.info("Schedule matches in tid {}", tournament.getTid());
         freeTablesForCompleteMatches(tournament, place, batch);

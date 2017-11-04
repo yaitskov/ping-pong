@@ -8,7 +8,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.bid.Uid;
@@ -31,7 +31,7 @@ public class GroupServiceTest {
 
     @Test
     public void zeroPopulationsNoGroups() {
-        assertThat(sut.populations(OpenTournamentMemState.builder()
+        assertThat(sut.populations(TournamentMemState.builder()
                         .participants(ImmutableMap.of(UID1,
                                 ParticipantMemState.builder()
                                         .gid(Optional.empty())
@@ -47,7 +47,7 @@ public class GroupServiceTest {
 
     @Test
     public void populations1Person() {
-        assertThat(sut.populations(OpenTournamentMemState.builder()
+        assertThat(sut.populations(TournamentMemState.builder()
                         .participants(ImmutableMap.of(UID1, ParticipantMemState.builder()
                                 .gid(Optional.of(GID))
                                 .uid(UID1)

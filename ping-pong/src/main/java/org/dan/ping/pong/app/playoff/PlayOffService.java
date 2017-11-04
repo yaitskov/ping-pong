@@ -8,7 +8,7 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.Mid;
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -49,7 +49,7 @@ public class PlayOffService {
                 .collect(toList());
     }
 
-    public List<MatchInfo> findPlayOffMatches(OpenTournamentMemState tournament, int cid) {
+    public List<MatchInfo> findPlayOffMatches(TournamentMemState tournament, int cid) {
         return tournament.getMatches().values().stream()
                 .filter(minfo -> minfo.getCid() == cid)
                 .filter(minfo -> !minfo.getGid().isPresent())

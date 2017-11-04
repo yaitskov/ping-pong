@@ -2,7 +2,7 @@ package org.dan.ping.pong.app.bid.result;
 
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 import org.dan.ping.pong.app.tournament.TournamentService;
@@ -23,7 +23,7 @@ public class BidResultService {
     @Inject
     private TournamentService tournamentService;
 
-    public BidResult getResults(OpenTournamentMemState tournament, Uid uid) {
+    public BidResult getResults(TournamentMemState tournament, Uid uid) {
         final ParticipantMemState participant = tournament.getParticipant(uid);
         final List<TournamentResultEntry> resultEntries = tournamentService
                 .tournamentResult(tournament, participant.getCid());
@@ -60,7 +60,7 @@ public class BidResultService {
     @Inject
     private Clocker clocker;
 
-    private BidTimeStats time(OpenTournamentMemState tournament,
+    private BidTimeStats time(TournamentMemState tournament,
             ParticipantMemState participant) {
         final Instant now = clocker.get();
         final LongSummaryStatistics stat = matchTimes(tournament, participant, now);
@@ -74,7 +74,7 @@ public class BidResultService {
                 .build();
     }
 
-    private LongSummaryStatistics matchTimes(OpenTournamentMemState tournament,
+    private LongSummaryStatistics matchTimes(TournamentMemState tournament,
             ParticipantMemState participant, Instant now) {
         return tournament.participantMatches(participant.getUid())
                 .map(m -> m.duration(now))
@@ -84,7 +84,7 @@ public class BidResultService {
                 .summaryStatistics();
     }
 
-    private BidMatchesStat matches(OpenTournamentMemState tournament, Uid uid) {
+    private BidMatchesStat matches(TournamentMemState tournament, Uid uid) {
         final CounterInt total = new CounterInt();
         final CounterInt won = new CounterInt();
         final CounterInt lost = new CounterInt();

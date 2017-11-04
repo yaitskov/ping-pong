@@ -1,8 +1,10 @@
 package org.dan.ping.pong.app.match;
 
 import static java.time.Duration.between;
+import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,6 +27,9 @@ import java.util.Set;
 @NoArgsConstructor(onConstructor = @__(@JsonCreator))
 @AllArgsConstructor
 public class MatchInfo {
+    public static final String USER = "user";
+    public static final String MATCH = "match";
+
     private Mid mid;
     private Tid tid;
     private int cid;
@@ -44,6 +49,13 @@ public class MatchInfo {
             return l.size();
         }
         return 0;
+    }
+
+    public void checkParticipant(Uid uid) {
+        if (!participantIdScore.containsKey(uid)) {
+            throw badRequest("user-not-plays-match",
+                    ImmutableMap.of(USER, uid, MATCH, mid));
+        }
     }
 
     public static class MatchInfoBuilder {

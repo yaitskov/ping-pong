@@ -7,6 +7,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +16,9 @@ import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.Mid;
+import org.dan.ping.pong.app.match.dispute.DisputeMemState;
 import org.dan.ping.pong.app.place.Pid;
+import org.dan.ping.pong.sys.error.PiPoEx;
 
 import java.time.Instant;
 import java.util.List;
@@ -27,7 +30,10 @@ import java.util.stream.Stream;
 @Getter
 @Setter
 @Builder
-public class OpenTournamentMemState {
+public class TournamentMemState {
+    public static final String EXPECTED_TOURNAMENT_STATE = "expected_state";
+    public static final String TOURNAMENT_STATE = "state";
+
     private Tid tid;
     private String name;
     private Pid pid;
@@ -42,6 +48,7 @@ public class OpenTournamentMemState {
     private Optional<Double> ticketPrice;
     private Optional<Tid> previousTid;
     private Instant opensAt;
+    private List<DisputeMemState> disputes;
 
     public Optional<MatchInfo> maybeMatchById(Mid mid) {
         return ofNullable(matches.get(mid));
@@ -110,5 +117,14 @@ public class OpenTournamentMemState {
     public Stream<MatchInfo> participantMatches(Uid uid) {
         return matches.values().stream()
                 .filter(m -> m.getParticipantIdScore().containsKey(uid));
+    }
+
+    public void checkState(TournamentState expectedState) {
+        if (state != expectedState) {
+            throw PiPoEx.badRequest("tournament state is not but",
+                    ImmutableMap.of(
+                            TOURNAMENT_STATE, state,
+                            EXPECTED_TOURNAMENT_STATE, expectedState));
+        }
     }
 }

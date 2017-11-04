@@ -6,7 +6,7 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchValidationRule;
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.bid.Uid;
 
 import java.util.Collection;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class GroupService {
     public Map<Uid, BidSuccessInGroup> emptyMatchesState(
-            OpenTournamentMemState tournament,
+            TournamentMemState tournament,
             Collection<MatchInfo> allMatchesInGroup) {
         return allMatchesInGroup.stream()
                 .map(MatchInfo::getParticipantIdScore)
@@ -30,7 +30,7 @@ public class GroupService {
                         (a, b) -> a));
     }
 
-    public List<Uid> orderUidsInGroup(OpenTournamentMemState tournament,
+    public List<Uid> orderUidsInGroup(TournamentMemState tournament,
             List<MatchInfo> allMatchesInGroup) {
         final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(tournament, allMatchesInGroup);
         final MatchValidationRule matchRule = tournament.getRule().getMatch();
@@ -76,7 +76,7 @@ public class GroupService {
                 .ifPresent(uid -> loser.lost()); // walkover = 0
     }
 
-    public GroupPopulations populations(OpenTournamentMemState tournament, int cid) {
+    public GroupPopulations populations(TournamentMemState tournament, int cid) {
         final List<GroupLink> groupLinks = tournament.getGroupsByCategory(cid).stream()
                 .sorted(Comparator.comparingInt(GroupInfo::getOrdNumber))
                 .map(GroupInfo::toLink)
@@ -95,7 +95,7 @@ public class GroupService {
                 .build();
     }
 
-    public boolean isNotCompleteGroup(OpenTournamentMemState tournament, int gid) {
+    public boolean isNotCompleteGroup(TournamentMemState tournament, int gid) {
         final Optional<Integer> ogid = Optional.of(gid);
         return tournament.getMatches()
                 .values()

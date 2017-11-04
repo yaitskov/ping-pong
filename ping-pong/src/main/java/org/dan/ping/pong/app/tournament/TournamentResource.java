@@ -144,7 +144,7 @@ public class TournamentResource {
 
     @Inject
     @Named(TOURNAMENT_CACHE)
-    private LoadingCache<Tid, OpenTournamentMemState> tournamentCache;
+    private LoadingCache<Tid, TournamentMemState> tournamentCache;
 
     @POST
     @Path(TOURNAMENT_INVALIDATE_CACHE)
@@ -292,7 +292,7 @@ public class TournamentResource {
     public void getTournamentRules(
             @Suspended AsyncResponse response,
             @PathParam(TID) Tid tid) {
-        tournamentAccessor.read(tid, response, OpenTournamentMemState::getRule);
+        tournamentAccessor.read(tid, response, TournamentMemState::getRule);
     }
 
     @POST

@@ -10,7 +10,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.table.TableService;
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
@@ -36,7 +36,7 @@ public class GlobalScheduleService implements ScheduleService {
     private TableService tableService;
 
     @Override
-    public void beginTournament(OpenTournamentMemState tournament,
+    public void beginTournament(TournamentMemState tournament,
             DbUpdater batch, Instant now) {
         sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
                 place -> {
@@ -50,7 +50,7 @@ public class GlobalScheduleService implements ScheduleService {
     }
 
     @Override
-    public void cancelTournament(OpenTournamentMemState tournament,
+    public void cancelTournament(TournamentMemState tournament,
             DbUpdater batch, Instant now) {
         sequentialExecutor.executeSync(placeCache.load(tournament.getPid()), place -> {
             batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
@@ -62,7 +62,7 @@ public class GlobalScheduleService implements ScheduleService {
     }
 
     @Override
-    public void participantLeave(OpenTournamentMemState tournament,
+    public void participantLeave(TournamentMemState tournament,
             DbUpdater batch, Instant now) {
         sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
                 place -> {
@@ -72,7 +72,7 @@ public class GlobalScheduleService implements ScheduleService {
     }
 
     @Override
-    public void afterMatchComplete(OpenTournamentMemState tournament,
+    public void afterMatchComplete(TournamentMemState tournament,
             DbUpdater batch, Instant now) {
         sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
                 place -> {
@@ -86,7 +86,7 @@ public class GlobalScheduleService implements ScheduleService {
     }
 
     @Override
-    public <T> T withPlaceTables(OpenTournamentMemState tournament, Function<TablesDiscovery, T> f) {
+    public <T> T withPlaceTables(TournamentMemState tournament, Function<TablesDiscovery, T> f) {
         return sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
                 place -> f.apply(new GlobalTablesDiscovery(place)));
     }

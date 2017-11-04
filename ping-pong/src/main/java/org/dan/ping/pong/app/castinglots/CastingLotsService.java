@@ -30,7 +30,7 @@ import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.sys.db.DbUpdaterSql;
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentRules;
@@ -73,7 +73,7 @@ public class CastingLotsService {
     private GroupDivider groupDivider;
 
     @Transactional(TRANSACTION_MANAGER)
-    public void seed(OpenTournamentMemState tournament) {
+    public void seed(TournamentMemState tournament) {
         log.info("Begin seeding tournament {}", tournament.getTid());
         final TournamentRules rules = tournament.getRule();
         final List<ParticipantMemState> readyBids = findBidsReadyToPlay(tournament);
@@ -96,7 +96,7 @@ public class CastingLotsService {
     private DbUpdaterFactory dbUpdaterFactory;
 
     private void seedJustPlayOffTournament(TournamentRules rules,
-            OpenTournamentMemState tournament,
+            TournamentMemState tournament,
             List<ParticipantMemState> readyBids) {
         log.info("Seed tid {} as playoff", tournament.getTid());
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
@@ -128,7 +128,7 @@ public class CastingLotsService {
 
     private void assignBidsToBaseMatches(Integer cid, int basePositions,
             List<ParticipantMemState> orderedBids,
-            OpenTournamentMemState tournament, DbUpdaterSql batch) {
+            TournamentMemState tournament, DbUpdaterSql batch) {
         final List<Integer> seeds = ofNullable(PLAY_OFF_SEEDS.get(basePositions))
                 .orElseThrow(() -> internalError("No seeding for "
                         + orderedBids.size() + " participants"));
@@ -164,7 +164,7 @@ public class CastingLotsService {
     }
 
     private void seedJustGroupTournament(TournamentRules rules,
-            OpenTournamentMemState tournament,
+            TournamentMemState tournament,
             List<ParticipantMemState> readyBids) {
         log.info("Seed tid {} as group", tournament.getTid());
         final Tid tid = tournament.getTid();
@@ -184,7 +184,7 @@ public class CastingLotsService {
     }
 
     private void seedTournamentWithGroupsAndPlayOff(TournamentRules rules,
-            OpenTournamentMemState tournament, List<ParticipantMemState> readyBids) {
+            TournamentMemState tournament, List<ParticipantMemState> readyBids) {
         final Tid tid = tournament.getTid();
         final int quits = rules.getGroup().get().getQuits();
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
@@ -220,7 +220,7 @@ public class CastingLotsService {
         }
     }
 
-    private List<ParticipantMemState> findBidsReadyToPlay(OpenTournamentMemState tournament) {
+    private List<ParticipantMemState> findBidsReadyToPlay(TournamentMemState tournament) {
         return tournament.getParticipants().values().stream()
                 .filter(bid -> ImmutableSet.of(Want, Paid, Here).contains(bid.getBidState()))
                 .collect(toList());
@@ -252,7 +252,7 @@ public class CastingLotsService {
     @Inject
     private Clocker clocker;
 
-    public void addParticipant(Uid uid, OpenTournamentMemState tournament, DbUpdater batch) {
+    public void addParticipant(Uid uid, TournamentMemState tournament, DbUpdater batch) {
         final ParticipantMemState participant = tournament.getParticipant(uid);
         log.info("Add participant {} to group", uid, participant.getGid());
         int[] priority = new int[1];

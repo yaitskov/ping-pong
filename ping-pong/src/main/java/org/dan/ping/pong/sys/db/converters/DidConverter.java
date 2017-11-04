@@ -1,23 +1,23 @@
 package org.dan.ping.pong.sys.db.converters;
 
-import org.dan.ping.pong.app.place.Pid;
+import org.dan.ping.pong.app.match.dispute.DisputeId;
 import org.jooq.Converter;
 
-public class PidConverter implements Converter<Integer, Pid> {
+public class DidConverter implements Converter<Integer, DisputeId> {
     @Override
-    public Pid from(Integer pid) {
+    public DisputeId from(Integer pid) {
         if (pid == null || pid == 0) {
             return null;
         }
-        return new Pid(pid);
+        return new DisputeId(pid);
     }
 
     @Override
-    public Integer to(Pid u) {
+    public Integer to(DisputeId u) {
         if (u == null) {
             return null;
         }
-        return u.getPid();
+        return u.getId();
     }
 
     @Override
@@ -26,7 +26,7 @@ public class PidConverter implements Converter<Integer, Pid> {
     }
 
     @Override
-    public Class<Pid> toType() {
-        return Pid.class;
+    public Class<DisputeId> toType() {
+        return DisputeId.class;
     }
 }

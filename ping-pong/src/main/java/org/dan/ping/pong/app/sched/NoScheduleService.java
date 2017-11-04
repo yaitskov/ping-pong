@@ -8,7 +8,7 @@ import static org.dan.ping.pong.app.sched.NoTablesDiscovery.NO_TABLES_DISCOVERY;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.table.TableService;
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.time.Instant;
@@ -25,7 +25,7 @@ public class NoScheduleService implements ScheduleService {
     private BidDao bidDao;
 
     @Override
-    public void beginTournament(OpenTournamentMemState tournament,
+    public void beginTournament(TournamentMemState tournament,
             DbUpdater batch, Instant now) {
         selectForScheduling(tournament).forEach(match -> {
             tableService.markAsSchedule(match, now, batch);
@@ -34,29 +34,29 @@ public class NoScheduleService implements ScheduleService {
     }
 
     @Override
-    public void cancelTournament(OpenTournamentMemState tournament,
+    public void cancelTournament(TournamentMemState tournament,
             DbUpdater batch, Instant now) {
         beginTournament(tournament, batch, now);
     }
 
     @Override
-    public void participantLeave(OpenTournamentMemState tournament,
+    public void participantLeave(TournamentMemState tournament,
             DbUpdater batch, Instant now) {
         beginTournament(tournament, batch, now);
     }
 
     @Override
-    public void afterMatchComplete(OpenTournamentMemState tournament,
+    public void afterMatchComplete(TournamentMemState tournament,
             DbUpdater batch, Instant now) {
         beginTournament(tournament, batch, now);
     }
 
     @Override
-    public <T> T withPlaceTables(OpenTournamentMemState tournament, Function<TablesDiscovery, T> f) {
+    public <T> T withPlaceTables(TournamentMemState tournament, Function<TablesDiscovery, T> f) {
         return f.apply(NO_TABLES_DISCOVERY);
     }
 
-    private List<MatchInfo> selectForScheduling(OpenTournamentMemState tournament) {
+    private List<MatchInfo> selectForScheduling(TournamentMemState tournament) {
         return tournament.getMatches().values().stream()
                 .filter(minfo -> minfo.getState() == Place)
                 .filter(minfo -> minfo.getParticipantIdScore().size() == 2)

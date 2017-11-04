@@ -1,24 +1,23 @@
 package org.dan.ping.pong.app.sched;
 
-import org.dan.ping.pong.app.place.PlaceMemState;
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.time.Instant;
 import java.util.function.Function;
 
 public interface ScheduleService {
-    void beginTournament(OpenTournamentMemState tournament,
+    void beginTournament(TournamentMemState tournament,
             DbUpdater batch, Instant now);
 
-    void cancelTournament(OpenTournamentMemState tournament,
+    void cancelTournament(TournamentMemState tournament,
             DbUpdater batch, Instant now);
 
-    void participantLeave(OpenTournamentMemState tournament,
+    void participantLeave(TournamentMemState tournament,
             DbUpdater batch, Instant now);
 
-    void afterMatchComplete(OpenTournamentMemState tournament,
+    void afterMatchComplete(TournamentMemState tournament,
             DbUpdater batch, Instant now);
 
-    <T> T withPlaceTables(OpenTournamentMemState tournament, Function<TablesDiscovery, T> f);
+    <T> T withPlaceTables(TournamentMemState tournament, Function<TablesDiscovery, T> f);
 }

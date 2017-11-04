@@ -91,6 +91,9 @@ angular.module('pingPong').
                     when('/my/tournament/edit/:tournamentId', {
                         template: '<tournament-edit></tournament-edit>'
                     }).
+                    when('/tournament/match/new-dispute/:tournamentId/:matchId', {
+                        template: '<match-result-new-dispute></match-result-new-dispute>'
+                    }).
                     when('/my/tournament/parameters/:tournamentId', {
                         template: '<tournament-parameters></tournament-parameters>'
                     }).

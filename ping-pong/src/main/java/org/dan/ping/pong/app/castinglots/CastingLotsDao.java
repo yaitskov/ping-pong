@@ -25,7 +25,7 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.playoff.PlayOffRule;
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.bid.Uid;
@@ -51,7 +51,7 @@ public class CastingLotsDao {
     @Inject
     private MatchDaoServer matchDao;
 
-    private List<Integer> pickSchedule(OpenTournamentMemState tournament,
+    private List<Integer> pickSchedule(TournamentMemState tournament,
             List<ParticipantMemState> groupBids) {
         final GroupSchedule groupSchedules = tournament.getRule().getGroup().get()
                 .getSchedule().orElse(DEFAULT_SCHEDULE);
@@ -60,7 +60,7 @@ public class CastingLotsDao {
                         .orElseThrow(() -> internalError("No schedule for group of " + groupBids.size())));
     }
 
-    public int generateGroupMatches(OpenTournamentMemState tournament, int gid,
+    public int generateGroupMatches(TournamentMemState tournament, int gid,
             List<ParticipantMemState> groupBids, int priorityGroup) {
         final Tid tid = tournament.getTid();
         log.info("Generate matches for group {} in tournament {}", gid, tid);
@@ -75,7 +75,7 @@ public class CastingLotsDao {
         return priorityGroup;
     }
 
-    public int addGroupMatch(OpenTournamentMemState tournament, int priorityGroup,
+    public int addGroupMatch(TournamentMemState tournament, int priorityGroup,
             ParticipantMemState bid1, ParticipantMemState bid2) {
         final Mid mid = matchDao.createGroupMatch(bid1.getTid(),
                 bid1.getGid().get(), bid1.getCid(), ++priorityGroup,
@@ -96,7 +96,7 @@ public class CastingLotsDao {
         return priorityGroup;
     }
 
-    public Mid generatePlayOffMatches(OpenTournamentMemState tinfo, Integer cid,
+    public Mid generatePlayOffMatches(TournamentMemState tinfo, Integer cid,
             int playOffStartPositions, int basePlayOffPriority) {
         final Tid tid = tinfo.getTid();
         log.info("Generate play off matches for {} bids in tid {}",

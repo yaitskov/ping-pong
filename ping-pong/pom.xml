@@ -478,6 +478,21 @@
                                     <binding>org.dan.ping.pong.sys.db.converters.PidConverter</binding>
                                 </customType>
                                 <customType>
+                                    <name>DisputeStatus</name>
+                                    <type>org.dan.ping.pong.app.match.dispute.DisputeStatus</type>
+                                    <binding>org.dan.ping.pong.app.match.dispute.DisputeStateConverter</binding>
+                                </customType>
+                                <customType>
+                                    <name>Did</name>
+                                    <type>org.dan.ping.pong.app.match.dispute.DisputeId</type>
+                                    <binding>org.dan.ping.pong.sys.db.converters.DidConverter</binding>
+                                </customType>
+                                <customType>
+                                    <name>Scores</name>
+                                    <type>java.util.Map&lt;org.dan.ping.pong.app.bid.Uid,java.util.List&lt;java.lang.Integer&gt;&gt;</type>
+                                    <binding>org.dan.ping.pong.sys.db.converters.MatchScoresConverter</binding>
+                                </customType>
+                                <customType>
                                     <name>Tid</name>
                                     <type>org.dan.ping.pong.app.tournament.Tid</type>
                                     <binding>org.dan.ping.pong.sys.db.converters.TidConverter</binding>
@@ -534,6 +549,51 @@
                                 </customType>
                             </customTypes>
                             <forcedTypes>
+                                <forcedType>
+                                    <name>DisputeStatus</name>
+                                    <expression>.*match_dispute\.status</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Scores</name>
+                                    <expression>.*match_dispute\.proposed_score</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>OptionalInstant</name>
+                                    <expression>.*match_dispute\.resolved_at</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Instant</name>
+                                    <expression>.*match_dispute\.created</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Uid</name>
+                                    <expression>.*match_dispute\.(plaintiff|judge)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Mid</name>
+                                    <expression>.*match_dispute\.mid</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Tid</name>
+                                    <expression>.*match_dispute\.tid</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Did</name>
+                                    <expression>.*match_dispute\.did</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>OptionalString</name>
+                                    <expression>.*match_dispute\.(judge|plaintiff)_comment</expression>
+                                    <types>.*</types>
+                                </forcedType>
                                 <forcedType>
                                     <name>OptionalString</name>
                                     <expression>.*users\.(email|phone)</expression>

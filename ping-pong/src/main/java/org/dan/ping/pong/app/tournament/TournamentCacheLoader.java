@@ -25,7 +25,7 @@ import javax.inject.Inject;
 
 
 @Slf4j
-public class TournamentCacheLoader extends CacheLoader<Tid, OpenTournamentMemState> {
+public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> {
     @Inject
     private TournamentDao tournamentDao;
 
@@ -46,10 +46,10 @@ public class TournamentCacheLoader extends CacheLoader<Tid, OpenTournamentMemSta
 
     @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public OpenTournamentMemState load(Tid tid) throws Exception {
+    public TournamentMemState load(Tid tid) throws Exception {
         log.info("Loading tournament {}", tid);
         final TournamentRow row = tournamentDao.getRow(tid).orElseThrow(() -> notFound("tournament " + tid));
-        return OpenTournamentMemState.builder()
+        return TournamentMemState.builder()
                 .name(row.getName())
                 .participants(bidDao.loadParticipants(tid))
                 .categories(categoryDao.listCategoriesByTid(tid).stream()

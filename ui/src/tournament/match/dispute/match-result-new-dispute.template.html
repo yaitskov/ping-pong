@@ -1,0 +1,65 @@
+<main-menu></main-menu>
+<div class="container">
+  <div class="form-group">
+    <div class="alert alert-info">
+      Click on a set score you think is wrong,
+      provide alternative outcome and claim a dispute.
+    </div>
+    <div class="alert alert-info">
+      The match and its all following dependent play off matches will
+      be blocked until the dispute is resolved by an administrator
+      (accepted or rejected).
+    </div>
+  </div>
+  <div class="form-group">
+    <a class="btn btn-default" title="back" back-button>
+      <span class="glyphicon glyphicon-circle-arrow-left"></span>
+    </a>
+    <a href="#!/tournament/played-matches/{{$ctrl.tournamentId}}"
+       class="btn btn-primary"
+       title="list my played matches">
+      <span class="glyphicon glyphicon-book"></span>
+    </a>
+    <a href="#!/tournaments/{{$ctrl.tournament.tid}}"
+       class="btn btn-primary">
+      <span class="glyphicon glyphicon-home"></span>
+    </a>
+  </div>
+  <div class="form-group" ng-show="!$ctrl.setRescoring">
+    <review-sets></review-sets>
+  </div>
+  <base-score-set ng-show="$ctrl.setRescoring"></base-score-set>
+  <div class="form-group" ng-show="$ctrl.setRescoring">
+    <a class="btn btn-primary" ng-click="$ctrl.acceptSetScore()">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      accept set score
+    </a>
+    <a class="btn btn-danger" ng-click="$ctrl.cancelSetScore()">
+      <span class="glyphicon glyphicon-remove-sign"></span>
+      cancel
+    </a>
+  </div>
+  <div class="form-group">
+    <label for="comment" translate="comment"/>
+    <input name="comment" type="text" ng-maxlength="40"
+           placeholder="{{ 'Optional dispute reasoning' | translate }}"
+           id="comment" class="form-control" ng-model="$ctrl.dispute.comment"/>
+    <p class="help-block"
+       ng-show="$ctrl.form.comment.$error.maxlength">
+      {{ 'comment-length' | translate : '{max: 40}' }}
+    </p>
+  </div>
+  <div class="form-group">
+    <request-status></request-status>
+  </div>
+  <div class="form-group">
+    <a class="btn btn-danger" ng-click="$ctrl.openDispute()">
+      <span class="glyphicon glyphicon-flash"></span>
+      Open dispute
+    </a>
+    <a class="btn btn-default" title="back" back-button>
+      <span class="glyphicon glyphicon-circle-arrow-left"></span>
+    </a>
+  </div>
+</div>
+</div>

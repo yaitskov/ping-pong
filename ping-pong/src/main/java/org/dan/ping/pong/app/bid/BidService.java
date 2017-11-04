@@ -15,7 +15,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.tournament.OpenTournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserLink;
@@ -34,11 +34,11 @@ public class BidService {
     @Inject
     private BidDao bidDao;
 
-    public void paid(OpenTournamentMemState tournament, Uid uid, DbUpdater batch) {
+    public void paid(TournamentMemState tournament, Uid uid, DbUpdater batch) {
         setBidState(tournament.getParticipant(uid), Paid, singletonList(Want), batch);
     }
 
-    public void readyToPlay(OpenTournamentMemState tournament, Uid uid, DbUpdater batch) {
+    public void readyToPlay(TournamentMemState tournament, Uid uid, DbUpdater batch) {
         setBidState(tournament.getParticipant(uid), Here, asList(Paid, Want), batch);
     }
 
@@ -54,13 +54,13 @@ public class BidService {
     @Inject
     private Clocker clocker;
 
-    public void setCategory(OpenTournamentMemState tournament, SetCategory setCategory, DbUpdater batch) {
+    public void setCategory(TournamentMemState tournament, SetCategory setCategory, DbUpdater batch) {
         tournament.checkCategory(setCategory.getCid());
         tournament.getParticipant(setCategory.getUid()).setCid(setCategory.getCid());
         bidDao.setCategory(setCategory, clocker.get(), batch);
     }
 
-    public void setBidState(OpenTournamentMemState tournament, SetBidState setState, DbUpdater batch) {
+    public void setBidState(TournamentMemState tournament, SetBidState setState, DbUpdater batch) {
         setBidState(tournament.getParticipant(setState.getUid()), setState.getTarget(),
                 singletonList(setState.getExpected()), batch);
     }
@@ -81,7 +81,7 @@ public class BidService {
                 target, expected, clocker.get(), batch);
     }
 
-    public List<UserLink> findByState(OpenTournamentMemState tournament, List<BidState> states) {
+    public List<UserLink> findByState(TournamentMemState tournament, List<BidState> states) {
         return tournament.getParticipants().values().stream()
                 .filter(p -> states.contains(p.getState()))
                 .filter(p -> tournament.participantMatches(p.getUid())

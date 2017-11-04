@@ -10,17 +10,17 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public class TournamentCache implements Cache<Tid, OpenTournamentMemState> {
+public class TournamentCache implements Cache<Tid, TournamentMemState> {
     @Inject
     @Named(TOURNAMENT_CACHE)
-    private LoadingCache<Tid, OpenTournamentMemState> tournamentCache;
+    private LoadingCache<Tid, TournamentMemState> tournamentCache;
 
-    public OpenTournamentMemState load(int tid) {
+    public TournamentMemState load(int tid) {
         return load(new Tid(tid));
     }
 
     @SneakyThrows
-    public OpenTournamentMemState load(Tid tid) {
+    public TournamentMemState load(Tid tid) {
         try {
             return tournamentCache.get(tid);
         } catch (ExecutionException e) {

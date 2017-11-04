@@ -157,7 +157,7 @@ public class TournamentDao {
                 .map(this::mapToDatedDigest);
     }
 
-    public void setState(OpenTournamentMemState tournament, DbUpdater batch) {
+    public void setState(TournamentMemState tournament, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .logBefore(() -> log.info("Switch tournament {} into {} state.",
                         tournament.getTid(), tournament.getState()))

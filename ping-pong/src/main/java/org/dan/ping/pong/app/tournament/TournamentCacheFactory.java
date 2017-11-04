@@ -19,7 +19,7 @@ public class TournamentCacheFactory {
     private int expireTournamentSeconds;
 
     @Bean(name = TOURNAMENT_CACHE)
-    public LoadingCache<Tid, OpenTournamentMemState> create() {
+    public LoadingCache<Tid, TournamentMemState> create() {
         return CacheBuilder.newBuilder()
                 .expireAfterAccess(expireTournamentSeconds, TimeUnit.SECONDS)
                 .build(loader);

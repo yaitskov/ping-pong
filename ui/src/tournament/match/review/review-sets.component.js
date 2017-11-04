@@ -8,7 +8,28 @@ angular.
         controller: ['$routeParams', 'pageCtx', 'binder', '$rootScope', '$scope',
                      function ($routeParams, pageCtx, binder, $rootScope, $scope) {
                          var self = this;
+
+                         self.strongSet = function (iSet) {
+                             return self.strong[iSet];
+                         };
+                         self.appendSet = function () {
+                             $rootScope.$broadcast('event.review.match.set.appended');
+                         };
+                         self.removeLastSet = function () {
+                             $rootScope.$broadcast('event.review.match.set.popped');
+                         };
+                         self.pickSet = function (setIdx, set) {
+                             $rootScope.$broadcast('event.review.match.set.picked', setIdx, set);
+                         };
+                         self.strong = {};
+                         self.config = {edit: false};
                          binder($scope, {
+                             'event.review.match.strong.data': (event, strong) => {
+                                 self.strong = strong;
+                             },
+                             'event.review.match.config': (event, config) => {
+                                 self.config = config;
+                             },
                              'event.review.match.data': (event, match) => {
                                  self.matchReview = match;
                                  self.matchScore = self.matchReview.score;

@@ -1,8 +1,8 @@
 import angular from 'angular';
-import template from './participant-presence.template.html';
+import template from './par-state-mgmt-list.template.html';
 
-angular.module('participantPresence').
-    component('participantPresence', {
+angular.module('participant').
+    component('parStateMgmtList', {
         templateUrl: template,
         controller: ['$http', 'mainMenu', '$routeParams', 'auth', 'requestStatus',
                      'Participant', 'Tournament',

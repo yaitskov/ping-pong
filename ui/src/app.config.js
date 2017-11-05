@@ -137,7 +137,7 @@ angular.module('pingPong').
                         template: '<place-picker></place-picker>'
                     }).
                     when('/my/tournament/presence/:tournamentId', {
-                        template: '<participant-presence></participant-presence>'
+                        template: '<par-state-mgmt-list></par-state-mgmt-list>'
                     }).
                     when('/my/tournament/:tournamentId/participant/:userId', {
                         template: '<manage-one-participant></manage-one-participant>'

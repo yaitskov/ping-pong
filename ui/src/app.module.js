@@ -28,7 +28,6 @@ angular.module('pingPong', [
     'tournamentParameters',
     'tournament',
     'changeCategory',
-    'participantPresence',
     'categoryMemberList',
     'tournamentCategories'
 ]);

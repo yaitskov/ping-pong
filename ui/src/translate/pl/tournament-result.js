@@ -8,7 +8,7 @@ module.exports = {
     'Score': 'Wynik',
     'count of won matches': 'liczba wygranych meczów',
     'cumulative score across all matches': 'Łączna suma punktów wszystkich meczów',
-    'Opponents participating in the match': 'Oponenty uczestniający w meczu',
+    'Opponents participating in the match': 'Przeciwnicy uczestniający w meczu',
     'Tournament results': 'Wyniki turnieju',
     "Loading participants": "Ladowanie uczestników"
 };

@@ -3,7 +3,7 @@ module.exports = {
     'Win set score': 'Gemy wygrane',
     'Lost set score': 'Gemy przegrane',
     'Match Review': 'Recenzja meczu',
-    'Judge next': 'Sądzić dalej',
+    'Judge next': 'Kolejny mecz',
     'match-is-complete-info': 'Ten mecz jest zakończony. Sprawdź wynik i przechodź do kolejnego meczu.',
     'Set n scored. Match continues': 'Set {{n}} is scored. Match continues',
     'Match score response unknown': 'Match score response {{name}} is unknown',

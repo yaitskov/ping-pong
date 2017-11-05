@@ -5,25 +5,26 @@ angular.module('tournament').
     component('playInTournamentList', {
         templateUrl: template,
         cache: false,
-        controller: ['Tournament', 'mainMenu', 'requestStatus',
-                     function (Tournament, mainMenu, requestStatus) {
+        controller: ['Tournament', 'mainMenu', 'requestStatus', 'binder', '$scope',
+                     function (Tournament, mainMenu, requestStatus, binder, $scope) {
                          mainMenu.setTitle('Tournaments I am enlisted to');
                          this.tournaments = null;
                          var self = this;
-                         requestStatus.startLoading();
                          this.viewUrl = function (tournament) {
-                             // if (tournament.state == 'Close') {
-                             //     return '/tournament/result/' + tournament.tid;
-                             // }
                              return '/tournaments/' + tournament.tid;
                          }
-                         Tournament.participateIn(
-                             {completeAfterDays: 3},
-                             function (tournaments) {
-                                 requestStatus.complete();
-                                 self.tournaments = tournaments;
-                             },
-                             requestStatus.failed);
+                         binder($scope, {
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading();
+                                 Tournament.participateIn(
+                                     {completeAfterDays: 3},
+                                     function (tournaments) {
+                                         requestStatus.complete();
+                                         self.tournaments = tournaments;
+                                     },
+                                     requestStatus.failed);
+                             }
+                         });
                      }
                     ]
     });

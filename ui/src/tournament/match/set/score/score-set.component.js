@@ -8,9 +8,13 @@ angular.
         controller: ['Match', 'requestStatus', '$scope', '$rootScope', 'binder',
                      function (Match, requestStatus, $scope, $rootScope, binder) {
                          var self = this;
+                         self.setScoreBtn = 'Score';
                          binder($scope, {
                              'event.base.match.set.ready': (event) => {
                                  $rootScope.$broadcast('event.match.set.ready');
+                             },
+                             'event.match.set.playedSets': (event, btnLabel) => {
+                                 self.setScoreBtn = btnLabel;
                              },
                              'event.match.set.scored': (event, matchScore) => {
                                  Match.scoreMatch(

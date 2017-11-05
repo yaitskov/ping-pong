@@ -5,9 +5,9 @@ angular.module('tournament').
     component('judgeMatchListToJudge', {
         templateUrl: template,
         controller: ['Match', 'Tournament', 'Participant', 'mainMenu', '$location',
-                     'pageCtx', 'requestStatus', '$routeParams', 'cutil',
+                     'pageCtx', 'requestStatus', '$routeParams', 'cutil', 'binder', '$scope',
                      function (Match, Tournament, Participant, mainMenu, $location,
-                               pageCtx, requestStatus, $routeParams, cutil) {
+                               pageCtx, requestStatus, $routeParams, cutil, binder, $scope) {
                          mainMenu.setTitle('Match Judgement');
                          var self = this;
                          self.matches = null;
@@ -40,41 +40,47 @@ angular.module('tournament').
                                  requestStatus.failed);
                          };
 
-                         requestStatus.startLoading();
-                         Tournament.parameters(
-                             {tournamentId: $routeParams.tournamentId},
-                             (rules) => {
-                                 if (rules.place && rules.place.arenaDistribution == 'GLOBAL') {
-                                     self.showTables = true;
-                                     self.orderField = 'table.label';
-                                     Match.myMatchesNeedToJudge(
-                                         {tournamentId: $routeParams.tournamentId},
-                                         (matches) => {
-                                             requestStatus.complete();
-                                             self.matches = matches.matches;
-                                             self.progress = matches.progress;
-                                             self.tournamentNotOpen = !matches.length;
-                                         },
-                                         requestStatus.failed);
-                                 } else {
-                                     self.orderField = 'enemy.name';
-                                     self.showTables = false;
-                                     Participant.findByState(
-                                         {tid: $routeParams.tournamentId,
-                                          states: ['Wait', 'Play']
-                                         },
-                                         (bids) => {
-                                             requestStatus.complete();
-                                             self.bids = bids;
-                                             if (bids.length) {
-                                                 self.bid = "" + cutil.findValByO(bids, {uid: +pageCtx.get('last-bid')}, bids[0]).uid;
-                                                 self.bidChange();
-                                             }
-                                         },
-                                         requestStatus.failed);
-                                 }
-                             },
-                             requestStatus.failed);
+                         binder($scope, {
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading();
+                                 Tournament.parameters(
+                                     {tournamentId: $routeParams.tournamentId},
+                                     (rules) => {
+                                         if (rules.place && rules.place.arenaDistribution == 'GLOBAL') {
+                                             self.showTables = true;
+                                             self.orderField = 'table.label';
+                                             Match.myMatchesNeedToJudge(
+                                                 {tournamentId: $routeParams.tournamentId},
+                                                 (matches) => {
+                                                     requestStatus.complete();
+                                                     self.matches = matches.matches;
+                                                     self.progress = matches.progress;
+                                                     self.tournamentNotOpen = !matches.length;
+                                                 },
+                                                 requestStatus.failed);
+                                         } else {
+                                             self.orderField = 'enemy.name';
+                                             self.showTables = false;
+                                             Participant.findByState(
+                                                 {tid: $routeParams.tournamentId,
+                                                  states: ['Wait', 'Play']
+                                                 },
+                                                 (bids) => {
+                                                     requestStatus.complete();
+                                                     self.bids = bids;
+                                                     if (bids.length) {
+                                                         self.bid = "" + cutil.findValByO(
+                                                             bids, {uid: +pageCtx.get('last-bid')}, bids[0]).uid;
+                                                         self.bidChange();
+                                                     }
+                                                 },
+                                                 requestStatus.failed);
+                                         }
+                                     },
+                                     requestStatus.failed);
+                             }
+                         });
+
                      }
                     ]
     });

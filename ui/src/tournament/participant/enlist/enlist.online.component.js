@@ -5,9 +5,9 @@ angular.
     module('participant').
     component('enlistOnline', {
         templateUrl: template,
-        controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu',
+        controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu', 'binder', '$scope',
                      '$http', '$location', 'requestStatus', 'cutil', 'pageCtx',
-                     function ($routeParams, Tournament, auth, mainMenu,
+                     function ($routeParams, Tournament, auth, mainMenu, binder, $scope,
                                $http,  $location, requestStatus, cutil, pageCtx) {
                          var self = this;
                          self.myCategory = pageCtx.get('my-category-' + $routeParams.tournamentId) || {};
@@ -97,29 +97,33 @@ angular.
                                  },
                                  requestStatus.failed);
                          };
-
-                         requestStatus.startLoading('Loading');
                          mainMenu.setTitle('Drafting');
-                         Tournament.aDrafting(
-                             {tournamentId: $routeParams.tournamentId},
-                             function (tournament) {
-                                 requestStatus.complete();
-                                 mainMenu.setTitle(['Drafting to', {name: tournament.name}]);
-                                 self.tournament = tournament;
-                                 var rnkOptions = tournament.rules.casting.providedRankOptions;
-                                 if (tournament.rules.casting.providedRankOptions) {
-                                     self.rankRange = {min: rnkOptions.minValue, max: rnkOptions.maxValue};
-                                     self.rank = rnkOptions.minValue;
-                                 }
-                                 if (self.tournament.myCategoryId) {
-                                     self.myCategory = {cid: tournament.myCategoryId,
-                                                        name: cutil.findValBy(self.tournament.categories,
-                                                                              {cid: tournament.myCategoryId}).name}
-                                 }
-                             },
-                             function (r) {
-                                 requestStatus.failed(r, {tid: $routeParams.tournamentId});
-                             });
+
+                         binder($scope, {
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading('Loading');
+                                 Tournament.aDrafting(
+                                     {tournamentId: $routeParams.tournamentId},
+                                     function (tournament) {
+                                         requestStatus.complete();
+                                         mainMenu.setTitle(['Drafting to', {name: tournament.name}]);
+                                         self.tournament = tournament;
+                                         var rnkOptions = tournament.rules.casting.providedRankOptions;
+                                         if (tournament.rules.casting.providedRankOptions) {
+                                             self.rankRange = {min: rnkOptions.minValue, max: rnkOptions.maxValue};
+                                             self.rank = rnkOptions.minValue;
+                                         }
+                                         if (self.tournament.myCategoryId) {
+                                             self.myCategory = {cid: tournament.myCategoryId,
+                                                                name: cutil.findValBy(self.tournament.categories,
+                                                                                      {cid: tournament.myCategoryId}).name}
+                                         }
+                                     },
+                                     function (r) {
+                                         requestStatus.failed(r, {tid: $routeParams.tournamentId});
+                                     });
+                             }
+                         });
                      }
                     ]
     });

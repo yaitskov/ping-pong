@@ -73,6 +73,7 @@ angular.
                          };
                          self.nextScoreUpdated = function () {
                              sBtnTrans.trans(['Score Set', {n: 1 + self.match.playedSets}], function (v) {
+                                 $rootScope.$broadcast('event.match.set.playedSets', v);
                                  self.setScoreBtn = v;
                              });
                          };

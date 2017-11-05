@@ -7,8 +7,10 @@ angular.
         templateUrl: template,
         controller: ['$routeParams', 'Tournament', 'mainMenu', '$q', 'Group',
                      'requestStatus', 'Participant', '$http', 'auth', 'pageCtx',
+                     'binder', '$scope',
                      function ($routeParams, Tournament, mainMenu, $q, Group,
-                               requestStatus, Participant, $http, auth, pageCtx) {
+                               requestStatus, Participant, $http, auth, pageCtx,
+                               binder, $scope) {
                          mainMenu.setTitle('Offline enlist');
                          var self = this;
                          self.groupId = null;
@@ -20,7 +22,6 @@ angular.
                          self.rankRange = {};
                          self.enlisted = [];
                          self.form = {};
-                         requestStatus.startLoading('Loading');
                          self.loadGroupPopulations = function (tid, cid) {
                              requestStatus.startLoading('Loading');
                              self.groupId = null;
@@ -39,39 +40,44 @@ angular.
                                  requestStatus.failed);
                          };
                          var req = {tournamentId: $routeParams.tournamentId};
-                         $q.all([
-                             Tournament.aDrafting(req).$promise,
-                             Tournament.parameters(req).$promise]).
-                             then(
-                                 (responses) => {
-                                     var tournament = responses[0];
-                                     self.tournament = tournament;
-                                     self.rules = responses[1];
-                                     var rnkOptions = self.rules.casting.providedRankOptions;
-                                     if (rnkOptions) {
-                                         self.rankRange = {min: rnkOptions.minValue, max: rnkOptions.maxValue};
-                                     }
-                                     requestStatus.complete();
-                                     mainMenu.setTitle(['Offline enlist to', {name: tournament.name}]);
-                                     self.categories = tournament.categories;
-                                     var wasCategoryId = pageCtx.get('offline-category-' + $routeParams.tournamentId);
-                                     for (var i in tournament.categories) {
-                                         if (!wasCategoryId || wasCategoryId == tournament.categories[i].cid) {
-                                             self.categoryId = tournament.categories[i].cid;
-                                             break;
-                                         }
-                                     }
-                                     if (!self.categoryId) {
-                                         for (var i in tournament.categories) {
-                                             self.categoryId = tournament.categories[i].cid;
-                                             break;
-                                         }
-                                     }
-                                     if (self.tournament.state == 'Open' && self.categoryId) {
-                                         self.loadGroupPopulations($routeParams.tournamentId, self.categoryId);
-                                     }
-                                 },
-                                 requestStatus.failed);
+                         binder($scope, {
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading('Loading');
+                                 $q.all([
+                                     Tournament.aDrafting(req).$promise,
+                                     Tournament.parameters(req).$promise]).
+                                     then(
+                                         (responses) => {
+                                             var tournament = responses[0];
+                                             self.tournament = tournament;
+                                             self.rules = responses[1];
+                                             var rnkOptions = self.rules.casting.providedRankOptions;
+                                             if (rnkOptions) {
+                                                 self.rankRange = {min: rnkOptions.minValue, max: rnkOptions.maxValue};
+                                             }
+                                             requestStatus.complete();
+                                             mainMenu.setTitle(['Offline enlist to', {name: tournament.name}]);
+                                             self.categories = tournament.categories;
+                                             var wasCategoryId = pageCtx.get('offline-category-' + $routeParams.tournamentId);
+                                             for (var i in tournament.categories) {
+                                                 if (!wasCategoryId || wasCategoryId == tournament.categories[i].cid) {
+                                                     self.categoryId = tournament.categories[i].cid;
+                                                     break;
+                                                 }
+                                             }
+                                             if (!self.categoryId) {
+                                                 for (var i in tournament.categories) {
+                                                     self.categoryId = tournament.categories[i].cid;
+                                                     break;
+                                                 }
+                                             }
+                                             if (self.tournament.state == 'Open' && self.categoryId) {
+                                                 self.loadGroupPopulations($routeParams.tournamentId, self.categoryId);
+                                             }
+                                         },
+                                         requestStatus.failed);
+                             }
+                         });
 
                          this.activate = function (cid) {
                              self.categoryId = cid;

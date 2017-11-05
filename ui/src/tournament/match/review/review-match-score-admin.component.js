@@ -5,8 +5,8 @@ angular.
     module('tournament').
     component('reviewMatchScoreForAdmin', {
         templateUrl: template,
-        controller: ['mainMenu', '$routeParams', 'binder', '$rootScope', '$scope',
-                     function (mainMenu, $routeParams, binder, $rootScope, $scope) {
+        controller: ['mainMenu', 'pageCtx', '$routeParams', 'binder', '$rootScope', '$scope',
+                     function (mainMenu, pageCtx, $routeParams, binder, $rootScope, $scope) {
                          mainMenu.setTitle('Match Review');
                          this.tournamentId = $routeParams.tournamentId;
                          binder($scope, {

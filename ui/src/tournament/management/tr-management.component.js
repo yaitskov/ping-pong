@@ -7,9 +7,9 @@ angular.
     component('tournamentManagement', {
         templateUrl: template,
         controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu',
-                     '$http', 'pageCtx', 'requestStatus', '$location',
+                     '$http', 'pageCtx', 'requestStatus', '$location', 'binder', '$scope',
                      function ($routeParams, Tournament, auth, mainMenu,
-                               $http, pageCtx, requestStatus, $location) {
+                               $http, pageCtx, requestStatus, $location, binder, $scope) {
                          var ctxMenu = {};
                          ctxMenu['#!/my/tournament/presence/' + $routeParams.tournamentId] = 'CheckPresence';
                          ctxMenu['#!/my/tournament/categories/' + $routeParams.tournamentId] = 'Categories';
@@ -19,19 +19,23 @@ angular.
                          self.tournament = null;
                          self.wantRemove = false;
                          self.errorHasUncheckedUsers = null;
-                         requestStatus.startLoading();
-                         Tournament.aMine(
-                             {tournamentId: $routeParams.tournamentId},
-                             function (tournament) {
-                                 requestStatus.complete();
-                                 mainMenu.setTitle(['Administration of', {name: tournament.name}], ctxMenu);
-                                 self.tournament = tournament;
-                                 pageCtx.put('tournamentInfoForCategories',
-                                             {tid: self.tournament.tid,
-                                              name: self.tournament.name,
-                                              state: self.tournament.state});
-                             },
-                             requestStatus.failed);
+                         binder($scope, {
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading();
+                                 Tournament.aMine(
+                                     {tournamentId: $routeParams.tournamentId},
+                                     function (tournament) {
+                                         requestStatus.complete();
+                                         mainMenu.setTitle(['Administration of', {name: tournament.name}], ctxMenu);
+                                         self.tournament = tournament;
+                                         pageCtx.put('tournamentInfoForCategories',
+                                                     {tid: self.tournament.tid,
+                                                      name: self.tournament.name,
+                                                      state: self.tournament.state});
+                                     },
+                                     requestStatus.failed);
+                             }
+                         });
                          this.canBeginDrafting = function () {
                              return self.tournament && (self.tournament.state == 'Hidden'
                                                         || self.tournament.state == 'Announce');

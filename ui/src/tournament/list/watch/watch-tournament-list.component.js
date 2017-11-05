@@ -4,12 +4,12 @@ import template from './watch-tournament-list.template.html';
 angular.module('tournament').
     component('watchTournamentList', {
         templateUrl: template,
-        controller: ['Tournament', 'mainMenu', 'requestStatus',
-                     function (Tournament, mainMenu, requestStatus) {
+        controller: ['Tournament', 'mainMenu', 'requestStatus', 'binder', '$scope',
+                     function (Tournament, mainMenu, requestStatus, binder, $scope) {
                          mainMenu.setTitle('Running tournaments');
                          var self = this;
                          self.tournaments = null;
-                         requestStatus.startLoading();
+
                          this.viewUrl = function (tournament) {
                              if (tournament.state == 'Open') {
                                  return '/watch/tournament/' + tournament.tid;
@@ -23,13 +23,18 @@ angular.module('tournament').
                              var ratio = tournament.gamesComplete / tournament.gamesOverall;
                              return Math.round(ratio * 100.0) + '%';
                          };
-                         Tournament.running(
-                             {alsoCompleteInDays: 3},
-                             function (tournaments) {
-                                 self.tournaments = tournaments;
-                                 requestStatus.complete();
-                             },
-                             requestStatus.failed);
+                         binder($scope, {
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading();
+                                 Tournament.running(
+                                     {alsoCompleteInDays: 3},
+                                     function (tournaments) {
+                                         self.tournaments = tournaments;
+                                         requestStatus.complete();
+                                     },
+                                     requestStatus.failed);
+                             }
+                         });
                      }
                     ]
-        });
+    });

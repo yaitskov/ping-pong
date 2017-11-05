@@ -5,18 +5,22 @@ angular.
     module('participant').
     component('participantResult', {
         templateUrl: template,
-        controller: ['Participant', 'mainMenu', '$routeParams', 'requestStatus',
-                     function (Participant, mainMenu, $routeParams, requestStatus) {
+        controller: ['Participant', 'mainMenu', '$routeParams', 'requestStatus', 'binder', '$scope',
+                     function (Participant, mainMenu, $routeParams, requestStatus, binder, $scope) {
                          mainMenu.setTitle('Participant results');
                          var self = this;
-                         requestStatus.startLoading();
-                         Participant.getResults(
-                             {tournamentId: $routeParams.tournamentId,
-                              uid: $routeParams.participantId},
-                             function (results) {
-                                 requestStatus.complete();
-                                 self.results = results;
-                             },
-                             requestStatus.failed);
+                         binder($scope, {
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading();
+                                 Participant.getResults(
+                                     {tournamentId: $routeParams.tournamentId,
+                                      uid: $routeParams.participantId},
+                                     function (results) {
+                                         requestStatus.complete();
+                                         self.results = results;
+                                     },
+                                     requestStatus.failed);
+                             }
+                         });
                      }
                     ]});

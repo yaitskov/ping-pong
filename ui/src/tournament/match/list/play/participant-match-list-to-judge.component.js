@@ -5,9 +5,9 @@ angular.module('tournament').
     component('participantMatchListToJudge', {
         templateUrl: template,
         controller: ['Match', 'mainMenu', 'cutil', '$routeParams',
-                     'pageCtx', 'auth', 'requestStatus', '$location',
+                     'pageCtx', 'auth', 'requestStatus', '$location', 'binder', '$scope',
                      function (Match, mainMenu, cutil, $routeParams,
-                               pageCtx, auth, requestStatus, $location) {
+                               pageCtx, auth, requestStatus, $location, binder, $scope) {
                          mainMenu.setTitle('My matches to be played');
                          this.tournamentId = $routeParams.tournamentId;
                          this.matches = null;
@@ -17,17 +17,21 @@ angular.module('tournament').
                              pageCtx.put('last-scoring-match', match);
                              $location.path('/participant/score/set/' + match.mid);
                          };
-                         requestStatus.startLoading();
-                         Match.myMatchesNeedToPlay(
-                             {tournamentId: $routeParams.tournamentId},
-                             function (matches) {
-                                 requestStatus.complete();
-                                 self.matches = matches;
-                                 if (matches.showTables) {
-                                     self.openMatch = cutil.findValByO(matches.matches, {state: 'Game'});
-                                 }
-                             },
-                             requestStatus.failed);
+                         binder($scope, {
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading();
+                                 Match.myMatchesNeedToPlay(
+                                     {tournamentId: $routeParams.tournamentId},
+                                     function (matches) {
+                                         requestStatus.complete();
+                                         self.matches = matches;
+                                         if (matches.showTables) {
+                                             self.openMatch = cutil.findValByO(matches.matches, {state: 'Game'});
+                                         }
+                                     },
+                                     requestStatus.failed);
+                             }
+                         });
                      }
                     ]
         });

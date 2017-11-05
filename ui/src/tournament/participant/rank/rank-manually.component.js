@@ -4,8 +4,10 @@ import template from './rank-manually.template.html';
 angular.module('participant').
     component('rankBidManually', {
         templateUrl: template,
-        controller: ['Casting', 'Tournament', '$q', 'mainMenu', 'requestStatus', '$routeParams', 'shuffleArray', '$scope',
-                     function (Casting, Tournament, $q, mainMenu, requestStatus, $routeParams, shuffleArray, $scope) {
+        controller: ['Casting', 'Tournament', '$q', 'mainMenu', 'requestStatus',
+                     '$routeParams', 'shuffleArray', '$scope', 'binder',
+                     function (Casting, Tournament, $q, mainMenu, requestStatus,
+                               $routeParams, shuffleArray, $scope, binder) {
                          var self = this;
                          self.sortMode = 'manual';
                          self.saveOrder = () => {
@@ -34,22 +36,27 @@ angular.module('participant').
                                  throw "Unknown sort mode " + self.sortMode;
                              }
                          });
-                         requestStatus.startLoading();
-                         $q.all([
-                             Tournament.aDrafting(
-                                 {tournamentId: $routeParams.tournamentId}).$promise,
-                             Casting.manualBidsOrder(
-                                 {tournamentId: $routeParams.tournamentId,
-                                  categoryId: $routeParams.categoryId})
-                                 .$promise]).then(
-                                     (responses) => {
-                                         self.tournament = responses[0];
-                                         self.categoryName = self.tournament.categories.find((c) => c.cid == $routeParams.categoryId).name;
-                                         mainMenu.setTitle(['Ranking category',
-                                                            {name: self.categoryName}]);
-                                         self.rankedBids = responses[1];
-                                         requestStatus.complete(responses);
-                                     },
-                                     requestStatus.failed);
+                         binder($scope, {
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading();
+                                 $q.all([
+                                     Tournament.aDrafting(
+                                         {tournamentId: $routeParams.tournamentId}).$promise,
+                                     Casting.manualBidsOrder(
+                                         {tournamentId: $routeParams.tournamentId,
+                                          categoryId: $routeParams.categoryId})
+                                         .$promise]).then(
+                                             (responses) => {
+                                                 self.tournament = responses[0];
+                                                 self.categoryName = self.tournament.categories.find(
+                                                     (c) => c.cid == $routeParams.categoryId).name;
+                                                 mainMenu.setTitle(['Ranking category',
+                                                                    {name: self.categoryName}]);
+                                                 self.rankedBids = responses[1];
+                                                 requestStatus.complete(responses);
+                                             },
+                                             requestStatus.failed);
+                             }
+                         });
                      }
                     ]});

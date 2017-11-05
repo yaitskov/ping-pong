@@ -5,8 +5,8 @@ angular.
     module('tournament').
     component('reviewSets', {
         templateUrl: template,
-        controller: ['$routeParams', 'pageCtx', 'binder', '$rootScope', '$scope',
-                     function ($routeParams, pageCtx, binder, $rootScope, $scope) {
+        controller: ['$routeParams', 'binder', '$rootScope', '$scope',
+                     function ($routeParams, binder, $rootScope, $scope) {
                          var self = this;
 
                          self.strongSet = function (iSet) {

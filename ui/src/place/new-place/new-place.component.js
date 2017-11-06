@@ -2,14 +2,13 @@ import angular from 'angular';
 import template from './new-place.template.html';
 
 angular.
-    module('newPlace').
+    module('place').
     component('newPlace', {
         templateUrl: template,
         controller: ['auth', 'mainMenu', '$http', '$location', 'requestStatus',
-                     'City', 'Country', 'LocalStorage', '$timeout', 'pageCtx',
+                     'City', 'Country', 'LocalStorage', '$timeout', 'pageCtx', 'binder', '$scope',
                      function (auth, mainMenu, $http, $location, requestStatus,
-                               City, Country, LocalStorage, $timeout, pageCtx) {
-                         mainMenu.setTitle('New Place');
+                               City, Country, LocalStorage, $timeout, pageCtx, binder, $scope) {
                          this.form = {};
                          this.cityForm = {};
                          this.countryForm = {};
@@ -113,21 +112,6 @@ angular.
                                      },
                                      requestStatus.failed);
                          };
-                         requestStatus.startLoading('Countries');
-                         Country.list(
-                             {},
-                             function (countries) {
-                                 self.countries = countries;
-                                 if (!self.countryId) {
-                                     for (var i in countries) {
-                                         self.countryId = countries[i].id;
-                                         break;
-                                     }
-                                     self.loadCities();
-                                 }
-                                 requestStatus.complete();
-                             },
-                             requestStatus.failed);
                          self.loadCities = function () {
                              requestStatus.startLoading('Cities');
                              City.list(
@@ -138,7 +122,28 @@ angular.
                                  },
                                  requestStatus.failed);
                          }
-                         if (self.countryId) {
-                             self.loadCities();
-                         }
+                         binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('New Place'),
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading('Countries');
+                                 Country.list(
+                                     {},
+                                     function (countries) {
+                                         self.countries = countries;
+                                         if (!self.countryId) {
+                                             for (var i in countries) {
+                                                 self.countryId = countries[i].id;
+                                                 break;
+                                             }
+                                             self.loadCities();
+                                         }
+                                         requestStatus.complete();
+                                     },
+                                     requestStatus.failed);
+
+                                 if (self.countryId) {
+                                     self.loadCities();
+                                 }
+                             }
+                         });
                      }]});

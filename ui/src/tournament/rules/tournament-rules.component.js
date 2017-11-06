@@ -7,10 +7,9 @@ angular.
         templateUrl: template,
         controller: ['Tournament', '$routeParams', 'requestStatus', 'mainMenu', 'binder', '$scope',
                      function (Tournament, $routeParams, requestStatus, mainMenu, binder, $scope) {
-                         mainMenu.setTitle('Tournament Rules');
-
                          var self = this;
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Tournament Rules'),
                              'event.request.status.ready': (event) => {
                                  requestStatus.startLoading();
                                  Tournament.parameters(

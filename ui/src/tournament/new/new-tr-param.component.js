@@ -45,13 +45,13 @@ angular.
                      function (auth, mainMenu, $http, $location,
                       pageCtx, requestStatus, $moment, groupSchedule,
                       $scope, $rootScope, binder) {
-                         mainMenu.setTitle('Tournament Parameters');
                          var self = this;
                          self.tournament = pageCtx.get('newTournament') || {};
                          self.tournament.rules = Object.assign({}, defaultRules, self.tournament.rules || {});
                          self.published = self.tournament.tid;
 
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Tournament Parameters'),
                              'event.tournament.rules.update': (event, rules) => {
                                  requestStatus.startLoading('Publishing');
                                  var req = angular.copy(self.tournament);

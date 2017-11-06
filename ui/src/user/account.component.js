@@ -6,9 +6,8 @@ angular.
     component('account', {
         templateUrl: template,
         controller: [
-            'mainMenu', '$http', 'cutil', 'auth', 'requestStatus', 'pageCtx', 'syncTranslate',
-            function (mainMenu, $http, cutil, auth, requestStatus, pageCtx, syncTranslate) {
-                mainMenu.setTitle('Account Details');
+            'mainMenu', '$http', 'cutil', 'auth', 'requestStatus', 'pageCtx', 'syncTranslate', 'binder', '$scope',
+            function (mainMenu, $http, cutil, auth, requestStatus, pageCtx, syncTranslate, binder, $scope) {
                 var stranslate = syncTranslate.create();
                 var self = this;
                 this.uid = auth.myUid();
@@ -28,7 +27,6 @@ angular.
                 this.setLanguage(auth.myLang());
                 this.logoutWithoutEmail = false;
                 this.signInEmailSent = false;
-                requestStatus.startLoading();
                 this.requestAdminPermissions = function () {
                     requestStatus.startLoading("Requesting admin access");
                     $http.post('/api/user/request-admin-access',
@@ -67,11 +65,17 @@ angular.
                 this.lostAccessToAccount = function () {
                     auth.logout();
                 };
-                $http.get('/api/anonymous/user/info/by/session/' + auth.mySession()).
-                    then(
-                        function (ok) {
-                            requestStatus.complete();
-                            self.userData = ok.data;
-                        },
-                        requestStatus.failed);
+                binder($scope, {
+                    'event.main.menu.ready': (e) => mainMenu.setTitle('Account Details'),
+                    'event.request.status.ready': (event) => {
+                        requestStatus.startLoading();
+                        $http.get('/api/anonymous/user/info/by/session/' + auth.mySession()).
+                            then(
+                                function (ok) {
+                                    requestStatus.complete();
+                                    self.userData = ok.data;
+                                },
+                                requestStatus.failed);
+                    }
+                });
             }]});

@@ -5,9 +5,10 @@ angular.
     module('tournament').
     component('newTournament', {
         templateUrl: template,
-        controller: ['auth', 'mainMenu', '$http', '$location', 'placePicker', 'pageCtx', '$scope',
-                     function (auth, mainMenu, $http, $location, placePicker, pageCtx, $scope) {
-                         mainMenu.setTitle('New Tournament');
+        controller: ['auth', 'mainMenu', '$http', '$location', 'placePicker', 'pageCtx', '$scope', 'binder',
+                     function (auth, mainMenu, $http, $location, placePicker, pageCtx, $scope, binder) {
+                         binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('New Tournament')});
                          this.tournament = pageCtx.get('newTournament') || {ticketPrice: 30};
                          if (this.tournament.tid) {
                              delete this.tournament.tid;

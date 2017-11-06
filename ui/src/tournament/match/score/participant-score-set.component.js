@@ -9,7 +9,6 @@ angular.
                      'pageCtx', 'requestStatus', '$scope', '$rootScope', 'binder',
                      function (auth, mainMenu, Match, $routeParams, $location,
                                pageCtx, requestStatus, $scope, $rootScope, binder) {
-                         mainMenu.setTitle('Match Scoring');
                          this.match = pageCtx.get('last-scoring-match');
                          this.match.participants = [this.match.enemy,
                                                     {uid: auth.myUid(), name: '*you*'}];
@@ -19,6 +18,7 @@ angular.
                              $location.path('/match/user-conflict-review/' + self.match.tid + '/' + $routeParams.matchId);
                          };
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Match Scoring'),
                              'event.match.set.ready': (event) => $rootScope.$broadcast('event.match.set', self.match),
                              'event.match.score.conflict': (event, conflict) => self.showConflict(conflict),
                              'event.match.scored': (event, matchScore) => {

@@ -9,9 +9,9 @@ angular.
                      '$routeParams', '$rootScope', 'binder',
                      function (mainMenu, $scope, Tournament, requestStatus,
                                $routeParams, $rootScope, binder) {
-                         mainMenu.setTitle('Tournament Modification');
                          var self = this;
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Tournament Modification'),
                              'event.tournament.rules.update': function (event, rules) {
                                  requestStatus.startLoading('Saving changes');
                                  Tournament.updateParams(

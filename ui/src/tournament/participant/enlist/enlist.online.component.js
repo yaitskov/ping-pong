@@ -97,9 +97,9 @@ angular.
                                  },
                                  requestStatus.failed);
                          };
-                         mainMenu.setTitle('Drafting');
 
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Drafting'),
                              'event.request.status.ready': (event) => {
                                  requestStatus.startLoading('Loading');
                                  Tournament.aDrafting(

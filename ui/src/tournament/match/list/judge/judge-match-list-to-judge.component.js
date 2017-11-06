@@ -8,7 +8,6 @@ angular.module('tournament').
                      'pageCtx', 'requestStatus', '$routeParams', 'cutil', 'binder', '$scope',
                      function (Match, Tournament, Participant, mainMenu, $location,
                                pageCtx, requestStatus, $routeParams, cutil, binder, $scope) {
-                         mainMenu.setTitle('Match Judgement');
                          var self = this;
                          self.matches = null;
                          self.tournamentId = $routeParams.tournamentId;
@@ -41,6 +40,7 @@ angular.module('tournament').
                          };
 
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Match Judgement'),
                              'event.request.status.ready': (event) => {
                                  requestStatus.startLoading();
                                  Tournament.parameters(

@@ -5,13 +5,10 @@ angular.module('participant').
     component('parStateMgmtList', {
         templateUrl: template,
         controller: ['$http', 'mainMenu', '$routeParams', 'auth', 'requestStatus',
-                     'Participant', 'Tournament',
+                     'Participant', 'Tournament', 'binder', '$scope',
                      function ($http, mainMenu, $routeParams, auth, requestStatus,
-                               Participant, Tournament) {
+                               Participant, Tournament, binder, $scope) {
                          this.tournamentId = $routeParams.tournamentId;
-                         var ctxMenu = {};
-                         ctxMenu['#!/my/tournament/' + $routeParams.tournamentId] = 'Tournament';
-                         mainMenu.setTitle('ManagementOfParticipants', ctxMenu);
                          this.enlisted = null;
                          this.toBeExpelled = null;
                          var self = this;
@@ -84,15 +81,24 @@ angular.module('participant').
                                  },
                                  requestStatus.failed);
                          };
-                         requestStatus.startLoading();
-                         $http.get('/api/bid/enlisted-to-be-checked/' + $routeParams.tournamentId,
-                                   {headers: {session: auth.mySession()}}).
-                             then(
-                                 function (okResp) {
-                                     self.enlisted = okResp.data;
-                                     requestStatus.complete();
-                                 },
-                                 requestStatus.failed);
+                         binder($scope, {
+                             'event.main.menu.ready': (e) => {
+                                 var ctxMenu = {};
+                                 ctxMenu['#!/my/tournament/' + $routeParams.tournamentId] = 'Tournament';
+                                 mainMenu.setTitle('ManagementOfParticipants', ctxMenu);
+                             },
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading();
+                                 $http.get('/api/bid/enlisted-to-be-checked/' + $routeParams.tournamentId,
+                                           {headers: {session: auth.mySession()}}).
+                                     then(
+                                         function (okResp) {
+                                             self.enlisted = okResp.data;
+                                             requestStatus.complete();
+                                         },
+                                         requestStatus.failed);
+                             }
+                         });
                      }
                     ]
         });

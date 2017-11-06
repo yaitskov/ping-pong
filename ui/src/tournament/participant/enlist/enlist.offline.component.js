@@ -11,7 +11,6 @@ angular.
                      function ($routeParams, Tournament, mainMenu, $q, Group,
                                requestStatus, Participant, $http, auth, pageCtx,
                                binder, $scope) {
-                         mainMenu.setTitle('Offline enlist');
                          var self = this;
                          self.groupId = null;
                          self.categoryId = null;
@@ -41,6 +40,7 @@ angular.
                          };
                          var req = {tournamentId: $routeParams.tournamentId};
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Offline enlist'),
                              'event.request.status.ready': (event) => {
                                  requestStatus.startLoading('Loading');
                                  $q.all([

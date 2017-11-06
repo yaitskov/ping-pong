@@ -8,7 +8,6 @@ angular.module('tournament').
                      'pageCtx', 'auth', 'requestStatus', '$location', 'binder', '$scope',
                      function (Match, mainMenu, cutil, $routeParams,
                                pageCtx, auth, requestStatus, $location, binder, $scope) {
-                         mainMenu.setTitle('My matches to be played');
                          this.tournamentId = $routeParams.tournamentId;
                          this.matches = null;
                          this.openMatch = null;
@@ -18,6 +17,7 @@ angular.module('tournament').
                              $location.path('/participant/score/set/' + match.mid);
                          };
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('My matches to be played'),
                              'event.request.status.ready': (event) => {
                                  requestStatus.startLoading();
                                  Match.myMatchesNeedToPlay(

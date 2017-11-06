@@ -2,13 +2,14 @@ import angular from 'angular';
 import template from './sign-in.template.html';
 
 angular.
-    module('signIn').
+    module('user').
     component('signIn', {
         templateUrl: template,
         controller: [
-            'mainMenu', '$http', 'auth', 'requestStatus',
-            function (mainMenu, $http, auth, requestStatus) {
-                mainMenu.setTitle('Sign In');
+            'mainMenu', '$http', 'auth', 'requestStatus', 'binder', '$scope',
+            function (mainMenu, $http, auth, requestStatus, binder, $scope) {
+                binder($scope, {
+                    'event.main.menu.ready': (e) => mainMenu.setTitle('Sign In')});
                 var self = this;
                 this.email = auth.myEmail()
                 this.form = null;

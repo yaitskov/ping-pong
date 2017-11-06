@@ -6,7 +6,6 @@ angular.module('tournament').
         templateUrl: template,
         controller: ['Tournament', 'mainMenu', 'requestStatus', 'binder', '$scope',
                      function (Tournament, mainMenu, requestStatus, binder, $scope) {
-                         mainMenu.setTitle('Running tournaments');
                          var self = this;
                          self.tournaments = null;
 
@@ -24,6 +23,7 @@ angular.module('tournament').
                              return Math.round(ratio * 100.0) + '%';
                          };
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Running tournaments'),
                              'event.request.status.ready': (event) => {
                                  requestStatus.startLoading();
                                  Tournament.running(

@@ -15,8 +15,8 @@ angular.
                          self.tournament = null;
                          self.tid = $routeParams.tournamentId;
                          var params = {tournamentId: $routeParams.tournamentId};
-                         mainMenu.setTitle('IncompleteTournamentGames');
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('IncompleteTournamentGames'),
                              'event.request.status.ready': (event) => {
                                  refresher.seconds($scope, 60 * 1000, function () {
                                      requestStatus.startLoading();

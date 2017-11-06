@@ -10,16 +10,18 @@ angular.
                      '$http', 'pageCtx', 'requestStatus', '$location', 'binder', '$scope',
                      function ($routeParams, Tournament, auth, mainMenu,
                                $http, pageCtx, requestStatus, $location, binder, $scope) {
-                         var ctxMenu = {};
-                         ctxMenu['#!/my/tournament/presence/' + $routeParams.tournamentId] = 'CheckPresence';
-                         ctxMenu['#!/my/tournament/categories/' + $routeParams.tournamentId] = 'Categories';
-                         mainMenu.setTitle('MyTournament', ctxMenu);
                          var self = this;
                          self.whistle = whistle;
                          self.tournament = null;
                          self.wantRemove = false;
                          self.errorHasUncheckedUsers = null;
+                         var ctxMenu = {};
+                         ctxMenu['#!/my/tournament/presence/' + $routeParams.tournamentId] = 'CheckPresence';
+                         ctxMenu['#!/my/tournament/categories/' + $routeParams.tournamentId] = 'Categories';
                          binder($scope, {
+                             'event.main.menu.ready': (e) => {
+                                 mainMenu.setTitle('MyTournament', ctxMenu);
+                             },
                              'event.request.status.ready': (event) => {
                                  requestStatus.startLoading();
                                  Tournament.aMine(

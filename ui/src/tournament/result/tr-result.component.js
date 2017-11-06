@@ -7,7 +7,6 @@ angular.
         templateUrl: template,
         controller: ['Tournament', 'mainMenu', '$routeParams', 'requestStatus', 'binder', '$scope',
                      function (Tournament, mainMenu, $routeParams, requestStatus, binder, $scope) {
-                         mainMenu.setTitle('Tournament results');
                          var self = this;
                          self.matches = null;
                          self.winners = null;
@@ -29,6 +28,7 @@ angular.
                                  requestStatus.failed);
                          };
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Tournament results'),
                              'event.request.status.ready': (event) => {
                                  requestStatus.startLoading();
                                  Tournament.aComplete(

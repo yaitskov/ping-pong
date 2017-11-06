@@ -2,13 +2,12 @@ import angular from 'angular';
 import template from './tables.template.html';
 
 angular.
-    module('myTableList').
+    module('place').
     component('myTableList', {
         templateUrl: template,
         controller: [
-            'mainMenu', 'auth', 'requestStatus', 'Place', 'Table', '$routeParams',
-            function (mainMenu, auth, requestStatus, Place, Table, $routeParams) {
-                mainMenu.setTitle('Place Tables');
+            'mainMenu', 'auth', 'requestStatus', 'Place', 'Table', '$routeParams', 'binder', '$scope',
+            function (mainMenu, auth, requestStatus, Place, Table, $routeParams, binder, $scope) {
                 var self = this;
                 this.place = null;
                 this.tables = null;
@@ -56,5 +55,8 @@ angular.
                                  },
                                  requestStatus.failed);
                 };
-                self.load();
-            }]});
+                binder($scope, {
+                    'event.main.menu.ready': (e) => mainMenu.setTitle('Place Tables'),
+                    'event.request.status.ready': (event) => self.load()});
+            }
+        ]});

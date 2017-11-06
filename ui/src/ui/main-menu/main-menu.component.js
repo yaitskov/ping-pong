@@ -5,23 +5,27 @@ angular.
     module('mainMenu').
     component('mainMenu', {
         templateUrl: template,
-        controller: ['auth', 'mainMenu', '$rootScope',
-                     function (auth, mainMenu, $rootScope) {
+        controller: ['auth', 'mainMenu', '$rootScope', 'binder', '$scope', '$window',
+                     function (auth, mainMenu, $rootScope, binder, $scope, $window) {
                          var self = this;
-                         this.accountName = auth.myName();
-                         $rootScope.$on('title.set', function (event, title) {
-                             self.title = title;
-                         });
-                         this.title = mainMenu.getTitle();
-                         this.isAuthenticated = function () {
+                         self.accountName = auth.myName();
+                         self.title = mainMenu.getTitle();
+                         self.isAuthenticated = function () {
                              return auth.isAuthenticated();
                          };
-                         this.isAdmin = function () {
+                         self.isAdmin = function () {
                              return auth.userType() == 'Admin' || auth.userType() == 'Super';
                          };
-                         $rootScope.$on('menu.set', function (event, menu) {
-                             self.contextMenu = menu;
+                         self.contextMenu = mainMenu.getContextMenu();
+                         binder($scope, {
+                             'menu.set': (event, menu) => {
+                                 self.contextMenu = menu;
+                             },
+                             'title.set': (event, title) => {
+                                 $window.document.title = title;
+                                 self.title = title;
+                             }
                          });
-                         this.contextMenu = mainMenu.getContextMenu();
+                         $rootScope.$broadcast('event.main.menu.ready');
                      }]
     });

@@ -9,9 +9,9 @@ angular.
                      'requestStatus', 'binder', '$scope',
                      function (Participant, pageCtx, mainMenu, $routeParams,
                                requestStatus, binder, $scope) {
-                         mainMenu.setTitle('Participant lbl');
                          var self = this;
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Participant lbl'),
                              'event.request.status.ready': (event) => {
                                  requestStatus.startLoading();
                                  Participant.profile(

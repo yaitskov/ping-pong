@@ -7,11 +7,11 @@ angular.
         templateUrl: template,
         controller: ['Category', 'pageCtx', 'mainMenu', '$routeParams', 'requestStatus', '$rootScope', '$scope', 'binder',
                      function (Category, pageCtx, mainMenu, $routeParams, requestStatus, $rootScope, $scope, binder) {
-                         mainMenu.setTitle('Enlisted to tournament');
                          var self = this;
                          self.categories = pageCtx.get('categories');
                          self.tournamentId = $routeParams.tournamentId;
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Enlisted to tournament'),
                              'event.category.switch.current': (event, cid) => {
                                  requestStatus.startLoading("Loading participants");
                                  Category.members({categoryId: cid},

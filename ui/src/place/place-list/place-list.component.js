@@ -1,22 +1,25 @@
 import angular from 'angular';
 import template from './place-list.template.html';
 
-angular.module('placeList').
+angular.module('place').
     component('placeList', {
         templateUrl: template,
-        controller: ['Place', 'mainMenu', 'requestStatus',
-                     function (Place, mainMenu, requestStatus) {
-                         mainMenu.setTitle('My Places', {'#!/my/new/place': 'AddPlaceBtn'});
-                         this.places = null;
+        controller: ['Place', 'mainMenu', 'requestStatus', 'binder', '$scope',
+                     function (Place, mainMenu, requestStatus, binder, $scope) {
                          var self = this;
-                         requestStatus.startLoading();
-                         Place.myPlaces(
-                             {},
-                             function (places) {
-                                 requestStatus.complete();
-                                 self.places = places;
-                             },
-                             requestStatus.failed);
+                         binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('My Places', {'#!/my/new/place': 'AddPlaceBtn'}),
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading();
+                                 Place.myPlaces(
+                                     {},
+                                     function (places) {
+                                         requestStatus.complete();
+                                         self.places = places;
+                                     },
+                                     requestStatus.failed);
+                             }
+                         });
                      }
                     ]
     });

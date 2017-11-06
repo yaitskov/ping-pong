@@ -9,7 +9,6 @@ angular.
                      'binder', '$rootScope', '$scope', 'requestStatus', '$location',
                      function (MatchDispute, Match, mainMenu, $routeParams,
                                binder, $rootScope, $scope, requestStatus, $location) {
-                         mainMenu.setTitle('Dispute builder');
                          var self = this;
                          self.tournamentId = $routeParams.tournamentId;
                          self.matchId = $routeParams.matchId;
@@ -51,6 +50,7 @@ angular.
                          };
 
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Dispute builder'),
                              'event.match.set.scored': (event, setScore) => {
                                  self.setRescoring = false;
                                  self.mergeSetScore(setScore);

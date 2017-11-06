@@ -5,10 +5,11 @@ angular.
     module('tournament').
     component('matchScoreConflictUser', {
         templateUrl: template,
-        controller: ['mainMenu', 'pageCtx', '$routeParams', '$location',
-                     function (mainMenu, pageCtx, $routeParams, $location) {
+        controller: ['mainMenu', 'pageCtx', '$routeParams', '$location', 'binder', '$scope',
+                     function (mainMenu, pageCtx, $routeParams, $location, binder, $scope) {
                          var self = this;
-                         mainMenu.setTitle('Match scoring conflict');
+                         binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Match scoring conflict')});
                          self.tournamentId = $routeParams.tournamentId;
                          self.matchId = $routeParams.matchId;
                          self.conflict = pageCtx.get('match-score-conflict-' + $routeParams.matchId);

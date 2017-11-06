@@ -6,9 +6,8 @@ angular.
     component('accountEdit', {
         templateUrl: template,
         controller: [
-            'mainMenu', 'auth', 'requestStatus', 'User', '$http',
-            function (mainMenu, auth, requestStatus, User, $http) {
-                mainMenu.setTitle('Account Modification');
+            'mainMenu', 'auth', 'requestStatus', 'User', '$http', 'binder', '$scope',
+            function (mainMenu, auth, requestStatus, User, $http, binder, $scope) {
                 var self = this;
                 this.data = {}
                 this.data.name = auth.myName();
@@ -24,12 +23,17 @@ angular.
                                 },
                                 requestStatus.failed);
                 };
-                requestStatus.startLoading();
-                $http.get('/api/anonymous/user/info/by/session/' + auth.mySession()).
-                    then(
-                        function (ok) {
-                            requestStatus.complete();
-                            self.data.phone = ok.data.phone;
-                        },
-                        requestStatus.failed);
+                binder($scope, {
+                    'event.main.menu.ready': (e) => mainMenu.setTitle('Account Modification'),
+                    'event.request.status.ready': (event) => {
+                        requestStatus.startLoading();
+                        $http.get('/api/anonymous/user/info/by/session/' + auth.mySession()).
+                            then(
+                                function (ok) {
+                                    requestStatus.complete();
+                                    self.data.phone = ok.data.phone;
+                                },
+                                requestStatus.failed);
+                    }
+                });
             }]});

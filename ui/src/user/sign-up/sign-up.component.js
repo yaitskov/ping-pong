@@ -2,13 +2,14 @@ import angular from 'angular';
 import template from './sign-up.template.html';
 
 angular.
-    module('signUp').
+    module('user').
     component('signUp', {
         templateUrl: template,
         controller: [
-            'mainMenu', '$http', 'cutil', 'auth', 'requestStatus',
-            function (mainMenu, $http, cutil, auth, requestStatus) {
-                mainMenu.setTitle('Sign Up btn');
+            'mainMenu', '$http', 'cutil', 'auth', 'requestStatus', 'binder', '$scope',
+            function (mainMenu, $http, cutil, auth, requestStatus, binder, $scope) {
+                binder($scope, {
+                    'event.main.menu.ready': (e) => mainMenu.setTitle('Sign Up btn')});
                 this.form = {};
                 var self = this;
                 this.signUp = function (form) {

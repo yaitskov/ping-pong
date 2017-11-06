@@ -7,10 +7,10 @@ angular.
         templateUrl: template,
         controller: ['Match', 'mainMenu', '$routeParams', 'requestStatus', 'binder', '$scope',
                      function (Match, mainMenu, $routeParams, requestStatus, binder, $scope) {
-                         mainMenu.setTitle('Matches played by me');
                          var self = this;
                          self.tournamentId = $routeParams.tournamentId;
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Matches played by me'),
                              'event.request.status.ready': (event) => {
                                  requestStatus.startLoading();
                                  Match.myPlayedMatches(

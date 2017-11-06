@@ -4,11 +4,8 @@ import template from './tr-category-list.template.html';
 angular.module('tournamentCategory').
     component('tournamentCategoryList', {
         templateUrl: template,
-        controller: ['$http', 'mainMenu', '$routeParams', 'auth', 'requestStatus', 'pageCtx', '$location',
-                     function ($http, mainMenu, $routeParams, auth, requestStatus, pageCtx, $location) {
-                         var ctxMenu = {};
-                         ctxMenu['#!/my/tournament/' + $routeParams.tournamentId] = 'Tournament';
-                         mainMenu.setTitle('Categories', ctxMenu);
+        controller: ['$http', 'mainMenu', '$routeParams', 'auth', 'requestStatus', 'pageCtx', '$location', 'binder', '$scope',
+                     function ($http, mainMenu, $routeParams, auth, requestStatus, pageCtx, $location, binder, $scope) {
                          this.tournament = pageCtx.get('tournamentInfoForCategories') || {tid: $routeParams.tournamentId};
                          this.categories = null;
                          this.newCategoryName = '';
@@ -61,14 +58,23 @@ angular.module('tournamentCategory').
                                      },
                                      requestStatus.failed);
                          };
-                         requestStatus.startLoading('Load categories');
-                         $http.get('/api/category/find/by/tid/' + $routeParams.tournamentId).
-                             then(
-                                 function (okResp) {
-                                     requestStatus.complete();
-                                     self.categories = okResp.data;
-                                 },
-                                 requestStatus.failed);
+                         binder($scope, {
+                             'event.main.menu.ready': (e) => {
+                                 var ctxMenu = {};
+                                 ctxMenu['#!/my/tournament/' + $routeParams.tournamentId] = 'Tournament';
+                                 mainMenu.setTitle('Categories', ctxMenu);
+                             },
+                             'event.request.status.ready': (e) => {
+                                 requestStatus.startLoading('Load categories');
+                                 $http.get('/api/category/find/by/tid/' + $routeParams.tournamentId).
+                                     then(
+                                         function (okResp) {
+                                             requestStatus.complete();
+                                             self.categories = okResp.data;
+                                         },
+                                         requestStatus.failed);
+                             }
+                         });
                      }
                     ]
         });

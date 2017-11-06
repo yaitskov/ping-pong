@@ -9,7 +9,6 @@ angular.
                      'pageCtx', '$scope', 'Tournament', 'requestStatus', '$routeParams', 'moment',
                      function (auth, mainMenu, $http, $location, placePicker,
                                pageCtx, $scope, Tournament, requestStatus, $routeParams, moment) {
-                         mainMenu.setTitle('Tournament Modification');
                          var changes = pageCtx.get('editableTournament');
                          if (changes && $routeParams.tournamentId != changes.tid) {
                              changes = {}
@@ -63,15 +62,20 @@ angular.
                                  },
                                  requestStatus.failed);
                          };
-                         requestStatus.startLoading();
-                         Tournament.aMine(
-                             {tournamentId: $routeParams.tournamentId},
-                             function (tournament) {
-                                 requestStatus.complete();
-                                 self.place = placePicker.getChosenPlace() || tournament.place;
-                                 self.tournament = Object.assign(tournament, pageCtx.get('editableTournament') || {});
-                                 self.splitDate();
-                                 pageCtx.put('editableTournament', self.tournament);
-                             },
-                             requestStatus.failed);
+                         binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Tournament Modification'),
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading();
+                                 Tournament.aMine(
+                                     {tournamentId: $routeParams.tournamentId},
+                                     function (tournament) {
+                                         requestStatus.complete();
+                                         self.place = placePicker.getChosenPlace() || tournament.place;
+                                         self.tournament = Object.assign(tournament, pageCtx.get('editableTournament') || {});
+                                         self.splitDate();
+                                         pageCtx.put('editableTournament', self.tournament);
+                                     },
+                                     requestStatus.failed);
+                             }
+                         });
                      }]});

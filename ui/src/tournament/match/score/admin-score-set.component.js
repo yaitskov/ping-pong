@@ -7,7 +7,6 @@ angular.
         templateUrl: template,
         controller: ['mainMenu', '$routeParams', 'pageCtx', '$scope', '$location', '$rootScope', 'binder',
                      function (mainMenu, $routeParams, pageCtx, $scope, $location, $rootScope, binder) {
-                         mainMenu.setTitle('Match Scoring');
                          this.match = pageCtx.get('last-scoring-match');
                          var self = this;
                          self.showConflict = function (conflict) {
@@ -15,6 +14,7 @@ angular.
                              $location.path('/match/admin-conflict-review/' + self.match.tid + '/' + $routeParams.matchId);
                          };
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Match Scoring'),
                              'event.match.set.ready': (event) => $rootScope.$broadcast('event.match.set', self.match),
                              'event.match.score.conflict': (event, conflict) => self.showConflict(conflict),
                              'event.match.scored': (event, matchScore) => {

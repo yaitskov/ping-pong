@@ -7,9 +7,9 @@ angular.
         templateUrl: template,
         controller: ['Participant', 'mainMenu', '$routeParams', 'requestStatus', 'binder', '$scope',
                      function (Participant, mainMenu, $routeParams, requestStatus, binder, $scope) {
-                         mainMenu.setTitle('Participant results');
                          var self = this;
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Participant results'),
                              'event.request.status.ready': (event) => {
                                  requestStatus.startLoading();
                                  Participant.getResults(

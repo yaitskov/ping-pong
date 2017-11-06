@@ -4,16 +4,24 @@ import template from './manage-tr-list.template.html';
 angular.module('tournament').
     component('manageTournamentList', {
         templateUrl: template,
-        controller: ['Tournament', 'mainMenu',
-                     function (Tournament, mainMenu) {
-                         mainMenu.setTitle('AdministratedTournaments', {'#!/tournament/new': 'AddTournament'});
-                         this.tournaments = null;
+        controller: ['Tournament', 'mainMenu', '$rootScope', 'binder', '$scope', 'requestStatus',
+                     function (Tournament, mainMenu, $rootScope, binder, $scope, requestStatus) {
                          var self = this;
-                         Tournament.administered(
-                             {completeInDays: 30},
-                             function (tournaments) {
-                                 self.tournaments = tournaments;
-                             });
+                         binder($scope, {
+                             'event.main.menu.ready': (e) =>
+                                 mainMenu.setTitle('AdministratedTournaments',
+                                                   {'#!/tournament/new': 'AddTournament'}),
+                             'event.request.status.ready': (e) => {
+                                 requestStatus.startLoading();
+                                 Tournament.administered(
+                                     {completeInDays: 30},
+                                     function (tournaments) {
+                                         requestStatus.complete();
+                                         self.tournaments = tournaments;
+                                     },
+                                     requestStatus.failed);
+                             }
+                         });
                      }
                     ]
         });

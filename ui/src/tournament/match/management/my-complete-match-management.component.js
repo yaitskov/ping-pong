@@ -7,11 +7,11 @@ angular.
         templateUrl: template,
         controller: ['Match', 'mainMenu', '$routeParams', 'binder', '$rootScope', '$scope', 'requestStatus',
                      function (Match, mainMenu, $routeParams, binder, $rootScope, $scope, requestStatus) {
-                         mainMenu.setTitle('Match management');
                          var self = this;
                          self.tournamentId = $routeParams.tournamentId;
                          self.matchId = $routeParams.matchId;
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Match management'),
                              'event.match.review.ready': (event) => {
                                  requestStatus.startLoading();
                                  Match.matchResult(

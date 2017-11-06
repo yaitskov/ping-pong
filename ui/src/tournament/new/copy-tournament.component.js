@@ -6,10 +6,9 @@ angular.
     component('copyTournament', {
         templateUrl: template,
         controller: ['auth', 'mainMenu', '$http', '$location', 'pageCtx', '$scope',
-                     'Tournament', '$routeParams', 'requestStatus', 'moment',
+                     'Tournament', '$routeParams', 'requestStatus', 'moment', 'binder',
                      function (auth, mainMenu, $http, $location, pageCtx, $scope,
-                               Tournament, $routeParams, requestStatus, $moment) {
-                         mainMenu.setTitle('Copy Tournament');
+                               Tournament, $routeParams, requestStatus, $moment, binder) {
                          this.tournament = pageCtx.get('copyTournament') || {};
 
                          if (this.tournament.tid) {
@@ -51,12 +50,17 @@ angular.
                                      },
                                      requestStatus.failed);
                          };
-                         requestStatus.startLoading();
-                         Tournament.aMine({tournamentId: $routeParams.tournamentId},
-                                              function (tournament) {
-                                                  requestStatus.complete();
-                                                  self.tournament.name = tournament.name;
-                                                  self.tournament.startTime = $moment(tournament.opensAt).format('hh:mm A');
-                                              },
-                                              requestStatus.failed);
+                         binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Copy Tournament'),
+                             'event.request.status.ready': (event) => {
+                                 requestStatus.startLoading();
+                                 Tournament.aMine({tournamentId: $routeParams.tournamentId},
+                                                  function (tournament) {
+                                                      requestStatus.complete();
+                                                      self.tournament.name = tournament.name;
+                                                      self.tournament.startTime = $moment(tournament.opensAt).format('hh:mm A');
+                                                  },
+                                                  requestStatus.failed);
+                             }
+                         });
                      }]});

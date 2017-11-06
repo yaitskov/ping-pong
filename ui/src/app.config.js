@@ -41,151 +41,151 @@ angular.module('pingPong').
                 $locationProvider.hashPrefix('!');
                 $routeProvider.
                     when('/tournament/draft/list', {
-                        template: '<tournament-draft-list></tournament-draft-list>'
+                        template: '<tournament-draft-list/>'
                     }).
                     when('/watch/tournaments', {
-                        template: '<watch-tournament-list></watch-tournament-list>'
+                        template: '<watch-tournament-list/>'
                     }).
                     when('/play/in/tournaments', {
-                        template: '<play-in-tournament-list></play-in-tournament-list>'
+                        template: '<play-in-tournament-list/>'
                     }).
                     when('/participant/score/set/:matchId', {
-                        template: '<participant-score-set></participant-score-set>'
+                        template: '<participant-score-set/>'
                     }).
                     when('/complete/match/:matchId', {
-                        template: '<admin-score-set></admin-score-set>'
+                        template: '<admin-score-set/>'
                     }).
                     when('/match/admin-conflict-review/:tournamentId/:matchId', {
-                        template: '<match-score-conflict-admin></match-score-conflict-admin>'
+                        template: '<match-score-conflict-admin/>'
                     }).
                     when('/tournament/rules/:tournamentId', {
-                        template: '<tournament-rules></tournament-rules>'
+                        template: '<tournament-rules/>'
                     }).
                     when('/tournament/played-matches/:tournamentId', {
-                        template: '<participant-played-matches></participant-played-matches>'
+                        template: '<participant-played-matches/>'
                     }).
                     when('/match/user-conflict-review/:tournamentId/:matchId', {
-                        template: '<match-score-conflict-user></match-score-conflict-user>'
+                        template: '<match-score-conflict-user/>'
                     }).
                     when('/review/admin-scored-match/:tournamentId/:matchId', {
-                        template: '<review-match-score-for-admin></review-match-score-for-admin>'
+                        template: '<review-match-score-for-admin/>'
                     }).
                     when('/tournament/my-complete-match/:tournamentId/:matchId', {
-                        template: '<my-complete-match-management></my-complete-match-management>'
+                        template: '<my-complete-match-management/>'
                     }).
                     when('/tournament/enlisted/:tournamentId', {
-                        template: '<enlisted-participants></enlisted-participants>'
+                        template: '<enlisted-participants/>'
                     }).
                     when('/review/user-scored-match/:tournamentId/:matchId', {
-                        template: '<review-match-score-for-user></review-match-score-for-user>'
+                        template: '<review-match-score-for-user/>'
                     }).
                     when('/my/matches/play/:tournamentId', {
-                        template: '<participant-match-list-to-judge></participant-match-list-to-judge>'
+                        template: '<participant-match-list-to-judge/>'
                     }).
                     when('/match/state/description', {
-                        template: '<match-state-description></match-state-description>'
+                        template: '<match-state-description/>'
                     }).
                     when('/my/tournament/:tournamentId/category/:categoryId/members', {
-                        template: '<tr-category-member-list></tr-category-member-list>'
+                        template: '<tr-category-member-list/>'
                     }).
                     when('/my/tournament/edit/:tournamentId', {
-                        template: '<tournament-edit></tournament-edit>'
+                        template: '<tournament-edit/>'
                     }).
                     when('/tournament/match/new-dispute/:tournamentId/:matchId', {
-                        template: '<match-result-new-dispute></match-result-new-dispute>'
+                        template: '<match-result-new-dispute/>'
                     }).
                     when('/my/tournament/parameters/:tournamentId', {
-                        template: '<tr-parameters-edit></tr-tournament-parameters-editor>'
+                        template: '<tr-parameters-edit/>'
                     }).
                     when('/participant/result/:tournamentId/:participantId', {
-                        template: '<participant-result></participant-result>'
+                        template: '<participant-result/>'
                     }).
                     when('/my/tournament/:tournamentId/change-category/:participantId', {
-                        template: '<tr-category-membery-switcher></tr-category-membery-switcher>'
+                        template: '<tr-category-membery-switcher/>'
                     }).
                     when('/my/matches/judgement/:tournamentId', {
-                        template: '<judge-match-list-to-judge></judge-match-list-to-judge>'
+                        template: '<judge-match-list-to-judge/>'
                     }).
                     when('/watch/tournament/:tournamentId', {
-                        template: '<watch-tournament></watch-tournament>'
+                        template: '<watch-tournament/>'
                     }).
                     when('/tournament/new', {
-                        template: '<new-tournament></new-tournament>'
+                        template: '<new-tournament/>'
                     }).
                     when('/tournament/copy/:tournamentId', {
-                        template: '<copy-tournament></copy-tournament>'
+                        template: '<copy-tournament/>'
                     }).
                     when('/tournament/new/parameters', {
-                        template: '<new-tournament-parameters></new-tournament-parameters>'
+                        template: '<new-tournament-parameters/>'
                     }).
                     when('/my/new/place', {
-                        template: '<new-place></new-place>'
+                        template: '<new-place/>'
                     }).
                     when('/place/:placeId', {
-                        template: '<place-detail></place-detail>'
+                        template: '<place-detail/>'
                     }).
                     when('/my-place/:placeId', {
-                        template: '<my-place></my-place>'
+                        template: '<my-place/>'
                     }).
                     when('/my-place/edit/:placeId', {
-                        template: '<my-place-edit></my-place-edit>'
+                        template: '<my-place-edit/>'
                     }).
                     when('/my-place/tables/:placeId', {
-                        template: '<my-table-list></my-table-list>'
+                        template: '<my-table-list/>'
                     }).
                     when('/pick/place', {
-                        template: '<place-picker></place-picker>'
+                        template: '<place-picker/>'
                     }).
                     when('/my/tournament/presence/:tournamentId', {
-                        template: '<par-state-mgmt-list></par-state-mgmt-list>'
+                        template: '<par-state-mgmt-list/>'
                     }).
                     when('/my/tournament/:tournamentId/participant/:userId', {
-                        template: '<manage-one-participant></manage-one-participant>'
+                        template: '<manage-one-participant/>'
                     }).
                     when('/my/tournament/categories/:tournamentId', {
-                        template: '<tournament-category-list></tournament-category-list>'
+                        template: '<tournament-category-list/>'
                     }).
                     when('/my/places', {
-                        template: '<place-list></place-list>'
+                        template: '<place-list/>'
                     }).
                     when('/my/tournaments', {
-                        template: '<manage-tournament-list></manage-tournament-list>'
+                        template: '<manage-tournament-list/>'
                     }).
                     when('/sign-up', {
-                        template: '<sign-up></sign-up>'
+                        template: '<sign-up/>'
                     }).
                     when('/sign-in', {
-                        template: '<sign-in></sign-in>'
+                        template: '<sign-in/>'
                     }).
                     when('/do-sign-in/:oneTimeSignInToken/:email', {
-                        template: '<do-sign-in></do-sign-in>'
+                        template: '<do-sign-in/>'
                     }).
                     when('/account', {
-                        template: '<account></account>'
+                        template: '<account/>'
                     }).
                     when('/account/profile/edit', {
-                        template: '<account-edit></account-edit>'
+                        template: '<account-edit/>'
                     }).
                     when('/participant/profile/:tournamentId/:participantId', {
-                        template: '<participant-profile></participant-profile>'
+                        template: '<participant-profile/>'
                     }).
                     when('/tournaments/:tournamentId', {
-                        template: '<enlist-online></enlist-online>'
+                        template: '<enlist-online/>'
                     }).
                     when('/tournament/:tournamentId/rank/manually/cid/:categoryId', {
-                        template: '<rank-bid-manually></rank-bid-manually>'
+                        template: '<rank-bid-manually/>'
                     }).
                     when('/tournament/result/:tournamentId', {
-                        template: '<tournament-result></tournament-result>'
+                        template: '<tournament-result/>'
                     }).
                     when('/my/tournament/:tournamentId', {
-                        template: '<tournament-management></tournament-management>'
+                        template: '<tournament-management/>'
                     }).
                     when('/tournament/enlist/offline/:tournamentId', {
-                        template: '<enlist-offline></enlist-offline>'
+                        template: '<enlist-offline/>'
                     }).
                     when('/default/route', {
-                        template: '<default-route></default-route>'
+                        template: '<default-route/>'
                     }).
                     otherwise('/default/route');
             }

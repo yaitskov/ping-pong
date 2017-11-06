@@ -5,10 +5,11 @@ angular.
     module('tournament').
     component('matchScoreConflictAdmin', {
         templateUrl: template,
-        controller: ['mainMenu', 'pageCtx', '$routeParams', 'Match', 'requestStatus', '$location',
-                     function (mainMenu, pageCtx, $routeParams, Match, requestStatus, $location) {
+        controller: ['mainMenu', 'pageCtx', '$routeParams', 'Match', 'requestStatus', '$location', 'binder', '$scope',
+                     function (mainMenu, pageCtx, $routeParams, Match, requestStatus, $location, binder, $scope) {
                          var self = this;
-                         mainMenu.setTitle('Match scoring conflict');
+                         binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Match scoring conflict')});
                          self.conflict = pageCtx.get('match-score-conflict-' + $routeParams.matchId);
                          self.matchScore = self.conflict.matchScore;
                          self.matchId = $route.matchId;
@@ -35,7 +36,7 @@ angular.
                          self.yourSet = self.conflict.yourSet;
                          self.yourSetScore = self.conflict.yourSetScore;
 
-                         this.rescore = function () {
+                         self.rescore = function () {
                              requestStatus.startLoading('Reset match score');
                              Match.resetSetScoreDownTo(
                                  {mid: self.matchScore.mid,

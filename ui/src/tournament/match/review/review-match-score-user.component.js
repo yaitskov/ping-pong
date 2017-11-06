@@ -7,9 +7,9 @@ angular.
         templateUrl: template,
         controller: ['mainMenu', '$routeParams', 'binder', '$rootScope', '$scope',
                      function (mainMenu, $routeParams, binder, $rootScope, $scope) {
-                         mainMenu.setTitle('Match Review');
                          this.tournamentId = $routeParams.tournamentId;
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Match Review'),
                              'event.review.match.ready': (event) => {
                                  $rootScope.$broadcast(
                                      'event.review.match.data',

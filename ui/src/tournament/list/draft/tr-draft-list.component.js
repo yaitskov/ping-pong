@@ -6,13 +6,12 @@ angular.module('tournament').
         templateUrl: template,
         controller: ['Tournament', 'auth', 'mainMenu', '$location', 'requestStatus', 'binder', '$scope',
                      function (Tournament, auth, mainMenu, $location, requestStatus, binder, $scope) {
-                         mainMenu.setTitle('Drafting');
                          var self = this;
-                         self.tournaments = null;
                          self.goTo = function (tid) {
                              $location.path('/tournaments/' + tid);
                          };
                          binder($scope, {
+                             'event.main.menu.ready': (e) => mainMenu.setTitle('Drafting'),
                              'event.request.status.ready': (event) => {
                                  requestStatus.startLoading();
                                  Tournament.drafting(

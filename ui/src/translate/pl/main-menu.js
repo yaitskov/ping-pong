@@ -1,7 +1,7 @@
 module.exports = {
     'Watch Games': 'Oglądaj gry',
     'My Schedule': 'Moje mecze',
-    'Participation': 'Uczestniczę w',
+    'Participation': 'Uczestnictwo',
     'Administration': 'Administracja',
     'My Judgement': 'Sędziowanie',
     'My Places': 'Moje boiska',

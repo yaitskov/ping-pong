@@ -86,7 +86,7 @@ angular.module('pingPong').
                         template: '<match-state-description></match-state-description>'
                     }).
                     when('/my/tournament/:tournamentId/category/:categoryId/members', {
-                        template: '<category-member-list></category-member-list>'
+                        template: '<tr-category-member-list></tr-category-member-list>'
                     }).
                     when('/my/tournament/edit/:tournamentId', {
                         template: '<tournament-edit></tournament-edit>'
@@ -95,13 +95,13 @@ angular.module('pingPong').
                         template: '<match-result-new-dispute></match-result-new-dispute>'
                     }).
                     when('/my/tournament/parameters/:tournamentId', {
-                        template: '<tournament-parameters></tournament-parameters>'
+                        template: '<tr-parameters-edit></tr-tournament-parameters-editor>'
                     }).
                     when('/participant/result/:tournamentId/:participantId', {
                         template: '<participant-result></participant-result>'
                     }).
                     when('/my/tournament/:tournamentId/change-category/:participantId', {
-                        template: '<change-category></change-category>'
+                        template: '<tr-category-membery-switcher></tr-category-membery-switcher>'
                     }).
                     when('/my/matches/judgement/:tournamentId', {
                         template: '<judge-match-list-to-judge></judge-match-list-to-judge>'
@@ -143,13 +143,13 @@ angular.module('pingPong').
                         template: '<manage-one-participant></manage-one-participant>'
                     }).
                     when('/my/tournament/categories/:tournamentId', {
-                        template: '<tournament-categories></tournament-categories>'
+                        template: '<tournament-category-list></tournament-category-list>'
                     }).
                     when('/my/places', {
                         template: '<place-list></place-list>'
                     }).
                     when('/my/tournaments', {
-                        template: '<my-tournament-list></my-tournament-list>'
+                        template: '<manage-tournament-list></manage-tournament-list>'
                     }).
                     when('/sign-up', {
                         template: '<sign-up></sign-up>'

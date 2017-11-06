@@ -1,3 +1,5 @@
+import './category/tr-category.import.js';
+
 import './match/set/score/score-set.module.js';
 import './match/set/score/base-score-set.component.js';
 import './match/set/score/score-set.component.js';
@@ -27,3 +29,8 @@ import './management/tr-management.component.js';
 import './watch/watch-tournament.component.js';
 import './rules/tournament-rules.component.js';
 import './list/watch/watch-tournament-list.component.js';
+import './list/manage/manage-tr-list.component.js';
+import './new/copy-tournament.component.js';
+import './new/new-tournament.component.js';
+import './management/tr-properties-editor.component.js';
+import './management/tr-parameters-editor.component.js';

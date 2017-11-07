@@ -48,6 +48,7 @@ public class MatchResource {
     private static final String MATCH_TOURNAMENT_WINNERS = "/match/tournament-winners/";
     private static final String MID = "mid";
     private static final String MID_JP = "{mid}";
+    public static final String MATCH_FOR_JUDGE = "/match/for-judge/";
 
     @Inject
     private AuthService authService;
@@ -174,6 +175,16 @@ public class MatchResource {
             @Suspended AsyncResponse response,
             @PathParam(TID) Tid tid) {
         tournamentAccessor.read(tid, response, matchService::findOpenMatchesForWatching);
+    }
+
+    @GET
+    @Path(MATCH_FOR_JUDGE + TID_JP + "/" + MID_JP)
+    public void getMatchForJudge(
+            @Suspended AsyncResponse response,
+            @PathParam(TID) Tid tid,
+            @PathParam(MID) Mid mid) {
+        tournamentAccessor.read(tid, response,
+                tournament -> matchService.getMatchForJudge(tournament, mid));
     }
 
     @GET

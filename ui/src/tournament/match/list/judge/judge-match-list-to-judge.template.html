@@ -12,6 +12,16 @@
       </a>
     </div>
   </div>
+  <div class="form-group">
+    <a class="btn btn-default" title="back" back-button>
+      <span class="glyphicon glyphicon-circle-arrow-left"></span>
+    </a>
+    <a href="#!/my/tournament/{{$ctrl.tournamentId}}"
+       title="tournament management"
+       class="btn btn-default">
+      <span class="glyphicon glyphicon-home"/>
+    </a>
+  </div>
   <div class="form-group tables" ng-show="$ctrl.showTables && $ctrl.matches.length">
     <button class="btn btn-primary"
             ng-repeat="match in $ctrl.matches | orderBy : 'table.label'"

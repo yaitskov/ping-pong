@@ -48,6 +48,7 @@ import org.dan.ping.pong.app.group.PlayOffMatcherFromGroup;
 import org.dan.ping.pong.app.place.PlaceRules;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
+import org.dan.ping.pong.app.sched.TablesDiscovery;
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -670,18 +671,7 @@ public class MatchService {
         return scheduleService.withPlaceTables(tournament, (tablesDiscovery -> tournament.getMatches()
                 .values().stream()
                 .filter(m -> m.getState() == Game)
-                .map(m -> OpenMatchForJudge.builder()
-                        .mid(m.getMid())
-                        .tid(tournament.getTid())
-                        .minGamesToWin(tournament.getRule().getMatch().getMinGamesToWin())
-                        .playedSets(m.getPlayedSets())
-                        .started(m.getStartedAt().get())
-                        .matchType(m.getType())
-                        .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
-                        .participants(m.getParticipantIdScore().keySet().stream()
-                                .map(uid -> tournament.getParticipant(uid).toLink())
-                                .collect(toList()))
-                        .build())
+                .map(m -> getMatchForJudge(tournament, m, tablesDiscovery))
                 .collect(toList())));
     }
 
@@ -749,5 +739,28 @@ public class MatchService {
             }
             return Spectator;
         }).orElse(Spectator);
+    }
+
+    public OpenMatchForJudge getMatchForJudge(TournamentMemState tournament, Mid mid) {
+        return scheduleService.withPlaceTables(tournament,
+                tablesDiscovery -> getMatchForJudge(tournament,
+                        tournament.getMatchById(mid), tablesDiscovery));
+    }
+
+    private OpenMatchForJudge getMatchForJudge(
+            TournamentMemState tournament, MatchInfo m,
+            TablesDiscovery tablesDiscovery) {
+        return OpenMatchForJudge.builder()
+                .mid(m.getMid())
+                .tid(tournament.getTid())
+                .minGamesToWin(tournament.getRule().getMatch().getMinGamesToWin())
+                .playedSets(m.getPlayedSets())
+                .started(m.getStartedAt().get())
+                .matchType(m.getType())
+                .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
+                .participants(m.getParticipantIdScore().keySet().stream()
+                        .map(uid -> tournament.getParticipant(uid).toLink())
+                        .collect(toList()))
+                .build();
     }
 }

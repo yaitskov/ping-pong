@@ -7,9 +7,9 @@ import static org.dan.ping.pong.app.tournament.TournamentService.TID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
-import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.util.time.Clocker;
@@ -165,10 +165,7 @@ public class MatchResource {
     public void findOpenMatchesForJudge(
             @PathParam(TID) Tid tid,
             @Suspended AsyncResponse response) {
-        tournamentAccessor.update(tid, response,
-                (tournament, batch) -> {
-                    return matchService.findOpenMatchesForJudgeList(tournament);
-                });
+        tournamentAccessor.read(tid, response, matchService::findOpenMatchesForJudgeList);
     }
 
     @GET
@@ -176,10 +173,7 @@ public class MatchResource {
     public void findOpenMatchesForWatching(
             @Suspended AsyncResponse response,
             @PathParam(TID) Tid tid) {
-        tournamentAccessor.update(tid, response,
-                (tournament, batch) -> {
-                    return matchService.findOpenMatchesForWatching(tournament);
-                });
+        tournamentAccessor.read(tid, response, matchService::findOpenMatchesForWatching);
     }
 
     @GET

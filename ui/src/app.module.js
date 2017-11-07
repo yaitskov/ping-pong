@@ -10,5 +10,6 @@ angular.module('pingPong', [
     'ui',
     'core',
     'user',
+    'place',
     'tournament'
 ]);

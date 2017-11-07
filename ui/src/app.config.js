@@ -89,13 +89,13 @@ angular.module('pingPong').
                         template: '<tr-category-member-list/>'
                     }).
                     when('/my/tournament/edit/:tournamentId', {
-                        template: '<tournament-edit/>'
+                        template: '<tournament-properties-editor/>'
                     }).
                     when('/tournament/match/new-dispute/:tournamentId/:matchId', {
                         template: '<match-result-new-dispute/>'
                     }).
                     when('/my/tournament/parameters/:tournamentId', {
-                        template: '<tr-parameters-edit/>'
+                        template: '<tr-parameters-editor/>'
                     }).
                     when('/participant/result/:tournamentId/:participantId', {
                         template: '<participant-result/>'

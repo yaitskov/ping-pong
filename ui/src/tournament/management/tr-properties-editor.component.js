@@ -5,9 +5,9 @@ angular.
     module('tournament').
     component('tournamentPropertiesEditor', {
         templateUrl: template,
-        controller: ['auth', 'mainMenu', '$http', '$location', 'placePicker',
+        controller: ['auth', 'mainMenu', '$http', '$location', 'placePicker', 'binder',
                      'pageCtx', '$scope', 'Tournament', 'requestStatus', '$routeParams', 'moment',
-                     function (auth, mainMenu, $http, $location, placePicker,
+                     function (auth, mainMenu, $http, $location, placePicker, binder,
                                pageCtx, $scope, Tournament, requestStatus, $routeParams, moment) {
                          var changes = pageCtx.get('editableTournament');
                          if (changes && $routeParams.tournamentId != changes.tid) {

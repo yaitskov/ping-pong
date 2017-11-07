@@ -361,6 +361,9 @@ public class TournamentService {
             throw badRequest("Tournament could be modified until it's open");
         }
         tournament.setPid(update.getPlaceId());
+        tournament.setTicketPrice(update.getPrice());
+        tournament.setName(update.getName());
+        tournament.setOpensAt(update.getOpensAt());
         tournamentDao.update(update, batch);
     }
 

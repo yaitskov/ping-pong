@@ -9,5 +9,6 @@ module.exports = {
     'match-type-lbl': 'Type',
     'match-state-lbl': 'State',
     'to-score': 'Score',
-    'Match management': 'Match management'
+    'Match management': 'Match management',
+    'Schedule tables': 'Schedule tables'
 };

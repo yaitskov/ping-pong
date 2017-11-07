@@ -115,6 +115,31 @@
     </div>
   </div>
   <div class="form-group toggle-btn">
+    <label>{{ 'arena-lbl' | translate }}</label>
+    <a class="pull-right arrow"
+       simple-toggler="#arena-parameters">
+      <span class="glyphicon glyphicon-menu-down"></span>
+      <span class="glyphicon glyphicon-menu-up"></span>
+    </a>
+  </div>
+  <div id="arena-parameters" class="toggle-panel in">
+    <div class="form-group">
+      <label class="toggle-option">
+        {{ 'Schedule tables' | translate }}
+      </label>
+      <a class="btn btn-default"
+         ng-click="$ctrl.rules.place.arenaDistribution = 'GLOBAL'"
+         ng-class="{'btn-primary': $ctrl.rules.place.arenaDistribution == 'GLOBAL'}">
+        {{ 'yes-lbl' | translate }}
+      </a>
+      <a class="btn btn-default"
+         ng-click="$ctrl.rules.place.arenaDistribution == 'NO'"
+         ng-class="{'btn-danger': !$ctrl.rules.place || $ctrl.rules.place.arenaDistribution == 'NO'}">
+        {{ 'no-lbl' | translate }}
+      </a>
+    </div>
+  </div>
+  <div class="form-group toggle-btn">
     <label>{{ 'group-lbl' | translate }}</label>
     <input type="checkbox"
            data-size="small"

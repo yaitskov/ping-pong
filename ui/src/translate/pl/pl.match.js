@@ -9,5 +9,6 @@ module.exports = {
     'match-type-lbl': 'Typ',
     'match-state-lbl': 'Stan',
     'to-score': 'Ocenić',
-    'Match management': 'Zarządzanie meczem'
+    'Match management': 'Zarządzanie meczem',
+    'Schedule tables': 'Planować stoły'
 };

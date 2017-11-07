@@ -86,8 +86,8 @@
     <tbody>
       <tr ng-repeat="match in $ctrl.matches.matches">
         <td ng-show="!$ctrl.matches.showTables">
-          <a class="btn btn-primary" ng-click="$ctrl.matchScoring(match)">
-            <span class="glyphicon glyphicon-play"></span>
+          <a class="btn btn-primary" href="#!/match/management/{{match.tid}}/{{match.mid}}">
+            <span class="glyphicon glyphicon-info-sign"></span>
           </a>
         </td>
         <td class="match-state-description"
@@ -108,7 +108,7 @@
           <span title="{{ 'No free table' | translate }}" ng-show="!match.table.id">-</span>
         </td>
         <td title="{{ 'Your opponent in a game.' | translate }}">
-          <a href="#!/participant/result/{{match.tid}}/{{match.enemy.uid}}">
+          <a ng-click="$ctrl.matchScoring(match)">
             {{match.enemy.name}}
           </a>
         </td>

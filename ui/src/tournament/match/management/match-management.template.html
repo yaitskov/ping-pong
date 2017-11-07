@@ -1,0 +1,101 @@
+<main-menu></main-menu>
+<div class="container">
+  <div class="form-group">
+    <a class="btn btn-default" title="back" back-button>
+      <span class="glyphicon glyphicon-circle-arrow-left"></span>
+    </a>
+    <a class="btn btn-default"
+       ng-show="$ctrl.match.role == 'Admin'"
+       title="to the tournament"
+       href="#!/my/tournament/{{$ctrl.tournamentId}}">
+      <span class="glyphicon glyphicon-home"></span>
+    </a>
+    <a class="btn btn-default"
+       ng-show="$ctrl.match.role == 'Participant'"
+       title="to the tournament"
+       href="#!/tournaments/{{$ctrl.tournamentId}}">
+      <span class="glyphicon glyphicon-home"></span>
+    </a>
+    <a class="btn btn-danger"
+       ng-show="$ctrl.match.role == 'Participant' && $ctrl.isMatchStateDraftPlaceGame"
+       title="walkover the match"
+       ng-click="$ctrl.walkOver()">
+      <span class="glyphicon glyphicon-stop"></span>
+    </a>
+    <a class="btn btn-primary"
+       ng-show="$ctrl.match.role == 'Admin' && $ctrl.match.state == 'Game'"
+       title="score the match"
+       href="#!/judge/score/set/{{$ctrl.tournamentId}}/{{$ctrl.matchId}}">
+      <span class="glyphicon glyphicon-bullhorn"></span>
+    </a>
+    <a class="btn btn-primary"
+       ng-show="$ctrl.match.role == 'Participant' && $ctrl.match.state == 'Game'"
+       title="score the match"
+       href="#!/participant/score/set/{{$ctrl.tournamentId}}/{{$ctrl.matchId}}">
+      <span class="glyphicon glyphicon-play-circle"></span>
+    </a>
+    <a class="btn btn-warning"
+       ng-show="$ctrl.match.role == 'Admin' && $ctrl.isMatchStateGameOver"
+       title="alter set score"
+       href="#!/match/edit-score/{{$ctrl.tournamentId}}/{{$ctrl.matchId}}">
+      <span class="glyphicon glyphicon-pencil"></span>
+    </a>
+    <a class="btn btn-danger"
+       title="dispute list"
+       ng-show="$ctrl.match.disputes"
+       href="#!/tournament/match/dispute-list/{{$ctrl.tournamentId}}/{{$ctrl.matchId}}">
+      <span class="glyphicon glyphicon-comment"></span>
+    </a>
+    <a class="btn btn-danger"
+       ng-show="$ctrl.match.role == 'Participant'"
+       title="you are disagree with the score and want to claim an issue to the judge"
+       href="#!/tournament/match/new-dispute/{{$ctrl.tournamentId}}/{{$ctrl.matchId}}">
+      <span class="glyphicon glyphicon-flash"></span>
+    </a>
+  </div>
+  <div class="form-group">
+    <table class="table table-bordered">
+      <tr ng-show="match.table">
+        <td translate="arena-lbl"/>
+        <td>
+          <a href="#!/place/tables/{{match.table.id}}">
+            {{ 'table-short-cut' | translate }}{{match.table.label}}
+          </a>
+        </td>
+      </tr>
+      <tr ng-show="$ctrl.match.group.gid">
+        <td translate="group-lbl"/>
+        <td>
+          <a href="#!/group/members/{{$ctrl.match.tid}}/{{$ctrl.match.group.gid}}"
+             class="btn btn-default">
+            {{$ctrl.match.group.label}}
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <td translate="category-lbl"/>
+        <td>
+          <a href="#!/category/members/{{$ctrl.match.tid}}/{{$ctrl.match.category.cid}}"
+             class="btn btn-default">
+            {{$ctrl.match.category.name}}
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <td translate="match-type-lbl"/>
+        <td>
+          {{$ctrl.match.type | translate}}
+        </td>
+      </tr>
+      <tr>
+        <td translate="match-state-lbl"/>
+        <td>
+          {{$ctrl.match.state | translate}}
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="form-group">
+    <review-sets></review-sets>
+  </div>
+</div>

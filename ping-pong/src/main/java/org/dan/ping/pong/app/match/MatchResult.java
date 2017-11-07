@@ -6,10 +6,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dan.ping.pong.app.category.CategoryInfo;
+import org.dan.ping.pong.app.group.GroupLink;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserLink;
+import org.dan.ping.pong.app.user.UserRole;
 
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -23,4 +27,9 @@ public class MatchResult {
     private List<UserLink> participants;
     private int minGamesToWin;
     private int disputes;
+    private MatchState state;
+    private MatchType type;
+    private Optional<GroupLink> group;
+    private CategoryInfo category;
+    private UserRole role;
 }

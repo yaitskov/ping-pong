@@ -30,7 +30,7 @@ angular.
                                  break;
                              }
                              pageCtx.put('last-scoring-match', match);
-                             $location.path('/complete/match/' + self.matchId);
+                             $location.path('/judge/score/set/' + self.tournamentId + '/' + self.matchId);
                          }
 
                          self.yourSet = self.conflict.yourSet;
@@ -59,7 +59,7 @@ angular.
                                                      break;
                                                  }
                                                  pageCtx.put('last-scoring-match', match);
-                                                 $location.path('/complete/match/' + self.matchId);
+                                                 $location.path('/judge/score/set/' + self.tournamentId + '/' + self.matchId);
                                              } else {
                                                  $location.path('/review/admin-scored-match/' + self.tournamentId + '/' + self.matchId);
                                              }

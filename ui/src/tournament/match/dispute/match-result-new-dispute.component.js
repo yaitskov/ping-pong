@@ -22,7 +22,7 @@ angular.
                                   sets: self.match.score.sets},
                                  function (ok) {
                                      requestStatus.complete();
-                                     $location.path('/tournament/my-complete-match/' +
+                                     $location.path('/match/management/' +
                                                     $routeParams.tournamentId + '/' +
                                                     $routeParams.matchId);
                                  },

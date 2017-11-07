@@ -52,7 +52,7 @@ angular.module('pingPong').
                     when('/participant/score/set/:matchId', {
                         template: '<participant-score-set/>'
                     }).
-                    when('/complete/match/:matchId', {
+                    when('/judge/score/set/:tournamentId/:matchId', {
                         template: '<admin-score-set/>'
                     }).
                     when('/match/admin-conflict-review/:tournamentId/:matchId', {
@@ -70,8 +70,8 @@ angular.module('pingPong').
                     when('/review/admin-scored-match/:tournamentId/:matchId', {
                         template: '<review-match-score-for-admin/>'
                     }).
-                    when('/tournament/my-complete-match/:tournamentId/:matchId', {
-                        template: '<my-complete-match-management/>'
+                    when('/match/management/:tournamentId/:matchId', {
+                        template: '<match-management/>'
                     }).
                     when('/tournament/enlisted/:tournamentId', {
                         template: '<enlisted-participants/>'

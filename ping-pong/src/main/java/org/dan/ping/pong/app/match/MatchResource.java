@@ -10,10 +10,12 @@ import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.util.time.Clocker;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -84,10 +86,12 @@ public class MatchResource {
     @Consumes(APPLICATION_JSON)
     public void result(
             @Suspended AsyncResponse response,
+            @HeaderParam(SESSION) String session,
             @PathParam(TID) Tid tid,
             @PathParam(MID) Mid mid) {
+        final Optional<Uid> ouid = authService.userInfoBySessionQuite(session).map(UserInfo::getUid);
         tournamentAccessor.read(tid, response,
-                tournament -> matchService.matchResult(tournament, mid));
+                tournament -> matchService.matchResult(tournament, mid, ouid));
     }
 
     @GET

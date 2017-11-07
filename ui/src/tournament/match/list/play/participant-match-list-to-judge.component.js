@@ -14,7 +14,7 @@ angular.module('tournament').
                          var self = this;
                          this.matchScoring = function (match) {
                              pageCtx.put('last-scoring-match', match);
-                             $location.path('/participant/score/set/' + match.mid);
+                             $location.path('/participant/score/set/' + $routeParams.tournamentId + '/' + match.mid);
                          };
                          binder($scope, {
                              'event.main.menu.ready': (e) => mainMenu.setTitle('My matches to be played'),

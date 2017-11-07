@@ -48,7 +48,10 @@ angular.
                               },
                               matchResult: {
                                   url: '/api/match/result/:tournamentId/:matchId',
-                                  method: 'GET'
+                                  method: 'GET',
+                                  headers: {
+                                      session: 1
+                                  }
                               },
                               winners: {
                                   url: '/api/match/tournament-winners/:tournamentId',

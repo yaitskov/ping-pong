@@ -50,16 +50,18 @@
           <td ng-show="!$ctrl.showTables">
             {{ 'Opponent' | translate }}
           </td>
-          <td>
-            {{ 'Score' | translate }}
-          </td>
+          <td/>
         </tr>
       </thead>
       <tbody>
         <tr ng-repeat="match in $ctrl.matches | orderBy : $ctrl.orderField">
-          <td class="match-cell">{{match.matchType | translate}}</td>
+          <td class="match-cell">
+            <a class="btn btn-default" ng-click="$ctrl.completeMatch(match)">
+              {{match.matchType | translate}}
+            </a>
+          </td>
           <td ng-show="$ctrl.showTables">
-            <a href="#!/place/tables/{{match.table.id}}">
+            <a ng-click="$ctrl.completeMatch(match)">
               <span class="glyphicon glyphicon-map-marker"></span>
               {{ 'table-short-cut' | translate }}{{match.table.label}}
             </a>
@@ -67,21 +69,21 @@
           <td class="participant-names" ng-show="$ctrl.showTables">
             <a ng-repeat="participant in match.participants"
                class="btn btn-default"
-               href="#!/my/tournament/{{match.tid}}/participant/{{participant.uid}}">
+               ng-click="$ctrl.completeMatch(match)">
               {{participant.name}}
             </a>
           </td>
           <td class="participant-names" ng-show="!$ctrl.showTables">
             <a class="btn btn-default"
-               href="#!/my/tournament/{{match.tid}}/participant/{{match.enemy.uid}}">
+               title="{{ 'to-score' | translate }}"
+               ng-click="$ctrl.completeMatch(match)">
               {{match.enemy.name}}
             </a>
           </td>
           <td>
             <a class="btn btn-primary"
-               title="{{ 'Score' | translate }}"
-               ng-click="$ctrl.completeMatch(match)">
-              <span class="glyphicon glyphicon-bullhorn"></span>
+               href="#!/match/management/{{match.tid}}/{{match.mid}}">
+              <span class="glyphicon glyphicon-info-sign"></span>
             </a>
           </td>
         </tr>

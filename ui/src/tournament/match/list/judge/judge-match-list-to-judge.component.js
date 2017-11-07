@@ -22,7 +22,7 @@ angular.module('tournament').
                                       name: cutil.findValBy(self.bids, {uid: +self.bid}).name}];
                              }
                              pageCtx.put('last-scoring-match', match);
-                             $location.path('/complete/match/' + match.mid);
+                             $location.path('/judge/score/set/' + self.tournamentId + '/' + match.mid);
                          };
                          self.bidChange = () => {
                              self.matches = null;

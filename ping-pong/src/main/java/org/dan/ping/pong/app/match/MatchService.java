@@ -29,6 +29,9 @@ import static org.dan.ping.pong.app.place.ArenaDistributionPolicy.NO;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.app.tournament.SetScoreResultName.MatchContinues;
+import static org.dan.ping.pong.app.user.UserRole.Admin;
+import static org.dan.ping.pong.app.user.UserRole.Participant;
+import static org.dan.ping.pong.app.user.UserRole.Spectator;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -53,6 +56,7 @@ import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.TournamentProgress;
 import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
@@ -718,16 +722,32 @@ public class MatchService {
                 .build();
     }
 
-    public MatchResult matchResult(TournamentMemState tournament, Mid mid) {
+    public MatchResult matchResult(TournamentMemState tournament, Mid mid, Optional<Uid> ouid) {
         MatchInfo m = tournament.getMatchById(mid);
         return MatchResult.builder()
                 .participants(m.getParticipantIdScore().keySet().stream()
                         .map(uid -> tournament.getParticipant(uid).toLink())
                         .collect(toList()))
                 .score(matchScore(tournament, m))
+                .role(detectRole(tournament, m, ouid))
+                .state(m.getState())
+                .type(m.getType())
+                .group(m.getGid().map(gid -> tournament.getGroups().get(gid).toLink()))
+                .category(tournament.getCategory(m.getCid()))
                 .tid(tournament.getTid())
                 .playedSets(m.getPlayedSets())
                 .minGamesToWin(tournament.getRule().getMatch().getMinGamesToWin())
                 .build();
+    }
+
+    public UserRole detectRole(TournamentMemState tournament, MatchInfo match, Optional<Uid> ouid) {
+        return ouid.map(uid -> {
+            if (tournament.isAdminOf(uid)) {
+                return Admin;
+            } else if (match.getParticipantIdScore().containsKey(uid)) {
+                return Participant;
+            }
+            return Spectator;
+        }).orElse(Spectator);
     }
 }

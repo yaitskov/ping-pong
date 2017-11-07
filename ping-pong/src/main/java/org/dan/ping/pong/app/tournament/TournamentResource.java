@@ -282,8 +282,11 @@ public class TournamentResource {
     @GET
     @Path(MY_TOURNAMENT)
     @Consumes(APPLICATION_JSON)
-    public MyTournamentInfo getMyTournamentInfo(@PathParam(TID) Tid tid) {
-        return tournamentService.getMyTournamentInfo(tid);
+    public void getMyTournamentInfo(
+            @Suspended AsyncResponse response,
+            @PathParam(TID) Tid tid) {
+        tournamentAccessor.read(tid, response,
+                tournament -> tournamentService.getMyTournamentInfo(tournament));
     }
 
     @GET

@@ -22,5 +22,5 @@ public class MyTournamentInfo {
     private Instant opensAt;
     private int categories;
     private int enlisted;
-    private Optional<Integer> previousTid = Optional.empty();
+    private Optional<Tid> previousTid = Optional.empty();
 }

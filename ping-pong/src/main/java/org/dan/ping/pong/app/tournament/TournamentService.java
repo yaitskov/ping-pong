@@ -248,10 +248,19 @@ public class TournamentService {
                         .build());
     }
 
-    public MyTournamentInfo getMyTournamentInfo(Tid tid) {
-        return tournamentDao.getMyTournamentInfo(tid)
-                .orElseThrow(() -> notFound("Tournament "
-                        + tid + " not found"));
+    public MyTournamentInfo getMyTournamentInfo(TournamentMemState tournament) {
+        return sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
+                place -> MyTournamentInfo.builder()
+                        .categories(tournament.getCategories().size())
+                        .opensAt(tournament.getOpensAt())
+                        .previousTid(tournament.getPreviousTid())
+                        .price(tournament.getTicketPrice())
+                        .place(place.toLink())
+                        .state(tournament.getState())
+                        .enlisted(tournament.getParticipants().size())
+                        .name(tournament.getName())
+                        .tid(tournament.getTid())
+                        .build());
     }
 
     public void leaveTournament(ParticipantMemState bid, TournamentMemState tournament,

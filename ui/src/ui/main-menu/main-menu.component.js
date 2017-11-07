@@ -5,11 +5,12 @@ angular.
     module('mainMenu').
     component('mainMenu', {
         templateUrl: template,
-        controller: ['auth', 'mainMenu', '$rootScope', 'binder', '$scope', '$window',
-                     function (auth, mainMenu, $rootScope, binder, $scope, $window) {
+        controller: ['auth', 'mainMenu', '$rootScope', 'binder', '$scope', '$window', 'pageCtx',
+                     function (auth, mainMenu, $rootScope, binder, $scope, $window, pageCtx) {
                          var self = this;
                          self.accountName = auth.myName();
                          self.title = mainMenu.getTitle();
+                         self.lastTournament = pageCtx.get('last-tournament');
                          self.isAuthenticated = function () {
                              return auth.isAuthenticated();
                          };
@@ -18,6 +19,10 @@ angular.
                          };
                          self.contextMenu = mainMenu.getContextMenu();
                          binder($scope, {
+                             'event.mm.last.tournament': (event, tournament) => {
+                                 pageCtx.put('last-tournament', tournament);
+                                 self.lastTournament = tournament;
+                             },
                              'menu.set': (event, menu) => {
                                  self.contextMenu = menu;
                              },

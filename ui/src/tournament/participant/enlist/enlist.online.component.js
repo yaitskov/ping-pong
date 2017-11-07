@@ -6,9 +6,9 @@ angular.
     component('enlistOnline', {
         templateUrl: template,
         controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu', 'binder', '$scope',
-                     '$http', '$location', 'requestStatus', 'cutil', 'pageCtx',
+                     '$http', '$location', 'requestStatus', 'cutil', 'pageCtx', 'eBarier', '$rootScope',
                      function ($routeParams, Tournament, auth, mainMenu, binder, $scope,
-                               $http,  $location, requestStatus, cutil, pageCtx) {
+                               $http,  $location, requestStatus, cutil, pageCtx, eBarier, $rootScope) {
                          var self = this;
                          self.myCategory = pageCtx.get('my-category-' + $routeParams.tournamentId) || {};
                          self.tournament = null;
@@ -98,8 +98,22 @@ angular.
                                  requestStatus.failed);
                          };
 
+                         var setLastTournament = eBarier.create(
+                             ['got.tr', 'mm.ready'],
+                             (tournament) =>
+                                 $rootScope.$broadcast('event.mm.last.tournament',
+                                                       {
+                                                           tid: tournament.tid,
+                                                           name: tournament.name,
+                                                           role: tournament.iAmAdmin ? 'Admin' : 'Participant',
+                                                           state: tournament.state
+                                                       }));
+
                          binder($scope, {
-                             'event.main.menu.ready': (e) => mainMenu.setTitle('Drafting'),
+                             'event.main.menu.ready': (e) => {
+                                 mainMenu.setTitle('Drafting');
+                                 setLastTournament.got('mm.ready');
+                             },
                              'event.request.status.ready': (event) => {
                                  requestStatus.startLoading('Loading');
                                  Tournament.aDrafting(
@@ -107,6 +121,7 @@ angular.
                                      function (tournament) {
                                          requestStatus.complete();
                                          mainMenu.setTitle(['Drafting to', {name: tournament.name}]);
+                                         setLastTournament.got('got.tr', tournament);
                                          self.tournament = tournament;
                                          var rnkOptions = tournament.rules.casting.providedRankOptions;
                                          if (tournament.rules.casting.providedRankOptions) {

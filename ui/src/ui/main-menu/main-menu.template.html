@@ -7,6 +7,34 @@
       <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
+      <li ng-show="$ctrl.lastTournament">
+        <a href="#!/my/matches/judgement/{{$ctrl.lastTournament.tid}}"
+           ng-show="$ctrl.lastTournament.role == 'Admin' && $ctrl.lastTournament.state == 'Open'">
+          <span class="glyphicon glyphicon-bullhorn"></span>
+          {{ $ctrl.lastTournament.name }}
+        </a>
+        <a href="#!/my/matches/judgement/{{$ctrl.lastTournament.tid}}"
+           ng-show="$ctrl.lastTournament.role == 'Admin' && $ctrl.lastTournament.state != 'Open'">
+          <span class="glyphicon glyphicon-cog"></span>
+          {{ $ctrl.lastTournament.name }}
+        </a>
+        <a href="#!/my/matches/play/{{$ctrl.lastTournament.tid}}"
+           ng-show="$ctrl.lastTournament.role == 'Participant' && $ctrl.lastTournament.state == 'Open'">
+          <span class="glyphicon glyphicon-play-circle"></span>
+          {{ $ctrl.lastTournament.name }}
+        </a>
+        <a href="#!/tournaments/{{$ctrl.lastTournament.tid}}"
+           ng-show="$ctrl.lastTournament.role == 'Participant' && $ctrl.lastTournament.state != 'Open' && $ctrl.lastTournament.state != 'Close'">
+          <span class="glyphicon glyphicon-edit"></span>
+          {{ $ctrl.lastTournament.name }}
+        </a>
+        <a href="#!/tournament/result/{{$ctrl.lastTournament.tid}}"
+           ng-show="$ctrl.lastTournament.role == 'Participant' && $ctrl.lastTournament.state == 'Close'">
+          <span class="glyphicon glyphicon-eye-open"></span>
+          {{ $ctrl.lastTournament.name }}
+        </a>
+      </li>
+      <li role="separator" class="divider" ng-show="$ctrl.lastTournament"></li>
       <li>
         <a href="#!/tournament/draft/list">
           <span class="glyphicon glyphicon-pencil"></span>

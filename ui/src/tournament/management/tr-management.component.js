@@ -6,11 +6,21 @@ angular.
     module('tournament').
     component('tournamentManagement', {
         templateUrl: template,
-        controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu',
+        controller: ['$routeParams', 'Tournament', 'auth', 'mainMenu', 'eBarier', '$rootScope',
                      '$http', 'pageCtx', 'requestStatus', '$location', 'binder', '$scope',
-                     function ($routeParams, Tournament, auth, mainMenu,
+                     function ($routeParams, Tournament, auth, mainMenu, eBarier, $rootScope,
                                $http, pageCtx, requestStatus, $location, binder, $scope) {
                          var self = this;
+                         var setLastTournament = eBarier.create(
+                             ['got.tr', 'mm.ready'],
+                             (tournament) =>
+                                 $rootScope.$broadcast('event.mm.last.tournament',
+                                                       {
+                                                           tid: tournament.tid,
+                                                           name: tournament.name,
+                                                           role: 'Admin',
+                                                           state: tournament.state
+                                                       }));
                          self.whistle = whistle;
                          self.tournament = null;
                          self.wantRemove = false;
@@ -21,6 +31,7 @@ angular.
                          binder($scope, {
                              'event.main.menu.ready': (e) => {
                                  mainMenu.setTitle('MyTournament', ctxMenu);
+                                 setLastTournament.got('mm.ready');
                              },
                              'event.request.status.ready': (event) => {
                                  requestStatus.startLoading();
@@ -29,6 +40,7 @@ angular.
                                      function (tournament) {
                                          requestStatus.complete();
                                          mainMenu.setTitle(['Administration of', {name: tournament.name}], ctxMenu);
+                                         setLastTournament.got('got.tr', tournament);
                                          self.tournament = tournament;
                                          pageCtx.put('tournamentInfoForCategories',
                                                      {tid: self.tournament.tid,

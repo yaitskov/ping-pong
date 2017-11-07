@@ -93,6 +93,33 @@ angular.
             return $filter('date')(dt, 'MMM d EEE h:mm a Z').replace(/:00 /, ' ');
         };
     }]).
+    factory('eBarier', [function () {
+        return new function () {
+            this.create = (labels, callback) => {
+                return new function () {
+                    var self = this;
+                    self.gotCount = labels.length;
+                    self.labels = {};
+                    self.callback = callback;
+                    labels.forEach((k) => {
+                        self.labels[k] = 0;
+                    });
+                    self.got = (label, value) => {
+                        if (self.labels[label] == 0) {
+                            if (value) {
+                                self.value = value;
+                            }
+                            self.labels[label] = 1;
+                            self.gotCount -= 1;
+                            if (!self.gotCount) {
+                                self.callback(self.value);
+                            }
+                        }
+                    };
+                };
+            };
+        };
+    }]).
     factory('longDateTime', ['$filter', function ($filter) {
         return function (dt) {
             if (!dt) {

@@ -21,6 +21,11 @@
        class="btn btn-default">
       <span class="glyphicon glyphicon-home"/>
     </a>
+    <a href="#!/tournament/judged-matches/{{$ctrl.tournamentId}}"
+       title="list of complete matches"
+       class="btn btn-default">
+      <span class="glyphicon glyphicon-book"/>
+    </a>
   </div>
   <div class="form-group tables" ng-show="$ctrl.showTables && $ctrl.matches.length">
     <button class="btn btn-primary"

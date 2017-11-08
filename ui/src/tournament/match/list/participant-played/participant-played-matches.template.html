@@ -3,49 +3,11 @@
   <request-status></request-status>
   <div class="form-group" ng-show="$ctrl.matches.inGroup">
     <label translate="Group matches"/>
-    <table class="table">
-      <thead>
-        <tr>
-          <td>#</td>
-          <td translate="Opponent"/>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-repeat="match in $ctrl.matches.inGroup">
-          <td>{{$index + 1}}</td>
-          <td>
-            <a href="#!/tournament/match/{{$ctrl.tournamentId}}/{{match.mid}}"
-               class="btn"
-               ng-class="{'btn-success': match.opponent.uid != match.winnerUid, 'btn-danger':  match.opponent.uid == match.winnerUid}">
-              {{match.opponent.name}}
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <complete-match-list label="inGroup" tournament-id="$ctrl.tournamentId"/>
   </div>
   <div class="form-group" ng-show="$ctrl.matches.playOff">
     <label translate="PlayOff matches"/>
-    <table class="table">
-      <thead>
-        <tr>
-          <td>#</td>
-          <td translate="Opponent'"/>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-repeat="match in $ctrl.matches.playOff">
-          <td>{{$index + 1}}</td>
-          <td>
-            <a href="#!/match/management/{{$ctrl.tournamentId}}/{{match.mid}}"
-               class="btn"
-               ng-class="{'btn-success': match.opponent.uid != match.winnerUid, 'btn-danger':  match.opponent.uid == match.winnerUid}">
-              {{match.opponent.name}}
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <complete-match-list label="playOff" tournament-id="$ctrl.tournamentId"/>
   </div>
   <div class="form-group" ng-show="$ctrl.matches && !$ctrl.matches.playOff && !$ctrl.matches.inGroup">
     <div class="alert alert-info" translate="you-havent-played-matches"/>

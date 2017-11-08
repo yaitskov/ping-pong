@@ -208,7 +208,7 @@ public class TournamentDao {
                         .state(r.get(TOURNAMENT.STATE))
                         .price(r.get(TOURNAMENT.TICKET_PRICE))
                         .opensAt(r.get(TOURNAMENT.OPENS_AT))
-                        .previousTid(r.get(TOURNAMENT.PREVIOUS_TID))
+                        .previousTid(r.get(TOURNAMENT.PREVIOUS_TID).map(Tid::new))
                         .build());
     }
 

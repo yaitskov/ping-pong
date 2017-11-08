@@ -1,4 +1,6 @@
 module.exports = {
+    'participant-lbl': 'Participant',
+
     'Bid state': 'Participant state',
 
     'Want': 'Want',

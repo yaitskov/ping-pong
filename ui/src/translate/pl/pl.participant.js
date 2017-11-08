@@ -1,4 +1,5 @@
 module.exports = {
+    'participant-lbl': 'Uczestnik',
     'Bid state': 'Stan uczesnika',
 
     'Want': 'Chce uczestniczyć',

@@ -16,6 +16,7 @@ module.exports = {
     'Next match': 'Kolejny mecz',
     'playing-participants': 'Aktywny uczestniki',
     'player-has-no-matches-to-play': 'Uczestnik nie ma meczów do zagrania.',
+    'player-has-no-complete-matches': 'Uczestnik nie ma skończonych meczów',
     'table-short-cut': 'S',
 
     'Score of': 'Ocena dla',

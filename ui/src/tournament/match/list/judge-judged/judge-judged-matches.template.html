@@ -1,0 +1,34 @@
+<main-menu></main-menu>
+<div class="container">
+  <request-status></request-status>
+  <div class="form-group" ng-show="$ctrl.bids.length">
+    <label for="bids" translate="participant-lbl"/>
+    <select class="form-control"
+            ng-model="$ctrl.bid"
+            ng-change="$ctrl.bidChange()"
+            required name="bids" id="bids">
+      <option ng-repeat="bid in $ctrl.bids | orderBy : 'name'" value="{{bid.uid}}">
+        {{bid.name}}
+      </option>
+    </select>
+  </div>
+  <div class="form-group"
+       ng-show="$ctrl.bids.length && $ctrl.matches && !$ctrl.matches.inGroup && !$ctrl.matches.playOff">
+    <div class="alert alert-info" translate="player-has-no-complete-matches"/>
+  </div>
+  <div class="form-group" ng-show="$ctrl.matches.inGroup">
+    <label translate="Group matches"/>
+    <complete-match-list label="inGroup" tournament-id="$ctrl.tournamentId"/>
+  </div>
+  <div class="form-group" ng-show="$ctrl.matches.playOff">
+    <label translate="PlayOff matches"/>
+    <complete-match-list label="playOff" tournament-id="$ctrl.tournamentId"/>
+  </div>
+  <div class="form-group" ng-show="$ctrl.matches && !$ctrl.matches.playOff && !$ctrl.matches.inGroup">
+    <div class="alert alert-info" translate="you-havent-played-matches"/>
+  </div>
+  <div class="form-group" ng-show="$ctrl.matches.progress">
+    <div class="alert alert-info" translate="tournament-progress-line"
+         translate-values="$ctrl.matches.progress"/>
+  </div>
+</div>

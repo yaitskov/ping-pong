@@ -37,6 +37,11 @@ angular.
                                         method: 'POST',
                                         isArray: true
                                     },
+                                    findWithMatch: {
+                                        url: '/api/bid/find-with-match/:tournamentId',
+                                        method: 'GET',
+                                        isArray: true
+                                    },
                                     setState: {
                                         url: '/api/bid/set-state',
                                         method: 'POST',

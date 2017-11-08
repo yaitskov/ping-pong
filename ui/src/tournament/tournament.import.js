@@ -24,6 +24,7 @@ import './match/conflict/match-score-conflict-user.component.js';
 import './match/list/participant-played/participant-played-matches.component.js';
 import './match/management/match-management.component.js';
 import './match/dispute/match-result-new-dispute.component.js';
+import './match/list/judge-judged/judge-judged-matches.component.js';
 import './list/draft/tr-draft-list.component.js';
 import './management/tr-management.component.js';
 import './watch/watch-tournament.component.js';

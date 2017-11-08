@@ -6,6 +6,8 @@ module.exports = {
     'you-havent-played-matches': 'Nie zagrałeś żadnego meczu',
     'Group matches': 'Meczi w grupie',
 
+    'Judged matches': 'Ocenione meczi',
+
     'match-type-lbl': 'Typ',
     'match-state-lbl': 'Stan',
     'to-score': 'Ocenić',

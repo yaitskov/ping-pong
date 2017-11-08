@@ -682,12 +682,13 @@ public class MatchService {
                 .build();
     }
 
-    public PlayedMatchList findPlayedMatchesByMe(TournamentMemState tournament, Uid uid) {
+    public PlayedMatchList findPlayedMatchesByBid(TournamentMemState tournament, Uid uid) {
         final List<MatchInfo> completeMatches = tournament.participantMatches(uid)
                 .filter(m -> m.getState() == Over)
                 .sorted(Comparator.comparing(m -> m.getEndedAt().get()))
                 .collect(toList());
         return PlayedMatchList.builder()
+                .participant(tournament.getParticipant(uid).toLink())
                 .progress(tournamentProgress(tournament, uid))
                 .inGroup(completeMatches.stream().filter(m -> m.getType() == Grup)
                         .map(m -> PlayedMatchLink.builder()

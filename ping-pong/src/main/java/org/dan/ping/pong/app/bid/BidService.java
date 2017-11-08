@@ -10,11 +10,13 @@ import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.match.MatchService.incompleteMatchStates;
+import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
@@ -86,6 +88,15 @@ public class BidService {
                 .filter(p -> states.contains(p.getState()))
                 .filter(p -> tournament.participantMatches(p.getUid())
                         .anyMatch(m -> incompleteMatchStates.contains(m.getState())))
+                .map(ParticipantMemState::toLink)
+                .sorted(Comparator.comparing(UserLink::getName))
+                .collect(toList());
+    }
+
+    public List<UserLink> findWithMatch(TournamentMemState tournament) {
+        return tournament.getParticipants().values().stream()
+                .filter(p -> tournament.participantMatches(p.getUid())
+                        .anyMatch(m -> m.getState() == Over))
                 .map(ParticipantMemState::toLink)
                 .sorted(Comparator.comparing(UserLink::getName))
                 .collect(toList());

@@ -34,6 +34,7 @@ import javax.ws.rs.container.Suspended;
 public class MatchResource {
     public static final String MATCH_RESULT = "/match/result/";
     public static final String MATCH_LIST_PLAYED_ME = "/match/list/played-by-me/";
+    public static final String MATCH_LIST_JUDGED = "/match/list/judged/";
     public static final String MY_PENDING_MATCHES = "/match/list/my/pending/";
     public static final String BID_PENDING_MATCHES = "/match/list/bid/pending/";
     public static final String OPEN_MATCHES_FOR_JUDGE = "/match/judge/list/open/";
@@ -104,7 +105,17 @@ public class MatchResource {
             @PathParam(TID) Tid tid) {
         final Uid uid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.read(tid, response,
-                tournament -> matchService.findPlayedMatchesByMe(tournament, uid));
+                tournament -> matchService.findPlayedMatchesByBid(tournament, uid));
+    }
+
+    @GET
+    @Path(MATCH_LIST_JUDGED + TID_JP + TID_SLASH_UID + UID_JP)
+    public void findJudgedMatches(
+            @Suspended AsyncResponse response,
+            @PathParam(TID) Tid tid,
+            @PathParam(UID) Uid uid) {
+        tournamentAccessor.read(tid, response,
+                tournament -> matchService.findPlayedMatchesByBid(tournament, uid));
     }
 
     @Inject

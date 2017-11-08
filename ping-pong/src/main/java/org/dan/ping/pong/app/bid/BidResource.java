@@ -34,6 +34,7 @@ public class BidResource {
     private static final String BID = "/bid/";
     public static final String PROFILE = BID + "profile/";
     public static final String FIND_BIDS_BY_STATE = BID + "find-by-state";
+    public static final String FIND_BIDS_WITH_MATCH = "/bid/find-with-match/";
     public static final String BID_PAID = BID + "paid";
     public static final String BID_READY_TO_PLAY = BID + "ready-to-play";
     public static final String BID_SET_STATE = BID + "set-state";
@@ -148,11 +149,11 @@ public class BidResource {
     }
 
     @GET
-    @Path(BID + "state/{tid}/{uid}")
+    @Path(BID + "state/" + TID_JP + TID_SLASH_UID + UID_JP)
     public DatedParticipantState getParticipantState(
             @HeaderParam(SESSION) String session,
-            @PathParam("tid") Tid tid,
-            @PathParam("uid") Uid uid) {
+            @PathParam(TID) Tid tid,
+            @PathParam(UID) Uid uid) {
         return bidService.getParticipantState(tid, uid);
     }
 
@@ -163,5 +164,13 @@ public class BidResource {
             FindByState request) {
         tournamentAccessor.read(request.getTid(), response,
                 tournament -> bidService.findByState(tournament, request.getStates()));
+    }
+
+    @GET
+    @Path(FIND_BIDS_WITH_MATCH + TID_JP)
+    public void findWithMatch(
+            @Suspended AsyncResponse response,
+            @PathParam(TID) Tid tid) {
+        tournamentAccessor.read(tid, response, bidService::findWithMatch);
     }
 }

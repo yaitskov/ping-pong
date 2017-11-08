@@ -105,15 +105,13 @@ angular.
                         self.labels[k] = 0;
                     });
                     self.got = (label, value) => {
-                        if (self.labels[label] == 0) {
-                            if (value) {
-                                self.value = value;
-                            }
-                            self.labels[label] = 1;
-                            self.gotCount -= 1;
-                            if (!self.gotCount) {
-                                self.callback(self.value);
-                            }
+                        self.labels[label] = 1;
+                        if (value) {
+                            self.value = value;
+                        }
+                        self.gotCount -= 1;
+                        if (self.gotCount <= 0) {
+                            self.callback(self.value);
                         }
                     };
                 };

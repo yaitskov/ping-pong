@@ -15,6 +15,7 @@ module.exports = {
     'Setting your set score': 'Setting your set score',
     'Next match': 'Next match',
     'player-has-no-matches-to-play': 'Player has no matches to play.',
+    'player-has-no-complete-matches': 'Player has played matches.',
     'playing-participants': 'Playing participants',
     'table-short-cut': 'T',
 

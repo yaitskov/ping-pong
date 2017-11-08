@@ -19,6 +19,7 @@ module.exports = merge.apply(
      require('./en.participant.js'),
      require('./en.rules.js'),
      require('./en.match.js'),
+     require('./en.dispute.js'),
      require('./en.arena.js'),
      require('./en.category.js'),
      require('./en.tournament.js'),

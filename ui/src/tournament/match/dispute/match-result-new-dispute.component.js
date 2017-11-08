@@ -68,7 +68,7 @@ angular.
                                  self.match.setScores = [set.a, set.b];
                                  $rootScope.$broadcast('event.match.set', self.match);
                              },
-                             'event.match.review.ready': (event) => {
+                             'event.review.match.ready': (event) => {
                                  $rootScope.$broadcast('event.review.match.config', {edit: true});
                                  requestStatus.startLoading();
                                  Match.matchResult(

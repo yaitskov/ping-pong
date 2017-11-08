@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.dan.ping.pong.app.category.CategoryInfo;
+import org.dan.ping.pong.app.category.CategoryLink;
 
 import java.util.List;
 
@@ -19,5 +19,5 @@ import java.util.List;
 public class TournamentComplete {
     private TournamentState state;
     private String name;
-    private List<CategoryInfo> categories;
+    private List<CategoryLink> categories;
 }

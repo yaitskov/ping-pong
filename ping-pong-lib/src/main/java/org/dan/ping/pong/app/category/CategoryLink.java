@@ -11,7 +11,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryInfo {
+public class CategoryLink {
     private int cid;
     private String name;
 }

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.bid.BidState;
-import org.dan.ping.pong.app.category.CategoryInfo;
+import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.place.PlaceLink;
 
 import java.time.Instant;
@@ -30,7 +30,7 @@ public class DraftingTournamentInfo {
     private PlaceLink place;
     private Optional<Integer> myCategoryId = Optional.empty();
     private boolean iAmAdmin;
-    private Collection<CategoryInfo> categories;
+    private Collection<CategoryLink> categories;
     private TournamentState state;
     private Optional<BidState> bidState = Optional.empty();
     private TournamentRules rules;

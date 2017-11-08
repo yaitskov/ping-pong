@@ -2,13 +2,32 @@
 <div class="container admin-category-members">
   <request-status></request-status>
   <div class="form-group">
-    <a class="btn btn-primary" back-button>
-      {{ 'Back btn' | translate }}
+    <a class="btn btn-default" title="back" back-button>
+      <span class="glyphicon glyphicon-circle-arrow-left"></span>
     </a>
-    <a class="btn"
+    <a class="btn btn-default"
+       ng-show="$ctrl.catInfo.role == 'Admin'"
+       title="to the tournament"
+       href="#!/my/tournament/{{$ctrl.tournamentId}}">
+      <span class="glyphicon glyphicon-home"></span>
+    </a>
+    <a class="btn btn-default"
+       ng-show="$ctrl.catInfo.role == 'Participant' || $ctrl.catInfo.role == 'Spectator'"
+       title="to the tournament"
+       href="#!/tournaments/{{$ctrl.tournamentId}}">
+      <span class="glyphicon glyphicon-home"></span>
+    </a>
+    <a class="btn btn-default"
+       ng-show="$ctrl.catInfo.role == 'Admin'"
        title="Order participants in the category manually"
        href="#!/tournament/{{$ctrl.tournamentId}}/rank/manually/cid/{{$ctrl.categoryId}}">
       <span class="glyphicon glyphicon-sort-by-attributes-alt"></span>
+    </a>
+  </div>
+  <div class="form-group" ng-show="$ctrl.catInfo.link">
+    <label translate="category-lbl"/>
+    <a href="" class="btn btn-primary">
+      {{$ctrl.catInfo.link.name}}
     </a>
   </div>
   <div class="form-group" ng-show="$ctrl.members.length == 0">
@@ -19,8 +38,13 @@
   <div class="form-group" ng-show="$ctrl.members.length > 0">
     <table class="table">
       <tr ng-repeat="member in $ctrl.members | orderBy : 'name'">
-        <td>
+        <td ng-show="$ctrl.catInfo.role == 'Admin'">
           <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{member.uid}}">
+            {{member.name}}
+          </a>
+        </td>
+        <td ng-show="$ctrl.catInfo.role == 'Participant' || $ctrl.catInfo.role == 'Spectator'">
+          <a href="#!/participant/profile/{{$ctrl.tournamentId}}/{{member.uid}}">
             {{member.name}}
           </a>
         </td>

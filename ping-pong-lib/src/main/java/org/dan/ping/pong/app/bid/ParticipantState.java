@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.dan.ping.pong.app.category.CategoryInfo;
+import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.user.UserLink;
 
 @Getter
@@ -15,6 +15,6 @@ import org.dan.ping.pong.app.user.UserLink;
 @AllArgsConstructor
 public class ParticipantState {
     private UserLink user;
-    private CategoryInfo category;
+    private CategoryLink category;
     private BidState state;
 }

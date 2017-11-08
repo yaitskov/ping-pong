@@ -17,7 +17,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.category.CategoryInfo;
+import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
@@ -121,7 +121,7 @@ public class BidDaoServer implements BidDao {
                 .where(BID.TID.eq(tid))
                 .fetch()
                 .map(r -> ParticipantState.builder()
-                        .category(CategoryInfo.builder()
+                        .category(CategoryLink.builder()
                                 .cid(r.get(CATEGORY.CID))
                                 .name(r.get(CATEGORY.NAME))
                                 .build())
@@ -146,7 +146,7 @@ public class BidDaoServer implements BidDao {
                 .where(BID.TID.eq(tid), BID.UID.eq(uid))
                 .fetchOne())
                 .map(r -> DatedParticipantState.builder()
-                        .category(CategoryInfo.builder()
+                        .category(CategoryLink.builder()
                                 .cid(r.get(CATEGORY.CID))
                                 .name(r.get(CATEGORY.NAME))
                                 .build())

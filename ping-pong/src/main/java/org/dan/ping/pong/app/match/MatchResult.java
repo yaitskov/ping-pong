@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dan.ping.pong.app.category.CategoryInfo;
+import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.group.GroupLink;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.user.UserLink;
@@ -30,6 +30,6 @@ public class MatchResult {
     private MatchState state;
     private MatchType type;
     private Optional<GroupLink> group;
-    private CategoryInfo category;
+    private CategoryLink category;
     private UserRole role;
 }

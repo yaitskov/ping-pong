@@ -22,7 +22,7 @@ module.exports = {
     'Place': 'Miejsce',
     'Game': 'Gra',
     'Auto': 'Auto',
-    'Over': 'Koniec',
+    'Over': 'Skończony',
 
     'Wait for a free table.': 'Poczekaj na wolny stół.',
     'match state': 'Stan',

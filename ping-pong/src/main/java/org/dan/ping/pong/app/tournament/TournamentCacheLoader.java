@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryDao;
-import org.dan.ping.pong.app.category.CategoryInfo;
+import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -53,7 +53,7 @@ public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> 
                 .name(row.getName())
                 .participants(bidDao.loadParticipants(tid))
                 .categories(categoryDao.listCategoriesByTid(tid).stream()
-                        .collect(toMap(CategoryInfo::getCid, o -> o)))
+                        .collect(toMap(CategoryLink::getCid, o -> o)))
                 .groups(groupDao.load(tid))
                 .matches(combineMatchesAndSets(matchDao.load(tid), matchScoreDao.load(tid)))
                 .tid(tid)

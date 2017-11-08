@@ -15,7 +15,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserLinkList {
+public class CategoryInfo {
+    private CategoryLink link;
     private UserRole role;
     private List<UserLink> users;
 }

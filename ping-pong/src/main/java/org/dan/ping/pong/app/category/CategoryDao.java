@@ -1,14 +1,11 @@
 package org.dan.ping.pong.app.category;
 
 import static java.util.stream.Collectors.toList;
-import static ord.dan.ping.pong.jooq.Tables.USERS;
-import static ord.dan.ping.pong.jooq.tables.Bid.BID;
 import static ord.dan.ping.pong.jooq.tables.Category.CATEGORY;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.user.UserInfo;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,31 +30,14 @@ public class CategoryDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<CategoryInfo> listCategoriesByTid(Tid tid) {
+    public List<CategoryLink> listCategoriesByTid(Tid tid) {
         return jooq.select(CATEGORY.CID, CATEGORY.NAME)
                 .from(CATEGORY)
                 .where(CATEGORY.TID.eq(tid))
                 .fetch()
-                .map(r -> CategoryInfo.builder()
+                .map(r -> CategoryLink.builder()
                         .cid(r.get(CATEGORY.CID))
                         .name(r.get(CATEGORY.NAME))
-                        .build());
-    }
-
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<UserInfo> listCategoryMembers(int cid) {
-        return jooq.select(BID.UID, USERS.NAME, USERS.TYPE, USERS.PHONE, USERS.EMAIL)
-                .from(BID)
-                .innerJoin(USERS)
-                .on(BID.UID.eq(USERS.UID))
-                .where(BID.CID.eq(cid))
-                .fetch()
-                .map(r -> UserInfo.builder()
-                        .uid(r.get(BID.UID))
-                        .name(r.get(USERS.NAME))
-                        .userType(r.get(USERS.TYPE))
-                        .phone(r.get(USERS.PHONE))
-                        .email(r.get(USERS.EMAIL))
                         .build());
     }
 
@@ -71,7 +51,7 @@ public class CategoryDao {
 
     @Transactional(TRANSACTION_MANAGER)
     public void copy(Tid originTid, Tid tid) {
-        final List<CategoryInfo> categories = listCategoriesByTid(originTid);
+        final List<CategoryLink> categories = listCategoriesByTid(originTid);
         jooq.batch(
                 categories.stream().map(cinfo ->
                         jooq.insertInto(CATEGORY, CATEGORY.NAME, CATEGORY.TID)

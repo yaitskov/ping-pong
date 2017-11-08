@@ -8,7 +8,6 @@ angular.module('tournamentCategory').
                      function ($http, mainMenu, $routeParams, auth, requestStatus, pageCtx, Category, binder, $scope) {
                          this.tournamentId = $routeParams.tournamentId;
                          this.categoryId = $routeParams.categoryId;
-                         this.members = null;
                          this.newCategoryName = '';
                          var self = this;
                          binder($scope, {
@@ -20,10 +19,11 @@ angular.module('tournamentCategory').
                              'event.request.status.ready': (e) => {
                                  requestStatus.startLoading('Loading members'),
                                  Category.members(
-                                     {categoryId: $routeParams.categoryId},
-                                     function (members) {
+                                     {tournamentId: self.tournamentId, categoryId: $routeParams.categoryId},
+                                     function (catInfo) {
                                          requestStatus.complete();
-                                         self.members = members;
+                                         self.members = catInfo.users;
+                                         self.catInfo = catInfo;
                                      },
                                      requestStatus.failed);
                              }

@@ -14,10 +14,10 @@ angular.
                              'event.main.menu.ready': (e) => mainMenu.setTitle('Enlisted to tournament'),
                              'event.category.switch.current': (event, cid) => {
                                  requestStatus.startLoading("Loading participants");
-                                 Category.members({categoryId: cid},
-                                                  function (members) {
+                                 Category.members({tournamentId: self.tournamentId, categoryId: cid},
+                                                  function (catInfo) {
                                                       requestStatus.complete();
-                                                      self.members = members;
+                                                      self.members = catInfo.users;
                                                   },
                                                   requestStatus.failed);
                              },

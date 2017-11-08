@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.dan.ping.pong.app.category.CategoryInfo;
+import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.table.TableLink;
 import org.dan.ping.pong.app.user.UserLink;
 
@@ -23,5 +23,5 @@ public class OpenMatchForWatch {
     private Instant started;
     private MatchType type;
     private List<Integer> score;
-    private CategoryInfo category;
+    private CategoryLink category;
 }

@@ -6,13 +6,11 @@ angular.
                          function ($resource) {
                              return $resource('/api/category', {}, {
                                  members: {
-                                     url: '/api/category/find/members/:categoryId',
+                                     url: '/api/category/find/members/:tournamentId/:categoryId',
                                      method: 'GET',
-                                     cache: false,
                                      headers: {
                                          session: 1
-                                     },
-                                     isArray: true
+                                     }
                                  },
                                  ofTournament: {
                                      url: '/api/category/find/by/tid/:tournamentId',

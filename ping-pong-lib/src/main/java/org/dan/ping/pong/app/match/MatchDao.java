@@ -9,6 +9,7 @@ import org.dan.ping.pong.sys.db.DbUpdater;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface MatchDao {
     Mid createGroupMatch(Tid tid, int gid, int cid, int priorityGroup, Uid uid1, Uid uid2);
@@ -20,9 +21,9 @@ public interface MatchDao {
     void changeStatus(Mid mid, MatchState state, DbUpdater batch);
 
     Optional<Uid> scoreSet(TournamentMemState tournament, MatchInfo matchInfo,
-            DbUpdater batch, FinalMatchScore matchScore);
+            DbUpdater batch, List<IdentifiedScore> scores);
 
-    void completeMatch(Mid mid, Uid winUid, Instant now, DbUpdater batch, MatchState... expected);
+    void completeMatch(Mid mid, Uid winUid, Instant now, DbUpdater batch, Set<MatchState> expected);
 
     void markAsSchedule(MatchInfo match, DbUpdater batch);
 
@@ -43,4 +44,8 @@ public interface MatchDao {
     void removeParticipants(DbUpdater batch, Mid mid);
 
     void removeScores(DbUpdater batch, Mid mid, Uid uid);
+
+    void setWinnerId(MatchInfo mInfo, DbUpdater batch);
+
+    void insertScores(MatchInfo mInfo, DbUpdater batch);
 }

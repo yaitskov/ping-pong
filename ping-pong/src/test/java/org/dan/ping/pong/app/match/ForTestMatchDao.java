@@ -4,7 +4,6 @@ import static java.util.Optional.ofNullable;
 import static ord.dan.ping.pong.jooq.Tables.MATCHES;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
-import ord.dan.ping.pong.jooq.tables.Matches;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -29,20 +28,23 @@ public class ForTestMatchDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public Optional<MatchInfo> getById(Mid mid) {
-        return ofNullable(jooq.select(Matches.MATCHES.TID, Matches.MATCHES.STATE, Matches.MATCHES.GID,
-                Matches.MATCHES.CID, Matches.MATCHES.LOSE_MID, Matches.MATCHES.WIN_MID, Matches.MATCHES.TYPE)
-                .from(Matches.MATCHES)
-                .where(Matches.MATCHES.MID.eq(mid))
+        return ofNullable(jooq.select(MATCHES.TID, MATCHES.STATE, MATCHES.GID,
+                MATCHES.CID, MATCHES.LOSE_MID, MATCHES.WIN_MID, MATCHES.TYPE,
+                MATCHES.LEVEL, MATCHES.PRIORITY)
+                .from(MATCHES)
+                .where(MATCHES.MID.eq(mid))
                 .fetchOne()).map(r ->
                 MatchInfo.builder()
-                        .gid(r.get(Matches.MATCHES.GID))
+                        .gid(r.get(MATCHES.GID))
                         .mid(mid)
-                        .cid(r.get(Matches.MATCHES.CID))
-                        .type(r.get(Matches.MATCHES.TYPE))
-                        .state(r.get(Matches.MATCHES.STATE))
-                        .tid(r.get(Matches.MATCHES.TID))
-                        .winnerMid(r.get(Matches.MATCHES.WIN_MID))
-                        .loserMid(r.get(Matches.MATCHES.LOSE_MID))
+                        .cid(r.get(MATCHES.CID))
+                        .type(r.get(MATCHES.TYPE))
+                        .state(r.get(MATCHES.STATE))
+                        .tid(r.get(MATCHES.TID))
+                        .level(r.get(MATCHES.LEVEL))
+                        .priority(r.get(MATCHES.PRIORITY))
+                        .winnerMid(r.get(MATCHES.WIN_MID))
+                        .loserMid(r.get(MATCHES.LOSE_MID))
                         .build());
     }
 }

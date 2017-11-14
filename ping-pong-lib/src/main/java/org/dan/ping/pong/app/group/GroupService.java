@@ -30,6 +30,21 @@ public class GroupService {
                         (a, b) -> a));
     }
 
+    public List<Uid> findUidsQuittingGroup(TournamentMemState tournament,
+            GroupRules groupRules, List<MatchInfo> groupMatches) {
+        // todo rule option skip walk over or not
+        return orderUidsInGroup(tournament, groupMatches)
+                .stream()
+                .limit(groupRules.getQuits())
+                .collect(toList());
+    }
+
+    public List<MatchInfo> findMatchesInGroup(TournamentMemState tournament, int gid) {
+        return tournament.getMatches().values().stream()
+                .filter(minfo -> minfo.getGid().equals(Optional.of(gid)))
+                .collect(toList());
+    }
+
     public List<Uid> orderUidsInGroup(TournamentMemState tournament,
             List<MatchInfo> allMatchesInGroup) {
         final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(tournament, allMatchesInGroup);

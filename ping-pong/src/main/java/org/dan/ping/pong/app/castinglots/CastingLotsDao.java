@@ -83,6 +83,7 @@ public class CastingLotsDao {
         tournament.getMatches().put(mid, MatchInfo.builder()
                 .tid(bid1.getTid())
                 .mid(mid)
+                .level(0)
                 .priority(priorityGroup)
                 .state(MatchState.Place)
                 .gid(bid1.getGid())

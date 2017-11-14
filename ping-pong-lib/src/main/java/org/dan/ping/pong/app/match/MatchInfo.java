@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match;
 
 import static java.time.Duration.between;
+import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -15,6 +16,7 @@ import org.dan.ping.pong.app.bid.Uid;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +45,7 @@ public class MatchInfo {
     private Optional<Instant> startedAt;
     private Optional<Instant> endedAt;
     private int priority;
+    private int level;
 
     public int getPlayedSets() {
         for (List<Integer> l : participantIdScore.values()) {
@@ -100,5 +103,25 @@ public class MatchInfo {
     public Optional<Duration> duration(Instant now) {
         return startedAt.map(s -> endedAt.map(e -> between(s, e))
                 .orElseGet(() -> between(s, now)));
+    }
+
+    public MatchInfo clone() {
+        return MatchInfo.builder()
+                .tid(tid)
+                .mid(mid)
+                .level(level)
+                .endedAt(endedAt)
+                .cid(cid)
+                .state(state)
+                .loserMid(loserMid)
+                .winnerMid(winnerMid)
+                .winnerId(winnerId)
+                .type(type)
+                .priority(priority)
+                .gid(gid)
+                .participantIdScore(participantIdScore.entrySet()
+                        .stream().collect(toMap(Map.Entry::getKey,
+                                e -> new ArrayList<>(e.getValue()))))
+                .build();
     }
 }

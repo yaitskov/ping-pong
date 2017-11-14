@@ -25,7 +25,7 @@ public interface BidDao {
             Expl, Lost, Quit);
 
     void setBidState(Tid tid, Uid uid, BidState target,
-            List<BidState> expected, Instant now, DbUpdater batch);
+            Collection<BidState> expected, Instant now, DbUpdater batch);
 
     void markParticipantsBusy(TournamentMemState tournament,
             Collection<Uid> uids, Instant now, DbUpdater batch);

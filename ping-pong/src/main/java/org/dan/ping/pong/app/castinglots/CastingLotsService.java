@@ -133,8 +133,8 @@ public class CastingLotsService {
                 .orElseThrow(() -> internalError("No seeding for "
                         + orderedBids.size() + " participants"));
 
-        final List<MatchInfo> baseMatches = playOffService.findBaseMatches(
-                playOffService.findPlayOffMatches(tournament, cid))
+        final List<MatchInfo> baseMatches = playOffService
+                .findBaseMatches(tournament, cid)
                 .stream()
                 .sorted(Comparator.comparing(MatchInfo::getMid))
                 .collect(toList());

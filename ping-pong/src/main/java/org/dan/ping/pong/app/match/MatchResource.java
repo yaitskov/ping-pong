@@ -50,6 +50,7 @@ public class MatchResource {
     private static final String MID = "mid";
     private static final String MID_JP = "{mid}";
     public static final String MATCH_FOR_JUDGE = "/match/for-judge/";
+    private static final String MATCH_RESCORE_MATCH = "/match/rescore-match";
 
     @Inject
     private AuthService authService;
@@ -148,12 +149,30 @@ public class MatchResource {
             @HeaderParam(SESSION) String session,
             ResetSetScore reset) {
         final Uid uid = authService.userInfoBySession(session).getUid();
-        log.info("User {} reset scores in min {} of tid {}",
+        log.info("User {} reset scores in mid {} of tid {}",
                 uid, reset.getMid(), reset.getTid());
         tournamentAccessor.update(reset.getTid(), response,
                 (tournament, batch) -> {
                     tournament.checkAdmin(uid);
-                    matchService.resetMatchScore(tournament, reset, batch);
+                    matchEditorService.resetMatchScore(tournament, reset, batch);
+                });
+    }
+
+    @Inject
+    private MatchEditorService matchEditorService;
+
+    @POST
+    @Path(MATCH_RESCORE_MATCH)
+    public void rescoreMatch(
+            @Suspended AsyncResponse response,
+            @HeaderParam(SESSION) String session,
+            RescoreMatch rescoreMatch) {
+        final Uid uid = authService.userInfoBySession(session).getUid();
+        log.info("User {} rescores match {}", uid, rescoreMatch);
+        tournamentAccessor.update(rescoreMatch.getTid(), response,
+                (tournament, batch) -> {
+                    tournament.checkAdmin(uid);
+                    matchEditorService.rescoreMatch(tournament, rescoreMatch, batch);
                 });
     }
 

@@ -19,6 +19,10 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class PlayOffService {
+    public List<MatchInfo> findBaseMatches(TournamentMemState tournament, int cid) {
+        return findBaseMatches(findPlayOffMatches(tournament, cid));
+    }
+
     public List<MatchInfo> findBaseMatches(List<MatchInfo> cidMatches) {
         Map<Mid, Mid> midChild = new HashMap<>();
         cidMatches.forEach(m -> {

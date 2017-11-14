@@ -32,6 +32,13 @@ angular.
                                       session: 1
                                   }
                               },
+                              rescoreMatch: {
+                                  url: '/api/match/rescore-match',
+                                  method: 'POST',
+                                  headers: {
+                                      session: 1
+                                  }
+                              },
                               myMatchesNeedToJudge: {
                                   url: '/api/match/judge/list/open/:tournamentId',
                                   method: 'GET',

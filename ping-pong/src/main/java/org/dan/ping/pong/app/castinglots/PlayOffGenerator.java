@@ -98,6 +98,7 @@ public class PlayOffGenerator {
                 .mid(mid)
                 .state(MatchState.Draft)
                 .priority(priority)
+                .level(level)
                 .gid(Optional.empty())
                 .participantIdScore(new HashMap<>())
                 .type(type)

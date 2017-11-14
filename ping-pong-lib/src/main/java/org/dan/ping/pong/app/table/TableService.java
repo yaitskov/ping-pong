@@ -87,7 +87,10 @@ public class TableService {
                             break;
                         case Draft:
                         case Place:
-                            throw internalError("unexpected-match-state", STATE, match.getState());
+                            if (t.getState() == Busy) {
+                                freeTable(batch,t );
+                            }
+                            break;
                         case Game:
                             // ok keep
                             break;

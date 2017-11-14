@@ -43,7 +43,7 @@ public class BidDaoServer implements BidDao {
 
     @Override
     public void setBidState(Tid tid, Uid uid, BidState target,
-            List<BidState> expected, Instant now, DbUpdater batch) {
+            Collection<BidState> expected, Instant now, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .logBefore(() -> log.info("Set bid status {} for {} if {}",
                         target, uid, expected))

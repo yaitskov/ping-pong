@@ -6,12 +6,7 @@
          class="btn btn-default"
          ng-class="{'btn-primary': $ctrl.winnerIdx == $index}"
          holdLink="#!/my/tournament/{{$ctrl.match.tid}}/participant/{{participant.uid}}">
-        <span ng-show="participant.name == '*you*'">
-          {{participant.name | translate}}
-        </span>
-        <span ng-show="participant.name != '*you*'">
-          {{participant.name}}
-        </span>
+        <you name="participant.name"/>
       </a>
     </div>
   </div>
@@ -36,7 +31,7 @@
   <div>
     <a class="btn btn-default score"
        ng-repeat="score in $ctrl.possibleLostScores"
-       ng-click="$ctrl.pick(1 - $ctrl.winnerIdx, score)"
+       ng-click="$ctrl.pickLost(1 - $ctrl.winnerIdx, score)"
        ng-class="{'btn-primary': score == $ctrl.scores[1 - $ctrl.winnerIdx]}">
       {{score}}
     </a>

@@ -41,12 +41,12 @@ public class MatchValidationRuleUnitTest {
 
     @Test
     public void validatePass() {
-        PING_PONG_RULE.validateSet(scores(11, 0));
-        PING_PONG_RULE.validateSet(scores(0, 11));
-        PING_PONG_RULE.validateSet(scores(9, 11));
-        PING_PONG_RULE.validateSet(scores(11, 9));
-        PING_PONG_RULE.validateSet(scores(15, 13));
-        TENNIS_RULE.validateSet(scores(6, 4));
+        PING_PONG_RULE.validateSet(0, scores(11, 0));
+        PING_PONG_RULE.validateSet(0, scores(0, 11));
+        PING_PONG_RULE.validateSet(0, scores(9, 11));
+        PING_PONG_RULE.validateSet(0, scores(11, 9));
+        PING_PONG_RULE.validateSet(0, scores(15, 13));
+        TENNIS_RULE.validateSet(0, scores(6, 4));
     }
 
     @Rule
@@ -56,21 +56,21 @@ public class MatchValidationRuleUnitTest {
     public void validateFailsOnMaxGamesToSmall() {
         thrown.expect(hasProperty("message",
                 containsString("Winner should have at least")));
-        PING_PONG_RULE.validateSet(scores(10, 0));
+        PING_PONG_RULE.validateSet(0, scores(10, 0));
     }
 
     @Test
     public void validateFailsOnNegaiteveGames() {
         thrown.expect(hasProperty("message",
                 containsString("Games cannot less than")));
-        PING_PONG_RULE.validateSet(scores(10, -1));
+        PING_PONG_RULE.validateSet(0, scores(10, -1));
     }
 
     @Test
     public void validateFailsOnCloseGames() {
         thrown.expect(hasProperty("message",
                 containsString("Difference between games in a complete set")));
-        PING_PONG_RULE.validateSet(scores(11, 10));
+        PING_PONG_RULE.validateSet(0, scores(11, 10));
     }
 
     private List<IdentifiedScore> scores(int scoreA, int scoreB) {

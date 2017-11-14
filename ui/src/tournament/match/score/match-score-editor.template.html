@@ -1,0 +1,54 @@
+<main-menu></main-menu>
+<div class="container">
+  <div class="form-group">
+    <div class="alert alert-info" translate="click-score-to-change"/>
+    <div class="alert alert-info" translate="play-off-match-will-replayed"/>
+  </div>
+  <div class="form-group">
+    <a class="btn btn-default" title="back" back-button>
+      <span class="glyphicon glyphicon-circle-arrow-left"></span>
+    </a>
+    <a href="#!/tournament/judged-matches/{{$ctrl.tournamentId}}"
+       class="btn btn-primary"
+       title="complete matches">
+      <span class="glyphicon glyphicon-book"></span>
+    </a>
+    <a href="#!/tournaments/{{$ctrl.tournamentId}}"
+       class="btn btn-primary">
+      <span class="glyphicon glyphicon-home"></span>
+    </a>
+  </div>
+  <div class="form-group" ng-show="!$ctrl.setRescoring">
+    <review-sets></review-sets>
+  </div>
+  <base-score-set ng-show="$ctrl.setRescoring"></base-score-set>
+  <div class="form-group">
+    <request-status></request-status>
+  </div>
+  <div class="form-group" ng-show="$ctrl.effect">
+    <div class="alert alert-warning"
+         translate="following-matches-will-be-replayed"/>
+    <table class="table table-bordered">
+      <tr ng-repeat="match in $ctrl.effect">
+        <td>{{$index + 1}}</td>
+        <td>
+          <a ng-repeat="participant in match.participants"
+             class="btn btn-default"
+             href="#!/match/management/{{$ctrl.tournamentId}}/{{match.mid}}">
+            {{participant.name}}
+          </a>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="form-group">
+    <a class="btn btn-danger" ng-click="$ctrl.rescoreMatch()">
+      <span class="glyphicon glyphicon-flash"></span>
+      {{ 'Rescore match' | translate }}
+    </a>
+    <a class="btn btn-default" title="back" back-button>
+      <span class="glyphicon glyphicon-circle-arrow-left"></span>
+    </a>
+  </div>
+</div>
+</div>

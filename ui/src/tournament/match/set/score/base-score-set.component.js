@@ -54,7 +54,7 @@ angular.
                                  self.possibleWinScores.push(++last);
                              }
                          };
-                         self.pick = function (idx, score) {
+                         self.pick = (idx, score) => {
                              self.scores[idx] = score;
                          };
                          function findScores() {
@@ -63,6 +63,12 @@ angular.
                                      {uid: self.participants[1 - self.winnerIdx].uid,
                                       score: self.scores[1 - self.winnerIdx]}];
                          }
+                         self.pickLost = (idx, score) => {
+                             self.pick(idx, score);
+                             $rootScore.$broatcast('event.base.match.set.pick.lost',
+                                                   {setOrdNumber: self.match.playedSets,
+                                                    scores: findScores()});
+                         };
                          self.onMatchSet = function (match) {
                              console.log("caught event.match.set");
                              self.match = match;

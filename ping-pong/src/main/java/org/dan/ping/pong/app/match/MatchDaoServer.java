@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -87,15 +88,27 @@ public class MatchDaoServer implements MatchDao {
 
     @Override
     public Optional<Uid> scoreSet(TournamentMemState tournament, MatchInfo matchInfo,
-            DbUpdater batch, FinalMatchScore matchScore) {
+            DbUpdater batch, List<IdentifiedScore> scores) {
         final Optional<Uid> winUidO = matchInfo.addSetScore(
-                matchScore.getScores(), tournament.getRule().getMatch());
-        insertSetScore(batch, matchScore);
+                scores, tournament.getRule().getMatch());
+        insertSetScore(batch, matchInfo.getMid(), scores);
         return winUidO;
     }
 
     @Override
-    public void completeMatch(Mid mid, Uid winUid, Instant now, DbUpdater batch, MatchState... expected) {
+    public void insertScores(MatchInfo mInfo, DbUpdater batch) {
+        mInfo.getParticipantIdScore().forEach(
+                (uid, sets) ->
+                        sets.forEach(games -> batch.exec(
+                                DbUpdateSql.builder()
+                                        .query(jooq.insertInto(SET_SCORE, SET_SCORE.MID,
+                                                SET_SCORE.UID, SET_SCORE.GAMES)
+                                                .values(mInfo.getMid(), uid, games))
+                                        .build())));
+    }
+
+    @Override
+    public void completeMatch(Mid mid, Uid winUid, Instant now, DbUpdater batch, Set<MatchState> expected) {
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(JUST_A_ROW)
                 .logBefore(() -> log.info("Match {} won uid {} if {}", mid, winUid, expected))
@@ -108,12 +121,12 @@ public class MatchDaoServer implements MatchDao {
                 .build());
     }
 
-    private void insertSetScore(DbUpdater batch, FinalMatchScore matchScore) {
-        matchScore.getScores().forEach(score -> batch.exec(
+    private void insertSetScore(DbUpdater batch, Mid mid, List<IdentifiedScore> scores) {
+        scores.forEach(score -> batch.exec(
                 DbUpdateSql.builder()
                         .query(jooq.insertInto(SET_SCORE, SET_SCORE.MID,
                                 SET_SCORE.UID, SET_SCORE.GAMES)
-                                .values(matchScore.getMid(), score.getUid(), score.getScore()))
+                                .values(mid, score.getUid(), score.getScore()))
                         .build()));
     }
 
@@ -217,7 +230,7 @@ public class MatchDaoServer implements MatchDao {
                 MATCHES.WIN_MID, MATCHES.LOSE_MID, MATCHES.PRIORITY,
                 MATCHES.STATE, MATCHES.TYPE, MATCHES.ENDED,
                 MATCHES.UID_LESS, MATCHES.UID_MORE, MATCHES.UID_WIN,
-                MATCHES.STARTED)
+                MATCHES.STARTED, MATCHES.LEVEL)
                 .from(MATCHES)
                 .where(MATCHES.TID.eq(tid))
                 .fetch()
@@ -236,6 +249,7 @@ public class MatchDaoServer implements MatchDao {
                             .state(r.get(MATCHES.STATE))
                             .type(r.get(MATCHES.TYPE))
                             .loserMid(r.get(MATCHES.LOSE_MID))
+                            .level(r.get(MATCHES.LEVEL))
                             .priority(r.get(MATCHES.PRIORITY))
                             .winnerMid(r.get(MATCHES.WIN_MID))
                             .winnerId(ofNullable(r.get(MATCHES.UID_WIN)))
@@ -289,6 +303,16 @@ public class MatchDaoServer implements MatchDao {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.deleteFrom(SET_SCORE)
                         .where(SET_SCORE.MID.eq(mid), SET_SCORE.UID.eq(uid)))
+                .build());
+    }
+
+    @Override
+    public void setWinnerId(MatchInfo mInfo, DbUpdater batch) {
+        batch.exec(DbUpdateSql.builder()
+                .query(jooq.update(MATCHES)
+                        .set(MATCHES.UID_WIN, mInfo.getWinnerId().orElse(null))
+                        .where(MATCHES.TID.eq(mInfo.getTid()),
+                                MATCHES.MID.eq(mInfo.getMid())))
                 .build());
     }
 }

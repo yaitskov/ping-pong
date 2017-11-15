@@ -15,6 +15,7 @@ import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.JUST_A_ROW;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
@@ -22,6 +23,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.Users;
+import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.bid.Uid;
@@ -255,6 +257,7 @@ public class MatchDaoServer implements MatchDao {
                             .winnerId(ofNullable(r.get(MATCHES.UID_WIN)))
                             .startedAt(r.get(MATCHES.STARTED))
                             .endedAt(r.get(MATCHES.ENDED))
+                            .losersMeet(uids.size() == 1 && uids.containsKey(FILLER_LOSER_UID))
                             .participantIdScore(uids)
                             .tid(tid)
                             .build();

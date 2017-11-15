@@ -1,8 +1,8 @@
 package org.dan.ping.pong.app.match;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singleton;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -59,12 +59,13 @@ import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -77,6 +78,7 @@ public class MatchService {
             .thenComparing(MatchInfo::getMid);
 
     static final ImmutableSet<MatchState> EXPECTED_MATCH_STATES = ImmutableSet.of(Game, Place, Auto);
+    private static final Set<BidState> ONLY_PLAY = singleton(Play);
 
     private static Comparator<MatchInfo> noTablesParticipantMatchComparator(
             TournamentMemState tournament, Uid uid) {
@@ -152,7 +154,7 @@ public class MatchService {
             Uid winUid, DbUpdater batch, Set<MatchState> completeMatchExStates) {
         completeMatch(matchInfo, winUid, batch, completeMatchExStates);
         if (matchInfo.getGid().isPresent()) {
-            tryToCompleteGroup(tournament, matchInfo, batch, singletonList(Play));
+            tryToCompleteGroup(tournament, matchInfo, batch, ONLY_PLAY);
         } else {
             completePlayOffMatch(tournament, matchInfo, winUid, batch);
         }
@@ -167,66 +169,52 @@ public class MatchService {
         matchDao.completeMatch(matchInfo.getMid(), winUid, now, batch, expectedMatchStates);
     }
 
-    private void completeNoLastPlayOffMatch(TournamentMemState tournament, MatchInfo matchInfo,
-            Uid winUid, DbUpdater batch) {
-        ParticipantMemState winBid = tournament.getParticipants().get(winUid);
-        bidService.setBidState(winBid, Wait, singletonList(Play), batch);
-        assignBidToMatch(tournament, matchInfo.getWinnerMid().get(), winUid, batch);
-        final Uid lostUid = matchInfo.getOpponentUid(winUid).get();
-        final ParticipantMemState lostBid = tournament.getParticipants().get(lostUid);
-        if (lostBid == null) {
-            checkArgument(FILLER_LOSER_UID.equals(lostUid));
-        }
-        if (matchInfo.getLoserMid().isPresent()) {
-            if (lostBid != null) {
-                bidService.setBidState(lostBid, Wait, asList(Play, Rest), batch);
-            }
-            assignBidToMatch(tournament, matchInfo.getLoserMid().get(), lostUid, batch);
-        } else {
-            if (lostBid == null) {
-                return;
-            }
-            bidService.setBidState(lostBid,
-                    matchInfo.getType() == MatchType.Brnz
-                            ? Win3
-                            : Lost, asList(Play, Wait, Rest), batch);
-        }
-    }
-
-    private void completeLastPlayOffMatch(TournamentMemState tournament, MatchInfo matchInfo,
-            Uid winUid, DbUpdater batch) {
-        switch (matchInfo.getType()) {
+    private BidState playOffMatchWinnerState(MatchInfo mInfo) {
+        switch (mInfo.getType()) {
             case Gold:
-                setMedalMatchBidStatuses(tournament, matchInfo, winUid, batch, Win1, Win2);
-                break;
+                return Win1;
             case Brnz:
-                setMedalMatchBidStatuses(tournament, matchInfo, winUid, batch, Win3, Lost);
-                break;
+                return Win3;
+            case POff:
+                return Wait;
             default:
-                throw internalError("Match type "
-                        + matchInfo.getType()
-                        + " is not terminal");
+                throw internalError("Match type " + mInfo.getType() + " is not supported");
         }
-        tournamentService.endOfTournamentCategory(tournament, matchInfo.getCid(), batch);
     }
 
-    private void setMedalMatchBidStatuses(
-            TournamentMemState tournament,
-            MatchInfo matchInfo,
-            Uid winUid, DbUpdater batch,
-            BidState win, BidState lost) {
-        matchInfo.getParticipantIdScore().keySet().forEach(uid ->
-                bidService.setBidState(tournament.getParticipant(uid),
-                        winUid.equals(uid) ? win : lost, asList(Play, Rest), batch));
+    private BidState playOffMatchLoserState(MatchInfo mInfo) {
+        switch (mInfo.getType()) {
+            case Gold:
+                return Win2;
+            case Brnz:
+                return Lost;
+            case POff:
+                return mInfo.getLoserMid().map(lMid -> Wait).orElse(Lost);
+            default:
+                throw internalError("Match type " + mInfo.getType() + " is not supported");
+        }
     }
 
-    private void completePlayOffMatch(TournamentMemState tournament, MatchInfo matchInfo,
+    private void completePlayOffMatch(TournamentMemState tournament, MatchInfo mInfo,
             Uid winUid, DbUpdater batch) {
-        if (matchInfo.getWinnerMid().isPresent()) {
-            completeNoLastPlayOffMatch(tournament, matchInfo, winUid, batch);
-        } else {
-            completeLastPlayOffMatch(tournament, matchInfo, winUid, batch);
+        final ParticipantMemState winBid = tournament.getBidOrQuit(winUid);
+        if (!isPyrrhic(winBid)) {
+            bidService.setBidState(winBid, playOffMatchWinnerState(mInfo),
+                    ONLY_PLAY, batch);
         }
+        mInfo.getWinnerMid().ifPresent(wMid -> assignBidToMatch(tournament, wMid, winUid, batch));
+        final Uid lostUid = mInfo.getOpponentUid(winUid)
+                .orElseThrow(() -> internalError("no opponent in match " + mInfo.getMid()));
+        final ParticipantMemState lostBid = tournament.getBidOrQuit(lostUid);
+        if (!isPyrrhic(winBid)) {
+            bidService.setBidState(lostBid, playOffMatchLoserState(mInfo), ONLY_PLAY, batch);
+        }
+        mInfo.getLoserMid().ifPresent(
+                lMid -> assignBidToMatch(tournament, lMid, lostUid, batch));
+        if (mInfo.getWinnerMid().isPresent()) {
+            return;
+        }
+        tournamentService.endOfTournamentCategory(tournament, mInfo.getCid(), batch);
     }
 
     @Inject
@@ -236,7 +224,7 @@ public class MatchService {
     private GroupDao groupDao;
 
     public void tryToCompleteGroup(TournamentMemState tournament, MatchInfo matchInfo,
-            DbUpdater batch, List<BidState> expected) {
+            DbUpdater batch, Collection<BidState> expected) {
         final int gid = matchInfo.getGid().get();
         final Set<Uid> uids = matchInfo.getParticipantIdScore().keySet();
         final List<MatchInfo> matches = groupService.findMatchesInGroup(tournament, gid);
@@ -244,7 +232,9 @@ public class MatchService {
                 .map(MatchInfo::getState)
                 .filter(Over::equals)
                 .count();
-        uids.stream().map(tournament::getBid).filter(b -> b.getState() == Wait)
+        uids.stream()
+                .map(tournament::getBid)
+                .filter(b -> b.getState() == Wait)
                 .forEach(b -> bidService.setBidState(b, Wait, expected, batch));
         if (completedMatches < matches.size()) {
             log.debug("Matches {} left to play in the group {}",
@@ -259,13 +249,10 @@ public class MatchService {
 
     private void completeParticipationLeftBids(TournamentMemState tournament,
             List<Uid> leftUids, DbUpdater batch) {
-        leftUids.forEach(uid -> {
-            final ParticipantMemState participant = tournament.getParticipant(uid);
-            if (participant.getState() == Quit || participant.getState() == Expl) {
-                return;
-            }
-            bidService.setBidState(participant, Lost, asList(Wait, Rest), batch);
-        });
+        leftUids.stream()
+                .map(tournament::getBidOrQuit)
+                .filter(bid -> !isPyrrhic(bid))
+                .forEach(bid -> bidService.setBidState(bid, Lost, asList(Wait, Rest), batch));
     }
 
     @Inject
@@ -301,7 +288,18 @@ public class MatchService {
         log.info("Pick bids for playoff from gid {} in tid {}", gid, tournament.getTid());
         final int quits = tournament.getRule().getGroup().get().getQuits();
         final List<Uid> orderUids = groupService.orderUidsInGroup(tournament, matches);
-        final List<Uid> quitUids = orderUids.subList(0, quits);
+
+        final List<Uid> quitUids = orderUids.stream()
+                .map(tournament::getBidOrExpl)
+                .filter(b -> b.getState() != Expl)
+                .limit(quits)
+                .map(ParticipantMemState::getUid)
+                .collect(toList());
+        if (quitUids.size() < quits) {
+            Stream.generate(() -> FILLER_LOSER_UID)
+                    .limit(quits - quitUids.size())
+                    .forEach(quitUids::add);
+        }
         log.info("{} quit group {}", quitUids, gid);
         final GroupInfo iGru = tournament.getGroups().get(gid);
         final List<MatchInfo> playOffMatches = playOffService
@@ -327,57 +325,87 @@ public class MatchService {
                         quitUids.get(iQuitter), batch);
             }
         }
+        if (orderUids.size() < quits) {
+            return emptyList();
+        }
         return orderUids.subList(quits, orderUids.size());
+    }
+
+    private static final Set<BidState> quitOrExpl = ImmutableSet.of(Quit, Expl);
+
+    public boolean isPyrrhic(ParticipantMemState bid) {
+        return bid.getUid().equals(FILLER_LOSER_UID)
+                || quitOrExpl.contains(bid.getState());
     }
 
     public void assignBidToMatch(TournamentMemState tournament, Mid mid, Uid uid, DbUpdater batch) {
         log.info("Assign uid {} to mid {} in tid {}", uid, mid, tournament.getTid());
-        final MatchInfo matchInfo = tournament.getMatchById(mid);
-        if (matchInfo.getParticipantIdScore().size() == 2) {
-            throw internalError("Match " + matchInfo.getMid() + " gets 3rd participant");
-        }
-        matchDao.setParticipant(matchInfo.getParticipantIdScore().size(),
-                matchInfo.getMid(), uid, batch);
-        matchInfo.getParticipantIdScore().put(uid, new ArrayList<>());
-        if (matchInfo.getParticipantIdScore().size() == 2) {
-            switch (matchInfo.getState()) {
+        final MatchInfo mInfo = tournament.getMatchById(mid);
+        mInfo.checkParticipantSpace();
+        mInfo.addParticipant(uid);
+        matchDao.setParticipant(mInfo.numberOfParticipants(), mInfo.getMid(), uid, batch);
+        final int numberOfParticipants = mInfo.numberOfParticipants();
+        if (numberOfParticipants == 2) {
+            switch (mInfo.getState()) {
                 case Draft:
-                    changeStatus(batch, matchInfo, Place);
+                    final ParticipantMemState bid = tournament.getBidOrQuit(uid);
+                    if (isPyrrhic(bid)) {
+                        walkOver(tournament, uid, mInfo, batch);
+                    } else if (bid.getState() == Wait) {
+                        changeStatus(batch, mInfo, Place);
+                    } else {
+                        throw internalError("unexpected bid "
+                                + uid + " state " + bid.getState());
+                    }
                     break;
                 case Auto:
-                    autoWinComplete(tournament, matchInfo, uid, batch);
+                    autoWinComplete(tournament, mInfo, uid, batch);
                     break;
                 default:
                     throw internalError("Unexpected state "
-                            + matchInfo.getState() + " in " + mid);
+                            + mInfo.getState() + " in " + mid);
             }
+        } else if (numberOfParticipants == 1) {
+            final ParticipantMemState bid = tournament.getBidOrQuit(uid);
+            if (isPyrrhic(bid)) {
+                walkOver(tournament, uid, mInfo, batch);
+            }
+        } else {
+            throw internalError("invalid number of participants " + numberOfParticipants);
         }
     }
 
-    private void autoWinComplete(TournamentMemState tournament, MatchInfo matchInfo,
-            Uid uid, DbUpdater batch) {
-        log.info("Auto complete mid {} due {} quit and {} detected",
-                matchInfo.getMid(), matchInfo.getOpponentUid(uid), uid);
-        completeMatch(matchInfo, uid, batch, ImmutableSet.of(Game, Place, Auto));
-        matchInfo.getWinnerMid()
-                .ifPresent(wmid -> assignBidToMatch(tournament, wmid, uid, batch));
-        if (FILLER_LOSER_UID.equals(uid)) {
-            return;
-        }
-        switch (matchInfo.getType()) {
+    private void autoWinComplete(TournamentMemState tournament, MatchInfo mInfo,
+            Uid winUid, DbUpdater batch) {
+        log.info("Auto complete mid {} due {} quit and {} won",
+                mInfo.getMid(), mInfo.getOpponentUid(winUid), winUid);
+        completeMatch(mInfo, winUid, batch, singleton(Auto));
+        switch (mInfo.getType()) {
             case Brnz:
-                bidService.setBidState(tournament.getBid(uid), Win3, asList(Play, Wait, Rest), batch);
+                checkSinkMatch(mInfo);
+                bidService.setBidState(tournament.getBidOrQuit(winUid), Win3, asList(Play, Wait, Rest), batch);
                 break;
             case Gold:
-                bidService.setBidState(tournament.getBid(uid), Win1, asList(Play, Wait, Rest), batch);
+                checkSinkMatch(mInfo);
+                bidService.setBidState(tournament.getBidOrQuit(winUid), Win1, asList(Play, Wait, Rest), batch);
                 break;
-            case Grup:
             case POff:
-                // skip
+                mInfo.getWinnerMid()
+                        .ifPresent(wMid -> assignBidToMatch(tournament, wMid, winUid, batch));
+                // lMid branch is ready evaluated
                 break;
             default:
-                throw internalError("Unexpected state " + matchInfo.getType());
+                throw internalError("Unexpected state " + mInfo.getType());
         }
+    }
+
+    private void checkSinkMatch(MatchInfo mInfo) {
+        mInfo.getWinnerMid().ifPresent(wMid -> {
+            throw internalError("match " + mInfo.getMid() + " has a match for a winner");
+        });
+        mInfo.getLoserMid().ifPresent(wMid -> {
+            throw internalError("match " + mInfo.getMid() + " has a match for a loser");
+        });
     }
 
     public void changeStatus(DbUpdater batch, MatchInfo matchInfo, MatchState state) {

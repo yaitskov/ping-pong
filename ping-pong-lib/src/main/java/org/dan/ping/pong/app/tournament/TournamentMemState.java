@@ -2,6 +2,10 @@ package org.dan.ping.pong.app.tournament;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.dan.ping.pong.app.bid.BidState.Expl;
+import static org.dan.ping.pong.app.bid.BidState.Quit;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.createLoserBid;
 import static org.dan.ping.pong.app.user.UserRole.Admin;
 import static org.dan.ping.pong.app.user.UserRole.Spectator;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
@@ -13,6 +17,7 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.group.GroupInfo;
@@ -84,6 +89,22 @@ public class TournamentMemState {
 
     public ParticipantMemState getBid(Uid bid) {
         return participants.get(bid);
+    }
+
+    public ParticipantMemState getBidOrQuit(Uid uid) {
+        return getBidOr(uid,  Quit);
+    }
+
+    public ParticipantMemState getBidOrExpl(Uid uid) {
+        return getBidOr(uid,  Expl);
+    }
+
+    public ParticipantMemState getBidOr(Uid bid, BidState state) {
+        final ParticipantMemState result = participants.get(bid);
+        if (result == null & FILLER_LOSER_UID.equals(bid)) {
+            return createLoserBid(tid, -1, state);
+        }
+        return result;
     }
 
     public List<GroupInfo> getGroupsByCategory(int cid) {

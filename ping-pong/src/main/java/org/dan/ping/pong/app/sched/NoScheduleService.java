@@ -59,7 +59,7 @@ public class NoScheduleService implements ScheduleService {
     private List<MatchInfo> selectForScheduling(TournamentMemState tournament) {
         return tournament.getMatches().values().stream()
                 .filter(minfo -> minfo.getState() == Place)
-                .filter(minfo -> minfo.getParticipantIdScore().size() == 2)
+                .filter(minfo -> minfo.numberOfParticipants() == 2)
                 .sorted(comparingInt(MatchInfo::getPriority)
                         .thenComparing(MatchInfo::getMid))
                 .collect(toList());

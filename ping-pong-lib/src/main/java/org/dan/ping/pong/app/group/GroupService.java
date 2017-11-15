@@ -70,13 +70,13 @@ public class GroupService {
         final Uid lostUid = minfo.getOpponentUid(winUid).get();
         final BidSuccessInGroup loser = uid2Stat.get(lostUid);
 
-        minfo.getParticipantIdScore().get(winUid)
+        minfo.getParticipantScore(winUid)
                 .forEach(winner::winBalls);
-        minfo.getParticipantIdScore().get(winUid)
+        minfo.getParticipantScore(winUid)
                 .forEach(loser::lostBalls);
-        minfo.getParticipantIdScore().get(lostUid)
+        minfo.getParticipantScore(lostUid)
                 .forEach(loser::winBalls);
-        minfo.getParticipantIdScore().get(lostUid)
+        minfo.getParticipantScore(lostUid)
                 .forEach(winner::lostBalls);
 
         final Map<Uid, Integer> uid2Sets = matchRule.calcWonSets(minfo.getParticipantIdScore());

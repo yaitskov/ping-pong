@@ -6,6 +6,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.auth.AuthResource.DEV_CLEAN_SIGN_IN_TOKEN_TABLE;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
@@ -25,13 +26,17 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.FinalMatchScore;
 import org.dan.ping.pong.app.match.ForTestBidDao;
 import org.dan.ping.pong.app.match.ForTestMatchDao;
 import org.dan.ping.pong.app.match.IdentifiedScore;
 import org.dan.ping.pong.app.match.MatchDao;
+import org.dan.ping.pong.app.match.MatchResource;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
+import org.dan.ping.pong.app.match.RescoreMatch;
 import org.dan.ping.pong.app.match.SetScoreResult;
 import org.dan.ping.pong.app.place.ForTestPlaceDao;
 import org.dan.ping.pong.app.table.TableInfo;
@@ -60,11 +65,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 @Slf4j
 public class Simulator {
+
     private TestUserSession testAdmin;
 
     @Inject
@@ -236,6 +241,19 @@ public class Simulator {
             default:
                 throw new IllegalArgumentException("Unknown decision " + hookDecision);
         }
+    }
+
+    public void rescore(TournamentScenario scenario, Mid mid,
+            Map<Player, List<Integer>> newScore, String checkHash) {
+        rest.voidPost(MatchResource.MATCH_RESCORE_MATCH,
+                    scenario.getTestAdmin(),
+                    RescoreMatch.builder().tid(scenario.getTid())
+                            .mid(mid)
+                            .effectHash(checkHash)
+                            .sets(newScore.entrySet().stream()
+                                    .collect(toMap(e -> (Uid) scenario.player2Uid(e.getKey()),
+                                            Map.Entry::getValue)))
+                            .build());
     }
 
     private SetScoreResultName scoreSet(Set<Player> players, TournamentScenario scenario,

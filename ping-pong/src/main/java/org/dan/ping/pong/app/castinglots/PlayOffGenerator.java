@@ -122,7 +122,8 @@ public class PlayOffGenerator {
                     level == 0
                             ? Optional.of(mid)
                             : Optional.empty(),
-                    priority, level, Brnz)
+                    priority, level,
+                    level == 0 ? POff : Brnz)
                     .ifPresent(nextMidLevel::add);
         }
         if (level == 0) {

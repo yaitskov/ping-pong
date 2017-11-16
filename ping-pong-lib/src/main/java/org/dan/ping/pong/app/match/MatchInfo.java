@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.tournament.Tid;
 
@@ -28,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+@Slf4j
 @Getter
 @Setter
 @Builder
@@ -85,15 +87,17 @@ public class MatchInfo {
         return participantIdScore.size();
     }
 
-    public void addParticipant(Uid uid) {
+    public boolean addParticipant(Uid uid) {
         if (FILLER_LOSER_UID.equals(uid) && participantIdScore.containsKey(uid)) {
             losersMeet = true;
         } else {
             if (participantIdScore.containsKey(uid)) {
-                throw internalError("Attempt to override participant in match " + mid);
+                log.warn("ReAdd uid {} to mid {}. Allowed for rescore", mid, uid);
+                return true;
             }
             participantIdScore.put(uid, new ArrayList<>());
         }
+        return false;
     }
 
     public void loadParticipants(Map<Uid, List<Integer>> scores) {

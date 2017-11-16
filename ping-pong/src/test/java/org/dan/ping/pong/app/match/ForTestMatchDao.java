@@ -41,7 +41,7 @@ public class ForTestMatchDao {
                         .type(r.get(MATCHES.TYPE))
                         .state(r.get(MATCHES.STATE))
                         .tid(r.get(MATCHES.TID))
-                        .level(r.get(MATCHES.LEVEL))
+                        .level(ofNullable(r.get(MATCHES.LEVEL)).orElse(0))
                         .priority(r.get(MATCHES.PRIORITY))
                         .winnerMid(r.get(MATCHES.WIN_MID))
                         .loserMid(r.get(MATCHES.LOSE_MID))

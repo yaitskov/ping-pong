@@ -30,6 +30,7 @@ import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
@@ -100,6 +101,8 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .playOff(Optional.of(Losing1))
             .place(Optional.of(GLOBAL))
             .build();
+
+    public static final TournamentRules RULES_G_S3A2G11 = RULES_G8Q1_S3A2G11.withPlayOff(Optional.empty());
 
     public static final TournamentRules RULES_G8Q1_S1A2G11 = TournamentRules
             .builder()

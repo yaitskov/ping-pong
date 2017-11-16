@@ -7,9 +7,11 @@ import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Play;
+import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.PLAY_OFF_SEEDS;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.createLoserBid;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
@@ -146,17 +148,15 @@ public class CastingLotsService {
             final int iStrongBid = Math.min(iBid1, iBid2);
             final int iWeakBid = Math.max(iBid1, iBid2);
 
+            bidService.setBidState(orderedBids.get(iStrongBid), Wait,
+                    singletonList(Here), batch);
             matchService.assignBidToMatch(tournament, match.getMid(),
                     orderedBids.get(iStrongBid).getUid(), batch);
 
             if (iWeakBid >= orderedBids.size()) {
-                final ParticipantMemState fakeLoser = createLoserBid(
-                        tournament.getTid(), cid);
-                bidService.setBidState(orderedBids.get(iStrongBid), Play, singletonList(Here), batch);
-                matchService.assignBidToMatch(tournament, match.getMid(),
-                        fakeLoser.getUid(), batch);
-                matchService.leaveFromPlayOff(fakeLoser, tournament, batch);
+                matchService.assignBidToMatch(tournament, match.getMid(), FILLER_LOSER_UID, batch);
             } else {
+                bidService.setBidState(orderedBids.get(iWeakBid), Wait, singletonList(Here), batch);
                 matchService.assignBidToMatch(tournament, match.getMid(),
                         orderedBids.get(iWeakBid).getUid(), batch);
             }

@@ -44,6 +44,7 @@ import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.group.PlayOffMatcherFromGroup;
 import org.dan.ping.pong.app.place.PlaceRules;
+import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.sched.TablesDiscovery;
@@ -77,7 +78,7 @@ public class MatchService {
             .thenComparing(MatchInfo::getPriority)
             .thenComparing(MatchInfo::getMid);
 
-    static final ImmutableSet<MatchState> EXPECTED_MATCH_STATES = ImmutableSet.of(Game, Place, Auto);
+    static final ImmutableSet<MatchState> EXPECTED_MATCH_STATES = ImmutableSet.of(Draft, Game, Place, Auto);
     private static final Set<BidState> ONLY_PLAY = singleton(Play);
 
     private static Comparator<MatchInfo> noTablesParticipantMatchComparator(
@@ -150,31 +151,39 @@ public class MatchService {
         }
     }
 
-    public void matchWinnerDetermined(TournamentMemState tournament, MatchInfo matchInfo,
+    public void matchWinnerDetermined(TournamentMemState tournament, MatchInfo mInfo,
             Uid winUid, DbUpdater batch, Set<MatchState> completeMatchExStates) {
-        completeMatch(matchInfo, winUid, batch, completeMatchExStates);
-        if (matchInfo.getGid().isPresent()) {
-            tryToCompleteGroup(tournament, matchInfo, batch, ONLY_PLAY);
+        completeMatch(mInfo, winUid, batch, completeMatchExStates);
+        if (mInfo.getGid().isPresent()) {
+            tryToCompleteGroup(tournament, mInfo, batch, ONLY_PLAY);
         } else {
-            completePlayOffMatch(tournament, matchInfo, winUid, batch);
+            completePlayOffMatch(tournament, mInfo, winUid, batch);
         }
     }
 
-    private void completeMatch(MatchInfo matchInfo, Uid winUid,
+    public void completeMatch(MatchInfo mInfo, Uid winUid,
             DbUpdater batch, Set<MatchState> expectedMatchStates) {
-        matchInfo.setState(Over);
-        matchInfo.setWinnerId(Optional.of(winUid));
+        log.info("Match {} won by {}", mInfo.getMid(), winUid);
+        mInfo.setState(Over);
+        mInfo.setWinnerId(Optional.of(winUid));
         final Instant now = clocker.get();
-        matchInfo.setEndedAt(Optional.of(now));
-        matchDao.completeMatch(matchInfo.getMid(), winUid, now, batch, expectedMatchStates);
+        mInfo.setEndedAt(Optional.of(now));
+        matchDao.completeMatch(mInfo.getMid(), winUid, now, batch, expectedMatchStates);
     }
 
-    private BidState playOffMatchWinnerState(MatchInfo mInfo) {
+    private BidState playOffMatchWinnerState(PlayOffRule playOff, MatchInfo mInfo) {
         switch (mInfo.getType()) {
             case Gold:
                 return Win1;
             case Brnz:
-                return Win3;
+                switch (playOff.getLosings()) {
+                    case 1:
+                        return Win3;
+                    case 2:
+                        return Wait;
+                    default:
+                        throw internalError("unsupported number of losing " + playOff.getLosings());
+                }
             case POff:
                 return Wait;
             default:
@@ -182,12 +191,19 @@ public class MatchService {
         }
     }
 
-    private BidState playOffMatchLoserState(MatchInfo mInfo) {
+    private BidState playOffMatchLoserState(PlayOffRule playOff, MatchInfo mInfo) {
         switch (mInfo.getType()) {
             case Gold:
                 return Win2;
             case Brnz:
-                return Lost;
+                switch (playOff.getLosings()) {
+                    case 1:
+                        return Lost;
+                    case 2:
+                        return Win3;
+                    default:
+                        throw internalError("unsupported number of losing " + playOff.getLosings());
+                }
             case POff:
                 return mInfo.getLoserMid().map(lMid -> Wait).orElse(Lost);
             default:
@@ -197,9 +213,12 @@ public class MatchService {
 
     private void completePlayOffMatch(TournamentMemState tournament, MatchInfo mInfo,
             Uid winUid, DbUpdater batch) {
+        final PlayOffRule playOffRule = tournament.getRule().getPlayOff().get();
         final ParticipantMemState winBid = tournament.getBidOrQuit(winUid);
         if (!isPyrrhic(winBid)) {
-            bidService.setBidState(winBid, playOffMatchWinnerState(mInfo),
+            bidService.setBidState(winBid,
+                    playOffMatchWinnerState(
+                            playOffRule, mInfo),
                     ONLY_PLAY, batch);
         }
         mInfo.getWinnerMid().ifPresent(wMid -> assignBidToMatch(tournament, wMid, winUid, batch));
@@ -207,7 +226,8 @@ public class MatchService {
                 .orElseThrow(() -> internalError("no opponent in match " + mInfo.getMid()));
         final ParticipantMemState lostBid = tournament.getBidOrQuit(lostUid);
         if (!isPyrrhic(winBid)) {
-            bidService.setBidState(lostBid, playOffMatchLoserState(mInfo), ONLY_PLAY, batch);
+            bidService.setBidState(lostBid,
+                    playOffMatchLoserState(playOffRule, mInfo), ONLY_PLAY, batch);
         }
         mInfo.getLoserMid().ifPresent(
                 lMid -> assignBidToMatch(tournament, lMid, lostUid, batch));
@@ -233,8 +253,8 @@ public class MatchService {
                 .filter(Over::equals)
                 .count();
         uids.stream()
-                .map(tournament::getBid)
-                .filter(b -> b.getState() == Wait)
+                .map(tournament::getBidOrQuit)
+                .filter(b -> expected.contains(b.getState()))
                 .forEach(b -> bidService.setBidState(b, Wait, expected, batch));
         if (completedMatches < matches.size()) {
             log.debug("Matches {} left to play in the group {}",
@@ -265,6 +285,7 @@ public class MatchService {
             TournamentMemState tournament, GroupInfo iGru,
             List<Uid> quitUids, DbUpdater batch) {
         if (iGru.getOrdNumber() == 0) {
+            log.info("Set terminal bid states in mini tid {}", tournament.getTid());
             for (int i = 0; i < quitUids.size(); ++i) {
                 bidService.setBidState(tournament.getParticipant(quitUids.get(i)),
                         i < WIN_STATES.size()
@@ -342,7 +363,10 @@ public class MatchService {
         log.info("Assign uid {} to mid {} in tid {}", uid, mid, tournament.getTid());
         final MatchInfo mInfo = tournament.getMatchById(mid);
         mInfo.checkParticipantSpace();
-        mInfo.addParticipant(uid);
+        if (mInfo.addParticipant(uid)) {
+            log.info("Match is already complete and doesn't requires to be rescored");
+            return;
+        }
         matchDao.setParticipant(mInfo.numberOfParticipants(), mInfo.getMid(), uid, batch);
         final int numberOfParticipants = mInfo.numberOfParticipants();
         if (numberOfParticipants == 2) {
@@ -408,12 +432,14 @@ public class MatchService {
         });
     }
 
-    public void changeStatus(DbUpdater batch, MatchInfo matchInfo, MatchState state) {
-        if (matchInfo.getState() == state) {
+    public void changeStatus(DbUpdater batch, MatchInfo mInfo, MatchState state) {
+        log.info("Change match {} status {} => {}",
+                mInfo.getMid(), mInfo.getState(), state);
+        if (mInfo.getState() == state) {
             return;
         }
-        matchInfo.setState(state);
-        matchDao.changeStatus(matchInfo.getMid(), state, batch);
+        mInfo.setState(state);
+        matchDao.changeStatus(mInfo.getMid(), state, batch);
     }
 
     private void checkPermissions(TournamentMemState tournament, Uid senderUid,

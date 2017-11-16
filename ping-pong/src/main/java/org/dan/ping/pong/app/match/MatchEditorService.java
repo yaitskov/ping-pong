@@ -39,6 +39,7 @@ import org.dan.ping.pong.util.time.Clocker;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,8 @@ import javax.inject.Named;
 
 @Slf4j
 public class MatchEditorService {
+    public static final String DONT_CHECK_HASH = "dont-check-hash";
+
     private static final Set<MatchState> rescorableMatchState = ImmutableSet.of(Game, Over);
     private static final Set<MatchState> GAME_EXPECTED = singleton(Game);
     private static final Set<MatchState> OVER_EXPECTED = singleton(Over);
@@ -259,55 +262,78 @@ public class MatchEditorService {
         validateEffectHash(tournament, rescore, affectedMatches);
 
         final Optional<Uid> newWinner = findNewWinnerUid(tournament, newSets, mInfo);
-
+        log.info("New winner {} in mid {}", newWinner, mInfo.getMid());
+        reopenTournamentIfClosed(tournament, batch);
         truncateSets(batch, mInfo, mInfo.getPlayedSets());
         mInfo.loadParticipants(newSets);
         matchDao.insertScores(mInfo, batch);
 
         resetMatches(tournament, batch, affectedMatches);
 
-        boolean reschedule = false;
         if (newWinner.isPresent()) {
-            if (mInfo.getWinnerId().isPresent()) {
-                mInfo.participants()
-                        .map(tournament::getBidOrQuit)
-                        .forEach(bid -> resetBidStateTo(batch, bid, Play));
-                matchService.matchWinnerDetermined(
-                        tournament, mInfo, newWinner.get(), batch, OVER_EXPECTED);
-                reschedule = true;
-            } else { // was playing
-                matchService.matchWinnerDetermined(
-                        tournament, mInfo, newWinner.get(), batch, GAME_EXPECTED);
-                reschedule = true;
-            }
+            matchRescoreGivesWinner(tournament, batch, mInfo, newWinner);
         } else {
-            if (mInfo.getState() == Game) {
-                // keep allocated table
-            } else { // request table scheduling
-                mInfo.participants()
-                        .map(tournament::getBidOrQuit)
-                        .forEach(bid -> resetBidStateTo(batch, bid, Want));
-                matchService.changeStatus(batch, mInfo, Place);
-                reschedule = true;
-            }
+            matchRescoreNoWinner(tournament, batch, mInfo);
         }
-        if (reschedule || !affectedMatches.isEmpty()) {
-            reopenTournamentIfClosed(tournament, batch);
-            scheduleService.afterMatchComplete(tournament, batch, clocker.get());
+        scheduleService.afterMatchComplete(tournament, batch, clocker.get());
+    }
+
+    private void matchRescoreNoWinner(TournamentMemState tournament, DbUpdater batch, MatchInfo mInfo) {
+        if (mInfo.getState() == Game) {
+            log.info("Mid {} stays open", mInfo.getMid());
+        } else { // request table scheduling
+            log.info("Rescored mid {} returns to game", mInfo.getMid());
+            mInfo.participants()
+                    .map(tournament::getBidOrQuit)
+                    .forEach(bid -> resetBidStateTo(batch, bid, Want));
+            matchService.changeStatus(batch, mInfo, Place);
         }
+    }
+
+    private void matchRescoreGivesWinner(TournamentMemState tournament, DbUpdater batch,
+            MatchInfo mInfo, Optional<Uid> newWinner) {
+        if (mInfo.getWinnerId().isPresent()) {
+            final Set<Uid> playing = makeParticipantPlaying(tournament, batch, mInfo);
+            matchService.matchWinnerDetermined(
+                    tournament, mInfo, newWinner.get(), batch, OVER_EXPECTED);
+            recoverPlayingStates(tournament, batch, playing);
+        } else { // was playing
+            log.info("Rescored mid {} is complete", mInfo.getMid());
+            matchService.matchWinnerDetermined(
+                    tournament, mInfo, newWinner.get(), batch, GAME_EXPECTED);
+        }
+    }
+
+    private Set<Uid> makeParticipantPlaying(TournamentMemState tournament, DbUpdater batch, MatchInfo mInfo) {
+        Set<Uid> playing = new HashSet<>();
+        mInfo.participants()
+                .map(tournament::getBidOrQuit)
+                .peek(bid -> { if (bid.getState() == Play) {  playing.add(bid.getUid()); } })
+                .forEach(bid -> resetBidStateTo(batch, bid, Play));
+        return playing;
+    }
+
+    private void recoverPlayingStates(TournamentMemState tournament, DbUpdater batch, Set<Uid> playing) {
+        playing.stream()
+                .map(tournament::getBidOrQuit)
+                .forEach(bid -> bidService.setBidState(bid, Play, singleton(bid.getState()), batch));
     }
 
     private void reopenTournamentIfClosed(TournamentMemState tournament, DbUpdater batch) {
         if (tournament.getState() == Close) {
-            tournament.setState(Open);
-            tournamentService.setTournamentState(tournament, batch);
+            tournamentService.setTournamentState(tournament, Open, batch);
         }
     }
 
     private void validateEffectHash(TournamentMemState tournament,
             RescoreMatch rescore, List<MatchUid> effectedMatches) {
+        final String presenteHash = rescore.getEffectHash();
+        if (DONT_CHECK_HASH.equals(presenteHash)) {
+            log.info("Skip hash check {} on rescoring mid {}", presenteHash, rescore.getMid());
+            return;
+        }
         final String expectedEffectHash = calculateEffectHash(effectedMatches);
-        if (!expectedEffectHash.equals(rescore.getEffectHash())) {
+        if (!expectedEffectHash.equals(presenteHash)) {
             throw badRequest(new EffectHashMismatchError(expectedEffectHash,
                     effectedMatches.stream()
                             .map(MatchUid::getMid)
@@ -317,16 +343,18 @@ public class MatchEditorService {
                             .map(m -> toEffectedMatch(tournament, m))
                             .collect(toList())));
         }
+        log.info("Hash check passed for {} on rescoring mid {}",
+                presenteHash, rescore.getMid());
     }
 
     private static final Set<TournamentState> openOrClose = ImmutableSet.of(Open, Close);
 
     private void validateRescoreMatch(TournamentMemState tournament, MatchInfo mInfo,
             Map<Uid, List<Integer>> newSets) {
-        if (openOrClose.contains(tournament.getState())) {
+        if (!openOrClose.contains(tournament.getState())) {
             throw badRequest("tournament is not open nor closed");
         }
-        if (rescorableMatchState.contains(mInfo.getState())) {
+        if (!rescorableMatchState.contains(mInfo.getState())) {
             throw badRequest("match is not in a rescorable state");
         }
         if (mInfo.getPlayedSets() == 0) {
@@ -398,32 +426,35 @@ public class MatchEditorService {
     }
 
     private void removeParticipant(TournamentMemState tournament,
-            DbUpdater batch, MatchInfo minfo, Uid uid) {
-        if (!minfo.removeParticipant(uid)) {
+            DbUpdater batch, MatchInfo mInfo, Uid uid) {
+        if (!mInfo.removeParticipant(uid)) {
+            log.warn("No uid {} is not in mid {}", uid, mInfo.getMid());
             return;
         }
-        matchDao.removeScores(batch, minfo.getMid(), uid);
-        final int numberOfParticipants = minfo.numberOfParticipants();
+        matchDao.removeScores(batch, mInfo.getMid(), uid);
+        final int numberOfParticipants = mInfo.numberOfParticipants();
         if (numberOfParticipants == 1) {
-            final Uid opUid = minfo.leftUid().get();
+            log.warn("Remove first uid {} from mid {}", uid, mInfo.getMid());
+            final Uid opUid = mInfo.leftUid().get();
             final ParticipantMemState opponent = tournament.getBidOrQuit(opUid);
             final BidState opoState = opponent.getState();
             switch (opoState) {
                 case Expl:
                 case Quit:
-                    matchService.changeStatus(batch, minfo, Auto);
+                    matchService.changeStatus(batch, mInfo, Auto);
                     break;
                 default:
-                    matchService.changeStatus(batch, minfo, Draft);
+                    matchService.changeStatus(batch, mInfo, Draft);
                     break;
             }
             resetBidStateTo(batch, opponent, Want);
             final ParticipantMemState bid = tournament.getBidOrQuit(uid);
             resetBidStateTo(batch, bid, Want);
-            matchDao.removeSecondParticipant(batch, minfo.getMid(), opUid);
+            matchDao.removeSecondParticipant(batch, mInfo.getMid(), opUid);
         } else if (numberOfParticipants == 0) {
-            matchService.changeStatus(batch, minfo, Draft);
-            matchDao.removeParticipants(batch, minfo.getMid());
+            log.warn("Remove last uid {} from mid {}", uid, mInfo.getMid());
+            matchService.changeStatus(batch, mInfo, Draft);
+            matchDao.removeParticipants(batch, mInfo.getMid());
         } else {
             throw internalError("unexpected number or participants left "
                     + numberOfParticipants);

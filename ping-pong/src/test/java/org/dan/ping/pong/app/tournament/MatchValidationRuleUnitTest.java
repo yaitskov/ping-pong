@@ -62,14 +62,14 @@ public class MatchValidationRuleUnitTest {
     @Test
     public void validateFailsOnNegaiteveGames() {
         thrown.expect(hasProperty("message",
-                containsString("Games cannot less than")));
+                containsString("Games cannot be less than")));
         PING_PONG_RULE.validateSet(0, scores(10, -1));
     }
 
     @Test
     public void validateFailsOnCloseGames() {
         thrown.expect(hasProperty("message",
-                containsString("Difference between games in a complete set")));
+                containsString("Difference between games cannot be less than")));
         PING_PONG_RULE.validateSet(0, scores(11, 10));
     }
 

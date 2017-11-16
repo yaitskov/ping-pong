@@ -26,7 +26,6 @@ import static org.dan.ping.pong.app.tournament.TournamentService.UNKNOWN_PLACE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
-import static org.dan.ping.pong.app.user.UserType.User;
 import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
 import static org.dan.ping.pong.mock.Generators.genFutureTime;
 import static org.dan.ping.pong.mock.Generators.genPhone;
@@ -48,14 +47,13 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.place.ForTestPlaceDao;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceAddress;
 import org.dan.ping.pong.app.place.PlaceDao;
-import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin;
 import org.dan.ping.pong.mock.RestEntityGenerator;
 import org.dan.ping.pong.mock.TestAdmin;
@@ -64,7 +62,6 @@ import org.dan.ping.pong.mock.UserSessionGenerator;
 import org.dan.ping.pong.sys.ctx.TestCtx;
 import org.dan.ping.pong.sys.error.TemplateError;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
-import org.dan.ping.pong.util.time.Clocker;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -308,15 +305,6 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         assertThat(openAfter, hasItem(hasProperty("tid", is(tid))));
     }
 
-    @Inject
-    private TournamentDao tournamentDao;
-
-    @Inject
-    private Clocker clocker;
-
-    @Inject
-    private BidDao bidDao;
-
     private void setTournamentState(Tid previousTid, TournamentState state) {
         myRest().voidPost(TOURNAMENT_STATE, adminSession,
                 SetTournamentState.builder()
@@ -324,8 +312,6 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                         .state(state)
                         .build());
     }
-
-    static class UserInfoList extends ArrayList<UserInfo> {};
 
     @Test
     public void enlistOffline() {
@@ -341,11 +327,11 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                         .name(name)
                         .build())
                 .readEntity(Uid.class);
-        final List<UserInfo> digests = myRest().get(CATEGORY_MEMBERS + cid, UserInfoList.class);
-        assertThat(digests,
+        final CategoryInfo digests = myRest().get(
+                CATEGORY_MEMBERS + tid.getTid() + "/" + cid, CategoryInfo.class);
+        assertThat(digests.getUsers(),
                 hasItem(allOf(
                         hasProperty("name", is(name)),
-                        hasProperty("userType", is(User)),
                         hasProperty("uid", is(uid)))));
     }
 }

@@ -50,7 +50,7 @@ public class MatchResource {
     private static final String MID = "mid";
     private static final String MID_JP = "{mid}";
     public static final String MATCH_FOR_JUDGE = "/match/for-judge/";
-    private static final String MATCH_RESCORE_MATCH = "/match/rescore-match";
+    public static final String MATCH_RESCORE_MATCH = "/match/rescore-match";
 
     @Inject
     private AuthService authService;

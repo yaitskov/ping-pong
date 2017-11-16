@@ -48,6 +48,7 @@ public class DbUpdaterSql implements DbUpdater {
 
     @Override
     public void flush() {
+        log.info("*** Flush db {} queries ***", updates.size());
         final List<Query> queries = updates.stream()
                 .map(u -> {
                     u.getLogBefore().run();
@@ -63,6 +64,7 @@ public class DbUpdaterSql implements DbUpdater {
                             -> checkAffectedRows(rowsExpected, rowsUpdates, update));
         }
         clear();
+        log.info("*** Flush db {} queries is complete ***", updates.size());
     }
 
     @SneakyThrows

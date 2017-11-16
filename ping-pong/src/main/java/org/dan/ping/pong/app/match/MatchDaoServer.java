@@ -251,7 +251,7 @@ public class MatchDaoServer implements MatchDao {
                             .state(r.get(MATCHES.STATE))
                             .type(r.get(MATCHES.TYPE))
                             .loserMid(r.get(MATCHES.LOSE_MID))
-                            .level(r.get(MATCHES.LEVEL))
+                            .level(ofNullable(r.get(MATCHES.LEVEL)).orElse(0))
                             .priority(r.get(MATCHES.PRIORITY))
                             .winnerMid(r.get(MATCHES.WIN_MID))
                             .winnerId(ofNullable(r.get(MATCHES.UID_WIN)))
@@ -265,18 +265,24 @@ public class MatchDaoServer implements MatchDao {
     }
 
     @Override
-    public void deleteSets(DbUpdater batch, MatchInfo minfo, int setNumber) {
-        minfo.getParticipantIdScore().keySet().forEach(uid -> {
+    public void deleteSets(DbUpdater batch, MatchInfo mInfo, int setNumber) {
+        final int limit = mInfo.getPlayedSets() - setNumber;
+        mInfo.participants().forEach(uid -> {
+            final List<Integer> participantScore = mInfo.getParticipantScore(uid);
+            if (participantScore.isEmpty()) {
+                log.info("Uid {} in mid {} has no scores", uid, mInfo.getMid());
+                return;
+            }
             batch.exec(DbUpdateSql.builder()
-                    .mustAffectRows(NON_ZERO_ROWS)
-                    .logBefore(() -> log.info("Delete sets after {} in mid {}",
-                            setNumber, minfo.getMid()))
+                    .mustAffectRows(empty())
+                    .logBefore(() -> log.info("Delete sets after {} in mid {} for uid {}",
+                            setNumber, mInfo.getMid(), uid))
                     .query(jooq.query("delete from "
                                     + SET_SCORE.getSchema().getName() + "." + SET_SCORE.getName()
                                     + " where " + SET_SCORE.MID.getName() + " = ? and "
                                     + SET_SCORE.UID.getName() + " = ? order by "
                                     + SET_SCORE.SET_ID.getName() + " desc limit ?",
-                            minfo.getMid(), uid, minfo.getPlayedSets() - setNumber))
+                            mInfo.getMid(), uid, limit))
                     .build());
         });
     }
@@ -304,6 +310,7 @@ public class MatchDaoServer implements MatchDao {
     @Override
     public void removeScores(DbUpdater batch, Mid mid, Uid uid) {
         batch.exec(DbUpdateSql.builder()
+                .logBefore(() -> log.info("Delete all scors for mid {} uid {}", mid, uid))
                 .query(jooq.deleteFrom(SET_SCORE)
                         .where(SET_SCORE.MID.eq(mid), SET_SCORE.UID.eq(uid)))
                 .build());

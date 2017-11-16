@@ -354,8 +354,7 @@ public class TournamentResource {
         log.info("Uid {} sets status {} for tid {}", uid,
                 stateUpdate.getState(), stateUpdate.getTid());
         tournamentAccessor.update(stateUpdate.getTid(), response, (tournament, batch) -> {
-            tournament.setState(stateUpdate.getState());
-            tournamentService.setTournamentState(tournament, batch);
+            tournamentService.setTournamentState(tournament, stateUpdate.getState(), batch);
         });
     }
 

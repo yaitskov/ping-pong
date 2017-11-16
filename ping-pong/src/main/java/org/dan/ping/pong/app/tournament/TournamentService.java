@@ -340,8 +340,12 @@ public class TournamentService {
         scheduleService.participantLeave(tournament, batch, now);
     }
 
-    public void setTournamentState(TournamentMemState tournament, DbUpdater batch) {
-        tournamentDao.setState(tournament, batch);
+    public void setTournamentState(TournamentMemState tournament, TournamentState target, DbUpdater batch) {
+        log.info("Set tid {} state to {}", tournament.getTid(), tournament.getState());
+        if (tournament.getState() != target) {
+            tournament.setState(target);
+            tournamentDao.setState(tournament, batch);
+        }
     }
 
     public void setTournamentCompleteAt(TournamentMemState tournament, Instant now, DbUpdater batch) {
@@ -395,8 +399,7 @@ public class TournamentService {
         final Instant now = clocker.get();
 
         final Tid tid = tournament.getTid();
-        tournament.setState(Canceled);
-        setTournamentState(tournament, batch);
+        setTournamentState(tournament, Canceled, batch);
         setTournamentCompleteAt(tournament, clocker.get(), batch);
         scheduleService.cancelTournament(tournament, batch, now);
         matchDao.deleteAllByTid(tournament, batch, tournament.getMatches().size());
@@ -523,8 +526,7 @@ public class TournamentService {
         if (incompleteCids.isEmpty()) {
             log.info("All matches of tid {} are complete", tid);
             setTournamentCompleteAt(tournament, clocker.get(), batch);
-            tournament.setState(Close);
-            setTournamentState(tournament, batch);
+            setTournamentState(tournament, Close, batch);
             return true;
         } else {
             log.info("Tid {} is fully complete", tid);

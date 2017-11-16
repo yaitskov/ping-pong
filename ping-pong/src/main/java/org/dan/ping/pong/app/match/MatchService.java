@@ -110,7 +110,7 @@ public class MatchService {
     private ScheduleService scheduleService;
 
     public SetScoreResult scoreSet(TournamentMemState tournament, Uid uid,
-            FinalMatchScore score, Instant now, DbUpdater batch) {
+            SetScoreReq score, Instant now, DbUpdater batch) {
         tournament.getRule().getMatch().validateSet(score.getSetOrdNumber(), score.getScores());
         final MatchInfo matchInfo = tournament.getMatchById(score.getMid());
         try {
@@ -443,7 +443,7 @@ public class MatchService {
     }
 
     private void checkPermissions(TournamentMemState tournament, Uid senderUid,
-            MatchInfo matchInfo, FinalMatchScore score) {
+            MatchInfo matchInfo, SetScoreReq score) {
         final Set<Uid> scoreUids = score.getScores().stream()
                 .map(IdentifiedScore::getUid).collect(toSet());
         final Set<Uid> participantIds = matchInfo.getParticipantIdScore().keySet();

@@ -50,7 +50,7 @@ public class MatchResource {
     private static final String MID = "mid";
     private static final String MID_JP = "{mid}";
     public static final String MATCH_FOR_JUDGE = "/match/for-judge/";
-    public static final String MATCH_RESCORE_MATCH = "/match/rescore-match";
+    public static final String RESCORE_MATCH = "/match/rescore-match";
 
     @Inject
     private AuthService authService;
@@ -131,7 +131,7 @@ public class MatchResource {
     public void scoreSetAndCompleteIfWinOrLose(
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
-            FinalMatchScore score) {
+            SetScoreReq score) {
         //response.setTimeout(30, TimeUnit.SECONDS);
         final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("User {} sets scores {} for match {}",
@@ -162,7 +162,7 @@ public class MatchResource {
     private MatchEditorService matchEditorService;
 
     @POST
-    @Path(MATCH_RESCORE_MATCH)
+    @Path(RESCORE_MATCH)
     public void rescoreMatch(
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,

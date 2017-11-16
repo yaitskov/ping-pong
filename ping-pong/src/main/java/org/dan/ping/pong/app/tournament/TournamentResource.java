@@ -44,7 +44,7 @@ public class TournamentResource {
     public static final String BEGIN_TOURNAMENT = TOURNAMENT + "begin";
     public static final String CANCEL_TOURNAMENT = TOURNAMENT + "cancel";
     public static final String DRAFTING = TOURNAMENT + "drafting/";
-    public static final String MY_TOURNAMENT = TOURNAMENT + "mine/{tid}";
+    public static final String MY_TOURNAMENT = TOURNAMENT + "mine/";
     public static final String TOURNAMENT_RULES = TOURNAMENT + "rules";
     public static final String GET_TOURNAMENT_RULES = TOURNAMENT_RULES + "/";
     public static final String EDITABLE_TOURNAMENTS = TOURNAMENT + "editable/by/me";
@@ -280,7 +280,7 @@ public class TournamentResource {
     }
 
     @GET
-    @Path(MY_TOURNAMENT)
+    @Path(MY_TOURNAMENT + TID_JP)
     @Consumes(APPLICATION_JSON)
     public void getMyTournamentInfo(
             @Suspended AsyncResponse response,

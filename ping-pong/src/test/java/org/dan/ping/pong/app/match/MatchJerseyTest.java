@@ -30,7 +30,6 @@ import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
@@ -234,7 +233,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .collect(toSet()));
 
         rest.voidPost(SCORE_SET, adminSession,
-                FinalMatchScore.builder()
+                SetScoreReq.builder()
                         .tid(tid)
                         .mid(adminOpenMatches.get(0).getMid())
                         .scores(asList(
@@ -358,7 +357,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .type(Hook.AfterScore)
                         .callback((s, meta) -> {
                             myRest().voidPost(SCORE_SET, s.getPlayersSessions().get(p1),
-                                    FinalMatchScore.builder()
+                                    SetScoreReq.builder()
                                             .tid(s.getTid())
                                             .mid(meta.getOpenMatch().getMid())
                                             .scores(asList(
@@ -392,7 +391,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .type(Hook.AfterScore)
                         .callback((s, meta) -> {
                             final Response re = myRest().post(SCORE_SET, s.getPlayersSessions().get(p1),
-                                    FinalMatchScore.builder()
+                                    SetScoreReq.builder()
                                             .setOrdNumber(0)
                                             .tid(s.getTid())
                                             .mid(meta.getOpenMatch().getMid())

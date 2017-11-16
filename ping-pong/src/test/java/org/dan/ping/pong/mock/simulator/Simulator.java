@@ -27,7 +27,7 @@ import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
-import org.dan.ping.pong.app.match.FinalMatchScore;
+import org.dan.ping.pong.app.match.SetScoreReq;
 import org.dan.ping.pong.app.match.ForTestBidDao;
 import org.dan.ping.pong.app.match.ForTestMatchDao;
 import org.dan.ping.pong.app.match.IdentifiedScore;
@@ -245,7 +245,7 @@ public class Simulator {
 
     public void rescore(TournamentScenario scenario, Mid mid,
             Map<Player, List<Integer>> newScore, String checkHash) {
-        rest.voidPost(MatchResource.MATCH_RESCORE_MATCH,
+        rest.voidPost(MatchResource.RESCORE_MATCH,
                     scenario.getTestAdmin(),
                     RescoreMatch.builder().tid(scenario.getTid())
                             .mid(mid)
@@ -269,7 +269,7 @@ public class Simulator {
             return SetScoreResultName.MatchComplete;
         }
         final Response response = rest.post(SCORE_SET, testAdmin,
-                FinalMatchScore.builder()
+                SetScoreReq.builder()
                         .tid(scenario.getTid())
                         .setOrdNumber(ordNumber)
                         .mid(openMatch.getMid())
@@ -346,7 +346,7 @@ public class Simulator {
     @Inject
     private ValueGenerator valueGenerator;
 
-    private void setupEnvironment(TournamentScenario scenario) {
+    public void setupEnvironment(TournamentScenario scenario) {
         rest.voidAnonymousPost(DEV_CLEAN_SIGN_IN_TOKEN_TABLE, "");
         final String prefix = scenario.getName()
                 .orElseGet(() -> "todo")

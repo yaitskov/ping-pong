@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FinalMatchScore {
+public class SetScoreReq {
     private Tid tid;
     private Mid mid;
     private int setOrdNumber;

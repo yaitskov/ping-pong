@@ -33,10 +33,10 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     private Simulator simulator;
 
     @Test
-    public void rescoreCompleteMatchGroup2NoPlayOff() {
+    public void rescoreEndedMatchGroup2NoPlayOff() {
         MatchMetaInfo[] mm = new MatchMetaInfo[1];
         final TournamentScenario scenario = TournamentScenario.begin()
-                .name("rescoreComMtcG2PO2")
+                .name("rescoreEndedMtcG2PO2")
                 .rules(RULES_G_S3A2G11)
                 .category(c1, p1, p2)
                 .custom(game(p1, p2, 0, 11, 1, 11, 2, 11))
@@ -116,6 +116,34 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         }).build())
                 .quitsGroup(p1)
                 .champions(c1, p1);
+
+        simulator.simulate(scenario);
+    }
+
+    @Test
+    public void rescoreEndLastOpenMatchNoPlayOff3Matches() {
+        int[] c = new int[1];
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .name("rescoreEndLastOpenGrpMtchNPO3")
+                .rules(RULES_G_S3A2G11)
+                .category(c1, p1, p2, p3)
+                .custom(game(p1, p3, 11, 0, 11, 1, 11, 2))
+                .custom(game(p2, p1, 11, 0, 11, 1, 11, 2))
+                .custom(game(p3, p2, 11, 0, 11, 1, 0, 11))
+                .pause(p2, p3, PlayHook.builder()
+                        .type(Hook.BeforeScore)
+                        .callback((s, m) -> {
+                            if (++c[0] == 3) {
+                                simulator.rescore(s,
+                                        m.getOpenMatch().getMid(),
+                                        ImmutableMap.of(p3, asList(0, 0, 0),
+                                                p2, asList(11, 11, 11)),
+                                        DONT_CHECK_HASH);
+                            }
+                            return Score;
+                        }).build())
+                .quitsGroup(p2)
+                .champions(c1, p2);
 
         simulator.simulate(scenario);
     }

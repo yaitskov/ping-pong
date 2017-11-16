@@ -341,7 +341,8 @@ public class TournamentService {
     }
 
     public void setTournamentState(TournamentMemState tournament, TournamentState target, DbUpdater batch) {
-        log.info("Set tid {} state to {}", tournament.getTid(), tournament.getState());
+        log.info("Switch tid {} from state {} to {}",
+                tournament.getTid(), tournament.getState(), target);
         if (tournament.getState() != target) {
             tournament.setState(target);
             tournamentDao.setState(tournament, batch);

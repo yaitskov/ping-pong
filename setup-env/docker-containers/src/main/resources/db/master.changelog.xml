@@ -8,4 +8,5 @@
     <include relativeToChangelogFile="true" file="r1.0.004.quartz.changelog.sql"/>
     <include relativeToChangelogFile="true" file="r1.0.005.start.schema.changelog.sql"/>
     <include relativeToChangelogFile="true" file="r1.0.006.dispute.changelog.sql"/>
+    <include relativeToChangelogFile="true" file="r1.0.007.extend.user.name.length.changelog.sql"/>
 </databaseChangeLog>

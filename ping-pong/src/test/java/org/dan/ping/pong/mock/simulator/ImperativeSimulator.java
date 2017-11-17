@@ -181,6 +181,10 @@ public class ImperativeSimulator {
         return doAutoReload();
     }
 
+    public ImperativeSimulator scoreSet(Player p1, int games1, Player p2, int games2) {
+        return scoreSet(0, p1, games1, p2, games2);
+    }
+
     public ImperativeSimulator scoreSet(int set, Player p1, int games1, Player p2, int games2) {
         final Response response = myRest.post(SCORE_SET, scenario.getTestAdmin(),
                 SetScoreReq.builder()

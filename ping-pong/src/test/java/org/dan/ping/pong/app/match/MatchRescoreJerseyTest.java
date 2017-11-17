@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Arrays.asList;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Score;
@@ -168,5 +169,21 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                 .champions(c1, p2);
 
         simulator.simulate(scenario);
+    }
+
+    @Test
+    public void rescoreLastEndedMatchGroup3NoPlayOffImperative() {
+        isf.create(begin().name("rescoreLastEndedMtcG3NPOi")
+                .rules(RULES_G_S1A2G11)
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p3, 0)
+                        .scoreSet(p1, 11, p2, 1)
+                        .scoreSet(p2, 2, p3, 11)
+                        .checkResult(p1, p3, p2)
+                        .checkTournamentComplete()
+                        .rescoreMatch(p1, p3, 3, 11)
+                        .checkResult(p3, p1, p2)
+                        .checkTournamentComplete());
     }
 }

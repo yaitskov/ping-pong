@@ -9,8 +9,8 @@ import org.junit.Test;
 
 public class DisambiguationPolicyTest {
     @Test
-    public void moreCmpWinLostEqualsPunkts() {
-        final BidSuccessInGroup less = BidSuccessInGroup.builder()
+    public void moreCmpWinLostEqualsPunktsLostPlay() {
+        final BidSuccessInGroup weaker = BidSuccessInGroup.builder()
                 .finalState(BidState.Lost)
                 .punkts(2)
                 .winSets(0)
@@ -18,7 +18,7 @@ public class DisambiguationPolicyTest {
                 .winBalls(9)
                 .lostBalls(66)
                 .build();
-        final BidSuccessInGroup more = BidSuccessInGroup.builder()
+        final BidSuccessInGroup stronger = BidSuccessInGroup.builder()
                 .finalState(BidState.Play)
                 .punkts(2)
                 .winSets(3)
@@ -26,6 +26,6 @@ public class DisambiguationPolicyTest {
                 .winBalls(33)
                 .lostBalls(3)
                 .build();
-        assertThat(WIN_AND_LOSE_COMPARATOR.compare(more, less), lessThan(0));
+        assertThat(WIN_AND_LOSE_COMPARATOR.compare(stronger, weaker), lessThan(0));
     }
 }

@@ -1,7 +1,11 @@
 package org.dan.ping.pong.app.bid;
 
 public enum BidState {
-    Want, // User is willing to participate in the tournament
+    Want {
+        public int score() {
+            return 4;
+        }
+    }, // User is willing to participate in the tournament
     Paid, // once he paid for the ticket
     Here, // passed check right before the tournament
     Play {

@@ -68,15 +68,15 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
         isf.create(begin().name("rescoreEndedMtcG2PO2i")
                 .rules(RULES_G_S3A2G11)
                 .category(c1, p1, p2)).run(c -> {
-            c.beginTournament();
-            c.scoreSet(0, p1, 0, p2, 11);
-            c.scoreSet(1, p1, 1, p2, 11);
-            c.scoreSet(2, p1, 2, p2, 11);
-            c.checkResult(p2, p1);
-            c.checkTournamentComplete();
-            c.rescoreMatch(p1, p2, 11, 3, 11, 4, 11, 5);
-            c.checkResult(p1, p2);
-            c.checkTournamentComplete();
+            c.beginTournament()
+                    .scoreSet(0, p1, 0, p2, 11)
+            .scoreSet(1, p1, 1, p2, 11)
+            .scoreSet(2, p1, 2, p2, 11)
+            .checkResult(p2, p1)
+            .checkTournamentComplete()
+            .rescoreMatch(p1, p2, 11, 3, 11, 4, 11, 5)
+            .checkResult(p1, p2)
+            .checkTournamentComplete();
         });
     }
 

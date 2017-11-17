@@ -7,9 +7,10 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.match.MatchEditorService.DONT_CHECK_HASH;
-import static org.dan.ping.pong.app.match.MatchResource.RESCORE_MATCH;
 import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
+import static org.dan.ping.pong.app.match.MatchResource.RESCORE_MATCH;
 import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
+import static org.dan.ping.pong.app.tournament.SetScoreResultName.MatchContinues;
 import static org.dan.ping.pong.app.tournament.TournamentResource.MY_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.RESULT_CATEGORY;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_EXPEL;
@@ -31,6 +32,7 @@ import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
 import org.dan.ping.pong.app.match.RescoreMatch;
 import org.dan.ping.pong.app.match.SetScoreReq;
+import org.dan.ping.pong.app.match.SetScoreResult;
 import org.dan.ping.pong.app.tournament.ExpelParticipant;
 import org.dan.ping.pong.app.tournament.MyTournamentInfo;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
@@ -45,6 +47,7 @@ import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -54,6 +57,12 @@ public class ImperativeSimulator {
     private final TournamentScenario scenario;
     private final MyRest myRest;
     private final Map<Set<Player>, Mid> matchMap = new HashMap<>();
+    private boolean matchMapAutoReload;
+
+    public ImperativeSimulator autoReload() {
+        matchMapAutoReload = true;
+        return this;
+    }
 
     public void run(Consumer<ImperativeSimulator> c) {
         try {
@@ -66,13 +75,15 @@ public class ImperativeSimulator {
         }
     }
 
-    public void beginTournament() {
+    public ImperativeSimulator beginTournament() {
         restGenerator.beginTournament(scenario.getTestAdmin(), scenario.getTid());
         reloadMatchMap();
+        return this;
     }
 
-    public void checkTournamentComplete() {
+    public ImperativeSimulator checkTournamentComplete() {
         assertEquals(Close, getTournamentInfo().getState());
+        return this;
     }
 
     public MyTournamentInfo getTournamentInfo() {
@@ -92,28 +103,40 @@ public class ImperativeSimulator {
                                 "no player label for uid " + uid));
     }
 
-    public void playerQuits(Player p) {
+    public ImperativeSimulator playerQuits(Player p) {
         myRest.voidPost(TOURNAMENT_RESIGN,
                 ofNullable(scenario.getPlayersSessions().get(p))
                         .orElseThrow(
                                 () -> new RuntimeException(
                                         "no session for player " + p)),
                 scenario.getTid());
+        reloadMatchMap();
+        return this;
     }
 
-    public void expelPlayer(Player p) {
+    public ImperativeSimulator expelPlayer(Player p) {
         myRest.voidPost(TOURNAMENT_EXPEL,
                 scenario.getTestAdmin(),
                 ExpelParticipant.builder()
                         .tid(scenario.getTid())
                         .uid(scenario.player2Uid(p))
                         .build());
+        reloadMatchMap();
+        return this;
     }
 
-    public void checkResult(Player... p) {
+    private ImperativeSimulator doAutoReload() {
+        if (matchMapAutoReload) {
+            reloadMatchMap();
+        }
+        return this;
+    }
+
+    public ImperativeSimulator checkResult(Player... p) {
         assertThat(getTournamentResult().stream()
                         .map(tr -> uid2Player(tr.getUser().getUid())).collect(toList()),
                 is(asList(p)));
+        return this;
     }
 
     public List<TournamentResultEntry> getTournamentResult() {
@@ -134,7 +157,7 @@ public class ImperativeSimulator {
         return scenario.getCategoryDbId().values().iterator().next();
     }
 
-    public void rescoreMatch(Player p1, Player p2, int... games) {
+    public ImperativeSimulator rescoreMatch(Player p1, Player p2, int... games) {
         checkArgument(games.length % 2 == 0);
         List<Integer> games1 = IntStream.range(0, games.length)
                 .filter(i -> (i % 2) == 0)
@@ -155,10 +178,11 @@ public class ImperativeSimulator {
                                 scenario.player2Uid(p2),
                                 games2))
                         .build());
+        return doAutoReload();
     }
 
-    public void scoreSet(int set, Player p1, int games1, Player p2, int games2) {
-        myRest.voidPost(SCORE_SET, scenario.getTestAdmin(),
+    public ImperativeSimulator scoreSet(int set, Player p1, int games1, Player p2, int games2) {
+        final Response response = myRest.post(SCORE_SET, scenario.getTestAdmin(),
                 SetScoreReq.builder()
                         .tid(scenario.getTid())
                         .mid(resolveMid(p1, p2))
@@ -166,6 +190,11 @@ public class ImperativeSimulator {
                         .scores(asList(identifiedScore(p1, games1),
                                 identifiedScore(p2, games2)))
                         .build());
+        final SetScoreResult setScoreResult = response.readEntity(SetScoreResult.class);
+        if (setScoreResult.getScoreOutcome() == MatchContinues) {
+            return this;
+        }
+        return doAutoReload();
     }
 
     private IdentifiedScore identifiedScore(Player p1, int games1) {

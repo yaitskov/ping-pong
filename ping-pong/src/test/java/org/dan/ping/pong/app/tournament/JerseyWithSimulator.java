@@ -14,7 +14,7 @@ import org.dan.ping.pong.app.sched.ScheduleCtx;
 import org.dan.ping.pong.app.score.MatchScoreCtx;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.dan.ping.pong.app.table.TableCtx;
-import org.dan.ping.pong.mock.simulator.ImperativeSimulatorFactory;
+import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.sys.ctx.BaseTestContext;
 import org.springframework.context.annotation.Import;

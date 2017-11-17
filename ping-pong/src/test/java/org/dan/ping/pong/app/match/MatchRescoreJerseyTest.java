@@ -1,9 +1,12 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Arrays.asList;
+import static org.dan.ping.pong.app.bid.BidState.Lost;
+import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11_NP;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Score;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Skip;
@@ -13,13 +16,14 @@ import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.app.match.MatchEditorService.DONT_CHECK_HASH;
 import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
+import static org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc.restState;
 
 import com.google.common.collect.ImmutableMap;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.mock.simulator.Hook;
-import org.dan.ping.pong.mock.simulator.ImperativeSimulatorFactory;
+import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.mock.simulator.MatchMetaInfo;
 import org.dan.ping.pong.mock.simulator.PlayHook;
 import org.dan.ping.pong.mock.simulator.Simulator;
@@ -68,18 +72,25 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void rescoreEndedMatchGroup2NoPlayOffImperative() {
-        isf.create(begin().name("rescoreEndedMtcG2PO2i")
-                .rules(RULES_G_S3A2G11)
+        endedMatchGroup2NoPlayOff("rescoreEndedMtcG2PO2i", RULES_G_S3A2G11);
+    }
+
+    @Test
+    public void rescoreEndedMatchGroup2NoPlayOffImperativeNp() {
+        endedMatchGroup2NoPlayOff("rescoreEndedMtcG2PO2iNp", RULES_G_S3A2G11_NP);
+    }
+
+    private void endedMatchGroup2NoPlayOff(String name, TournamentRules rules) {
+        isf.create(begin().name(name)
+                .rules(rules)
                 .category(c1, p1, p2)).run(c -> {
             c.beginTournament()
                     .scoreSet(0, p1, 0, p2, 11)
             .scoreSet(1, p1, 1, p2, 11)
             .scoreSet(2, p1, 2, p2, 11)
-            .checkResult(p2, p1)
-            .checkTournamentComplete()
+            .checkTournamentComplete(restState(Lost).bid(p2, Win1))
             .rescoreMatch(p1, p2, 11, 3, 11, 4, 11, 5)
-            .checkResult(p1, p2)
-            .checkTournamentComplete();
+            .checkTournamentComplete(restState(Lost).bid(p1, Win1));
         });
     }
 
@@ -187,10 +198,10 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .scoreSet(p1, 11, p2, 1)
                         .scoreSet(p2, 2, p3, 11)
                         .checkResult(p1, p3, p2)
-                        .checkTournamentComplete()
+                        .checkTournamentComplete(restState(Lost).bid(p1, Win1))
                         .rescoreMatch(p1, p3, 3, 11)
                         .checkResult(p3, p1, p2)
-                        .checkTournamentComplete());
+                        .checkTournamentComplete(restState(Lost).bid(p3, Win1)));
     }
 
     @Test

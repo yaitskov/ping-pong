@@ -1,4 +1,4 @@
-package org.dan.ping.pong.mock.simulator;
+package org.dan.ping.pong.mock.simulator.imerative;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
@@ -6,6 +6,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.dan.ping.pong.app.bid.BidResource.ENLISTED_BIDS;
 import static org.dan.ping.pong.app.match.MatchEditorService.DONT_CHECK_HASH;
 import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
 import static org.dan.ping.pong.app.match.MatchResource.RESCORE_MATCH;
@@ -17,6 +18,9 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_EXP
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -25,6 +29,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.bid.ParticipantState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.IdentifiedScore;
 import org.dan.ping.pong.app.match.Mid;
@@ -38,6 +44,9 @@ import org.dan.ping.pong.app.tournament.MyTournamentInfo;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 import org.dan.ping.pong.mock.MyRest;
 import org.dan.ping.pong.mock.RestEntityGenerator;
+import org.dan.ping.pong.mock.simulator.Player;
+import org.dan.ping.pong.mock.simulator.Simulator;
+import org.dan.ping.pong.mock.simulator.TournamentScenario;
 
 import java.util.HashMap;
 import java.util.List;
@@ -81,19 +90,45 @@ public class ImperativeSimulator {
         return this;
     }
 
-    public ImperativeSimulator checkTournamentComplete() {
+    public ImperativeSimulator checkTournamentComplete(BidStatesDesc expected) {
         assertEquals(Close, getTournamentInfo().getState());
+        final OpenMatchForJudgeList openMatchForJudgeList = openMatches();
+        assertThat(openMatchForJudgeList,
+                allOf(
+                        hasProperty("progress",
+                                hasProperty("leftMatches", is(0L))),
+                        hasProperty("matches", empty())));
+        checkAllBidsState(expected);
         return this;
     }
 
     public MyTournamentInfo getTournamentInfo() {
-        return myRest.get(MY_TOURNAMENT + scenario.getTid().getTid(),
+        return myRest.get(MY_TOURNAMENT + tid(),
                 MyTournamentInfo.class);
     }
 
+    public List<ParticipantState> enlistedParticipants() {
+        return myRest.get(ENLISTED_BIDS + tid(),
+                new GenericType<List<ParticipantState>>() {});
+    }
+
+    public void checkAllBidsState(BidStatesDesc expectedPattern) {
+        final Map<Player, BidState> got = enlistedParticipants().stream()
+                .collect(toMap(p -> uid2Player(p.getUser().getUid()),
+                        ParticipantState::getState));
+        final Map<Player, BidState> expected = got.keySet().stream().collect(
+                toMap(o -> o, o -> expectedPattern.getRest()));
+        expected.putAll(expectedPattern.getSpecial());
+        assertThat(got, is(expected));
+    }
+
     public OpenMatchForJudgeList openMatches() {
-        return myRest.get(OPEN_MATCHES_FOR_JUDGE + scenario.getTid().getTid(),
+        return myRest.get(OPEN_MATCHES_FOR_JUDGE + tid(),
                 OpenMatchForJudgeList.class);
+    }
+
+    private int tid() {
+        return scenario.getTid().getTid();
     }
 
     private Player uid2Player(Uid uid) {
@@ -144,7 +179,7 @@ public class ImperativeSimulator {
     }
 
     public List<TournamentResultEntry> getTournamentResult(Integer onlyCid) {
-        return myRest.get(TOURNAMENT_RESULT + scenario.getTid().getTid()
+        return myRest.get(TOURNAMENT_RESULT + tid()
                         + RESULT_CATEGORY + onlyCid,
                 new GenericType<List<TournamentResultEntry>>() {});
 

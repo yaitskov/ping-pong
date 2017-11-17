@@ -40,6 +40,7 @@ public class BidResource {
     public static final String BID_SET_STATE = BID + "set-state";
     private static final String BID_RESULTS = BID + "results/";
     public static final String TID_SLASH_UID = "/";
+    public static final String ENLISTED_BIDS = "/bid/enlisted-to-be-checked/";
 
     @Inject
     private AuthService authService;
@@ -141,7 +142,7 @@ public class BidResource {
     }
 
     @GET
-    @Path(BID + "enlisted-to-be-checked/" + TID_JP)
+    @Path(ENLISTED_BIDS + TID_JP)
     public List<ParticipantState> enlistedToBeChecked(
             @HeaderParam(SESSION) String session,
             @PathParam(TID) Tid tid) {

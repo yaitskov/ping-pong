@@ -1,7 +1,9 @@
-package org.dan.ping.pong.mock.simulator;
+package org.dan.ping.pong.mock.simulator.imerative;
 
 import org.dan.ping.pong.mock.MyRest;
 import org.dan.ping.pong.mock.RestEntityGenerator;
+import org.dan.ping.pong.mock.simulator.Simulator;
+import org.dan.ping.pong.mock.simulator.TournamentScenario;
 
 import javax.inject.Inject;
 

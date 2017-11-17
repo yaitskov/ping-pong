@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.match;
 
 import static java.util.Arrays.asList;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Score;
@@ -16,6 +17,7 @@ import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 import com.google.common.collect.ImmutableMap;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
+import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.mock.simulator.Hook;
 import org.dan.ping.pong.mock.simulator.ImperativeSimulatorFactory;
 import org.dan.ping.pong.mock.simulator.MatchMetaInfo;
@@ -173,8 +175,12 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void rescoreLastEndedMatchGroup3NoPlayOffImperative() {
-        isf.create(begin().name("rescoreLastEndedMtcG3NPOi")
-                .rules(RULES_G_S1A2G11)
+        lastEndedMatchGroupNoPlayOff("rescoreLastEndedMtcG3NPOi", RULES_G_S1A2G11);
+    }
+
+    private void lastEndedMatchGroupNoPlayOff(String name, TournamentRules rules) {
+        isf.create(begin().name(name)
+                .rules(rules)
                 .category(c1, p1, p2, p3))
                 .run(c -> c.beginTournament()
                         .scoreSet(p1, 11, p3, 0)
@@ -185,5 +191,10 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .rescoreMatch(p1, p3, 3, 11)
                         .checkResult(p3, p1, p2)
                         .checkTournamentComplete());
+    }
+
+    @Test
+    public void rescoreLastEndedMatchGroup3NoPlayOffImperativeNp() {
+        lastEndedMatchGroupNoPlayOff("rescoreLastEndedMtcG3NPOiNp", RULES_G_S1A2G11_NP);
     }
 }

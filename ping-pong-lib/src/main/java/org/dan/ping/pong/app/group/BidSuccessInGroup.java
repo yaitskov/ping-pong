@@ -15,8 +15,8 @@ import org.dan.ping.pong.app.bid.Uid;
 @Setter
 @Getter
 @Builder
+@ToString
 @AllArgsConstructor
-@ToString(of={"uid","finalState","punkts"})
 @NoArgsConstructor(onConstructor = @__(@JsonCreator))
 public class BidSuccessInGroup {
     private Uid uid;

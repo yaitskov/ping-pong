@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.dan.ping.pong.app.group.BidSuccessInGroup;
 
 import java.util.Comparator;
@@ -14,6 +15,7 @@ import java.util.Comparator;
 @Getter
 @Setter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class CumulativeScore {

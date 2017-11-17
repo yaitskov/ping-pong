@@ -4,7 +4,11 @@ public enum BidState {
     Want, // User is willing to participate in the tournament
     Paid, // once he paid for the ticket
     Here, // passed check right before the tournament
-    Play, // participates right now in a match
+    Play {
+        public int score() {
+            return 4;
+        }
+    }, // participates right now in a match
     Rest {
         public int score() {
             return 4;

@@ -68,6 +68,7 @@ public class ImperativeSimulator {
 
     public void beginTournament() {
         restGenerator.beginTournament(scenario.getTestAdmin(), scenario.getTid());
+        reloadMatchMap();
     }
 
     public void checkTournamentComplete() {

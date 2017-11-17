@@ -1,7 +1,10 @@
 package org.dan.ping.pong.app.tournament;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.place.PlaceLink;
@@ -13,6 +16,8 @@ import java.util.Optional;
 @Setter
 @Builder
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MyTournamentInfo {
     private Tid tid;
     private String name;

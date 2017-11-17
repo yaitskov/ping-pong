@@ -10,11 +10,13 @@ import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.app.match.MatchEditorService.DONT_CHECK_HASH;
+import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 
 import com.google.common.collect.ImmutableMap;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.mock.simulator.Hook;
+import org.dan.ping.pong.mock.simulator.ImperativeSimulatorFactory;
 import org.dan.ping.pong.mock.simulator.MatchMetaInfo;
 import org.dan.ping.pong.mock.simulator.PlayHook;
 import org.dan.ping.pong.mock.simulator.Simulator;
@@ -35,7 +37,7 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void rescoreEndedMatchGroup2NoPlayOff() {
         MatchMetaInfo[] mm = new MatchMetaInfo[1];
-        final TournamentScenario scenario = TournamentScenario.begin()
+        final TournamentScenario scenario = begin()
                 .name("rescoreEndedMtcG2PO2")
                 .rules(RULES_G_S3A2G11)
                 .category(c1, p1, p2)
@@ -58,10 +60,30 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
         simulator.simulate(scenario);
     }
 
+    @Inject
+    private ImperativeSimulatorFactory isf;
+
+    @Test
+    public void rescoreEndedMatchGroup2NoPlayOffImperative() {
+        isf.create(begin().name("rescoreEndedMtcG2PO2i")
+                .rules(RULES_G_S3A2G11)
+                .category(c1, p1, p2)).run(c -> {
+            c.beginTournament();
+            c.scoreSet(0, p1, 0, p2, 11);
+            c.scoreSet(1, p1, 1, p2, 11);
+            c.scoreSet(2, p1, 2, p2, 11);
+            c.checkResult(p2, p1);
+            c.checkTournamentComplete();
+            c.rescoreMatch(p1, p2, 11, 3, 11, 4, 11, 5);
+            c.checkResult(p1, p2);
+            c.checkTournamentComplete();
+        });
+    }
+
     @Test
     public void rescoreKeepOpenGroupMatchNoPlayOff2Matches() {
         final int[] c = new int[1];
-        final TournamentScenario scenario = TournamentScenario.begin()
+        final TournamentScenario scenario = begin()
                 .name("rescoreKeepOpenMtchGrpNPO2")
                 .rules(RULES_G_S3A2G11)
                 .category(c1, p1, p2)
@@ -87,7 +109,7 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     public void rescoreCompleteNotLastMatchNoPlayOff3Matches() {
         MatchMetaInfo[] p1p2m = new MatchMetaInfo[1];
         MatchMetaInfo[] mm = new MatchMetaInfo[1];
-        final TournamentScenario scenario = TournamentScenario.begin()
+        final TournamentScenario scenario = begin()
                 .name("rescoreCompleteNotLastGrpMtchNPO3")
                 .rules(RULES_G_S3A2G11)
                 .category(c1, p1, p2, p3)
@@ -123,7 +145,7 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void rescoreEndLastOpenMatchNoPlayOff3Matches() {
         int[] c = new int[1];
-        final TournamentScenario scenario = TournamentScenario.begin()
+        final TournamentScenario scenario = begin()
                 .name("rescoreEndLastOpenGrpMtchNPO3")
                 .rules(RULES_G_S3A2G11)
                 .category(c1, p1, p2, p3)

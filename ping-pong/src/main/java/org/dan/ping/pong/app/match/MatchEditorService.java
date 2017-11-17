@@ -6,7 +6,9 @@ import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.bid.BidService.TERMINAL_RECOVERABLE_STATES;
+import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
+import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.match.MatchState.Auto;
 import static org.dan.ping.pong.app.match.MatchState.Draft;
@@ -285,15 +287,28 @@ public class MatchEditorService {
             log.info("Rescored mid {} returns to game", mInfo.getMid());
             mInfo.participants()
                     .map(tournament::getBidOrQuit)
-                    .forEach(bid -> resetBidStateTo(batch, bid, Want));
+                    .forEach(bid -> resetBidStateTo(batch, bid, Wait));
+            resetBidStatesForRestGroupParticipants(tournament, mInfo, batch);
             matchService.changeStatus(batch, mInfo, Place);
         }
+    }
+
+    private void resetBidStatesForRestGroupParticipants(TournamentMemState tournament,
+            MatchInfo mInfo, DbUpdater batch) {
+        mInfo.getGid().ifPresent(gid -> {
+            log.info("Reset rest lost bids to wait in gid {} of tid {}", gid, tournament.getTid());
+            tournament.getParticipants().values().stream()
+                    .filter(p -> p.getGid().equals(mInfo.getGid()))
+                    .filter(p -> p.getBidState() == Lost)
+                    .forEach(p -> bidService.setBidState(p, Wait, singleton(Lost), batch));
+        });
     }
 
     private void matchRescoreGivesWinner(TournamentMemState tournament, DbUpdater batch,
             MatchInfo mInfo, Optional<Uid> newWinner) {
         if (mInfo.getWinnerId().isPresent()) {
             final Set<Uid> playing = makeParticipantPlaying(tournament, batch, mInfo);
+            resetBidStatesForRestGroupParticipants(tournament, mInfo, batch);
             matchService.matchWinnerDetermined(
                     tournament, mInfo, newWinner.get(), batch, OVER_EXPECTED);
             recoverPlayingStates(tournament, batch, playing);

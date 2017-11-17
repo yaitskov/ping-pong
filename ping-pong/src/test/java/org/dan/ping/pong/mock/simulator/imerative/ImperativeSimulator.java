@@ -20,7 +20,9 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RES
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -42,6 +44,7 @@ import org.dan.ping.pong.app.match.SetScoreResult;
 import org.dan.ping.pong.app.tournament.ExpelParticipant;
 import org.dan.ping.pong.app.tournament.MyTournamentInfo;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
+import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.mock.MyRest;
 import org.dan.ping.pong.mock.RestEntityGenerator;
 import org.dan.ping.pong.mock.simulator.Player;
@@ -91,13 +94,34 @@ public class ImperativeSimulator {
     }
 
     public ImperativeSimulator checkTournamentComplete(BidStatesDesc expected) {
-        assertEquals(Close, getTournamentInfo().getState());
+        return checkTournament(Close, expected);
+    }
+
+    public ImperativeSimulator checkTournament(
+            TournamentState expectedTournamentState,
+            BidStatesDesc expected) {
+        assertEquals(expectedTournamentState, getTournamentInfo().getState());
         final OpenMatchForJudgeList openMatchForJudgeList = openMatches();
-        assertThat(openMatchForJudgeList,
-                allOf(
-                        hasProperty("progress",
-                                hasProperty("leftMatches", is(0L))),
-                        hasProperty("matches", empty())));
+        switch (expectedTournamentState) {
+            case Canceled:
+            case Close:
+            case Replaced:
+                assertThat(openMatchForJudgeList,
+                        allOf(
+                                hasProperty("progress",
+                                        hasProperty("leftMatches", is(0L))),
+                                hasProperty("matches", empty())));
+                break;
+            case Open:
+                assertThat(openMatchForJudgeList,
+                        allOf(
+                                hasProperty("progress",
+                                        hasProperty("leftMatches", greaterThan(0L))),
+                                hasProperty("matches", not(empty()))));
+                break;
+            default:
+                throw new IllegalArgumentException("state " + expectedTournamentState);
+        }
         checkAllBidsState(expected);
         return this;
     }
@@ -168,9 +192,15 @@ public class ImperativeSimulator {
     }
 
     public ImperativeSimulator checkResult(Player... p) {
-        assertThat(getTournamentResult().stream()
-                        .map(tr -> uid2Player(tr.getUser().getUid())).collect(toList()),
-                is(asList(p)));
+        final List<TournamentResultEntry> tournamentResult = getTournamentResult();
+        try {
+            assertThat(tournamentResult.stream()
+                            .map(tr -> uid2Player(tr.getUser().getUid())).collect(toList()),
+                    is(asList(p)));
+        } catch (AssertionError e) {
+            log.info("results {}", tournamentResult);
+            throw e;
+        }
         return this;
     }
 
@@ -218,6 +248,12 @@ public class ImperativeSimulator {
 
     public ImperativeSimulator scoreSet(Player p1, int games1, Player p2, int games2) {
         return scoreSet(0, p1, games1, p2, games2);
+    }
+
+    public ImperativeSimulator scoreSet3(Player p1, int games1, Player p2, int games2) {
+        return scoreSet(0, p1, games1, p2, games2)
+                .scoreSet(1, p1, games1, p2, games2)
+                .scoreSet(2, p1, games1, p2, games2);
     }
 
     public ImperativeSimulator scoreSet(int set, Player p1, int games1, Player p2, int games2) {

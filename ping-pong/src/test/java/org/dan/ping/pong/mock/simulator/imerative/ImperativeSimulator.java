@@ -8,6 +8,7 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidResource.ENLISTED_BIDS;
 import static org.dan.ping.pong.app.match.MatchEditorService.DONT_CHECK_HASH;
+import static org.dan.ping.pong.app.match.MatchResource.MATCH_RESULT;
 import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
 import static org.dan.ping.pong.app.match.MatchResource.RESCORE_MATCH;
 import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
@@ -35,6 +36,8 @@ import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.ParticipantState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.IdentifiedScore;
+import org.dan.ping.pong.app.match.MatchResult;
+import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
@@ -90,6 +93,14 @@ public class ImperativeSimulator {
     public ImperativeSimulator beginTournament() {
         restGenerator.beginTournament(scenario.getTestAdmin(), scenario.getTid());
         reloadMatchMap();
+        return this;
+    }
+
+    public ImperativeSimulator checkMatchStatus(Player p1, Player p2, MatchState state) {
+        Mid mid = resolveMid(p1, p2);
+        final MatchResult result = myRest.get(MATCH_RESULT + scenario.getTid().getTid()
+                + "/" + mid.getId(), MatchResult.class);
+        assertEquals(state, result.getState());
         return this;
     }
 
@@ -253,6 +264,11 @@ public class ImperativeSimulator {
     public ImperativeSimulator scoreSet3(Player p1, int games1, Player p2, int games2) {
         return scoreSet(0, p1, games1, p2, games2)
                 .scoreSet(1, p1, games1, p2, games2)
+                .scoreSet(2, p1, games1, p2, games2);
+    }
+
+    public ImperativeSimulator scoreSetLast2(Player p1, int games1, Player p2, int games2) {
+        return scoreSet(1, p1, games1, p2, games2)
                 .scoreSet(2, p1, games1, p2, games2);
     }
 

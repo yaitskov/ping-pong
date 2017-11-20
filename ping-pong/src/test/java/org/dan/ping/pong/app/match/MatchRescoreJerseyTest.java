@@ -9,6 +9,8 @@ import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11_NP;
+import static org.dan.ping.pong.app.match.MatchState.Game;
+import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Score;
@@ -235,5 +237,25 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void rescoreOpenLastEndedMatchGroupNoPlayOffNoPlace() {
         lastOpenLastEndedMatchGroupNoPlayOff("rescoreOpenLastEndedMtcG3NPOiNp", RULES_G_S3A2G11_NP);
+    }
+
+    @Test
+    public void rescoredMatchGetPlayStatusNoPlayOffNoPlace() {
+        isf.create(begin().name("matchGetsPlayStatusNp")
+                .rules(RULES_G_S3A2G11_NP)
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet3(p1, 11, p3, 0)
+                        .scoreSet3(p1, 11, p2, 1)
+                        .scoreSet3(p2, 2, p3, 11)
+                        .checkResult(p1, p3, p2)
+                        .rescoreMatch(p1, p3, 3, 11)
+                        .rescoreMatch(p1, p2, 3, 11)
+                        .checkMatchStatus(p1, p2, Game)
+                        .checkTournament(Open, restState(Play))
+                        .scoreSetLast2(p1, 3, p2, 11)
+                        .scoreSetLast2(p1, 3, p3, 11)
+                        .checkResult(p3, p2, p1)
+                        .checkTournamentComplete(restState(Lost).bid(p3, Win1)));
     }
 }

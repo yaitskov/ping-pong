@@ -5,12 +5,13 @@ import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
+import static org.dan.ping.pong.app.match.MatchEditorService.DONT_CHECK_HASH;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchState.Game;
-import static org.dan.ping.pong.app.tournament.TournamentState.Close;
+import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Score;
@@ -19,7 +20,6 @@ import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
-import static org.dan.ping.pong.app.match.MatchEditorService.DONT_CHECK_HASH;
 import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 import static org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc.restState;
 
@@ -28,11 +28,11 @@ import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.mock.simulator.Hook;
-import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.mock.simulator.MatchMetaInfo;
 import org.dan.ping.pong.mock.simulator.PlayHook;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
+import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -255,6 +255,27 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .checkTournament(Open, restState(Play))
                         .scoreSetLast2(p1, 3, p2, 11)
                         .scoreSetLast2(p1, 3, p3, 11)
+                        .checkResult(p3, p2, p1)
+                        .checkTournamentComplete(restState(Lost).bid(p3, Win1)));
+    }
+
+    @Test
+    public void rescoredMatchGetPlaceStatusNoPlayOff() {
+        isf.create(begin().name("matchGetsPlaceStatus")
+                .rules(RULES_G_S3A2G11)
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet3(p1, 11, p3, 0)
+                        .scoreSet3(p1, 11, p2, 1)
+                        .scoreSet3(p2, 2, p3, 11)
+                        .checkResult(p1, p3, p2)
+                        .rescoreMatch(p1, p3, 3, 11)
+                        .rescoreMatch(p1, p2, 3, 11)
+                        .checkMatchStatus(p1, p2, Place)
+                        .checkMatchStatus(p1, p3, Game)
+                        .checkTournament(Open, restState(Play).bid(p2, Wait))
+                        .scoreSetLast2(p1, 3, p3, 11)
+                        .scoreSetLast2(p1, 3, p2, 11)
                         .checkResult(p3, p2, p1)
                         .checkTournamentComplete(restState(Lost).bid(p3, Win1)));
     }

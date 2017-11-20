@@ -233,6 +233,10 @@ public class ImperativeSimulator {
         return scenario.getCategoryDbId().values().iterator().next();
     }
 
+    public ImperativeSimulator rescoreMatch3(Player p1, Player p2, int games1, int games2) {
+        return rescoreMatch(p1, p2, games1, games2, games1, games2, games1, games2);
+    }
+
     public ImperativeSimulator rescoreMatch(Player p1, Player p2, int... games) {
         checkArgument(games.length % 2 == 0);
         List<Integer> games1 = IntStream.range(0, games.length)

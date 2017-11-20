@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.match;
 import static java.util.Arrays.asList;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
+import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.match.MatchEditorService.DONT_CHECK_HASH;
@@ -11,6 +12,7 @@ import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchState.Game;
+import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
@@ -278,5 +280,22 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .scoreSetLast2(p1, 3, p2, 11)
                         .checkResult(p3, p2, p1)
                         .checkTournamentComplete(restState(Lost).bid(p3, Win1)));
+    }
+
+    @Test
+    public void rescoreWinnerWinMatchWithQuitParticipantNoPlay() {
+        isf.create(begin().name("winnerWinQuitParticipant2")
+                .rules(RULES_G_S3A2G11)
+                .category(c1, p1, p2))
+                .run(c -> c.beginTournament()
+                        .scoreSet(0, p1, 11, p2, 1)
+                        .playerQuits(p1)
+                        .checkMatchStatus(p1, p2, Over)
+                        .checkTournamentComplete(restState(Win1).bid(p1, Quit))
+                        .checkResult(p2, p1)
+                        .rescoreMatch3(p1, p2, 2, 11)
+                        .checkMatchStatus(p1, p2, Over)
+                        .checkResult(p2, p1)
+                        .checkTournamentComplete(restState(Win1).bid(p1, Quit)));
     }
 }

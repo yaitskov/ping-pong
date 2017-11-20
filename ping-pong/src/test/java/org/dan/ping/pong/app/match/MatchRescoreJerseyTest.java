@@ -283,9 +283,18 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     }
 
     @Test
-    public void rescoreWinnerWinMatchWithQuitParticipantNoPlay() {
-        isf.create(begin().name("winnerWinQuitParticipant2")
-                .rules(RULES_G_S3A2G11)
+    public void rescoreWinnerWinMatchWithQuitParticipantNoPlayOff() {
+        rescoreWinnerWinMatchWithQuiterNoPlayOff(RULES_G_S3A2G11, "winnerWinQuitParticipant2");
+    }
+
+    @Test
+    public void rescoreWinnerWinMatchWithQuitParticipantNoPlayOffNP() {
+        rescoreWinnerWinMatchWithQuiterNoPlayOff(RULES_G_S3A2G11_NP, "winnerWinQuitParticipant2Np");
+    }
+
+    private void rescoreWinnerWinMatchWithQuiterNoPlayOff(TournamentRules rules, String name) {
+        isf.create(begin().name(name)
+                .rules(rules)
                 .category(c1, p1, p2))
                 .run(c -> c.beginTournament()
                         .scoreSet(0, p1, 11, p2, 1)
@@ -298,4 +307,6 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .checkResult(p2, p1)
                         .checkTournamentComplete(restState(Win1).bid(p1, Quit)));
     }
+
+
 }

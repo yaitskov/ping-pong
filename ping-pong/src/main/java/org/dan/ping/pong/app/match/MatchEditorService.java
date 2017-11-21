@@ -266,7 +266,7 @@ public class MatchEditorService {
         final Optional<Uid> newWinner = findNewWinnerUid(tournament, newSets, mInfo);
         log.info("New winner {} in mid {}", newWinner, mInfo.getMid());
         reopenTournamentIfClosed(tournament, batch);
-        truncateSets(batch, mInfo, mInfo.getPlayedSets());
+        truncateSets(batch, mInfo, 0);
         mInfo.loadParticipants(newSets);
         matchDao.insertScores(mInfo, batch);
 
@@ -442,11 +442,16 @@ public class MatchEditorService {
 
     private void removeParticipant(TournamentMemState tournament,
             DbUpdater batch, MatchInfo mInfo, Uid uid) {
+        final int played = mInfo.getPlayedSets();
         if (!mInfo.removeParticipant(uid)) {
             log.warn("No uid {} is not in mid {}", uid, mInfo.getMid());
             return;
         }
-        matchDao.removeScores(batch, mInfo.getMid(), uid);
+        matchDao.removeScores(batch, mInfo.getMid(), uid, played);
+        mInfo.leftUid().ifPresent(ouid -> {
+            matchDao.removeScores(batch, mInfo.getMid(), ouid, played);
+            mInfo.getParticipantScore(ouid).clear();
+        });
         final int numberOfParticipants = mInfo.numberOfParticipants();
         if (numberOfParticipants == 1) {
             log.warn("Remove first uid {} from mid {}", uid, mInfo.getMid());
@@ -462,9 +467,9 @@ public class MatchEditorService {
                     matchService.changeStatus(batch, mInfo, Draft);
                     break;
             }
-            resetBidStateTo(batch, opponent, Want);
+            resetBidStateTo(batch, opponent, Wait);
             final ParticipantMemState bid = tournament.getBidOrQuit(uid);
-            resetBidStateTo(batch, bid, Want);
+            resetBidStateTo(batch, bid, Wait);
             matchDao.removeSecondParticipant(batch, mInfo.getMid(), opUid);
         } else if (numberOfParticipants == 0) {
             log.warn("Remove last uid {} from mid {}", uid, mInfo.getMid());

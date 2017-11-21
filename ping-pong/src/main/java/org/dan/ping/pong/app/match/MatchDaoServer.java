@@ -23,7 +23,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
 import ord.dan.ping.pong.jooq.tables.Users;
-import org.dan.ping.pong.app.tournament.ParticipantMemState;
+import ord.dan.ping.pong.jooq.tables.records.MatchesRecord;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.bid.Uid;
@@ -31,6 +31,7 @@ import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdateSql;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.jooq.DSLContext;
+import org.jooq.TableField;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -219,11 +220,20 @@ public class MatchDaoServer implements MatchDao {
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(NON_ZERO_ROWS)
                 .query(jooq.update(MATCHES)
-                        .set(n == 0
-                                ? MATCHES.UID_LESS
-                                : MATCHES.UID_MORE, uid)
+                        .set(pickField(n), uid)
                         .where(MATCHES.MID.eq(mid)))
                 .build());
+    }
+
+    private TableField<MatchesRecord, Uid> pickField(int n) {
+        switch (n) {
+            case 1:
+                return MATCHES.UID_LESS;
+            case 2:
+                return MATCHES.UID_MORE;
+            default:
+                throw internalError("n scouhd be 1 or 2");
+        }
     }
 
     @Override
@@ -308,9 +318,10 @@ public class MatchDaoServer implements MatchDao {
     }
 
     @Override
-    public void removeScores(DbUpdater batch, Mid mid, Uid uid) {
+    public void removeScores(DbUpdater batch, Mid mid, Uid uid, int played) {
         batch.exec(DbUpdateSql.builder()
-                .logBefore(() -> log.info("Delete all scors for mid {} uid {}", mid, uid))
+                .logBefore(() -> log.info("Delete all scores for mid {} uid {}", mid, uid))
+                .mustAffectRows(Optional.of(played))
                 .query(jooq.deleteFrom(SET_SCORE)
                         .where(SET_SCORE.MID.eq(mid), SET_SCORE.UID.eq(uid)))
                 .build());

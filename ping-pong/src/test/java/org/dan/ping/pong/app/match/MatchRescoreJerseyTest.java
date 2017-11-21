@@ -478,7 +478,7 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .scoreSet(p1, 11, p2, 1)
                         .rescoreMatch(p1, p2, 2, 11, 1, 11)
                         .checkMatchStatus(p1, p2, Game)
-                        .checkTournamentComplete(restState(Play).bid(p1, Play)));
+                        .checkTournament(Open, restState(Play).bid(p1, Play)));
     }
 
     @Test
@@ -511,5 +511,31 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void rescoreJustPlayOff2NpEndIncomplete() {
         rescoreJustPlayOff2EndIncomplete(RULES_JP_S3A2G11_NP, "JustPlayOff2NPEndIncomplete");
+    }
+
+    private void rescoreJustPlayOff4ResetForwardComplete(TournamentRules rules, String name) {
+        isf.create(begin().name(name)
+                .rules(rules)
+                .category(c1, p1, p2, p3, p4))
+                .run(c -> c.beginTournament()
+                        .scoreSet3(p1, 11, p4, 1)
+                        .scoreSet3(p2, 11, p3, 8)
+                        .scoreSet3(p1, 11, p2, 1)
+                        .rescoreMatch(p1, p4, 2, 11, 3, 11, 4, 11)
+                        .checkMatchStatus(p1, p4, Over)
+                        .checkMatchStatus(p2, p4, Game)
+                        .scoreSet3(p4, 11, p2, 6)
+                        .checkResult(p4, p2, p3, p1)
+                        .checkTournamentComplete(restState(Lost).bid(p2, Win2).bid(p4, Win1)));
+    }
+
+    @Test
+    public void rescoreJustPlayOff4ResetForwardComplete() {
+        rescoreJustPlayOff4ResetForwardComplete(RULES_JP_S3A2G11, "JustPlayOff4ResetForwardComplete");
+    }
+
+    @Test
+    public void rescoreJustPlayOff4NpResetForwardComplete() {
+        rescoreJustPlayOff4ResetForwardComplete(RULES_JP_S3A2G11_NP, "JustPlayOff4NPResetForwardComplete");
     }
 }

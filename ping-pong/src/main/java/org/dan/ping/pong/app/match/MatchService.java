@@ -80,6 +80,7 @@ public class MatchService {
 
     static final ImmutableSet<MatchState> EXPECTED_MATCH_STATES = ImmutableSet.of(Draft, Game, Place, Auto);
     private static final Set<BidState> ONLY_PLAY = singleton(Play);
+    private static final Set<BidState> PLAY_WAIT = ImmutableSet.of(Play, Wait);
 
     private static Comparator<MatchInfo> noTablesParticipantMatchComparator(
             TournamentMemState tournament, Uid uid) {
@@ -155,7 +156,7 @@ public class MatchService {
             Uid winUid, DbUpdater batch, Set<MatchState> completeMatchExStates) {
         completeMatch(mInfo, winUid, batch, completeMatchExStates);
         if (mInfo.getGid().isPresent()) {
-            tryToCompleteGroup(tournament, mInfo, batch, ONLY_PLAY);
+            tryToCompleteGroup(tournament, mInfo, batch, PLAY_WAIT);
         } else {
             completePlayOffMatch(tournament, mInfo, winUid, batch);
         }
@@ -219,7 +220,7 @@ public class MatchService {
             bidService.setBidState(winBid,
                     playOffMatchWinnerState(
                             playOffRule, mInfo),
-                    ONLY_PLAY, batch);
+                    PLAY_WAIT, batch);
         }
         mInfo.getWinnerMid().ifPresent(wMid -> assignBidToMatch(tournament, wMid, winUid, batch));
         final Uid lostUid = mInfo.getOpponentUid(winUid)
@@ -227,7 +228,7 @@ public class MatchService {
         final ParticipantMemState lostBid = tournament.getBidOrQuit(lostUid);
         if (!isPyrrhic(lostBid)) {
             bidService.setBidState(lostBid,
-                    playOffMatchLoserState(playOffRule, mInfo), ONLY_PLAY, batch);
+                    playOffMatchLoserState(playOffRule, mInfo), PLAY_WAIT, batch);
         }
         mInfo.getLoserMid().ifPresent(
                 lMid -> assignBidToMatch(tournament, lMid, lostUid, batch));

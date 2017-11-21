@@ -43,7 +43,7 @@ public interface MatchDao {
 
     void removeParticipants(DbUpdater batch, Mid mid);
 
-    void removeScores(DbUpdater batch, Mid mid, Uid uid);
+    void removeScores(DbUpdater batch, Mid mid, Uid uid, int played);
 
     void setWinnerId(MatchInfo mInfo, DbUpdater batch);
 

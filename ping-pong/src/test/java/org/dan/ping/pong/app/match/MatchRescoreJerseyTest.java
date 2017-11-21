@@ -7,11 +7,14 @@ import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
+import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.match.MatchEditorService.DONT_CHECK_HASH;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11_NP;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
@@ -385,5 +388,30 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .checkMatchStatus(p1, p2, Over)
                         .checkResult(p2, p1)
                         .checkTournamentComplete(restState(Win1).bid(p1, Expl)));
+    }
+
+    private void rescoreJustPlayOff2(TournamentRules rules, String name) {
+        isf.create(begin().name(name)
+                .rules(rules)
+                .category(c1, p1, p2))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p2, 1)
+                        .checkMatchStatus(p1, p2, Over)
+                        .checkTournamentComplete(restState(Win2).bid(p1, Win1))
+                        .checkResult(p1, p2)
+                        .rescoreMatch(p1, p2, 2, 11)
+                        .checkMatchStatus(p1, p2, Over)
+                        .checkResult(p2, p1)
+                        .checkTournamentComplete(restState(Win2).bid(p2, Win1)));
+    }
+
+    @Test
+    public void rescoreJustPlayOff2() {
+        rescoreJustPlayOff2(RULES_JP_S1A2G11, "JustPlayOff2");
+    }
+
+    @Test
+    public void rescoreJustPlayOff2Np() {
+        rescoreJustPlayOff2(RULES_JP_S1A2G11_NP, "JustPlayOff2NP");
     }
 }

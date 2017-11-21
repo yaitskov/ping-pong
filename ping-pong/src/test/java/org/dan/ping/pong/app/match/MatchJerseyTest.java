@@ -132,7 +132,9 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .build();
 
     public static final TournamentRules RULES_G_S1A2G11 = RULES_G8Q1_S1A2G11.withPlayOff(Optional.empty());
+    public static final TournamentRules RULES_JP_S1A2G11 = RULES_G8Q1_S1A2G11.withGroup(Optional.empty());
     public static final TournamentRules RULES_G_S1A2G11_NP = RULES_G_S1A2G11.withPlace(Optional.empty());
+    public static final TournamentRules RULES_JP_S1A2G11_NP = RULES_JP_S1A2G11.withPlace(Optional.empty());
 
     public static final TournamentRules RULES_G2Q1_S1A2G11_MIX = TournamentRules
             .builder()

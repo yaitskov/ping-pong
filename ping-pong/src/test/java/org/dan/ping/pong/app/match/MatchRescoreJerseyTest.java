@@ -592,4 +592,32 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     public void rescoreJustPlayOff4NpBaseMatchOfQuitSwitch() {
         rescoreJustPlayOff4BaseMatchOfQuitSwitch(RULES_JP_S3A2G11_NP, "JustPlayOff4NpBaseMatchOfQuitSwitch");
     }
+
+    private void rescoreJustPlayOff4ResetBaseToCompleteToIncomplete(TournamentRules rules, String name) {
+        isf.create(begin().name(name)
+                .rules(rules)
+                .category(c1, p1, p2, p3, p4))
+                .run(c -> c.beginTournament()
+                        .scoreSet3(p1, 11, p4, 1)
+                        .scoreSet3(p2, 11, p3, 4)
+                        .scoreSet3(p1, 11, p2, 1)
+                        .rescoreMatch(p1, p4, 9, 11)
+                        .checkMatchStatus(p1, p4, Game)
+                        .checkTournament(Open, restState(Play).bid(p3, Lost).bid(p2, Wait))
+                        .scoreSetLast2(p1, 9, p4, 11)
+                        .checkMatchStatus(p2, p4, Game)
+                        .checkTournament(Open, restState(Play).bid(p3, Lost).bid(p1, Lost)));
+    }
+
+    @Test
+    public void rescoreJustPlayOff4ResetBaseToCompleteToIncomplete() {
+        rescoreJustPlayOff4ResetBaseToCompleteToIncomplete(
+                RULES_JP_S3A2G11, "JstPlOf4RstBaseToCompleteIncomplete");
+    }
+
+    @Test
+    public void rescoreJustPlayOff4NpResetBaseToCompleteToIncomplete() {
+        rescoreJustPlayOff4ResetBaseToCompleteToIncomplete(
+                RULES_JP_S3A2G11_NP, "JstPlOf4NpRstBaseToCompleteIncomplete");
+    }
 }

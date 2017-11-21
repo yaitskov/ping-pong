@@ -27,6 +27,7 @@ import static org.dan.ping.pong.mock.simulator.HookDecision.Skip;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
+import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 import static org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc.restState;
@@ -467,5 +468,48 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void rescoreJustPlayOff2NpExplBetter() {
         rescoreJustPlayOff2ExplBetter(RULES_JP_S3A2G11_NP, "JustPlayOff2QuitBetterNP");
+    }
+
+    private void rescoreJustPlayOff2KeepIncomplete(TournamentRules rules, String name) {
+        isf.create(begin().name(name)
+                .rules(rules)
+                .category(c1, p1, p2))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p2, 1)
+                        .rescoreMatch(p1, p2, 2, 11, 1, 11)
+                        .checkMatchStatus(p1, p2, Game)
+                        .checkTournamentComplete(restState(Play).bid(p1, Play)));
+    }
+
+    @Test
+    public void rescoreJustPlayOff2KeepIncomplete() {
+        rescoreJustPlayOff2KeepIncomplete(RULES_JP_S3A2G11, "JustPlayOff2KeepIncomplete");
+    }
+
+    @Test
+    public void rescoreJustPlayOff2NpKeepIncomplete() {
+        rescoreJustPlayOff2KeepIncomplete(RULES_JP_S3A2G11_NP, "JustPlayOff2NPKeepIncomplete");
+    }
+
+    private void rescoreJustPlayOff2EndIncomplete(TournamentRules rules, String name) {
+        isf.create(begin().name(name)
+                .rules(rules)
+                .category(c1, p1, p2))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p2, 1)
+                        .rescoreMatch(p1, p2, 2, 11, 1, 11, 11, 0, 11, 13)
+                        .checkMatchStatus(p1, p2, Over)
+                        .checkResult(p2, p1)
+                        .checkTournamentComplete(restState(Win2).bid(p2, Win1)));
+    }
+
+    @Test
+    public void rescoreJustPlayOff2EndIncomplete() {
+        rescoreJustPlayOff2EndIncomplete(RULES_JP_S3A2G11, "JustPlayOff2EndIncomplete");
+    }
+
+    @Test
+    public void rescoreJustPlayOff2NpEndIncomplete() {
+        rescoreJustPlayOff2EndIncomplete(RULES_JP_S3A2G11_NP, "JustPlayOff2NPEndIncomplete");
     }
 }

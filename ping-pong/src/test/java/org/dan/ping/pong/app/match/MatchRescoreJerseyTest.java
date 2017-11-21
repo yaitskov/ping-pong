@@ -15,6 +15,8 @@ import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11_NP;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S3A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S3A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
@@ -413,5 +415,31 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void rescoreJustPlayOff2Np() {
         rescoreJustPlayOff2(RULES_JP_S1A2G11_NP, "JustPlayOff2NP");
+    }
+
+    private void rescoreJustPlayOff2QuitBetter(TournamentRules rules, String name) {
+        isf.create(begin().name(name)
+                .rules(rules)
+                .category(c1, p1, p2))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p2, 1)
+                        .playerQuits(p1)
+                        .checkMatchStatus(p1, p2, Over)
+                        .checkTournamentComplete(restState(Win1).bid(p1, Win2))
+                        .checkResult(p2, p1)
+                        .rescoreMatch3(p1, p2, 2, 11)
+                        .checkMatchStatus(p1, p2, Over)
+                        .checkResult(p2, p1)
+                        .checkTournamentComplete(restState(Win1).bid(p1, Win2)));
+    }
+
+    @Test
+    public void rescoreJustPlayOff2QuitBetter() {
+        rescoreJustPlayOff2QuitBetter(RULES_JP_S3A2G11, "JustPlayOffQuitBetter2");
+    }
+
+    @Test
+    public void rescoreJustPlayOff2NpQuitBetter() {
+        rescoreJustPlayOff2QuitBetter(RULES_JP_S3A2G11_NP, "JustPlayOff2QuitBetterNP");
     }
 }

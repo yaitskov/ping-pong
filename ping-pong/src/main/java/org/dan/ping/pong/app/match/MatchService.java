@@ -225,7 +225,7 @@ public class MatchService {
         final Uid lostUid = mInfo.getOpponentUid(winUid)
                 .orElseThrow(() -> internalError("no opponent in match " + mInfo.getMid()));
         final ParticipantMemState lostBid = tournament.getBidOrQuit(lostUid);
-        if (!isPyrrhic(winBid)) {
+        if (!isPyrrhic(lostBid)) {
             bidService.setBidState(lostBid,
                     playOffMatchLoserState(playOffRule, mInfo), ONLY_PLAY, batch);
         }

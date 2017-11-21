@@ -363,7 +363,6 @@ public class MatchService {
     public void assignBidToMatch(TournamentMemState tournament, Mid mid, Uid uid, DbUpdater batch) {
         log.info("Assign uid {} to mid {} in tid {}", uid, mid, tournament.getTid());
         final MatchInfo mInfo = tournament.getMatchById(mid);
-        mInfo.checkParticipantSpace();
         if (mInfo.addParticipant(uid)) {
             log.info("Match is already complete and doesn't requires to be rescored");
             return;

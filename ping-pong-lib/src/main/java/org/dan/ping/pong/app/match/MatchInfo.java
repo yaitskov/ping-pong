@@ -95,6 +95,7 @@ public class MatchInfo {
                 log.warn("ReAdd uid {} to mid {}. Allowed for rescore", mid, uid);
                 return true;
             }
+            checkParticipantSpace();
             participantIdScore.put(uid, new ArrayList<>());
         }
         return false;

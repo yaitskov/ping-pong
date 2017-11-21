@@ -538,4 +538,28 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     public void rescoreJustPlayOff4NpResetForwardComplete() {
         rescoreJustPlayOff4ResetForwardComplete(RULES_JP_S3A2G11_NP, "JustPlayOff4NPResetForwardComplete");
     }
+
+    private void rescoreJustPlayOff4KeepForwardComplete(TournamentRules rules, String name) {
+        isf.create(begin().name(name)
+                .rules(rules)
+                .category(c1, p1, p2, p3, p4))
+                .run(c -> c.beginTournament()
+                        .scoreSet3(p1, 11, p4, 1)
+                        .scoreSet3(p2, 11, p3, 4)
+                        .scoreSet3(p1, 11, p2, 1)
+                        .rescoreMatch(p4, p1, 9, 11, 9, 11, 9, 11)
+                        .checkMatchStatus(p1, p4, Over)
+                        .checkResult(p1, p2, p4, p3)
+                        .checkTournamentComplete(restState(Lost).bid(p2, Win2).bid(p1, Win1)));
+    }
+
+    @Test
+    public void rescoreJustPlayOff4KeepForwardComplete() {
+        rescoreJustPlayOff4KeepForwardComplete(RULES_JP_S3A2G11, "JustPlayOff4KeepForwardComplete");
+    }
+
+    @Test
+    public void rescoreJustPlayOff4NpKeepForwardComplete() {
+        rescoreJustPlayOff4KeepForwardComplete(RULES_JP_S3A2G11_NP, "JustPlayOff4NPKeepForwardComplete");
+    }
 }

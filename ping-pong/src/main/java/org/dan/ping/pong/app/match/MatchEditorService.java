@@ -9,7 +9,6 @@ import static org.dan.ping.pong.app.bid.BidService.TERMINAL_RECOVERABLE_STATES;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
-import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.match.MatchState.Auto;
 import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
@@ -41,7 +40,7 @@ import org.dan.ping.pong.util.time.Clocker;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -265,7 +264,7 @@ public class MatchEditorService {
 
         final Optional<Uid> newWinner = findNewWinnerUid(tournament, newSets, mInfo);
         log.info("New winner {} in mid {}", newWinner, mInfo.getMid());
-        reopenTournamentIfClosed(tournament, batch);
+        reopenTournamentIfClosed(tournament, batch, affectedMatches, newWinner);
         truncateSets(batch, mInfo, 0);
         mInfo.loadParticipants(newSets);
         matchDao.insertScores(mInfo, batch);
@@ -273,7 +272,7 @@ public class MatchEditorService {
         resetMatches(tournament, batch, affectedMatches);
 
         if (newWinner.isPresent()) {
-            matchRescoreGivesWinner(tournament, batch, mInfo, newWinner);
+            matchRescoreGivesWinner(tournament, batch, mInfo, newWinner, affectedMatches);
         } else {
             matchRescoreNoWinner(tournament, batch, mInfo);
         }
@@ -305,13 +304,19 @@ public class MatchEditorService {
     }
 
     private void matchRescoreGivesWinner(TournamentMemState tournament, DbUpdater batch,
-            MatchInfo mInfo, Optional<Uid> newWinner) {
+            MatchInfo mInfo, Optional<Uid> newWinner, List<MatchUid> affectedMatches) {
         if (mInfo.getWinnerId().isPresent()) {
-            final Set<Uid> playing = makeParticipantPlaying(tournament, batch, mInfo);
-            resetBidStatesForRestGroupParticipants(tournament, mInfo, batch);
+            final Map<Uid, BidState> playing = makeParticipantPlaying(tournament, batch, mInfo);
+            if (!affectedMatches.isEmpty()) {
+                mInfo.getGid().ifPresent(gid -> log.info("Reset bid states in group {}", gid));
+                resetBidStatesForRestGroupParticipants(tournament, mInfo, batch);
+            }
             matchService.matchWinnerDetermined(
                     tournament, mInfo, newWinner.get(), batch, OVER_EXPECTED);
-            recoverPlayingStates(tournament, batch, playing);
+            if (affectedMatches.isEmpty()) {
+                mInfo.getGid().ifPresent(gid -> log.info("Recover bid states {}", gid));
+                recoverPlayingStates(tournament, batch, playing);
+            }
         } else { // was playing
             log.info("Rescored mid {} is complete", mInfo.getMid());
             matchService.matchWinnerDetermined(
@@ -319,24 +324,35 @@ public class MatchEditorService {
         }
     }
 
-    private Set<Uid> makeParticipantPlaying(TournamentMemState tournament, DbUpdater batch, MatchInfo mInfo) {
-        Set<Uid> playing = new HashSet<>();
+    private Map<Uid, BidState> makeParticipantPlaying(TournamentMemState tournament,
+            DbUpdater batch, MatchInfo mInfo) {
+        Map<Uid, BidState> states = new HashMap<>();
         mInfo.participants()
                 .map(tournament::getBidOrQuit)
-                .peek(bid -> { if (bid.getState() == Play) {  playing.add(bid.getUid()); } })
-                .forEach(bid -> resetBidStateTo(batch, bid, Play));
-        return playing;
+                .peek(bid -> states.put(bid.getUid(), bid.getState()))
+                .forEach(bid -> {
+                    if (bid.getState() != Play) {
+                        resetBidStateTo(batch, bid, Play);
+                    }
+                });
+        return states;
     }
 
-    private void recoverPlayingStates(TournamentMemState tournament, DbUpdater batch, Set<Uid> playing) {
-        playing.stream()
-                .map(tournament::getBidOrQuit)
-                .forEach(bid -> bidService.setBidState(bid, Play, singleton(bid.getState()), batch));
+    private void recoverPlayingStates(TournamentMemState tournament, DbUpdater batch,
+            Map<Uid, BidState> playing) {
+        playing.entrySet()
+                .forEach(e -> {
+                    final ParticipantMemState bid = tournament.getBidOrQuit(e.getKey());
+                    bidService.setBidState(bid, e.getValue(), singleton(bid.getState()), batch);
+                });
     }
 
-    private void reopenTournamentIfClosed(TournamentMemState tournament, DbUpdater batch) {
+    private void reopenTournamentIfClosed(TournamentMemState tournament, DbUpdater batch,
+            List<MatchUid> affectedMatches, Optional<Uid> newWinner) {
         if (tournament.getState() == Close) {
-            tournamentService.setTournamentState(tournament, Open, batch);
+            if (!affectedMatches.isEmpty() || !newWinner.isPresent()) {
+                tournamentService.setTournamentState(tournament, Open, batch);
+            }
         }
     }
 
@@ -427,7 +443,7 @@ public class MatchEditorService {
 
         resetMatches(tournament, batch, affectedMatches);
 
-        reopenTournamentIfClosed(tournament, batch);
+        reopenTournamentIfClosed(tournament, batch, affectedMatches, Optional.empty());
         scheduleService.afterMatchComplete(tournament, batch, clocker.get());
     }
 

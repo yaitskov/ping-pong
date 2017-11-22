@@ -648,4 +648,31 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
         rescoreJustPlayOff4ResetBaseToIncomplete(
                 RULES_JP_S3A2G11_NP, "JstPlOf4NpRstBaseToIncomplete");
     }
+
+    private void rescoreJustPlayOff4ChangeBaseCompleteWhenFinalExpl(TournamentRules rules, String name) {
+        isf.create(begin().name(name)
+                .rules(rules)
+                .category(c1, p1, p2, p3, p4))
+                .run(c -> c.beginTournament()
+                        .scoreSet3(p1, 11, p4, 1)
+                        .scoreSet3(p2, 11, p3, 4)
+                        .scoreSet(p1, 11, p2, 1)
+                        .expelPlayer(p2)
+                        .rescoreMatch3(p1, p4, 9, 11)
+                        .checkMatchStatus(p1, p4, Over)
+                        .checkMatchStatus(p1, p2, Over)
+                        .checkTournamentComplete(restState(Lost).bid(p2, Expl).bid(p4, Win1)));
+    }
+
+    @Test
+    public void rescoreJustPlayOff4ChangeBaseCompleteWhenFinalExpl() {
+        rescoreJustPlayOff4ChangeBaseCompleteWhenFinalExpl(
+                RULES_JP_S3A2G11, "JstPlOf4ChngBaseCmpltFinalExpl");
+    }
+
+    @Test
+    public void rescoreJustPlayOff4NpChangeBaseCompleteWhenFinalExpl() {
+        rescoreJustPlayOff4ChangeBaseCompleteWhenFinalExpl(
+                RULES_JP_S3A2G11_NP, "JstPlOf4NpChngBaseCmpltFinalExpl");
+    }
 }

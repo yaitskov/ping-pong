@@ -81,7 +81,6 @@ public class MatchService {
             .thenComparing(MatchInfo::getMid);
 
     static final ImmutableSet<MatchState> EXPECTED_MATCH_STATES = ImmutableSet.of(Draft, Game, Place, Auto);
-    private static final Set<BidState> ONLY_PLAY = singleton(Play);
     private static final Set<BidState> PLAY_WAIT = ImmutableSet.of(Play, Wait);
 
     private static Comparator<MatchInfo> noTablesParticipantMatchComparator(
@@ -390,6 +389,7 @@ public class MatchService {
             bidService.setBidState(bid,
                     stateF.apply(tournament.getRule().getPlayOff().get(), mInfo),
                     singleton(bid.getBidState()), batch);
+            tournamentService.endOfTournamentCategory(tournament, bid.getCid(), batch);
         }
     }
 
@@ -403,9 +403,8 @@ public class MatchService {
             }
         } else {
             if (isPyrrhic(bid)) {
-                mInfo.getLoserMid().ifPresent(lMid -> {
-                    nextMatch(tournament.getMatchById(lMid), tournament, batch, uid);
-                });
+                mInfo.getLoserMid().ifPresent(
+                        lMid -> nextMatch(tournament.getMatchById(lMid), tournament, batch, uid));
             } else {
                 bidService.setBidState(bid, Wait, singletonList(bid.getBidState()), batch);
             }
@@ -461,10 +460,12 @@ public class MatchService {
             case Brnz:
                 checkSinkMatch(mInfo);
                 bidService.setBidState(tournament.getBidOrQuit(winUid), Win3, asList(Play, Wait, Rest), batch);
+                tournamentService.endOfTournamentCategory(tournament, mInfo.getCid(), batch);
                 break;
             case Gold:
                 checkSinkMatch(mInfo);
                 bidService.setBidState(tournament.getBidOrQuit(winUid), Win1, asList(Play, Wait, Rest), batch);
+                tournamentService.endOfTournamentCategory(tournament, mInfo.getCid(), batch);
                 break;
             case POff:
                 mInfo.getWinnerMid()

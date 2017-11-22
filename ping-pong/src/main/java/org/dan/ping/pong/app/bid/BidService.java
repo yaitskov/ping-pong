@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
+import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
@@ -35,7 +36,7 @@ import javax.inject.Inject;
 @Slf4j
 public class BidService {
     public static final List<BidState> WIN_STATES = asList(Win1, Win2, Win3);
-    public static final Set<BidState> TERMINAL_RECOVERABLE_STATES = ImmutableSet.of(Win1, Win2, Win3, Lost);
+    public static final Set<BidState> TERMINAL_RECOVERABLE_STATES = ImmutableSet.of(Win1, Win2, Win3, Lost, Play);
 
     @Inject
     private BidDao bidDao;

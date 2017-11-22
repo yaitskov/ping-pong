@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.match;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -66,6 +67,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -256,7 +258,9 @@ public class MatchService {
         uids.stream()
                 .map(tournament::getBidOrQuit)
                 .filter(b -> expected.contains(b.getState()))
-                .forEach(b -> bidService.setBidState(b, Wait, expected, batch));
+                .forEach(b -> bidService.setBidState(b,
+                        completeGroupMatchBidState(tournament, b),
+                        expected, batch));
         if (completedMatches < matches.size()) {
             log.debug("Matches {} left to play in the group {}",
                     matches.size() - completedMatches, gid);
@@ -266,6 +270,15 @@ public class MatchService {
                 tournament,
                 completeGroup(gid, tournament, matches, batch),
                 batch);
+    }
+
+    public BidState completeGroupMatchBidState(TournamentMemState tournament, ParticipantMemState b) {
+        if (b.getGid().map(gid ->
+                tournament.participantMatches(b.getUid())
+                        .anyMatch(m -> m.getState() == Game && m.getGid().equals(b.getGid()))).orElse(false)) {
+            return Play;
+        }
+        return Wait;
     }
 
     private void completeParticipationLeftBids(TournamentMemState tournament,
@@ -360,11 +373,51 @@ public class MatchService {
                 || quitOrExpl.contains(bid.getState());
     }
 
+    private void nextMatch(MatchInfo mInfo, TournamentMemState tournament, DbUpdater batch, Uid uid) {
+        if (mInfo.hasParticipant(uid)) {
+            bidRewalksLadder(tournament, mInfo, batch, uid);
+        } else {
+            throw internalError("no participant "
+                    + uid + " in mid " + mInfo.getMid());
+        }
+    }
+
+    private void nextMatch(TournamentMemState tournament, Optional<Mid> nMid,
+            MatchInfo mInfo, DbUpdater batch, Uid uid, BiFunction<PlayOffRule, MatchInfo, BidState> stateF) {
+        final ParticipantMemState bid = tournament.getBidOrQuit(uid);
+        nMid.ifPresent(wMid -> nextMatch(tournament.getMatchById(wMid), tournament, batch, uid));
+        if (!nMid.isPresent()) {
+            bidService.setBidState(bid,
+                    stateF.apply(tournament.getRule().getPlayOff().get(), mInfo),
+                    singleton(bid.getBidState()), batch);
+        }
+    }
+
+    private void bidRewalksLadder(TournamentMemState tournament, MatchInfo mInfo, DbUpdater batch, Uid uid) {
+        final ParticipantMemState bid = tournament.getBidOrQuit(uid);
+        if (mInfo.getWinnerId().isPresent()) {
+            if (mInfo.getWinnerId().equals(Optional.of(uid))) {
+                nextMatch(tournament, mInfo.getWinnerMid(), mInfo, batch, uid, this::playOffMatchWinnerState);
+            } else {
+                nextMatch(tournament, mInfo.getLoserMid(), mInfo, batch, uid, this::playOffMatchLoserState);
+            }
+        } else {
+            if (isPyrrhic(bid)) {
+                mInfo.getLoserMid().ifPresent(lMid -> {
+                    nextMatch(tournament.getMatchById(lMid), tournament, batch, uid);
+                });
+            } else {
+                bidService.setBidState(bid, Wait, singletonList(bid.getBidState()), batch);
+            }
+        }
+    }
+
     public void assignBidToMatch(TournamentMemState tournament, Mid mid, Uid uid, DbUpdater batch) {
         log.info("Assign uid {} to mid {} in tid {}", uid, mid, tournament.getTid());
         final MatchInfo mInfo = tournament.getMatchById(mid);
         if (mInfo.addParticipant(uid)) {
             log.info("Match is already complete and doesn't requires to be rescored");
+            bidRewalksLadder(tournament, mInfo, batch, uid);
             return;
         }
         matchDao.setParticipant(mInfo.numberOfParticipants(), mInfo.getMid(), uid, batch);

@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.app.bid.BidState.Lost;
-import static org.dan.ping.pong.app.bid.BidState.Quit;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +26,10 @@ public class ParticipantMemState {
     private String name;
     private Instant enlistedAt;
     private Instant updatedAt;
+
+    public static class ParticipantMemStateBuilder {
+        Optional<Integer> gid = Optional.empty();
+    }
 
     public String toString() {
         return "bid(" + uid + ", " + tid + ", " + cid + ")";

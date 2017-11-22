@@ -703,4 +703,32 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
         rescoreJustPlayOff4KeepBaseCompleteWhenFinalExpl(
                 RULES_JP_S3A2G11_NP, "JstPlOf4NpKeepBaseCmpltFinalExpl");
     }
+
+    private void rescoreJustPlayOff4KeepBaseCompleteWhenFinalExplRight(TournamentRules rules, String name) {
+        isf.create(begin().name(name)
+                .rules(rules)
+                .category(c1, p1, p2, p3, p4))
+                .run(c -> c.beginTournament()
+                        .scoreSet3(p1, 11, p4, 1)
+                        .scoreSet3(p2, 11, p3, 4)
+                        .checkMatchStatus(p1, p2, Game)
+                        .expelPlayer(p2)
+                        .rescoreMatch3(p1, p4, 11, 9)
+                        .checkMatchStatus(p1, p4, Over)
+                        .checkMatchStatus(p1, p2, Over)
+                        .checkResult(p1, p4, p3, p2)
+                        .checkTournamentComplete(restState(Lost).bid(p2, Expl).bid(p1, Win1)));
+    }
+
+    @Test
+    public void rescoreJustPlayOff4KeepBaseCompleteWhenFinalExplRight() {
+        rescoreJustPlayOff4KeepBaseCompleteWhenFinalExplRight(
+                RULES_JP_S3A2G11, "JstPlOf4ChngKeepCmpltFinalExplRight");
+    }
+
+    @Test
+    public void rescoreJustPlayOff4NpKeepBaseCompleteWhenFinalExplRight() {
+        rescoreJustPlayOff4KeepBaseCompleteWhenFinalExplRight(
+                RULES_JP_S3A2G11_NP, "JstPlOf4NpKeepBaseCmpltFinalExplRight");
+    }
 }

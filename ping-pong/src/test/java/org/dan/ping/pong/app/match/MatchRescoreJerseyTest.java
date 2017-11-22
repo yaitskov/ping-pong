@@ -660,7 +660,7 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .expelPlayer(p2)
                         .rescoreMatch3(p1, p4, 9, 11)
                         .checkMatchStatus(p1, p4, Over)
-                        .checkMatchStatus(p1, p2, Over)
+                        .checkMatchStatus(p1 /*as p4*/, p2, Over)
                         .checkTournamentComplete(restState(Lost).bid(p2, Expl).bid(p4, Win1)));
     }
 
@@ -674,5 +674,33 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     public void rescoreJustPlayOff4NpChangeBaseCompleteWhenFinalExpl() {
         rescoreJustPlayOff4ChangeBaseCompleteWhenFinalExpl(
                 RULES_JP_S3A2G11_NP, "JstPlOf4NpChngBaseCmpltFinalExpl");
+    }
+
+    private void rescoreJustPlayOff4KeepBaseCompleteWhenFinalExpl(TournamentRules rules, String name) {
+        isf.create(begin().name(name)
+                .rules(rules)
+                .category(c1, p1, p2, p3, p4))
+                .run(c -> c.beginTournament()
+                        .scoreSet3(p1, 11, p4, 1)
+                        .scoreSet3(p2, 11, p3, 4)
+                        .scoreSet(p1, 11, p2, 1)
+                        .expelPlayer(p2)
+                        .rescoreMatch3(p1, p4, 11, 9)
+                        .checkMatchStatus(p1, p4, Over)
+                        .checkMatchStatus(p1, p2, Over)
+                        .checkResult(p1, p4, p3, p2)
+                        .checkTournamentComplete(restState(Lost).bid(p2, Expl).bid(p1, Win1)));
+    }
+
+    @Test
+    public void rescoreJustPlayOff4KeepBaseCompleteWhenFinalExpl() {
+        rescoreJustPlayOff4KeepBaseCompleteWhenFinalExpl(
+                RULES_JP_S3A2G11, "JstPlOf4ChngKeepCmpltFinalExpl");
+    }
+
+    @Test
+    public void rescoreJustPlayOff4NpKeepBaseCompleteWhenFinalExpl() {
+        rescoreJustPlayOff4KeepBaseCompleteWhenFinalExpl(
+                RULES_JP_S3A2G11_NP, "JstPlOf4NpKeepBaseCmpltFinalExpl");
     }
 }

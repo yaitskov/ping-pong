@@ -58,6 +58,7 @@ import org.dan.ping.pong.app.tournament.TournamentProgress;
 import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.sys.db.DbUpdater;
+import org.dan.ping.pong.util.TriFunc;
 import org.dan.ping.pong.util.time.Clocker;
 
 import java.time.Instant;
@@ -173,13 +174,20 @@ public class MatchService {
         matchDao.completeMatch(mInfo.getMid(), winUid, now, batch, expectedMatchStates);
     }
 
-    private BidState playOffMatchWinnerState(PlayOffRule playOff, MatchInfo mInfo) {
+    private BidState playOffMatchWinnerState(PlayOffRule playOff, MatchInfo mInfo,
+            ParticipantMemState bid) {
         switch (mInfo.getType()) {
             case Gold:
+                if (bid.getBidState() == Expl) {
+                    return Expl;
+                }
                 return Win1;
             case Brnz:
                 switch (playOff.getLosings()) {
                     case 1:
+                        if (bid.getBidState() == Expl) {
+                            return Expl;
+                        }
                         return Win3;
                     case 2:
                         return Wait;
@@ -193,9 +201,12 @@ public class MatchService {
         }
     }
 
-    private BidState playOffMatchLoserState(PlayOffRule playOff, MatchInfo mInfo) {
+    private BidState playOffMatchLoserState(PlayOffRule playOff, MatchInfo mInfo, ParticipantMemState bid) {
         switch (mInfo.getType()) {
             case Gold:
+                if (bid.getBidState() == Expl) {
+                    return Expl;
+                }
                 return Win2;
             case Brnz:
                 switch (playOff.getLosings()) {
@@ -219,8 +230,7 @@ public class MatchService {
         final ParticipantMemState winBid = tournament.getBidOrQuit(winUid);
         if (!isPyrrhic(winBid)) {
             bidService.setBidState(winBid,
-                    playOffMatchWinnerState(
-                            playOffRule, mInfo),
+                    playOffMatchWinnerState(playOffRule, mInfo, winBid),
                     PLAY_WAIT, batch);
         }
         mInfo.getWinnerMid().ifPresent(wMid -> assignBidToMatch(tournament, wMid, winUid, batch));
@@ -229,7 +239,7 @@ public class MatchService {
         final ParticipantMemState lostBid = tournament.getBidOrQuit(lostUid);
         if (!isPyrrhic(lostBid)) {
             bidService.setBidState(lostBid,
-                    playOffMatchLoserState(playOffRule, mInfo), PLAY_WAIT, batch);
+                    playOffMatchLoserState(playOffRule, mInfo, lostBid), PLAY_WAIT, batch);
         }
         mInfo.getLoserMid().ifPresent(
                 lMid -> assignBidToMatch(tournament, lMid, lostUid, batch));
@@ -382,12 +392,13 @@ public class MatchService {
     }
 
     private void nextMatch(TournamentMemState tournament, Optional<Mid> nMid,
-            MatchInfo mInfo, DbUpdater batch, Uid uid, BiFunction<PlayOffRule, MatchInfo, BidState> stateF) {
+            MatchInfo mInfo, DbUpdater batch, Uid uid,
+            TriFunc<PlayOffRule, MatchInfo, ParticipantMemState, BidState> stateF) {
         final ParticipantMemState bid = tournament.getBidOrQuit(uid);
         nMid.ifPresent(wMid -> nextMatch(tournament.getMatchById(wMid), tournament, batch, uid));
         if (!nMid.isPresent()) {
             bidService.setBidState(bid,
-                    stateF.apply(tournament.getRule().getPlayOff().get(), mInfo),
+                    stateF.apply(tournament.getRule().getPlayOff().get(), mInfo, bid),
                     singleton(bid.getBidState()), batch);
             tournamentService.endOfTournamentCategory(tournament, bid.getCid(), batch);
         }

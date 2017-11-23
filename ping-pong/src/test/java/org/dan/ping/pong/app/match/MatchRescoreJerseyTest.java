@@ -14,9 +14,13 @@ import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11_3P;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11_NP;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11_NP_3P;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S3A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S3A2G11_3P;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S3A2G11_NP;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S3A2G11_NP_3P;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
@@ -729,7 +733,7 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void rescoreJustPlayOff4NpKeepBaseCompleteWhenFinalExplRight() {
         rescoreJustPlayOff4KeepBaseCompleteWhenFinalExplRight(
-                RULES_JP_S3A2G11_NP, "JstPlOf4NpKeepBaseCmpltFinalExplRight");
+                RULES_JP_S3A2G11_NP, "JstPlOf4NpKeepBaseCmpltFnlExplRght");
     }
 
     private void rescoreJustPlayOff4BaseExpl(TournamentRules rules, String name) {
@@ -746,7 +750,7 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .checkMatchStatus(p1, p4, Over)
                         .checkMatchStatus(p1, p2, Over)
                         .checkResult(p2, p4, p3, p1)
-                        .checkTournamentComplete(restState(Lost).bid(p1, Expl).bid(p1, Win1)));
+                        .checkTournamentComplete(restState(Lost).bid(p1, Expl).bid(p2, Win1)));
     }
 
     @Test
@@ -759,5 +763,55 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     public void rescoreJustPlayOff4NpBaseExpl() {
         rescoreJustPlayOff4BaseExpl(
                 RULES_JP_S3A2G11_NP, "JstPlOf4NpBaseExpl");
+    }
+
+    @Test
+    public void rescoreJustPlayOff2_3p() {
+        rescoreJustPlayOff2(RULES_JP_S1A2G11_3P, "JustPlayOff2_3p");
+    }
+
+    @Test
+    public void rescoreJustPlayOff2Np3p() {
+        rescoreJustPlayOff2(RULES_JP_S1A2G11_NP_3P, "JustPlayOff2NP3p");
+    }
+
+    @Test
+    public void rescoreJustPlayOff2QuitBetter3p() {
+        rescoreJustPlayOff2QuitBetter(RULES_JP_S3A2G11_3P, "JustPlayOffQuitBetter2_3p");
+    }
+
+    @Test
+    public void rescoreJustPlayOff2NpQuitBetter3p() {
+        rescoreJustPlayOff2QuitBetter(RULES_JP_S3A2G11_NP_3P, "JustPlayOff2QuitBetterNP3p");
+    }
+
+    @Test
+    public void rescoreJustPlayOff2ExplBetter3p() {
+        rescoreJustPlayOff2ExplBetter(RULES_JP_S3A2G11_3P, "JustPlayOffQuitBetter2_3p");
+    }
+
+    @Test
+    public void rescoreJustPlayOff2NpExplBetter3p() {
+        rescoreJustPlayOff2ExplBetter(RULES_JP_S3A2G11_NP_3P, "JustPlayOff2QuitBetterNP3p");
+    }
+
+    @Test
+    public void rescoreJustPlayOff2KeepIncomplete3p() {
+        rescoreJustPlayOff2KeepIncomplete(RULES_JP_S3A2G11_3P, "JustPlayOff2KeepIncomplete3p");
+    }
+
+    @Test
+    public void rescoreJustPlayOff2NpKeepIncomplete3p() {
+        rescoreJustPlayOff2KeepIncomplete(RULES_JP_S3A2G11_NP_3P, "JustPlayOff2NPKeepIncomplete3p");
+    }
+
+    @Test
+    public void rescoreJustPlayOff2EndIncomplete3p() {
+        rescoreJustPlayOff2EndIncomplete(RULES_JP_S3A2G11_3P, "JustPlayOff2EndIncomplete3p");
+    }
+
+    @Test
+    public void rescoreJustPlayOff2NpEndIncomplete3p() {
+        rescoreJustPlayOff2EndIncomplete(RULES_JP_S3A2G11_NP_3P, "JustPlayOff2NPEndIncomplete3p");
     }
 }

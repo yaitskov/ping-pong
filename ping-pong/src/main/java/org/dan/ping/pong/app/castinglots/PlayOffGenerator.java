@@ -80,7 +80,7 @@ public class PlayOffGenerator {
         }
         final Optional<Mid> omid = createMatch(parentMid, loserMid, priority, level, types.getType());
         Optional<Mid> midBronze = Optional.empty();
-        if (thirdPlaceMatch && types.getType() == Gold) {
+        if (thirdPlaceMatch && types.getType() == Gold && level > 1) {
             midBronze = createMatch(Optional.empty(), Optional.empty(), priority, level, Brnz);
         }
         generateTree(level - 1, omid, priority - 1, types.next(), midBronze);

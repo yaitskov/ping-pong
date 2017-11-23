@@ -4,10 +4,11 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 
+import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
-import org.dan.ping.pong.app.bid.Uid;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 
+@Slf4j
 public class GroupService {
     public Map<Uid, BidSuccessInGroup> emptyMatchesState(
             TournamentMemState tournament,
@@ -65,6 +67,10 @@ public class GroupService {
 
     public void aggMatch(Map<Uid, BidSuccessInGroup> uid2Stat,
             MatchInfo minfo, MatchValidationRule matchRule) {
+        if (!minfo.getWinnerId().isPresent()) {
+            log.error("Match {} is not complete", minfo.getMid());
+            return;
+        }
         final Uid winUid = minfo.getWinnerId().get();
         final BidSuccessInGroup winner = uid2Stat.get(winUid);
         final Uid lostUid = minfo.getOpponentUid(winUid).get();

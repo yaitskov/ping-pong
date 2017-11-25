@@ -543,9 +543,18 @@ public class MatchService {
                 .tid(matchInfo.getTid())
                 .winUid(matchInfo.getWinnerId())
                 .sets(matchInfo.getParticipantIdScore())
-                .wonSets(tournament.getRule().getMatch()
-                        .calcWonSets(matchInfo.getParticipantIdScore()))
+                .wonSets(wonSets(tournament, matchInfo))
                 .build();
+    }
+
+    private Map<Uid, Integer> wonSets(TournamentMemState tournament, MatchInfo matchInfo) {
+        if (matchInfo.getParticipantIdScore().size() < 2) {
+            return matchInfo.getParticipantIdScore().keySet()
+                    .stream()
+                    .collect(toMap(o -> o, o -> 0));
+        }
+        return tournament.getRule().getMatch()
+                .calcWonSets(matchInfo.getParticipantIdScore());
     }
 
     public static final Set<MatchState> incompleteMatchStates = ImmutableSet.of(Draft, Place, Game);

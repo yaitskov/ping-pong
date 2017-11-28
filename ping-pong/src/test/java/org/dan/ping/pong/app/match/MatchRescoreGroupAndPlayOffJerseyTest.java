@@ -6,6 +6,7 @@ import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G3Q2_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
@@ -122,5 +123,38 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .scoreSet(p2, 11, p4, 8)
                         .checkResult(p2, p4, p3, p6, p1, p5)
                         .checkTournamentComplete(restState(Lost).bid(p4, Win2).bid(p2, Win1)));
+    }
+
+    @Test
+    public void rescoreNotLastMatchInGroup() {
+        isf.create(begin().name("rescoreNotLastMatchInGroup")
+                .rules(RULES_G8Q2_S1A2G11)
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p3, 3)
+                        .scoreSet(p1, 11, p2, 1)
+                        .rescoreMatch(p1, p3, 11, 0)
+                        .scoreSet(p2, 11, p3, 2)
+                        .reloadMatchMap()
+                        .scoreSet(p2, 0, p3, 11)
+                        .checkResult(p3, p2, p1)
+                        .checkTournamentComplete(restState(Lost).bid(p3, Win1).bid(p2, Win2)));
+    }
+
+    @Test
+    public void rescoreLastOpenMatchInGroup() {
+        isf.create(begin().name("rescoreLastOpenMatchInGroup")
+                .rules(RULES_G8Q2_S3A2G11)
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet3(p1, 11, p3, 3)
+                        .scoreSet3(p1, 11, p2, 1)
+                        .scoreSet(p2, 11, p3, 2)
+                        .rescoreMatch(p2, p3, 0, 11)
+                        .scoreSetLast2(p2, 0, p3, 11)
+                        .reloadMatchMap()
+                        .scoreSet3(p1, 0, p3, 11)
+                        .checkResult(p3, p1, p2)
+                        .checkTournamentComplete(restState(Lost).bid(p3, Win1).bid(p1, Win2)));
     }
 }

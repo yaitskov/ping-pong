@@ -82,4 +82,53 @@ public class MatchRescorePlayOff2DefeatsJerseyTest extends AbstractSpringJerseyT
                         .checkResult(p1, p2)
                         .checkTournamentComplete(restState(Win2).bid(p1, Win1)));
     }
+
+    @Test
+    public void rescoreBaseQuitKeepMtchInJp2Of2() {
+        isf.create(begin().name("rescoreBaseQuitKeepMtchInJp2Of2")
+                .rules(RULES_JP2_S3A2G11)
+                .category(c1, p1, p2))
+                .run(c -> c.beginTournament()
+                        .scoreSet3(p1, 11, p2, 1)
+                        .storeMatchMap(firstMatch)
+                        .reloadMatchMap()
+                        .storeMatchMap(secondMatch)
+                        .scoreSet(p1, 3, p2, 11)
+                        .playerQuits(p1)
+                        .checkMatchStatus(p2, p1, Over)
+                        .checkResult(p2, p1)
+                        .checkTournamentComplete(restState(Win2).bid(p2, Win1))
+                        .restoreMatchMap(firstMatch)
+                        .rescoreMatch3(p1, p2, 11, 7)
+                        .checkMatchStatus(p1, p2, Over)
+                        .restoreMatchMap(secondMatch)
+                        .checkMatchStatus(p1, p2, Over)
+                        .checkResult(p2, p1)
+                        .checkTournamentComplete(restState(Win2).bid(p2, Win1)));
+    }
+
+    @Test
+    public void rescoreBaseQuitSwapMtchInJp2Of2() {
+        isf.create(begin().name("rescoreBaseQuitSwapMtchInJp2Of2")
+                .rules(RULES_JP2_S3A2G11)
+                .category(c1, p1, p2))
+                .run(c -> c.beginTournament()
+                        .scoreSet3(p1, 11, p2, 1)
+                        .storeMatchMap(firstMatch)
+                        .reloadMatchMap()
+                        .storeMatchMap(secondMatch)
+                        .scoreSet(p1, 3, p2, 11)
+                        .playerQuits(p1)
+                        .checkMatchStatus(p2, p1, Over)
+                        .checkResult(p2, p1)
+                        .checkTournamentComplete(restState(Win2).bid(p2, Win1))
+                        .restoreMatchMap(firstMatch)
+                        .rescoreMatch3(p1, p2, 7, 11)
+                        .checkMatchStatus(p1, p2, Over)
+                        .restoreMatchMap(secondMatch)
+                        .checkMatchStatus(p1, p2, Game)
+                        .scoreSet3(p1, 11, p2, 1)
+                        .checkResult(p1, p2)
+                        .checkTournamentComplete(restState(Win2).bid(p1, Win1)));
+    }
 }

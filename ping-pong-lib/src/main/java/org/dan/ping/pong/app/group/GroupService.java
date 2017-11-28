@@ -2,9 +2,11 @@ package org.dan.ping.pong.app.group;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchValidationRule;
@@ -15,27 +17,28 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
 @Slf4j
 public class GroupService {
     public Map<Uid, BidSuccessInGroup> emptyMatchesState(
-            TournamentMemState tournament,
+            Function<Uid, BidState> participantState,
             Collection<MatchInfo> allMatchesInGroup) {
         return allMatchesInGroup.stream()
                 .map(MatchInfo::getParticipantIdScore)
                 .map(Map::keySet)
                 .flatMap(Collection::stream)
                 .collect(toMap(uid -> uid,
-                        uid -> new BidSuccessInGroup(uid, tournament.getParticipant(uid).getState()),
+                        uid -> new BidSuccessInGroup(uid, participantState.apply(uid)),
                         (a, b) -> a));
     }
 
     public List<Uid> findUidsQuittingGroup(TournamentMemState tournament,
             GroupRules groupRules, List<MatchInfo> groupMatches) {
         // todo rule option skip walk over or not
-        return orderUidsInGroup(tournament, groupMatches)
+        return orderUidsInGroup(tournament, uid -> Play, groupMatches)
                 .stream()
                 .limit(groupRules.getQuits())
                 .collect(toList());
@@ -48,8 +51,9 @@ public class GroupService {
     }
 
     public List<Uid> orderUidsInGroup(TournamentMemState tournament,
+            Function<Uid, BidState> participantStateF,
             List<MatchInfo> allMatchesInGroup) {
-        final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(tournament, allMatchesInGroup);
+        final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(participantStateF, allMatchesInGroup);
         final MatchValidationRule matchRule = tournament.getRule().getMatch();
         allMatchesInGroup.forEach(minfo -> aggMatch(uid2Stat, minfo, matchRule));
         return order(uid2Stat.values(), tournament.getRule().getGroup().get().getDisambiguation())

@@ -455,7 +455,8 @@ public class TournamentService {
     private void ranksLevelMatches(TournamentMemState tournament, int level,
             Map<Uid, CumulativeScore> uidLevel,
             Collection<MatchInfo> matches, MatchValidationRule rules) {
-        final Map<Uid, BidSuccessInGroup> uid2Stat = groupService.emptyMatchesState(tournament, matches);
+        final Map<Uid, BidSuccessInGroup> uid2Stat = groupService.emptyMatchesState(
+                uid ->  tournament.getParticipant(uid).getState(), matches);
         matches.forEach(m -> groupService.aggMatch(uid2Stat, m, rules));
         uid2Stat.forEach((uid, stat) ->
                 uidLevel.merge(uid,

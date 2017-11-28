@@ -331,7 +331,8 @@ public class MatchService {
             List<MatchInfo> matches, DbUpdater batch) {
         log.info("Pick bids for playoff from gid {} in tid {}", gid, tournament.getTid());
         final int quits = tournament.getRule().getGroup().get().getQuits();
-        final List<Uid> orderUids = groupService.orderUidsInGroup(tournament, matches);
+        final List<Uid> orderUids = groupService.orderUidsInGroup(tournament,
+                uid -> tournament.getParticipant(uid).getState(), matches);
 
         final List<Uid> quitUids = orderUids.stream()
                 .map(tournament::getBidOrExpl)

@@ -4,6 +4,8 @@ import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -35,13 +37,13 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
     @Inject
     private ImperativeSimulatorFactory isf;
 
-    final Map<Set<Player>, Mid> firstMatch = new HashMap<>();
-    final Map<Set<Player>, Mid> secondMatch = new HashMap<>();
+    final Map<Set<Player>, Mid> groupMatches = new HashMap<>();
+    final Map<Set<Player>, Mid> playOffMatches = new HashMap<>();
 
     @After
     public void cleanMaps() {
-        firstMatch.clear();
-        secondMatch.clear();
+        groupMatches.clear();
+        playOffMatches.clear();
     }
 
     @Test
@@ -60,5 +62,30 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .checkMatchStatus(p1, p3, Over)
                         .checkResult(p1, p3, p2, p4)
                         .checkTournamentComplete(restState(Lost).bid(p1, Win1).bid(p3, Win2)));
+    }
+
+    @Test
+    public void rescoreMtchInGrp4ChangeAllQuittersByScore() {
+        isf.create(begin().name("chngGrpAllQuittersByScore")
+                .rules(RULES_G8Q2_S1A2G11)
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p3, 11, p1, 2)
+                        .scoreSet(p1, 11, p2, 1)
+                        .scoreSet(p2, 11, p3, 3)
+                        .storeMatchMap(groupMatches)
+                        .reloadMatchMap()
+                        .storeMatchMap(playOffMatches)
+                        .scoreSet(p3, 8, p1, 11)
+                        .checkResult(p1, p3, p2)
+                        .checkTournamentComplete(restState(Lost).bid(p1, Win1).bid(p3, Win2))
+                        .restoreMatchMap(groupMatches)
+                        .rescoreMatch(p1, p2, 11, 9)
+                        .checkMatchStatus(p1, p2, Over)
+                        .reloadMatchMap()
+                        .checkMatchStatus(p2, p3, Game)
+                        .scoreSet(p2, 4, p3, 11)
+                        .checkResult(p3, p2, p1)
+                        .checkTournamentComplete(restState(Lost).bid(p3, Win1).bid(p2, Win2)));
     }
 }

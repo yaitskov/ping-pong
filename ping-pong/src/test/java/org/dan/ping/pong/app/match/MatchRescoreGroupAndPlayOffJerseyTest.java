@@ -104,8 +104,8 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .scoreSet(p1, 11, p2, 1)
                         .scoreSet(p4, 11, p5, 0)
 
-                        .scoreSet(p2, 11, p3, 3)
-                        .scoreSet(p5, 11, p6, 3)
+                        .scoreSet(p2, 11, p3, 4)
+                        .scoreSet(p5, 11, p6, 4)
                         .storeMatchMap(groupMatches)
                         .reloadMatchMap()
                         .scoreSet(p3, 8, p4, 11)
@@ -113,14 +113,14 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .scoreSet(p1, 11, p4, 8)
                         .checkResult(p1, p4, p3, p6, p2, p5)
                         .storeMatchMap(playOffMatches)
-                        .checkTournamentComplete(restState(Lost).bid(p1, Win1).bid(p4, Win2)));//
-//                        .restoreMatchMap(groupMatches)
-//                        .rescoreMatch(p1, p2, 11, 9)
-//                        .checkMatchStatus(p1, p2, Over)
-//                        .reloadMatchMap()
-//                        .checkMatchStatus(p2, p3, Game)
-//                        .scoreSet(p2, 4, p3, 11)
-//                        .checkResult(p3, p2, p1)
-//                        .checkTournamentComplete(restState(Lost).bid(p3, Win1).bid(p2, Win2)));
+                        .checkTournamentComplete(restState(Lost).bid(p1, Win1).bid(p4, Win2))
+                        .restoreMatchMap(groupMatches)
+                        .rescoreMatch(p1, p2, 11, 3)
+                        .checkMatchStatus(p1, p2, Over)
+                        .reloadMatchMap()
+                        .scoreSet(p2, 11, p6, 4)
+                        .scoreSet(p2, 11, p4, 8)
+                        .checkResult(p2, p4, p3, p6, p1, p5)
+                        .checkTournamentComplete(restState(Lost).bid(p4, Win2).bid(p2, Win1)));
     }
 }

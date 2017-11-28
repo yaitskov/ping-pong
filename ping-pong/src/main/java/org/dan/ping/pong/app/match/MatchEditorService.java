@@ -136,16 +136,16 @@ public class MatchEditorService {
     }
 
     private List<Uid> findAffectedUidsQuittingGroup(
-            TournamentMemState tournament, MatchInfo minfo,
+            TournamentMemState tournament, MatchInfo mInfo,
             Map<Uid, List<Integer>> newSets,
             List<MatchInfo> groupMatches) {
         final GroupRules groupRules = tournament.getRule().getGroup().get();
 
         final List<Uid> currentlyQuittingUids = groupService.findUidsQuittingGroup(
                 tournament, groupRules, groupMatches);
-        final MatchInfo rescoredMatch = minfo.clone();
+        final MatchInfo rescoredMatch = mInfo.clone();
         final List<MatchInfo> rescoredGroupMatches = groupMatches.stream()
-                .filter(mm -> mm.getMid().equals(minfo.getMid()))
+                .filter(mm -> !mm.getMid().equals(mInfo.getMid()))
                 .collect(toList());
         rescoredGroupMatches.add(rescoredMatch);
 

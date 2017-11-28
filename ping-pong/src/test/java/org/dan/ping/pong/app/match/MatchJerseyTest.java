@@ -18,6 +18,7 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.L1_3P;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
+import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing2;
 import static org.dan.ping.pong.app.table.TableState.Free;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
@@ -140,6 +141,8 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
     public static final TournamentRules RULES_JP_S1A2G11_NP_3P = RULES_JP_S1A2G11_NP.withPlayOff(Optional.of(L1_3P));
     public static final TournamentRules RULES_JP_S3A2G11_NP = RULES_JP_S3A2G11.withPlace(Optional.empty());
     public static final TournamentRules RULES_JP_S3A2G11_3P = RULES_JP_S3A2G11.withPlayOff(Optional.of(L1_3P));
+    public static final TournamentRules RULES_JP2_S3A2G11 = RULES_JP_S3A2G11.withPlayOff(Optional.of(Losing2));
+    public static final TournamentRules RULES_JP2_S3A2G11_NP = RULES_JP2_S3A2G11.withPlace(Optional.empty());
     public static final TournamentRules RULES_JP_S3A2G11_NP_3P = RULES_JP_S3A2G11_NP.withPlayOff(Optional.of(L1_3P));
 
     public static final TournamentRules RULES_G2Q1_S1A2G11_MIX = TournamentRules

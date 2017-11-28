@@ -54,7 +54,7 @@ import javax.inject.Inject;
 
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = JerseyWithSimulator.class)
-public class JustPlayOff2LossesJerseyTest extends AbstractSpringJerseyTest {
+public class JustPlayOff2DefeatsJerseyTest extends AbstractSpringJerseyTest {
     private static final TournamentRules RULES_PO_S1A2G11 = TournamentRules
             .builder()
             .match(S1A2G11)

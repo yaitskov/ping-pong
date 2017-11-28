@@ -265,6 +265,16 @@ public class ImperativeSimulator {
         return scoreSet(0, p1, games1, p2, games2);
     }
 
+    public ImperativeSimulator storeMatchMap(Map<Set<Player>, Mid> memory) {
+        memory.putAll(matchMap);
+        return this;
+    }
+
+    public ImperativeSimulator restoreMatchMap(Map<Set<Player>, Mid> memory) {
+        matchMap.putAll(memory);
+        return this;
+    }
+
     public ImperativeSimulator scoreSet3(Player p1, int games1, Player p2, int games2) {
         return scoreSet(0, p1, games1, p2, games2)
                 .scoreSet(1, p1, games1, p2, games2)
@@ -320,12 +330,13 @@ public class ImperativeSimulator {
         }
     }
 
-    public void reloadMatchMap() {
+    public ImperativeSimulator reloadMatchMap() {
         matchMap.putAll(openMatches().getMatches().stream().collect(toMap(
                 m -> m.getParticipants().stream()
                         .map(
                                 pl -> uid2Player(pl.getUid()))
                         .collect(toSet()),
                 OpenMatchForJudge::getMid)));
+        return this;
     }
 }

@@ -8,6 +8,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G2Q1;
+import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G3Q2;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q1;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q2;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S1A2G11;
@@ -171,6 +172,9 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .playOff(Optional.of(Losing1))
             .place(Optional.of(GLOBAL))
             .build();
+
+    public static final TournamentRules RULES_G3Q2_S1A2G11 = RULES_G8Q2_S1A2G11
+            .withGroup(Optional.of(G3Q2));
 
     public static final TournamentRules RULES_G8Q2_S3A2G11 = TournamentRules
             .builder()

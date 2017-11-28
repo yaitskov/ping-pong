@@ -45,7 +45,7 @@ public class PlayOffMatcherFromGroup {
         int tmp;
         for (int ig = 0; ig < groups; ig += 2) {
             result.put(ig, asList(a, b));
-            result.put(ig, asList(b, a));
+            result.put(ig + 1, asList(b, a));
             ++a;
             --b;
             tmp = a;

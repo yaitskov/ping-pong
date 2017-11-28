@@ -52,6 +52,8 @@ public class MatchScheduleInGroupJerseyTest extends AbstractSpringJerseyTest {
             .disambiguation(CMP_WIN_AND_LOSE)
             .build();
 
+    public static final GroupRules G3Q2 = G8Q2.withGroupSize(3);
+
     public static final GroupRules G2Q1 = GroupRules.builder()
             .groupSize(2)
             .quits(1)

@@ -132,13 +132,13 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                 .category(c1, p1, p2, p3))
                 .run(c -> c.beginTournament()
                         .scoreSet(p1, 11, p3, 3)
-                        .scoreSet(p1, 11, p2, 1)
+                        .scoreSet(p2, 11, p1, 1)
                         .rescoreMatch(p1, p3, 11, 0)
-                        .scoreSet(p2, 11, p3, 2)
+                        .scoreSet(p3, 11, p2, 2)
                         .reloadMatchMap()
-                        .scoreSet(p2, 0, p3, 11)
-                        .checkResult(p3, p2, p1)
-                        .checkTournamentComplete(restState(Lost).bid(p3, Win1).bid(p2, Win2)));
+                        .scoreSet(p1, 0, p2, 11)
+                        .checkResult(p1, p2, p3)
+                        .checkTournamentComplete(restState(Lost).bid(p1, Win1).bid(p2, Win2)));
     }
 
     @Test

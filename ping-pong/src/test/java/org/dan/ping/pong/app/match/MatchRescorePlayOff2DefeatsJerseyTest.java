@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.match;
 
+import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP2_S3A2G11;
@@ -130,5 +131,29 @@ public class MatchRescorePlayOff2DefeatsJerseyTest extends AbstractSpringJerseyT
                         .scoreSet3(p1, 11, p2, 1)
                         .checkResult(p1, p2)
                         .checkTournamentComplete(restState(Win2).bid(p1, Win1)));
+    }
+
+    @Test
+    public void rescoreBaseExplSwapMtchInJp2Of2() {
+        isf.create(begin().name("rescoreBaseExplSwapMtchInJp2Of2")
+                .rules(RULES_JP2_S3A2G11)
+                .category(c1, p1, p2))
+                .run(c -> c.beginTournament()
+                        .scoreSet3(p1, 11, p2, 1)
+                        .storeMatchMap(firstMatch)
+                        .reloadMatchMap()
+                        .storeMatchMap(secondMatch)
+                        .scoreSet(p1, 3, p2, 11)
+                        .expelPlayer(p1)
+                        .checkMatchStatus(p2, p1, Over)
+                        .checkResult(p2, p1)
+                        .checkTournamentComplete(restState(Expl).bid(p2, Win1))
+                        .restoreMatchMap(firstMatch)
+                        .rescoreMatch3(p1, p2, 7, 11)
+                        .checkMatchStatus(p1, p2, Over)
+                        .restoreMatchMap(secondMatch)
+                        .checkMatchStatus(p1, p2, Over)
+                        .checkResult(p2, p1)
+                        .checkTournamentComplete(restState(Expl).bid(p2, Win1)));
     }
 }

@@ -139,7 +139,8 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .reloadMatchMap()
                         .scoreSet(p1, 0, p2, 11)
                         .checkResult(p2, p1, p3)
-                        .checkTournamentComplete(restState(Lost).bid(p1, Win1).bid(p2, Win2)));
+                        .checkTournamentComplete(restState(Lost)
+                                .bid(p1, Win2).bid(p2, Win1)));
     }
 
     @Test
@@ -185,5 +186,26 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .storeMatchMap(playOffMatches)
                         .checkTournamentComplete(restState(Lost)
                                 .bid(p1, Expl).bid(p4, Win1)));
+    }
+
+    @Test
+    public void rescoreMtchInGrpWithGoodExpl() {
+        isf.create(begin().name("rescoreMtchInGrpGoodExpl")
+                .rules(RULES_G3Q2_S1A2G11)
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p3, 1, p1, 11)
+                        .scoreSet(p1, 11, p2, 1)
+                        .expelPlayer(p1)
+                        .scoreSet(p2, 11, p3, 4)
+                        .storeMatchMap(groupMatches)
+                        .reloadMatchMap()
+                        .scoreSet(p3, 11, p2, 9)
+                        .rescoreMatch(p1, p3, 11, 7)
+                        .reloadMatchMap()
+                        .checkResult(p3, p2, p1)
+                        .storeMatchMap(playOffMatches)
+                        .checkTournamentComplete(restState(Lost)
+                                .bid(p1, Expl).bid(p2, Win2).bid(p3, Win1)));
     }
 }

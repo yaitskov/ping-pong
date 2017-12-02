@@ -377,7 +377,9 @@ public class MatchService {
         if (orderUids.size() < quits) {
             return emptyList();
         }
-        return orderUids.subList(quits, orderUids.size());
+        return orderUids.stream()
+                .filter(uid -> !quitUids.contains(uid))
+                .collect(toList());
     }
 
     private static final Set<BidState> quitOrExpl = ImmutableSet.of(Quit, Expl);

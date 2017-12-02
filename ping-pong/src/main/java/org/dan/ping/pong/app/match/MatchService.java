@@ -68,7 +68,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -327,16 +326,21 @@ public class MatchService {
     @Inject
     private PlayOffService playOffService;
 
+    private boolean notExpelledInGroup(TournamentMemState tournament, ParticipantMemState b) {
+        return b.getState() != Expl || tournament.participantMatches(b.getUid())
+                .anyMatch(m -> !m.getGid().isPresent());
+    }
+
     private List<Uid> completeGroup(Integer gid, TournamentMemState tournament,
             List<MatchInfo> matches, DbUpdater batch) {
         log.info("Pick bids for playoff from gid {} in tid {}", gid, tournament.getTid());
         final int quits = tournament.getRule().getGroup().get().getQuits();
         final List<Uid> orderUids = groupService.orderUidsInGroup(tournament,
-                uid -> tournament.getParticipant(uid).getState(), matches);
+                uid -> Play, matches);
 
         final List<Uid> quitUids = orderUids.stream()
                 .map(tournament::getBidOrExpl)
-                .filter(b -> b.getState() != Expl)
+                .filter(b -> notExpelledInGroup(tournament, b))
                 .limit(quits)
                 .map(ParticipantMemState::getUid)
                 .collect(toList());

@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.match;
 
+import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
@@ -137,7 +138,7 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .scoreSet(p3, 11, p2, 2)
                         .reloadMatchMap()
                         .scoreSet(p1, 0, p2, 11)
-                        .checkResult(p1, p2, p3)
+                        .checkResult(p2, p1, p3)
                         .checkTournamentComplete(restState(Lost).bid(p1, Win1).bid(p2, Win2)));
     }
 
@@ -156,5 +157,33 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .scoreSet3(p1, 0, p3, 11)
                         .checkResult(p3, p1, p2)
                         .checkTournamentComplete(restState(Lost).bid(p3, Win1).bid(p1, Win2)));
+    }
+
+    @Test
+    public void rescoreMtchInGrpWithKeepExpl() {
+        isf.create(begin().name("rescoreMtchInGrpKeepExpl")
+                .rules(RULES_G3Q2_S1A2G11)
+                .category(c1, p1, p2, p3, p4, p5, p6))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p3, 11, p1, 2)
+                        .scoreSet(p6, 11, p4, 2)
+
+                        .scoreSet(p1, 11, p2, 1)
+                        .scoreSet(p4, 11, p5, 0)
+
+                        .scoreSet(p2, 11, p3, 4)
+                        .scoreSet(p5, 11, p6, 4)
+
+                        .storeMatchMap(groupMatches)
+                        .reloadMatchMap()
+                        .scoreSet(p3, 8, p4, 11)
+                        .scoreSet(p1, 11, p6, 5)
+                        .expelPlayer(p1)
+                        .rescoreMatch(p2, p3, 11, 3)
+                        .reloadMatchMap()
+                        .checkResult(p4, p3, p6, p2, p5, p1)
+                        .storeMatchMap(playOffMatches)
+                        .checkTournamentComplete(restState(Lost)
+                                .bid(p1, Expl).bid(p4, Win1)));
     }
 }

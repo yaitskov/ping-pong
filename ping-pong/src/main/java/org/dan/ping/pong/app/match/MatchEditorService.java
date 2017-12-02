@@ -40,7 +40,6 @@ import org.dan.ping.pong.util.time.Clocker;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -282,6 +281,7 @@ public class MatchEditorService {
         if (mInfo.getState() == Game) {
             log.info("Mid {} stays open", mInfo.getMid());
         } else { // request table scheduling
+            removeWinnerUidIf(batch, mInfo);
             resetMatches(tournament, batch, affectedMatches);
             log.info("Rescored mid {} returns to game", mInfo.getMid());
             mInfo.participants()
@@ -291,6 +291,13 @@ public class MatchEditorService {
             resetBidStatesForRestGroupParticipants(tournament, mInfo, batch);
             matchService.changeStatus(batch, mInfo, Place);
         }
+    }
+
+    private void removeWinnerUidIf(DbUpdater batch, MatchInfo mInfo) {
+        mInfo.getWinnerId().ifPresent(wId -> {
+            mInfo.setWinnerId(Optional.empty());
+            matchDao.setWinnerId(mInfo, batch);
+        });
     }
 
     private void resetBidStatesForRestGroupParticipants(TournamentMemState tournament,
@@ -307,6 +314,7 @@ public class MatchEditorService {
     private void matchRescoreGivesWinner(TournamentMemState tournament, DbUpdater batch,
             MatchInfo mInfo, Optional<Uid> newWinner, List<MatchUid> affectedMatches) {
         if (mInfo.getWinnerId().isPresent()) {
+            removeWinnerUidIf(batch, mInfo);
             resetMatches(tournament, batch, affectedMatches);
             makeParticipantPlaying(tournament, batch, mInfo);
             if (!affectedMatches.isEmpty()) {
@@ -472,6 +480,7 @@ public class MatchEditorService {
             resetBidStateTo(batch, opponent, Wait);
             final ParticipantMemState bid = tournament.getBidOrQuit(uid);
             resetBidStateTo(batch, bid, Wait);
+            removeWinnerUidIf(batch, mInfo);
             matchDao.removeSecondParticipant(batch, mInfo.getMid(), opUid);
         } else if (numberOfParticipants == 0) {
             log.warn("Remove last uid {} from mid {}", uid, mInfo.getMid());

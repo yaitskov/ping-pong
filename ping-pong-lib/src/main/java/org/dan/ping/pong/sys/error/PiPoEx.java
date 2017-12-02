@@ -75,11 +75,11 @@ public class PiPoEx extends RuntimeException {
     }
 
     public static PiPoEx internalError(String messageTemplate, Map<String, Object> params) {
-        return badRequest(new TemplateError(messageTemplate, params));
+        return internalError(new TemplateError(messageTemplate, params));
     }
 
     public static PiPoEx internalError(String messageTemplate, String param, Object value) {
-        return badRequest(messageTemplate, ImmutableMap.of(param, value));
+        return internalError(messageTemplate, ImmutableMap.of(param, value));
     }
 
     public static PiPoEx internalError(Error error) {

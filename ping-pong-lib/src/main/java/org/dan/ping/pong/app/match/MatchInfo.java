@@ -21,7 +21,6 @@ import org.dan.ping.pong.app.tournament.Tid;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +91,7 @@ public class MatchInfo {
             losersMeet = true;
         } else {
             if (participantIdScore.containsKey(uid)) {
-                log.warn("ReAdd uid {} to mid {}. Allowed for rescore", mid, uid);
+                log.warn("ReAdd uid {} to mid {}. Allowed for rescore", uid, mid);
                 return true;
             }
             checkParticipantSpace();

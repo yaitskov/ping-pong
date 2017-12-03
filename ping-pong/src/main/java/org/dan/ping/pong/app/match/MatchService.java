@@ -23,6 +23,7 @@ import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
+import static org.dan.ping.pong.app.match.MatchType.Gold;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.place.ArenaDistributionPolicy.NO;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
@@ -582,14 +583,20 @@ public class MatchService {
                 });
     }
 
-    public void walkOver(TournamentMemState tournament, Uid walkoverUid, MatchInfo matchInfo, DbUpdater batch) {
-        log.info("Uid {} walkovers mid {}", walkoverUid, matchInfo.getMid());
-        Optional<Uid> winUid = matchInfo.getOpponentUid(walkoverUid);
+    public void walkOver(TournamentMemState tournament, Uid walkoverUid, MatchInfo mInfo, DbUpdater batch) {
+        log.info("Uid {} walkovers mid {}", walkoverUid, mInfo.getMid());
+        Optional<Uid> winUid = mInfo.getOpponentUid(walkoverUid);
         if (winUid.isPresent()) {
-            matchWinnerDetermined(tournament, matchInfo, winUid.get(), batch, EXPECTED_MATCH_STATES);
+            matchWinnerDetermined(tournament, mInfo, winUid.get(), batch, EXPECTED_MATCH_STATES);
         } else {
-            changeStatus(batch, matchInfo, Auto);
-            matchInfo.getLoserMid()
+            changeStatus(batch, mInfo, Auto);
+            if (mInfo.getType() == Gold) {
+                ParticipantMemState bid = tournament.getBidOrQuit(walkoverUid);
+                if (bid.getBidState() == Quit) {
+                    bidService.setBidState(bid, Win2, singleton(bid.getBidState()), batch);
+                }
+            }
+            mInfo.getLoserMid()
                     .ifPresent(lmid -> assignBidToMatch(tournament, lmid, walkoverUid, batch));
         }
     }

@@ -80,7 +80,6 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .scoreSet(p2, 11, p3, 3)
                         .storeMatchMap(groupMatches)
                         .reloadMatchMap()
-                        .storeMatchMap(playOffMatches)
                         .scoreSet(p3, 8, p1, 11)
                         .checkResult(p1, p3, p2)
                         .checkTournamentComplete(restState(Lost).bid(p1, Win1).bid(p3, Win2))
@@ -114,7 +113,6 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .scoreSet(p1, 11, p6, 5)
                         .scoreSet(p1, 11, p4, 8)
                         .checkResult(p1, p4, p3, p6, p2, p5)
-                        .storeMatchMap(playOffMatches)
                         .checkTournamentComplete(restState(Lost).bid(p1, Win1).bid(p4, Win2))
                         .restoreMatchMap(groupMatches)
                         .rescoreMatch(p1, p2, 11, 3)
@@ -175,7 +173,6 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .scoreSet(p2, 11, p3, 4)
                         .scoreSet(p5, 11, p6, 4)
 
-                        .storeMatchMap(groupMatches)
                         .reloadMatchMap()
                         .scoreSet(p3, 8, p4, 11)
                         .scoreSet(p1, 11, p6, 5)
@@ -183,7 +180,6 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .rescoreMatch(p2, p3, 11, 3)
                         .reloadMatchMap()
                         .checkResult(p4, p3, p6, p2, p5, p1)
-                        .storeMatchMap(playOffMatches)
                         .checkTournamentComplete(restState(Lost)
                                 .bid(p1, Expl).bid(p4, Win1)));
     }
@@ -198,14 +194,31 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .scoreSet(p1, 11, p2, 1)
                         .expelPlayer(p1)
                         .scoreSet(p2, 11, p3, 4)
-                        .storeMatchMap(groupMatches)
                         .reloadMatchMap()
                         .scoreSet(p3, 11, p2, 9)
                         .rescoreMatch(p1, p3, 11, 7)
                         .reloadMatchMap()
                         .checkResult(p3, p2, p1)
-                        .storeMatchMap(playOffMatches)
                         .checkTournamentComplete(restState(Lost)
                                 .bid(p1, Expl).bid(p2, Win2).bid(p3, Win1)));
+    }
+
+    @Test
+    public void rescoreMtchInGrpWithGoodQuit() {
+        isf.create(begin().name("rescoreMtchInGrpGoodQuit")
+                .rules(RULES_G3Q2_S1A2G11)
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p3, 1, p1, 11)
+                        .scoreSet(p1, 11, p2, 1)
+                        .playerQuits(p1)
+                        .scoreSet(p2, 11, p3, 4)
+                        .checkResult(p2, p1, p3)
+                        .checkTournamentComplete(restState(Lost)
+                                .bid(p1, Win2).bid(p2, Win1))
+                        .rescoreMatch(p1, p3, 11, 7)
+                        .checkResult(p2, p1, p3)
+                        .checkTournamentComplete(restState(Lost)
+                                .bid(p1, Win2).bid(p2, Win1)));
     }
 }

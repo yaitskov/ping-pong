@@ -19,5 +19,7 @@ module.exports = {
     'click-score-to-change': 'Kliknij oceniony set, żeby go zmienić.',
     'Match score editor': 'Editor wyniku meczu',
 
-    'following-matches-will-be-replayed': 'Kolejny meczi będą odwołany:'
+    'following-matches-will-be-replayed': 'Kolejny meczi będą odwołany:',
+
+    'no-played-matches-in-tournament': 'Nie ma zagranych meczi w turnieju'
 };

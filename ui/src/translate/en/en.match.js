@@ -20,5 +20,7 @@ module.exports = {
     'click-score-to-change': 'Click on a set score you want to change.',
     'Match score editor': 'Match score editor',
 
-    'following-matches-will-be-replayed': 'Following matches will be cancelled:'
+    'following-matches-will-be-replayed': 'Following matches will be cancelled:',
+
+    'no-played-matches-in-tournament': 'Tournament has no played matches'
 };

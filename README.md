@@ -42,7 +42,7 @@ http://localhost/ddd/#!/emails
 
 Launching server side (http port is 8081):
 ```
-mvn -pl ping-pong -P run-server
+mvn -pl ping-pong -P run-server -DskipTests
 ```
 
 Rebuilding ui part:
@@ -62,7 +62,7 @@ server {
 
         location / {
            autoindex on;
-           root /home/dan/pro/ping-pong/code/ui/dist;
+           root /home/egnyte/pro/ping-pong/code/ui/dist;
         }
         location /api/ {
            proxy_set_header Host \$http_host;
@@ -72,16 +72,16 @@ server {
         # just for dev
         location /js/libs {
            autoindex on;
-           alias /home/dan/pro/ping-pong/code/ui/node_modules;
+           alias /home/egnyte/pro/ping-pong/code/ui/node_modules;
         }
         location /css/libs {
            autoindex on;
-           alias /home/dan/pro/ping-pong/code/ui/node_modules;
+           alias /home/egnyte/pro/ping-pong/code/ui/node_modules;
         }
         # access to authentication without emails
         location /ddd {
            autoindex on;
-           alias /home/dan/pro/ping-pong/code/ui/src/dev;
+           alias /home/egnyte/pro/ping-pong/code/ui/src/dev;
         }
 }
 ```

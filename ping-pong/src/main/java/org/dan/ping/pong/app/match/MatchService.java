@@ -240,6 +240,8 @@ public class MatchService {
         if (!isPyrrhic(lostBid)) {
             bidService.setBidState(lostBid,
                     playOffMatchLoserState(playOffRule, mInfo, lostBid), PLAY_WAIT, batch);
+        } else if (lostBid.getBidState() == Quit && mInfo.getType() == Gold) {
+            bidService.setBidState(lostBid, Win2, singleton(lostBid.getBidState()), batch);
         }
         mInfo.getLoserMid().ifPresent(
                 lMid -> assignBidToMatch(tournament, lMid, lostUid, batch));

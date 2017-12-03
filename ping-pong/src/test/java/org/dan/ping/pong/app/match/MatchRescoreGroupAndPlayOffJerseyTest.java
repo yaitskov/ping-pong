@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.match;
 
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
+import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
@@ -213,6 +214,60 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .scoreSet(p1, 11, p2, 1)
                         .playerQuits(p1)
                         .scoreSet(p2, 11, p3, 4)
+                        .checkResult(p2, p1, p3)
+                        .checkTournamentComplete(restState(Lost)
+                                .bid(p1, Win2).bid(p2, Win1))
+                        .rescoreMatch(p1, p3, 11, 7)
+                        .checkResult(p2, p1, p3)
+                        .checkTournamentComplete(restState(Lost)
+                                .bid(p1, Win2).bid(p2, Win1)));
+    }
+
+    @Test
+    public void rescoreMtchInGrpWithGoodQuit2() {
+        isf.create(begin().name("rescoreMtchInGrpGoodQuit2")
+                .rules(RULES_G3Q2_S1A2G11)
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p3, 8, p1, 11)
+                        .playerQuits(p1)
+                        .scoreSet(p2, 11, p3, 0)
+                        .checkResult(p2, p1, p3)
+                        .checkTournamentComplete(restState(Lost)
+                                .bid(p1, Win2).bid(p2, Win1))
+                        .rescoreMatch(p1, p3, 11, 7)
+                        .checkResult(p2, p1, p3)
+                        .checkTournamentComplete(restState(Lost)
+                                .bid(p1, Win2).bid(p2, Win1)));
+    }
+
+    @Test
+    public void rescoreMtchInGrp2Quit() {
+        isf.create(begin().name("rescoreMtchInGrp2Quit")
+                .rules(RULES_G3Q2_S1A2G11)
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p3, 8, p1, 11)
+                        .playerQuits(p1)
+                        .playerQuits(p3)
+                        .checkResult(p2, p1, p3)
+                        .checkTournamentComplete(restState(Quit)
+                                .bid(p1, Win2).bid(p2, Win1))
+                        .rescoreMatch(p1, p3, 11, 7)
+                        .checkResult(p2, p1, p3)
+                        .checkTournamentComplete(restState(Quit)
+                                .bid(p1, Win2).bid(p2, Win1)));
+    }
+
+    @Test
+    public void rescoreMtchInGrpQuitterSecondInGroup() {
+        isf.create(begin().name("rescoreQuitterSecondInGrp")
+                .rules(RULES_G3Q2_S1A2G11)
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p3, 9, p1, 11)
+                        .playerQuits(p1)
+                        .scoreSet(p2, 11, p3, 0)
                         .checkResult(p2, p1, p3)
                         .checkTournamentComplete(restState(Lost)
                                 .bid(p1, Win2).bid(p2, Win1))

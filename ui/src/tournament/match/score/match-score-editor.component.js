@@ -50,6 +50,7 @@ angular.
                              setScore.scores.forEach(score => {
                                  self.match.score.sets[score.uid][setScore.setOrdNumber] = score.score;
                              });
+                             $rootScope.$broadcast('event.review.match.data', self.match);
                          };
                          self.removeLastSet = function () {
                              var keys = Object.keys(self.match.score.sets);
@@ -79,6 +80,7 @@ angular.
                              'event.review.match.set.picked': (event, setIdx, set) => {
                                  self.setRescoring = true;
                                  self.match.setScores = [set.a, set.b];
+                                 self.match.playedSets = setIdx;
                                  $rootScope.$broadcast('event.match.set', self.match);
                              },
                              'event.review.match.ready': (event) => {

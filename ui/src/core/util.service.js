@@ -131,7 +131,12 @@ angular.
             if (name.indexOf(' ') < 0) {
                 return name.substr(0, 9);
             }
-            return name.split(' ').map(function (part) { return part.substr(0, 4); }).join(' ');
+            var nameParts = name.split(' ');
+            if (nameParts.length == 1) {
+               return name.substr(0, 4) + '..' + name.substr(name.length - 3, 3);
+            }
+            return nameParts[0].substr(0, 2) + ' ' + nameParts[1].substr(0, 3) +
+                   '..' + nameParts[1].substr(nameParts[1].length - 1, 1);
         };
     }).
     factory('syncTranslate', ['$translate', '$q', function ($translate, $q) {

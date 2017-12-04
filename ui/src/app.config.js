@@ -85,7 +85,7 @@ angular.module('pingPong').
                     when('/my/matches/play/:tournamentId', {
                         template: '<participant-match-list-to-judge/>'
                     }).
-                    when('/match/edit-store/:tournamentId/:matchId', {
+                    when('/match/edit-score/:tournamentId/:matchId', {
                         template: '<match-score-editor/>'
                     }).
                     when('/match/state/description', {

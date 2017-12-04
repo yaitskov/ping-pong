@@ -5,16 +5,20 @@ angular.
     module('scoreSet').
     component('scoreSet', {
         templateUrl: template,
-        controller: ['Match', 'requestStatus', '$scope', '$rootScope', 'binder',
-                     function (Match, requestStatus, $scope, $rootScope, binder) {
+        controller: ['Match', 'requestStatus', '$scope', '$rootScope', 'binder', '$routeParams',
+                     function (Match, requestStatus, $scope, $rootScope, binder, $routeParams) {
                          var self = this;
                          self.setScoreBtn = 'Score';
+                         self.tournamentId = $routeParams.tournamentId;
+                         self.matchId = $routeParams.matchId;
+
                          binder($scope, {
                              'event.base.match.set.ready': (event) => {
                                  $rootScope.$broadcast('event.match.set.ready');
                              },
-                             'event.match.set.playedSets': (event, btnLabel) => {
+                             'event.match.set.playedSets': (event, btnLabel, n) => {
                                  self.setScoreBtn = btnLabel;
+                                 self.nextSetNumber = n;
                              },
                              'event.match.set.scored': (event, matchScore) => {
                                  Match.scoreMatch(

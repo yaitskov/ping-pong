@@ -2,7 +2,9 @@
   <tr>
     <td>Sets</td>
     <td ng-repeat="participant in $ctrl.participants">
-      <you name="participant.name | compactName"/>
+      <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}">
+        <you name="participant.name | compactName"/>
+      </a>
     </td>
   </tr>
   <tr ng-repeat="set in $ctrl.sets"

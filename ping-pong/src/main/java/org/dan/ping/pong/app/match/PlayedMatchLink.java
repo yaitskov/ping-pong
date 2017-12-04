@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 
+import java.util.Optional;
+
 @Getter
 @Setter
 @Builder
@@ -16,5 +18,5 @@ import org.dan.ping.pong.app.user.UserLink;
 public class PlayedMatchLink {
     private Mid mid;
     private UserLink opponent;
-    private Uid winnerUid;
+    private Optional<Uid> winnerUid;
 }

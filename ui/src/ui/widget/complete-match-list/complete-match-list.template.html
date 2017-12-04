@@ -11,7 +11,7 @@
       <td>
         <a href="#!/match/management/{{$ctrl.tournamentId}}/{{match.mid}}"
            class="btn"
-           ng-class="{'btn-success': match.opponent.uid != match.winnerUid, 'btn-danger':  match.opponent.uid == match.winnerUid}">
+           ng-class="{'btn-success': match.opponent.uid != match.winnerUid && match.winnerUid, 'btn-danger':  match.opponent.uid == match.winnerUid}">
           {{match.opponent.name}}
         </a>
       </td>

@@ -12,6 +12,10 @@
       <button class="btn btn-default" back-button>
         {{ 'Back btn' | translate }}
       </button>
+      <a ng-show="$ctrl.nextSetNumber > 1"
+         class="btn btn-warning" href="#!/match/edit-score/{{$ctrl.tournamentId}}/{{$ctrl.matchId}}">
+        <span class="glyphicon glyphicon-pencil"></span>
+      </a>
     </div>
   </div>
 </form>

@@ -15,7 +15,7 @@ module.exports = {
     'Schedule tables': 'Planować stoły',
 
     'Rescore match': 'Ocenić mecz ponownie',
-    'play-off-match-will-replayed': 'Zależny play off meczi będą odwołany.',
+    'play-off-match-will-replayed': 'W razie gwałtownej zmiany wyniku zależny meczi w play off będą odwołany, ale będziesz mięć okzję zobaczyć konsekwencji',
     'click-score-to-change': 'Kliknij oceniony set, żeby go zmienić.',
     'Match score editor': 'Editor wyniku meczu',
 

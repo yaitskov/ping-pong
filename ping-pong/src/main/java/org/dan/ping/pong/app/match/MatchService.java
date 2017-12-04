@@ -704,7 +704,8 @@ public class MatchService {
 
     public PlayedMatchList findPlayedMatchesByBid(TournamentMemState tournament, Uid uid) {
         final List<MatchInfo> completeMatches = tournament.participantMatches(uid)
-                .filter(m -> m.getState() == Over)
+                .filter(m -> m.getState() == Over
+                        || m.getState() == Game && m.getPlayedSets() > 0)
                 .sorted(Comparator.comparing(m -> m.getEndedAt().get()))
                 .collect(toList());
         return PlayedMatchList.builder()
@@ -717,7 +718,7 @@ public class MatchService {
                                         .map(tournament::getParticipant)
                                         .map(ParticipantMemState::toLink)
                                         .get())
-                                .winnerUid(m.getWinnerId().orElseThrow(() -> internalError("no winner")))
+                                .winnerUid(m.getWinnerId())
                                 .build())
                         .collect(toList()))
                 .playOff(completeMatches.stream().filter(m -> m.getType() != Grup)
@@ -727,7 +728,7 @@ public class MatchService {
                                         .map(tournament::getParticipant)
                                         .map(ParticipantMemState::toLink)
                                         .get())
-                                .winnerUid(m.getWinnerId().orElseThrow(() -> internalError("no winner")))
+                                .winnerUid(m.getWinnerId())
                                 .build())
                         .collect(toList()))
                 .build();

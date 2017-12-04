@@ -8,6 +8,7 @@ angular.
         controller: ['$routeParams', 'binder', '$rootScope', '$scope',
                      function ($routeParams, binder, $rootScope, $scope) {
                          var self = this;
+                         self.tournamentId = $routeParams.tournamentId;
 
                          self.strongSet = function (iSet) {
                              return self.strong[iSet];

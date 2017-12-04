@@ -16,7 +16,7 @@ module.exports = {
 
     'Rescore match': 'Rescore match',
 
-    'play-off-match-will-replayed': 'Dependent play off matches will be replayed.',
+    'play-off-match-will-replayed': 'Dependent play off matches will be replayed, but you will have an opportunity to see consequences in advance.',
     'click-score-to-change': 'Click on a set score you want to change.',
     'Match score editor': 'Match score editor',
 

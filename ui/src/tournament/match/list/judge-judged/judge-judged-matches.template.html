@@ -34,9 +34,6 @@
     <label translate="PlayOff matches"/>
     <complete-match-list label="playOff" tournament-id="$ctrl.tournamentId"/>
   </div>
-  <div class="form-group" ng-show="$ctrl.matches && !$ctrl.matches.playOff && !$ctrl.matches.inGroup">
-    <div class="alert alert-info" translate="you-havent-played-matches"/>
-  </div>
   <div class="form-group" ng-show="$ctrl.bids.length == 0">
     <div class="alert alert-info" translate="no-played-matches-in-tournament"/>
   </div>

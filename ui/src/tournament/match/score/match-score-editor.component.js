@@ -79,15 +79,18 @@ angular.
                                      self.match.playedSets = self.match.score.sets[keys[i]].length;
                                      break;
                                  }
+                                 requestStatus.complete();
                                  $rootScope.$broadcast('event.match.set', self.match);
                              },
                              'event.review.match.set.popped': (event) => {
+                                 requestStatus.complete();
                                  self.removeLastSet();
                              },
                              'event.review.match.set.picked': (event, setIdx, set) => {
                                  self.setRescoring = true;
                                  self.match.setScores = [set.a, set.b];
                                  self.match.playedSets = setIdx;
+                                 requestStatus.complete();
                                  $rootScope.$broadcast('event.match.set', self.match);
                              },
                              'event.review.match.ready': (event) => {

@@ -202,4 +202,8 @@ td.match-state-description.text-danger {
     font-weight: bold;
 }
 
+tr.bottom-line td {
+    border-top: 2px solid #111 !important;
+}
+
 @import "mobile/app-mobile.scss";

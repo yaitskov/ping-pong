@@ -22,5 +22,7 @@ module.exports = {
 
     'following-matches-will-be-replayed': 'Following matches will be cancelled:',
 
-    'no-played-matches-in-tournament': 'Tournament has no played matches'
+    'no-played-matches-in-tournament': 'Tournament has no played matches',
+
+    'Total': 'Total'
 };

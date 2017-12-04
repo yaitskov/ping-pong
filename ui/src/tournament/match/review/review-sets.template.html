@@ -35,8 +35,8 @@
       </a>
     </td>
   </tr>
-  <tr>
-    <td>Total</td>
+  <tr ng-class="{'bottom-line': !$ctrl.config.edit}">
+    <td translate="Total" />
     <td class="alert" ng-class="{'alert-success': $ctrl.participants[0].uid == $ctrl.matchScore.winUid, 'alert-danger': $ctrl.participants[1].uid == $ctrl.matchScore.winUid}">
       {{$ctrl.matchScore.wonSets[$ctrl.participants[0].uid]}}
     </td>

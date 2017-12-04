@@ -21,5 +21,7 @@ module.exports = {
 
     'following-matches-will-be-replayed': 'Kolejny meczi będą odwołany:',
 
-    'no-played-matches-in-tournament': 'Nie ma zagranych meczi w turnieju'
+    'no-played-matches-in-tournament': 'Nie ma zagranych meczi w turnieju',
+
+    'Total': 'Suma'
 };

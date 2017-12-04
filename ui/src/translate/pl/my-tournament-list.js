@@ -1,5 +1,5 @@
 module.exports = {
         // my-tournament-list
     'you-not-created-tournament': 'Nie masz własnych turniejów.',
-    'AdministratedTournaments': 'Administrowany turnieje'
+    'AdministratedTournaments': 'Administrowane turnieje'
 };

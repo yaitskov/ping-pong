@@ -8,15 +8,16 @@ import org.jooq.exception.DataAccessException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 @Slf4j
 @Provider
-@RequiredArgsConstructor
 public class JooqExceptionMapper implements ExceptionMapper<DataAccessException> {
-    private final ExceptionMapper forward;
+    @Inject
+    private DefaultExceptionMapper forward;
 
     @Override
     public Response toResponse(DataAccessException exception) {

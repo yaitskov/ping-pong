@@ -5,5 +5,7 @@ module.exports = {
     'Open': 'Otwarty',
     'Close': 'Zakończony',
     'Canceled': 'Anulowany',
-    'Replaced': 'Przeniesiony'
+    'Replaced': 'Przeniesiony',
+
+    'tournament not found': 'Turniej {{tid}} nie istnieje'
 };

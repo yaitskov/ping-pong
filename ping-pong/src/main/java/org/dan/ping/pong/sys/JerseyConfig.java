@@ -23,6 +23,7 @@ import org.dan.ping.pong.app.place.PlaceResource;
 import org.dan.ping.pong.app.table.TableResource;
 import org.dan.ping.pong.app.tournament.TournamentResource;
 import org.dan.ping.pong.app.user.UserResource;
+import org.dan.ping.pong.sys.error.UncheckedExecutionExceptionMapper;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -38,9 +39,9 @@ public class JerseyConfig extends ResourceConfig {
         register(new JacksonFeature());
         register(new PiPoExMapper());
         register(new JerseyExceptionMapper());
-        final ExceptionMapper defaultMapper = new DefaultExceptionMapper();
-        register(new JooqExceptionMapper(defaultMapper));
-        register(defaultMapper);
+        register(new DefaultExceptionMapper());
+        register(JooqExceptionMapper.class);
+        register(UncheckedExecutionExceptionMapper.class);
         packages(false,
                 asList(UserResource.class, SysAdminSignInResource.class,
                         PlaceResource.class, TournamentResource.class,

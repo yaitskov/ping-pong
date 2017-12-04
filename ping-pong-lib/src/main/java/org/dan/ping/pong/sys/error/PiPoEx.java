@@ -28,6 +28,11 @@ public class PiPoEx extends RuntimeException {
         return new PiPoEx(NOT_FOUND_404, new Error(clientMessage), null);
     }
 
+    public static PiPoEx notFound(String template, String param, Object value) {
+        return new PiPoEx(NOT_FOUND_404,
+                new TemplateError(template, ImmutableMap.of(param, value)), null);
+    }
+
     public static PiPoEx notAuthorized(String msg) {
         return new PiPoEx(UNAUTHORIZED_401, new Error(msg), null);
     }

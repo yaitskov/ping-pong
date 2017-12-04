@@ -5,5 +5,7 @@ module.exports = {
     'Open': 'Open',
     'Close': 'Close',
     'Canceled': 'Canceled',
-    'Replaced': 'Replaced'
+    'Replaced': 'Replaced',
+
+    'tournament not found': 'Tournament {{tid}} does not exist'
 };

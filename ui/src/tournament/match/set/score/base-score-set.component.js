@@ -56,6 +56,11 @@ angular.
                          };
                          self.pick = (idx, score) => {
                              self.scores[idx] = score;
+                             if (self.possibleLostScores.length == 0) {
+                                $rootScope.$broadcast('event.base.match.set.pick.lost',
+                                                      {setOrdNumber: self.match.playedSets,
+                                                       scores: findScores()});
+                             }
                          };
                          function findScores() {
                              return [{uid: self.participants[self.winnerIdx].uid,
@@ -94,7 +99,7 @@ angular.
                              'event.match.score.raise.conflict': (event, data) => {
                                  $rootScope.$broadcast('event.match.score.conflict',
                                                        {matchId: $routeParams.matchId,
-                                                        matchScore: resp.data.matchScore,
+                                                        matchScore: data.data.matchScore,
                                                         yourSetScore: findScores(),
                                                         participants: self.match.participants,
                                                         yourSet: self.match.playedSets});

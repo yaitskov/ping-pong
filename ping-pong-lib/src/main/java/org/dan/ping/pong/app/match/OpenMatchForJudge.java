@@ -25,6 +25,7 @@ public class OpenMatchForJudge {
     private List<UserLink> participants;
     private Instant started;
     private int minGamesToWin;
+    private int minAdvanceInGames;
     private int playedSets;
     private MatchType matchType;
 }

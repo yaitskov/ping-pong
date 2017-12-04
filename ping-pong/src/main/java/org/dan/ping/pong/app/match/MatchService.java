@@ -650,20 +650,24 @@ public class MatchService {
                                         .map(PlaceRules::getArenaDistribution).orElse(NO) == NO
                                         ? noTablesParticipantMatchComparator(tournament, uid)
                                         : PARTICIPANT_MATCH_COMPARATOR)
-                                .map(m -> MyPendingMatch.builder()
-                                        .mid(m.getMid())
-                                        .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
-                                        .state(m.getState())
-                                        .playedSets(m.getPlayedSets())
-                                        .tid(tournament.getTid())
-                                        .matchType(m.getType())
-                                        .minGamesToWin(tournament.getRule().getMatch().getMinGamesToWin())
-                                        .enemy(m.getOpponentUid(uid).map(ouid ->
-                                                ofNullable(tournament.getBid(ouid))
-                                                        .orElseThrow(() -> internalError("no opponent for "
-                                                        + uid + " in " + m)))
-                                                .map(ParticipantMemState::toLink))
-                                        .build())
+                                .map(m -> {
+                                    final MatchValidationRule matchRules = tournament.getRule().getMatch();
+                                    return MyPendingMatch.builder()
+                                            .mid(m.getMid())
+                                            .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
+                                            .state(m.getState())
+                                            .playedSets(m.getPlayedSets())
+                                            .tid(tournament.getTid())
+                                            .matchType(m.getType())
+                                            .minAdvanceInGames(matchRules.getMinAdvanceInGames())
+                                            .minGamesToWin(matchRules.getMinGamesToWin())
+                                            .enemy(m.getOpponentUid(uid).map(ouid ->
+                                                    ofNullable(tournament.getBid(ouid))
+                                                            .orElseThrow(() -> internalError("no opponent for "
+                                                                    + uid + " in " + m)))
+                                                    .map(ParticipantMemState::toLink))
+                                            .build();
+                                })
                                 .collect(toList()))
                         .showTables(tournament.getRule().getPlace().map(PlaceRules::getArenaDistribution)
                                 .orElse(NO) != NO)
@@ -739,7 +743,8 @@ public class MatchService {
     }
 
     public MatchResult matchResult(TournamentMemState tournament, Mid mid, Optional<Uid> ouid) {
-        MatchInfo m = tournament.getMatchById(mid);
+        final MatchInfo m = tournament.getMatchById(mid);
+        final MatchValidationRule matchRules = tournament.getRule().getMatch();
         return MatchResult.builder()
                 .participants(m.getParticipantIdScore().keySet().stream()
                         .map(uid -> tournament.getParticipant(uid).toLink())
@@ -752,7 +757,8 @@ public class MatchService {
                 .category(tournament.getCategory(m.getCid()))
                 .tid(tournament.getTid())
                 .playedSets(m.getPlayedSets())
-                .minGamesToWin(tournament.getRule().getMatch().getMinGamesToWin())
+                .minGamesToWin(matchRules.getMinGamesToWin())
+                .minAdvanceInGames(matchRules.getMinAdvanceInGames())
                 .build();
     }
 
@@ -776,10 +782,12 @@ public class MatchService {
     private OpenMatchForJudge getMatchForJudge(
             TournamentMemState tournament, MatchInfo m,
             TablesDiscovery tablesDiscovery) {
+        final MatchValidationRule matchRules = tournament.getRule().getMatch();
         return OpenMatchForJudge.builder()
                 .mid(m.getMid())
                 .tid(tournament.getTid())
-                .minGamesToWin(tournament.getRule().getMatch().getMinGamesToWin())
+                .minGamesToWin(matchRules.getMinGamesToWin())
+                .minAdvanceInGames(matchRules.getMinAdvanceInGames())
                 .playedSets(m.getPlayedSets())
                 .started(m.getStartedAt().get())
                 .matchType(m.getType())

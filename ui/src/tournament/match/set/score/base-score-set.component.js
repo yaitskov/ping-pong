@@ -29,7 +29,7 @@ angular.
                                  self.winnerIdx = (winScore == self.scores[0]) ? 0 : 1;
                                  self.pick(self.winnerIdx, winScore);
                                  self.pick(1 - self.winnerIdx, lostScore);
-                                 for (var i = 0; i <= Math.max(self.match.minGamesToWin, lostScore); ++i) {
+                                 for (var i = 0; i <= Math.max(self.match.minGamesToWin - self.match.minAdvanceInGames, lostScore); ++i) {
                                      self.possibleLostScores.push(i);
                                  }
                                  var winLimit = Math.max(self.match.minGamesToWin, winScore);
@@ -41,7 +41,7 @@ angular.
                                  self.possibleLostScores = [];
                                  self.scores = [-1, -1];
                                  self.pick(self.winnerIdx, self.match.minGamesToWin);
-                                 for (var i = 0 ; i <= self.match.minGamesToWin; ++i) {
+                                 for (var i = 0 ; i <= self.match.minGamesToWin - self.match.minAdvanceInGames; ++i) {
                                      self.possibleLostScores.push(i);
                                  }
                              }

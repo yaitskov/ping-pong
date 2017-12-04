@@ -26,6 +26,7 @@ public class MatchResult {
     private MatchScore score;
     private List<UserLink> participants;
     private int minGamesToWin;
+    private int minAdvanceInGames;
     private int disputes;
     private MatchState state;
     private MatchType type;

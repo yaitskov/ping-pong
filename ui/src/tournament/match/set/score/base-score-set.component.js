@@ -65,7 +65,7 @@ angular.
                          }
                          self.pickLost = (idx, score) => {
                              self.pick(idx, score);
-                             $rootScore.$broatcast('event.base.match.set.pick.lost',
+                             $rootScope.$broadcast('event.base.match.set.pick.lost',
                                                    {setOrdNumber: self.match.playedSets,
                                                     scores: findScores()});
                          };

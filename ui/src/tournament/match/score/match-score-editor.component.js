@@ -28,9 +28,9 @@ angular.
                                                     $routeParams.matchId);
                                  },
                                  (errRes) => {
-                                     if (errRes.status == 400 && errResp.data.error == 'effectHashMismatch') {
-                                         self.effectHash = errResp.data.effectHash;
-                                         self.effect = errResp.data.effectedMatches;
+                                     if (errRes.status == 400 && errRes.data.error == 'effectHashMismatch') {
+                                         self.effectHash = errRes.data.effectHash;
+                                         self.effect = errRes.data.effectedMatches;
                                          requestStatus.complete();
                                      } else {
                                          requestStatus.failed(errRes);

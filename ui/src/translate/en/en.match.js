@@ -24,5 +24,7 @@ module.exports = {
 
     'no-played-matches-in-tournament': 'Tournament has no played matches',
 
-    'Total': 'Total'
+    'Total': 'Total',
+
+    'Difference between games cannot be less than': 'Difference between games in the set {{set+1}} cannot be less than {{minAdvanceInGames}}'
 };

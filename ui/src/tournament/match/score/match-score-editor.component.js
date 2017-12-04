@@ -56,7 +56,9 @@ angular.
                              var keys = Object.keys(self.match.score.sets);
                              for (var i in keys) {
                                  self.match.score.sets[keys[i]].splice(-1, 1);
+                                 self.match.playedSets = self.match.score.sets[keys[i]].length;
                              }
+                             $rootScope.$broadcast('event.review.match.data', self.match);
                          };
 
                          binder($scope, {
@@ -72,6 +74,11 @@ angular.
                              'event.review.match.set.appended': (event) => {
                                  self.setRescoring = true;
                                  self.match.setScores = null;
+                                 var keys = Object.keys(self.match.score.sets);
+                                 for (var i in keys) {
+                                     self.match.playedSets = self.match.score.sets[keys[i]].length;
+                                     break;
+                                 }
                                  $rootScope.$broadcast('event.match.set', self.match);
                              },
                              'event.review.match.set.popped': (event) => {

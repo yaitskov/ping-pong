@@ -103,7 +103,7 @@ public class BidService {
         return tournament.getParticipants().values().stream()
                 .filter(p -> tournament.participantMatches(p.getUid())
                         .anyMatch(m -> m.getState() == Over
-                                || m.getState() == Game && m.getPlayedSets() > 0))
+                                || m.getPlayedSets() > 0))
                 .map(ParticipantMemState::toLink)
                 .sorted(Comparator.comparing(UserLink::getName))
                 .collect(toList());

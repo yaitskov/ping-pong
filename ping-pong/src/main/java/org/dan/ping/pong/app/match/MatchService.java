@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.match;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.min;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
@@ -167,6 +168,10 @@ public class MatchService {
     public void completeMatch(MatchInfo mInfo, Uid winUid,
             DbUpdater batch, Set<MatchState> expectedMatchStates) {
         log.info("Match {} won by {}", mInfo.getMid(), winUid);
+        if (!expectedMatchStates.contains(mInfo.getState())) {
+            throw internalError("Match " + mInfo.getMid()
+                    + " should be in state " + expectedMatchStates);
+        }
         mInfo.setState(Over);
         mInfo.setWinnerId(Optional.of(winUid));
         final Instant now = clocker.get();
@@ -704,8 +709,7 @@ public class MatchService {
 
     public PlayedMatchList findPlayedMatchesByBid(TournamentMemState tournament, Uid uid) {
         final List<MatchInfo> completeMatches = tournament.participantMatches(uid)
-                .filter(m -> m.getState() == Over
-                        || m.getState() == Game && m.getPlayedSets() > 0)
+                .filter(m -> m.getState() == Over || m.getPlayedSets() > 0)
                 .sorted(Comparator.comparing(m -> m.getEndedAt().get()))
                 .collect(toList());
         return PlayedMatchList.builder()

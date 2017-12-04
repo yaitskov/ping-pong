@@ -53,8 +53,7 @@ import javax.inject.Named;
 public class MatchEditorService {
     public static final String DONT_CHECK_HASH = "dont-check-hash";
 
-    private static final Set<MatchState> rescorableMatchState = ImmutableSet.of(Game, Over);
-    private static final Set<MatchState> GAME_EXPECTED = singleton(Game);
+    private static final Set<MatchState> GAME_PLACE_EXPECTED = ImmutableSet.of(Place, Game);
     private static final Set<MatchState> OVER_EXPECTED = singleton(Over);
 
     @Inject
@@ -326,7 +325,7 @@ public class MatchEditorService {
         } else { // was playing
             log.info("Rescored mid {} is complete", mInfo.getMid());
             matchService.matchWinnerDetermined(
-                    tournament, mInfo, newWinner.get(), batch, GAME_EXPECTED);
+                    tournament, mInfo, newWinner.get(), batch, GAME_PLACE_EXPECTED);
         }
     }
 
@@ -378,9 +377,6 @@ public class MatchEditorService {
             Map<Uid, List<Integer>> newSets) {
         if (!openOrClose.contains(tournament.getState())) {
             throw badRequest("tournament is not open nor closed");
-        }
-        if (!rescorableMatchState.contains(mInfo.getState())) {
-            throw badRequest("match is not in a rescorable state");
         }
         if (mInfo.getPlayedSets() == 0) {
             throw badRequest("match should have a scored set");

@@ -23,7 +23,6 @@ angular.
                                          requestStatus.complete();
                                          self.match = match;
                                          self.isMatchStateGameOver = (match.state == 'Game' || match.state == 'Over');
-                                         self.isMatchStateGameOver = (match.state == 'Game' || match.state == 'Over');
                                          self.isMatchStateDraftPlaceGame = match.state == 'Game' ||
                                              match.state == 'Draft' ||
                                              match.state == 'Place';

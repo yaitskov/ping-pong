@@ -35,7 +35,7 @@
       <span class="glyphicon glyphicon-play-circle"></span>
     </a>
     <a class="btn btn-warning"
-       ng-show="$ctrl.match.role == 'Admin' && $ctrl.isMatchStateGameOver"
+       ng-show="$ctrl.match.role == 'Admin' && $ctrl.match.playedSets"
        title="alter set score"
        href="#!/match/edit-score/{{$ctrl.tournamentId}}/{{$ctrl.matchId}}">
       <span class="glyphicon glyphicon-pencil"></span>

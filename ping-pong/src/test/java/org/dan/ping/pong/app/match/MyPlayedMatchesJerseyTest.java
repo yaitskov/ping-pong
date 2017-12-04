@@ -21,6 +21,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 
 @Category(JerseySpringTest.class)
@@ -57,16 +59,16 @@ public class MyPlayedMatchesJerseyTest extends AbstractSpringJerseyTest {
                 allOf(
                         hasProperty("opponent",
                                 hasProperty("uid", is(scenario.player2Uid(p1)))),
-                        hasProperty("winnerUid", is(scenario.player2Uid(p2))))));
+                        hasProperty("winnerUid", is(Optional.of(scenario.player2Uid(p2)))))));
 
         assertThat(played.getInGroup(), contains(
                 allOf(
                         hasProperty("opponent",
                                 hasProperty("uid", is(scenario.player2Uid(p1)))),
-                        hasProperty("winnerUid", is(scenario.player2Uid(p1)))),
+                        hasProperty("winnerUid", is(Optional.of(scenario.player2Uid(p1))))),
                 allOf(
                         hasProperty("opponent",
                                 hasProperty("uid", is(scenario.player2Uid(p3)))),
-                        hasProperty("winnerUid", is(scenario.player2Uid(p2))))));
+                        hasProperty("winnerUid", is(Optional.of(scenario.player2Uid(p2)))))));
     }
 }

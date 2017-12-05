@@ -1,17 +1,6 @@
 <main-menu></main-menu>
 <div class="container admin-judgement">
   <request-status></request-status>
-  <div ng-show="!$ctrl.showTables && $ctrl.bids.length == 0 || $ctrl.showTables && $ctrl.matches.length == 0">
-    <div class="alert alert-info" translate="tournament is complete"
-         translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
-    </div>
-    <div class="form-group">
-      <a class="btn btn-default"
-         href="#!/tournament/result/{{$ctrl.tournamentId}}">
-        {{ 'Watch Ratings' | translate }}
-      </a>
-    </div>
-  </div>
   <div class="form-group">
     <a class="btn btn-default" title="back" back-button>
       <span class="glyphicon glyphicon-circle-arrow-left"></span>
@@ -26,6 +15,17 @@
        class="btn btn-default">
       <span class="glyphicon glyphicon-book"/>
     </a>
+  </div>
+  <div ng-show="!$ctrl.showTables && $ctrl.bids.length == 0 || $ctrl.showTables && $ctrl.matches.length == 0">
+    <div class="alert alert-info" translate="tournament is complete"
+         translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
+    </div>
+    <div class="form-group">
+      <a class="btn btn-default"
+         href="#!/tournament/result/{{$ctrl.tournamentId}}">
+        {{ 'Watch Ratings' | translate }}
+      </a>
+    </div>
   </div>
   <div class="form-group tables" ng-show="$ctrl.showTables && $ctrl.matches.length">
     <button class="btn btn-primary"

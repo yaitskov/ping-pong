@@ -53,7 +53,7 @@ angular.module('tournament').
                                                  {tournamentId: $routeParams.tournamentId},
                                                  (matches) => {
                                                      requestStatus.complete();
-                                                     self.matches = matches.matches;
+                                                     self.matches = matches.matches || [];
                                                      self.progress = matches.progress;
                                                      self.tournamentNotOpen = !matches.length;
                                                  },
@@ -67,7 +67,7 @@ angular.module('tournament').
                                                  },
                                                  (bids) => {
                                                      requestStatus.complete();
-                                                     self.bids = bids;
+                                                     self.bids = bids || [];
                                                      if (bids.length) {
                                                          self.bid = "" + cutil.findValByO(
                                                              bids, {uid: +pageCtx.get('last-bid')}, bids[0]).uid;

@@ -27,8 +27,8 @@ angular.
                                  self.possibleWinScores = [];
                                  self.possibleLostScores = [];
                                  self.winnerIdx = (winScore == self.scores[0]) ? 0 : 1;
-                                 self.pick(self.winnerIdx, winScore);
-                                 self.pick(1 - self.winnerIdx, lostScore);
+                                 self.scores[self.winnerIdx] = winScore;
+                                 self.scores[1 - self.winnerIdx] = lostScore;
                                  for (var i = 0; i <= Math.max(self.match.minGamesToWin - self.match.minAdvanceInGames, lostScore); ++i) {
                                      self.possibleLostScores.push(i);
                                  }
@@ -37,29 +37,39 @@ angular.
                                      self.possibleWinScores.push(i);
                                  }
                              } else {
-                                 self.possibleWinScores = [self.match.minGamesToWin];
-                                 self.possibleLostScores = [];
                                  self.scores = [-1, -1];
-                                 self.pick(self.winnerIdx, self.match.minGamesToWin);
-                                 for (var i = 0 ; i <= self.match.minGamesToWin - self.match.minAdvanceInGames; ++i) {
-                                     self.possibleLostScores.push(i);
-                                 }
+                                 self.noBalance();
                              }
                          }
+                         self.noBalance = function () {
+                             self.possibleWinScores = [self.match.minGamesToWin];
+                             self.possibleLostScores = [];
+                             self.scores[self.winnerIdx] = self.match.minGamesToWin;
+                             for (var i = 0 ; i <= self.match.minGamesToWin - self.match.minAdvanceInGames; ++i) {
+                                 self.possibleLostScores.push(i);
+                             }
+                         };
                          self.extendWinScore = function () {
                              self.possibleLostScores.length = 0;
                              var last = self.possibleWinScores[self.possibleWinScores.length - 1];
                              self.possibleWinScores.length = 0;
+                             self.possibleWinScores.push(self.match.minGamesToWin);
                              for (var i = 0; i < 3; ++i) {
                                  self.possibleWinScores.push(++last);
                              }
                          };
-                         self.pick = (idx, score) => {
+                         self.pick = (idx, score, noEvent) => {
                              self.scores[idx] = score;
-                             if (self.possibleLostScores.length == 0) {
-                                $rootScope.$broadcast('event.base.match.set.pick.lost',
-                                                      {setOrdNumber: self.match.playedSets,
-                                                       scores: findScores()});
+                             if (score > self.match.minGamesToWin) {
+                                 self.scores[1 - idx] = score - self.match.minAdvanceInGames;
+                                 $rootScope.$broadcast('event.base.match.set.pick.lost',
+                                                       {setOrdNumber: self.match.playedSets,
+                                                        scores: findScores()});
+                             } else if (score == self.match.minGamesToWin && self.possibleWinScores.length > 1) {
+                                 self.noBalance();
+                                 if (self.scores[1 - idx] > score - self.match.minAdvanceInGames) {
+                                     self.scores[1 - idx] = score - self.match.minAdvanceInGames;
+                                 }
                              }
                          };
                          function findScores() {
@@ -69,7 +79,7 @@ angular.
                                       score: self.scores[1 - self.winnerIdx]}];
                          }
                          self.pickLost = (idx, score) => {
-                             self.pick(idx, score);
+                             self.scores[idx] = score;
                              $rootScope.$broadcast('event.base.match.set.pick.lost',
                                                    {setOrdNumber: self.match.playedSets,
                                                     scores: findScores()});

@@ -31,5 +31,7 @@ module.exports = {
     'Set': 'Set',
     'Winner': 'Zwycięzca',
     'match-continues': 'Mecz trwa...',
-    'Group members': 'Skład grupy'
+    'Group members': 'Skład grupy',
+
+    'won sets more that required': 'Mecz ma za dużo wygranych setów'
 };

@@ -32,5 +32,7 @@ module.exports = {
     'Set': 'Set',
     'Winner': 'Winner',
     'match-continues': 'Match continues...',
-    'Group members': 'Group members'
+    'Group members': 'Group members',
+
+    'won sets more that required': 'Match has to many won sets'
 };

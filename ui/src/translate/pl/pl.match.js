@@ -30,5 +30,6 @@ module.exports = {
     'Sets': 'Sety',
     'Set': 'Set',
     'Winner': 'Zwycięzca',
-    'match-continues': 'Mecz trwa...'
+    'match-continues': 'Mecz trwa...',
+    'Group members': 'Skład grupy'
 };

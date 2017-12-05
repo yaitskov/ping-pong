@@ -31,5 +31,6 @@ module.exports = {
     'Sets': 'Sets',
     'Set': 'Set',
     'Winner': 'Winner',
-    'match-continues': 'Match continues...'
+    'match-continues': 'Match continues...',
+    'Group members': 'Group members'
 };

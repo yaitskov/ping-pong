@@ -1,16 +1,21 @@
 package org.dan.ping.pong.app.group;
 
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchValidationRule;
+import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
+import org.dan.ping.pong.sys.error.PiPoEx;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -127,5 +132,19 @@ public class GroupService {
                 .stream()
                 .anyMatch(m -> ogid.equals(m.getGid())
                         && m.getState() != Over);
+    }
+
+    public GroupWithMembers members(TournamentMemState tournament, int gid) {
+        final GroupInfo groupInfo = ofNullable(tournament.getGroups().get(gid))
+                .orElseThrow(() -> notFound("group not found", "gid", gid));
+        return GroupWithMembers.builder()
+                .gid(gid)
+                .name(groupInfo.getLabel())
+                .category(tournament.getCategory(groupInfo.getCid()))
+                .members(tournament.getParticipants().values().stream()
+                        .filter(p -> p.getGid().equals(of(gid)))
+                        .map(ParticipantMemState::toLink)
+                        .collect(toList()))
+                .build();
     }
 }

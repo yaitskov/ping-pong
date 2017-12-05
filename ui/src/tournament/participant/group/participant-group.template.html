@@ -1,0 +1,33 @@
+<main-menu></main-menu>
+<div class="container tournament-result">
+  <request-status></request-status>
+  <div class="form-group">
+    <a class="btn btn-primary"
+       href="#!/my/tournament/{{$ctrl.tournamentId}}/category/{{$ctrl.group.category.cid}}/members">
+      {{$ctrl.group.category.name}}
+    </a>
+  </div>
+  <div class="form-group">
+    <table class="table" ng-show="$ctrl.members">
+      <thead>
+        <tr>
+          <td>#</td>
+          <td>{{ 'Participant' | translate }}</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="participant in $ctrl.members">
+          <td>{{$index + 1}}</td>
+          <td title="{{ 'Opponents participating in the match' | translate }}">
+            <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}">
+              {{participant.name}}
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="alert alert-info" ng-show="$ctrl.members.length == 0">
+      Group has no participants
+    </div>
+  </div>
+</div>

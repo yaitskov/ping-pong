@@ -8,6 +8,13 @@ angular.
                               populations: {
                                   url: '/api/group/populations/:tournamentId/cid/:categoryId',
                                   method: 'GET'
+                              },
+                              infoWithMembers: {
+                                  url: '/api/group/members/:tournamentId/:groupId',
+                                  method: 'GET',
+                                  headers: {
+                                      session: 1
+                                  }
                               }
                           });
                       }

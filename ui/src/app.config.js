@@ -115,6 +115,9 @@ angular.module('pingPong').
                     when('/watch/tournament/:tournamentId', {
                         template: '<watch-tournament/>'
                     }).
+                    when('/group/members/:tournamentId/:groupId', {
+                        template: '<participant-group/>'
+                    }).
                     when('/tournament/new', {
                         template: '<new-tournament/>'
                     }).

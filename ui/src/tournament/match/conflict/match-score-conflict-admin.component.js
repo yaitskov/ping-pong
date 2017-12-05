@@ -12,7 +12,7 @@ angular.
                              'event.main.menu.ready': (e) => mainMenu.setTitle('Match scoring conflict')});
                          self.conflict = pageCtx.get('match-score-conflict-' + $routeParams.matchId);
                          self.matchScore = self.conflict.matchScore;
-                         self.matchId = $route.matchId;
+                         self.matchId = $routeParams.matchId;
                          self.tournamentId = $routeParams.tournamentId;
 
                          self.showReview = function () {

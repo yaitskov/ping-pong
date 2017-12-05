@@ -5,8 +5,8 @@ angular.
     module('tournament').
     component('matchManagement', {
         templateUrl: template,
-        controller: ['Match', 'mainMenu', '$routeParams', 'binder', '$rootScope', '$scope', 'requestStatus',
-                     function (Match, mainMenu, $routeParams, binder, $rootScope, $scope, requestStatus) {
+        controller: ['Match', 'mainMenu', '$routeParams', 'binder', '$rootScope', '$scope', 'requestStatus', 'pageCtx',
+                     function (Match, mainMenu, $routeParams, binder, $rootScope, $scope, requestStatus, pageCtx) {
                          var self = this;
                          self.tournamentId = $routeParams.tournamentId;
                          self.matchId = $routeParams.matchId;
@@ -21,6 +21,7 @@ angular.
                                       matchId: $routeParams.matchId},
                                      function (match) {
                                          requestStatus.complete();
+                                         pageCtx.put('last-scoring-match', match);
                                          self.match = match;
                                          self.isMatchStateGameOver = (match.state == 'Game' || match.state == 'Over');
                                          self.isMatchStateDraftPlaceGame = match.state == 'Game' ||

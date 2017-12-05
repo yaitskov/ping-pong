@@ -31,9 +31,9 @@ angular.
                                              matchReady.got('match.loaded', match);
                                          },
                                          requestStatus.failed);
-                                     } else {
-                                         matchReady.got('match.loaded', self.match);
-                                     }
+                                 } else {
+                                     matchReady.got('match.loaded', self.match);
+                                 }
                              },
                              'event.main.menu.ready': (e) => mainMenu.setTitle('Match Scoring'),
                              'event.match.set.ready': (event) => matchReady.got('score.widget.ready'),

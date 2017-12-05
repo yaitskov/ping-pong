@@ -1,6 +1,6 @@
 <table class="table">
   <tr>
-    <td>Sets</td>
+    <td translate="Sets" />
     <td ng-repeat="participant in $ctrl.participants">
       <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}">
         <you name="participant.name | compactName"/>
@@ -45,7 +45,7 @@
     </td>
   </tr>
   <tr ng-show="$ctrl.matchScore.winUid">
-    <td>Winner</td>
+    <td translate="Winner" />
     <td colspan="2">
       <span ng-repeat="participant in $ctrl.participants">
         <a href="#!/my/tournament/{{$ctrl.matchScore.tid}}/participant/{{participant.uid}}"

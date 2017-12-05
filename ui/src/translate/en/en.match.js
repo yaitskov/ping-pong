@@ -26,5 +26,10 @@ module.exports = {
 
     'Total': 'Total',
 
-    'Difference between games cannot be less than': 'Difference between games in the set {{set+1}} cannot be less than {{minAdvanceInGames}}'
+    'Difference between games cannot be less than': 'Difference between games in the set {{set+1}} cannot be less than {{minAdvanceInGames}}',
+
+    'Sets': 'Sets',
+    'Set': 'Set',
+    'Winner': 'Winner',
+    'match-continues': 'Match continues...'
 };

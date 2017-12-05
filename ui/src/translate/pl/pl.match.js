@@ -25,5 +25,10 @@ module.exports = {
 
     'Total': 'Suma',
 
-    'Difference between games cannot be less than': 'W secie {{set+1}} różnica między gemami nie może być mniej niż {{minAdvanceInGames}}'
+    'Difference between games cannot be less than': 'W secie {{set+1}} różnica między gemami nie może być mniej niż {{minAdvanceInGames}}',
+
+    'Sets': 'Sety',
+    'Set': 'Set',
+    'Winner': 'Zwycięzca',
+    'match-continues': 'Mecz trwa...'
 };

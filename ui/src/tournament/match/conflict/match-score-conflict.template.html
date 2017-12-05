@@ -7,7 +7,7 @@
 <div class="form-group">
   <table class="table">
     <tr>
-      <td>Set</td>
+      <td translate="Set" />
       <td ng-repeat="participant in $ctrl.participants">
         <a href="#!/my/tournament/{{$ctrl.matchScore.tid}}/participant/{{participant.uid}}">
           <you name="participant.name | compactName"/>
@@ -31,7 +31,7 @@
       </td>
     </tr>
     <tr>
-      <td>Total</td>
+      <td translate="Total" />
       <td class="alert" ng-class="{'success': $ctrl.participants[0].uid == $ctrl.matchScore.winUid, 'danger': $ctrl.participants[1].uid == $ctrl.matchScore.winUid}">
         {{$ctrl.matchScore.wonSets[$ctrl.participants[0].uid]}}
       </td>
@@ -40,7 +40,7 @@
       </td>
     </tr>
     <tr ng-show="$ctrl.matchScore.winUid">
-      <td>Winner</td>
+      <td translate="Winner" />
       <td colspan="2">
         <span ng-repeat="participant in $ctrl.participants">
           <a href="#!/my/tournament/{{$ctrl.matchScore.tid}}/participant/{{participant.uid}}"
@@ -51,9 +51,7 @@
       </td>
     </tr>
     <tr ng-show="!$ctrl.matchScore.winUid">
-      <td colspan="3">
-        Match continues...
-      </td>
+      <td colspan="3" translate="match-continues" />
     </tr>
   </table>
 </div>

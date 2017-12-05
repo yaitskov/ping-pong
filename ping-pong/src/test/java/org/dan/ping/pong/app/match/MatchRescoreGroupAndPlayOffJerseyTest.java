@@ -276,4 +276,25 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .checkTournamentComplete(restState(Lost)
                                 .bid(p1, Win2).bid(p2, Win1)));
     }
+
+    @Test
+    public void twoGroupsBy2AlmostCompleteRescoreP1P2() {
+        isf.create(begin().name("2GrpsBy3AlmostCmpltS1RP1P2")
+                .rules(RULES_G3Q2_S1A2G11)
+                .category(c1, p1, p2, p3, p4, p5, p6))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p3, 3)
+                        .scoreSet(p4, 11, p6, 6)
+
+                        .scoreSet(p1, 11, p2, 2)
+                        .scoreSet(p4, 11, p5, 1)
+
+                        .scoreSet(p2, 11, p3, 5)
+                        .scoreSet(p5, 11, p6, 7)
+
+                        .scoreSet(p1, 11, p5, 5)
+                        .scoreSet(p4, 11, p2, 2)
+                        .rescoreMatch(p1, p2, 2, 11));
+    }
+
 }

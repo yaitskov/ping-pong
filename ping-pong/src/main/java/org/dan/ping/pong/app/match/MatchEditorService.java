@@ -148,6 +148,12 @@ public class MatchEditorService {
         rescoredGroupMatches.add(rescoredMatch);
 
         rescoredMatch.setParticipantIdScore(newSets);
+        tournament.getRule().getMatch().findWinnerByScores(newSets)
+                .ifPresent(wUid -> rescoredMatch.setWinnerId(Optional.of(wUid)));
+
+        if (!rescoredMatch.getWinnerId().isPresent()) {
+            throw internalError("no winner");
+        }
 
         final List<Uid> thenQuittingUids = groupService.findUidsQuittingGroup(
                 tournament, groupRules, rescoredGroupMatches);

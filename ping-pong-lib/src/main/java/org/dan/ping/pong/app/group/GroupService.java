@@ -15,7 +15,6 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
-import org.dan.ping.pong.sys.error.PiPoEx;
 
 import java.util.Collection;
 import java.util.Comparator;

@@ -13,13 +13,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupInfo {
-    private int gid;
-    private int cid;
-    private int ordNumber;
-    private String label;
-
-    public GroupLink toLink() {
-        return GroupLink.builder().label(label).gid(gid).build();
-    }
+public class HisIntPair {
+    private int his;
+    private int enemy;
 }

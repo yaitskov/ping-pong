@@ -5,9 +5,9 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
-import org.dan.ping.pong.app.castinglots.CastingLotsDao;
-import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.castinglots.CastingLotsDaoIf;
+import org.dan.ping.pong.app.tournament.ParticipantMemState;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ public class ParticipantRankingService {
     }
 
     @Inject
-    private CastingLotsDao castingLotsDao;
+    private CastingLotsDaoIf castingLotsDao;
 
     private List<ParticipantMemState> sortByProvidedRating(List<ParticipantMemState> bids,
             OrderDirection direction) {

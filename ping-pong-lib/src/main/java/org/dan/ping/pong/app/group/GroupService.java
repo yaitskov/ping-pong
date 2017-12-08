@@ -4,6 +4,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.IntStream.range;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
@@ -11,18 +12,25 @@ import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentRules;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import javax.inject.Inject;
 
 
 @Slf4j
@@ -145,5 +153,60 @@ public class GroupService {
                         .map(ParticipantMemState::toLink)
                         .collect(toList()))
                 .build();
+    }
+
+    @Inject
+    private ParticipantRankingService rankingService;
+
+    public GroupParticipants result(TournamentMemState tournament, int gid) {
+        final List<MatchInfo> matches = findMatchesInGroup(tournament, gid);
+        final List<ParticipantMemState> bids = groupBids(tournament, gid);
+        final TournamentRules rules = tournament.getRule();
+        final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(
+                uid -> Play,
+                matches);
+        final MatchValidationRule matchRule = tournament.getRule().getMatch();
+        matches.forEach(minfo -> aggMatch(uid2Stat, minfo, matchRule));
+        final DisambiguationPolicy disambiguation = tournament.getRule()
+                .getGroup().get().getDisambiguation();
+        final List<Uid> finalUidsOrder = order(uid2Stat.values(), disambiguation)
+                .stream().map(BidSuccessInGroup::getUid)
+                .collect(toList());
+
+        final List<ParticipantMemState> seedBidsOrder = rankingService
+                .sort(bids, rules.getCasting());
+        final Map<Uid, GroupParticipantResult> result = bids.stream().collect(toMap(
+                ParticipantMemState::getUid,
+                bid -> {
+                    final Optional<BidSuccessInGroup> bidResult = ofNullable(uid2Stat.get(bid.getUid()));
+                    return GroupParticipantResult.builder()
+                            .name(bid.getName())
+                            .uid(bid.getUid())
+                            .punkts(bidResult.get().getPunkts())
+                            .matches(matches.stream()
+                                    .filter(m -> m.hasParticipant(bid.getUid()))
+                                    .collect(toMap(
+                                            m -> m.getOpponentUid(bid.getUid()).get(),
+                                            m -> GroupMatchResult.builder()
+                                                    .sets(HisIntPair.builder().build())
+                                                    .games(Collections.emptyList())
+                                                    .build())))
+                            .build();
+                }));
+
+        range(0, finalUidsOrder.size()).forEach(
+                i -> result.get(finalUidsOrder.get(i)).setFinishPosition(i));
+        range(0, finalUidsOrder.size()).forEach(
+                i -> result.get(seedBidsOrder.get(i).getUid()).setSeedPosition(i));
+
+        return GroupParticipants.builder()
+                .tid(tournament.getTid())
+                .participants(result.values())
+                .build();
+    }
+
+    private List<ParticipantMemState> groupBids(TournamentMemState tournament, int gid) {
+        return tournament.getParticipants().values().stream()
+                .filter(bid -> bid.getGid().equals(of(gid))).collect(toList());
     }
 }

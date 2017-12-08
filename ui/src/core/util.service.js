@@ -126,6 +126,15 @@ angular.
             return $filter('date')(dt, 'MMM d EEE h:mm a Z').replace(/:00 /, ' ');
         };
     }]).
+    filter('initials', function () {
+        return function (name) {
+            if (name.indexOf(' ') < 0) {
+                return name.substr(0, 2);
+            }
+            var nameParts = name.split(' ');
+            return nameParts[0].substr(0, 1) + nameParts[1].substr(0, 1);
+        };
+    }).
     filter('compactName',  function () {
         return function (name) {
             if (name.indexOf(' ') < 0) {

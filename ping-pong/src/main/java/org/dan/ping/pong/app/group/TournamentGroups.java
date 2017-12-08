@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.category.CategoryLink;
+
+import java.util.Map;
 
 @Getter
 @Setter
@@ -13,13 +16,8 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupInfo {
-    private int gid;
-    private int cid;
-    private int ordNumber;
-    private String label;
+public class TournamentGroups {
+    private Map<Integer, GroupInfo> groups;
+    private Map<Integer, CategoryLink> categories;
 
-    public GroupLink toLink() {
-        return GroupLink.builder().label(label).gid(gid).build();
-    }
 }

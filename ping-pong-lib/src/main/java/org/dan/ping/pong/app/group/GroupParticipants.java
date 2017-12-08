@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.tournament.Tid;
+
+import java.util.Collection;
 
 @Getter
 @Setter
@@ -13,13 +16,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupInfo {
-    private int gid;
-    private int cid;
-    private int ordNumber;
-    private String label;
-
-    public GroupLink toLink() {
-        return GroupLink.builder().label(label).gid(gid).build();
-    }
+public class GroupParticipants {
+    private Collection<GroupParticipantResult> participants;
+    private Tid tid;
 }

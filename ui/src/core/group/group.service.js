@@ -15,6 +15,14 @@ angular.
                                   headers: {
                                       session: 1
                                   }
+                              },
+                              list: {
+                                  url: '/api/group/list/:tournamentId',
+                                  method: 'GET'
+                              },
+                              result: {
+                                  url: '/api/group/result/:tournamentId/:groupId',
+                                  method: 'GET'
                               }
                           });
                       }

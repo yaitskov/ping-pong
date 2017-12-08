@@ -9,9 +9,15 @@
        ng-show="$ctrl.tournament.state == 'Open'">
     {{ 'tournament in progress' | translate : '{name: $ctrl.tournament.name}' }}
   </div>
- <div class="alert alert-info"
+  <div class="alert alert-info"
        ng-show="$ctrl.tournament.state == 'Draft' || $ctrl.tournament.state == 'Announce'">
     {{ 'tournament not started' | translate : '{name: $ctrl.tournament.name}' }}
+  </div>
+  <div class="form-group">
+      <a href="#!/tournament/group/result/{{$ctrl.tournament.tid}}"
+         class="btn btn-primary">
+         <span class="glyphicon glyphicon-th"></span>
+      </a>
   </div>
   <div class="form-group" ng-show="$ctrl.tournament.categories.length > 1">
     <label>{{ 'Categories' | translate }}</label>

@@ -7,19 +7,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupInfo {
-    private int gid;
-    private int cid;
-    private int ordNumber;
-    private String label;
-
-    public GroupLink toLink() {
-        return GroupLink.builder().label(label).gid(gid).build();
-    }
+public class GroupMatchResult {
+    private HisIntPair sets;
+    private List<HisIntPair> games;
 }

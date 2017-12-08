@@ -44,7 +44,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 @Slf4j
-public class CastingLotsDao {
+public class CastingLotsDao implements CastingLotsDaoIf {
     @Inject
     private DSLContext jooq;
 

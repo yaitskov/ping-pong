@@ -26,6 +26,8 @@ public class GroupResource {
     public static final String CID = "/cid/";
     public static final String GID_JP = "{gid}";
     public static final String GID = "gid";
+    public static final String GROUP_RESULT = "/group/result/";
+    public static final String GROUP_LIST = "/group/list/";
 
     @Inject
     private GroupService groupService;
@@ -53,5 +55,27 @@ public class GroupResource {
             @PathParam(GID) int gid) {
         tournamentAccessor.read(tid, response,
                 tournament -> groupService.members(tournament, gid));
+    }
+
+    @GET
+    @Path(GROUP_LIST + TID_JP)
+    public void list(
+            @Suspended AsyncResponse response,
+            @PathParam(TID) Tid tid) {
+        tournamentAccessor.read(tid, response,
+                tournament -> TournamentGroups.builder()
+                        .categories(tournament.getCategories())
+                        .groups(tournament.getGroups())
+                        .build());
+    }
+
+    @GET
+    @Path(GROUP_RESULT + TID_JP + "/" + GID_JP)
+    public void result(
+            @Suspended AsyncResponse response,
+            @PathParam(TID) Tid tid,
+            @PathParam(GID) int gid) {
+        tournamentAccessor.read(tid, response,
+                tournament -> groupService.result(tournament, gid));
     }
 }

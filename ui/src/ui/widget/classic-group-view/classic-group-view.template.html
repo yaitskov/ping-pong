@@ -1,0 +1,57 @@
+<table class="table">
+    <thead>
+    <tr>
+        <td title="position">
+            #
+        </td>
+        <td>
+            Participant
+        </td>
+        <td ng-repeat="participant in $ctrl.participants">
+            {{ $index + 1 }} {{participant.name | initials}}
+        </td>
+        <td title="punkts">
+            Punkts
+        </td>
+        <td title="initials">
+            N
+        </td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="participant in $ctrl.participants">
+        <td>{{$index + 1}}</td>
+        <td>
+            <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}">
+                {{participant.name}}
+            </a>
+        </td>
+        <td ng-repeat="p2 in $ctrl.participants">
+            <span ng-show="participant.uid == p2.uid">
+                {{participant.name | initials}}
+            </span>
+            <span ng-show="participant.uid != p2.uid">
+                <span ng-switch="$ctrl.scoreShowMode">
+                    <span ng-switch-when="'sets'">
+                        {{ participant.enemies[p2.uid].sets.his }}:{{ participant.enemies[p2.uid].sets.enemy }}
+                    </span>
+                    <span ng-switch-when="'games'">
+                        <span ng-repeat="set in participant.enemies[p2.uid].games">
+                            {{ set.his }}:{{ set.enemy }}
+                        </span>
+                    </span>
+                    <span ng-switch-default>
+                        unsupported mode {{$ctrl.scoreShowMode}}
+                    </span>
+                </span>
+            </span>
+        </td>
+        <td>
+            {{participant.punkts}}
+        </td>
+        <td>
+            {{participant.name | initials}}
+        </td>
+    </tr>
+    </tbody>
+</table>

@@ -34,5 +34,7 @@ module.exports = {
     'match-continues': 'Match continues...',
     'Group members': 'Group members',
 
-    'won sets more that required': 'Match has to many won sets'
+    'won sets more that required': 'Match has to many won sets',
+
+    'Results in groups': 'Results in groups'
 };

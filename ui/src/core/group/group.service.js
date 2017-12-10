@@ -18,11 +18,13 @@ angular.
                               },
                               list: {
                                   url: '/api/group/list/:tournamentId',
-                                  method: 'GET'
+                                  method: 'GET',
+                                  isArray: false,
                               },
                               result: {
                                   url: '/api/group/result/:tournamentId/:groupId',
-                                  method: 'GET'
+                                  method: 'GET',
+                                  isArray: false,
                               }
                           });
                       }

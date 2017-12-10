@@ -33,5 +33,7 @@ module.exports = {
     'match-continues': 'Mecz trwa...',
     'Group members': 'Skład grupy',
 
-    'won sets more that required': 'Mecz ma za dużo wygranych setów'
+    'won sets more that required': 'Mecz ma za dużo wygranych setów',
+
+    'Results in groups': 'Wyniki w grupie'
 };

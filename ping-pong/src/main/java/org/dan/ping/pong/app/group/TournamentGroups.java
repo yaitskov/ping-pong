@@ -8,7 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.category.CategoryLink;
 
-import java.util.Map;
+import java.util.Collection;
 
 @Getter
 @Setter
@@ -17,7 +17,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TournamentGroups {
-    private Map<Integer, GroupInfo> groups;
-    private Map<Integer, CategoryLink> categories;
+    private Collection<GroupInfo> groups;
+    private Collection<CategoryLink> categories;
 
 }

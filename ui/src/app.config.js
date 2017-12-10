@@ -119,7 +119,7 @@ angular.module('pingPong').
                         template: '<participant-group/>'
                     }).
                     when('/tournament/group/result/:tournamentId', {
-                        template: '<tournamentGroupResult/>'
+                        template: '<tournament-group-result/>'
                     }).
                     when('/tournament/new', {
                         template: '<new-tournament/>'

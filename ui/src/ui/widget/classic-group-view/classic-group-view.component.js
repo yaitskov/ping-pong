@@ -12,14 +12,14 @@ angular.
                          var sorters = {
                              'seed':  (a, b) => a.seedPosition - b.seedPosition,
                              'final': (a, b) => a.finishPosition - b.finishPosition,
-                             'abc':   (a, b) => a.name.localeCompare(a.name)
+                             'name':   (a, b) => a.name.localeCompare(b.name)
                          };
                          self.scoreShowMode = 'sets';
                          self.rowOrder = 'seed'; // final | abc
                          self.loadData = function (tournament) {
                              self.participants = tournament.participants;
                              self.tournamentId = tournament.tid;
-                             participants.sort(sorters[self.rowOrder]);
+                             self.participants.sort(sorters[self.rowOrder]);
                          };
                          self.setRowOrder = function (order) {
                              self.rowOrder = order;

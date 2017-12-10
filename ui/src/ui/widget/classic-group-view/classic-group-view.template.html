@@ -32,11 +32,11 @@
             </span>
             <span ng-show="participant.uid != p2.uid">
                 <span ng-switch="$ctrl.scoreShowMode">
-                    <span ng-switch-when="'sets'">
-                        {{ participant.enemies[p2.uid].sets.his }}:{{ participant.enemies[p2.uid].sets.enemy }}
+                    <span ng-switch-when="sets">
+                        {{ participant.matches[p2.uid].sets.his }}:{{ participant.matches[p2.uid].sets.enemy }}
                     </span>
-                    <span ng-switch-when="'games'">
-                        <span ng-repeat="set in participant.enemies[p2.uid].games">
+                    <span ng-switch-when="games">
+                        <span ng-repeat="set in participant.matches[p2.uid].games">
                             {{ set.his }}:{{ set.enemy }}
                         </span>
                     </span>

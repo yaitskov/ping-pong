@@ -37,7 +37,7 @@ angular.
                          });
 
                          self.pickCategory = function (cid) {
-                             self.activeGroup.length = 0;
+                             self.activeGroup = [];
                              for (var gi in self.allGroups) {
                                  var group = self.allGroups[gi];
                                  if (group.cid == cid) {
@@ -57,14 +57,13 @@ angular.
                                      requestStatus.failed);
                          };
                          binder($scope, {
-                             'event.main.menu.ready': (e) => mainMenu.setTitle('Results in groups'),
-                             'event.participant.order.ready': (e) = {},
-                             'event.request.status.ready': (event) => barWidgetsReady.got('status'),
-                             'event.classic.group.view.ready': (e) => barWidgetsReady.got('view'),
-                             'event.category.switch.ready': (e) => barWidgetsReady.got('category'),
-                             'event.group.switch.ready': (e) => barWidgetsReady.got('group'),
-                             'event.group.switch.current': (e, gid) => self.pickGroup(gid),
-                             'event.category.switch.current': (e, cid) => self.pickCategory(cid)
+                             'event.main.menu.ready': function (e) { mainMenu.setTitle('Results in groups'); },
+                             'event.request.status.ready': function (event) { barWidgetsReady.got('status'); },
+                             'event.classic.group.view.ready': function (e) { barWidgetsReady.got('view'); },
+                             'event.category.switch.ready': function (e) { barWidgetsReady.got('category'); },
+                             'event.group.switch.ready': function (e) { barWidgetsReady.got('group'); },
+                             'event.group.switch.current': function (e, gid) { self.pickGroup(gid); },
+                             'event.category.switch.current': function (e, cid) { self.pickCategory(cid); }
                          });
                      }
                     ]

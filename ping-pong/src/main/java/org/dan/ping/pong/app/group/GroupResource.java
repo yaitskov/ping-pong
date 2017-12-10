@@ -64,8 +64,8 @@ public class GroupResource {
             @PathParam(TID) Tid tid) {
         tournamentAccessor.read(tid, response,
                 tournament -> TournamentGroups.builder()
-                        .categories(tournament.getCategories())
-                        .groups(tournament.getGroups())
+                        .categories(tournament.getCategories().values())
+                        .groups(tournament.getGroups().values())
                         .build());
     }
 

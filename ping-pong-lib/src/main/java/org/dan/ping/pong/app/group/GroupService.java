@@ -6,7 +6,12 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
 import static org.dan.ping.pong.app.bid.BidState.Play;
+import static org.dan.ping.pong.app.group.ParticipantMatchState.Pending;
+import static org.dan.ping.pong.app.group.ParticipantMatchState.Run;
+import static org.dan.ping.pong.app.group.ParticipantMatchState.WALKOVER;
+import static org.dan.ping.pong.app.group.ParticipantMatchState.WALKWINER;
 import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import lombok.extern.slf4j.Slf4j;
@@ -19,16 +24,15 @@ import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 
@@ -187,10 +191,7 @@ public class GroupService {
                                     .filter(m -> m.hasParticipant(bid.getUid()))
                                     .collect(toMap(
                                             m -> m.getOpponentUid(bid.getUid()).get(),
-                                            m -> GroupMatchResult.builder()
-                                                    .sets(HisIntPair.builder().build())
-                                                    .games(Collections.emptyList())
-                                                    .build())))
+                                            m -> matchResult(bid.getUid(), tournament, m))))
                             .build();
                 }));
 
@@ -208,5 +209,64 @@ public class GroupService {
     private List<ParticipantMemState> groupBids(TournamentMemState tournament, int gid) {
         return tournament.getParticipants().values().stream()
                 .filter(bid -> bid.getGid().equals(of(gid))).collect(toList());
+    }
+
+    private GroupMatchResult matchResult(Uid uid, TournamentMemState tournament, MatchInfo m) {
+        final Uid oUid = m.getOpponentUid(uid)
+                .orElseThrow(() -> internalError("no opponent uid" + uid));
+        final MatchValidationRule matchRule = tournament.getRule().getMatch();
+        final Map<Uid, List<Integer>> scores = m.getParticipantIdScore();
+        final Map<Uid, Integer> uid2WonSets = matchRule.calcWonSets(scores);
+        final Optional<Uid> scoreWinner = matchRule.findWinnerId(uid2WonSets);
+        return GroupMatchResult.builder()
+                .state(participantMatchState(uid, scoreWinner, m))
+                .sets(HisIntPair.builder()
+                        .his(uid2WonSets.get(uid))
+                        .enemy(uid2WonSets.get(oUid))
+                        .build())
+                .games(pairGames(uid, oUid, scores))
+                .build();
+    }
+
+    private ParticipantMatchState participantMatchState(
+            Uid uid, Optional<Uid> scoreWinner, MatchInfo m) {
+        if (m.getWinnerId().isPresent()) {
+            if (scoreWinner.isPresent()) {
+                if (scoreWinner.equals(m.getWinnerId())) {
+                    return ParticipantMatchState.Over;
+                }
+                throw internalError("match is over by score but winner does not mismatch");
+            } else {
+                if (m.getWinnerId().get().equals(uid)) {
+                    return WALKWINER;
+                } else {
+                    return WALKOVER;
+                }
+            }
+        } else {
+            switch (m.getState()) {
+                case Draft:
+                case Place:
+                    return Pending;
+                case Game:
+                case Auto:
+                    return Run;
+                default:
+                    throw internalError("bad state " + m.getState());
+            }
+        }
+    }
+
+    private List<HisIntPair> pairGames(Uid uid, Uid oUid, Map<Uid, List<Integer>> scores) {
+        final List<Integer> setsA = scores.get(uid);
+        final List<Integer> setsB = scores.get(oUid);
+        final List<HisIntPair> result = new ArrayList<>();
+        for (int i = 0; i < setsA.size(); ++i) {
+            result.add(HisIntPair.builder()
+                    .his(setsA.get(i))
+                    .enemy(setsB.get(i))
+                    .build());
+        }
+        return result;
     }
 }

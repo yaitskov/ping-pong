@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupMatchResult {
+    private ParticipantMatchState state;
     private HisIntPair sets;
     private List<HisIntPair> games;
 }

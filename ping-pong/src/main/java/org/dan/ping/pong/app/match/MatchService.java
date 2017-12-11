@@ -714,7 +714,7 @@ public class MatchService {
     public PlayedMatchList findPlayedMatchesByBid(TournamentMemState tournament, Uid uid) {
         final List<MatchInfo> completeMatches = tournament.participantMatches(uid)
                 .filter(m -> m.getState() == Over || m.getPlayedSets() > 0)
-                .sorted(Comparator.comparing(m -> m.getEndedAt().get()))
+                .sorted(Comparator.comparing(m -> m.getEndedAt().orElse(Instant.MIN)))
                 .collect(toList());
         return PlayedMatchList.builder()
                 .participant(tournament.getParticipant(uid).toLink())

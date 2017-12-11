@@ -30,11 +30,15 @@ angular.
                          };
                          self.isLost = function (p1, p2) {
                              var m = p1.matches[p2.uid];
-                             return m.sets.his < m.sets.enemy;
+                             if (m) {
+                                return m.sets.his < m.sets.enemy;
+                             }
                          };
                          self.isWon = function (p1, p2) {
                              var m = p1.matches[p2.uid];
-                             return m.sets.his > m.sets.enemy;
+                             if (m) {
+                                return m.sets.his > m.sets.enemy;
+                             }
                          };
                          binder($scope, {
                              'event.classic.group.view.data': (event, tournament) => self.loadData(tournament),

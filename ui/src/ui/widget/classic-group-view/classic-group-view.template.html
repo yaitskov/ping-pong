@@ -4,15 +4,11 @@
         <td title="position">
             #
         </td>
-        <td>
-            Participant
-        </td>
+        <td translate="Participant lbl" />
         <td ng-repeat="participant in $ctrl.participants" class="text-center">
             {{ $index + 1 }} {{participant.name | initials}}
         </td>
-        <td title="punkts" class="text-center">
-            Punkts
-        </td>
+        <td title="punkts" class="text-center" translate="Punkts lbl" />
     </tr>
     </thead>
     <tbody>
@@ -34,7 +30,8 @@
                     </span>
                     <span ng-show="participant.matches[p2.uid].state == 'Run'">
                         <span ng-repeat="set in participant.matches[p2.uid].games" class="small">
-                            {{set.his}} : {{set.enemy}}
+                            {{set.his}}&nbsp;:&nbsp;{{set.enemy}}
+                            <span ng-show="$index + 1 != participant.matches[p2.uid].games.length">,</span>
                         </span>
                         <sup>
                             <span class="glyphicon glyphicon-refresh spinning-slow tiny"/>
@@ -44,11 +41,12 @@
                           ng-class="{'text-danger': $ctrl.isLost(participant, p2), 'text-success': $ctrl.isWon(participant, p2)}">
                         <span ng-switch="$ctrl.scoreShowMode">
                             <span ng-switch-when="sets">
-                                {{participant.matches[p2.uid].sets.his}} : {{participant.matches[p2.uid].sets.enemy}}
+                                {{participant.matches[p2.uid].sets.his}}&nbsp;:&nbsp;{{participant.matches[p2.uid].sets.enemy}}
                             </span>
                             <span ng-switch-when="games">
-                                <span ng-repeat="set in participant.matches[p2.uid].games">
-                                    {{set.his}} : {{set.enemy}}
+                                <span ng-repeat="set in participant.matches[p2.uid].games" class="small">
+                                    {{set.his}}&nbsp;:&nbsp;{{set.enemy}}
+                                    <span ng-show="$index + 1 != participant.matches[p2.uid].games.length">,</span>
                                 </span>
                             </span>
                             <span ng-switch-default>

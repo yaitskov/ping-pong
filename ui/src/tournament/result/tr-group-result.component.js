@@ -56,7 +56,25 @@ angular.
                                      },
                                      requestStatus.failed);
                          };
+
+                         self.scoreShowMode = 'sets';
+
+                         self.showSets = function () {
+                             self.pickShowMode('sets');
+                         };
+
+                         self.showGames = function () {
+                             self.pickShowMode('games');
+                         };
+
+                         self.pickShowMode = function (mode) {
+                             $rootScope.$broadcast('event.classic.group.view.score.show.mode', mode);
+                         };
+
                          binder($scope, {
+                             'event.classic.group.view.score.show.mode': function (e, mode) {
+                                   self.scoreShowMode = mode;
+                             },
                              'event.main.menu.ready': function (e) { mainMenu.setTitle('Results in groups'); },
                              'event.request.status.ready': function (event) { barWidgetsReady.got('status'); },
                              'event.classic.group.view.ready': function (e) { barWidgetsReady.got('view'); },

@@ -5,11 +5,31 @@
     <a class="btn btn-default" back-button>
       <span class="glyphicon glyphicon-circle-arrow-left"></span>
     </a>
+    <a class="btn btn-default" title="to the tournament"
+       href="#!/my/tournament/{{$ctrl.tid}}">
+      <span class="glyphicon glyphicon-home"></span>
+    </a>
+    <a class="btn btn-default" title="to the tournament"
+       href="#!/tournament/result/{{$ctrl.tid}}">
+      <span class="glyphicon glyphicon-list"></span>
+    </a>
   </div>
   <category-switch/>
   <group-switch/>
   <div class="form-group">
     <participant-order/>
+    <a class="btn btn-default" ng-click="$ctrl.showGames()"
+       title="show games/balls"
+       ng-show="$ctrl.scoreShowMode == 'sets'">
+      <span class="glyphicon glyphicon-eye-open"></span>
+      <span class="glyphicon glyphicon-cd"></span>
+    </a>
+    <a class="btn btn-primary" ng-click="$ctrl.showSets()"
+       title="hide games/balls"
+       ng-show="$ctrl.scoreShowMode == 'games'">
+      <span class="glyphicon glyphicon-eye-open"></span>
+      <span class="glyphicon glyphicon-cd"></span>
+    </a>
   </div>
   <classic-group-view/>
 </div>

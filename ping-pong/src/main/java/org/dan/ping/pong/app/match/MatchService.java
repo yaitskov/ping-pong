@@ -1,10 +1,9 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.min;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -66,6 +65,7 @@ import org.dan.ping.pong.util.time.Clocker;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -283,6 +283,7 @@ public class MatchService {
             return;
         }
         completeParticipationLeftBids(
+                gid,
                 tournament,
                 completeGroup(gid, tournament, matches, batch),
                 batch);
@@ -297,10 +298,11 @@ public class MatchService {
         return Wait;
     }
 
-    private void completeParticipationLeftBids(TournamentMemState tournament,
-            List<Uid> leftUids, DbUpdater batch) {
-        leftUids.stream()
-                .map(tournament::getBidOrQuit)
+    private void completeParticipationLeftBids(int gid, TournamentMemState tournament,
+            Set<Uid> quitUids, DbUpdater batch) {
+        tournament.getParticipants().values().stream()
+                .filter(bid -> bid.getGid().equals(of(gid)))
+                .filter(bid -> !quitUids.contains(bid.getUid()))
                 .filter(bid -> !isPyrrhic(bid))
                 .forEach(bid -> bidService.setBidState(bid, Lost, asList(Wait, Rest), batch));
     }
@@ -339,10 +341,31 @@ public class MatchService {
                 .anyMatch(m -> !m.getGid().isPresent());
     }
 
-    private List<Uid> completeGroup(Integer gid, TournamentMemState tournament,
+    private Set<Uid> completeGroup(Integer gid, TournamentMemState tournament,
             List<MatchInfo> matches, DbUpdater batch) {
         log.info("Pick bids for playoff from gid {} in tid {}", gid, tournament.getTid());
         final int quits = tournament.getRule().getGroup().get().getQuits();
+        final List<Uid> quitUids = selectQuitingUids(gid, tournament, matches, quits);
+        final GroupInfo iGru = tournament.getGroups().get(gid);
+        final List<MatchInfo> playOffMatches = playOffMatches(tournament, iGru);
+        if (playOffMatches.isEmpty()) {
+            completeMiniTournamentGroup(tournament, iGru, quitUids, batch);
+        } else {
+            distributeGroupQuittersBetweenPlayOffMatches(tournament, batch, quits,
+                    quitUids, iGru, playOffMatches);
+        }
+        return new HashSet<>(quitUids);
+    }
+
+    private List<MatchInfo> playOffMatches(TournamentMemState tournament, GroupInfo iGru) {
+        return playOffService
+                .findBaseMatches(tournament, iGru.getCid())
+                .stream()
+                .sorted(Comparator.comparing(MatchInfo::getMid))
+                .collect(toList());
+    }
+
+    private List<Uid> selectQuitingUids(Integer gid, TournamentMemState tournament, List<MatchInfo> matches, int quits) {
         final List<Uid> orderUids = groupService.orderUidsInGroup(tournament,
                 uid -> Play, matches);
 
@@ -358,36 +381,27 @@ public class MatchService {
                     .forEach(quitUids::add);
         }
         log.info("{} quit group {}", quitUids, gid);
-        final GroupInfo iGru = tournament.getGroups().get(gid);
-        final List<MatchInfo> playOffMatches = playOffService
-                .findBaseMatches(tournament, iGru.getCid())
-                .stream()
-                .sorted(Comparator.comparing(MatchInfo::getMid))
-                .collect(toList());
-        if (playOffMatches.isEmpty()) {
-            completeMiniTournamentGroup(tournament, iGru, quitUids, batch);
-        } else {
-            final List<GroupInfo> groups = tournament.getGroupsByCategory(iGru.getCid());
-            final int expectedPlayOffMatches = roundPlayOffBase(quits * groups.size()) / 2;
-            if (playOffMatches.size() != expectedPlayOffMatches) {
-                throw internalError("Mismatch in number of play off matches "
-                        + expectedPlayOffMatches + " !=" + playOffMatches.size()
-                        + " group " + iGru.getGid());
-            }
-            final List<Integer> matchIndexes = PlayOffMatcherFromGroup.find(
-                    quits, iGru.getOrdNumber(), groups.size());
-            for (int iQuitter = 0; iQuitter < quits; ++iQuitter) {
-                int matchIdx = matchIndexes.get(iQuitter);
-                assignBidToMatch(tournament, playOffMatches.get(matchIdx).getMid(),
-                        quitUids.get(iQuitter), batch);
-            }
+        return quitUids;
+    }
+
+    private void distributeGroupQuittersBetweenPlayOffMatches(
+            TournamentMemState tournament,
+            DbUpdater batch, int quits, List<Uid> quitUids,
+            GroupInfo iGru, List<MatchInfo> playOffMatches) {
+        final List<GroupInfo> groups = tournament.getGroupsByCategory(iGru.getCid());
+        final int expectedPlayOffMatches = roundPlayOffBase(quits * groups.size()) / 2;
+        if (playOffMatches.size() != expectedPlayOffMatches) {
+            throw internalError("Mismatch in number of play off matches "
+                    + expectedPlayOffMatches + " !=" + playOffMatches.size()
+                    + " group " + iGru.getGid());
         }
-        if (orderUids.size() < quits) {
-            return emptyList();
+        final List<Integer> matchIndexes = PlayOffMatcherFromGroup.find(
+                quits, iGru.getOrdNumber(), groups.size());
+        for (int iQuitter = 0; iQuitter < quits; ++iQuitter) {
+            int matchIdx = matchIndexes.get(iQuitter);
+            assignBidToMatch(tournament, playOffMatches.get(matchIdx).getMid(),
+                    quitUids.get(iQuitter), batch);
         }
-        return orderUids.stream()
-                .filter(uid -> !quitUids.contains(uid))
-                .collect(toList());
     }
 
     private static final Set<BidState> quitOrExpl = ImmutableSet.of(Quit, Expl);

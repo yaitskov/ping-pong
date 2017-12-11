@@ -28,6 +28,14 @@ angular.
                          self.setScoreShowMode = function (mode) {
                              self.scoreShowMode = mode;
                          };
+                         self.isLost = function (p1, p2) {
+                             var m = p1.matches[p2.uid];
+                             return m.sets.his < m.sets.enemy;
+                         };
+                         self.isWon = function (p1, p2) {
+                             var m = p1.matches[p2.uid];
+                             return m.sets.his > m.sets.enemy;
+                         };
                          binder($scope, {
                              'event.classic.group.view.data': (event, tournament) => self.loadData(tournament),
                              'event.classic.group.view.row.order': (event, order) => self.setRowOrder(order),

@@ -8,8 +8,8 @@ import static java.util.stream.IntStream.range;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.Pending;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.Run;
-import static org.dan.ping.pong.app.group.ParticipantMatchState.WALKOVER;
-import static org.dan.ping.pong.app.group.ParticipantMatchState.WALKWINER;
+import static org.dan.ping.pong.app.group.ParticipantMatchState.WalkOver;
+import static org.dan.ping.pong.app.group.ParticipantMatchState.WalkWiner;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
@@ -26,7 +26,6 @@ import org.dan.ping.pong.app.tournament.TournamentRules;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -220,6 +219,7 @@ public class GroupService {
         final Optional<Uid> scoreWinner = matchRule.findWinnerId(uid2WonSets);
         return GroupMatchResult.builder()
                 .state(participantMatchState(uid, scoreWinner, m))
+                .mid(m.getMid())
                 .sets(HisIntPair.builder()
                         .his(uid2WonSets.get(uid))
                         .enemy(uid2WonSets.get(oUid))
@@ -238,9 +238,9 @@ public class GroupService {
                 throw internalError("match is over by score but winner does not mismatch");
             } else {
                 if (m.getWinnerId().get().equals(uid)) {
-                    return WALKWINER;
+                    return WalkWiner;
                 } else {
-                    return WALKOVER;
+                    return WalkOver;
                 }
             }
         } else {

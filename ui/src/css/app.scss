@@ -206,4 +206,10 @@ tr.bottom-line td {
     border-top: 2px solid #111 !important;
 }
 
+.tiny {
+    font-size: 75%;
+}
+
 @import "mobile/app-mobile.scss";
+
+@import "spinner.scss";

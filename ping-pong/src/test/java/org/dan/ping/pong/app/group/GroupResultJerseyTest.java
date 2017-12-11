@@ -48,7 +48,7 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
         final int tid = scenario.getTid().getTid();
 
         final TournamentGroups g = myRest().get(GROUP_LIST + tid, TournamentGroups.class);
-        final int gid = g.getGroups().keySet().stream().findFirst().get();
+        final int gid = g.getGroups().stream().findFirst().get().getGid();
         final GroupParticipants r = myRest().get(GROUP_RESULT + tid + "/"
                 + gid, GroupParticipants.class);
 

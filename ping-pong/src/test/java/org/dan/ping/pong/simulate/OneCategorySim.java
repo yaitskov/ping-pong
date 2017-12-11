@@ -190,4 +190,22 @@ public class OneCategorySim {
                         .scoreSet(p1, 11, p5, 5)
                         .scoreSet(p4, 11, p2, 2));
     }
+
+    @Test
+    public void aGroupsOf4AlmostCompleteT2() {
+        isf.create(begin().name("aGroupsOf4AlmostCompleteT2")
+                .tables(2)
+                .rules(RULES_G8Q1_S3A2G11)
+                .category(c1, p1, p2, p3, p4))
+                .run(c -> c.beginTournament()
+                        .scoreSet3(p1, 11, p3, 3)
+                        .scoreSet3(p4, 11, p2, 4)
+                        .scoreSet(p1, 11, p2, 2)
+                        .expelPlayer(p4));
+                        //.scoreSet3(p4, 11, p3, 3)
+
+                        //.scoreSet3(p1, 11, p4, 5)
+                        //.scoreSet3(p2, 11, p3, 7));
+    }
+
 }

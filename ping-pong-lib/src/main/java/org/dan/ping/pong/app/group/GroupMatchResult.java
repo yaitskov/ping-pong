@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.match.Mid;
 
 import java.util.List;
 
@@ -19,4 +20,5 @@ public class GroupMatchResult {
     private ParticipantMatchState state;
     private HisIntPair sets;
     private List<HisIntPair> games;
+    private Mid mid;
 }

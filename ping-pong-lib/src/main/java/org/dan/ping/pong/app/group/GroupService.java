@@ -88,7 +88,7 @@ public class GroupService {
         return result;
     }
 
-    private SetMultimap<Uid, Uid> findStrongerExtraOrder(TournamentMemState tournament,
+    SetMultimap<Uid, Uid> findStrongerExtraOrder(TournamentMemState tournament,
             Map<Uid, Integer> uid2Points, List<MatchInfo> matches) {
         final SetMultimap<Integer, Uid> ambiguousUids = findParticipantsWithSamePoints(uid2Points);
 
@@ -192,7 +192,7 @@ public class GroupService {
     private List<MatchInfo> filterMatchesByUids(List<MatchInfo> matches, Set<Uid> uids) {
         return matches.stream()
                 .filter(m -> !m.getParticipantIdScore().isEmpty()
-                        && m.getParticipantIdScore().values().stream()
+                        && m.getParticipantIdScore().keySet().stream()
                         .allMatch(uids::contains))
                 .collect(toList());
     }

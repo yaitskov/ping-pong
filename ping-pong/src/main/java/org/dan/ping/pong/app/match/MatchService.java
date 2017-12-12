@@ -365,9 +365,9 @@ public class MatchService {
                 .collect(toList());
     }
 
-    private List<Uid> selectQuitingUids(Integer gid, TournamentMemState tournament, List<MatchInfo> matches, int quits) {
-        final List<Uid> orderUids = groupService.orderUidsInGroup(tournament,
-                uid -> Play, matches);
+    private List<Uid> selectQuitingUids(Integer gid, TournamentMemState tournament,
+            List<MatchInfo> matches, int quits) {
+        final List<Uid> orderUids = groupService.orderUidsInGroup(tournament, matches);
 
         final List<Uid> quitUids = orderUids.stream()
                 .map(tournament::getBidOrExpl)

@@ -14,6 +14,8 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
@@ -26,10 +28,15 @@ import org.dan.ping.pong.app.tournament.TournamentRules;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -53,7 +60,7 @@ public class GroupService {
     public List<Uid> findUidsQuittingGroup(TournamentMemState tournament,
             GroupRules groupRules, List<MatchInfo> groupMatches) {
         // todo rule option skip walk over or not
-        return orderUidsInGroup(tournament, uid -> Play, groupMatches)
+        return orderUidsInGroup(tournament, groupMatches)
                 .stream()
                 .limit(groupRules.getQuits())
                 .collect(toList());
@@ -66,14 +73,173 @@ public class GroupService {
     }
 
     public List<Uid> orderUidsInGroup(TournamentMemState tournament,
-            Function<Uid, BidState> participantStateF,
             List<MatchInfo> allMatchesInGroup) {
-        final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(participantStateF, allMatchesInGroup);
-        final MatchValidationRule matchRule = tournament.getRule().getMatch();
-        allMatchesInGroup.forEach(minfo -> aggMatch(uid2Stat, minfo, matchRule));
-        return order(uid2Stat.values(), tournament.getRule().getGroup().get().getDisambiguation())
-                .stream().map(BidSuccessInGroup::getUid)
+        final Map<Uid, Integer> uid2Points = countPoints(allMatchesInGroup);
+        final SetMultimap<Uid, Uid> strongerExtraOrder = findStrongerExtraOrder(tournament,
+                uid2Points, allMatchesInGroup);
+
+        final List<Uid> result = uid2Points.keySet().stream()
+                .sorted(UidGroupComparator.builder()
+                        .uid2Points(uid2Points)
+                        .strongerExtraOrder(strongerExtraOrder)
+                        .build())
                 .collect(toList());
+        log.info("Final uids order in group: {}", result);
+        return result;
+    }
+
+    private SetMultimap<Uid, Uid> findStrongerExtraOrder(TournamentMemState tournament,
+            Map<Uid, Integer> uid2Points, List<MatchInfo> matches) {
+        final SetMultimap<Integer, Uid> ambiguousUids = findParticipantsWithSamePoints(uid2Points);
+
+        final SetMultimap<Uid, Uid> strongerExtraOrder = HashMultimap.create();
+
+        for (Integer points : ambiguousUids.keySet()) {
+            final Set<Uid> uids =  ambiguousUids.get(points);
+            final int numUids = uids.size();
+            if (numUids == 2) {
+                Iterator<Uid> uidIterator = uids.iterator();
+                compareDirectMatch(matches, uidIterator.next(),
+                        uidIterator.next(), strongerExtraOrder);
+            } else if (numUids > 2) {
+                compareMatchesBetweenMany(tournament, matches, uids, strongerExtraOrder);
+            } else {
+                throw internalError("wrong number of uids " + numUids);
+            }
+        }
+        return strongerExtraOrder;
+    }
+
+    private void orderUidsRandomly(int gid, Set<Uid> uids, SetMultimap<Uid, Uid> strongerExtraOrder) {
+        final List<Uid> orderedUids = new ArrayList<>(uids);
+        Collections.sort(orderedUids);
+        Collections.shuffle(orderedUids, new Random(gid));
+        orderListToStrongerMultimap(strongerExtraOrder, orderedUids);
+    }
+
+    private void compareMatchesBetweenMany(TournamentMemState tournament,
+            List<MatchInfo> matches, Set<Uid> uids,
+            SetMultimap<Uid, Uid> strongerExtraOrder) {
+
+        final List<MatchInfo> matchesWithUids = filterMatchesByUids(matches, uids);
+
+        final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(uid -> Play, matchesWithUids);
+        final MatchValidationRule matchRule = tournament.getRule().getMatch();
+        matchesWithUids.forEach(minfo -> aggMatch(uid2Stat, minfo, matchRule));
+
+        orderTwiceAmbiguous(tournament, matches, uids,
+                strongerExtraOrder, matchesWithUids, uid2Stat);
+        orderJustAmbiguous(tournament, strongerExtraOrder, uid2Stat);
+    }
+
+    private void orderJustAmbiguous(TournamentMemState tournament,
+            SetMultimap<Uid, Uid> strongerExtraOrder,
+            Map<Uid, BidSuccessInGroup> uid2Stat) {
+        final Comparator<BidSuccessInGroup> comparator = tournament.getRule().getGroup()
+                .get().getDisambiguation().getComparator();
+        final List<BidSuccessInGroup> orderded = uid2Stat.values().stream()
+                .sorted(comparator)
+                .collect(toList());
+        for (int i = 0; i < orderded.size() - 1; ++i) {
+            final BidSuccessInGroup iStat = orderded.get(i);
+            for (int j = i + 1; j < orderded.size(); ++j) {
+                final BidSuccessInGroup jStat = orderded.get(j);
+                if (comparator.compare(iStat, jStat) < 0) {
+                    strongerExtraOrder.put(iStat.getUid(), jStat.getUid());
+                }
+            }
+        }
+    }
+
+    private void orderTwiceAmbiguous(TournamentMemState tournament,
+            List<MatchInfo> matches, Set<Uid> uids,
+            SetMultimap<Uid, Uid> strongerExtraOrder,
+            List<MatchInfo> matchesWithUids,
+            Map<Uid, BidSuccessInGroup> uid2Stat) {
+        final Map<Uid, PointSetBallComparableWrapper> uid2StatWrapped = uid2Stat.values().stream()
+                .collect(toMap(
+                        BidSuccessInGroup::getUid,
+                        stat -> PointSetBallComparableWrapper.builder()
+                                .stat(stat)
+                                .build()));
+
+        final SetMultimap<PointSetBallComparableWrapper, Uid> ambiguousUids
+                = findParticipantsWithSamePoints(uid2StatWrapped);
+
+        for (PointSetBallComparableWrapper stat : ambiguousUids.keySet()) {
+            final Set<Uid> subUids = ambiguousUids.get(stat);
+            final int numUids = subUids.size();
+            if (numUids == 2) {
+                Iterator<Uid> uidIterator = uids.iterator();
+                compareDirectMatch(matches, uidIterator.next(),
+                        uidIterator.next(), strongerExtraOrder);
+            } else if (numUids > 2) {
+                if (numUids == uids.size()) { // all uids
+                    orderUidsRandomly(matches.get(0).getGid()
+                                    .orElseThrow(() -> internalError("no gid in match "
+                                            + matches.get(0).getMid())),
+                            uids, strongerExtraOrder);
+                } else {
+                    compareMatchesBetweenMany(tournament, matchesWithUids,
+                            subUids, strongerExtraOrder);
+                }
+            } else {
+                throw internalError("wrong number of uids " + numUids);
+            }
+        }
+    }
+
+    private List<MatchInfo> filterMatchesByUids(List<MatchInfo> matches, Set<Uid> uids) {
+        return matches.stream()
+                .filter(m -> !m.getParticipantIdScore().isEmpty()
+                        && m.getParticipantIdScore().values().stream()
+                        .allMatch(uids::contains))
+                .collect(toList());
+    }
+
+    private void orderListToStrongerMultimap(SetMultimap<Uid, Uid> strongerExtraOrder, List<Uid> orderedUids) {
+        log.info("Ordered uids {}", orderedUids);
+        for (int i = 0; i < orderedUids.size() - 1; ++i) {
+            for (int j = i + 1; j < orderedUids.size(); ++j) {
+                strongerExtraOrder.put(orderedUids.get(i), orderedUids.get(j));
+            }
+        }
+    }
+
+    private void compareDirectMatch(List<MatchInfo> matches, Uid uidA, Uid uidB,
+            SetMultimap<Uid, Uid> strongerExtraOrder) {
+        final MatchInfo abMatch = matches.stream()
+                .filter(m -> m.hasParticipant(uidA) && m.hasParticipant(uidB))
+                .findAny().orElseThrow(() -> internalError(
+                        "no match between " + uidA + " and " + uidB));
+        final Uid winnerUid = abMatch.getWinnerId()
+                .orElseThrow(() -> internalError("no winner in match " + abMatch.getMid()));
+        strongerExtraOrder.put(winnerUid, abMatch.getOpponentUid(winnerUid)
+                .orElseThrow(() -> internalError("no opponent in match " + abMatch.getMid())));
+    }
+
+    private Map<Uid, Integer> countPoints(List<MatchInfo> allMatchesInGroup) {
+        CounterMap<Uid> counters = new CounterMap<>();
+        allMatchesInGroup.stream().map(MatchInfo::getWinnerId)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(counters::increment);
+        return counters.toMap();
+    }
+
+    private <T> SetMultimap<T, Uid> findParticipantsWithSamePoints(Map<Uid, T> uid2Points) {
+        final Map<T, Uid> metPoints = new HashMap<>();
+        final SetMultimap<T, Uid> result = HashMultimap.create();
+        uid2Points.forEach((uid, points) -> {
+            final Uid firstUid = metPoints.putIfAbsent(points, uid);
+            if (firstUid != null) {
+                if (result.get(points).isEmpty()) {
+                    result.put(points, firstUid);
+                }
+                result.put(points, uid);
+            }
+        });
+        return result;
     }
 
     public Collection<BidSuccessInGroup> order(

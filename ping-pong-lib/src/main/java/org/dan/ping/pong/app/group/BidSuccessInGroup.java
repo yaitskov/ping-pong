@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +17,7 @@ import org.dan.ping.pong.app.bid.Uid;
 @Getter
 @Builder
 @ToString
+@EqualsAndHashCode(of={""})
 @AllArgsConstructor
 @NoArgsConstructor(onConstructor = @__(@JsonCreator))
 public class BidSuccessInGroup {

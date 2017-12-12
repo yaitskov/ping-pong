@@ -218,12 +218,14 @@ public class GroupService {
                 .orElseThrow(() -> internalError("no opponent in match " + abMatch.getMid())));
     }
 
-    private Map<Uid, Integer> countPoints(List<MatchInfo> allMatchesInGroup) {
+    Map<Uid, Integer> countPoints(List<MatchInfo> allMatchesInGroup) {
         CounterMap<Uid> counters = new CounterMap<>();
         allMatchesInGroup.stream().map(MatchInfo::getWinnerId)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .forEach(counters::increment);
+        allMatchesInGroup.forEach(m -> m.getParticipantIdScore().keySet()
+                .forEach(counters::zeroIfMissing));
         return counters.toMap();
     }
 

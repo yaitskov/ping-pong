@@ -24,6 +24,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class GroupServiceTest {
@@ -113,5 +115,15 @@ public class GroupServiceTest {
 
         assertEquals(got.get(UID1), ImmutableSet.of(UID2, UID3));
         assertEquals(got.get(UID2), ImmutableSet.of(UID3));
+    }
+
+    @Test
+    public void countPointsUidWithoutWins0() {
+        Map<Uid, Integer> got = sut.countPoints(asList(MatchInfo.builder()
+                .winnerId(Optional.of(UID1))
+                .participantIdScore(ImmutableMap.of(UID1, singletonList(11),
+                        UID2, singletonList(0)))
+                .build()));
+        assertEquals(ImmutableMap.of(UID1, 1, UID2, 0), got);
     }
 }

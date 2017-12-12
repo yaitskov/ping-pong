@@ -1,5 +1,7 @@
 package org.dan.ping.pong.app.group;
 
+import org.dan.ping.pong.app.bid.Uid;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,5 +18,9 @@ public class CounterMap<T> {
 
     public Map<T, Integer> toMap() {
         return map;
+    }
+
+    public void zeroIfMissing(T uid) {
+        map.putIfAbsent(uid, 0);
     }
 }

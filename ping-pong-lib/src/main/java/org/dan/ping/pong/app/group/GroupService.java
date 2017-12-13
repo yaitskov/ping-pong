@@ -161,6 +161,7 @@ public class GroupService {
                         BidSuccessInGroup::getUid,
                         stat -> PointSetBallComparableWrapper.builder()
                                 .stat(stat)
+                                .disambiguationPolicy(tournament.getRule().getGroup().get().getDisambiguation())
                                 .build()));
 
         final SetMultimap<PointSetBallComparableWrapper, Uid> ambiguousUids

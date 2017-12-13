@@ -19,4 +19,6 @@ import java.util.Collection;
 public class GroupParticipants {
     private Collection<GroupParticipantResult> participants;
     private Tid tid;
+    private DisambiguationPolicy disambiguationPolicy;
+    private int quitsGroup;
 }

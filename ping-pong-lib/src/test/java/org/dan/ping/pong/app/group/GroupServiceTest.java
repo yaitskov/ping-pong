@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.SetMultimap;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchValidationRule;
@@ -84,7 +83,7 @@ public class GroupServiceTest {
     public void findStrongerExtraOrder3ParticipantsEveryHas1Win() {
         final TournamentMemState tournament = tournamentForOrder();
 
-        final SetMultimap<Uid, Uid> got = sut.findStrongerExtraOrder(tournament,
+        final ExtraUidOrderInGroup got = sut.findStrongerExtraOrder(tournament,
                 ImmutableMap.<Uid, Integer>builder().put(UID1, 1).put(UID2, 1).put(UID3, 1).build(),
                 MatchListBuilder.matches()
                         .m(UID1, 11, UID2, 0)
@@ -92,8 +91,8 @@ public class GroupServiceTest {
                         .m(UID3, 14, UID1, 12)
                         .build());
 
-        assertEquals(ImmutableSet.of(UID2, UID3), got.get(UID1));
-        assertEquals(ImmutableSet.of(UID3), got.get(UID2));
+        assertEquals(ImmutableSet.of(UID2, UID3), got.getStrongerOf().get(UID1));
+        assertEquals(ImmutableSet.of(UID3), got.getStrongerOf().get(UID2));
     }
 
     private static class MatchListBuilder {

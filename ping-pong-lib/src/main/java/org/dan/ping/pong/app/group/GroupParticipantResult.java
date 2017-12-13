@@ -9,6 +9,7 @@ import lombok.ToString;
 import org.dan.ping.pong.app.bid.Uid;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -23,4 +24,6 @@ public class GroupParticipantResult {
     private int punkts;
     private int seedPosition;
     private int finishPosition;
+    private Optional<SetsAndBalls> setsAndBalls;
+    private boolean dice;
 }

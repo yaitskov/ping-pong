@@ -75,24 +75,30 @@ public class GroupService {
     public List<Uid> orderUidsInGroup(TournamentMemState tournament,
             List<MatchInfo> allMatchesInGroup) {
         final Map<Uid, Integer> uid2Points = countPoints(allMatchesInGroup);
-        final SetMultimap<Uid, Uid> strongerExtraOrder = findStrongerExtraOrder(tournament,
+        final ExtraUidOrderInGroup strongerExtraOrder = findStrongerExtraOrder(tournament,
                 uid2Points, allMatchesInGroup);
+        final List<Uid> result = orderUidsByPointsAndExtraOrder(uid2Points,
+                strongerExtraOrder.getStrongerOf());
+        log.info("Final uids order in group: {}", result);
+        return result;
+    }
 
-        final List<Uid> result = uid2Points.keySet().stream()
+    public List<Uid> orderUidsByPointsAndExtraOrder(
+            Map<Uid, Integer> uid2Points,
+            SetMultimap<Uid, Uid> strongerExtraOrder) {
+        return uid2Points.keySet().stream()
                 .sorted(UidGroupComparator.builder()
                         .uid2Points(uid2Points)
                         .strongerExtraOrder(strongerExtraOrder)
                         .build())
                 .collect(toList());
-        log.info("Final uids order in group: {}", result);
-        return result;
     }
 
-    SetMultimap<Uid, Uid> findStrongerExtraOrder(TournamentMemState tournament,
+    ExtraUidOrderInGroup findStrongerExtraOrder(TournamentMemState tournament,
             Map<Uid, Integer> uid2Points, List<MatchInfo> matches) {
         final SetMultimap<Integer, Uid> ambiguousUids = findParticipantsWithSamePoints(uid2Points);
 
-        final SetMultimap<Uid, Uid> strongerExtraOrder = HashMultimap.create();
+        final ExtraUidOrderInGroup strongerExtraOrder = ExtraUidOrderInGroup.create();
 
         for (Integer points : ambiguousUids.keySet()) {
             final Set<Uid> uids =  ambiguousUids.get(points);
@@ -110,30 +116,31 @@ public class GroupService {
         return strongerExtraOrder;
     }
 
-    private void orderUidsRandomly(int gid, Set<Uid> uids, SetMultimap<Uid, Uid> strongerExtraOrder) {
+    private void orderUidsRandomly(int gid, Set<Uid> uids, ExtraUidOrderInGroup strongerExtraOrder) {
         final List<Uid> orderedUids = new ArrayList<>(uids);
         Collections.sort(orderedUids);
         Collections.shuffle(orderedUids, new Random(gid));
+        strongerExtraOrder.getDiced().addAll(orderedUids);
         orderListToStrongerMultimap(strongerExtraOrder, orderedUids);
     }
 
     private void compareMatchesBetweenMany(TournamentMemState tournament,
             List<MatchInfo> matches, Set<Uid> uids,
-            SetMultimap<Uid, Uid> strongerExtraOrder) {
+            ExtraUidOrderInGroup strongerExtraOrder) {
 
         final List<MatchInfo> matchesWithUids = filterMatchesByUids(matches, uids);
 
         final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(uid -> Play, matchesWithUids);
         final MatchValidationRule matchRule = tournament.getRule().getMatch();
         matchesWithUids.forEach(minfo -> aggMatch(uid2Stat, minfo, matchRule));
-
+        strongerExtraOrder.getUid2SetsAndBalls().putAll(uid2Stat);
         orderTwiceAmbiguous(tournament, matches, uids,
                 strongerExtraOrder, matchesWithUids, uid2Stat);
         orderJustAmbiguous(tournament, strongerExtraOrder, uid2Stat);
     }
 
     private void orderJustAmbiguous(TournamentMemState tournament,
-            SetMultimap<Uid, Uid> strongerExtraOrder,
+            ExtraUidOrderInGroup strongerExtraOrder,
             Map<Uid, BidSuccessInGroup> uid2Stat) {
         final Comparator<BidSuccessInGroup> comparator = tournament.getRule().getGroup()
                 .get().getDisambiguation().getComparator();
@@ -145,7 +152,7 @@ public class GroupService {
             for (int j = i + 1; j < orderded.size(); ++j) {
                 final BidSuccessInGroup jStat = orderded.get(j);
                 if (comparator.compare(iStat, jStat) < 0) {
-                    strongerExtraOrder.put(iStat.getUid(), jStat.getUid());
+                    strongerExtraOrder.getStrongerOf().put(iStat.getUid(), jStat.getUid());
                 }
             }
         }
@@ -153,7 +160,7 @@ public class GroupService {
 
     private void orderTwiceAmbiguous(TournamentMemState tournament,
             List<MatchInfo> matches, Set<Uid> uids,
-            SetMultimap<Uid, Uid> strongerExtraOrder,
+            ExtraUidOrderInGroup strongerExtraOrder,
             List<MatchInfo> matchesWithUids,
             Map<Uid, BidSuccessInGroup> uid2Stat) {
         final Map<Uid, PointSetBallComparableWrapper> uid2StatWrapped = uid2Stat.values().stream()
@@ -198,24 +205,24 @@ public class GroupService {
                 .collect(toList());
     }
 
-    private void orderListToStrongerMultimap(SetMultimap<Uid, Uid> strongerExtraOrder, List<Uid> orderedUids) {
+    private void orderListToStrongerMultimap(ExtraUidOrderInGroup strongerExtraOrder, List<Uid> orderedUids) {
         log.info("Ordered uids {}", orderedUids);
         for (int i = 0; i < orderedUids.size() - 1; ++i) {
             for (int j = i + 1; j < orderedUids.size(); ++j) {
-                strongerExtraOrder.put(orderedUids.get(i), orderedUids.get(j));
+                strongerExtraOrder.getStrongerOf().put(orderedUids.get(i), orderedUids.get(j));
             }
         }
     }
 
     private void compareDirectMatch(List<MatchInfo> matches, Uid uidA, Uid uidB,
-            SetMultimap<Uid, Uid> strongerExtraOrder) {
+            ExtraUidOrderInGroup strongerExtraOrder) {
         final MatchInfo abMatch = matches.stream()
                 .filter(m -> m.hasParticipant(uidA) && m.hasParticipant(uidB))
                 .findAny().orElseThrow(() -> internalError(
                         "no match between " + uidA + " and " + uidB));
         final Uid winnerUid = abMatch.getWinnerId()
                 .orElseThrow(() -> internalError("no winner in match " + abMatch.getMid()));
-        strongerExtraOrder.put(winnerUid, abMatch.getOpponentUid(winnerUid)
+        strongerExtraOrder.getStrongerOf().put(winnerUid, abMatch.getOpponentUid(winnerUid)
                 .orElseThrow(() -> internalError("no opponent in match " + abMatch.getMid())));
     }
 
@@ -243,14 +250,6 @@ public class GroupService {
             }
         });
         return result;
-    }
-
-    public Collection<BidSuccessInGroup> order(
-            Collection<BidSuccessInGroup> bidSuccess,
-            DisambiguationPolicy disambiguation) {
-        return bidSuccess.stream()
-                .sorted(disambiguation.getComparator())
-                .collect(toList());
     }
 
     public void aggMatch(Map<Uid, BidSuccessInGroup> uid2Stat,
@@ -334,43 +333,44 @@ public class GroupService {
         final List<MatchInfo> matches = findMatchesInGroup(tournament, gid);
         final List<ParticipantMemState> bids = groupBids(tournament, gid);
         final TournamentRules rules = tournament.getRule();
-        final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(
-                uid -> Play,
-                matches);
-        final MatchValidationRule matchRule = tournament.getRule().getMatch();
-        matches.forEach(minfo -> aggMatch(uid2Stat, minfo, matchRule));
-        final DisambiguationPolicy disambiguation = tournament.getRule()
-                .getGroup().get().getDisambiguation();
-        final List<Uid> finalUidsOrder = order(uid2Stat.values(), disambiguation)
-                .stream().map(BidSuccessInGroup::getUid)
-                .collect(toList());
+
+        final Map<Uid, Integer> uid2Points = countPoints(matches);
+        final ExtraUidOrderInGroup strongerExtraOrder = findStrongerExtraOrder(tournament, uid2Points, matches);
+        final List<Uid> finalUidsOrder = orderUidsByPointsAndExtraOrder(uid2Points,
+                strongerExtraOrder.getStrongerOf());
 
         final List<ParticipantMemState> seedBidsOrder = rankingService
                 .sort(bids, rules.getCasting());
         final Map<Uid, GroupParticipantResult> result = bids.stream().collect(toMap(
                 ParticipantMemState::getUid,
-                bid -> {
-                    final Optional<BidSuccessInGroup> bidResult = ofNullable(uid2Stat.get(bid.getUid()));
-                    return GroupParticipantResult.builder()
-                            .name(bid.getName())
-                            .uid(bid.getUid())
-                            .punkts(bidResult.get().getPunkts())
-                            .matches(matches.stream()
-                                    .filter(m -> m.hasParticipant(bid.getUid()))
-                                    .collect(toMap(
-                                            m -> m.getOpponentUid(bid.getUid()).get(),
-                                            m -> matchResult(bid.getUid(), tournament, m))))
-                            .build();
-                }));
+                bid -> GroupParticipantResult.builder()
+                        .name(bid.getName())
+                        .uid(bid.getUid())
+                        .dice(strongerExtraOrder.getDiced().contains(bid.getUid()))
+                        .setsAndBalls(ofNullable(
+                                strongerExtraOrder.getUid2SetsAndBalls()
+                                        .get(bid.getUid()))
+                                .map(BidSuccessInGroup::toSetsAndBalls))
+                        .punkts(uid2Points.get(bid.getUid()))
+                        .matches(matches.stream()
+                                .filter(m -> m.hasParticipant(bid.getUid()))
+                                .collect(toMap(
+                                        m -> m.getOpponentUid(bid.getUid()).get(),
+                                        m -> matchResult(bid.getUid(), tournament, m))))
+                        .build()));
 
         range(0, finalUidsOrder.size()).forEach(
                 i -> result.get(finalUidsOrder.get(i)).setFinishPosition(i));
         range(0, finalUidsOrder.size()).forEach(
                 i -> result.get(seedBidsOrder.get(i).getUid()).setSeedPosition(i));
 
+        final GroupRules groupRules = tournament.getRule().getGroup().get();
+
         return GroupParticipants.builder()
                 .tid(tournament.getTid())
                 .participants(result.values())
+                .disambiguationPolicy(groupRules.getDisambiguation())
+                .quitsGroup(groupRules.getQuits())
                 .build();
     }
 

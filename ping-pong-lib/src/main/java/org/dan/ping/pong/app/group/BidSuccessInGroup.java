@@ -73,4 +73,13 @@ public class BidSuccessInGroup {
                 winBalls + b.winBalls,
                 lostBalls + b.lostBalls);
     }
+
+    public SetsAndBalls toSetsAndBalls() {
+        return SetsAndBalls.builder()
+                .lostBalls(lostBalls)
+                .lostSets(lostSets)
+                .winBalls(winBalls)
+                .wonSets(winSets)
+                .build();
+    }
 }

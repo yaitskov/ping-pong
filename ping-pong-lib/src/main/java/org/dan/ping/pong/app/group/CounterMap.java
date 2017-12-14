@@ -1,7 +1,5 @@
 package org.dan.ping.pong.app.group;
 
-import org.dan.ping.pong.app.bid.Uid;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +12,10 @@ public class CounterMap<T> {
 
     public void increment(T key) {
         map.merge(key, 1, (o, n) -> o + n);
+    }
+
+    public void increment2(T key) {
+        map.merge(key, 2, (o, n) -> o + n);
     }
 
     public Map<T, Integer> toMap() {

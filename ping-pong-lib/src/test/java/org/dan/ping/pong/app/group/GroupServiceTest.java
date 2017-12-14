@@ -130,12 +130,22 @@ public class GroupServiceTest {
 
     @Test
     public void countPointsUidWithoutWins0() {
-        Map<Uid, Integer> got = sut.countPoints(asList(MatchInfo.builder()
-                .winnerId(Optional.of(UID1))
-                .participantIdScore(ImmutableMap.of(UID1, singletonList(11),
-                        UID2, singletonList(0)))
-                .build()));
-        assertEquals(ImmutableMap.of(UID1, 1, UID2, 0), got);
+        Map<Uid, Integer> got = sut.countPoints(
+                S1A2G11,
+                MatchListBuilder.matches().m(UID1, 11, UID2, 0).build());
+        assertEquals(ImmutableMap.of(UID1, 2, UID2, 1), got);
+    }
+
+    @Test
+    public void countPoints2WinsAnd1() {
+        Map<Uid, Integer> got = sut.countPoints(
+                S1A2G11,
+                MatchListBuilder.matches()
+                        .m(UID1, 11, UID2, 0)
+                        .m(UID1, 11, UID3, 2)
+                        .m(UID3, 11, UID2, 1)
+                        .build());
+        assertEquals(ImmutableMap.of(UID1, 4, UID3, 3, UID2, 2), got);
     }
 
     @Test

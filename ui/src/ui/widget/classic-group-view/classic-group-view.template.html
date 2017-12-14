@@ -6,7 +6,19 @@
         </td>
         <td translate="Participant lbl" />
         <td ng-repeat="participant in $ctrl.participants" class="text-center">
-            {{ $index + 1 }} {{participant.name | initials}}
+            <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}"
+               title="{{participant.name}}"
+               class="text-black">
+                {{ $index + 1 }} {{participant.name | initials}}
+            </a>
+        </td>
+        <td ng-show="$ctrl.showBalance" title="set balance" class="text-center">
+            <span>⚖</span>
+            <span>⚔</span>
+        </td>
+        <td ng-show="$ctrl.showBalance" title="ball balance" class="text-center">
+            <span>⚖</span>
+            <span>⚪/⚫</span>
         </td>
         <td title="punkts" class="text-center" translate="Punkts lbl" />
     </tr>
@@ -15,13 +27,18 @@
     <tr ng-repeat="participant in $ctrl.participants">
         <td>{{$index + 1}}</td>
         <td>
-            <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}">
+            <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}"
+               ng-class="{'text-success': participant.finishPosition < $ctrl.quitsGroup}">
                 {{participant.name}}
             </a>
         </td>
         <td ng-repeat="p2 in $ctrl.participants" class="text-center">
-            <span ng-show="participant.uid == p2.uid" class="text-muted">
-                {{participant.name | initials}}
+            <span ng-show="participant.uid == p2.uid">
+                <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}"
+                   title="{{participant.name}}"
+                   class="text-muted">
+                    {{participant.name | initials}}
+                </a>
             </span>
             <span ng-show="participant.uid != p2.uid">
                 <a href="#!/match/management/{{$ctrl.tournamentId}}/{{participant.matches[p2.uid].mid}}">
@@ -65,8 +82,67 @@
                 </a>
             </span>
         </td>
+        <td ng-show="$ctrl.showBalance" class="text-center">
+            <span ng-show="participant.setsAndBalls"
+                  title="won sets in matches with participants having the same number of points"
+                  class="text-success">
+                {{participant.setsAndBalls.wonSets}}
+            </span>
+            <span ng-show="$ctrl.disambiguationPolicy == 'CMP_WIN_MINUS_LOSE'">
+                -
+            </span>
+            <span ng-show="$ctrl.disambiguationPolicy == 'CMP_WIN_AND_LOSE'">
+                &nbsp;
+            </span>
+            <span ng-show="participant.setsAndBalls"
+                  title="lost sets in matches with participants having the same number of points"
+                  class="text-danger">
+                {{participant.setsAndBalls.lostSets}}
+            </span>
+            <hr class="half-cell"/>
+            <span ng-show="participant.setsAndBalls && $ctrl.disambiguationPolicy == 'CMP_WIN_MINUS_LOSE'"
+                  title="sets balance in matches with participants having the same number of points">
+                <strong>
+                    {{participant.setsAndBalls.wonSets - participant.setsAndBalls.lostSets}}
+                </strong>
+            </span>
+        </td>
+        <td ng-show="$ctrl.showBalance" class="text-center">
+            <span ng-show="participant.setsAndBalls"
+                  title="won balls in matches with participants having the same number of points"
+                  class="text-success">
+                {{participant.setsAndBalls.winBalls}}
+            </span>
+            <span ng-show="$ctrl.disambiguationPolicy == 'CMP_WIN_MINUS_LOSE'">
+                -
+            </span>
+            <span ng-show="$ctrl.disambiguationPolicy == 'CMP_WIN_AND_LOSE'">
+                &nbsp;
+            </span>
+            <span ng-show="participant.setsAndBalls"
+                  title="lost balls in matches with participants having the same number of points"
+                  class="text-danger">
+                {{participant.setsAndBalls.lostBalls}}
+            </span>
+            <hr class="half-cell"/>
+            <span ng-show="participant.setsAndBalls && $ctrl.disambiguationPolicy == 'CMP_WIN_MINUS_LOSE'"
+                  title="ball balance in matches with participants having the same number of points">
+                <strong>
+                    {{participant.setsAndBalls.winBalls - participant.setsAndBalls.lostBalls}}
+                </strong>
+            </span>
+        </td>
         <td class="text-center">
             {{participant.punkts}}
+            <div class="dice-set text-warning" ng-show="participant.dice"
+                 title="{{ 'dice-comment' | translate }}">
+                <div class="dice">
+                    ⚂
+                </div>
+                <div class="dice">
+                    ⚄
+                </div>
+            </div>
         </td>
     </tr>
     </tbody>

@@ -213,3 +213,13 @@ tr.bottom-line td {
 @import "mobile/app-mobile.scss";
 
 @import "spinner.scss";
+@import "dice.scss";
+
+
+.table hr.half-cell {
+   margin: 5px 0px;
+}
+
+.text-black {
+   color: #333;
+}

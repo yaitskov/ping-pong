@@ -18,7 +18,15 @@ angular.
                          self.rowOrder = 'seed'; // final | abc
                          self.loadData = function (tournament) {
                              self.participants = tournament.participants;
+                             for (var pi in self.participants) {
+                                 var p = self.participants[pi];
+                                 if (p.setsAndBalls) {
+                                    self.showBalance = true;
+                                 }
+                             }
                              self.tournamentId = tournament.tid;
+                             self.quitsGroup = tournament.quitsGroup;
+                             self.disambiguationPolicy = tournament.disambiguationPolicy;
                              self.participants.sort(sorters[self.rowOrder]);
                          };
                          self.setRowOrder = function (order) {

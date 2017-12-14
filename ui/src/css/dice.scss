@@ -1,0 +1,22 @@
+.dice-set {
+    margin: 0mm auto;;
+    position: relative;
+    width: 10mm;
+    height: 7mm;
+    transform: scale(0.6);
+}
+
+.dice {
+    font-size: 6mm;
+    float: left;
+    position: absolute;
+    top: 1mm;
+    left: 5mm;
+
+}
+
+.dice + .dice {
+    left: 0mm;
+    top: 0mm;
+    transform: rotate(40deg);
+}

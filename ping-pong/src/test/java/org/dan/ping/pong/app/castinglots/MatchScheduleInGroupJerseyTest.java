@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.castinglots;
 
 import static java.util.Arrays.asList;
 import static org.dan.ping.pong.app.group.DisambiguationPolicy.CMP_WIN_AND_LOSE;
+import static org.dan.ping.pong.app.group.DisambiguationPolicy.CMP_WIN_MINUS_LOSE;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.GLOBAL;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
 import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
@@ -59,6 +60,8 @@ public class MatchScheduleInGroupJerseyTest extends AbstractSpringJerseyTest {
             .quits(1)
             .disambiguation(CMP_WIN_AND_LOSE)
             .build();
+
+    public static final GroupRules G8Q2_M = G8Q2.withDisambiguation(CMP_WIN_MINUS_LOSE);
 
     public static final MatchValidationRule S1A2G11 = MatchValidationRule.builder()
             .setsToWin(1)

@@ -1,5 +1,6 @@
 package org.dan.ping.pong.simulate;
 
+import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q2_M;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G3Q2_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
@@ -26,6 +27,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -208,4 +211,14 @@ public class OneCategorySim {
                         //.scoreSet3(p2, 11, p3, 7));
     }
 
+    @Test
+    public void diceGroupOf3() {
+        isf.create(begin().name("diceGroupOf3")
+                .rules(RULES_G8Q1_S1A2G11.withGroup(Optional.of(G8Q2_M)))
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p3, 0)
+                        .scoreSet(p2, 11, p1, 0)
+                        .scoreSet(p3, 11, p2, 0));
+    }
 }

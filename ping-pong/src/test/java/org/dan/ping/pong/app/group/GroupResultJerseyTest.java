@@ -24,8 +24,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.Optional;
-
 import javax.inject.Inject;
 
 @Category(JerseySpringTest.class)

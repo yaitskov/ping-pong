@@ -74,7 +74,7 @@ public class GroupService {
 
     public List<Uid> orderUidsInGroup(TournamentMemState tournament,
             List<MatchInfo> allMatchesInGroup) {
-        final Map<Uid, Integer> uid2Points = countPoints(allMatchesInGroup);
+        final Map<Uid, Integer> uid2Points = countPoints(tournament.getRule().getMatch(), allMatchesInGroup);
         final ExtraUidOrderInGroup strongerExtraOrder = findStrongerExtraOrder(tournament,
                 uid2Points, allMatchesInGroup);
         final List<Uid> result = orderUidsByPointsAndExtraOrder(uid2Points,
@@ -226,12 +226,16 @@ public class GroupService {
                 .orElseThrow(() -> internalError("no opponent in match " + abMatch.getMid())));
     }
 
-    Map<Uid, Integer> countPoints(List<MatchInfo> allMatchesInGroup) {
+    Map<Uid, Integer> countPoints(MatchValidationRule rules, List<MatchInfo> allMatchesInGroup) {
         CounterMap<Uid> counters = new CounterMap<>();
-        allMatchesInGroup.stream().map(MatchInfo::getWinnerId)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .forEach(counters::increment);
+        allMatchesInGroup.stream().forEach(m ->
+            m.getWinnerId().ifPresent(winnerId -> {
+                counters.increment2(winnerId);
+                if (rules.findWinner(m).equals(m.getWinnerId())) {
+                    counters.increment(m.getOpponentUid(winnerId).get());
+                }
+            }));
+        // walkover all matches
         allMatchesInGroup.forEach(m -> m.getParticipantIdScore().keySet()
                 .forEach(counters::zeroIfMissing));
         return counters.toMap();
@@ -334,7 +338,7 @@ public class GroupService {
         final List<ParticipantMemState> bids = groupBids(tournament, gid);
         final TournamentRules rules = tournament.getRule();
 
-        final Map<Uid, Integer> uid2Points = countPoints(matches);
+        final Map<Uid, Integer> uid2Points = countPoints(rules.getMatch(), matches);
         final ExtraUidOrderInGroup strongerExtraOrder = findStrongerExtraOrder(tournament, uid2Points, matches);
         final List<Uid> finalUidsOrder = orderUidsByPointsAndExtraOrder(uid2Points,
                 strongerExtraOrder.getStrongerOf());

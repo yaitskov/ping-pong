@@ -36,5 +36,8 @@ module.exports = {
 
     'won sets more that required': 'Match has to many won sets',
 
-    'Results in groups': 'Results in groups'
+    'Results in groups': 'Results in groups',
+
+    'dice-comment': 'The participant performed equally well with at least 2 others in the group, '
+                        + 'so order between them is randomly chosen'
 };

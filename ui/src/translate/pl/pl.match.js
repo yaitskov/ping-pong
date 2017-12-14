@@ -35,5 +35,8 @@ module.exports = {
 
     'won sets more that required': 'Mecz ma za dużo wygranych setów',
 
-    'Results in groups': 'Wyniki w grupie'
+    'Results in groups': 'Wyniki w grupie',
+
+    'dice-comment': 'Wynik uczestnika jest podobny do dwóch innych w grupie, '
+                    + 'dla tego kolejność międze nimi wybrana losowo'
 };

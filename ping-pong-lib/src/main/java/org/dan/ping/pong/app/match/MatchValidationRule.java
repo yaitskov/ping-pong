@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Wither;
 import org.dan.ping.pong.app.bid.Uid;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 @Getter
 @Setter
+@Wither
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

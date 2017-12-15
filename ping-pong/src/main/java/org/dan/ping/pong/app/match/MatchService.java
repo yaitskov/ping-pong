@@ -336,11 +336,6 @@ public class MatchService {
     @Inject
     private PlayOffService playOffService;
 
-    private boolean notExpelledInGroup(TournamentMemState tournament, ParticipantMemState b) {
-        return b.getState() != Expl || tournament.participantMatches(b.getUid())
-                .anyMatch(m -> !m.getGid().isPresent());
-    }
-
     private Set<Uid> completeGroup(Integer gid, TournamentMemState tournament,
             List<MatchInfo> matches, DbUpdater batch) {
         log.info("Pick bids for playoff from gid {} in tid {}", gid, tournament.getTid());
@@ -371,7 +366,7 @@ public class MatchService {
 
         final List<Uid> quitUids = orderUids.stream()
                 .map(tournament::getBidOrExpl)
-                .filter(b -> notExpelledInGroup(tournament, b))
+                .filter(b -> groupService.notExpelledInGroup(tournament, b))
                 .limit(quits)
                 .map(ParticipantMemState::getUid)
                 .collect(toList());

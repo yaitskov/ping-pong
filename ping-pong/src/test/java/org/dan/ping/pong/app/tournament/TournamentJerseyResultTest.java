@@ -2,8 +2,11 @@ package org.dan.ping.pong.app.tournament;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import static org.dan.ping.pong.app.group.GroupResource.GROUP_LIST;
+import static org.dan.ping.pong.app.group.GroupResource.GROUP_RESULT;
 import static org.dan.ping.pong.app.match.DisambiguateGroupScoreJerseyTest.RULES_G8Q2_S1A2G11_M;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S3A2G11;
+import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
 import static org.dan.ping.pong.app.tournament.TournamentResource.RESULT_CATEGORY;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
@@ -18,6 +21,9 @@ import static org.dan.ping.pong.mock.simulator.PlayerCategory.c2;
 import static org.junit.Assert.assertEquals;
 
 import org.dan.ping.pong.JerseySpringTest;
+import org.dan.ping.pong.app.group.GroupParticipantResult;
+import org.dan.ping.pong.app.group.GroupParticipants;
+import org.dan.ping.pong.app.group.TournamentGroups;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
@@ -25,7 +31,9 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.GenericType;
@@ -63,17 +71,17 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
         final List<TournamentResultEntry> result = result(scenario);
 
         TournamentResultEntry p1Result = result.get(0);
-        assertEquals(6, p1Result.getPunkts());
+        assertEquals(100, p1Result.getPunkts());
         assertEquals(scenario.getPlayersSessions().get(p1).getUid(),
                 p1Result.getUser().getUid());
 
         TournamentResultEntry p2Result = result.get(1);
-        assertEquals(4, p2Result.getPunkts());
+        assertEquals(97, p2Result.getPunkts());
         assertEquals(scenario.getPlayersSessions().get(p2).getUid(),
                 p2Result.getUser().getUid());
 
         TournamentResultEntry p3Result = result.get(2);
-        assertEquals(2, p3Result.getPunkts());
+        assertEquals(94, p3Result.getPunkts());
         assertEquals(scenario.getPlayersSessions().get(p3).getUid(),
                 p3Result.getUser().getUid());
     }
@@ -99,11 +107,59 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
                         .map(e -> scenario.getUidPlayer()
                                 .get(e.getUser().getUid()))
                         .collect(toList()));
+
+        final int tid = scenario.getTid().getTid();
+        final TournamentGroups g = myRest().get(GROUP_LIST + tid, TournamentGroups.class);
+        final int gid = g.getGroups().stream().findFirst().get().getGid();
+        final GroupParticipants r = myRest().get(GROUP_RESULT + tid + "/"
+                + gid, GroupParticipants.class);
+
+        assertEquals(asList(p1, p2, p3),
+                r.getParticipants().stream()
+                        .sorted(Comparator.comparingInt(GroupParticipantResult::getFinishPosition))
+                        .map(GroupParticipantResult::getUid)
+                        .map(e -> scenario.getUidPlayer().get(e))
+                        .collect(toList()));
     }
 
     private List<TournamentResultEntry> result(TournamentScenario scenario) {
         return myRest()
                 .get(TOURNAMENT_RESULT + scenario.getTid() + RESULT_CATEGORY + scenario.getCategoryDbId().get(c1),
                         new GenericType<List<TournamentResultEntry>>() {});
+    }
+
+    @Test
+    public void playOffIncomplete() {
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .name("ResultPlayOffIncomplete")
+                .ignoreUnexpectedGames()
+                .rules(RULES_G8Q2_S1A2G11_M.withPlayOff(Optional.of(Losing1)))
+                .category(c1, p1, p2, p3)
+                .custom(game(p1, p2, 11, 1))
+                .custom(game(p2, p3, 11, 0))
+                .custom(game(p3, p1, 14, 12));
+
+        simulator.simulate(scenario);
+
+        final List<TournamentResultEntry> result = result(scenario);
+
+        assertEquals(asList(p1, p2, p3),
+                result.stream()
+                        .map(e -> scenario.getUidPlayer()
+                                .get(e.getUser().getUid()))
+                        .collect(toList()));
+
+        final int tid = scenario.getTid().getTid();
+        final TournamentGroups g = myRest().get(GROUP_LIST + tid, TournamentGroups.class);
+        final int gid = g.getGroups().stream().findFirst().get().getGid();
+        final GroupParticipants r = myRest().get(GROUP_RESULT + tid + "/"
+                + gid, GroupParticipants.class);
+
+        assertEquals(asList(p1, p2, p3),
+                r.getParticipants().stream()
+                        .sorted(Comparator.comparingInt(GroupParticipantResult::getFinishPosition))
+                        .map(GroupParticipantResult::getUid)
+                        .map(e -> scenario.getUidPlayer().get(e))
+                        .collect(toList()));
     }
 }

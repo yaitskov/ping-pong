@@ -30,9 +30,11 @@ public class TournamentRules {
     private Optional<PlayOffRule> playOff;
     private Optional<GroupRules> group;
     private Optional<PlaceRules> place = Optional.empty();
+    private Optional<RewardRules> rewards = Optional.empty();
 
     public static class TournamentRulesBuilder {
         int version = FIRST_VERSION;
+        Optional<RewardRules> rewards = Optional.empty();
         Optional<PlaceRules> place = Optional.empty();
         CastingLotsRule casting = CastingLotsRule.builder()
                 .splitPolicy(BalancedMix)

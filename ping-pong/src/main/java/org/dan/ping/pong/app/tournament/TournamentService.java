@@ -11,11 +11,9 @@ import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
-import static org.dan.ping.pong.app.group.DisambiguationPolicy.WIN_AND_LOSE_COMPARATOR;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.table.TableService.STATE;
-import static org.dan.ping.pong.app.tournament.CumulativeScore.createComparator;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
@@ -39,15 +37,11 @@ import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryService;
-import org.dan.ping.pong.app.group.BidSuccessInGroup;
-import org.dan.ping.pong.app.group.DisambiguationPolicy;
 import org.dan.ping.pong.app.group.GroupDao;
-import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
-import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.place.PlaceService;
@@ -64,13 +58,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -420,52 +412,23 @@ public class TournamentService {
     private GroupService groupService;
 
     public List<TournamentResultEntry> tournamentResult(TournamentMemState tournament, int cid) {
-        final List<MatchInfo> cidMatches = categoryService.findMatchesInCategory(tournament, cid);
-        int level = 1;
-        final Map<Uid, CumulativeScore> uidLevel = new HashMap<>();
-        Collection<MatchInfo> baseMatches = playOffService.findBaseMatches(cidMatches);
-        final MatchValidationRule matchRules = tournament.getRule().getMatch();
-        while (true) {
-            ranksLevelMatches(tournament, level++, uidLevel, baseMatches, matchRules);
-            final Collection<MatchInfo> nextLevel = playOffService
-                    .findNextMatches(tournament.getMatches(), baseMatches);
-            if (nextLevel.isEmpty()) {
-                break;
-            }
-            baseMatches = nextLevel;
+        final List<TournamentResultEntry> groupOrdered = groupService.resultOfAllGroupsInCategory(tournament, cid);
+        final List<TournamentResultEntry> playOffResult = playOffService.playOffResult(tournament, cid, groupOrdered);
+        if (playOffResult.isEmpty()) {
+            return enumerate(tournament, groupOrdered);
+        } else {
+            playOffResult.addAll(groupOrdered);
+            return enumerate(tournament, playOffResult);
         }
-        ranksLevelMatches(tournament, 0, uidLevel, playOffService.findCompleteGroupMatches(cidMatches), matchRules);
-        return uidLevel.values().stream().sorted(createComparator(
-                tournament.getRule().getGroup()
-                        .map(GroupRules::getDisambiguation)
-                        .map(DisambiguationPolicy::getComparator)
-                        .orElse(WIN_AND_LOSE_COMPARATOR)))
-                .map(cuScore -> {
-                    final ParticipantMemState participant = tournament.getParticipant(cuScore.getRating().getUid());
-                    return TournamentResultEntry.builder()
-                            .user(participant.toLink())
-                            .state(participant.getState())
-                            .punkts(cuScore.getRating().getPunkts())
-                            .score(cuScore)
-                        .build();
-                })
-                .collect(toList());
     }
 
-    private void ranksLevelMatches(TournamentMemState tournament, int level,
-            Map<Uid, CumulativeScore> uidLevel,
-            Collection<MatchInfo> matches, MatchValidationRule rules) {
-        final Map<Uid, BidSuccessInGroup> uid2Stat = groupService.emptyMatchesState(
-                uid ->  tournament.getParticipant(uid).getState(), matches);
-        matches.forEach(m -> groupService.aggMatch(uid2Stat, m, rules));
-        uid2Stat.forEach((uid, stat) ->
-                uidLevel.merge(uid,
-                    CumulativeScore.builder()
-                            .level(level)
-                            .rating(stat)
-                            .weighted(stat.multiply((int) Math.pow(10, level)))
-                            .build(),
-                    CumulativeScore::merge));
+    private List<TournamentResultEntry> enumerate(
+            TournamentMemState tournament,
+            List<TournamentResultEntry> playOffResult) {
+        final RewardRules reward = tournament.rewards();
+        IntStream.range(0, playOffResult.size()).forEach(
+                i -> playOffResult.get(i).setPunkts(reward.getBestScore() - reward.getNextScoreStep() * i));
+        return playOffResult;
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)

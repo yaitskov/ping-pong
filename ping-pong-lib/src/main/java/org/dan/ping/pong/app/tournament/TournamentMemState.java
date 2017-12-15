@@ -20,7 +20,9 @@ import lombok.Setter;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryLink;
+import org.dan.ping.pong.app.group.DisambiguationPolicy;
 import org.dan.ping.pong.app.group.GroupInfo;
+import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.dispute.DisputeMemState;
@@ -154,5 +156,14 @@ public class TournamentMemState {
 
     public UserRole detectRole(Optional<Uid> ouid) {
         return ouid.map(uid -> isAdminOf(uid) ? Admin : Spectator).orElse(Spectator);
+    }
+
+    public RewardRules rewards() {
+        return getRule().getRewards().orElse(RewardRules.defaultRewards);
+    }
+
+    public DisambiguationPolicy disambiguationPolicy() {
+        return getRule().getGroup().map(GroupRules::getDisambiguation)
+                .orElse(DisambiguationPolicy.CMP_WIN_AND_LOSE);
     }
 }

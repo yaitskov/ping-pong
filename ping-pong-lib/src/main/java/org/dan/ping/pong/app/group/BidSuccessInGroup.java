@@ -82,4 +82,8 @@ public class BidSuccessInGroup {
                 .wonSets(winSets)
                 .build();
     }
+
+    public void addPunkts(Integer positionInGroup) {
+        punkts += positionInGroup;
+    }
 }

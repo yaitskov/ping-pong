@@ -4,7 +4,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import lombok.extern.slf4j.Slf4j;
-import ord.dan.ping.pong.jooq.tables.Category;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
@@ -14,6 +13,7 @@ import org.dan.ping.pong.app.tournament.TournamentMemState;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Slf4j
 public class CategoryService {
@@ -24,9 +24,12 @@ public class CategoryService {
                 .collect(toSet());
     }
 
+    public Stream<MatchInfo> findMatchesInCategoryStream(TournamentMemState tournament, int cid) {
+        return tournament.getMatches().values().stream().filter(m -> m.getCid() == cid);
+    }
+
     public List<MatchInfo> findMatchesInCategory(TournamentMemState tournament, int cid) {
-        return tournament.getMatches().values().stream().filter(m -> m.getCid() == cid)
-                .collect(toList());
+        return findMatchesInCategoryStream(tournament, cid).collect(toList());
     }
 
     public CategoryInfo categoryInfo(TournamentMemState tournament,

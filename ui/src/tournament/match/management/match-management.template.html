@@ -95,6 +95,9 @@
       </tr>
     </table>
   </div>
+  <div class="form-group" ng-show="!$ctrl.match.playedSets && $ctrl.match.state == 'Over'">
+    <div class="alert alert-info" translate="match-has-been-walked-over" />
+  </div>`
   <div class="form-group">
     <review-sets></review-sets>
   </div>

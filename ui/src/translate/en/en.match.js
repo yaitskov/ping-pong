@@ -39,5 +39,7 @@ module.exports = {
     'Results in groups': 'Results in groups',
 
     'dice-comment': 'The participant performed equally well with at least 2 others in the group, '
-                        + 'so order between them is randomly chosen'
+                        + 'so order between them is randomly chosen',
+
+    'match-has-been-walked-over': 'Match has been complete due one of the participants resigned or get expelled'
 };

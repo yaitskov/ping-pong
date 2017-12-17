@@ -38,5 +38,7 @@ module.exports = {
     'Results in groups': 'Wyniki w grupie',
 
     'dice-comment': 'Wynik uczestnika jest podobny do dwóch innych w grupie, '
-                    + 'dla tego kolejność międze nimi wybrana losowo'
+                    + 'dla tego kolejność międze nimi wybrana losowo',
+
+    'match-has-been-walked-over': 'mecz jest zakonczony, bo jeden z przeczywników zrezygnował lub został wydaliony'
 };

@@ -1,4 +1,4 @@
-<table class="table">
+<table class="table classic-group-view">
     <thead>
     <tr>
         <td title="position">
@@ -28,7 +28,10 @@
         <td>{{$index + 1}}</td>
         <td>
             <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}"
-               ng-class="{'text-success': participant.finishPosition < $ctrl.quitsGroup}">
+               ng-class="{'text-success': participant.finishPosition < $ctrl.quitsGroup, 'text-danger': participant.state == 'Expl'}">
+                <span ng-show="participant.state == 'Expl'">
+                    ☠
+                </span>
                 {{participant.name}}
             </a>
         </td>
@@ -43,7 +46,7 @@
             <span ng-show="participant.uid != p2.uid">
                 <a href="#!/match/management/{{$ctrl.tournamentId}}/{{participant.matches[p2.uid].mid}}">
                     <span ng-show="participant.matches[p2.uid].state == 'Pending'" class="text-muted">
-                        <span class="glyphicon glyphicon-time"/>
+                        <span class="pending">𝄞</span>
                     </span>
                     <span ng-show="participant.matches[p2.uid].state == 'Run'">
                         <span ng-repeat="set in participant.matches[p2.uid].games" class="small">
@@ -73,11 +76,11 @@
                     </span>
                     <span ng-show="participant.matches[p2.uid].state == 'WalkOver'" class="text-danger"
                           title="participant walked over the match">
-                        <span class="glyphicon glyphicon-thumbs-down"/>
+                        <span class="walk-over">⚐</span>
                     </span>
                     <span ng-show="participant.matches[p2.uid].state == 'WalkWiner'" class="text-success"
                           title="enemy walked over the match">
-                        <span class="glyphicon glyphicon-thumbs-up"/>
+                        <span class="win-over">☺</span>
                     </span>
                 </a>
             </span>

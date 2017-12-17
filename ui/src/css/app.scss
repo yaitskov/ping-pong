@@ -210,7 +210,9 @@ tr.bottom-line td {
     font-size: 75%;
 }
 
-@import "mobile/app-mobile.scss";
+@media all and (min-resolution: 120dpi) {
+    @import "mobile/app-mobile.scss";
+}
 
 @import "spinner.scss";
 @import "dice.scss";

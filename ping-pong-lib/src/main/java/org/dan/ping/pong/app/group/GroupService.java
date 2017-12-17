@@ -356,6 +356,7 @@ public class GroupService {
                 bid -> GroupParticipantResult.builder()
                         .name(bid.getName())
                         .uid(bid.getUid())
+                        .state(bid.getState())
                         .dice(strongerExtraOrder.getDiced().contains(bid.getUid()))
                         .setsAndBalls(ofNullable(
                                 strongerExtraOrder.getUid2SetsAndBalls()

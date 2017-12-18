@@ -4,15 +4,17 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
-import static org.dan.ping.pong.app.bid.BidState.Play;
+import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.PLAY_OFF_SEEDS;
+import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
-import static org.dan.ping.pong.app.tournament.ParticipantMemState.createLoserBid;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -21,6 +23,8 @@ import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidService;
+import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
@@ -29,14 +33,13 @@ import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
-import org.dan.ping.pong.app.bid.Uid;
-import org.dan.ping.pong.sys.db.DbUpdater;
-import org.dan.ping.pong.sys.db.DbUpdaterSql;
-import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.user.UserLink;
+import org.dan.ping.pong.sys.db.DbUpdater;
+import org.dan.ping.pong.sys.db.DbUpdaterSql;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +55,9 @@ import javax.inject.Named;
 public class CastingLotsService {
     public static final String NOT_ENOUGH_PARTICIPANTS = "Not enough participants";
     public static final String N = "n";
+    private static final ImmutableSet<BidState> WANT_PAID_HERE = ImmutableSet.of(Want, Paid, Here);
+    private static final ImmutableSet<BidState> WANT_PAID = ImmutableSet.of(Want, Paid);
+    private static final ImmutableSet<BidState> QUIT_EXPELLED = ImmutableSet.of(Quit, Expl);
 
     public static Map<Integer, List<ParticipantMemState>> groupByCategories(
             List<ParticipantMemState> bids) {
@@ -222,13 +228,13 @@ public class CastingLotsService {
 
     private List<ParticipantMemState> findBidsReadyToPlay(TournamentMemState tournament) {
         return tournament.getParticipants().values().stream()
-                .filter(bid -> ImmutableSet.of(Want, Paid, Here).contains(bid.getBidState()))
+                .filter(bid -> WANT_PAID_HERE.contains(bid.getBidState()))
                 .collect(toList());
     }
 
     private void checkAllThatAllHere(List<ParticipantMemState> readyBids) {
-        final List<UserLink> notHere = readyBids.stream().filter(bid ->
-                bid.getState() == Want || bid.getState() == Paid)
+        final List<UserLink> notHere = readyBids.stream()
+                .filter(bid -> WANT_PAID.contains(bid.getState()))
                 .map(ParticipantMemState::toLink)
                 .collect(toList());
         if (notHere.isEmpty()) {
@@ -261,8 +267,17 @@ public class CastingLotsService {
                         && !p.getUid().equals(participant.getUid()))
                 .sorted(Comparator.comparingInt(p -> p.getUid().getId()))
                 .forEach(
-                        p -> priority[0] = castingLotsDao.addGroupMatch(
-                                tournament, priority[0], participant, p));
+                        p -> {
+                            final boolean isDeadParticipant = QUIT_EXPELLED.contains(p.getState());
+                            priority[0] = castingLotsDao.addGroupMatch(
+                                    tournament, priority[0], participant, p,
+                                    isDeadParticipant
+                                            ? Over
+                                            : Place,
+                                    isDeadParticipant
+                                            ? Optional.of(uid)
+                                            : Optional.empty());
+                        });
         scheduleService.afterMatchComplete(tournament, batch,  clocker.get());
     }
 }

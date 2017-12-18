@@ -8,6 +8,7 @@ import static ord.dan.ping.pong.jooq.Tables.BID;
 import static ord.dan.ping.pong.jooq.Tables.USERS;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.MID0;
 import static org.dan.ping.pong.app.group.GroupSchedule.DEFAULT_SCHEDULE;
+import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.match.MatchType.POff;
@@ -70,13 +71,14 @@ public class CastingLotsDao implements CastingLotsDaoIf {
             final int bidIdxB = schedule.get(i++);
             final ParticipantMemState bid1 = groupBids.get(bidIdxA);
             final ParticipantMemState bid2 = groupBids.get(bidIdxB);
-            priorityGroup = addGroupMatch(tournament, priorityGroup, bid1, bid2);
+            priorityGroup = addGroupMatch(tournament, priorityGroup, bid1, bid2, Place, Optional.empty());
         }
         return priorityGroup;
     }
 
     public int addGroupMatch(TournamentMemState tournament, int priorityGroup,
-            ParticipantMemState bid1, ParticipantMemState bid2) {
+            ParticipantMemState bid1, ParticipantMemState bid2,
+            MatchState state, Optional<Uid> winnerId) {
         final Mid mid = matchDao.createGroupMatch(bid1.getTid(),
                 bid1.getGid().get(), bid1.getCid(), ++priorityGroup,
                 bid1.getUid(), bid2.getUid());
@@ -85,7 +87,8 @@ public class CastingLotsDao implements CastingLotsDaoIf {
                 .mid(mid)
                 .level(0)
                 .priority(priorityGroup)
-                .state(MatchState.Place)
+                .state(state)
+                .winnerId(winnerId)
                 .gid(bid1.getGid())
                 .participantIdScore(ImmutableMap.of(
                         bid1.getUid(), new ArrayList<>(),

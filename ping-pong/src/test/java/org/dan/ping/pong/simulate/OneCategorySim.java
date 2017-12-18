@@ -6,6 +6,7 @@ import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G3Q2_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.mock.simulator.AutoResolution.RANDOM;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Hook.BeforeScore;
@@ -15,6 +16,8 @@ import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.Player.p5;
 import static org.dan.ping.pong.mock.simulator.Player.p6;
+import static org.dan.ping.pong.mock.simulator.Player.p7;
+import static org.dan.ping.pong.mock.simulator.Player.p8;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 
@@ -220,5 +223,24 @@ public class OneCategorySim {
                         .scoreSet(p1, 11, p3, 0)
                         .scoreSet(p2, 11, p1, 0)
                         .scoreSet(p3, 11, p2, 0));
+    }
+
+    @Test
+    public void completeJustPlayOff8() {
+        isf.create(begin().name("completeJustPlayOff8")
+                .rules(RULES_JP_S1A2G11)
+                // 1, 8, ;     5, 4,  3, 6, 7, 2
+                .category(c1, p1, p2, p3, p4, p5, p6, p7, p8))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p8, 8)
+                        .scoreSet(p4, 11, p5, 5)
+
+                        .scoreSet(p3, 11, p6, 6)
+                        .scoreSet(p2, 11, p7, 7)
+
+                        .scoreSet(p1, 11, p4, 4)
+                        .scoreSet(p2, 11, p3, 3)
+
+                        .scoreSet(p1, 11, p2, 2));
     }
 }

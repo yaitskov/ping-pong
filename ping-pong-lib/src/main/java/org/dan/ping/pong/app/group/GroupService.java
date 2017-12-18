@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.group;
 
 import static com.google.common.collect.Iterables.mergeSorted;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -473,6 +474,7 @@ public class GroupService {
                                     cumScore.getRating().getUid());
                             return TournamentResultEntry.builder()
                                     .user(participant.toLink())
+                                    .playOffStep(empty())
                                     .state(participant.getState())
                                     .punkts(cumScore.getRating().getPunkts())
                                     .score(cumScore)

@@ -26,6 +26,7 @@ import org.dan.ping.pong.app.group.GroupParticipants;
 import org.dan.ping.pong.app.group.TournamentGroups;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
+import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -46,6 +47,9 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
 
     @Inject
     private TournamentService tournamentService;
+
+    @Inject
+    private ImperativeSimulatorFactory isf;
 
     @Test
     public void tournamentResult() {
@@ -69,6 +73,8 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
 
         simulator.simulate(scenario);
         final List<TournamentResultEntry> result = result(scenario);
+
+        isf.resume(scenario).run(c -> c.checkPlayOffLevels(result, 1, 1, -1));
 
         TournamentResultEntry p1Result = result.get(0);
         assertEquals(100, p1Result.getPunkts());
@@ -107,6 +113,8 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
                         .map(e -> scenario.getUidPlayer()
                                 .get(e.getUser().getUid()))
                         .collect(toList()));
+
+        isf.resume(scenario).run(c -> c.checkPlayOffLevels(result, -1, -1, -1));
 
         final int tid = scenario.getTid().getTid();
         final TournamentGroups g = myRest().get(GROUP_LIST + tid, TournamentGroups.class);
@@ -148,6 +156,8 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
                         .map(e -> scenario.getUidPlayer()
                                 .get(e.getUser().getUid()))
                         .collect(toList()));
+
+        isf.resume(scenario).run(c -> c.checkPlayOffLevels(result, 1, 1, -1));
 
         final int tid = scenario.getTid().getTid();
         final TournamentGroups g = myRest().get(GROUP_LIST + tid, TournamentGroups.class);

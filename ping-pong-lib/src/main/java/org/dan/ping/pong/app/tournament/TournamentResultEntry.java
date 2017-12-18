@@ -9,6 +9,8 @@ import lombok.ToString;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.user.UserLink;
 
+import java.util.Optional;
+
 @Getter
 @Setter
 @Builder
@@ -20,4 +22,5 @@ public class TournamentResultEntry {
     private BidState state;
     private int punkts;
     private CumulativeScore score;
+    private Optional<Integer> playOffStep;
 }

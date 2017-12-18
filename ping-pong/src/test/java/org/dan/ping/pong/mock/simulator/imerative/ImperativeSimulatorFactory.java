@@ -25,4 +25,11 @@ public class ImperativeSimulatorFactory {
                 baseScenario.ignoreUnexpectedGames(),
                 myRest);
     }
+
+    public ImperativeSimulator resume(TournamentScenario scenario) {
+        return new ImperativeSimulator(simulator,
+                restGenerator,
+                scenario,
+                myRest);
+    }
 }

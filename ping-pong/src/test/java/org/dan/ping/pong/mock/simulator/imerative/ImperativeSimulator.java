@@ -30,6 +30,7 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.primitives.Ints;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidState;
@@ -54,9 +55,11 @@ import org.dan.ping.pong.mock.simulator.Player;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
@@ -81,7 +84,9 @@ public class ImperativeSimulator {
 
     public void run(Consumer<ImperativeSimulator> c) {
         try {
-            simulator.setupEnvironment(scenario);
+            if (scenario.getTid() == null) {
+                simulator.setupEnvironment(scenario);
+            }
             c.accept(this);
         } catch (AssertionError|Exception e) {
             log.info("Scenario {} failed", scenario, e);
@@ -217,6 +222,20 @@ public class ImperativeSimulator {
 
     public List<TournamentResultEntry> getTournamentResult() {
         return getTournamentResult(getOnlyCid());
+    }
+
+    public ImperativeSimulator checkPlayOffLevels(int... levels) {
+        return checkPlayOffLevels(getTournamentResult(), levels);
+    }
+
+    public ImperativeSimulator checkPlayOffLevels(List<TournamentResultEntry> tournamentResult , int... levels) {
+        final List<Optional<Integer>> expectedLevels = Ints.asList(levels).stream()
+                .map((Integer l) -> (l < 0) ? Optional.<Integer>empty() : Optional.of(l))
+                .collect(toList());
+
+        assertEquals(expectedLevels, tournamentResult.stream()
+                .map(TournamentResultEntry::getPlayOffStep).collect(toList()));
+        return this;
     }
 
     public List<TournamentResultEntry> getTournamentResult(Integer onlyCid) {

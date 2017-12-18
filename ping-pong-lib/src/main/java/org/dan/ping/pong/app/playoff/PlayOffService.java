@@ -4,7 +4,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.MID0;
-import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.tournament.CumulativeScore.createComparator;
 
 import org.dan.ping.pong.app.bid.Uid;
@@ -59,12 +58,6 @@ public class PlayOffService {
                 .values();
     }
 
-    public Collection<MatchInfo> findCompleteGroupMatches(List<MatchInfo> matches) {
-        return matches.stream().filter(m -> m.getGid().isPresent())
-                .filter(m -> m.getState() == Over)
-                .collect(toList());
-    }
-
     public List<MatchInfo> findPlayOffMatches(TournamentMemState tournament, int cid) {
         return tournament.getMatches().values().stream()
                 .filter(minfo -> minfo.getCid() == cid)
@@ -82,10 +75,13 @@ public class PlayOffService {
     public List<TournamentResultEntry> playOffResult(TournamentMemState tournament, int cid,
             List<TournamentResultEntry> groupOrdered) {
         final List<MatchInfo> cidMatches = categoryService.findMatchesInCategory(tournament, cid);
-
+        final Map<Uid, Integer> highestLevelReached = new HashMap<>();
         final List<MatchInfo> cidPlayOffMatches = cidMatches
                 .stream()
                 .filter(minfo -> !minfo.getGid().isPresent())
+                .peek(minfo -> minfo.getParticipantIdScore().keySet()
+                        .forEach(uid -> highestLevelReached.merge(uid,
+                                minfo.getLevel(), Math::max)))
                 .sorted(Comparator.comparing(MatchInfo::getMid))
                 .collect(toList());
 
@@ -117,6 +113,7 @@ public class PlayOffService {
                             cuScore.getRating().getUid());
                     return TournamentResultEntry.builder()
                             .user(participant.toLink())
+                            .playOffStep(ofNullable(highestLevelReached.get(participant.getUid())))
                             .state(participant.getState())
                             .punkts(cuScore.getRating().getPunkts())
                             .score(cuScore)

@@ -16,6 +16,7 @@ import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
+import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -40,6 +41,9 @@ public class JustPlayOffJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     private Simulator simulator;
 
+    @Inject
+    private ImperativeSimulatorFactory isf;
+
     @Test
     public void noAutoLoosers4() {
         final TournamentScenario scenario = TournamentScenario.begin()
@@ -53,6 +57,7 @@ public class JustPlayOffJerseyTest extends AbstractSpringJerseyTest {
                 .name("noAutoLoosers4");
 
         simulator.simulate(scenario);
+        isf.resume(scenario).run(c -> c.checkPlayOffLevels(2, 2, 1, 1));
     }
 
     @Test

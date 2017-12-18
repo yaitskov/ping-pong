@@ -1,6 +1,9 @@
 package org.dan.ping.pong.app.tournament;
 
+import static org.dan.ping.pong.app.bid.BidState.Expl;
+import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
+import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
@@ -39,6 +42,8 @@ import org.dan.ping.pong.mock.simulator.PlayHook;
 import org.dan.ping.pong.mock.simulator.Player;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
+import org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc;
+import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -78,16 +83,22 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     private ForTestMatchDao forTestMatchDao;
 
+    @Inject
+    private ImperativeSimulatorFactory isf;
+
     @Test
     public void resignInGroupMiddle() {
-        simulator.simulate(TournamentScenario.begin()
+        isf.create(TournamentScenario.begin()
                 .name("resignInGroupMiddle")
                 .rules(RULES_G8Q1_S3A2G11)
-                .category(c1, p1, p2, p3)
-                .custom(game(p1, p3, -1, 0))
-                .w30(p2, p3)
-                .quitsGroup(p2)
-                .champions(c1, p2));
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet3(p1, 11, p3, 0)
+                        .expelPlayer(p1)
+                        .scoreSet3(p2, 20, p3, 18)
+                        .checkTournamentComplete(BidStatesDesc
+                                .restState(Lost).bid(p2, Win1).bid(p1, Expl))
+                        .checkResult(p2, p1, p3));
     }
 
     @Test

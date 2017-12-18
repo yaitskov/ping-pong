@@ -41,5 +41,7 @@ module.exports = {
     'dice-comment': 'The participant performed equally well with at least 2 others in the group, '
                         + 'so order between them is randomly chosen',
 
-    'match-has-been-walked-over': 'Match has been complete due one of the participants resigned or get expelled'
+    'match-has-been-walked-over': 'Match has been complete due one of the participants resigned or get expelled',
+
+    'group-play-off-border': 'Left in a group'
 };

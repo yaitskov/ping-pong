@@ -48,10 +48,28 @@
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="participant in $ctrl.participants">
+      <tr ng-repeat="participant in $ctrl.playOffParticipants"
+          ng-class="{'even-row': ((participant.playOffStep || 1) + 1) % 2, 'text-danger': participant.state == 'Expl'}">
         <td>{{$index + 1}}</td>
         <td title="{{ 'Opponents participating in the match' | translate }}">
           <a href="#!/participant/result/{{$ctrl.tournament.tid}}/{{participant.user.uid}}">
+            <span ng-show="participant.state == 'Expl'">☠</span>
+            {{participant.user.name}}
+          </a>
+        </td>
+        <td>
+          {{participant.punkts}}
+        </td>
+      </tr>
+      <tr ng-show="$ctrl.playOffParticipants && $ctrl.inGroupParticipants">
+        <td colspan="3" class="text-center text-muted" translate="group-play-off-border"/>
+      </tr>
+      <tr ng-repeat="participant in $ctrl.inGroupParticipants" class="even-row"
+          ng-class="{'text-danger': participant.state == 'Expl'}">
+        <td>{{$ctrl.numOfPlayOffParticipants + $index + 1}}</td>
+        <td title="{{ 'Opponents participating in the match' | translate }}">
+          <a href="#!/participant/result/{{$ctrl.tournament.tid}}/{{participant.user.uid}}">
+            <span ng-show="participant.state == 'Expl'">☠</span>
             {{participant.user.name}}
           </a>
         </td>

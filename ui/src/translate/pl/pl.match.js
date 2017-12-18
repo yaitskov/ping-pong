@@ -40,5 +40,7 @@ module.exports = {
     'dice-comment': 'Wynik uczestnika jest podobny do dwóch innych w grupie, '
                     + 'dla tego kolejność międze nimi wybrana losowo',
 
-    'match-has-been-walked-over': 'mecz jest zakonczony, bo jeden z przeczywników zrezygnował lub został wydaliony'
+    'match-has-been-walked-over': 'mecz jest zakonczony, bo jeden z przeczywników zrezygnował lub został wydaliony',
+
+    'group-play-off-border': 'Zostali w grupie'
 };

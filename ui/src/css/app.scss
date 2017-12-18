@@ -12,6 +12,10 @@ $success-bg-color: #dff0d8;
 $section-panel-border-color: #d2d2d2;
 $section-panel-label-color: #666;
 
+tr.even-row {
+    background-color: $active-background-color;
+}
+
 /* begin of no side space */
 .view-container .container-fluid {
     padding-left: 0px;

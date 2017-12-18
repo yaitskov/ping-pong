@@ -14,7 +14,24 @@ angular.
                          self.currentCid = null;
                          self.tid = $routeParams.tournamentId;
                          var params = {tournamentId: $routeParams.tournamentId};
-                         this.pickCategory = function (cid) {
+                         self.splitPlayOffAndGroupParticipants = function () {
+                             var border = -1;
+                             self.inGroupParticipants = null;
+                             self.playOffParticipants = null;
+                             for (var i = 1; i < self.participants.length; ++i) {
+                                 if (self.participants[i - 1].playOffSet && !self.participants[i].playOffSet) {
+                                    border = i;
+                                    break;
+                                 }
+                             }
+                             if (border < 0) {
+                                 self.playOffParticipants = self.participants;
+                             } else {
+                                 self.playOffParticipants = self.participants.slice(0, border);
+                                 self.inGroupParticipants = self.participants.slice(border);
+                             }
+                         };
+                         self.pickCategory = function (cid) {
                              requestStatus.startLoading("Loading participants");
                              self.currentCid = cid;
                              Tournament.result(
@@ -24,6 +41,7 @@ angular.
                                      requestStatus.complete();
                                      self.currentCid = cid;
                                      self.participants = participants;
+                                     self.splitPlayOffAndGroupParticipants();
                                  },
                                  requestStatus.failed);
                          };

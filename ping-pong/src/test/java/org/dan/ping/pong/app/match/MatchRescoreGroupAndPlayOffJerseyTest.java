@@ -180,7 +180,7 @@ public class MatchRescoreGroupAndPlayOffJerseyTest extends AbstractSpringJerseyT
                         .expelPlayer(p1)
                         .rescoreMatch(p2, p3, 11, 3)
                         .reloadMatchMap()
-                        .checkResult(p4, p3, p6, p2, p5, p1)
+                        .checkResult(p4, p1, p3, p6, p2, p5)
                         .checkTournamentComplete(restState(Lost)
                                 .bid(p1, Expl).bid(p4, Win1)));
     }

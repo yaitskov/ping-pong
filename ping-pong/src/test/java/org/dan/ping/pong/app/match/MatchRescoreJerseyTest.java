@@ -692,7 +692,7 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .rescoreMatch3(p1, p4, 11, 9)
                         .checkMatchStatus(p1, p4, Over)
                         .checkMatchStatus(p1, p2, Over)
-                        .checkResult(p1, p4, p3, p2)
+                        .checkResult(p1, p2, p4, p3)
                         .checkTournamentComplete(restState(Lost).bid(p2, Expl).bid(p1, Win1)));
     }
 
@@ -720,7 +720,7 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .rescoreMatch3(p1, p4, 11, 9)
                         .checkMatchStatus(p1, p4, Over)
                         .checkMatchStatus(p1, p2, Over)
-                        .checkResult(p1, p4, p3, p2)
+                        .checkResult(p1, p2, p4, p3)
                         .checkTournamentComplete(restState(Lost).bid(p2, Expl).bid(p1, Win1)));
     }
 
@@ -749,7 +749,7 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .rescoreMatch3(p1, p4, 11, 9)
                         .checkMatchStatus(p1, p4, Over)
                         .checkMatchStatus(p1, p2, Over)
-                        .checkResult(p2, p4, p3, p1)
+                        .checkResult(p2, p1, p4, p3)
                         .checkTournamentComplete(restState(Lost).bid(p1, Expl).bid(p2, Win1)));
     }
 

@@ -19,7 +19,7 @@ angular.
                              self.inGroupParticipants = null;
                              self.playOffParticipants = null;
                              for (var i = 1; i < self.participants.length; ++i) {
-                                 if (self.participants[i - 1].playOffSet && !self.participants[i].playOffSet) {
+                                 if (self.participants[i - 1].playOffStep && !self.participants[i].playOffStep) {
                                     border = i;
                                     break;
                                  }
@@ -30,6 +30,7 @@ angular.
                                  self.playOffParticipants = self.participants.slice(0, border);
                                  self.inGroupParticipants = self.participants.slice(border);
                              }
+                             self.numOfPlayOffParticipants = self.playOffParticipants.length;
                          };
                          self.pickCategory = function (cid) {
                              requestStatus.startLoading("Loading participants");

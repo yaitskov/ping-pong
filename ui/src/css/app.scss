@@ -86,28 +86,6 @@ ul li a {
         padding: 1px;
         vertical-align: middle;
     }
-
-
-
-    .gold {
-        background-color: rgb(201, 137, 16);
-    }
-    .silver {
-        background-color: rgb(168, 168, 168);
-    }
-    .bronze {
-        background-color: rgb(150, 90, 56);
-    }
-
-    .medal {
-        color: black;
-        width: $medial-size;
-        height: $medial-size;
-        display: inline-block;
-        -moz-border-radius: $medial-size / 2;
-        -webkit-border-radius: $medial-size / 2;
-        border-radius: $medial-size / 2;
-    }
 }
 
 .list-item .completeness {
@@ -220,7 +198,7 @@ tr.bottom-line td {
 
 @import "spinner.scss";
 @import "dice.scss";
-
+@import "medal.scss";
 
 .table hr.half-cell {
    margin: 5px 0px;

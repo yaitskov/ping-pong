@@ -243,4 +243,26 @@ public class OneCategorySim {
 
                         .scoreSet(p1, 11, p2, 2));
     }
+
+    @Test
+    public void completeGroupAndPlayOff() {
+        isf.create(begin().name("completeGroupAndPlayOff")
+                .rules(RULES_G3Q2_S1A2G11)
+                .category(c1, p1, p2, p3, p4, p5, p6))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p3, 11, p1, 2)
+                        .scoreSet(p6, 11, p4, 2)
+
+                        .scoreSet(p1, 11, p2, 1)
+                        .scoreSet(p4, 11, p5, 0)
+
+                        .scoreSet(p2, 11, p3, 4)
+                        .scoreSet(p5, 11, p6, 4)
+
+                        .reloadMatchMap()
+                        .scoreSet(p3, 8, p4, 11)
+                        .scoreSet(p1, 11, p6, 5)
+                        .expelPlayer(p1)
+                        .rescoreMatch(p2, p3, 11, 3));
+    }
 }

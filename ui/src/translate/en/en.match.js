@@ -43,5 +43,7 @@ module.exports = {
 
     'match-has-been-walked-over': 'Match has been complete due one of the participants resigned or get expelled',
 
-    'group-play-off-border': 'Left in a group'
+    'group-play-off-border': 'Left in a group',
+
+    'category-has-no-participants': 'Category has no participants'
 };

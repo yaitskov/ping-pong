@@ -4,6 +4,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
@@ -431,12 +432,15 @@ public class TournamentService {
         return playOffResult;
     }
 
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public TournamentComplete completeInfo(Tid tid) {
-        TournamentComplete result = tournamentDao.completeInfo(tid)
-                .orElseThrow(() -> notFound("Tournament has been not found"));
-        result.setCategories(categoryDao.listCategoriesByTid(tid));
-        return result;
+    public TournamentComplete completeInfo(TournamentMemState tournament) {
+        return TournamentComplete
+                .builder()
+                .state(tournament.getState())
+                .name(tournament.getName())
+                .categories(tournament.getCategories().values())
+                .hasGroups(tournament.getRule().getGroup().isPresent())
+                .hasPlayOff(tournament.getRule().getPlayOff().isPresent())
+                .build();
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)

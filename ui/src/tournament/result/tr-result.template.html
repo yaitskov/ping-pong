@@ -22,7 +22,7 @@
       <span class="glyphicon glyphicon-home"></span>
     </a>
     <a href="#!/tournament/group/result/{{$ctrl.tournament.tid}}"
-       class="btn btn-primary">
+       class="btn btn-primary" ng-show="$ctrl.tournament.hasGroups">
       <span class="glyphicon glyphicon-th"></span>
     </a>
   </div>

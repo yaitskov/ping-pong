@@ -8,7 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.category.CategoryLink;
 
-import java.util.List;
+import java.util.Collection;
 
 @Getter
 @Setter
@@ -19,5 +19,7 @@ import java.util.List;
 public class TournamentComplete {
     private TournamentState state;
     private String name;
-    private List<CategoryLink> categories;
+    private Collection<CategoryLink> categories;
+    private boolean hasGroups;
+    private boolean hasPlayOff;
 }

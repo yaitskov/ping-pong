@@ -393,20 +393,6 @@ public class TournamentDao {
                 .build());
     }
 
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<TournamentComplete> completeInfo(Tid tid) {
-        return ofNullable(jooq.select(TOURNAMENT.NAME, TOURNAMENT.STATE)
-                .from(TOURNAMENT)
-                .where(TOURNAMENT.TID.eq(tid))
-                .fetchOne())
-                .map(r -> TournamentComplete
-                        .builder()
-                        .state(r.get(TOURNAMENT.STATE))
-                        .name(r.get(TOURNAMENT.NAME))
-                        .build());
-
-    }
-
     @Transactional(TRANSACTION_MANAGER)
     public Tid copy(CopyTournament copyTournament) {
         final Tid originTid = copyTournament.getOriginTid();

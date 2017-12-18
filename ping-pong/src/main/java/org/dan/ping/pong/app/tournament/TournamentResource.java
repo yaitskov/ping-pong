@@ -2,6 +2,8 @@ package org.dan.ping.pong.app.tournament;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
+import static org.dan.ping.pong.app.category.CategoryResource.CID;
+import static org.dan.ping.pong.app.category.CategoryResource.CID_JP;
 import static org.dan.ping.pong.app.match.MatchResource.TID_JP;
 import static org.dan.ping.pong.app.tournament.TournamentCacheFactory.TOURNAMENT_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentService.TID;
@@ -61,6 +63,7 @@ public class TournamentResource {
     public static final String MY_RECENT_TOURNAMENT_JUDGEMENT =  TOURNAMENT + "my-recent-judgement";
     public static final String TOURNAMENT_RESULT = "/tournament/result/";
     public static final String RESULT_CATEGORY = "/category/";
+    public static final String TOURNAMENT_COMPLETE = "/tournament/complete/";
 
     @Inject
     private TournamentService tournamentService;
@@ -375,18 +378,21 @@ public class TournamentResource {
     }
 
     @GET
-    @Path(TOURNAMENT_RESULT + "{tid}" + RESULT_CATEGORY + "{cid}")
+    @Path(TOURNAMENT_RESULT + TID_JP + RESULT_CATEGORY + CID_JP)
     public void tournamentResult(
             @Suspended AsyncResponse response,
-            @PathParam("tid") int tid,
-            @PathParam("cid") int cid) {
-        tournamentAccessor.read(new Tid(tid), response,
+            @PathParam(TID) Tid tid,
+            @PathParam(CID) int cid) {
+        tournamentAccessor.read(tid, response,
                 (tournament) -> tournamentService.tournamentResult(tournament, cid));
     }
 
     @GET
-    @Path("/tournament/complete/{tid}")
-    public TournamentComplete completeInfo(@PathParam("tid") Tid tid) {
-        return tournamentService.completeInfo(tid);
+    @Path(TOURNAMENT_COMPLETE + TID_JP)
+    public void completeInfo(
+            @Suspended AsyncResponse response,
+            @PathParam(TID) Tid tid) {
+        tournamentAccessor.read(tid, response,
+                (tournament) -> tournamentService.completeInfo(tournament));
     }
 }

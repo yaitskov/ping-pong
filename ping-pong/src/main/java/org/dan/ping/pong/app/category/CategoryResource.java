@@ -32,8 +32,8 @@ import javax.ws.rs.container.Suspended;
 public class CategoryResource {
     private static final String CATEGORY = "/category/";
     public static final String CATEGORY_MEMBERS = CATEGORY + "find/members/";
-    private static final String CID_JP = "{cid}";
-    private static final String CID = "cid";
+    public static final String CID_JP = "{cid}";
+    public static final String CID = "cid";
 
     @Inject
     private CategoryDao categoryDao;

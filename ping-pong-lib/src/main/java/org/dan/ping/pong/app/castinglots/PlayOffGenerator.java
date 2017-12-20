@@ -113,66 +113,84 @@ public class PlayOffGenerator {
         return omid;
     }
 
-    public Optional<Mid> generate2LossTree(int level, int priority) {
+    public Optional<Mid> generate2LossTree(int level/*8*/, int priority) {
         final Optional<Mid> omid = createMatch(Optional.empty(), Optional.empty(), priority, level, Gold);
         List<Mid> lostRefMids = new ArrayList<>();
         omid.ifPresent(lostRefMids::add);
-        List<Mid> nextMidLevel = new ArrayList<>();
-        level -= 1;
-        for (Mid mid : lostRefMids) {
-            createMatch(Optional.of(mid),
-                    level == 0
-                            ? Optional.of(mid)
-                            : Optional.empty(),
-                    priority, level,
-                    level == 0 ? POff : Brnz)
-                    .ifPresent(nextMidLevel::add);
-        }
-        if (level == 0) {
+        final List<Mid> nextMidLevel = new ArrayList<>();
+        level -= 1; // 7
+        createMatchForBronze(level, priority, lostRefMids, nextMidLevel);
+        if (level == 1) {
             return omid;
         }
         while (true) {
             final List<Mid> favorites = new ArrayList<>();
             final List<Mid> newLostRefs = new ArrayList<>();
-            level -= 1;
+            level -= 1;//6 //4
             for (int i = 0; i < nextMidLevel.size(); ++i) {
-                createMatch(Optional.of(lostRefMids.get(i / 2)),
-                        Optional.of(nextMidLevel.get(nextMidLevel.size() - 1 - i)),
-                        priority, level, POff)
-                        .ifPresent(favorites::add);
-                log.info("{} => {}  | {} => {}",
-                        favorites.get(favorites.size() - 1), lostRefMids.get(i / 2),
-                        favorites.get(favorites.size() - 1), nextMidLevel.get(nextMidLevel.size() - 1 - i));
-                createMatch(Optional.of(nextMidLevel.get(nextMidLevel.size() - 1 - i)),
-                        Optional.empty(), priority, level, POff)
-                        .ifPresent(newLostRefs::add);
-                log.info("{} => {}  | ",
-                        newLostRefs.get(newLostRefs.size() - 1), nextMidLevel.get(nextMidLevel.size() - 1 - i));
+                createWinMatch(level + 1, priority, lostRefMids, nextMidLevel, favorites, i);
+                createLoseMatch(level, priority, nextMidLevel, newLostRefs, i);
             }
-            if (level == 0) {
+            level -= 1;
+            if (level == 1) {
                 log.info("base");
                 createBaseMatches(level, priority, favorites, newLostRefs);
                 break;
             }
             nextMidLevel.clear();
-            for (int i = newLostRefs.size() - 1;  i >= 0; --i) {
-                final Mid lostMid = newLostRefs.get(i);
-                createMatch(Optional.of(lostMid),
-                        Optional.empty(),
-                        priority, level, POff)
-                        .ifPresent(nextMidLevel::add);
-                log.info("{} => {}  | ",
-                        nextMidLevel.get(nextMidLevel.size() - 1), lostMid);
-                createMatch(Optional.of(lostMid),
-                        Optional.empty(),
-                        priority, level, POff)
-                        .ifPresent(nextMidLevel::add);
-                log.info("{} => {}  | ",
-                        nextMidLevel.get(nextMidLevel.size() - 1), lostMid);
-            }
+            createJoinLevelMatchesForLosers(level/*5*/, priority, nextMidLevel, newLostRefs);
             lostRefMids = favorites;
         }
         return omid;
+    }
+
+    private void createLoseMatch(int level, int priority, List<Mid> nextMidLevel, List<Mid> newLostRefs, int i) {
+        createMatch(Optional.of(nextMidLevel.get(nextMidLevel.size() - 1 - i)),
+                Optional.empty(), priority, level, POff)
+                .ifPresent(newLostRefs::add);
+        log.info("{} => {}  | ",
+                newLostRefs.get(newLostRefs.size() - 1), nextMidLevel.get(nextMidLevel.size() - 1 - i));
+    }
+
+    private void createWinMatch(int level, int priority, List<Mid> lostRefMids, List<Mid> nextMidLevel, List<Mid> favorites, int i) {
+        createMatch(Optional.of(lostRefMids.get(i / 2)),
+                Optional.of(nextMidLevel.get(nextMidLevel.size() - 1 - i)),
+                priority, level, POff)
+                .ifPresent(favorites::add);
+        log.info("{} => {}  | {} => {}",
+                favorites.get(favorites.size() - 1), lostRefMids.get(i / 2),
+                favorites.get(favorites.size() - 1), nextMidLevel.get(nextMidLevel.size() - 1 - i));
+    }
+
+    private void createJoinLevelMatchesForLosers(int level, int priority, List<Mid> nextMidLevel, List<Mid> newLostRefs) {
+        for (int i = newLostRefs.size() - 1;  i >= 0; --i) {
+            final Mid lostMid = newLostRefs.get(i);
+            createMatch(Optional.of(lostMid),
+                    Optional.empty(),
+                    priority, level, POff)
+                    .ifPresent(nextMidLevel::add);
+            log.info("{} => {}  | ",
+                    nextMidLevel.get(nextMidLevel.size() - 1), lostMid);
+            createMatch(Optional.of(lostMid),
+                    Optional.empty(),
+                    priority, level, POff)
+                    .ifPresent(nextMidLevel::add);
+            log.info("{} => {}  | ",
+                    nextMidLevel.get(nextMidLevel.size() - 1), lostMid);
+        }
+    }
+
+    private void createMatchForBronze(int level, int priority,
+            List<Mid> lostRefMids, List<Mid> nextMidLevel) {
+        for (Mid mid : lostRefMids) {
+            createMatch(Optional.of(mid),
+                    level == 1
+                            ? Optional.of(mid)
+                            : Optional.empty(),
+                    priority, level,
+                    level == 1 ? POff : Brnz)
+                    .ifPresent(nextMidLevel::add);
+        }
     }
 
     private void createBaseMatches(int level, int priority,

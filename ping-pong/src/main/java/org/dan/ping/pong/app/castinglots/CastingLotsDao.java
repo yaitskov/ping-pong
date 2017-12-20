@@ -129,7 +129,7 @@ public class CastingLotsDao implements CastingLotsDaoIf {
                 return generator.generateTree(levels, empty(), lowestPriority,
                         TypeChain.of(Gold, POff), empty()).get();
             case 2:
-                return generator.generate2LossTree(levels, lowestPriority).get();
+                return generator.generate2LossTree(2 * levels, lowestPriority).get();
             default:
                 throw internalError("unsupported number of losings "
                         + playOffRule.getLosings() + " in " + tid + " ");

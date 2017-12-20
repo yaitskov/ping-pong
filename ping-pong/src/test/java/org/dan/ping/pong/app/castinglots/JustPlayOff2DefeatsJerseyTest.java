@@ -1,9 +1,11 @@
 package org.dan.ping.pong.app.castinglots;
 
+import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.GLOBAL;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing2;
 import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
+import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p17;
 import static org.dan.ping.pong.mock.simulator.Player.p18;
@@ -39,10 +41,13 @@ import static org.dan.ping.pong.mock.simulator.Player.p16;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 
 import org.dan.ping.pong.JerseySpringTest;
+import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
+import org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc;
+import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -67,18 +72,24 @@ public class JustPlayOff2DefeatsJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     private Simulator simulator;
 
+    @Inject
+    private ImperativeSimulatorFactory isf;
+
     @Test
     public void noAutoLoosers2() {
-        final TournamentScenario scenario = TournamentScenario.begin()
+        isf.create(TournamentScenario.begin()
+                .name("noAutoLoosers2")
                 .rules(RULES_PO_S1A2G11)
-                .category(c1, p1, p2)
-                .quitsGroup(p1, p2)
-                .win(p1, p2)
-                .win(p2, p1)
-                .champions(c1, p2, p1)
-                .name("noAutoLoosers2");
-
-        simulator.simulate(scenario);
+                .category(c1, p1, p2))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p2, 2)
+                        .reloadMatchMap()
+                        .scoreSet(p2, 11, p1, 1)
+                        .checkResult(p2, p1)
+                        .checkTournamentComplete(BidStatesDesc
+                                .restState(BidState.Win2)
+                                .bid(p2, Win1))
+                        .checkPlayOffLevels(2, 2));
     }
 
     @Test
@@ -132,11 +143,11 @@ public class JustPlayOff2DefeatsJerseyTest extends AbstractSpringJerseyTest {
                 // third round
                 .win(p1, p2)
                 // losers
-                .win(p5, p8)
-                .win(p6, p7)
+                .custom(game(p5, p8, 11, 9))
+                .custom(game(p6, p7, 11, 0))
                 //
-                .win(p3, p5)
-                .win(p4, p6)
+                .custom(game(p3, p5, 11, 9))
+                .custom(game(p4, p6, 11, 9))
                 .win(p3, p4)
                 // loser get third place
                 .win(p3, p2)
@@ -146,6 +157,11 @@ public class JustPlayOff2DefeatsJerseyTest extends AbstractSpringJerseyTest {
                 .name("noAutoLoosers8");
 
         simulator.simulate(scenario);
+
+        isf.resume(scenario)
+                .run(c -> c.checkResult(p3, p1, p2, p4, p6, p5, p8, p7)
+                        .checkPlayOffLevels(6, 6, 5, 4, 3, 3, 2, 2));
+
     }
 
     @Test

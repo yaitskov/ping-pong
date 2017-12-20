@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.MID0;
 import static org.dan.ping.pong.app.tournament.CumulativeScore.createComparator;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryService;
@@ -17,6 +18,7 @@ import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -136,5 +138,45 @@ public class PlayOffService {
 
     public Set<Uid> participantsOf(List<MatchInfo> matches) {
         return matches.stream().flatMap(MatchInfo::participants).collect(Collectors.toSet());
+    }
+
+    public PlayOffMatches playOffMatches(TournamentMemState tournament, int cid) {
+        final List<MatchLink> transitions = new ArrayList<>();
+        final List<PlayOffMatch> matches = new ArrayList<>();
+        final Map<Uid, String> participants = new HashMap<>();
+
+        findPlayOffMatches(tournament, cid)
+                .stream()
+                .filter(m -> !m.isLosersMeet())
+                .forEach(m -> {
+                    m.getWinnerMid().ifPresent(wMid -> transitions.add(
+                            MatchLink.builder()
+                                    .from(m.getMid())
+                                    .to(wMid)
+                                    .build()));
+                    if (!m.hasParticipant(FILLER_LOSER_UID)) {
+                        m.getLoserMid().ifPresent(lMid -> transitions.add(
+                                MatchLink.builder()
+                                        .from(m.getMid())
+                                        .to(lMid)
+                                        .build()));
+                    }
+                    m.getParticipantIdScore().keySet()
+                            .forEach(uid -> participants.computeIfAbsent(uid,
+                                    (u -> tournament.getParticipant(u).getName())));
+
+                    matches.add(PlayOffMatch.builder()
+                            .id(m.getMid())
+                            .level(m.getLevel())
+                            .score(tournament.getRule().getMatch()
+                                    .calcWonSets(m.getParticipantIdScore()))
+                            .state(m.getState())
+                            .build());
+                });
+        return PlayOffMatches.builder()
+                .transitions(transitions)
+                .matches(matches)
+                .participants(participants)
+                .build();
     }
 }

@@ -46,6 +46,7 @@ import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.place.PlaceService;
+import org.dan.ping.pong.app.playoff.PlayOffMatches;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.user.UserDao;
@@ -501,5 +502,9 @@ public class TournamentService {
             log.info("Tid {} is fully complete", tid);
             return false;
         }
+    }
+
+    public PlayOffMatches playOffMatches(TournamentMemState tournament, int cid) {
+        return playOffService.playOffMatches(tournament, cid);
     }
 }

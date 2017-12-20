@@ -64,6 +64,7 @@ public class TournamentResource {
     public static final String TOURNAMENT_RESULT = "/tournament/result/";
     public static final String RESULT_CATEGORY = "/category/";
     public static final String TOURNAMENT_COMPLETE = "/tournament/complete/";
+    public static final String TOURNAMENT_PLAY_OFF_MATCHES = "/tournament/play-off-matches/";
 
     @Inject
     private TournamentService tournamentService;
@@ -394,5 +395,15 @@ public class TournamentResource {
             @PathParam(TID) Tid tid) {
         tournamentAccessor.read(tid, response,
                 (tournament) -> tournamentService.completeInfo(tournament));
+    }
+
+    @GET
+    @Path(TOURNAMENT_PLAY_OFF_MATCHES + TID_JP)
+    public void playOffMatches(
+            @Suspended AsyncResponse response,
+            @PathParam(TID) Tid tid,
+            @PathParam(CID) int cid) {
+        tournamentAccessor.read(tid, response,
+                (tournament) -> tournamentService.playOffMatches(tournament, cid));
     }
 }

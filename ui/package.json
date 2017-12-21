@@ -21,6 +21,7 @@
     "clockpicker": "0.0.7",
     "flatpickr": "3.0.6",
     "jquery": "^3.2.1",
+    "vis": "4.21.0",
     "jquery-ui-dist": "1.12.1",
     "angular-ui-sortable": "0.17.2",
     "jquery-ui-touch-punch": "0.2.3",

@@ -1,0 +1,21 @@
+<main-menu ng-show="false"></main-menu>
+<request-status/>
+<category-switch/>
+<vis-ladder/>
+<div class="form-group" style="position: fixed; top: 10px; right: 10px;">
+  <a class="btn btn-default" back-button style="background-color: rgba(255, 255, 255, 0.5);">
+    <span class="glyphicon glyphicon-circle-arrow-left"></span>
+  </a>
+  <a class="btn btn-default"
+     style="background-color: rgba(255, 255, 255, 0.5);"
+     title="to the tournament"
+     href="#!/my/tournament/{{$ctrl.tid}}">
+    <span class="glyphicon glyphicon-home"></span>
+  </a>
+  <a class="btn btn-default"
+     style="background-color: rgba(255, 255, 255, 0.5);"
+     title="to the tournament"
+     href="#!/tournament/result/{{$ctrl.tid}}">
+    <span class="glyphicon glyphicon-list"></span>
+  </a>
+</div>

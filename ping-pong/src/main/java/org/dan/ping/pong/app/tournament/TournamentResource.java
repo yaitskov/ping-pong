@@ -398,7 +398,7 @@ public class TournamentResource {
     }
 
     @GET
-    @Path(TOURNAMENT_PLAY_OFF_MATCHES + TID_JP)
+    @Path(TOURNAMENT_PLAY_OFF_MATCHES + TID_JP + "/" + CID_JP)
     public void playOffMatches(
             @Suspended AsyncResponse response,
             @PathParam(TID) Tid tid,

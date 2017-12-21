@@ -11,6 +11,7 @@ import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.match.Mid;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -23,4 +24,7 @@ public class PlayOffMatch {
     private Map<Uid, Integer> score;
     private int level;
     private MatchState state;
+    private boolean walkOver;
+    private Optional<Uid> winnerId;
+    //private Map<Integer, Uid> groups;
 }

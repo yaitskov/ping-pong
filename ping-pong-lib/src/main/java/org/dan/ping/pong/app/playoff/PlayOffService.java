@@ -165,12 +165,15 @@ public class PlayOffService {
                             .forEach(uid -> participants.computeIfAbsent(uid,
                                     (u -> tournament.getParticipant(u).getName())));
 
+                    final MatchValidationRule matchRules = tournament.getRule().getMatch();
+                    final Map<Uid, Integer> score = matchRules
+                            .calcWonSets(m.getParticipantIdScore());
                     matches.add(PlayOffMatch.builder()
                             .id(m.getMid())
                             .level(m.getLevel())
-                            .score(tournament.getRule().getMatch()
-                                    .calcWonSets(m.getParticipantIdScore()))
+                            .score(score)
                             .state(m.getState())
+                            .winnerId(matchRules.findWinnerId(score))
                             .build());
                 });
         return PlayOffMatches.builder()

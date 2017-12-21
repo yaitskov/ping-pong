@@ -35,6 +35,10 @@ angular.
                                        },
                                        isArray: true
                                    },
+                                   playOffMatches: {
+                                       url: '/api/tournament/play-off-matches/:tournamentId/:categoryId',
+                                       method: 'GET'
+                                   },
                                    participateIn: {
                                        url: '/api/tournament/enlisted/:completeAfterDays',
                                        method: 'GET',

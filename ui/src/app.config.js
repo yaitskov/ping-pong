@@ -121,6 +121,9 @@ angular.module('pingPong').
                     when('/tournament/group/result/:tournamentId', {
                         template: '<tournament-group-result/>'
                     }).
+                    when('/tournament/play-off/result/:tournamentId', {
+                        template: '<tournament-play-off-result/>'
+                    }).
                     when('/tournament/new', {
                         template: '<new-tournament/>'
                     }).

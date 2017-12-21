@@ -1,8 +1,3 @@
-document.getElementById("body").addEventListener("noupdate", function() {
-    console.log("My NoUpdate hook");
-    //document.getElementById("demo").innerHTML = "Hello World";
-});
-
 import 'flatpickr/dist/flatpickr.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'jquery-ui-dist/jquery-ui.css';
@@ -12,26 +7,26 @@ import 'angular-touchspin/dist/angular-touchspin.css';
 
 import './css/app.scss';
 
-import jQuery from 'jquery';
+import 'jquery';
 import 'jquery-ui-dist/jquery-ui.js';
 import 'jquery-ui-touch-punch/jquery.ui.touch-punch.js';
-import moment from 'moment/moment.js';
-import flatpickr from 'flatpickr';
-import angular from 'angular';
-import angularRoute from 'angular-route';
-import angularResource from 'angular-resource';
-import angularMoment from 'angular-moment/angular-moment.js';
-import angularTouchSpin from 'angular-touchspin';
-import uiSortable from 'angular-ui-sortable/src/sortable.js';
-import bootstrap from 'bootstrap/dist/js/bootstrap.js';
-import bootstrapClockPicker from 'clockpicker/dist/bootstrap-clockpicker.js';
+import 'moment/moment.js';
+import 'flatpickr';
+import 'angular';
+import 'angular-route';
+import 'angular-resource';
+import 'angular-moment/angular-moment.js';
+import 'angular-touchspin';
+import 'angular-ui-sortable/src/sortable.js';
+import 'bootstrap/dist/js/bootstrap.js';
+import 'clockpicker/dist/bootstrap-clockpicker.js';
 import 'bootstrap-toggle/js/bootstrap-toggle.js';
 
-import appModule from './app.module.js';
-import appConfig from './app.config.js';
+import './app.module.js';
+import './app.config.js';
 
-import authModule from './auth/auth.module.js';
-import authService from './auth/auth.service.js';
+import './auth/auth.module.js';
+import './auth/auth.service.js';
 
 import './user/user.import.js';
 import './ui/ui.import.js';

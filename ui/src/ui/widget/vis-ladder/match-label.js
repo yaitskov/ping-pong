@@ -1,5 +1,3 @@
-//import StringUtils from 'core/string-util.js';
-
 export default function (tournament, match) {
     var uids = Object.keys(match.score);
     if (match.state == 'Over') {

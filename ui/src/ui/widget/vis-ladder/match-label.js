@@ -1,18 +1,18 @@
-import StringUtils from 'core/string-util.js';
+//import StringUtils from 'core/string-util.js';
 
 export default function (tournament, match) {
     var uids = Object.keys(match.score);
     if (match.state == 'Over') {
         var result = [];
         if (match.walkOver) {
-            for (var i = 0; i < 2; ++i) {
-                var name = (uids[i] == 1) ? 'bye' : tournament.participants[uids[i]];
+            for (let i of 2) {
+                let name = (uids[i] == 1) ? 'bye' : tournament.participants[uids[i]];
                 result.push((uids[i] == match.winnerId ? ' ☺' : " ⚐") +  " - " + name);
             }
         } else {
-            for (var i = 0; i < 2; ++i) {
-                var name = (uids[i] == 1) ? 'bye' : tournament.participants[uids[i]];
-                result.push(StringUtils.padLeft("" + match.score[uids[i]], ' ', 2)
+            for (let i of 2) {
+                let name = (uids[i] == 1) ? 'bye' : tournament.participants[uids[i]];
+                result.push(String(match.score[uids[i]]).padStart(2, ' ')
                             + (uids[i] == match.winnerId ? ' + ' : " - ") + name);
             }
         }
@@ -34,7 +34,7 @@ export default function (tournament, match) {
         var result = [];
         for (var i = 0; i < 2; ++i) {
             var name = tournament.participants[uids[i]];
-            result.push(StringUtils.padLeft("" + match.score[uids[i]], ' ', 2) + " - " + name);
+            result.push(String(match.score[uids[i]]).padStart(2, ' ') + " - " + name);
         }
         return result.join("\n");
     } else if (match.state == 'Auto') {

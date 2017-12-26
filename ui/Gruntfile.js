@@ -13,7 +13,7 @@
 // npm install offline-plugin --save-dev
 // npm install grunt-exec --save-dev
 
-const webpackConfig = require('./webpack.config');
+const webpackConfig = require('./webpack.config.js');
 
 module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-install-dependencies');

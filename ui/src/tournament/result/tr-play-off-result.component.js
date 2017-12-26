@@ -40,7 +40,8 @@ angular.
                              Tournament.playOffMatches(
                                 {tournamentId: $routeParams.tournamentId,
                                  categoryId: cid},
-                                function (tournament) {
+                                (tournament) => {
+                                    tournament.tid = $routeParams.tournamentId;
                                     $rootScope.$broadcast('event.playoff.view.data', tournament);
                                 },
                                 requestStatus.failed);

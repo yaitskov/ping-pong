@@ -1,0 +1,15 @@
+.screen-stretch {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+}
+
+.vis-chart-full-screen-container {
+    padding: 0px 0px;
+    margin: 0px 0px;
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+}

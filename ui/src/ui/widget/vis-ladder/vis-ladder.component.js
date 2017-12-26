@@ -1,7 +1,10 @@
 import angular from 'angular';
 import vis from 'vis';
+import './vis-ladder.css';
 import matchLabel from './match-label.js';
 import template from './vis-ladder.template.html';
+import NodeMenuManager from 'ui/vis-popup-menu/NodeMenuManager.js';
+import MatchManagementLinkFactory from 'ui/vis-popup-menu/MatchManagementLinkFactory.js';
 
 angular.
     module('widget').
@@ -68,7 +71,12 @@ angular.
                                  }
                              };
 
-                             self.network = new vis.Network(container, data, options);
+                             let menuManager = new NodeMenuManager(
+                                 $(container),
+                                 new vis.Network(container, data, options),
+                                 options,
+                                 nodeSet,
+                                 new MatchManagementLinkFactory(tournament.tid));
                          };
                          binder($scope, {
                              'event.playoff.view.data': (event, tournament) => self.loadData(tournament),

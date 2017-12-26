@@ -1,0 +1,13 @@
+.vis-node-menu {
+    position: absolute;
+    z-index: 111;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid green;
+    border-radius: 20px;
+}
+
+.vis-node-menu .utf-icon {
+    line-height: 0.8;
+    font-size: 200%;
+}

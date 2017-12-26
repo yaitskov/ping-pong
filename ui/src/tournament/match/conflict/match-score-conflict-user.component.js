@@ -20,7 +20,7 @@ angular.
                                          {score: self.matchScore,
                                           participants: self.conflict.participants
                                          });
-                             $location.path('/review/user-scored-match/' + self.tournamentId + '/' + self.matchId);
+                             $location.path(`/review/user-scored-match/${self.tournamentId}/${self.matchId}`);
                          };
 
                          self.continuePlayMatch = function () {
@@ -30,6 +30,6 @@ angular.
                                  break;
                              }
                              pageCtx.put('last-scoring-match', match);
-                             $location.path('/participant/score/set/' + self.matchId);
+                             $location.path(`/participant/score/set/${self.tournamentId}/${self.matchId}`);
                          }
                      }]});

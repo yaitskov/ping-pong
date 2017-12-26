@@ -49,7 +49,7 @@ angular.module('pingPong').
                     when('/play/in/tournaments', {
                         template: '<play-in-tournament-list/>'
                     }).
-                    when('/participant/score/set/:matchId', {
+                    when('/participant/score/set/:tournamentId/:matchId', {
                         template: '<participant-score-set/>'
                     }).
                     when('/judge/score/set/:tournamentId/:matchId', {

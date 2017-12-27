@@ -16,6 +16,12 @@ angular.module('pingPong').
             jQuery(".modal-backdrop").remove();
         });
     }]).
+    // factory('$exceptionHandler', ['$log', function($log, logErrorsToBackend) {
+    //     return function myExceptionHandler(exception, cause) {
+    //         console.log("OOOPS!");
+    //         $log.warn(exception, cause);
+    //     };
+    // }]).
     service('injectingSessionInterceptor', ['auth', function (auth) {
         var ser = this;
         ser.request = function (config) {

@@ -488,7 +488,7 @@ public class GroupService {
             Map<Uid, CumulativeScore> uidLevel,
             Collection<MatchInfo> matches, MatchValidationRule rules) {
         final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(
-                uid ->  tournament.getParticipant(uid).getState(), matches);
+                uid -> tournament.getBidOrExpl(uid).getState(), matches);
         matches.forEach(m -> aggMatch(uid2Stat, m, rules));
         uid2Stat.forEach((uid, stat) ->
                 uidLevel.merge(uid,

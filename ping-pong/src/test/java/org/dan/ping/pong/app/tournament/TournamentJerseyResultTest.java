@@ -6,6 +6,7 @@ import static org.dan.ping.pong.app.group.GroupResource.GROUP_LIST;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_RESULT;
 import static org.dan.ping.pong.app.match.DisambiguateGroupScoreJerseyTest.RULES_G8Q2_S1A2G11_M;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S3A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
 import static org.dan.ping.pong.app.tournament.TournamentResource.RESULT_CATEGORY;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
@@ -26,6 +27,7 @@ import org.dan.ping.pong.app.group.GroupParticipants;
 import org.dan.ping.pong.app.group.TournamentGroups;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
+import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulator;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
 import org.junit.Test;
@@ -133,7 +135,8 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
     private List<TournamentResultEntry> result(TournamentScenario scenario) {
         return myRest()
                 .get(TOURNAMENT_RESULT + scenario.getTid() + RESULT_CATEGORY + scenario.getCategoryDbId().get(c1),
-                        new GenericType<List<TournamentResultEntry>>() {});
+                        new GenericType<List<TournamentResultEntry>>() {
+                        });
     }
 
     @Test
@@ -171,5 +174,16 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
                         .map(GroupParticipantResult::getUid)
                         .map(e -> scenario.getUidPlayer().get(e))
                         .collect(toList()));
+    }
+
+    @Test
+    public void justPlayOff3() {
+        final TournamentScenario tournament = TournamentScenario.begin()
+                .name("justPlayOff3")
+                .rules(RULES_JP_S1A2G11)
+                .category(c1, p1, p2, p3);
+        final ImperativeSimulator simulator = isf.create(tournament);
+        simulator.run(c -> c.beginTournament()
+                .checkResult(p1, p2, p3));
     }
 }

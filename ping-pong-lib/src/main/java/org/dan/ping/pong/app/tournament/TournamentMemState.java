@@ -103,8 +103,12 @@ public class TournamentMemState {
 
     public ParticipantMemState getBidOr(Uid bid, BidState state) {
         final ParticipantMemState result = participants.get(bid);
-        if (result == null & FILLER_LOSER_UID.equals(bid)) {
-            return createLoserBid(tid, -1, state);
+        if (result == null) {
+            if (FILLER_LOSER_UID.equals(bid)) {
+                return createLoserBid(tid, -1, state);
+            }
+            throw notFound("User " + bid
+                    + " does participate in the tournament " + tid);
         }
         return result;
     }

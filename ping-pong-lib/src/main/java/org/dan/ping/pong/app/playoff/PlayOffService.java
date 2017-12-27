@@ -89,7 +89,7 @@ public class PlayOffService {
                 .collect(toList());
 
         final Set<Uid> playOffUids = participantsOf(cidPlayOffMatches);
-        Map<Uid, Integer> quitUid2Position = extractQuittingUids(playOffUids, groupOrdered);
+        final Map<Uid, Integer> quitUid2Position = extractQuittingUids(playOffUids, groupOrdered);
 
         int level = quitUid2Position.values().stream()
                 .map(n -> (int) Math.round(Math.ceil(Math.log10(n + 1))))
@@ -106,9 +106,9 @@ public class PlayOffService {
             }
             baseMatches = nextLevel;
         }
-        quitUid2Position.forEach((uid, positionInGroup) -> {
-            uidLevel.get(uid).getWeighted().lostBalls(positionInGroup);
-        });
+        quitUid2Position.forEach((uid, positionInGroup)
+                -> uidLevel.get(uid).getWeighted().lostBalls(positionInGroup));
+        uidLevel.remove(FILLER_LOSER_UID);
         return uidLevel.values().stream()
                 .sorted(createComparator(tournament.disambiguationPolicy().getComparator()))
                 .map(cuScore -> {
@@ -138,7 +138,11 @@ public class PlayOffService {
     }
 
     public Set<Uid> participantsOf(List<MatchInfo> matches) {
-        return matches.stream().flatMap(MatchInfo::participants).collect(Collectors.toSet());
+        final Set<Uid> result = matches.stream()
+                .flatMap(MatchInfo::participants)
+                .collect(Collectors.toSet());
+        result.remove(FILLER_LOSER_UID);
+        return result;
     }
 
     public PlayOffMatches playOffMatches(TournamentMemState tournament, int cid) {

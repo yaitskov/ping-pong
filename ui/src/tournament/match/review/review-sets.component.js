@@ -35,11 +35,13 @@ angular.
                                  self.matchReview = match;
                                  self.matchScore = self.matchReview.score;
                                  self.participants = self.matchReview.participants;
-                                 var result = [];
-                                 var l = self.matchScore.sets[self.participants[0].uid].length;
-                                 for (var i = 0; i < l; ++i) {
-                                     result.push({a: self.matchScore.sets[self.participants[0].uid][i],
-                                                  b: self.matchScore.sets[self.participants[1].uid][i]});
+                                 let result = [];
+                                 if (self.participants && self.participants.length == 2) {
+                                     let l = self.matchScore.sets[self.participants[0].uid].length;
+                                     for (let i of l) {
+                                         result.push({a: self.matchScore.sets[self.participants[0].uid][i],
+                                                      b: self.matchScore.sets[self.participants[1].uid][i]});
+                                     }
                                  }
                                  self.sets = result;
                              }

@@ -20,7 +20,8 @@ export default class VisLadder {
                 font: {
                     face: 'mono',
                     size: 20,
-                    color: 'black'
+                    color: 'black',
+                    align: 'left'
                 },
                 color: {
                     background: '#bbb',

@@ -1,4 +1,9 @@
-<div class="form-group">
+<div class="form-group" ng-show="$ctrl.match.participants.length != 2">
+  <div class="alert alert-danger">
+    Match does not have enough participants.
+  </div>
+</div>
+<div class="form-group" ng-show="$ctrl.match.participants.length == 2">
   <label translate="Set won name"/>
   <div>
     <div ng-repeat="participant in $ctrl.match.participants">

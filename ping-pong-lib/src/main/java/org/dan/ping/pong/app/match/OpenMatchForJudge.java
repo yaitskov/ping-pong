@@ -23,7 +23,7 @@ public class OpenMatchForJudge {
     private Tid tid;
     private Optional<TableLink> table;
     private List<UserLink> participants;
-    private Instant started;
+    private Optional<Instant> started;
     private int minGamesToWin;
     private int minAdvanceInGames;
     private int playedSets;

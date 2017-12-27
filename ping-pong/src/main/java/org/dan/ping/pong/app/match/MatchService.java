@@ -798,7 +798,7 @@ public class MatchService {
                 .minGamesToWin(matchRules.getMinGamesToWin())
                 .minAdvanceInGames(matchRules.getMinAdvanceInGames())
                 .playedSets(m.getPlayedSets())
-                .started(m.getStartedAt().get())
+                .started(m.getStartedAt())
                 .matchType(m.getType())
                 .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
                 .participants(m.getParticipantIdScore().keySet().stream()

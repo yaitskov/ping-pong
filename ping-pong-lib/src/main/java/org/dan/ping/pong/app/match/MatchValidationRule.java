@@ -13,6 +13,7 @@ import org.dan.ping.pong.app.bid.Uid;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,7 +61,13 @@ public class MatchValidationRule {
 
     public Map<Uid, Integer> calcWonSets(Map<Uid, List<Integer>> participantScores) {
         final List<Uid> uids = new ArrayList<>(participantScores.keySet());
+        if (uids.isEmpty()) {
+            return Collections.emptyMap();
+        }
         final Uid uidA = uids.get(0);
+        if (uids.size() == 1) {
+            return ImmutableMap.of(uidA, 0);
+        }
         final List<Integer> setsA = participantScores.get(uidA);
         final Uid uidB = uids.get(1);
         final List<Integer> setsB = participantScores.get(uidB);

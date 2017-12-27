@@ -328,7 +328,7 @@ public class ImperativeSimulator {
                 .build();
     }
 
-    private Mid resolveMid(Player p1, Player p2) {
+    public Mid resolveMid(Player p1, Player p2) {
         final ImmutableSet<Player> players = ImmutableSet.of(p1, p2);
         {
             final Mid mid = matchMap.get(players);

@@ -4,6 +4,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.MID0;
+import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.tournament.CumulativeScore.createComparator;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 
@@ -172,8 +173,9 @@ public class PlayOffService {
                             .id(m.getMid())
                             .level(m.getLevel())
                             .score(score)
+                            .walkOver(isWalkOver(m, matchRules, score))
                             .state(m.getState())
-                            .winnerId(matchRules.findWinnerId(score))
+                            .winnerId(m.getWinnerId())
                             .build());
                 });
         return PlayOffMatches.builder()
@@ -181,5 +183,13 @@ public class PlayOffService {
                 .matches(matches)
                 .participants(participants)
                 .build();
+    }
+
+    private boolean isWalkOver(MatchInfo m, MatchValidationRule matchRules, Map<Uid, Integer> score) {
+        if (m.getState() != Over) {
+            return false;
+        }
+        final Optional<Uid> calculatedWinner = matchRules.findWinnerId(score);
+        return !calculatedWinner.equals(m.getWinnerId());
     }
 }

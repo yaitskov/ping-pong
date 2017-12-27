@@ -5,6 +5,7 @@ import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_PLAY_OFF_MATCHES;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -12,9 +13,11 @@ import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -191,5 +194,44 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
                         hasProperty("state", is(Game)),
                         hasProperty("winnerId", is(Optional.empty())),
                         hasProperty("walkOver", is(false))));
+    }
+
+    @Test
+    public void justPlayOff3() {
+        final TournamentScenario scenario = TournamentScenario.begin()
+                .name("justPlayOff3")
+                .rules(RULES_JP_S1A2G11)
+                .category(c1, p1, p2, p3);
+        final ImperativeSimulator simulator = isf.create(scenario);
+        simulator.run(ImperativeSimulator::beginTournament);
+
+        final PlayOffMatches matches = matches(scenario);
+
+        final Uid uid1 = scenario.player2Uid(p1);
+        final Uid uid3 = scenario.player2Uid(p3);
+        final Uid uid2 = scenario.player2Uid(p2);
+        assertThat(matches.getMatches(),
+                hasItems(
+                        allOf(
+                                hasProperty("level", is(1)),
+                                hasProperty("state", is(Over)),
+                                hasProperty("walkOver", is(true)),
+                                hasProperty("score", is(ImmutableMap.of(
+                                        FILLER_LOSER_UID, 0,
+                                        uid1, 0))),
+                                hasProperty("winnerId", is(Optional.of(uid1)))),
+                        allOf(
+                                hasProperty("level", is(1)),
+                                hasProperty("state", is(Game)),
+                                hasProperty("score", is(ImmutableMap.of(
+                                        uid3, 0,
+                                        uid2, 0))),
+                                hasProperty("walkOver", is(false)),
+                                hasProperty("winnerId", is(Optional.empty())))));
+
+        assertThat(matches.getParticipants().keySet(),
+                allOf(
+                        not(hasItem(FILLER_LOSER_UID)),
+                        hasItems(uid1, uid2, uid3)));
     }
 }

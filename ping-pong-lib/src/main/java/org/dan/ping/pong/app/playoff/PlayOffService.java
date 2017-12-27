@@ -166,7 +166,10 @@ public class PlayOffService {
                                         .to(lMid)
                                         .build()));
                     }
-                    m.getParticipantIdScore().keySet()
+                    m.getParticipantIdScore()
+                            .keySet()
+                            .stream()
+                            .filter(uid -> !FILLER_LOSER_UID.equals(uid))
                             .forEach(uid -> participants.computeIfAbsent(uid,
                                     (u -> tournament.getParticipant(u).getName())));
 

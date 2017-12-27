@@ -13,7 +13,7 @@ export default class MatchManagementLinkFactory {
                                    <span class="utf-icon">⚙</span>
                                 </a>
                                 <a class="btn btn-primary" title="score the match"
-                                   href="#!/participant/score/set/${this.tournamentId}/${nodeId}">
+                                   href="#!/judge/score/set/${this.tournamentId}/${nodeId}">
                                    <span class="glyphicon glyphicon-bullhorn"></span>
                                 </a>
                                 <a class="btn btn-warning"

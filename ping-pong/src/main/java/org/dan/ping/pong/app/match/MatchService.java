@@ -559,6 +559,9 @@ public class MatchService {
             }
             throw badRequest(new MatchScoredError(matchScore(tournament, matchInfo)));
         }
+        if (Game != matchInfo.getState()) {
+            throw badRequest("Match is not in a scorable state");
+        }
     }
 
     public MatchScore matchScore(TournamentMemState tournament, MatchInfo matchInfo) {

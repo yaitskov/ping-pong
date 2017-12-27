@@ -1,7 +1,7 @@
 export default function (tournament, match) {
-    var uids = Object.keys(match.score);
+    let uids = Object.keys(match.score || {});
     if (match.state == 'Over') {
-        var result = [];
+        let result = [];
         if (match.walkOver) {
             for (let i of 2) {
                 let name = (uids[i] == 1) ? 'bye' : tournament.participants[uids[i]];
@@ -22,16 +22,16 @@ export default function (tournament, match) {
             return " ??? ";
         }
     } else if (match.state == 'Place') {
-        var result = [];
-        for (var i = 0; i < 2; ++i) {
-            var name = tournament.participants[uids[i]];
+        let result = [];
+        for (let i of 2) {
+            let name = tournament.participants[uids[i]];
             result.push(" ⌛ - " + name);
         }
         return result.join("\n");
     } else if (match.state == 'Game') {
-        var result = [];
-        for (var i = 0; i < 2; ++i) {
-            var name = tournament.participants[uids[i]];
+        let result = [];
+        for (let i of 2) {
+            let name = tournament.participants[uids[i]];
             result.push(String(match.score[uids[i]]).padStart(2, ' ') + " - " + name);
         }
         return result.join("\n");

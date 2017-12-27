@@ -221,6 +221,13 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
                                         uid1, 0))),
                                 hasProperty("winnerId", is(Optional.of(uid1)))),
                         allOf(
+                                hasProperty("level", is(2)),
+                                hasProperty("state", is(Draft)),
+                                hasProperty("score", is(ImmutableMap.of(
+                                        uid1, 0))),
+                                hasProperty("walkOver", is(false)),
+                                hasProperty("winnerId", is(Optional.empty()))),
+                        allOf(
                                 hasProperty("level", is(1)),
                                 hasProperty("state", is(Game)),
                                 hasProperty("score", is(ImmutableMap.of(

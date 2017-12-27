@@ -802,8 +802,16 @@ public class MatchService {
                 .matchType(m.getType())
                 .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
                 .participants(m.getParticipantIdScore().keySet().stream()
-                        .map(uid -> tournament.getParticipant(uid).toLink())
+                        .map(uid -> tournament.getBidOrExpl(uid).toLink())
                         .collect(toList()))
                 .build();
+    }
+
+    public List<Mid> findMatchesByParticipants(TournamentMemState tournament,
+            Uid uid1, Uid uid2) {
+        return tournament.getMatches().values().stream()
+                .filter(m -> m.hasParticipant(uid1) && m.hasParticipant(uid2))
+                .map(MatchInfo::getMid)
+                .collect(toList());
     }
 }

@@ -51,6 +51,7 @@ public class MatchResource {
     private static final String MID_JP = "{mid}";
     public static final String MATCH_FOR_JUDGE = "/match/for-judge/";
     public static final String RESCORE_MATCH = "/match/rescore-match";
+    public static final String MATCH_FIND_BY_PARTICIPANTS = "/match/find-by-participants/";
 
     @Inject
     private AuthService authService;
@@ -60,6 +61,18 @@ public class MatchResource {
 
     @Inject
     private MatchService matchService;
+
+    @GET
+    @Path(MATCH_FIND_BY_PARTICIPANTS + TID_JP + "/" + UID_JP + "/{uid2}")
+    @Consumes(APPLICATION_JSON)
+    public void findMatchesByParticipants(
+            @Suspended AsyncResponse response,
+            @PathParam(TID) Tid tid,
+            @PathParam(UID) Uid uid1,
+            @PathParam("uid2") Uid uid2) {
+        tournamentAccessor.read(tid, response,
+                tournament -> matchService.findMatchesByParticipants(tournament, uid1, uid2));
+    }
 
     @GET
     @Path(MY_PENDING_MATCHES + TID_JP)

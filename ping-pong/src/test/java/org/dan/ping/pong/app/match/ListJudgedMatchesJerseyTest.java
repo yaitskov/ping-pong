@@ -4,6 +4,8 @@ import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_FIND_BY_PARTICIPANTS;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_LIST_JUDGED;
+import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.match.MatchType.POff;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -21,6 +23,7 @@ import static org.junit.Assert.assertThat;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
+import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulator;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
@@ -115,5 +118,16 @@ public class ListJudgedMatchesJerseyTest extends AbstractSpringJerseyTest {
                                         hasProperty("winnerUid", is(Optional.of(uidP1))),
                                         hasProperty("opponent", hasProperty("uid", is(FILLER_LOSER_UID))),
                                         hasProperty("mid", is(mid)))))));
+
+        simulator.run(c -> assertThat(c.matchResult(mid),
+                allOf(
+                        hasProperty("role", is(UserRole.Spectator)),
+                        hasProperty("type", is(POff)),
+                        hasProperty("state", is(Over)),
+                        hasProperty("playedSets", is(0)),
+                        hasProperty("disputes", is(0)),
+                        hasProperty("participants", hasItems(
+                                hasProperty("uid", is(FILLER_LOSER_UID)),
+                                hasProperty("uid", is(uidP1)))))));
     }
 }

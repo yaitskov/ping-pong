@@ -759,7 +759,7 @@ public class MatchService {
         final MatchValidationRule matchRules = tournament.getRule().getMatch();
         return MatchResult.builder()
                 .participants(m.getParticipantIdScore().keySet().stream()
-                        .map(uid -> tournament.getParticipant(uid).toLink())
+                        .map(uid -> tournament.getBidOrExpl(uid).toLink())
                         .collect(toList()))
                 .score(matchScore(tournament, m))
                 .role(detectRole(tournament, m, ouid))

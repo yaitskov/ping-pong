@@ -103,10 +103,14 @@ public class ImperativeSimulator {
 
     public ImperativeSimulator checkMatchStatus(Player p1, Player p2, MatchState state) {
         Mid mid = resolveMid(p1, p2);
-        final MatchResult result = myRest.get(MATCH_RESULT + scenario.getTid().getTid()
-                + "/" + mid.getId(), MatchResult.class);
+        final MatchResult result = matchResult(mid);
         assertEquals(state, result.getState());
         return this;
+    }
+
+    public MatchResult matchResult(Mid mid) {
+        return myRest.get(MATCH_RESULT + scenario.getTid().getTid()
+                + "/" + mid.getId(), MatchResult.class);
     }
 
     public ImperativeSimulator checkTournamentComplete(BidStatesDesc expected) {

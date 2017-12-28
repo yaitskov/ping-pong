@@ -30,7 +30,11 @@ public class MatchResult {
     private int disputes;
     private MatchState state;
     private MatchType type;
-    private Optional<GroupLink> group;
+    private Optional<GroupLink> group = Optional.empty();
     private CategoryLink category;
     private UserRole role;
+
+    public static class MatchResultBuilder {
+        Optional<GroupLink> group = Optional.empty();
+    }
 }

@@ -78,10 +78,13 @@ public class PlayOffGenerator {
         if (level < FIRST_PLAY_OFF_MATCH_LEVEL) {
             return Optional.empty();
         }
+        final boolean bronzeMatch = thirdPlaceMatch && types.getType() == Gold && level > 1;
         final Optional<Mid> omid = createMatch(parentMid, loserMid,
-                priority + 1, level, types.getType());
+                priority + 1,
+                level + (bronzeMatch ? 1 : 0),
+                types.getType());
         Optional<Mid> midBronze = Optional.empty();
-        if (thirdPlaceMatch && types.getType() == Gold && level > 1) {
+        if (bronzeMatch) {
             midBronze = createMatch(Optional.empty(), Optional.empty(),
                     priority, level, Brnz);
         }

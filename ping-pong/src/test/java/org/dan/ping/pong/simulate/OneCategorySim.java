@@ -7,6 +7,7 @@ import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11_3P;
 import static org.dan.ping.pong.mock.simulator.AutoResolution.RANDOM;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Hook.BeforeScore;
@@ -25,6 +26,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.mock.simulator.EnlistMode;
 import org.dan.ping.pong.mock.simulator.Simulator;
+import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulator;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -264,5 +266,13 @@ public class OneCategorySim {
                         .scoreSet(p1, 11, p6, 5)
                         .expelPlayer(p1)
                         .rescoreMatch(p2, p3, 11, 3));
+    }
+
+    @Test
+    public void jpOf6With3rdPlaceBeginning() {
+        isf.create(begin().name("jpOf6With3rdStart")
+                .rules(RULES_JP_S1A2G11_3P)
+                .category(c1, p1, p2, p3, p4, p5, p6))
+                .run(ImperativeSimulator::beginTournament);
     }
 }

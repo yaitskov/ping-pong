@@ -107,7 +107,7 @@ public class TournamentMemState {
             if (FILLER_LOSER_UID.equals(bid)) {
                 return createLoserBid(tid, -1, state);
             }
-            throw notFound("User " + bid
+            throw internalError("User " + bid
                     + " does participate in the tournament " + tid);
         }
         return result;

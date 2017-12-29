@@ -25,6 +25,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.app.tournament.TournamentState.Replaced;
+import static org.dan.ping.pong.app.tournament.TournamentType.Classic;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
@@ -63,7 +64,6 @@ public class TournamentDao {
     private static final String GAMES_COMPLETE = "gamesComplete";
     private static final int DAYS_TO_SHOW_PAST_TOURNAMENT = 30;
     private static final String CATEGORIES = "categories";
-    private static final Uid UID0 = new Uid(0);
 
     @Inject
     private DSLContext jooq;
@@ -87,14 +87,16 @@ public class TournamentDao {
                 TOURNAMENT.PREVIOUS_TID,
                 TOURNAMENT.RULES,
                 TOURNAMENT.TICKET_PRICE,
-                TOURNAMENT.NAME)
+                TOURNAMENT.NAME,
+                TOURNAMENT.TYPE)
                 .values(hidden,
                         newTournament.getOpensAt(),
                         newTournament.getPlaceId(),
                         newTournament.getPreviousTid().map(Tid::getTid),
                         newTournament.getRules(),
                         newTournament.getTicketPrice(),
-                        newTournament.getName())
+                        newTournament.getName(),
+                        Classic)
                 .returning(TOURNAMENT.TID)
                 .fetchOne()
                 .getTid();
@@ -128,11 +130,13 @@ public class TournamentDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<TournamentDigest> findEnlistedIn(Uid uid, Instant before) {
-        return jooq.select(TOURNAMENT.NAME, TOURNAMENT.OPENS_AT, TOURNAMENT.TID, TOURNAMENT.STATE)
+        return jooq.select(TOURNAMENT.NAME, TOURNAMENT.OPENS_AT,
+                TOURNAMENT.TID, TOURNAMENT.STATE)
                 .from(TOURNAMENT)
                 .innerJoin(BID)
                 .on(TOURNAMENT.TID.eq(BID.TID))
                 .where(BID.UID.eq(uid), BID.STATE.ne(Quit),
+                        TOURNAMENT.TYPE.eq(Classic),
                         TOURNAMENT.STATE.in(Announce, Draft, Open)
                                 .or(TOURNAMENT.OPENS_AT.ge(before)))
                 .fetch()
@@ -152,7 +156,8 @@ public class TournamentDao {
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<DatedTournamentDigest> findByState(TournamentState state) {
         return selectDatedDigest()
-                .where(TOURNAMENT.STATE.eq(state))
+                .where(TOURNAMENT.TYPE.eq(Classic),
+                        TOURNAMENT.STATE.eq(state))
                 .fetch()
                 .map(this::mapToDatedDigest);
     }
@@ -226,9 +231,10 @@ public class TournamentDao {
                         MATCHES.STATE.eq(MatchState.Over))
                         .asField(GAMES_COMPLETE))
                 .from(TOURNAMENT)
-                .where(TOURNAMENT.STATE.eq(Open)
-                        .or(TOURNAMENT.STATE.eq(Close)
-                                .and(TOURNAMENT.OPENS_AT.ge(includeClosedAfter))))
+                .where(TOURNAMENT.TYPE.eq(Classic),
+                        TOURNAMENT.STATE.eq(Open)
+                                .or(TOURNAMENT.STATE.eq(Close)
+                                        .and(TOURNAMENT.OPENS_AT.ge(includeClosedAfter))))
                 .orderBy(TOURNAMENT.OPENS_AT)
                 .fetch()
                 .map(r -> OpenTournamentDigest.builder()
@@ -244,11 +250,13 @@ public class TournamentDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public Optional<DatedTournamentDigest> findMyNextTournament(Uid uid) {
-        return ofNullable(jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
+        return ofNullable(jooq
+                .select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
                 .from(BID)
                 .innerJoin(TOURNAMENT).on(BID.TID.eq(TOURNAMENT.TID))
                 .where(BID.UID.eq(uid),
-                        BID.STATE.in(Paid, Here, Want))
+                        BID.STATE.in(Paid, Here, Want),
+                        TOURNAMENT.TYPE.eq(Classic))
                 .orderBy(TOURNAMENT.OPENS_AT.asc())
                 .limit(1)
                 .fetchOne())
@@ -267,7 +275,8 @@ public class TournamentDao {
                 .innerJoin(TOURNAMENT).on(BID.TID.eq(TOURNAMENT.TID))
                 .where(BID.UID.eq(uid),
                         BID.UPDATED.ge(Optional.of(since)),
-                        BID.STATE.in(TERMINAL_BID_STATES))
+                        BID.STATE.in(TERMINAL_BID_STATES),
+                        TOURNAMENT.TYPE.eq(Classic))
                 .orderBy(BID.UPDATED.desc())
                 .limit(1)
                 .fetchOne())
@@ -283,7 +292,9 @@ public class TournamentDao {
         return jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
                 .from(BID)
                 .innerJoin(TOURNAMENT).on(BID.TID.eq(TOURNAMENT.TID))
-                .where(BID.UID.eq(uid), BID.STATE.in(Play, Rest, Wait))
+                .where(BID.UID.eq(uid),
+                        BID.STATE.in(Play, Rest, Wait),
+                        TOURNAMENT.TYPE.eq(Classic))
                 .fetch()
                 .map(r -> DatedTournamentDigest
                         .builder()
@@ -297,7 +308,9 @@ public class TournamentDao {
         return jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
                 .from(TOURNAMENT_ADMIN)
                 .innerJoin(TOURNAMENT).on(TOURNAMENT_ADMIN.TID.eq(TOURNAMENT.TID))
-                .where(TOURNAMENT_ADMIN.UID.eq(uid), TOURNAMENT.STATE.in(Open))
+                .where(TOURNAMENT_ADMIN.UID.eq(uid),
+                        TOURNAMENT.TYPE.eq(Classic),
+                        TOURNAMENT.STATE.in(Open))
                 .fetch()
                 .map(r -> DatedTournamentDigest
                         .builder()
@@ -319,11 +332,14 @@ public class TournamentDao {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public Optional<DatedTournamentDigest> findMyNextJudgeTournament(Uid uid) {
-        return ofNullable(jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
+        return ofNullable(jooq
+                .select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
                 .from(TOURNAMENT_ADMIN)
-                .leftJoin(TOURNAMENT).on(TOURNAMENT_ADMIN.TID.eq(TOURNAMENT.TID))
+                .leftJoin(TOURNAMENT)
+                .on(TOURNAMENT_ADMIN.TID.eq(TOURNAMENT.TID))
                 .where(TOURNAMENT_ADMIN.UID.eq(uid),
-                        TOURNAMENT.STATE.in(Announce, Draft))
+                        TOURNAMENT.STATE.in(Announce, Draft),
+                        TOURNAMENT.TYPE.eq(Classic))
                 .orderBy(TOURNAMENT.OPENS_AT.asc())
                 .limit(1)
                 .fetchOne())
@@ -336,13 +352,17 @@ public class TournamentDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<DatedTournamentDigest> findMyPreviousJudgeTournament(Instant now, Uid uid) {
-        return ofNullable(jooq.select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
+    public Optional<DatedTournamentDigest> findMyPreviousJudgeTournament(
+            Instant now, Uid uid) {
+        return ofNullable(jooq
+                .select(TOURNAMENT.TID, TOURNAMENT.NAME, TOURNAMENT.OPENS_AT)
                 .from(TOURNAMENT_ADMIN)
                 .leftJoin(TOURNAMENT).on(TOURNAMENT_ADMIN.TID.eq(TOURNAMENT.TID))
                 .where(TOURNAMENT_ADMIN.UID.eq(uid),
+                        TOURNAMENT.TYPE.eq(Classic),
                         TOURNAMENT.STATE.in(Close, Canceled, Replaced),
-                        TOURNAMENT.COMPLETE_AT.gt(Optional.of(now.minus(DAYS_TO_SHOW_PAST_TOURNAMENT, DAYS))))
+                        TOURNAMENT.COMPLETE_AT.gt(
+                                Optional.of(now.minus(DAYS_TO_SHOW_PAST_TOURNAMENT, DAYS))))
                 .orderBy(TOURNAMENT.COMPLETE_AT.desc())
                 .limit(1)
                 .fetchOne())
@@ -449,7 +469,7 @@ public class TournamentDao {
 
     public Optional<TournamentRow> getRow(Tid tid) {
         return ofNullable(jooq
-                .select(TOURNAMENT.PID, TOURNAMENT.RULES,
+                .select(TOURNAMENT.PID, TOURNAMENT.TYPE, TOURNAMENT.RULES,
                         TOURNAMENT.COMPLETE_AT, TOURNAMENT.OPENS_AT,
                         TOURNAMENT.NAME, TOURNAMENT.STATE, TOURNAMENT.TICKET_PRICE,
                         TOURNAMENT.PREVIOUS_TID)
@@ -461,6 +481,7 @@ public class TournamentDao {
                         .endedAt(r.get(TOURNAMENT.COMPLETE_AT))
                         .startedAt(r.get(TOURNAMENT.OPENS_AT))
                         .name(r.get(TOURNAMENT.NAME))
+                        .type(r.get(TOURNAMENT.TYPE))
                         .state(r.get(TOURNAMENT.STATE))
                         .rules(r.get(TOURNAMENT.RULES))
                         .ticketPrice(r.get(TOURNAMENT.TICKET_PRICE))

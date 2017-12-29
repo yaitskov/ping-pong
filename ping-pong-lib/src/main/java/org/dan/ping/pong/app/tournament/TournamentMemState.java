@@ -46,6 +46,7 @@ public class TournamentMemState {
 
     private Tid tid;
     private String name;
+    private TournamentType type;
     private Pid pid;
     private Set<Uid> adminIds;
     private Map<Uid, ParticipantMemState> participants;

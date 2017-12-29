@@ -547,6 +547,11 @@
                                     <type>org.dan.ping.pong.app.tournament.TournamentState</type>
                                     <binding>org.dan.ping.pong.app.tournament.TournamentStateConverter</binding>
                                 </customType>
+                                <customType>
+                                    <name>TournamentType</name>
+                                    <type>org.dan.ping.pong.app.tournament.TournamentType</type>
+                                    <binding>org.dan.ping.pong.app.tournament.TournamentTypeConverter</binding>
+                                </customType>
                             </customTypes>
                             <forcedTypes>
                                 <forcedType>
@@ -832,6 +837,11 @@
                                 <forcedType>
                                     <name>BidState</name>
                                     <expression>.*bid\.(state)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>TournamentType</name>
+                                    <expression>.*tournament\.(type)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

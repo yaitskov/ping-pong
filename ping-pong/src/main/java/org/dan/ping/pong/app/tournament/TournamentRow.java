@@ -15,6 +15,7 @@ public class TournamentRow {
     private Tid tid;
     private Pid pid;
     private String name;
+    private TournamentType type;
     private Instant startedAt;
     private Optional<Instant> endedAt;
     private TournamentState state;

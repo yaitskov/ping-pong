@@ -21,6 +21,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
+import static org.dan.ping.pong.app.tournament.TournamentType.Classic;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -105,12 +106,14 @@ public class TournamentService {
             if (!VALID_ENLIST_BID_STATES.contains(enlist.getBidState())) {
                 throw badRequest("Bid state could be " + VALID_ENLIST_BID_STATES);
             }
-            enlist.getGroupId().ifPresent(gid -> { throw badRequest("group is not expected"); });
+            enlist.getGroupId()
+                    .ifPresent(gid -> { throw badRequest("group is not expected"); });
         } else if (tournament.getState() == Open) {
             if (enlist.getBidState() != Wait) {
                 throw badRequest("Bid state should be Wait");
             }
-            int gid = enlist.getGroupId().orElseThrow(() -> badRequest("group is no set"));
+            int gid = enlist.getGroupId()
+                    .orElseThrow(() -> badRequest("group is no set"));
             if (!groupService.isNotCompleteGroup(tournament, gid)) {
                 throw badRequest("group is complete");
             }
@@ -127,16 +130,22 @@ public class TournamentService {
     }
 
     private void validateEnlist(TournamentMemState tournament, Enlist enlist) {
+        if (tournament.getType() != Classic) {
+            throw badRequest("Tournament does not allow direct enlistment");
+        }
         tournament.checkCategory(enlist.getCid());
         final CastingLotsRule casting = tournament.getRule().getCasting();
         if (casting.getPolicy() == ParticipantRankingPolicy.ProvidedRating) {
             final int rank = enlist.getProvidedRank()
-                    .orElseThrow(() -> badRequest("Ranking is required in", TID, tournament.getTid()));
-            casting.getProvidedRankOptions().orElseThrow(() -> internalError("no rank options"))
+                    .orElseThrow(() -> badRequest("Ranking is required in",
+                            TID, tournament.getTid()));
+            casting.getProvidedRankOptions()
+                    .orElseThrow(() -> internalError("no rank options"))
                     .validate(rank);
         } else {
             if (enlist.getProvidedRank().isPresent()) {
-                throw badRequest("Provided ranking is not used", TID, tournament.getTid());
+                throw badRequest("Provided ranking is not used",
+                        TID, tournament.getTid());
             }
         }
     }

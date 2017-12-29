@@ -15,6 +15,11 @@
        class="btn btn-default">
       <span class="glyphicon glyphicon-book"/>
     </a>
+    <a class="btn btn-default"
+       href="#!/tournament/result/{{$ctrl.tournamentId}}"
+       title="{{ 'Browser tournament results' | translate }}">
+      <span class="glyphicon glyphicon-eye-open"></span>
+    </a>
   </div>
   <div ng-show="!$ctrl.showTables && $ctrl.bids.length == 0 || $ctrl.showTables && $ctrl.matches.length == 0">
     <div class="alert alert-info" translate="tournament is complete"

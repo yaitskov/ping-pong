@@ -45,7 +45,7 @@ module.exports = {
 
     'group-play-off-border': 'Left in a group',
 
-    'category-has-no-participants': 'Category has no participants',
+    'category-has-no-played-matches': 'Category has no played matches',
 
     'PlayOff ladder': 'PlayOff ladder'
 };

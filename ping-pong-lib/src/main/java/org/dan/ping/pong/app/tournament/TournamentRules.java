@@ -23,17 +23,19 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TournamentRules {
-    public static final int FIRST_VERSION = 1;
+    public static final int FIRST_VERSION = 2;
     private int version = FIRST_VERSION;
     private MatchValidationRule match;
     private CastingLotsRule casting;
-    private Optional<PlayOffRule> playOff;
-    private Optional<GroupRules> group;
+    private Optional<PlayOffRule> playOff = Optional.empty();
+    private Optional<GroupRules> group = Optional.empty();
     private Optional<PlaceRules> place = Optional.empty();
     private Optional<RewardRules> rewards = Optional.empty();
 
     public static class TournamentRulesBuilder {
         int version = FIRST_VERSION;
+        Optional<PlayOffRule> playOff = Optional.empty();
+        Optional<GroupRules> group = Optional.empty();
         Optional<RewardRules> rewards = Optional.empty();
         Optional<PlaceRules> place = Optional.empty();
         CastingLotsRule casting = CastingLotsRule.builder()

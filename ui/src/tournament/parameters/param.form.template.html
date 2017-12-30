@@ -154,14 +154,14 @@
       <label>{{ 'disambiguation-group-lbl' | translate }}</label>
       <div>
         <a class="btn btn-default"
-           ng-click="$ctrl.rules.group.disambiguation = 'CMP_WIN_AND_LOSE'"
-           ng-class="{'btn-primary': $ctrl.rules.group.disambiguation == 'CMP_WIN_AND_LOSE'}">
-          {{ 'CMP_WIN_AND_LOSE' | translate }}
-        </a>
-        <a class="btn btn-default"
            ng-click="$ctrl.rules.group.disambiguation = 'CMP_WIN_MINUS_LOSE'"
            ng-class="{'btn-primary': $ctrl.rules.group.disambiguation == 'CMP_WIN_MINUS_LOSE'}">
           {{ 'CMP_WIN_MINUS_LOSE' | translate }}
+        </a>
+        <a class="btn btn-default"
+           ng-click="$ctrl.rules.group.disambiguation = 'CMP_WIN_AND_LOSE'"
+           ng-class="{'btn-primary': $ctrl.rules.group.disambiguation == 'CMP_WIN_AND_LOSE'}">
+          {{ 'CMP_WIN_AND_LOSE' | translate }}
         </a>
       </div>
       <p class="help-block">

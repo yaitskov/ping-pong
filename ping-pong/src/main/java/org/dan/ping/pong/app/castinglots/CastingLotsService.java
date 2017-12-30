@@ -205,7 +205,7 @@ public class CastingLotsService {
                 tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
                         .ordNumber(gi).label(groupLabel).build());
                 final List<ParticipantMemState> groupBids = bidsByGroups.get(gi);
-                if (groupBids.size() <= quits) {
+                if (groupBids.size() < quits) {
                     throw badRequest("Category should have more participants than quits from a group");
                 }
                 groupBids.forEach(bid -> bid.setGid(Optional.of(gid)));

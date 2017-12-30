@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -197,6 +198,22 @@ public class MatchDaoServer implements MatchDao {
                         .builder()
                         .name(r.get(USERS.NAME))
                         .uid(r.get(BID.UID))
+                        .build());
+    }
+
+    @Override
+    public void deleteByIds(Collection<Mid> mids, DbUpdater batch) {
+        log.info("Remove mids {}", mids);
+        batch
+                .exec(DbUpdateSql.builder()
+                        .mustAffectRows(empty())
+                        .query(jooq.deleteFrom(SET_SCORE)
+                                .where(SET_SCORE.MID.in(mids)))
+                        .build())
+                .exec(DbUpdateSql.builder()
+                        .mustAffectRows(NON_ZERO_ROWS)
+                        .query(jooq.deleteFrom(MATCHES)
+                                .where(MATCHES.MID.in(mids)))
                         .build());
     }
 

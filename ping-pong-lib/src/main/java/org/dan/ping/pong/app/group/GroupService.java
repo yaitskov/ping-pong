@@ -52,6 +52,22 @@ import javax.inject.Inject;
 
 @Slf4j
 public class GroupService {
+    public Optional<List<MatchInfo>> checkGroupComplete(
+            TournamentMemState tournament, int gid) {
+        final List<MatchInfo> matches = findMatchesInGroup(tournament, gid);
+        final long completedMatches = matches.stream()
+                .map(MatchInfo::getState)
+                .filter(Over::equals)
+                .count();
+
+        if (completedMatches < matches.size()) {
+            log.debug("Matches {} left to play in the group {}",
+                    matches.size() - completedMatches, gid);
+            return Optional.empty();
+        }
+        return Optional.of(matches);
+    }
+
     public Map<Uid, BidSuccessInGroup> emptyMatchesState(
             Function<Uid, BidState> participantState,
             Collection<MatchInfo> allMatchesInGroup) {

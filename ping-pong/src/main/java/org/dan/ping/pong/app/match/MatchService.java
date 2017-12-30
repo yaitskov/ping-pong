@@ -266,27 +266,25 @@ public class MatchService {
             DbUpdater batch, Collection<BidState> expected) {
         final int gid = matchInfo.getGid().get();
         final Set<Uid> uids = matchInfo.getParticipantIdScore().keySet();
-        final List<MatchInfo> matches = groupService.findMatchesInGroup(tournament, gid);
-        final long completedMatches = matches.stream()
-                .map(MatchInfo::getState)
-                .filter(Over::equals)
-                .count();
         uids.stream()
                 .map(tournament::getBidOrQuit)
                 .filter(b -> expected.contains(b.getState()))
                 .forEach(b -> bidService.setBidState(b,
                         completeGroupMatchBidState(tournament, b),
                         expected, batch));
-        if (completedMatches < matches.size()) {
-            log.debug("Matches {} left to play in the group {}",
-                    matches.size() - completedMatches, gid);
-            return;
-        }
-        completeParticipationLeftBids(
-                gid,
-                tournament,
-                completeGroup(gid, tournament, matches, batch),
-                batch);
+        tryToCompleteGroup(tournament, gid, batch);
+    }
+
+    public void tryToCompleteGroup(TournamentMemState tournament, int gid, DbUpdater batch) {
+        final Optional<List<MatchInfo>> oMatches = groupService
+                .checkGroupComplete(tournament, gid);
+
+        oMatches.ifPresent(matches ->
+                completeParticipationLeftBids(
+                        gid,
+                        tournament,
+                        completeGroup(gid, tournament, oMatches.get(), batch),
+                        batch));
     }
 
     public BidState completeGroupMatchBidState(TournamentMemState tournament, ParticipantMemState b) {

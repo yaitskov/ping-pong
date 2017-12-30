@@ -41,6 +41,7 @@ public class BidResource {
     private static final String BID_RESULTS = BID + "results/";
     public static final String TID_SLASH_UID = "/";
     public static final String ENLISTED_BIDS = "/bid/enlisted-to-be-checked/";
+    public static final String BID_CHANGE_GROUP = "/bid/change-group";
 
     @Inject
     private AuthService authService;
@@ -115,6 +116,20 @@ public class BidResource {
     }
 
     @POST
+    @Path(BID_CHANGE_GROUP)
+    @Consumes(APPLICATION_JSON)
+    public void changeGroup(
+            @Suspended AsyncResponse response,
+            @HeaderParam(SESSION) String session,
+            ChangeGroupReq req) {
+        final Uid adminUid = authService.userInfoBySession(session).getUid();
+        tournamentAccessor.update(req.getTid(), response, (tournament, batch) -> {
+            tournament.checkAdmin(adminUid);
+            bidService.changeGroup(tournament, req, batch);
+        });
+    }
+
+        @POST
     @Path(BID_SET_STATE)
     @Consumes(APPLICATION_JSON)
     public void setStatus(

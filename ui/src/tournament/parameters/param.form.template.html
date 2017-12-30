@@ -210,6 +210,35 @@
     </div>
   </div>
   <div class="form-group toggle-btn">
+    <label>{{ console-tournament-lbl | translate }}</label>
+    <input type="checkbox"
+           data-size="small"
+           ng-model="$ctrl.playConsoleTournament"
+           bs-toggle-on="{{ 'yes-lbl' | translate }}"
+           bs-toggle-off="{{ 'no-lbl' | translate }}"
+           bs-toggle-target="#console-tournament-parameters"
+           bs-toggle/>
+  </div>
+  <div id="console-tournament-parameters" class="toggle-panel"
+       ng-show="$ctrl.playConsoleTournament">
+    <div class="form-group">
+      <label class="toggle-option" translate="use-master-tournament-parameters"/>
+      <a class="btn btn-default"
+         ng-click="$ctrl.rules.group.console.useMasterRules = true"
+         ng-class="{'btn-primary': $ctrl.rules.group.console.useMasterRules}"
+         translate="yes-lbl"/>
+      <a class="btn btn-default"
+         ng-click="$ctrl.rules.group.console.useMasterRules = false"
+         ng-class="{'btn-success': !$ctrl.rules.group.console.useMasterRules}"
+         translate="use-custom-lbl"/>
+    </div>
+    <div class="form-group" ng-show="!$ctrl.rules.group.console.useMasterRules">
+      <a class="btn btn-primary"
+         ng-click="$ctrl.configureConsoleTournament()"
+         translate="configure-console-tournament"/>
+    </div>
+  </div>
+  <div class="form-group toggle-btn">
     <label>{{ 'play-off-lbl' | translate }}</label>
     <input type="checkbox"
            data-size="small"

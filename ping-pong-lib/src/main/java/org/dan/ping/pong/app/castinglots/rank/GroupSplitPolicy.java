@@ -2,5 +2,6 @@ package org.dan.ping.pong.app.castinglots.rank;
 
 public enum GroupSplitPolicy {
     BalancedMix,
-    BestToBest
+    BestToBest,
+    KeepMaster  // console tournament
 }

@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.match;
 
+import static org.apache.commons.lang3.ObjectUtils.min;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import com.google.common.collect.ImmutableMap;
@@ -9,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Wither;
+import org.apache.commons.lang3.ObjectUtils;
 import org.dan.ping.pong.app.bid.Uid;
 
 import java.util.ArrayList;
@@ -17,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.swing.text.html.Option;
 
 @Getter
 @Setter
@@ -89,6 +93,26 @@ public class MatchValidationRule {
 
     public Optional<Uid> findWinnerByScores(Map<Uid, List<Integer>> participantScores) {
         return findWinnerId(calcWonSets(participantScores));
+    }
+
+    public Optional<Uid> findStronger(MatchInfo mInfo) {
+        return findStronger(calcWonSets(mInfo.getParticipantIdScore()));
+    }
+
+    public Optional<Uid> findStronger(Map<Uid, Integer> wonSets) {
+        if (wonSets.size() == 1) {
+            return wonSets.keySet().stream().findFirst();
+        }
+        final List<Uid> uids = new ArrayList<>(wonSets.keySet());
+        final int scoreA = wonSets.get(uids.get(0));
+        final int scoreB = wonSets.get(uids.get(1));
+        if (scoreA < scoreB) {
+            return Optional.of(uids.get(1));
+        } else if (scoreA > scoreB) {
+            return Optional.of(uids.get(0));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public Optional<Uid> findWinnerId(Map<Uid, Integer> wonSets) {

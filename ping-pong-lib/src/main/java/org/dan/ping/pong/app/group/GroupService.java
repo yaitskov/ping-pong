@@ -22,6 +22,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
@@ -128,7 +129,7 @@ public class GroupService {
             final int numUids = uids.size();
             if (numUids == 2) {
                 Iterator<Uid> uidIterator = uids.iterator();
-                compareDirectMatch(matches, uidIterator.next(),
+                compareDirectMatch(tournament, matches, uidIterator.next(),
                         uidIterator.next(), strongerExtraOrder);
             } else if (numUids > 2) {
                 compareMatchesBetweenMany(tournament, matches, uids, strongerExtraOrder);
@@ -202,7 +203,7 @@ public class GroupService {
             final int numUids = subUids.size();
             if (numUids == 2) {
                 Iterator<Uid> uidIterator = uids.iterator();
-                compareDirectMatch(matches, uidIterator.next(),
+                compareDirectMatch(tournament, matches, uidIterator.next(),
                         uidIterator.next(), strongerExtraOrder);
             } else if (numUids > 2) {
                 if (numUids == uids.size()) { // all uids
@@ -237,14 +238,21 @@ public class GroupService {
         }
     }
 
-    private void compareDirectMatch(List<MatchInfo> matches, Uid uidA, Uid uidB,
+    private void compareDirectMatch(TournamentMemState tournament, List<MatchInfo> matches,
+            Uid uidA, Uid uidB,
             ExtraUidOrderInGroup strongerExtraOrder) {
         final MatchInfo abMatch = matches.stream()
                 .filter(m -> m.hasParticipant(uidA) && m.hasParticipant(uidB))
                 .findAny().orElseThrow(() -> internalError(
                         "no match between " + uidA + " and " + uidB));
         final Uid winnerUid = abMatch.getWinnerId()
-                .orElseThrow(() -> internalError("no winner in match " + abMatch.getMid()));
+                .orElseGet(() ->
+                     tournament.getRule().getMatch().findStronger(abMatch)
+                             .orElseGet(() -> {
+                                 strongerExtraOrder.getDiced()
+                                         .addAll(abMatch.getParticipantIdScore().keySet());
+                                 return ObjectUtils.min(uidA, uidB);
+                             }));
         strongerExtraOrder.getStrongerOf().put(winnerUid, abMatch.getOpponentUid(winnerUid)
                 .orElseThrow(() -> internalError("no opponent in match " + abMatch.getMid())));
     }

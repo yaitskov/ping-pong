@@ -299,9 +299,13 @@ public class ImperativeSimulator {
     }
 
     public ImperativeSimulator scoreSet3(Player p1, int games1, Player p2, int games2) {
-        return scoreSet(0, p1, games1, p2, games2)
-                .scoreSet(1, p1, games1, p2, games2)
-                .scoreSet(2, p1, games1, p2, games2);
+        return scoreSet3(0, p1, games1, p2, games2);
+    }
+
+    public ImperativeSimulator scoreSet3(int n, Player p1, int games1, Player p2, int games2) {
+        return scoreSet(n, p1, games1, p2, games2)
+                .scoreSet(n + 1, p1, games1, p2, games2)
+                .scoreSet(n + 2, p1, games1, p2, games2);
     }
 
     public ImperativeSimulator scoreSetLast2(Player p1, int games1, Player p2, int games2) {

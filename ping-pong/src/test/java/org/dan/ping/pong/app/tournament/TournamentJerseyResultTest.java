@@ -19,6 +19,7 @@ import static org.dan.ping.pong.mock.simulator.Player.p5;
 import static org.dan.ping.pong.mock.simulator.Player.p6;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c2;
+import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 import static org.junit.Assert.assertEquals;
 
 import org.dan.ping.pong.JerseySpringTest;
@@ -55,7 +56,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
 
     @Test
     public void tournamentResult() {
-        final TournamentScenario scenario = TournamentScenario.begin()
+        final TournamentScenario scenario = begin()
                 .name("tournamentResult")
                 .rules(RULES_G8Q2_S3A2G11)
                 .category(c1, p1, p2, p3)
@@ -96,7 +97,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
 
     @Test
     public void winMinusLose() {
-        final TournamentScenario scenario = TournamentScenario.begin()
+        final TournamentScenario scenario = begin()
                 .name("ResultWinMinusLose")
                 .rules(RULES_G8Q2_S1A2G11_M)
                 .category(c1, p1, p2, p3)
@@ -141,7 +142,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
 
     @Test
     public void playOffIncomplete() {
-        final TournamentScenario scenario = TournamentScenario.begin()
+        final TournamentScenario scenario = begin()
                 .name("ResultPlayOffIncomplete")
                 .ignoreUnexpectedGames()
                 .rules(RULES_G8Q2_S1A2G11_M.withPlayOff(Optional.of(Losing1)))
@@ -178,7 +179,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
 
     @Test
     public void justPlayOff3() {
-        final TournamentScenario tournament = TournamentScenario.begin()
+        final TournamentScenario tournament = begin()
                 .name("justPlayOff3")
                 .rules(RULES_JP_S1A2G11)
                 .category(c1, p1, p2, p3);

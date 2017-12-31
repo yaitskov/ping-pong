@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.dan.ping.pong.app.category.CategoryLink;
+import org.dan.ping.pong.app.group.GroupLink;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -19,4 +21,5 @@ public class BidProfile {
     private Instant enlistedAt;
     private String name;
     private CategoryLink category;
+    private Optional<GroupLink> group;
 }

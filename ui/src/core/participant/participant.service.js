@@ -24,10 +24,16 @@ angular.
                                             session: 1
                                         }
                                     },
+                                    changeGroup: {
+                                        url: '/api/bid/change-group',
+                                        method: 'POST',
+                                        headers: {
+                                            session: 1
+                                        }
+                                    },
                                     setCategory: {
                                         url: '/api/bid/set-category',
                                         method: 'POST',
-                                        cache: false,
                                         headers: {
                                             session: 1
                                         }

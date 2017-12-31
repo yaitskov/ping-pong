@@ -275,4 +275,13 @@ public class OneCategorySim {
                 .category(c1, p1, p2, p3, p4, p5, p6))
                 .run(ImperativeSimulator::beginTournament);
     }
+
+    @Test
+    public void setup2Group() {
+        isf.create(begin().name("setup2Group")
+                .rules(RULES_G3Q2_S1A2G11.withPlace(Optional.empty()))
+                .category(c1, p1, p2, p3, p4, p5))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p3, 3));
+    }
 }

@@ -80,6 +80,8 @@ public class BidResource {
             return BidProfile.builder()
                     .name(participant.getName())
                     .category(tournament.getCategory(participant.getCid()))
+                    .group(participant.getGid()
+                            .map(gid -> tournament.getGroups().get(gid).toLink()))
                     .state(participant.getState())
                     .enlistedAt(participant.getEnlistedAt())
                     .build();
@@ -129,7 +131,7 @@ public class BidResource {
         });
     }
 
-        @POST
+    @POST
     @Path(BID_SET_STATE)
     @Consumes(APPLICATION_JSON)
     public void setStatus(

@@ -30,7 +30,7 @@ a specific situation in a tournament to debug and test UI and server
 logic manually.
 
 ```
-mvn install -DskipTests -P simulate -Dtest=OneCategorySim#tournamentOf2
+mvn install -pl ping-pong -P simulate -Dtest=OneCategorySim#tournamentOf2
 ```
 
 Next logical step is to authenticate as an admin or a participant with dev handle:

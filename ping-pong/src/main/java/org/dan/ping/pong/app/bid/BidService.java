@@ -142,6 +142,11 @@ public class BidService {
             throw badRequest("Expected group is different",
                     "gid", bid.getGid());
         }
+        final Optional<Integer> opTargetGid = Optional.of(req.getTargetGid());
+        if (bid.getGid().equals(opTargetGid)) {
+            log.info("Target group is the same with expected");
+            return;
+        }
         groupService.checkGroupComplete(tournament, req.getTargetGid())
                 .ifPresent(matches -> {
                     throw badRequest("target group is complete");
@@ -152,7 +157,7 @@ public class BidService {
                 });
 
         bidDao.setGroupForUids(batch, req.getTargetGid(), req.getTid(), singletonList(bid));
-        bid.setGid(Optional.of(req.getTargetGid()));
+        bid.setGid(opTargetGid);
         // cancel matches in the source group
         cancelMatchesOf(tournament, req.getUid(), batch);
         // generate matches in target group

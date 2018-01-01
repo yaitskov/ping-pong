@@ -1,4 +1,5 @@
 import angular from 'angular';
+import './enlist.scss';
 import template from './enlist.offline.template.html';
 
 angular.

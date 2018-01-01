@@ -84,35 +84,6 @@ ul li a {
 }
 /* end of open tournament list */
 
-/* begin of enlist form */
-.enlist-form {
-    .date {
-        padding-right: 10px;
-        color: $base-red-color;
-    }
-    .time {
-        font-size: 12px;
-        color: gray;
-    }
-    .category-label {
-        width: 33%;
-    }
-    .category-value {
-        max-width: 60%;
-        overflow: wrap;
-    }
-    a.category.btn-primary {
-        color: $primary-btn-font-color;
-        background-color: $primary-btn-back-color;
-    }
-    a.category {
-        min-width: 200px;
-        margin-bottom: 3px;
-    }
-}
-
-/* end of enlist form */
-
 @include desktop-media {
     @import "desktop/app-desktop.scss";
 }

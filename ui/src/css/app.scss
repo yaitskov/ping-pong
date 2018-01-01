@@ -144,25 +144,6 @@ ul li a {
     padding-top: 20px !important;
 }
 
-.active .circle {
-    opacity: 1;
-}
-
-.btn .circle {
-    margin-right: 10px;
-}
-
-.circle {
-    width: 10px;
-    opacity: 0;
-    height: 10px;
-    display: inline-block;
-    background: white;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-}
-
 .match-state-description {
     tbody tr td:first-child {
         font-weight: bold;

@@ -1,0 +1,12 @@
+@import "~css/core-const.scss";
+
+.clockpicker-span-am-pm {
+    padding-left: 10px;
+}
+
+.clockpicker-am-pm-block {
+    .clockpicker-button.btn-primary {
+        background-color: $primary-btn-back-color !important;
+        color: $primary-btn-font-color !important;
+    }
+}

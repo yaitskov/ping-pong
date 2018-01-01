@@ -1,4 +1,5 @@
 import angular from 'angular';
+import './main-menu.scss';
 import template from './main-menu.template.html';
 
 angular.

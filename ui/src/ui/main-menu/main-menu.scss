@@ -1,0 +1,36 @@
+@import "~css/core-const.scss";
+@import "~css/media-mixin.scss";
+
+.view-container .dropdown-menu > li > a {
+    line-height: 1.4;
+    padding: 1px 10px;
+}
+
+.view-container .dropdown-menu .divider {
+    margin: 4px 0px;
+}
+
+@include desktop-media {
+    .view-container .dropdown-menu li a .glyphicon {
+        padding-right: 4px;
+    }
+}
+
+@include mobile-media {
+    .view-container .navbar-text {
+        margin-left: 8px;
+    }
+    .view-container .dropdown-menu {
+        font-size: 24px;
+    }
+    .view-container .dropdown-menu > li > a {
+        padding: 5px 10px;
+    }
+    .view-container a:hover,
+    .view-container a:active {
+        background-color: $active-background-color; /* highlight touched link */
+    }
+    .view-container .navbar {
+        margin-bottom: 0px;
+    }
+}

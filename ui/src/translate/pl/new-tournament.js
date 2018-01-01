@@ -1,5 +1,4 @@
 module.exports = {
-        // new-tournament
     'Name is required': 'Nazwa jest wymagana',
     'tournament-name-length': 'Nazwa turnieju musi być mniej niz {{max}} liter',
     'tournament start date': 'Data rozpoczęcia',

@@ -37,24 +37,6 @@ tr.even-row {
 }
 /* end of main menu */
 
-/* begin of clickable directive */
-.hover {
-    background-color: $active-background-color;
-    cursor: pointer;
-}
-.clickable {
-    cursor: pointer;
-}
-.clicked {
-    background-color: $active-background-color - #151515;
-}
-
-ul li a {
-    cursor: pointer;
-}
-
-/* end of clickable directive */
-
 /* begin of open tournament list */
 .open-tournament {
     min-height: 0px;

@@ -25,7 +25,17 @@ module.exports = {
                 test: /\.(scss|css)$/,
                 loader: ExtractTextPlugin.extract({
                     fallback: "style-loader",
-                    use: 'css-loader!sass-loader'
+                    use: [
+                        {
+                            loader: 'css-loader',
+                        },
+                        {
+                            loader: 'sass-loader',
+                            // options: {
+                            //     includePaths: ["absolute/path/a", "absolute/path/b"]
+                            // }
+                        }
+                    ]
                 }),
             },
             {

@@ -1,4 +1,5 @@
 import 'angular';
+import './classic-group-view.scss';
 import template from './classic-group-view.template.html';
 
 angular.

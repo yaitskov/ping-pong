@@ -1,4 +1,5 @@
 import angular from 'angular';
+import 'css/toggle-btn.scss';
 import template from './tournament-rules.template.html';
 
 angular.

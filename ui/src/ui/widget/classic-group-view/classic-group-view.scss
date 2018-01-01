@@ -1,5 +1,7 @@
 @import "~css/media-mixin.scss";
 
+@import "dice.scss";
+
 @include desktop-media {
     .classic-group-view {
         .walk-over {

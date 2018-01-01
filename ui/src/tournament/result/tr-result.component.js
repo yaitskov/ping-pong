@@ -1,4 +1,5 @@
 import angular from 'angular';
+import 'css/medal.scss';
 import template from './tr-result.template.html';
 
 angular.

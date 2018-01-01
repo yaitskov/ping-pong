@@ -1,10 +1,6 @@
 @import "core-const";
 @import "mixin";
 
-tr.even-row {
-    background-color: $active-background-color;
-}
-
 /* begin of no side space */
 .view-container .container-fluid {
     padding-left: 0px;

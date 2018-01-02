@@ -1,4 +1,5 @@
 import angular from 'angular';
+import '../../list.scss';
 import template from './manage-tr-list.template.html';
 
 angular.module('tournament').

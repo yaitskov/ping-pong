@@ -1,4 +1,5 @@
 import angular from 'angular';
+import '../../list.scss';
 import template from './rank-manually.template.html';
 
 angular.module('participant').

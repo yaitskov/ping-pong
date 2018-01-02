@@ -7,37 +7,6 @@
     width: initial;
 }
 
-.list.judge .complete {
-    background-color: #999 !important;
-}
-.list {
-    max-width: 800px;
-
-    .list-item {
-        border-radius: 20px;
-        border: 1px solid $active-background-color;
-        padding: 10px 20px;
-        margin-bottom: 10px;
-        margin-top: 10px;
-
-        .date {
-            font-size: 14px;
-            color: $base-red-color;
-            width: 57px;
-        }
-        .time {
-            font-size: 12px;
-            padding-right: 3px;
-            color: grey;
-            width: 62px;
-        }
-        .name a {
-            color: $base-font-color;
-            font-size: 18px;
-        }
-    }
-}
-
 .table-number {
     padding-left: 22px !important;
 }

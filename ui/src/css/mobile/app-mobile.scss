@@ -1,66 +1,9 @@
-    /* begin of main content view */
-    .container-fluid.list {
-        padding: 3px;
-    }
-
     .container {
         padding-top: 15px;
     }
 
-    .list .list-item:last-child {
-        border-bottom: none;
-    }
-
-    .list .list-item {
-        padding-top: 10px;
-        border-bottom: 1px solid grey;
-        min-height: 50px;
-    }
-
-    .list .list-item.tournament .name, .list .list-item.tournament .datetime {
-        padding-bottom: 5px;
-    }
-
-    .list .list-item.tournament .name a {
-        padding-left: 2px;
-        line-height: 1.6;
-        font-size: 18px;
-        color: $base-font-color;
-    }
-
-    .list .list-item.tournament span {
-        display: inline-block;
-        line-height: 1.9;
-    }
-
-    .list .list-item.tournament .date {
-        font-size: 14px;
-        color: $base-red-color;
-        width: 57px;
-    }
-
-    .list .list-item.tournament .time {
-        font-size: 12px;
-        padding-right: 3px;
-        color: grey;
-        width: 62px;
-    }
-    /* end of main content view*/
-
     .wrap-long {
         white-space: initial !important;
-    }
-
-    .list-item {
-        .completeness {
-            width: 42px;
-            text-align: right;
-
-        }
-        .datetime .time {
-            width: 80px !important;
-            text-align: right;
-        }
     }
 
     /* begin of match-score */

@@ -42,33 +42,6 @@
     padding-left: 22px !important;
 }
 
-
-/* begin of admin-judge in desktop */
-.admin-judgement {
-    .tables {
-        padding-left: 5px;
-        button {
-            margin-top: 5px;
-            margin-right: 5px;
-        }
-    }
-    table tr td {
-        vertical-align: middle;
-    }
-    .participant-names {
-        a {
-            white-space: initial;
-            background-color: $success-bg-color;
-            border: none;
-        }
-        a:first-child {
-            background-color: $info-bg-color;
-            margin-right: 8px;
-        }
-    }
-}
-/* end of admin-judge */
-
 /* begin match-score */
 .admin-score, .match-scoring {
     a.score {

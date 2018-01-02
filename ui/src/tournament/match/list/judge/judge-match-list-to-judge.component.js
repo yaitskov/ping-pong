@@ -1,4 +1,5 @@
 import angular from 'angular';
+import './judge-match-list.scss';
 import template from './judge-match-list-to-judge.template.html';
 
 angular.module('tournament').

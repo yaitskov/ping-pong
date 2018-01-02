@@ -63,69 +63,6 @@
         }
     }
 
-    .open-tournament {
-        .participant-names {
-            a {
-                white-space: initial;
-                background-color: $success-bg-color;
-                border: none;
-            }
-            a:first-child {
-                background-color: $info-bg-color;
-            }
-            /* a:last-child { */
-            /*     margin-bottom: 4px; */
-            /* } */
-        }
-
-        table thead tr td {
-            vertical-align: middle;
-        }
-        .badge {
-            background-color: $success-bg-color;
-            color: #333;
-            font-size: 18px;
-        }
-        .badge:first-child {
-            margin-bottom: 4px;
-            background-color: $info-bg-color;
-        }
-
-        table tbody tr:nth-child(even) {
-            background-color: #fbfbfb;
-        }
-        table tbody tr td:nth-child(2) {
-            vertical-align: middle;
-        }
-
-        table tbody tr td {
-            border-top: none;
-        }
-        table tbody tr td:first-child {
-            padding: 0px;
-            a {
-                margin-top: 4px;
-            }
-        }
-
-        table tbody tr td:last-child {
-            font-size: 14px;
-            /* div { */
-            /*     padding-bottom: 4px; */
-            /* } */
-            /* div:first-child { */
-            /*     padding-top: 14px; */
-            /* } */
-            div:last-child {
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                width: 100px;
-                display: block;
-                overflow: hidden;
-            }
-        }
-    }
-
     /* begin of admin-judgement */
     .admin-judgement {
         .form-group {

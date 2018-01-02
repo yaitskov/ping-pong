@@ -23,35 +23,6 @@
 }
 /* end of main toolbar */
 
-/* begin of open tournament list */
-.open-tournament {
-    min-height: 0px;
-
-    legend {
-        margin-bottom: 5px;
-        font-size: 16px;
-        border-bottom: none;
-    }
-
-    fieldset table tbody tr td:first-child {
-        font-size: 22px;
-        text-align: center;
-    }
-
-    fieldset table tr td {
-        border-top: none;
-        padding: 1px;
-        vertical-align: middle;
-    }
-}
-
-.list-item .completeness {
-    font-size: 14px;
-    width: 57px;
-    color: $base-red-color;
-}
-/* end of open tournament list */
-
 @include desktop-media {
     @import "desktop/app-desktop.scss";
 }

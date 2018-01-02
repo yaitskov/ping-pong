@@ -1,0 +1,126 @@
+@import "~css/core-const.scss";
+@import "~css/media-mixin.scss";
+
+.open-tournament {
+    min-height: 0px;
+
+    .participant-names {
+        a {
+            background-color: $success-bg-color;
+            border: none;
+        }
+        a:first-child {
+            background-color: $info-bg-color;
+        }
+    }
+
+    table tbody tr td {
+        border-top: none;
+    }
+
+    legend {
+        margin-bottom: 5px;
+        font-size: 16px;
+        border-bottom: none;
+    }
+
+    fieldset table tbody tr td:first-child {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    fieldset table tr td {
+        border-top: none;
+        padding: 1px;
+        vertical-align: middle;
+    }
+}
+
+@include desktop-media {
+    .open-tournament {
+        table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        table tbody tr {
+            td {
+                font-size: 16px;
+                vertical-align: middle;
+                .badge {
+                    font-size: inherit;
+                    color: #333;
+                    background-color: $success-bg-color;
+                }
+                .badge:first-child {
+                    background-color: $info-bg-color;
+                }
+                .glyphicon {
+                    font-size: 22px;
+                }
+            }
+            td > span, td > a {
+                margin-right: 5px;
+            }
+            td:last-child div {
+                float: left;
+                padding-right: 22px;
+            }
+        }
+    }
+
+    .container-fluid.open-tournament {
+        max-width: 900px;
+    }
+
+    .open-tournament.complete {
+        background-color: #999 !important;
+    }
+}
+
+@include mobile-media {
+    .open-tournament {
+        .participant-names {
+            a {
+                white-space: initial;
+            }
+        }
+
+        table thead tr td {
+            vertical-align: middle;
+        }
+        .badge {
+            background-color: $success-bg-color;
+            color: #333;
+            font-size: 18px;
+        }
+        .badge:first-child {
+            margin-bottom: 4px;
+            background-color: $info-bg-color;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: #fbfbfb;
+        }
+        table tbody tr td:nth-child(2) {
+            vertical-align: middle;
+        }
+
+        table tbody tr td:first-child {
+            padding: 0px;
+            a {
+                margin-top: 4px;
+            }
+        }
+
+        table tbody tr td:last-child {
+            font-size: 14px;
+
+            div:last-child {
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                width: 100px;
+                display: block;
+                overflow: hidden;
+            }
+        }
+    }
+}

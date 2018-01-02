@@ -7,7 +7,7 @@
     width: initial;
 }
 
-.open-tournament.complete, .list.judge .complete {
+.list.judge .complete {
     background-color: #999 !important;
 }
 .list {
@@ -42,52 +42,6 @@
     padding-left: 22px !important;
 }
 
-.open-tournament {
-    .participant-names {
-        a {
-            background-color: $success-bg-color;
-            border: none;
-        }
-        a:first-child {
-            background-color: $info-bg-color;
-        }
-    }
-
-    table tbody tr td {
-        border-top: none;
-    }
-    table tbody tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
-    table tbody tr {
-        td {
-            font-size: 16px;
-            vertical-align: middle;
-            .badge {
-                font-size: inherit;
-                color: #333;
-                background-color: $success-bg-color;
-            }
-            .badge:first-child {
-                background-color: $info-bg-color;
-            }
-            .glyphicon {
-                font-size: 22px;
-            }
-        }
-        td > span, td > a {
-            margin-right: 5px;
-        }
-        td:last-child div {
-            float: left;
-            padding-right: 22px;
-        }
-    }
-}
-
-.container-fluid.open-tournament {
-    max-width: 900px;
-}
 
 /* begin of admin-judge in desktop */
 .admin-judgement {

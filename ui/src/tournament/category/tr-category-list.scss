@@ -18,3 +18,16 @@
         }
     }
 }
+
+@include mobile-media {
+    .admin-categories {
+        input {
+            width: 80%;
+            margin-right: 8px;
+        }
+
+        table tr td {
+            vertical-align: middle;
+        }
+    }
+}

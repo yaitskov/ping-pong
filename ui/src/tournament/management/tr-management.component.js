@@ -1,4 +1,5 @@
 import angular from 'angular';
+import './tr-management.scss';
 import template from './tr-management.template.html';
 import whistle from './whistle.png';
 

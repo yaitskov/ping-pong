@@ -1,0 +1,9 @@
+@import "~css/media-mixin.scss";
+
+@include desktop-media {
+    .admin-tables {
+        .form-inline button {
+            margin-left: 8px;
+        }
+    }
+}

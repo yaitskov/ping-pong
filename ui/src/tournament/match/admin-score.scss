@@ -1,0 +1,23 @@
+@import "~css/media-mixin.scss";
+
+@include desktop-media {
+    .admin-score {
+        a.score {
+            margin-left: 5px;
+            margin-bottom: 5px;
+            min-width: auto;
+        }
+    }
+}
+
+@include mobile-media {
+    .admin-score {
+        a.score {
+            margin-left: 5px !important;
+            margin-bottom: 5px !important;
+        }
+        a.score:hover {
+            background-color: #204d74 !important;
+        }
+    }
+}

@@ -72,23 +72,6 @@
 }
 /* end of flickr calendar */
 
-.categories {
-    tr td:first-child {
-        width: 10%;
-    }
-    tr td:nth-child(2) {
-        a {
-            font-size: 18px;
-        }
-    }
-    tr td {
-        a.btn {
-            padding: 2px 8px;
-        }
-        vertical-align: middle;
-    }
-}
-
 .my-tournament-admin {
     table tr td:first-child {
         width: 30%;

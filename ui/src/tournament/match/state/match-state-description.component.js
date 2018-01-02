@@ -1,4 +1,5 @@
 import angular from 'angular';
+import './match-state-description.scss';
 import template from './match-state-description.template.html';
 
 angular.module('tournament').

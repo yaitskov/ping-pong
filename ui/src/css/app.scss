@@ -27,12 +27,6 @@
     @import "desktop/app-desktop.scss";
 }
 
-/* begin of debugging and tracing */
-.border {
-    border: 1px solid black;
-}
-/* end of debugging and tracing */
-
 .alert-info a {
     text-decoration: underline !important;
 }
@@ -52,16 +46,6 @@
 
 .top-buffer {
     padding-top: 20px !important;
-}
-
-.match-state-description {
-    tbody tr td:first-child {
-        font-weight: bold;
-    }
-}
-
-td.match-state-description.text-danger {
-    font-weight: bold;
 }
 
 tr.bottom-line td {

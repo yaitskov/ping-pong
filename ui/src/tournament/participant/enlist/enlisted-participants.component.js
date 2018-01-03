@@ -1,4 +1,5 @@
 import angular from 'angular';
+import '../../tournament-result.scss';
 import template from './enlisted-participants.template.html';
 
 angular.

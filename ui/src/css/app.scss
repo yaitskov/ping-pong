@@ -23,10 +23,6 @@
 }
 /* end of main toolbar */
 
-@include desktop-media {
-    @import "desktop/app-desktop.scss";
-}
-
 .alert-info a {
     text-decoration: underline !important;
 }
@@ -47,8 +43,41 @@ tr.bottom-line td {
     font-size: 75%;
 }
 
+@include desktop-media {
+    .container {
+        max-width: 800px;
+        padding-top: 15px;
+    }
+
+    .modal-dialog .modal-body .container {
+        width: initial;
+    }
+
+    .table-number {
+        padding-left: 22px !important;
+    }
+
+    .input-group-addon {
+        padding: 8px 12px;
+        width: 45px;
+        display: inline-block;
+    }
+}
+
 @include mobile-media {
-    @import "mobile/app-mobile.scss";
+    .container {
+        padding-top: 15px;
+    }
+
+    .wrap-long {
+        white-space: initial !important;
+    }
+
+    .input-group-addon {
+        padding: 8px 10px;
+        width: 40px;
+        display: inline-block;
+    }
 }
 
 @import "spinner.scss";

@@ -1,0 +1,14 @@
+@import "~css/media-mixin.scss";
+
+@include desktop-media {
+.tournament-result {
+    label {
+        margin-right: 10px;
+    }
+    table tr {
+        td:nth-child(3), td:nth-child(4) {
+            text-align: center;
+        }
+    }
+}
+}

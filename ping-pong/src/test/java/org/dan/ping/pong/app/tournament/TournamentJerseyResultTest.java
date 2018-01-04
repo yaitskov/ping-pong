@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_LIST;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_RESULT;
 import static org.dan.ping.pong.app.match.DisambiguateGroupScoreJerseyTest.RULES_G8Q2_S1A2G11_M;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G3Q2_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
@@ -186,5 +187,25 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
         final ImperativeSimulator simulator = isf.create(tournament);
         simulator.run(c -> c.beginTournament()
                 .checkResult(p1, p2, p3));
+    }
+
+    @Test
+    public void expelP3When2Groups() { // incomplete match between 2 participants with the same points
+        isf.create(begin().name("expelP3When2Groups")
+                .rules(RULES_G3Q2_S1A2G11.withPlace(Optional.empty()))
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p3, 3)
+                        .expelPlayer(p3)
+                        .getTournamentResult());
+    }
+
+    @Test
+    public void groupOf2() { // incomplete match between 2 participants with the same points
+        isf.create(begin().name("groupOf2")
+                .rules(RULES_G3Q2_S1A2G11.withPlace(Optional.empty()))
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .getTournamentResult());
     }
 }

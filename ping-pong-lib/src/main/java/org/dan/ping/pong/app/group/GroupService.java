@@ -14,12 +14,15 @@ import static org.dan.ping.pong.app.group.ParticipantMatchState.Pending;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.Run;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.WalkOver;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.WalkWiner;
+import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.tournament.CumulativeScore.createComparator;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -27,6 +30,7 @@ import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.tournament.CumulativeScore;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -475,6 +479,8 @@ public class GroupService {
         return result;
     }
 
+    private static final Set<MatchState> GameOrOverOrPlace = ImmutableSet.of(Over, Game, Place);
+
     public List<TournamentResultEntry> resultOfAllGroupsInCategory(TournamentMemState tournament, int cid) {
         final List<GroupInfo> groups = tournament.getGroupsByCategory(cid);
         final MatchValidationRule matchRules = tournament.getRule().getMatch();
@@ -483,7 +489,9 @@ public class GroupService {
                         mergeSorted(groups.stream()
                                         .map(groupInfo -> {
                                             final List<MatchInfo> completeGroupMatches = findMatchesInGroup(tournament, groupInfo.getGid())
-                                                    .stream().filter(m -> m.getState() == Over).collect(toList());
+                                                    .stream()
+                                                    .filter(m -> GameOrOverOrPlace.contains(m.getState()))
+                                                    .collect(toList());
                                             final Map<Uid, CumulativeScore> uidLevel = new HashMap<>();
                                             ranksLevelMatches(tournament, 0, uidLevel, completeGroupMatches, matchRules);
                                             return orderUidsInGroup(tournament, completeGroupMatches).stream()

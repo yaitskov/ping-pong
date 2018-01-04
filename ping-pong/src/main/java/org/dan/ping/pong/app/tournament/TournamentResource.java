@@ -156,13 +156,12 @@ public class TournamentResource {
     public void invalidateCache(
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
-            int tid) {
-
+            Tid tid) {
         final Uid adminUid = authService.userInfoBySession(session).getUid();
-        tournamentAccessor.update(new Tid(tid), response, (tournament, batch) -> {
+        tournamentAccessor.update(tid, response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
             log.info("invalidate tournament cache {}", tid);
-            tournamentCache.invalidate(new Tid(tid));
+            tournamentCache.invalidate(tid);
         });
     }
 

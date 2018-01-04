@@ -4,6 +4,7 @@ import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.group.GroupResource.CID;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_POPULATIONS;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
@@ -52,6 +53,45 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
 
     @Test
     public void enlistToGroupWithParticipantPlayedAllGames() {
+        final TournamentScenario scenario = TournamentScenario
+                .begin()
+                .name("enlistToGrpWithFinishedParticipant")
+                .rules(RULES_G8Q1_S1A2G11.withPlayOff(Optional.empty()).withPlace(Optional.empty()))
+                .category(c1, p1, p2, p3);
+        final ImperativeSimulator simulator = isf.create(scenario);
+        simulator.run(c -> {
+            c.beginTournament()
+                    .scoreSet(p1, 11, p3, 4)
+                    .scoreSet(p2, 11, p3, 5);
+
+            final int cid = scenario.getCategoryDbId().get(c1);
+
+            final GroupPopulations populations = myRest()
+                    .get(GROUP_POPULATIONS + scenario.getTid().getTid() + CID + cid,
+                            GroupPopulations.class);
+
+            final Uid joinedUid = enlistParticipant(scenario, cid, populations, "p4");
+            scenario.addPlayer(joinedUid, p4);
+            c.scoreSet(p1, 11, p2, 3)
+                    .reloadMatchMap()
+                    .scoreSet(p1, 11, p4, 5)
+                    .scoreSet(p2, 11, p4, 6)
+                    .scoreSet(p3, 11, p4, 7)
+                    .checkResult(p1, p2, p3, p4)
+                    .checkTournamentComplete(BidStatesDesc
+                            .restState(Lost).bid(p1, Win1));
+        });
+    }
+
+    private Uid enlistParticipant(TournamentScenario scenario, int cid, GroupPopulations populations, String p5) {
+        return myRest().post(TOURNAMENT_ENLIST_OFFLINE, scenario,
+                EnlistOffline.builder()
+                        .groupId(Optional.of(populations.getLinks().get(0).getGid()))
+                        .tid(scenario.getTid())
+                        .cid(cid)
+                        .bidState(BidState.Wait)
+                        .name(p5)
+                        .build()).readEntity(Uid.class);
     }
 
     @Test
@@ -106,14 +146,7 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                             .get(GROUP_POPULATIONS + scenario.getTid().getTid() + CID + cid,
                                     GroupPopulations.class);
 
-                    final Uid joinedUid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, scenario,
-                            EnlistOffline.builder()
-                                    .groupId(Optional.of(populations.getLinks().get(0).getGid()))
-                                    .tid(scenario.getTid())
-                                    .cid(cid)
-                                    .bidState(BidState.Wait)
-                                    .name("p4")
-                                    .build()).readEntity(Uid.class);
+                    final Uid joinedUid = enlistParticipant(scenario, cid, populations, "p4");
                     scenario.addPlayer(joinedUid, p4);
                     c.scoreSet(p2, 11, p3, 3)
                             .scoreSet(p2, 11, p4, 4)
@@ -140,14 +173,7 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                             final GroupPopulations populations = myRest()
                                     .get(GROUP_POPULATIONS + s.getTid().getTid() + CID + cid,
                                             GroupPopulations.class);
-                            final Uid uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, s,
-                                    EnlistOffline.builder()
-                                            .groupId(Optional.of(populations.getLinks().get(0).getGid()))
-                                            .tid(s.getTid())
-                                            .cid(cid)
-                                            .bidState(BidState.Wait)
-                                            .name("p4")
-                                            .build()).readEntity(Uid.class);
+                            final Uid uid = enlistParticipant(s, cid, populations, "p4");
                             s.addPlayer(uid, p4);
                             assertThat(myRest().get(BID_PENDING_MATCHES + s.getTid().getTid() + "/" + uid.getId(),
                                     MyPendingMatchList.class).getMatches(),
@@ -183,14 +209,7 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                             final GroupPopulations populations = myRest()
                                     .get(GROUP_POPULATIONS + s.getTid().getTid() + CID + cid,
                                             GroupPopulations.class);
-                            final Uid uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, s,
-                                    EnlistOffline.builder()
-                                            .groupId(Optional.of(populations.getLinks().get(0).getGid()))
-                                            .tid(s.getTid())
-                                            .cid(cid)
-                                            .bidState(BidState.Wait)
-                                            .name("p4")
-                                            .build()).readEntity(Uid.class);
+                            final Uid uid = enlistParticipant(s, cid, populations, "p4");
                             s.addPlayer(uid, p4);
                             return HookDecision.Skip;
                         })

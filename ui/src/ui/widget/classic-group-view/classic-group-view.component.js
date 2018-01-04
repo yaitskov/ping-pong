@@ -18,6 +18,7 @@ angular.
                          self.scoreShowMode = 'sets';
                          self.rowOrder = 'seed'; // final | abc
                          self.loadData = function (tournament) {
+                             self.showBalance = false;
                              self.participants = tournament.participants;
                              for (var pi in self.participants) {
                                  var p = self.participants[pi];

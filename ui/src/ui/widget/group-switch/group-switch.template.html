@@ -1,11 +1,11 @@
-<div class="form-group" ng-show="$ctrl.groups > 1">
+<div class="form-group" ng-show="$ctrl.groups.length > 1">
   <label>{{ 'Groups' | translate }}</label>
   <div class="btn-group">
     <a ng-click="$ctrl.pickGroup(group.gid)"
-       class="btn"
+       class="btn btn-default"
        ng-repeat="group in $ctrl.groups | orderBy : 'name'"
-       ng-class="{'btn-default': $ctrl.currentGid != group.gid, 'btn-primary': $ctrl.currentGid == group.cid}">
-      {{group.name}}
+       ng-class="{'btn-primary': $ctrl.currentGid == group.gid}">
+      {{group.label}}
     </a>
   </div>
 </div>

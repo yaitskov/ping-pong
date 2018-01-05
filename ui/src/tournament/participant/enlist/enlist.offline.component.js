@@ -24,16 +24,19 @@ angular.
                          self.form = {};
                          self.loadGroupPopulations = function (tid, cid) {
                              requestStatus.startLoading('Loading');
-                             self.groupId = null;
                              Group.populations(
-                                 {
-                                     tournamentId: tid,
-                                     categoryId: cid},
+                                 {tournamentId: tid, categoryId: cid},
                                  function (ok) {
                                      self.categoryGroups = ok;
-                                     for (var i in self.categoryGroups.links) {
-                                         self.groupId = self.categoryGroups.links[i].gid;
+                                     if (self.groupId === 0) {
+                                         for (let glink of self.categoryGroups.links) {
+                                             self.groupId = Math.max(glink.gid, self.groupId);
+                                         }
+                                     } else {
+                                         for (let glink of self.categoryGroups.links) {
+                                             self.groupId = glink.gid;
                                              break;
+                                         }
                                      }
                                      requestStatus.complete();
                                  },
@@ -87,7 +90,9 @@ angular.
                          };
                          this.activateGroup = function (gid) {
                              self.groupId = gid;
-                             pageCtx.put('offline-group-' + $routeParams.tournamentId, self.groupId);
+                             if (gid) {
+                                pageCtx.put('offline-group-' + $routeParams.tournamentId, self.groupId);
+                             }
                          };
 
                          this.enlist = function (bidState) {
@@ -123,6 +128,12 @@ angular.
                                          self.enlisted.unshift({uid: resp.data, name: name});
                                          self.form.$setPristine(true);
                                          jQuery(self.form.firstName.$$element).focus();
+                                         if (self.groupId === 0) {
+                                              self.loadGroupPopulations($routeParams.tournamentId, self.categoryId);
+                                         } else {
+                                              self.categoryGroups.populations[
+                                                    self.categoryGroups.links.findIndex((link) => link.gid == self.groupId)] += 1;
+                                         }
                                      },
                                      requestStatus.failed);
                          };

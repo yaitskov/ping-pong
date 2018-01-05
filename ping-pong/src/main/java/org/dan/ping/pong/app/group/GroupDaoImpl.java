@@ -16,10 +16,11 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 @Slf4j
-public class GroupDao {
+public class GroupDaoImpl implements GroupDao {
     @Inject
     private DSLContext jooq;
 
+    @Override
     public int createGroup(Tid tid, Integer cid, String label,
             int quits, int ordNumber) {
         final int gid = jooq.insertInto(GROUPS, GROUPS.TID, GROUPS.LABEL,
@@ -32,6 +33,7 @@ public class GroupDao {
         return gid;
     }
 
+    @Override
     public Map<Integer, GroupInfo> load(Tid tid) {
         return jooq.select(GROUPS.GID, GROUPS.CID, GROUPS.SORT, GROUPS.LABEL)
                 .from(GROUPS)
@@ -48,6 +50,7 @@ public class GroupDao {
 
     }
 
+    @Override
     public void deleteAllByTid(Tid tid, DbUpdater batch, int size) {
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(Optional.of(size))

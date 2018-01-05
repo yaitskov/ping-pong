@@ -100,9 +100,9 @@ public class CastingLotsDao implements CastingLotsDaoIf {
         return priorityGroup;
     }
 
-    public Mid generatePlayOffMatches(TournamentMemState tinfo, Integer cid,
+    public Mid generatePlayOffMatches(TournamentMemState tInfo, Integer cid,
             int playOffStartPositions, int basePlayOffPriority) {
-        final Tid tid = tinfo.getTid();
+        final Tid tid = tInfo.getTid();
         log.info("Generate play off matches for {} bids in tid {}",
                 playOffStartPositions, tid);
         if (playOffStartPositions == 1) {
@@ -116,10 +116,10 @@ public class CastingLotsDao implements CastingLotsDaoIf {
         }
         final int levels = (int) (log(playOffStartPositions) / log(2));
         final int lowestPriority = basePlayOffPriority + levels;
-        final PlayOffRule playOffRule = tinfo.getRule().getPlayOff()
+        final PlayOffRule playOffRule = tInfo.getRule().getPlayOff()
                 .orElseThrow(() -> internalError("no play off rule in " + tid));
         final PlayOffGenerator generator = PlayOffGenerator.builder()
-                .tournament(tinfo)
+                .tournament(tInfo)
                 .cid(cid)
                 .thirdPlaceMatch(playOffRule.getThirdPlaceMatch() == 1)
                 .matchDao(matchDao)

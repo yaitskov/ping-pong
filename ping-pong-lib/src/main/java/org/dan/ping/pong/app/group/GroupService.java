@@ -18,6 +18,7 @@ import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.tournament.CumulativeScore.createComparator;
+import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
@@ -344,11 +345,13 @@ public class GroupService {
 
     public boolean isNotCompleteGroup(TournamentMemState tournament, int gid) {
         final Optional<Integer> ogid = Optional.of(gid);
+        int[] c = new int[1];
         return tournament.getMatches()
                 .values()
                 .stream()
-                .anyMatch(m -> ogid.equals(m.getGid())
-                        && m.getState() != Over);
+                .filter(m -> ogid.equals(m.getGid()))
+                .peek(m -> ++c[0])
+                .anyMatch(m -> m.getState() != Over) || c[0] == 0;
     }
 
     public GroupWithMembers members(TournamentMemState tournament, int gid) {
@@ -535,5 +538,35 @@ public class GroupService {
     public boolean notExpelledInGroup(TournamentMemState tournament, ParticipantMemState b) {
         return b.getState() != Expl || tournament.participantMatches(b.getUid())
                 .anyMatch(m -> !m.getGid().isPresent());
+    }
+
+    public void ensureThatNewGroupCouldBeAdded(TournamentMemState tournament, int cid) {
+        final List<GroupInfo> categoryGroups = tournament.getGroupsByCategory(cid);
+        categoryGroups.forEach(groupInfo -> {
+            if (!isNotCompleteGroup(tournament, groupInfo.getGid())) {
+                throw badRequest("category-has-complete-group", "link", groupInfo.toLink());
+            }
+        });
+    }
+
+    public static String sortToLabel(int sort) {
+        return "Group " + (1 + sort);
+    }
+
+    @Inject
+    private GroupDao groupDao;
+
+    public int createGroup(TournamentMemState tournament, int cid) {
+        final int sort = tournament.getGroups().values().stream()
+                .map(GroupInfo::getOrdNumber)
+                .max(Integer::compare).orElse(-1) + 1;
+        final String label = sortToLabel(sort);
+        final int gid = groupDao.createGroup(tournament.getTid(), cid, label,
+                tournament.getRule().getGroup().get().getQuits(), sort);
+        log.info("New group {}/{} is created in tid/cid {}/{}",
+                gid, label, tournament.getTid(), cid);
+        tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
+                .ordNumber(sort).label(label).build());
+        return gid;
     }
 }

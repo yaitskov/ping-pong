@@ -13,6 +13,7 @@ import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
+import static org.dan.ping.pong.app.playoff.PlayOffRule.L1_3P;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.table.TableService.STATE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
@@ -47,6 +48,7 @@ import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.playoff.PlayOffMatches;
+import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.user.UserDao;
@@ -110,9 +112,13 @@ public class TournamentService {
             if (enlist.getBidState() != Wait) {
                 throw badRequest("Bid state should be Wait");
             }
-            int gid = enlist.getGroupId().orElseThrow(() -> badRequest("group is no set"));
-            if (!groupService.isNotCompleteGroup(tournament, gid)) {
-                throw badRequest("group is complete");
+            final Optional<Integer> ogid = enlist.getGroupId();
+            if (ogid.isPresent()) {
+                if (!groupService.isNotCompleteGroup(tournament, ogid.get())) {
+                    throw badRequest("group is complete");
+                }
+            } else {
+                groupService.ensureThatNewGroupCouldBeAdded(tournament, enlist.getCid());
             }
         } else {
             throw notDraftError(tournament);
@@ -460,6 +466,14 @@ public class TournamentService {
                 .name(enlistment.getName())
                 .build());
         final Instant now = clocker.get();
+        if (tournament.getState() == Open && !enlistment.getGroupId().isPresent()) {
+            if (!tournament.getRule().getPlayOff().isPresent()) {
+                generatePlayOffRules(tournament, batch);
+            }
+            final int gid = groupService.createGroup(tournament, enlistment.getCid());
+            castingLotsService.recreatePlayOff(tournament, enlistment.getCid(), batch);
+            enlistment.setGroupId(Optional.of(gid));
+        }
         tournament.getParticipants().put(participantUid, ParticipantMemState.builder()
                 .bidState(enlistment.getBidState())
                 .enlistedAt(now)
@@ -477,6 +491,11 @@ public class TournamentService {
                     castingLotsService.addParticipant(participantUid, tournament, batch));
         }
         return participantUid;
+    }
+
+    private void generatePlayOffRules(TournamentMemState tournament, DbUpdater batch) {
+        tournament.getRule().setPlayOff(Optional.of(L1_3P));
+        tournamentDao.updateParams(tournament.getTid(), tournament.getRule(), batch);
     }
 
     @Transactional(TRANSACTION_MANAGER)

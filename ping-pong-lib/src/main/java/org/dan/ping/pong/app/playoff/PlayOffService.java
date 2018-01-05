@@ -8,6 +8,7 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.tournament.CumulativeScore.createComparator;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 
+import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.group.GroupService;
@@ -32,6 +33,7 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
+@Slf4j
 public class PlayOffService {
     public List<MatchInfo> findBaseMatches(TournamentMemState tournament, int cid) {
         return findBaseMatches(findPlayOffMatches(tournament, cid));
@@ -198,5 +200,9 @@ public class PlayOffService {
         }
         final Optional<Uid> calculatedWinner = matchRules.findWinnerId(score);
         return !calculatedWinner.equals(m.getWinnerId());
+    }
+
+    public Stream<MatchInfo> findMatchesByLevelAndCid(int level, int cid, Stream<MatchInfo> stream) {
+        return stream.filter(m -> m.getCid() == cid && m.getLevel() == level);
     }
 }

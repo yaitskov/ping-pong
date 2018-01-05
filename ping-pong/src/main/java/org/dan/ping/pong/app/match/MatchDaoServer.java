@@ -203,6 +203,9 @@ public class MatchDaoServer implements MatchDao {
 
     @Override
     public void deleteByIds(Collection<Mid> mids, DbUpdater batch) {
+        if (mids.isEmpty()) {
+            return;
+        }
         log.info("Remove mids {}", mids);
         batch
                 .exec(DbUpdateSql.builder()

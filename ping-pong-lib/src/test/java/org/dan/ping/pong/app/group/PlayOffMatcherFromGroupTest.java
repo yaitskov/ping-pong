@@ -16,4 +16,15 @@ public class PlayOffMatcherFromGroupTest {
          Map<Integer, List<Integer>> m = generateForQuits2(2);
          assertEquals(ImmutableMap.of(0, asList(0, 1), 1, asList(1, 0)), m);
     }
+
+    @Test
+    public void generateForQuits2For4Groups() {
+        Map<Integer, List<Integer>> m = generateForQuits2(4);
+        assertEquals(ImmutableMap.of(
+                0, asList(0, 3),
+                1, asList(3, 0),
+                2, asList(2, 1),
+                3, asList(1, 2)),
+                m);
+    }
 }

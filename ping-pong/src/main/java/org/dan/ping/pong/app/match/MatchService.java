@@ -101,7 +101,7 @@ public class MatchService {
     @Inject
     private Clocker clocker;
 
-    public int roundPlayOffBase(int bids) {
+    public static int roundPlayOffBase(int bids) {
         int places = 1;
         while (places < bids) {
             places *= 2;
@@ -388,8 +388,9 @@ public class MatchService {
                     + expectedPlayOffMatches + " !=" + playOffMatches.size()
                     + " group " + iGru.getGid());
         }
+        final int roundedGroups = roundPlayOffBase(groups.size());
         final List<Integer> matchIndexes = PlayOffMatcherFromGroup.find(
-                quits, iGru.getOrdNumber(), groups.size());
+                quits, iGru.getOrdNumber(), roundedGroups);
         for (int iQuitter = 0; iQuitter < quits; ++iQuitter) {
             int matchIdx = matchIndexes.get(iQuitter);
             assignBidToMatch(tournament, playOffMatches.get(matchIdx).getMid(),

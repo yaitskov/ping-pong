@@ -4,11 +4,13 @@ import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.group.GroupResource.CID;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_POPULATIONS;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.BID_PENDING_MATCHES;
+import static org.dan.ping.pong.app.playoff.PlayOffRule.L1_3P;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST_OFFLINE;
 import static org.dan.ping.pong.mock.simulator.Hook.AfterMatch;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
@@ -16,6 +18,7 @@ import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.Player.p5;
+import static org.dan.ping.pong.mock.simulator.Player.p6;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.junit.Assert.assertThat;
 
@@ -52,12 +55,18 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
     private ImperativeSimulatorFactory isf;
 
     @Test
-    public void enlistToNewGroup() {
+    public void enlistToNewGroupWithoutPlayOff() {
         final TournamentScenario scenario = TournamentScenario
                 .begin()
-                .name("enlistToNewGroup")
-                .rules(RULES_G8Q1_S1A2G11)
+                .name("enlistToNewGroupWithoutPlayOff")
+                .rules(RULES_G2Q1_S1A2G11
+                        .withPlayOff(Optional.empty())
+                        .withPlace(Optional.empty()))
                 .category(c1, p1, p2);
+        join2PlayersIntoNewGroup(scenario);
+    }
+
+    private void join2PlayersIntoNewGroup(TournamentScenario scenario) {
         final ImperativeSimulator simulator = isf.create(scenario);
         simulator.run(c -> {
             c.beginTournament();
@@ -79,8 +88,59 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                     .scoreSet(p3, 11, p4, 7)
                     .scoreSet(p1, 11, p3, 4)
                     .checkResult(p1, p3, p4, p2)
-                    .checkTournamentComplete(BidStatesDesc.restState(Lost).bid(p3, Win2).bid(p1, Win1));
+                    .checkTournamentComplete(BidStatesDesc
+                            .restState(Lost)
+                            .bid(p3, Win2).bid(p1, Win1));
         });
+    }
+
+    @Test
+    public void enlistToNewGroupFakeGroup() {
+        final TournamentScenario scenario = TournamentScenario
+                .begin()
+                .name("enlistToNewGroupFakeGroup")
+                .rules(RULES_G2Q1_S1A2G11
+                        .withPlayOff(Optional.of(L1_3P))
+                        .withPlace(Optional.empty()))
+                .category(c1, p1, p2, p3, p4);
+        final ImperativeSimulator simulator = isf.create(scenario);
+        simulator.run(c -> {
+            c.beginTournament();
+            final int cid = scenario.getCategoryDbId().get(c1);
+            final Uid uidP5 = enlistParticipant(scenario, cid, Optional.empty(), "p5");
+            final GroupPopulations populations = myRest()
+                    .get(GROUP_POPULATIONS + scenario.getTid().getTid() + CID + cid,
+                            GroupPopulations.class);
+            final int newGid = populations.getLinks().stream()
+                    .map(GroupLink::getGid)
+                    .max(Integer::compare).get();
+            final Uid uidP6 = enlistParticipant(scenario, cid, Optional.of(newGid), "p6");
+
+            scenario.addPlayer(uidP5, p5);
+            scenario.addPlayer(uidP6, p6);
+
+            c.scoreSet(p1, 11, p2, 3)
+                    .scoreSet(p3, 11, p4, 7)
+                    .reloadMatchMap()
+                    .scoreSet(p5, 11, p6, 1)
+                    .reloadMatchMap()
+                    .scoreSet(p3, 11, p5, 8)
+                    .reloadMatchMap()
+                    .scoreSet(p1, 11, p3, 4)
+                    .checkResult(p1, p3, p5, p4, p2, p6)
+                    .checkTournamentComplete(BidStatesDesc.restState(Lost)
+                            .bid(p5, Win3).bid(p3, Win2).bid(p1, Win1));
+        });
+    }
+
+    @Test
+    public void enlistToNewGroup() {
+        final TournamentScenario scenario = TournamentScenario
+                .begin()
+                .name("enlistToNewGroup")
+                .rules(RULES_G8Q1_S1A2G11)
+                .category(c1, p1, p2);
+        join2PlayersIntoNewGroup(scenario);
     }
 
     @Test

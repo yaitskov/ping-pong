@@ -29,13 +29,13 @@ angular.module('participant').
                                  return;
                              }
                              requestStatus.startLoading('Changing group');
-                             Participant.changeGroup(
-                                 {targetGid: targetGid,
-                                  expectedGid: self.bid.group.gid,
-                                  tid: $routeParams.tournamentId,
-                                  uid: $routeParams.participantId},
-                                 () => history.back(),
-                                 requestStatus.failed);
+                             let req = {expectedGid: self.bid.group.gid,
+                                        tid: $routeParams.tournamentId,
+                                        uid: $routeParams.participantId};
+                             if (targetGid !== 0) {
+                                 req.targetGid = targetGid;
+                             }
+                             Participant.changeGroup(req, () => history.back(), requestStatus.failed);
                          };
 
                          binder($scope, {

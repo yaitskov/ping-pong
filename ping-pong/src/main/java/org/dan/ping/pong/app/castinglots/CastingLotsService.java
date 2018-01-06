@@ -16,6 +16,7 @@ import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.FIRST_PLAY_OFF_
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.PLAY_OFF_SEEDS;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
+import static org.dan.ping.pong.app.playoff.PlayOffRule.L1_3P;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -42,6 +43,7 @@ import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.user.UserLink;
@@ -87,6 +89,23 @@ public class CastingLotsService {
 
     @Inject
     private GroupDivider groupDivider;
+
+    @Inject
+    private TournamentDao tournamentDao;
+
+    private void generatePlayOffRules(TournamentMemState tournament, DbUpdater batch) {
+        tournament.getRule().setPlayOff(Optional.of(L1_3P));
+        tournamentDao.updateParams(tournament.getTid(), tournament.getRule(), batch);
+    }
+
+    public int addGroup(TournamentMemState tournament, DbUpdater batch, int cid) {
+        if (!tournament.getRule().getPlayOff().isPresent()) {
+            generatePlayOffRules(tournament, batch);
+        }
+        final int gid = groupService.createGroup(tournament, cid);
+        recreatePlayOff(tournament, cid, batch);
+        return gid;
+    }
 
     @Transactional(TRANSACTION_MANAGER)
     public void seed(TournamentMemState tournament) {

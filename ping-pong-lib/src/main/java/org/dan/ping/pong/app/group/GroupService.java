@@ -61,6 +61,9 @@ public class GroupService {
     public Optional<List<MatchInfo>> checkGroupComplete(
             TournamentMemState tournament, int gid) {
         final List<MatchInfo> matches = findMatchesInGroup(tournament, gid);
+        if (matches.isEmpty()) {
+            return Optional.empty();
+        }
         final long completedMatches = matches.stream()
                 .map(MatchInfo::getState)
                 .filter(Over::equals)

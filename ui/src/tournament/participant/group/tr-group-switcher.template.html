@@ -17,11 +17,19 @@
   <div class="form-group" ng-show="$ctrl.groups">
     <ul>
       <li ng-repeat="group in $ctrl.groups">
-          <a title="Pick" class="btn"
-             ng-class="{'btn-default': $ctrl.bid.group.gid != group.gid, 'btn-primary': $ctrl.bid.group.gid == group.gid}"
+          <a title="Pick" class="btn btn-default"
+             ng-class="{'btn-primary': $ctrl.bid.group.gid == group.gid}"
              ng-click="$ctrl.assignGroup(group.gid)">
             {{group.label}}
           </a>
+      </li>
+      <li>
+        <a title="Pick" class="btn btn-default"
+           ng-class="{'btn-primary': $ctrl.bid.group.gid == 0}"
+           ng-click="$ctrl.assignGroup(0)">
+          <span class="glyphicon glyphicon-plus-sign"/>
+          {{ 'put-into-new-group' | translate }}
+        </a>
       </li>
     </ul>
   </div>

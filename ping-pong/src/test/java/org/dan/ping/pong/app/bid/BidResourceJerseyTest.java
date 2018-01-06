@@ -15,6 +15,7 @@ import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_LIST;
 import static org.dan.ping.pong.app.group.GroupResource.MEMBERS;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G3Q2_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -121,26 +122,9 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
         final TournamentGroups groupsInfo = myRest()
                 .get(GROUP_LIST + tid, TournamentGroups.class);
 
-        final int sourceGid = groupsInfo.getGroups().stream()
-                .map(groupInfo -> myRest().get(MEMBERS + tid + "/" + groupInfo.getGid(),
-                        GroupWithMembers.class))
-                .filter(members -> members.getMembers().stream()
-                        .anyMatch(member -> member.getUid().equals(uidP3)))
-                .map(GroupWithMembers::getGid)
-                .findAny()
-                .get();
+        final int sourceGid = findSourceGroup(uidP3, tid, groupsInfo);
 
-        myRest().voidPost(BID_CHANGE_GROUP, scenario.getTestAdmin(),
-                ChangeGroupReq.builder()
-                        .tid(scenario.getTid())
-                        .uid(uidP3)
-                        .expectedGid(sourceGid)
-                        .targetGid(groupsInfo.getGroups().stream()
-                                .filter(gi -> gi.getGid() != sourceGid)
-                                .map(GroupInfo::getGid)
-                                .findAny()
-                                .get())
-                        .build());
+        changeGroup(scenario, uidP3, sourceGid, findTargetGroup(groupsInfo, sourceGid));
 
         simulator.run(c -> c
                 .reloadMatchMap()
@@ -157,5 +141,70 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
                 .checkTournamentComplete(BidStatesDesc
                         .restState(Lost)
                         .bid(p1, Win1).bid(p3, Win2)));
+    }
+
+    private Optional<Integer> findTargetGroup(TournamentGroups groupsInfo, int sourceGid) {
+        return groupsInfo.getGroups().stream()
+                .filter(gi -> gi.getGid() != sourceGid)
+                .map(GroupInfo::getGid)
+                .findAny();
+    }
+
+    private Integer findSourceGroup(Uid uidP3, int tid, TournamentGroups groupsInfo) {
+        return groupsInfo.getGroups().stream()
+                .map(groupInfo -> myRest().get(MEMBERS + tid + "/" + groupInfo.getGid(),
+                        GroupWithMembers.class))
+                .filter(members -> members.getMembers().stream()
+                        .anyMatch(member -> member.getUid().equals(uidP3)))
+                .map(GroupWithMembers::getGid)
+                .findAny()
+                .get();
+    }
+
+    @Test
+    public void changeToNewGroupG3() {
+        final TournamentScenario scenario = begin()
+                .name("changeToNewGroupG3")
+                .rules(RULES_G8Q1_S1A2G11.withPlace(Optional.empty()))
+                .category(c1, p1, p2, p3, p4);
+
+        final ImperativeSimulator simulator = isf.create(scenario);
+        simulator.run(ImperativeSimulator::beginTournament);
+
+        final Uid uidP3 = scenario.player2Uid(p3);
+        final Uid uidP4 = scenario.player2Uid(p4);
+
+        final int tid = scenario.getTid().getTid();
+        final TournamentGroups groupsInfo = myRest()
+                .get(GROUP_LIST + tid, TournamentGroups.class);
+
+        final int sourceGid = findSourceGroup(uidP3, tid, groupsInfo);
+
+        changeGroup(scenario, uidP3, sourceGid, Optional.empty());
+        changeGroup(scenario, uidP4, sourceGid,
+                findTargetGroup(
+                        myRest().get(GROUP_LIST + tid, TournamentGroups.class),
+                        sourceGid));
+
+        simulator.run(c -> c
+                .reloadMatchMap()
+                .scoreSet(p1, 11, p2, 3)
+                .scoreSet(p3, 11, p4, 7)
+                .reloadMatchMap()
+                .scoreSet(p1, 11, p3, 4)
+                .checkResult(p1, p3, p4, p2)
+                .checkTournamentComplete(BidStatesDesc.restState(Lost)
+                        .bid(p3, Win2).bid(p1, Win1)));
+    }
+
+    private void changeGroup(TournamentScenario scenario, Uid uidP3,
+            int sourceGid, Optional<Integer> targetGid) {
+        myRest().voidPost(BID_CHANGE_GROUP, scenario.getTestAdmin(),
+                ChangeGroupReq.builder()
+                        .tid(scenario.getTid())
+                        .uid(uidP3)
+                        .expectedGid(sourceGid)
+                        .targetGid(targetGid)
+                        .build());
     }
 }

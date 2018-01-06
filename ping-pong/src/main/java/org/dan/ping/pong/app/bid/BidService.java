@@ -129,6 +129,8 @@ public class BidService {
     @Inject
     private CastingLotsService castingLotsService;
 
+
+
     public void changeGroup(TournamentMemState tournament, ChangeGroupReq req, DbUpdater batch) {
         log.info("Change group {}");
 
@@ -142,22 +144,24 @@ public class BidService {
             throw badRequest("Expected group is different",
                     "gid", bid.getGid());
         }
-        final Optional<Integer> opTargetGid = Optional.of(req.getTargetGid());
+        final Optional<Integer> opTargetGid = req.getTargetGid();
         if (bid.getGid().equals(opTargetGid)) {
             log.info("Target group is the same with expected");
             return;
         }
-        groupService.checkGroupComplete(tournament, req.getTargetGid())
+        req.getTargetGid().ifPresent(tGid -> groupService.checkGroupComplete(tournament, tGid)
                 .ifPresent(matches -> {
                     throw badRequest("target group is complete");
-                });
+                }));
+        final int targetGid = req.getTargetGid()
+                .orElseGet(() ->  castingLotsService.addGroup(tournament, batch, bid.getCid()));
         groupService.checkGroupComplete(tournament, req.getExpectedGid())
                 .ifPresent(matches -> {
                     throw badRequest("source group is complete");
                 });
 
-        bidDao.setGroupForUids(batch, req.getTargetGid(), req.getTid(), singletonList(bid));
-        bid.setGid(opTargetGid);
+        bidDao.setGroupForUids(batch, targetGid, req.getTid(), singletonList(bid));
+        bid.setGid(Optional.of(targetGid));
         // cancel matches in the source group
         cancelMatchesOf(tournament, req.getUid(), batch);
         // generate matches in target group

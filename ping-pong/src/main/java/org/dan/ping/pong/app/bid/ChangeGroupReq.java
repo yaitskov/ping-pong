@@ -8,6 +8,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.tournament.Tid;
 
+import java.util.Optional;
+
 @Getter
 @Setter
 @Builder
@@ -18,5 +20,5 @@ public class ChangeGroupReq {
     private Tid tid;
     private Uid uid;
     private int expectedGid;
-    private int targetGid;
+    private Optional<Integer> targetGid;
 }

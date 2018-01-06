@@ -467,12 +467,8 @@ public class TournamentService {
                 .build());
         final Instant now = clocker.get();
         if (tournament.getState() == Open && !enlistment.getGroupId().isPresent()) {
-            if (!tournament.getRule().getPlayOff().isPresent()) {
-                generatePlayOffRules(tournament, batch);
-            }
-            final int gid = groupService.createGroup(tournament, enlistment.getCid());
-            castingLotsService.recreatePlayOff(tournament, enlistment.getCid(), batch);
-            enlistment.setGroupId(Optional.of(gid));
+            enlistment.setGroupId(Optional.of(
+                    castingLotsService.addGroup(tournament, batch, enlistment.getCid())));
         }
         tournament.getParticipants().put(participantUid, ParticipantMemState.builder()
                 .bidState(enlistment.getBidState())
@@ -491,11 +487,6 @@ public class TournamentService {
                     castingLotsService.addParticipant(participantUid, tournament, batch));
         }
         return participantUid;
-    }
-
-    private void generatePlayOffRules(TournamentMemState tournament, DbUpdater batch) {
-        tournament.getRule().setPlayOff(Optional.of(L1_3P));
-        tournamentDao.updateParams(tournament.getTid(), tournament.getRule(), batch);
     }
 
     @Transactional(TRANSACTION_MANAGER)

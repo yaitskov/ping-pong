@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/yaitskov/ping-pong.svg?branch=master)](https://travis-ci.org/yaitskov/ping-pong)
+
 #  Cloud-Sport application
 
 Cloud-Sport application is designed for conducting sport tournaments

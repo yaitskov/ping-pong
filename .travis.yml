@@ -12,4 +12,5 @@ script:
   - mvn -P upgrade-db -pl setup-env/docker-containers install
   - mvn -pl ping-pong -am install
 deploy:
-  - echo "my deploy"
+  provider: script
+  script: echo "my deploy"

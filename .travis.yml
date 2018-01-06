@@ -2,8 +2,9 @@ sudo: false
 language: java
 before_script:
   - echo "USE mysql;\nUPDATE user SET password=PASSWORD('password') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
+  - mvn -P upgrade-db -pl setup-env/docker-containers install
+
 services:
   - mysql
 script:
   - cp .travis.settings.xml $HOME/.m2/settings.xml
-  - mvn -P upgrade-db install

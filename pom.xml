@@ -19,7 +19,8 @@
         <mysql.password>root</mysql.password>
         <mysql.user>root</mysql.user>
 
-        <exec.maven.plugin.version>1.4.0</exec.maven.plugin.version>
+        <sure.fire.version>2.20</sure.fire.version>
+        <exec.maven.plugin.version>1.6.0</exec.maven.plugin.version>
         <docker.plugin.version>0.20.1</docker.plugin.version>
     </properties>
 

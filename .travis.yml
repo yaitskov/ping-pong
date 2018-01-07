@@ -1,3 +1,6 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=590d735192c6c0ab0c140d100768f689dac3f31de9a014b4dfe3edd9155d3c7a
 sudo: false
 language: java
 cache:
@@ -9,6 +12,9 @@ install:
   - echo "my install"
 before_script:
   - echo "USE mysql;\nUPDATE user SET password=PASSWORD('root') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
 script:
   - echo "my script"
   - cp .travis.settings.xml $HOME/.m2/settings.xml
@@ -18,3 +24,4 @@ deploy:
   script: echo "my deploy"
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

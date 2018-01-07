@@ -61,7 +61,7 @@
                         <configuration>
                             <excludes>
                                 <exclude>org/dan/ping/pong/**/*$*Builder.class</exclude>
-                                <exclude>org/dan/ping/pong/**/jooq/**/*.class</exclude>
+                                <exclude>org/dan/ping/pong/jooq/**/*.class</exclude>
                             </excludes>
                         </configuration>
                         <executions>

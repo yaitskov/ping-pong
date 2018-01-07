@@ -4,7 +4,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
+import static org.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;

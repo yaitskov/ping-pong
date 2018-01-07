@@ -846,7 +846,7 @@
                             <relations>true</relations>
                         </generate>
                         <target>
-                            <packageName>ord.dan.ping.pong.jooq</packageName>
+                            <packageName>org.dan.ping.pong.jooq</packageName>
                             <directory>target/generated-sources/</directory>
                         </target>
                     </generator>

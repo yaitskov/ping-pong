@@ -1,9 +1,9 @@
 package org.dan.ping.pong.app.user;
 
 import static java.util.Optional.ofNullable;
-import static ord.dan.ping.pong.jooq.Tables.ADMIN;
-import static ord.dan.ping.pong.jooq.Tables.USERS;
-import static ord.dan.ping.pong.jooq.tables.Sessions.SESSIONS;
+import static org.dan.ping.pong.jooq.Tables.ADMIN;
+import static org.dan.ping.pong.jooq.Tables.USERS;
+import static org.dan.ping.pong.jooq.tables.Sessions.SESSIONS;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 

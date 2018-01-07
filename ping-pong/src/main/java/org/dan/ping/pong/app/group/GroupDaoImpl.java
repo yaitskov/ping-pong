@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.group;
 
 import static java.util.stream.Collectors.toMap;
-import static ord.dan.ping.pong.jooq.Tables.GROUPS;
+import static org.dan.ping.pong.jooq.Tables.GROUPS;
 import static org.dan.ping.pong.app.castinglots.GroupState.Open;
 
 import lombok.extern.slf4j.Slf4j;

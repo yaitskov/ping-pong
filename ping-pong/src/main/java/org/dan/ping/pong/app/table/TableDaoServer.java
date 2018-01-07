@@ -4,7 +4,7 @@ import static com.google.common.primitives.Ints.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
-import static ord.dan.ping.pong.jooq.tables.Tables.TABLES;
+import static org.dan.ping.pong.jooq.tables.Tables.TABLES;
 import static org.dan.ping.pong.app.table.TableState.Busy;
 import static org.dan.ping.pong.app.table.TableState.Free;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -14,7 +14,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
-import ord.dan.ping.pong.jooq.Tables;
+import org.dan.ping.pong.jooq.Tables;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.sys.db.DbUpdateSql;

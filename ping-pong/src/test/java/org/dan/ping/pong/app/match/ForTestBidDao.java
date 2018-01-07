@@ -1,10 +1,10 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Optional.ofNullable;
-import static ord.dan.ping.pong.jooq.tables.Bid.BID;
+import static org.dan.ping.pong.jooq.tables.Bid.BID;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
-import ord.dan.ping.pong.jooq.Tables;
+import org.dan.ping.pong.jooq.Tables;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.bid.Uid;

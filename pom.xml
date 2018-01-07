@@ -12,6 +12,17 @@
     <name>Cloud Sport</name>
     <url>http://cloud-sport.org</url>
 
+    <properties>
+        <docker.network>classes_default</docker.network>
+        <mysql.host>127.0.0.1</mysql.host>
+        <mysql.port>3306</mysql.port>
+        <mysql.password>root</mysql.password>
+        <mysql.user>root</mysql.user>
+
+        <exec.maven.plugin.version>1.4.0</exec.maven.plugin.version>
+        <docker.plugin.version>0.20.1</docker.plugin.version>
+    </properties>
+
     <modules>
         <module>build-parent</module>
         <module>setup-env</module>

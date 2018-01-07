@@ -3,13 +3,4 @@
   xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
                       https://maven.apache.org/xsd/settings-1.0.0.xsd">
 
-  <!-- <mirrors> -->
-  <!--   <mirror> -->
-  <!--     <id>planetmirror.com</id> -->
-  <!--     <name>PlanetMirror Australia</name> -->
-  <!--     <url>http://downloads.planetmirror.com/pub/maven2</url> -->
-  <!--     <mirrorOf>central</mirrorOf> -->
-  <!--   </mirror> -->
-  <!-- </mirrors> -->
-
 </settings>

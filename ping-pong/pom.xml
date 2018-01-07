@@ -69,7 +69,7 @@
         </dependency>
         <dependency>
             <groupId>org.dan.ping.pong</groupId>
-            <artifactId>setup-env</artifactId>
+            <artifactId>docker-containers</artifactId>
             <version>${project.parent.version}</version>
             <type>pom</type>
         </dependency>

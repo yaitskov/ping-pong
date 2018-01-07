@@ -38,7 +38,11 @@ public class Generators {
     }
 
     public static String genPhone() {
-        return genStr().replaceAll("[^0-9]+", "").substring(0, 10);
+        final String result = genStr().replaceAll("[^0-9]+", "");
+        if (result.length() > 10) {
+            return result.substring(0, 9);
+        }
+        return result;
     }
 
     public static int genOrder() {

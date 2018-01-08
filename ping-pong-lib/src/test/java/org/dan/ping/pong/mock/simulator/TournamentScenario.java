@@ -22,7 +22,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
-import org.dan.ping.pong.app.match.MatchValidationRule;
+import org.dan.ping.pong.app.sport.Sport;
+import org.dan.ping.pong.app.sport.SportType;
+import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentRules;
@@ -45,6 +47,7 @@ import java.util.stream.Stream;
 @Getter
 @ToString(of = {"uidPlayer", "categoryDbId", "tid", "placeId", "params"})
 public class TournamentScenario implements SessionAware {
+    private SportType sport = SportType.PingPong;
     private Optional<String> name = empty();
     private final Multimap<Set<Player>, GameEnd> groupMatches = ArrayListMultimap.create();
     private final Multimap<Set<Player>, GameEnd> playOffMatches = ArrayListMultimap.create();
@@ -96,6 +99,11 @@ public class TournamentScenario implements SessionAware {
 
     public TournamentScenario onFailure(Consumer<TournamentScenario> cb){
         this.onFailure = Optional.of(cb);
+        return this;
+    }
+
+    public TournamentScenario sport(SportType type) {
+        sport = type;
         return this;
     }
 
@@ -223,13 +231,13 @@ public class TournamentScenario implements SessionAware {
 
     public TournamentScenario match(
             Player pa, MatchOutcome outcome, Player pb,
-            MatchValidationRule matchRules) {
+            PingPongMatchRules matchRules) {
         return match(pa, outcome, pb,
                 createRndGen(pa, outcome, pb, matchRules));
     }
 
     public static RndSetGenerator createRndGen(Player pa, MatchOutcome outcome, Player pb,
-            MatchValidationRule matchRules) {
+            PingPongMatchRules matchRules) {
         return new RndSetGenerator(
                 ImmutableMap.of(pa, outcome.first(), pb, outcome.second()),
                 matchRules);

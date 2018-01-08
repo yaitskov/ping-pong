@@ -13,7 +13,7 @@ import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.match.MatchValidationRule;
+import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.tournament.CumulativeScore;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -99,7 +99,7 @@ public class PlayOffService {
                 .orElse(0);
         final Map<Uid, CumulativeScore> uidLevel = new HashMap<>();
         Collection<MatchInfo> baseMatches = findBaseMatches(cidPlayOffMatches);
-        final MatchValidationRule matchRules = tournament.getRule().getMatch();
+        final PingPongMatchRules matchRules = tournament.getRule().getMatch();
         while (true) {
             groupService.ranksLevelMatches(tournament, level++, uidLevel, baseMatches, matchRules);
             final Collection<MatchInfo> nextLevel = findNextMatches(tournament.getMatches(), baseMatches);
@@ -175,7 +175,7 @@ public class PlayOffService {
                             .forEach(uid -> participants.computeIfAbsent(uid,
                                     (u -> tournament.getParticipant(u).getName())));
 
-                    final MatchValidationRule matchRules = tournament.getRule().getMatch();
+                    final PingPongMatchRules matchRules = tournament.getRule().getMatch();
                     final Map<Uid, Integer> score = matchRules
                             .calcWonSets(m.getParticipantIdScore());
                     matches.add(PlayOffMatch.builder()
@@ -194,7 +194,7 @@ public class PlayOffService {
                 .build();
     }
 
-    private boolean isWalkOver(MatchInfo m, MatchValidationRule matchRules, Map<Uid, Integer> score) {
+    private boolean isWalkOver(MatchInfo m, PingPongMatchRules matchRules, Map<Uid, Integer> score) {
         if (m.getState() != Over) {
             return false;
         }

@@ -5,7 +5,7 @@ import static org.dan.ping.pong.app.tournament.rules.GroupRuleValidator.VALUE_NU
 import static org.dan.ping.pong.app.tournament.rules.ValidationError.ofTemplate;
 
 import com.google.common.collect.Multimap;
-import org.dan.ping.pong.app.match.MatchValidationRule;
+import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 
 public class MatchRuleValidator {
     private static final String MATCH_RULE = "match-rule";
@@ -13,7 +13,7 @@ public class MatchRuleValidator {
     private static final String MIN_POSSIBLE_GAMES = ".min-possible-games";
     private static final String MIN_GAMES_TO_WIN = ".min-games-to-win";
 
-    public void validate(Multimap<String, ValidationError> errors, MatchValidationRule rule) {
+    public void validate(Multimap<String, ValidationError> errors, PingPongMatchRules rule) {
         if (rule == null) {
             errors.put(MATCH_RULE, ofTemplate(VALUE_NULL));
             return;

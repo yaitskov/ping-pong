@@ -15,7 +15,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.match.MatchValidationRule;
+import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -72,7 +72,7 @@ public class GroupServiceTest {
                         .groups(groups).build();
     }
 
-    public static final MatchValidationRule S1A2G11 = MatchValidationRule.builder()
+    public static final PingPongMatchRules S1A2G11 = PingPongMatchRules.builder()
             .setsToWin(1)
             .minAdvanceInGames(2)
             .minPossibleGames(0)

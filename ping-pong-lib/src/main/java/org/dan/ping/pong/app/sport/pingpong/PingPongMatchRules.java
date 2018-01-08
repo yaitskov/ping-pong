@@ -1,6 +1,5 @@
-package org.dan.ping.pong.app.match;
+package org.dan.ping.pong.app.sport.pingpong;
 
-import static org.apache.commons.lang3.ObjectUtils.min;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import com.google.common.collect.ImmutableMap;
@@ -10,8 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Wither;
-import org.apache.commons.lang3.ObjectUtils;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.sport.MatchRules;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,48 +20,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.swing.text.html.Option;
-
 @Getter
 @Setter
 @Wither
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MatchValidationRule {
-    public static final String SET = "set";
-    public static final String MIN_POSSIBLE_GAMES = "minPossibleGames";
-    private static final String MIN_GAMES_TO_WIN = "minGamesToWin";
-
+public class PingPongMatchRules implements MatchRules {
     private int minGamesToWin;
     private int minAdvanceInGames;
     private int minPossibleGames;
     private int setsToWin;
-
-    public void validateSet(int iset, List<IdentifiedScore> setScore) {
-        int aGames = setScore.get(0).getScore();
-        int bGames = setScore.get(1).getScore();
-        int maxGames = Math.max(aGames, bGames);
-        int minGames = Math.min(aGames, bGames);
-        if (minGames < minPossibleGames) {
-            throw badRequest("Games cannot be less than",
-                    ImmutableMap.of(SET, iset,
-                            MIN_POSSIBLE_GAMES, minPossibleGames));
-        }
-        if (maxGames < minGamesToWin) {
-            throw badRequest("Winner should have at least n games",
-                    ImmutableMap.of(SET, iset,
-                            MIN_GAMES_TO_WIN, minGamesToWin));
-        }
-        if (maxGames - minGames < minAdvanceInGames) {
-            throw badRequest("Difference between games cannot be less than",
-                    ImmutableMap.of(SET, iset,
-                            "minAdvanceInGames", minAdvanceInGames));
-        }
-        if (maxGames > minGamesToWin && maxGames - minGames > minAdvanceInGames) {
-            throw badRequest("Winner games are to big", SET, iset);
-        }
-    }
 
     public Map<Uid, Integer> calcWonSets(Map<Uid, List<Integer>> participantScores) {
         final List<Uid> uids = new ArrayList<>(participantScores.keySet());

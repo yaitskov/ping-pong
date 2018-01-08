@@ -11,6 +11,7 @@ import org.dan.ping.pong.app.match.MatchCtx;
 import org.dan.ping.pong.app.place.PlaceCtx;
 import org.dan.ping.pong.app.sched.ScheduleCtx;
 import org.dan.ping.pong.app.score.MatchScoreCtx;
+import org.dan.ping.pong.app.sport.SportCtx;
 import org.dan.ping.pong.app.table.TableCtx;
 import org.dan.ping.pong.app.tournament.TournamentCtx;
 import org.dan.ping.pong.app.user.UserCtx;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         AuthCtx.class,
         UserCtx.class,
         PlaceCtx.class,
+        SportCtx.class,
         CategoryCtx.class,
         GroupCtx.class,
         BidCtx.class,

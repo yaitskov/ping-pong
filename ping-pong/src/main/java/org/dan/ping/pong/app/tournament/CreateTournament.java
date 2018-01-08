@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import static lombok.AccessLevel.PRIVATE;
+import static org.dan.ping.pong.app.sport.SportType.PingPong;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.place.Pid;
+import org.dan.ping.pong.app.sport.SportType;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -26,9 +28,11 @@ public class CreateTournament {
     private Pid placeId;
     private TournamentRules rules;
     private Optional<Double> ticketPrice = Optional.empty();
+    private SportType sport = PingPong;
 
     public static class CreateTournamentBuilder {
         Optional<Double> ticketPrice = Optional.empty();
         Optional<Tid> previousTid = Optional.empty();
+        SportType sport = PingPong;
     }
 }

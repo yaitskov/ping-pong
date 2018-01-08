@@ -479,6 +479,11 @@
                                     <binding>org.dan.ping.pong.sys.db.converters.PidConverter</binding>
                                 </customType>
                                 <customType>
+                                    <name>SportType</name>
+                                    <type>org.dan.ping.pong.app.sport.SportType</type>
+                                    <binding>org.dan.ping.pong.app.sport.SportTypeConverter</binding>
+                                </customType>
+                                <customType>
                                     <name>DisputeStatus</name>
                                     <type>org.dan.ping.pong.app.match.dispute.DisputeStatus</type>
                                     <binding>org.dan.ping.pong.app.match.dispute.DisputeStateConverter</binding>
@@ -623,6 +628,11 @@
                                 <forcedType>
                                     <name>Pid</name>
                                     <expression>.*place\.(pid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>SportType</name>
+                                    <expression>.*tournament\.(sport)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

@@ -4,7 +4,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toMap;
 
 import com.google.common.collect.ImmutableMap;
-import org.dan.ping.pong.app.match.MatchValidationRule;
+import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 
 import java.util.Comparator;
 import java.util.List;
@@ -14,14 +14,14 @@ import java.util.Random;
 public class RndSetGenerator implements SetGenerator {
     private final Map<Player, Integer> targetSets;
     private final Map<Player, Integer> currentSets;
-    private final MatchValidationRule rule;
+    private final PingPongMatchRules rule;
     private final Player winer;
     private final Player loser;
     private final List<Player> players;
     private final Random random = new Random();
     private int setNumber;
 
-    public RndSetGenerator(Map<Player, Integer> targetSets, MatchValidationRule rule) {
+    public RndSetGenerator(Map<Player, Integer> targetSets, PingPongMatchRules rule) {
         this.targetSets = targetSets;
         winer = targetSets.entrySet().stream()
                 .max(Comparator.comparingInt(Map.Entry::getValue))

@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.tournament.Tid;
 
 import java.time.Duration;
@@ -160,8 +161,12 @@ public class MatchInfo {
         return setScore;
     }
 
-    public Optional<Uid> addSetScore(List<IdentifiedScore> scores, MatchValidationRule rule) {
+    public void addSetScore(List<IdentifiedScore> scores) {
         scores.forEach(score -> participantIdScore.get(score.getUid()).add(score.getScore()));
+    }
+
+    public Optional<Uid> addSetScore(List<IdentifiedScore> scores, PingPongMatchRules rule) {
+        addSetScore(scores);
         return rule.findWinnerId(rule.calcWonSets(getParticipantIdScore()));
     }
 

@@ -31,6 +31,8 @@ import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
+import org.dan.ping.pong.app.sport.Sports;
+import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentService;
@@ -115,7 +117,7 @@ public class MatchEditorService {
 
     private Optional<Uid> findNewWinnerUid(TournamentMemState tournament,
             Map<Uid, List<Integer>> newSets, MatchInfo minfo) {
-        final MatchValidationRule matchRule = tournament.getRule().getMatch();
+        final PingPongMatchRules matchRule = tournament.getRule().getMatch();
 
         if (minfo.getWinnerId().isPresent()) {
             final Optional<Uid> actualPracticalWinnerUid = matchRule.findWinner(minfo);
@@ -379,6 +381,9 @@ public class MatchEditorService {
 
     private static final Set<TournamentState> openOrClose = ImmutableSet.of(Open, Close);
 
+    @Inject
+    private Sports sports;
+
     private void validateRescoreMatch(TournamentMemState tournament, MatchInfo mInfo,
             Map<Uid, List<Integer>> newSets) {
         if (!openOrClose.contains(tournament.getState())) {
@@ -390,7 +395,7 @@ public class MatchEditorService {
         if (!mInfo.getParticipantIdScore().keySet().equals(newSets.keySet())) {
             throw badRequest("match has different participants");
         }
-        final MatchValidationRule matchRules = tournament.getRule().getMatch();
+        final PingPongMatchRules matchRules = tournament.getRule().getMatch();
         final Iterator<Uid> uidIterator = newSets.keySet().iterator();
         final Uid uid1 = uidIterator.next();
         final Uid uid2 = uidIterator.next();
@@ -402,18 +407,11 @@ public class MatchEditorService {
         if (score1.size() == 0) {
             throw badRequest("new match score has no any set");
         }
-        for (int iset = 0; iset < score2.size(); ++iset) {
-            matchRules.validateSet(
-                    iset,
-                    asList(IdentifiedScore.builder()
-                                    .score(score1.get(iset))
-                                    .uid(uid1)
-                                    .build(),
-                            IdentifiedScore.builder()
-                                    .score(score2.get(iset))
-                                    .uid(uid2)
-                                    .build()));
-        }
+
+        final MatchInfo mInfoExpectedAfter = mInfo.clone();
+        mInfoExpectedAfter.setParticipantIdScore(newSets);
+
+        sports.validateMatch(tournament, mInfoExpectedAfter);
         matchRules.checkWonSets(matchRules.calcWonSets(newSets));
     }
 

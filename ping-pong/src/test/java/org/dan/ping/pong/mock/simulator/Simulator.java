@@ -69,7 +69,6 @@ import javax.ws.rs.core.Response;
 
 @Slf4j
 public class Simulator {
-
     private TestUserSession testAdmin;
 
     @Inject
@@ -367,6 +366,7 @@ public class Simulator {
         final Tid tid = daoGenerator.genTournament(prefix, testAdmin.getUid(),
                 scenario.getPlaceId(), TournamentProps.builder()
                         .rules(scenario.getRules())
+                        .sport(scenario.getSport())
                         .state(TournamentState.Draft)
                         .build());
         scenario.setTid(tid);

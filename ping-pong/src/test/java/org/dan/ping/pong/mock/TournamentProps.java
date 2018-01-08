@@ -3,6 +3,7 @@ package org.dan.ping.pong.mock;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.Wither;
+import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
 
@@ -16,6 +17,7 @@ public class TournamentProps {
     private TournamentRules rules;
     private TournamentState state;
     private Optional<Instant> opensAt;
+    private SportType sport;
 
     public static class TournamentPropsBuilder {
         private TournamentState state = TournamentState.Draft;

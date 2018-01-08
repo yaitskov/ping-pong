@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
 import static com.google.common.primitives.Ints.asList;
-import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
@@ -10,43 +9,48 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
 import org.dan.ping.pong.app.bid.Uid;
-import org.dan.ping.pong.app.match.IdentifiedScore;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.match.MatchValidationRule;
+import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
+import org.dan.ping.pong.app.sport.pingpong.PingPongSport;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-public class MatchValidationRuleUnitTest {
-    public static final MatchValidationRule PING_PONG_RULE = MatchValidationRule.builder()
+public class PingPongMatchRulesUnitTest {
+    public static final PingPongMatchRules PING_PONG_RULE = PingPongMatchRules.builder()
             .minGamesToWin(11)
             .minPossibleGames(0)
             .minAdvanceInGames(2)
             .setsToWin(3)
             .build();
 
-    private static final MatchValidationRule TENNIS_RULE = MatchValidationRule.builder()
-            .minGamesToWin(6)
-            .minPossibleGames(0)
-            .minAdvanceInGames(2)
-            .setsToWin(2)
-            .build();
+    private static final PingPongSport RULES = new PingPongSport();
+
     private static final Uid UID_A = new Uid(1);
     private static final Uid UID_B = new Uid(2);
 
-
     @Test
     public void validatePass() {
-        PING_PONG_RULE.validateSet(0, scores(11, 0));
-        PING_PONG_RULE.validateSet(0, scores(0, 11));
-        PING_PONG_RULE.validateSet(0, scores(9, 11));
-        PING_PONG_RULE.validateSet(0, scores(11, 9));
-        PING_PONG_RULE.validateSet(0, scores(15, 13));
-        TENNIS_RULE.validateSet(0, scores(6, 4));
+        validate(11, 0);
+        validate(0, 11);
+        validate(9, 11);
+        validate(11, 9);
+        validate(15, 13);
+    }
+
+    private void validate(int a, int b) {
+        RULES.validate(PING_PONG_RULE, match(a, b));
+    }
+
+    private MatchInfo match(int a, int b) {
+        return MatchInfo.builder()
+                .participantIdScore(
+                        ImmutableMap.of(UID_A, asList(a),
+                                UID_B, asList(b)))
+                .build();
     }
 
     @Rule
@@ -56,27 +60,21 @@ public class MatchValidationRuleUnitTest {
     public void validateFailsOnMaxGamesToSmall() {
         thrown.expect(hasProperty("message",
                 containsString("Winner should have at least")));
-        PING_PONG_RULE.validateSet(0, scores(10, 0));
+        validate(10, 0);
     }
 
     @Test
     public void validateFailsOnNegaiteveGames() {
         thrown.expect(hasProperty("message",
                 containsString("Games cannot be less than")));
-        PING_PONG_RULE.validateSet(0, scores(10, -1));
+        validate(10, -1);
     }
 
     @Test
     public void validateFailsOnCloseGames() {
         thrown.expect(hasProperty("message",
                 containsString("Difference between games cannot be less than")));
-        PING_PONG_RULE.validateSet(0, scores(11, 10));
-    }
-
-    private List<IdentifiedScore> scores(int scoreA, int scoreB) {
-        return Stream.of(scoreA, scoreB)
-                .map(s -> IdentifiedScore.builder().uid(UID_A).score(s).build())
-                .collect(toList());
+        validate(11, 10);
     }
 
     @Test

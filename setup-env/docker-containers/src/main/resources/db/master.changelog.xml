@@ -9,4 +9,5 @@
     <include relativeToChangelogFile="true" file="r1.0.005.start.schema.changelog.sql"/>
     <include relativeToChangelogFile="true" file="r1.0.006.dispute.changelog.sql"/>
     <include relativeToChangelogFile="true" file="r1.0.007.extend.user.name.length.changelog.sql"/>
+    <include relativeToChangelogFile="true" file="r1.0.008.sport.changelog.sql"/>
 </databaseChangeLog>

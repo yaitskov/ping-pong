@@ -87,6 +87,7 @@ public class TournamentDao {
                 TOURNAMENT.PREVIOUS_TID,
                 TOURNAMENT.RULES,
                 TOURNAMENT.TICKET_PRICE,
+                TOURNAMENT.SPORT,
                 TOURNAMENT.NAME)
                 .values(hidden,
                         newTournament.getOpensAt(),
@@ -94,6 +95,7 @@ public class TournamentDao {
                         newTournament.getPreviousTid().map(Tid::getTid),
                         newTournament.getRules(),
                         newTournament.getTicketPrice(),
+                        newTournament.getSport(),
                         newTournament.getName())
                 .returning(TOURNAMENT.TID)
                 .fetchOne()
@@ -449,7 +451,7 @@ public class TournamentDao {
 
     public Optional<TournamentRow> getRow(Tid tid) {
         return ofNullable(jooq
-                .select(TOURNAMENT.PID, TOURNAMENT.RULES,
+                .select(TOURNAMENT.PID, TOURNAMENT.RULES, TOURNAMENT.SPORT,
                         TOURNAMENT.COMPLETE_AT, TOURNAMENT.OPENS_AT,
                         TOURNAMENT.NAME, TOURNAMENT.STATE, TOURNAMENT.TICKET_PRICE,
                         TOURNAMENT.PREVIOUS_TID)
@@ -458,6 +460,7 @@ public class TournamentDao {
                 .fetchOne())
                 .map(r -> TournamentRow.builder()
                         .pid(r.get(TOURNAMENT.PID))
+                        .sport(r.get(TOURNAMENT.SPORT))
                         .endedAt(r.get(TOURNAMENT.COMPLETE_AT))
                         .startedAt(r.get(TOURNAMENT.OPENS_AT))
                         .name(r.get(TOURNAMENT.NAME))

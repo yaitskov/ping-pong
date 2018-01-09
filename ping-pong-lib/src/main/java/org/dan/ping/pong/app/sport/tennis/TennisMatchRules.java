@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Wither;
 import org.dan.ping.pong.app.sport.MatchRules;
+import org.dan.ping.pong.app.sport.SportType;
 
 @Getter
 @Setter
@@ -20,4 +21,8 @@ public class TennisMatchRules implements MatchRules {
     private int minPossibleGames; // 0
     private int setsToWin; // 2
     private int tieBreakGames;  // 10
+
+    public SportType sport() {
+        return SportType.Tennis;
+    }
 }

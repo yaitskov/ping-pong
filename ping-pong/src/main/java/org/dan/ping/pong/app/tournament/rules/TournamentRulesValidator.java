@@ -5,6 +5,7 @@ import static org.dan.ping.pong.app.tournament.rules.ValidationError.ofTemplate;
 import com.google.common.collect.Multimap;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRuleValidator;
 import org.dan.ping.pong.app.playoff.PlayOffRuleValidator;
+import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 
 import javax.inject.Inject;
@@ -16,7 +17,7 @@ public class TournamentRulesValidator {
     private GroupRuleValidator groupRuleValidator;
 
     @Inject
-    private MatchRuleValidator matchRuleValidator;
+    private Sports sports;
 
     @Inject
     private CastingLotsRuleValidator rankValidator;
@@ -31,6 +32,6 @@ public class TournamentRulesValidator {
             errors.put(TOURNAMENT_RULES, ofTemplate("no-group-nor-playoff"));
         }
         rankValidator.validate(errors, rules.getCasting());
-        matchRuleValidator.validate(errors, rules.getMatch());
+        sports.validateMatch(rules.getMatch().sport(), errors, rules.getMatch());
     }
 }

@@ -3,10 +3,12 @@ package org.dan.ping.pong.app.sport;
 import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
+import com.google.common.collect.Multimap;
 import lombok.RequiredArgsConstructor;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
+import org.dan.ping.pong.app.tournament.rules.ValidationError;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,10 @@ public class Sports {
 
     public Sport get(SportType type) {
         return ofNullable(sports.get(type)).orElseThrow(() -> internalError("no sport " + type));
+    }
+
+    public void validateMatch(SportType sport, Multimap<String, ValidationError> errors, MatchRules rules) {
+        get(sport).validate(errors, rules);
     }
 
     public void validateMatch(TournamentMemState tournament, MatchInfo match) {

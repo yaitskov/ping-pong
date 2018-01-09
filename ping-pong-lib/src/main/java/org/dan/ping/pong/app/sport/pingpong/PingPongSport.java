@@ -3,13 +3,14 @@ package org.dan.ping.pong.app.sport.pingpong;
 import static org.dan.ping.pong.app.sport.SportType.PingPong;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.sport.MatchRules;
 import org.dan.ping.pong.app.sport.Sport;
 import org.dan.ping.pong.app.sport.SportType;
+import org.dan.ping.pong.app.tournament.rules.MatchRuleValidator;
+import org.dan.ping.pong.app.tournament.rules.ValidationError;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +26,8 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
     private static final String MIN_GAMES_TO_WIN = "minGamesToWin";
 
     @Override
-    public void validate(PingPongMatchRules rules) {
+    public void validate(Multimap<String, ValidationError> errors, PingPongMatchRules rules) {
+        MatchRuleValidator.validate(errors, rules);
     }
 
     @Override
@@ -64,11 +66,6 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
                 && maxGames - minGames > rules.getMinAdvanceInGames()) {
             throw badRequest("Winner games are to big", SET, iSet);
         }
-    }
-
-    @Override
-    public MatchRules parse(JsonNode node) {
-        return null;
     }
 
     @Override

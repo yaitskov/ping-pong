@@ -37,7 +37,6 @@ import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.sport.Sports;
-import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.tournament.CumulativeScore;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -497,7 +496,6 @@ public class GroupService {
 
     public List<TournamentResultEntry> resultOfAllGroupsInCategory(TournamentMemState tournament, int cid) {
         final List<GroupInfo> groups = tournament.getGroupsByCategory(cid);
-        final PingPongMatchRules matchRules = tournament.getRule().getMatch();
         return tournament.getRule().getGroup().map(groupRules ->
                 newArrayList(
                         mergeSorted(groups.stream()

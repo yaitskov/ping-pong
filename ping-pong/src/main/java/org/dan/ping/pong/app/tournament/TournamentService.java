@@ -386,6 +386,9 @@ public class TournamentService {
         if (!CONFIGURABLE_STATES.contains(tournament.getState())) {
             throw badRequest("Tournament could be modified until it's open");
         }
+        if (tournament.getSport() != parameters.getRules().getMatch().sport()) {
+            throw badRequest("sport mismatch");
+        }
         tournament.setRule(parameters.getRules());
         tournamentDao.updateParams(tournament.getTid(), tournament.getRule(), batch);
     }

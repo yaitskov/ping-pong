@@ -13,7 +13,7 @@ public class MatchRuleValidator {
     private static final String MIN_POSSIBLE_GAMES = ".min-possible-games";
     private static final String MIN_GAMES_TO_WIN = ".min-games-to-win";
 
-    public void validate(Multimap<String, ValidationError> errors, PingPongMatchRules rule) {
+    public static void validate(Multimap<String, ValidationError> errors, PingPongMatchRules rule) {
         if (rule == null) {
             errors.put(MATCH_RULE, ofTemplate(VALUE_NULL));
             return;

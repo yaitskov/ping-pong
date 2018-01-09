@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.sport;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 
 import java.util.List;
 import java.util.Map;
@@ -22,4 +23,6 @@ public interface Sport<T extends MatchRules> {
     Optional<Uid> findWinnerId(T rules, Map<Uid, Integer> wonSets);
 
     Optional<Uid> findStronger(Map<Uid, Integer> wonSets);
+
+    void checkWonSets(PingPongMatchRules rules, Map<Uid, Integer> uidWonSets);
 }

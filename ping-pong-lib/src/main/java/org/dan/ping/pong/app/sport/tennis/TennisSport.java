@@ -8,6 +8,7 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.sport.MatchRules;
 import org.dan.ping.pong.app.sport.Sport;
 import org.dan.ping.pong.app.sport.SportType;
+import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,10 @@ public class TennisSport implements Sport<TennisMatchRules> {
 
     @Override
     public Optional<Uid> findStronger(Map<Uid, Integer> wonSets) {
+        throw new IllegalStateException();
+    }
+
+    public void checkWonSets(PingPongMatchRules rules, Map<Uid, Integer> uidWonSets) {
         throw new IllegalStateException();
     }
 }

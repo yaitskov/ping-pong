@@ -1,6 +1,5 @@
 package org.dan.ping.pong.app.match;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
@@ -32,7 +31,6 @@ import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.sport.Sports;
-import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentService;
@@ -393,7 +391,6 @@ public class MatchEditorService {
         if (!mInfo.getParticipantIdScore().keySet().equals(newSets.keySet())) {
             throw badRequest("match has different participants");
         }
-        final PingPongMatchRules matchRules = tournament.getRule().getMatch();
         final Iterator<Uid> uidIterator = newSets.keySet().iterator();
         final Uid uid1 = uidIterator.next();
         final Uid uid2 = uidIterator.next();
@@ -410,7 +407,7 @@ public class MatchEditorService {
         mInfoExpectedAfter.setParticipantIdScore(newSets);
 
         sports.validateMatch(tournament, mInfoExpectedAfter);
-        matchRules.checkWonSets(sports.calcWonSets(tournament, mInfoExpectedAfter));
+        sports.checkWonSets(tournament, sports.calcWonSets(tournament, mInfoExpectedAfter));
     }
 
     public void resetMatchScore(TournamentMemState tournament, ResetSetScore reset, DbUpdater batch) {

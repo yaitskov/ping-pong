@@ -19,5 +19,5 @@ public class TennisMatchRules implements MatchRules {
     private int minAdvanceInGames; // 2
     private int minPossibleGames; // 0
     private int setsToWin; // 2
-    private int tieBreak;  // 10
+    private int tieBreakGames;  // 10
 }

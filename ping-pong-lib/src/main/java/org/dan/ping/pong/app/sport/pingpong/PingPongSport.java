@@ -12,6 +12,7 @@ import org.dan.ping.pong.app.sport.Sport;
 import org.dan.ping.pong.app.sport.SportType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -121,6 +122,21 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
             return Optional.of(uids.get(0));
         } else {
             return Optional.empty();
+        }
+    }
+
+    public void checkWonSets(PingPongMatchRules rules, Map<Uid, Integer> uidWonSets) {
+        final Collection<Integer> wonSets = uidWonSets.values();
+        wonSets.stream()
+                .filter(n -> n >  rules.getSetsToWin()).findAny()
+                .ifPresent(o -> {
+                    throw badRequest("won sets more that required");
+                });
+        final long winners = wonSets.stream()
+                .filter(n -> n == rules.getSetsToWin())
+                .count();
+        if (winners > 1) {
+            throw badRequest("winners are more that 1");
         }
     }
 }

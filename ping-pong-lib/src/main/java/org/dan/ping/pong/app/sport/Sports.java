@@ -45,4 +45,9 @@ public class Sports {
         final Sport sport = get(tournament.getSport());
         return sport.findStronger(sport.calcWonSets(mInfo.getParticipantIdScore()));
     }
+
+    public void checkWonSets(TournamentMemState tournament, Map<Uid, Integer> uidWonSets) {
+        final Sport sport = get(tournament.getSport());
+        sport.checkWonSets(tournament.getRule().getMatch(), uidWonSets);
+    }
 }

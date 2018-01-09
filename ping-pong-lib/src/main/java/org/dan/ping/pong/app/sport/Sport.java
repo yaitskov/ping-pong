@@ -3,7 +3,6 @@ package org.dan.ping.pong.app.sport;
 import com.google.common.collect.Multimap;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.tournament.rules.ValidationError;
 
 import java.util.List;
@@ -23,5 +22,5 @@ public interface Sport<T extends MatchRules> {
 
     Optional<Uid> findStronger(Map<Uid, Integer> wonSets);
 
-    void checkWonSets(PingPongMatchRules rules, Map<Uid, Integer> uidWonSets);
+    void checkWonSets(T rules, Map<Uid, Integer> uidWonSets);
 }

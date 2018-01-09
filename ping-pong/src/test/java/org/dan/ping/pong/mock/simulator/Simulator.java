@@ -317,7 +317,7 @@ public class Simulator {
                 Iterator<Player> iterator = players.iterator();
                 return Optional.of(GameEnd.game(iterator.next(),
                         scenario.getAutoResolution().get().choose(players),
-                        iterator.next(), scenario.getRules().getMatch()));
+                        iterator.next()));
             }
             if (scenario.isIgnoreUnexpectedGames()) {
                 return empty();

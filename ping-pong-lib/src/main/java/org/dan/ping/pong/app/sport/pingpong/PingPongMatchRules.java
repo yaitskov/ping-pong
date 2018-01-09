@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Wither;
+import org.dan.ping.pong.app.match.MyPendingMatchPingPongSport;
+import org.dan.ping.pong.app.match.MyPendingMatchSport;
 import org.dan.ping.pong.app.sport.MatchRules;
 import org.dan.ping.pong.app.sport.SportType;
 
@@ -25,5 +27,12 @@ public class PingPongMatchRules implements MatchRules {
 
     public SportType sport() {
         return PingPong;
+    }
+
+    public MyPendingMatchSport toMyPendingMatchSport() {
+        return MyPendingMatchPingPongSport.builder()
+                .minGamesToWin(minGamesToWin)
+                .minAdvanceInGames(minAdvanceInGames)
+                .build();
     }
 }

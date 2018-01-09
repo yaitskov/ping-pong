@@ -25,8 +25,7 @@ public class MatchResult {
     private int playedSets;
     private MatchScore score;
     private List<UserLink> participants;
-    private int minGamesToWin;
-    private int minAdvanceInGames;
+    private MyPendingMatchSport sport;
     private int disputes;
     private MatchState state;
     private MatchType type;

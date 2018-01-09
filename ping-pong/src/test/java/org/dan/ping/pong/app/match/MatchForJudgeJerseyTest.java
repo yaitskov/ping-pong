@@ -60,15 +60,15 @@ public class MatchForJudgeJerseyTest extends AbstractSpringJerseyTest {
         assertThat(match, allOf(
                 hasProperty("mid", is(mid)),
                 hasProperty("playedSets", is(0)),
-                hasProperty("minGamesToWin", is(11)),
-                hasProperty("minAdvanceInGames", is(2)),
+                hasProperty("sport", allOf(
+                        hasProperty("minGamesToWin", is(11)),
+                        hasProperty("minAdvanceInGames", is(2)))),
                 hasProperty("started", notNullValue()),
                 hasProperty("matchType", is(POff)),
                 hasProperty("tid", is(scenario.getTid())),
                 hasProperty("table", is(Optional.empty())),
                 hasProperty("participants", hasItems(
                         hasProperty("uid", is(FILLER_LOSER_UID)),
-                        hasProperty("uid", is(uid1))))
-                ));
+                        hasProperty("uid", is(uid1))))));
     }
 }

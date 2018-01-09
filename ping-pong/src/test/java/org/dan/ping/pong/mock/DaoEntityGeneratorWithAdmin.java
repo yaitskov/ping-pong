@@ -14,6 +14,7 @@ import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.castinglots.rank.OrderDirection;
 import org.dan.ping.pong.app.castinglots.rank.ProvidedRankOptions;
 import org.dan.ping.pong.app.group.GroupRules;
+import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.tournament.Tid;
@@ -62,6 +63,7 @@ public class DaoEntityGeneratorWithAdmin {
     public Tid genTournament(Pid placeId, TournamentState state) {
         return genTournament(placeId, TournamentProps.builder()
                 .state(state)
+                .sport(SportType.PingPong)
                 .rules(rules(2))
                 .build());
     }
@@ -69,6 +71,7 @@ public class DaoEntityGeneratorWithAdmin {
     public Tid genTournament(Pid placeId, TournamentState state, int quits) {
         return genTournament(placeId, TournamentProps.builder()
                 .state(state)
+                .sport(SportType.PingPong)
                 .rules(rules(quits))
                 .build());
     }

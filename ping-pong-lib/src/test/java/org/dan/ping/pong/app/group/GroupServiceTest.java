@@ -184,6 +184,7 @@ public class GroupServiceTest {
 
     private TournamentMemState tournamentForOrder() {
         return TournamentMemState.builder()
+                .sport(PingPong)
                 .rule(TournamentRules.builder()
                         .match(S1A2G11)
                         .group(

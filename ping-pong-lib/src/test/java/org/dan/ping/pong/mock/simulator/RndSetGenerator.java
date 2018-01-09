@@ -2,9 +2,10 @@ package org.dan.ping.pong.mock.simulator;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toMap;
+import static org.dan.ping.pong.mock.simulator.OutComeGenerator.genRandomLose;
+import static org.dan.ping.pong.mock.simulator.OutComeGenerator.genRandomWin;
 
 import com.google.common.collect.ImmutableMap;
-import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 
 import java.util.Comparator;
 import java.util.List;
@@ -14,21 +15,19 @@ import java.util.Random;
 public class RndSetGenerator implements SetGenerator {
     private final Map<Player, Integer> targetSets;
     private final Map<Player, Integer> currentSets;
-    private final PingPongMatchRules rule;
     private final Player winer;
     private final Player loser;
     private final List<Player> players;
     private final Random random = new Random();
     private int setNumber;
 
-    public RndSetGenerator(Map<Player, Integer> targetSets, PingPongMatchRules rule) {
+    public RndSetGenerator(Map<Player, Integer> targetSets) {
         this.targetSets = targetSets;
         winer = targetSets.entrySet().stream()
                 .max(Comparator.comparingInt(Map.Entry::getValue))
                 .map(Map.Entry::getKey).get();
         loser = targetSets.keySet().stream().filter(k -> !k.equals(winer))
                 .findAny().get();
-        this.rule = rule;
         players = asList(winer, loser);
         currentSets = targetSets.keySet().stream().collect(toMap(o -> o, o -> 0));
     }
@@ -45,10 +44,8 @@ public class RndSetGenerator implements SetGenerator {
 
     @Override
     public Map<Player, Integer> generate(TournamentScenario scenario) {
-        final int winGames = random.nextInt(2) + rule.getMinGamesToWin();
-        final int loseGames = winGames > rule.getMinGamesToWin()
-                ? winGames - rule.getMinAdvanceInGames()
-                : random.nextInt(rule.getMinGamesToWin() - rule.getMinAdvanceInGames() + 1);
+        final int winGames = genRandomWin(scenario.getRules().getMatch(), 2);
+        final int loseGames = genRandomLose(scenario.getRules().getMatch(), winGames);
         ++setNumber;
         final int leftToWin = diff(winer);
         final int leftToLose = diff(loser);

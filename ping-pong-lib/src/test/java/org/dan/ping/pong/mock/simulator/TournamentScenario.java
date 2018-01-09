@@ -21,15 +21,13 @@ import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
-import org.dan.ping.pong.app.sport.Sport;
-import org.dan.ping.pong.app.sport.SportType;
-import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.place.Pid;
+import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
-import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.mock.SessionAware;
 import org.dan.ping.pong.mock.TestUserSession;
 
@@ -187,17 +185,15 @@ public class TournamentScenario implements SessionAware {
     }
 
     public TournamentScenario win(Player pa, Player pb) {
-        return match(pa,
-                new MatchOutcome(getRules().getMatch().getSetsToWin(), 0),
-                pb, getRules().getMatch());
+        return match(pa, OutComeGenerator.generateWin(getRules().getMatch()), pb);
     }
 
     public TournamentScenario w31(Player pa, Player pb) {
-        return match(pa, W31, pb, getRules().getMatch());
+        return match(pa, W31, pb);
     }
 
     public TournamentScenario w10(Player pa, Player pb) {
-        return match(pa, W10, pb, getRules().getMatch());
+        return match(pa, W10, pb);
     }
 
     public TournamentScenario custom(SetGenerator generator) {
@@ -205,42 +201,37 @@ public class TournamentScenario implements SessionAware {
     }
 
     public TournamentScenario w30(Player pa, Player pb) {
-        return match(pa, W30, pb, getRules().getMatch());
+        return match(pa, W30, pb);
     }
 
     public TournamentScenario w32(Player pa, Player pb) {
-        return match(pa, W32, pb, getRules().getMatch());
+        return match(pa, W32, pb);
     }
 
     public TournamentScenario lose(Player pa, Player pb) {
-        return match(pa, new MatchOutcome(0, getRules().getMatch().getSetsToWin()),
-                pb, getRules().getMatch());
+        return match(pa, OutComeGenerator.generateLose(getRules().getMatch()), pb);
     }
 
     public TournamentScenario l13(Player pa, Player pb) {
-        return match(pa, L13, pb, getRules().getMatch());
+        return match(pa, L13, pb);
     }
 
     public TournamentScenario l23(Player pa, Player pb) {
-        return match(pa, L23, pb, getRules().getMatch());
+        return match(pa, L23, pb);
     }
 
     public TournamentScenario l01(Player pa, Player pb) {
-        return match(pa, L01, pb, getRules().getMatch());
+        return match(pa, L01, pb);
     }
 
     public TournamentScenario match(
-            Player pa, MatchOutcome outcome, Player pb,
-            PingPongMatchRules matchRules) {
-        return match(pa, outcome, pb,
-                createRndGen(pa, outcome, pb, matchRules));
+            Player pa, MatchOutcome outcome, Player pb) {
+        return match(pa, outcome, pb, createRndGen(pa, outcome, pb));
     }
 
-    public static RndSetGenerator createRndGen(Player pa, MatchOutcome outcome, Player pb,
-            PingPongMatchRules matchRules) {
+    public static RndSetGenerator createRndGen(Player pa, MatchOutcome outcome, Player pb) {
         return new RndSetGenerator(
-                ImmutableMap.of(pa, outcome.first(), pb, outcome.second()),
-                matchRules);
+                ImmutableMap.of(pa, outcome.first(), pb, outcome.second()));
     }
 
     public TournamentScenario quitsGroup(Player... ps) {

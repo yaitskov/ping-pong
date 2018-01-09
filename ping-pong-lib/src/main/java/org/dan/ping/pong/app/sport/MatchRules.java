@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.sport;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.dan.ping.pong.app.match.MyPendingMatchSport;
 import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.sport.tennis.TennisMatchRules;
 
@@ -16,4 +17,6 @@ import org.dan.ping.pong.app.sport.tennis.TennisMatchRules;
         @JsonSubTypes.Type(value = TennisMatchRules.class, name = "Tennis") })
 public interface MatchRules {
     SportType sport();
+
+    MyPendingMatchSport toMyPendingMatchSport();
 }

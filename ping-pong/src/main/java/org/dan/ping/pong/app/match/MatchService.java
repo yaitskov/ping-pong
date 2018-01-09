@@ -51,7 +51,6 @@ import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.sched.TablesDiscovery;
 import org.dan.ping.pong.app.sport.Sports;
-import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -670,7 +669,6 @@ public class MatchService {
                                         ? noTablesParticipantMatchComparator(tournament, uid)
                                         : PARTICIPANT_MATCH_COMPARATOR)
                                 .map(m -> {
-                                    final PingPongMatchRules matchRules = tournament.getRule().getMatch();
                                     return MyPendingMatch.builder()
                                             .mid(m.getMid())
                                             .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
@@ -678,8 +676,7 @@ public class MatchService {
                                             .playedSets(m.getPlayedSets())
                                             .tid(tournament.getTid())
                                             .matchType(m.getType())
-                                            .minAdvanceInGames(matchRules.getMinAdvanceInGames())
-                                            .minGamesToWin(matchRules.getMinGamesToWin())
+                                            .sport(tournament.getRule().getMatch().toMyPendingMatchSport())
                                             .enemy(m.getOpponentUid(uid).map(ouid ->
                                                     ofNullable(tournament.getBid(ouid))
                                                             .orElseThrow(() -> internalError("no opponent for "
@@ -763,7 +760,6 @@ public class MatchService {
 
     public MatchResult matchResult(TournamentMemState tournament, Mid mid, Optional<Uid> ouid) {
         final MatchInfo m = tournament.getMatchById(mid);
-        final PingPongMatchRules matchRules = tournament.getRule().getMatch();
         return MatchResult.builder()
                 .participants(m.getParticipantIdScore().keySet().stream()
                         .map(uid -> tournament.getBidOrExpl(uid).toLink())
@@ -776,8 +772,7 @@ public class MatchService {
                 .category(tournament.getCategory(m.getCid()))
                 .tid(tournament.getTid())
                 .playedSets(m.getPlayedSets())
-                .minGamesToWin(matchRules.getMinGamesToWin())
-                .minAdvanceInGames(matchRules.getMinAdvanceInGames())
+                .sport(tournament.getRule().getMatch().toMyPendingMatchSport())
                 .build();
     }
 
@@ -801,12 +796,10 @@ public class MatchService {
     private OpenMatchForJudge getMatchForJudge(
             TournamentMemState tournament, MatchInfo m,
             TablesDiscovery tablesDiscovery) {
-        final PingPongMatchRules matchRules = tournament.getRule().getMatch();
         return OpenMatchForJudge.builder()
                 .mid(m.getMid())
                 .tid(tournament.getTid())
-                .minGamesToWin(matchRules.getMinGamesToWin())
-                .minAdvanceInGames(matchRules.getMinAdvanceInGames())
+                .sport(tournament.getRule().getMatch().toMyPendingMatchSport())
                 .playedSets(m.getPlayedSets())
                 .started(m.getStartedAt())
                 .matchType(m.getType())

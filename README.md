@@ -8,6 +8,10 @@
 Cloud-Sport application is designed for conducting sport tournaments
 in sports like ping-pong, tennis, squash and badminton.
 
+
+[3 minute video explaning the main goal](https://www.youtube.com/watch?v=4-dI_iO-GBo&t=110s)
+
+
 ## Building
 
 Build requires Db schema to be deployed.

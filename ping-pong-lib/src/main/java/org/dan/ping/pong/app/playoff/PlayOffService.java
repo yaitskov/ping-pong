@@ -13,6 +13,7 @@ import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.tournament.CumulativeScore;
@@ -99,9 +100,8 @@ public class PlayOffService {
                 .orElse(0);
         final Map<Uid, CumulativeScore> uidLevel = new HashMap<>();
         Collection<MatchInfo> baseMatches = findBaseMatches(cidPlayOffMatches);
-        final PingPongMatchRules matchRules = tournament.getRule().getMatch();
         while (true) {
-            groupService.ranksLevelMatches(tournament, level++, uidLevel, baseMatches, matchRules);
+            groupService.ranksLevelMatches(tournament, level++, uidLevel, baseMatches);
             final Collection<MatchInfo> nextLevel = findNextMatches(tournament.getMatches(), baseMatches);
             if (nextLevel.isEmpty()) {
                 break;
@@ -147,6 +147,9 @@ public class PlayOffService {
         return result;
     }
 
+    @Inject
+    private Sports sports;
+
     public PlayOffMatches playOffMatches(TournamentMemState tournament, int cid) {
         final List<MatchLink> transitions = new ArrayList<>();
         final List<PlayOffMatch> matches = new ArrayList<>();
@@ -175,14 +178,12 @@ public class PlayOffService {
                             .forEach(uid -> participants.computeIfAbsent(uid,
                                     (u -> tournament.getParticipant(u).getName())));
 
-                    final PingPongMatchRules matchRules = tournament.getRule().getMatch();
-                    final Map<Uid, Integer> score = matchRules
-                            .calcWonSets(m.getParticipantIdScore());
+                    final Map<Uid, Integer> score = sports.calcWonSets(tournament, m);
                     matches.add(PlayOffMatch.builder()
                             .id(m.getMid())
                             .level(m.getLevel())
                             .score(score)
-                            .walkOver(isWalkOver(m, matchRules, score))
+                            .walkOver(isWalkOver(tournament, m, score))
                             .state(m.getState())
                             .winnerId(m.getWinnerId())
                             .build());
@@ -194,11 +195,11 @@ public class PlayOffService {
                 .build();
     }
 
-    private boolean isWalkOver(MatchInfo m, PingPongMatchRules matchRules, Map<Uid, Integer> score) {
+    private boolean isWalkOver(TournamentMemState tournament, MatchInfo m, Map<Uid, Integer> score) {
         if (m.getState() != Over) {
             return false;
         }
-        final Optional<Uid> calculatedWinner = matchRules.findWinnerId(score);
+        final Optional<Uid> calculatedWinner = sports.findWinnerId(tournament, score);
         return !calculatedWinner.equals(m.getWinnerId());
     }
 

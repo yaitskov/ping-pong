@@ -21,7 +21,7 @@ public interface MatchDao {
 
     void changeStatus(Mid mid, MatchState state, DbUpdater batch);
 
-    Optional<Uid> scoreSet(TournamentMemState tournament, MatchInfo matchInfo,
+    void scoreSet(TournamentMemState tournament, MatchInfo matchInfo,
             DbUpdater batch, List<IdentifiedScore> scores);
 
     void completeMatch(Mid mid, Uid winUid, Instant now, DbUpdater batch, Set<MatchState> expected);

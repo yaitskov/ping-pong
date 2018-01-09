@@ -136,7 +136,10 @@ public class MatchService {
         matchInfoForValidation.addSetScore(score.getScores());
         sports.validateMatch(tournament, matchInfoForValidation);
 
-        final Optional<Uid> winUidO = matchDao.scoreSet(tournament, matchInfo, batch, score.getScores());
+        matchInfo.addSetScore(score.getScores());
+        final Map<Uid, Integer> wonSets = sports.calcWonSets(tournament, matchInfo);
+        final Optional<Uid> winUidO = sports.findWinnerId(tournament, wonSets);
+        matchDao.scoreSet(tournament, matchInfo, batch, score.getScores());
         winUidO.ifPresent(winUid -> matchWinnerDetermined(tournament, matchInfo, winUid, batch, EXPECTED_MATCH_STATES));
 
         scheduleService.afterMatchComplete(tournament, batch, now);
@@ -588,8 +591,7 @@ public class MatchService {
                     .stream()
                     .collect(toMap(o -> o, o -> 0));
         }
-        return tournament.getRule().getMatch()
-                .calcWonSets(matchInfo.getParticipantIdScore());
+        return sports.calcWonSets(tournament, matchInfo);
     }
 
     public static final Set<MatchState> incompleteMatchStates = ImmutableSet.of(Draft, Place, Game);
@@ -644,10 +646,7 @@ public class MatchService {
                         .map(m -> OpenMatchForWatch.builder()
                                 .mid(m.getMid())
                                 .started(m.getStartedAt().get())
-                                .score(tournament.getRule().getMatch()
-                                        .calcWonSets(m.getParticipantIdScore())
-                                        .values()
-                                        .stream().collect(toList()))
+                                .score(sports.calcWonSets(tournament, m).values().stream().collect(toList()))
                                 .category(tournament.getCategory(m.getCid()))
                                 .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
                                 .type(m.getType())

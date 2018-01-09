@@ -165,11 +165,6 @@ public class MatchInfo {
         scores.forEach(score -> participantIdScore.get(score.getUid()).add(score.getScore()));
     }
 
-    public Optional<Uid> addSetScore(List<IdentifiedScore> scores, PingPongMatchRules rule) {
-        addSetScore(scores);
-        return rule.findWinnerId(rule.calcWonSets(getParticipantIdScore()));
-    }
-
     public Set<Uid> getUids() {
         return participantIdScore.keySet();
     }

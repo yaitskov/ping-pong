@@ -31,6 +31,7 @@ public class PingPongMatchRulesUnitTest {
 
     private static final Uid UID_A = new Uid(1);
     private static final Uid UID_B = new Uid(2);
+    public static final PingPongSport PING_PONG_SPORT = new PingPongSport();
 
     @Test
     public void validatePass() {
@@ -104,12 +105,14 @@ public class PingPongMatchRulesUnitTest {
 
     private void cannotFindWinner(List<Integer> a, List<Integer> b) {
         assertEquals(Optional.empty(),
-                PING_PONG_RULE.findWinnerId(PING_PONG_RULE.calcWonSets(match(a, b).getParticipantIdScore())));
+                PING_PONG_SPORT.findWinnerId(PING_PONG_RULE,
+                        PING_PONG_SPORT.calcWonSets(match(a, b).getParticipantIdScore())));
     }
 
     private void findWinner(Uid uid, List<Integer> a, List<Integer> b) {
         assertEquals(Optional.of(uid),
-                PING_PONG_RULE.findWinnerId(PING_PONG_RULE.calcWonSets(match(a, b).getParticipantIdScore())));
+                PING_PONG_SPORT.findWinnerId(PING_PONG_RULE,
+                        PING_PONG_SPORT.calcWonSets(match(a, b).getParticipantIdScore())));
     }
 
     private MatchInfo match(List<Integer> a, List<Integer> b) {
@@ -122,7 +125,7 @@ public class PingPongMatchRulesUnitTest {
     @Test
     public void findWinnerId3To1() {
         assertEquals(Optional.of(new Uid(111)),
-                PING_PONG_RULE.findWinnerId(ImmutableMap.of(
+                PING_PONG_SPORT.findWinnerId(PING_PONG_RULE, ImmutableMap.of(
                         new Uid(111), 3, new Uid(222), 1)));
     }
 }

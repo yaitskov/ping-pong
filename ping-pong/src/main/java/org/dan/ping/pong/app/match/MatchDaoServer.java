@@ -91,12 +91,9 @@ public class MatchDaoServer implements MatchDao {
     }
 
     @Override
-    public Optional<Uid> scoreSet(TournamentMemState tournament, MatchInfo matchInfo,
+    public void scoreSet(TournamentMemState tournament, MatchInfo matchInfo,
             DbUpdater batch, List<IdentifiedScore> scores) {
-        final Optional<Uid> winUidO = matchInfo.addSetScore(
-                scores, tournament.getRule().getMatch());
         insertSetScore(batch, matchInfo.getMid(), scores);
-        return winUidO;
     }
 
     @Override

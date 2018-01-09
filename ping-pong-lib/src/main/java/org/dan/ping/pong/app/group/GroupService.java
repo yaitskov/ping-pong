@@ -25,6 +25,10 @@ import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.dan.ping.pong.app.bid.BidState;
@@ -32,6 +36,7 @@ import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
+import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.tournament.CumulativeScore;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -57,6 +62,9 @@ import javax.inject.Inject;
 
 
 @Slf4j
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class GroupService {
     public Optional<List<MatchInfo>> checkGroupComplete(
             TournamentMemState tournament, int gid) {
@@ -106,7 +114,7 @@ public class GroupService {
 
     public List<Uid> orderUidsInGroup(TournamentMemState tournament,
             List<MatchInfo> allMatchesInGroup) {
-        final Map<Uid, Integer> uid2Points = countPoints(tournament.getRule().getMatch(), allMatchesInGroup);
+        final Map<Uid, Integer> uid2Points = countPoints(tournament, allMatchesInGroup);
         final ExtraUidOrderInGroup strongerExtraOrder = findStrongerExtraOrder(tournament,
                 uid2Points, allMatchesInGroup);
         final List<Uid> result = orderUidsByPointsAndExtraOrder(uid2Points,
@@ -163,8 +171,7 @@ public class GroupService {
         final List<MatchInfo> matchesWithUids = filterMatchesByUids(matches, uids);
 
         final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(uid -> Play, matchesWithUids);
-        final PingPongMatchRules matchRule = tournament.getRule().getMatch();
-        matchesWithUids.forEach(minfo -> aggMatch(uid2Stat, minfo, matchRule));
+        matchesWithUids.forEach(minfo -> aggMatch(tournament, uid2Stat, minfo));
         strongerExtraOrder.getUid2SetsAndBalls().putAll(uid2Stat);
         orderTwiceAmbiguous(tournament, matches, uids,
                 strongerExtraOrder, matchesWithUids, uid2Stat);
@@ -255,22 +262,22 @@ public class GroupService {
                         "no match between " + uidA + " and " + uidB));
         final Uid winnerUid = abMatch.getWinnerId()
                 .orElseGet(() ->
-                     tournament.getRule().getMatch().findStronger(abMatch)
-                             .orElseGet(() -> {
+                        sports.findStronger(tournament, abMatch)
+                                .orElseGet(() -> {
                                  strongerExtraOrder.getDiced()
                                          .addAll(abMatch.getParticipantIdScore().keySet());
-                                 return ObjectUtils.min(uidA, uidB);
-                             }));
+                                    return ObjectUtils.min(uidA, uidB);
+                                }));
         strongerExtraOrder.getStrongerOf().put(winnerUid, abMatch.getOpponentUid(winnerUid)
                 .orElseThrow(() -> internalError("no opponent in match " + abMatch.getMid())));
     }
 
-    Map<Uid, Integer> countPoints(PingPongMatchRules rules, List<MatchInfo> allMatchesInGroup) {
+    Map<Uid, Integer> countPoints(TournamentMemState tournament, List<MatchInfo> allMatchesInGroup) {
         CounterMap<Uid> counters = new CounterMap<>();
-        allMatchesInGroup.stream().forEach(m ->
+        allMatchesInGroup.forEach(m ->
                 m.getWinnerId().ifPresent(winnerId -> {
                     counters.increment2(winnerId);
-                    if (rules.findWinner(m).equals(m.getWinnerId())) {
+                    if (sports.findWinner(tournament, m).equals(m.getWinnerId())) {
                         counters.increment(m.getOpponentUid(winnerId).get());
                     }
                 }));
@@ -295,8 +302,11 @@ public class GroupService {
         return result;
     }
 
-    public void aggMatch(Map<Uid, BidSuccessInGroup> uid2Stat,
-            MatchInfo minfo, PingPongMatchRules matchRule) {
+    @Inject
+    private Sports sports;
+
+    public void aggMatch(TournamentMemState tournament, Map<Uid, BidSuccessInGroup> uid2Stat,
+            MatchInfo minfo) {
         if (!minfo.getWinnerId().isPresent()) {
             log.error("Match {} is not complete", minfo.getMid());
             return;
@@ -315,7 +325,7 @@ public class GroupService {
         minfo.getParticipantScore(lostUid)
                 .forEach(winner::lostBalls);
 
-        final Map<Uid, Integer> uid2Sets = matchRule.calcWonSets(minfo.getParticipantIdScore());
+        final Map<Uid, Integer> uid2Sets = sports.calcWonSets(tournament, minfo);
 
         loser.wonSets(uid2Sets.get(lostUid));
         loser.lostSets(uid2Sets.get(winUid));
@@ -323,7 +333,7 @@ public class GroupService {
         winner.lostSets(uid2Sets.get(lostUid));
 
         winner.win();
-        matchRule.findWinnerId(uid2Sets)
+        sports.findWinnerId(tournament, uid2Sets)
                 .ifPresent(uid -> loser.lost()); // walkover = 0
     }
 
@@ -379,7 +389,7 @@ public class GroupService {
         final List<ParticipantMemState> bids = groupBids(tournament, gid);
         final TournamentRules rules = tournament.getRule();
 
-        final Map<Uid, Integer> uid2Points = countPoints(rules.getMatch(), matches);
+        final Map<Uid, Integer> uid2Points = countPoints(tournament, matches);
         final ExtraUidOrderInGroup strongerExtraOrder = findStrongerExtraOrder(tournament, uid2Points, matches);
         final List<Uid> finalUidsOrder = orderUidsByPointsAndExtraOrder(uid2Points,
                 strongerExtraOrder.getStrongerOf());
@@ -428,10 +438,8 @@ public class GroupService {
     private GroupMatchResult matchResult(Uid uid, TournamentMemState tournament, MatchInfo m) {
         final Uid oUid = m.getOpponentUid(uid)
                 .orElseThrow(() -> internalError("no opponent uid" + uid));
-        final PingPongMatchRules matchRule = tournament.getRule().getMatch();
-        final Map<Uid, List<Integer>> scores = m.getParticipantIdScore();
-        final Map<Uid, Integer> uid2WonSets = matchRule.calcWonSets(scores);
-        final Optional<Uid> scoreWinner = matchRule.findWinnerId(uid2WonSets);
+        final Map<Uid, Integer> uid2WonSets = sports.calcWonSets(tournament, m);
+        final Optional<Uid> scoreWinner = sports.findWinnerId(tournament, uid2WonSets);
         return GroupMatchResult.builder()
                 .state(participantMatchState(uid, scoreWinner, m))
                 .mid(m.getMid())
@@ -439,7 +447,7 @@ public class GroupService {
                         .his(uid2WonSets.get(uid))
                         .enemy(uid2WonSets.get(oUid))
                         .build())
-                .games(pairGames(uid, oUid, scores))
+                .games(pairGames(uid, oUid, m.getParticipantIdScore()))
                 .build();
     }
 
@@ -499,7 +507,7 @@ public class GroupService {
                                                     .filter(m -> GameOrOverOrPlace.contains(m.getState()))
                                                     .collect(toList());
                                             final Map<Uid, CumulativeScore> uidLevel = new HashMap<>();
-                                            ranksLevelMatches(tournament, 0, uidLevel, completeGroupMatches, matchRules);
+                                            ranksLevelMatches(tournament, 0, uidLevel, completeGroupMatches);
                                             return orderUidsInGroup(tournament, completeGroupMatches).stream()
                                                     .map(uidLevel::get).collect(toList());
                                         })
@@ -524,10 +532,10 @@ public class GroupService {
 
     public void ranksLevelMatches(TournamentMemState tournament, int level,
             Map<Uid, CumulativeScore> uidLevel,
-            Collection<MatchInfo> matches, PingPongMatchRules rules) {
+            Collection<MatchInfo> matches) {
         final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(
                 uid -> tournament.getBidOrExpl(uid).getState(), matches);
-        matches.forEach(m -> aggMatch(uid2Stat, m, rules));
+        matches.forEach(m -> aggMatch(tournament, uid2Stat, m));
         uid2Stat.forEach((uid, stat) ->
                 uidLevel.merge(uid,
                         CumulativeScore.builder()

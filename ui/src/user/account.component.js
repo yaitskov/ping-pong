@@ -1,4 +1,5 @@
 import angular from 'angular';
+import AppLang from 'ui/lang.js';
 import template from './account.template.html';
 
 angular.
@@ -20,11 +21,11 @@ angular.
                 this.language = null;
                 this.setLanguage = function (originLanguage) {
                     stranslate.trans(originLanguage, function (language) {
-                        auth.setMyLang(originLanguage);
+                        AppLang.setLanguage(originLanguage);
                         self.language = language;
                     });
                 };
-                this.setLanguage(auth.myLang());
+                this.setLanguage(AppLang.getLanguage());
                 this.logoutWithoutEmail = false;
                 this.signInEmailSent = false;
                 this.requestAdminPermissions = function () {

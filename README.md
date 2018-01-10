@@ -1,7 +1,9 @@
 [![Build Status](https://travis-ci.org/yaitskov/ping-pong.svg?branch=master)](https://travis-ci.org/yaitskov/ping-pong)
 [![codecov](https://codecov.io/gh/yaitskov/ping-pong/branch/master/graph/badge.svg)](https://codecov.io/gh/yaitskov/ping-pong)
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/cloud-sport-org)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/a0215c65e53967d7c18e/test_coverage)](https://codeclimate.com/github/yaitskov/ping-pong/test_coverage)
 [![Maintainability](https://api.codeclimate.com/v1/badges/a0215c65e53967d7c18e/maintainability)](https://codeclimate.com/github/yaitskov/ping-pong/maintainability)
+
 
 #  Cloud-Sport application
 

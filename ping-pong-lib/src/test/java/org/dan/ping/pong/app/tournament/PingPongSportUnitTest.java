@@ -12,6 +12,7 @@ import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.sport.pingpong.PingPongSport;
+import org.dan.ping.pong.app.sport.tennis.TennisSport;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -19,7 +20,7 @@ import org.junit.rules.ExpectedException;
 import java.util.List;
 import java.util.Optional;
 
-public class PingPongMatchRulesUnitTest {
+public class PingPongSportUnitTest {
     public static final PingPongMatchRules PING_PONG_RULE = PingPongMatchRules.builder()
             .minGamesToWin(11)
             .minPossibleGames(0)
@@ -42,16 +43,21 @@ public class PingPongMatchRulesUnitTest {
         validate(15, 13);
     }
 
+    @Test
+    public void validateFailToManySets() {
+        thrown.expect(hasProperty("message",
+                containsString(TennisSport.TO_MANY_SETS)));
+        RULES.validate(PING_PONG_RULE,
+                match(asList(11, 11, 11, 11),
+                        asList(0, 1, 2, 3)));
+    }
+
     private void validate(int a, int b) {
         RULES.validate(PING_PONG_RULE, match(a, b));
     }
 
     private MatchInfo match(int a, int b) {
-        return MatchInfo.builder()
-                .participantIdScore(
-                        ImmutableMap.of(UID_A, asList(a),
-                                UID_B, asList(b)))
-                .build();
+        return match(asList(a), asList(b));
     }
 
     @Rule

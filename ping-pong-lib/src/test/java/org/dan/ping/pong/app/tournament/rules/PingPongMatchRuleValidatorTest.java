@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.tournament.rules;
 
 import static com.google.common.collect.HashMultimap.create;
-import static org.dan.ping.pong.app.tournament.PingPongMatchRulesUnitTest.PING_PONG_RULE;
+import static org.dan.ping.pong.app.tournament.PingPongSportUnitTest.PING_PONG_RULE;
 import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.Multimap;

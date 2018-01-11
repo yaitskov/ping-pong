@@ -24,6 +24,9 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
     private static final String SET = "set";
     private static final String MIN_POSSIBLE_GAMES = "minPossibleGames";
     private static final String MIN_GAMES_TO_WIN = "minGamesToWin";
+    private static final int A = 0;
+    private static final int B = 1;
+    public static final String TO_MANY_SETS = "to many sets";
 
     @Override
     public void validate(Multimap<String, ValidationError> errors, PingPongMatchRules rules) {
@@ -36,15 +39,21 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
         final Iterator<Uid> uidIterator = scores.keySet().iterator();
         final Uid uidA = uidIterator.next();
         final Uid uidB = uidIterator.next();
-
+        final int[] wonSets = new int[2];
         for (int iSet = 0; iSet < scores.get(uidA).size(); ++iSet) {
-            validate(rules, iSet,
+            ++wonSets[validate(rules, iSet,
                     scores.get(uidA).get(iSet),
-                    scores.get(uidB).get(iSet));
+                    scores.get(uidB).get(iSet))];
+            if (wonSets[A] > rules.getSetsToWin()) {
+                throw badRequest(TO_MANY_SETS);
+            }
+            if (wonSets[B] > rules.getSetsToWin()) {
+                throw badRequest(TO_MANY_SETS);
+            }
         }
     }
 
-    private void validate(PingPongMatchRules rules, int iSet, int aGames, int bGames) {
+    private int validate(PingPongMatchRules rules, int iSet, int aGames, int bGames) {
         final int maxGames = Math.max(aGames, bGames);
         final int minGames = Math.min(aGames, bGames);
         if (minGames < rules.getMinPossibleGames()) {
@@ -66,6 +75,10 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
                 && maxGames - minGames > rules.getMinAdvanceInGames()) {
             throw badRequest("Winner games are to big", SET, iSet);
         }
+        if (aGames < bGames) {
+            return B;
+        }
+        return A;
     }
 
     @Override

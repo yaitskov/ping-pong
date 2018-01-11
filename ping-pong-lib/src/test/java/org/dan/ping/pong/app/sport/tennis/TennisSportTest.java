@@ -39,6 +39,29 @@ public class TennisSportTest {
             .superTieBreakGames(10)
             .build();
 
+    public static final TennisMatchRules SHORT_TENNIS_RULES = TennisMatchRules.builder()
+            .setsToWin(1)
+            .minGamesToWin(6)
+            .minAdvanceInGames(2)
+            .superTieBreakGames(10)
+            .build();
+
+    @Test
+    public void validateShortPass() {
+        validateShort(emptyList(), emptyList());
+        validateShort(asList(0), asList(6));
+        validateShort(asList(4), asList(6));
+        validateShort(asList(6), asList(1));
+        validateShort(asList(7), asList(5));
+        validateShort(asList(7), asList(6));
+    }
+
+    @Test
+    public void validateFailShortToManySets() {
+        expect(TO_MANY_SETS);
+        validateShort(asList(6, 4), asList(4, 6));
+    }
+
     @Test
     public void validatePass() {
         validateClassic(emptyList(), emptyList());
@@ -165,6 +188,10 @@ public class TennisSportTest {
 
     private void validateClassic(List<Integer> a, List<Integer> b) {
         sut.validate(CLASSIC_TENNIS_RULES, match(a, b));
+    }
+
+    private void validateShort(List<Integer> a, List<Integer> b) {
+        sut.validate(SHORT_TENNIS_RULES, match(a, b));
     }
 
     private MatchInfo match(List<Integer> a, List<Integer> b) {

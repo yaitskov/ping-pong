@@ -32,6 +32,7 @@ public class TennisMatchRules implements MatchRules {
     public MyPendingMatchSport toMyPendingMatchSport() {
         return MyPendingMatchTennisSport.builder()
                 .minAdvanceInGames(minAdvanceInGames)
+                .setsToWin(setsToWin)
                 .minGamesToWin(minGamesToWin)
                 .superTieBreakGames(superTieBreakGames)
                 .build();

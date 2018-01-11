@@ -1,5 +1,6 @@
 import angular from 'angular';
 import template from './base-score-set.template.html';
+import possibleScoresStrategies from './possibleScoresStrategy.js';
 
 angular.
     module('scoreSet').
@@ -22,22 +23,16 @@ angular.
                          self.reset = function () {
                              if (self.match.setScores) {
                                  self.scores = self.match.setScores.slice();
-                                 var winScore = Math.max.apply(null, self.scores);
-                                 var lostScore = Math.min.apply(null, self.scores);
-                                 self.possibleWinScores = [];
-                                 self.possibleLostScores = [];
+                                 let winScore = Math.max.apply(null, self.scores);
+                                 let lostScore = Math.min.apply(null, self.scores);
                                  self.winnerIdx = (winScore == self.scores[0]) ? 0 : 1;
                                  self.scores[self.winnerIdx] = winScore;
                                  self.scores[1 - self.winnerIdx] = lostScore;
                                  const sport = self.match.sport;
-                                 const limit = Math.max(sport.minGamesToWin - sport.minAdvanceInGames, lostScore);
-                                 for (var i = 0; i <= limit; ++i) {
-                                     self.possibleLostScores.push(i);
-                                 }
-                                 var winLimit = Math.max(sport.minGamesToWin, winScore);
-                                 for (var i = sport.minGamesToWin; i <= winLimit; ++i) {
-                                     self.possibleWinScores.push(i);
-                                 }
+                                 self.possibleWinScores = self.scoreStrategy.winnerOptions(
+                                     sport, self.match.playedSets);
+                                 self.possibleLostScores = self.scoreStrategy.loserOptions(
+                                     sport, winScore, self.match.playedSets);
                              } else {
                                  self.scores = [-1, -1];
                                  self.noBalance();
@@ -45,12 +40,11 @@ angular.
                          }
                          self.noBalance = function () {
                              const sport = self.match.sport;
-                             self.possibleWinScores = [sport.minGamesToWin];
-                             self.possibleLostScores = [];
-                             self.scores[self.winnerIdx] = sport.minGamesToWin;
-                             for (var i = 0 ; i <= sport.minGamesToWin - sport.minAdvanceInGames; ++i) {
-                                 self.possibleLostScores.push(i);
-                             }
+                             self.possibleWinScores = self.scoreStrategy.winnerOptions(sport, self.match.playedSets);
+                             self.scores[self.winnerIdx] = self.scoreStrategy.defaultWinnerScore(sport, self.match.playedSets);
+                             self.possibleLostScores = self.scoreStrategy.loserOptions(sport,
+                                 self.scores[self.winnerIdx],
+                                 self.match.playedSets);
                          };
                          self.extendWinScore = function () {
                              self.possibleLostScores.length = 0;
@@ -64,15 +58,17 @@ angular.
                          self.pick = (idx, score, noEvent) => {
                              self.scores[idx] = score;
                              const sport = self.match.sport;
-                             if (score > sport.minGamesToWin) {
-                                 self.scores[1 - idx] = score - sport.minAdvanceInGames;
+                             self.possibleLostScores = self.scoreStrategy.loserOptions(sport, score, self.match.playedSets);
+                             if (self.possibleLostScores.length == 1) {
+                                 self.scores[1 - idx] = self.possibleLostScores[0];
                                  $rootScope.$broadcast('event.base.match.set.pick.lost',
                                                        {setOrdNumber: self.match.playedSets,
                                                         scores: findScores()});
-                             } else if (score == sport.minGamesToWin && self.possibleWinScores.length > 1) {
-                                 self.noBalance();
-                                 if (self.scores[1 - idx] > score - sport.minAdvanceInGames) {
-                                     self.scores[1 - idx] = score - sport.minAdvanceInGames;
+                             } else {
+                                 if (self.possibleLostScores[self.possibleLostScores.lenth - 1] < self.scores[1 - idx]) {
+                                     self.scores[1 - idx] = -1;
+                                 } else if (self.possibleLostScores[0] > self.scores[1 - idx]) {
+                                     self.scores[1 - idx] = -1;
                                  }
                              }
                          };
@@ -91,6 +87,7 @@ angular.
                          self.onMatchSet = function (match) {
                              console.log("caught event.match.set");
                              self.match = match;
+                             self.scoreStrategy = possibleScoresStrategies[match.sport['@type']];
                              self.participants = match.participants;
                              self.tournamentId = match.tid;
                              self.nextScoreUpdated();

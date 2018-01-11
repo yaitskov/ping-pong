@@ -17,4 +17,5 @@ public class MyPendingMatchTennisSport implements MyPendingMatchSport {
     private int minGamesToWin;
     private int minAdvanceInGames;
     private int superTieBreakGames;
+    private int setsToWin;
 }

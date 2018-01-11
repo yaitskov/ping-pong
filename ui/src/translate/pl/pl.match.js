@@ -13,6 +13,7 @@ module.exports = {
     'to-score': 'Ocenić',
     'Match management': 'Zarządzanie meczem',
     'Schedule tables': 'Planować stoły',
+    'Schedule courts': 'Planować korty',
 
     'Rescore match': 'Ocenić mecz ponownie',
     'play-off-match-will-replayed': 'W razie gwałtownej zmiany wyniku zależny meczi w play off będą odwołany, ale będziesz mięć okzję zobaczyć konsekwencji',

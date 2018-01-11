@@ -13,6 +13,7 @@ module.exports = {
     'to-score': 'Score',
     'Match management': 'Match management',
     'Schedule tables': 'Schedule tables',
+    'Schedule courts': 'Schedule courts',
 
     'Rescore match': 'Rescore match',
 

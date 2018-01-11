@@ -1,13 +1,20 @@
 module.exports = {
     'disambiguation-group-lbl': 'On same # of matches win',
-    'CMP_WIN_AND_LOSE': 'Compare won and defeat scores',
-    'CMP_WIN_MINUS_LOSE': 'Compare won minus defeat scores',
-    'disambiguation-group-help': 'Decides how to order participants in a group'
+    'CMP_WIN_AND_LOSE': 'Compare won and defeat',
+    'CMP_WIN_MINUS_LOSE': 'Compare won minus defeat',
+    'Tennis-disambiguation-group-help': 'Decides how to order participants in a group'
         + ' having the same number of won matches. In case of won and defeat '
-        + ' sum of gained scores across all matches are compared.'
+        + ' sum of gained games across all matches are compared.'
         + ' If they are also the same'
-        + ' then sums of lost scores across all matches are compared.'
-        + ' In case of win minus defeat sum lost scores is subtracted from the sum of gained scores'
+        + ' then sums of lost games across all matches are compared.'
+        + ' In case of win minus defeat sum lost games is subtracted from the sum of gained games'
+        + ' and then results are compared.',
+    'PingPong-disambiguation-group-help': 'Decides how to order participants in a group'
+        + ' having the same number of won matches. In case of won and defeat '
+        + ' sum of gained balls across all matches are compared.'
+        + ' If they are also the same'
+        + ' then sums of lost balls across all matches are compared.'
+        + ' In case of win minus defeat sum lost balls is subtracted from the sum of gained balls'
         + ' and then results are compared.',
     'thank-tournament-created-info': 'Thanks, tournament <a href="{{url}}">{{name}}</a>'
         + ' has been created and announced. Add categories to the tournament and begin drafting.',
@@ -19,7 +26,7 @@ module.exports = {
     'seeding-lbl': 'Seeding',
     'rank-direction-lbl': 'Order',
     'Sets to win a match': 'Number of sets',
-    'super-time-break-games-help': 'How much balls to get to win to the tiebreak',
+    'super-time-break-games-help': 'How much gems to get to win to the tiebreak',
     'Super tie break games': 'Super tie break games',
     'group-schedule-help': 'Sets up an order for playing matches in a group.'
         + ' One line per case with a specified number of participants.'
@@ -28,9 +35,12 @@ module.exports = {
         + ' If there is no schedule for a group'
         + ' then matches will be scheduled according to the rules in PZTS 2016.',
     'Min score to win a set': 'Min set score',
+    'Min games to win a set': 'Min games',
     'min-score-to-win-set-help': 'Minimal set score to win a set',
+    'min-games-to-win-set-help': 'Minimal games to win a set',
     'Min score advance to win a set': 'Min advance',
     'min-score-advance-help': 'Required advance in the score to win a set',
+    'min-games-advance-help': 'Required advance in the score to win a set',
     'decreasing-lbl': 'Descending',
     'increasing-lbl': 'Ascending',
     'rank-policy-lbl': 'Rating method',

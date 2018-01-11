@@ -12,8 +12,7 @@ import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.tournament.rules.TennisMatchRuleValidator;
 import org.dan.ping.pong.app.tournament.rules.ValidationError;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +29,8 @@ public class TennisSport implements Sport<TennisMatchRules> {
     public static final String GAMES_CANNOT_BE_EQUAL = "Games cannot be equal";
     public static final String WINNER_SHOULD_GET_N_BALLS_IN_SUPER_TIEBREAK = "Winner should get n balls in super tiebreak";
     public static final String SET_LENGTH_MISMATCH = "set length mismatch";
+    public static final String WON_SETS_MORE_THAT_REQUIRED = "won sets more that required";
+    public static final String WINNERS_ARE_MORE_THAT_1 = "winners are more that 1";
     private static int PlayerA = 1;
     private static int PlayerB = 0;
 
@@ -138,40 +139,25 @@ public class TennisSport implements Sport<TennisMatchRules> {
         return Tennis;
     }
 
-    public Map<Uid, Integer> calcWonSets(Map<Uid, List<Integer>> participantScores) {
-        final List<Uid> uids = new ArrayList<>(participantScores.keySet());
-        if (uids.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        final Uid uidA = uids.get(0);
-        if (uids.size() == 1) {
-            return ImmutableMap.of(uidA, 0);
-        }
-        final List<Integer> setsA = participantScores.get(uidA);
-        final Uid uidB = uids.get(1);
-        final List<Integer> setsB = participantScores.get(uidB);
-        int wonsA = 0;
-        int wonsB = 0;
-        for (int i = 0; i < setsA.size(); ++i) {
-            if (setsA.get(i) > setsB.get(i)) {
-                ++wonsA;
-            } else {
-                ++wonsB;
-            }
-        }
-        return ImmutableMap.of(uidA, wonsA, uidB, wonsB);
-    }
-
     public Optional<Uid> findWinnerId(TennisMatchRules rules, Map<Uid, Integer> wonSets) {
-        throw new IllegalStateException();
-    }
-
-    @Override
-    public Optional<Uid> findStronger(Map<Uid, Integer> wonSets) {
-        throw new IllegalStateException();
+        return wonSets.entrySet().stream()
+                .filter(e -> e.getValue() >= rules.getSetsToWin())
+                .map(Map.Entry::getKey)
+                .findAny();
     }
 
     public void checkWonSets(TennisMatchRules rules, Map<Uid, Integer> uidWonSets) {
-        throw new IllegalStateException();
+        final Collection<Integer> wonSets = uidWonSets.values();
+        wonSets.stream()
+                .filter(n -> n > rules.getSetsToWin()).findAny()
+                .ifPresent(o -> {
+                    throw badRequest(WON_SETS_MORE_THAT_REQUIRED);
+                });
+        final long winners = wonSets.stream()
+                .filter(n -> n == rules.getSetsToWin())
+                .count();
+        if (winners > 1) {
+            throw badRequest(WINNERS_ARE_MORE_THAT_1);
+        }
     }
 }

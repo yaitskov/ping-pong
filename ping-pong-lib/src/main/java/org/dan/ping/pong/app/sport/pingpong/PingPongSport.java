@@ -87,52 +87,11 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
     }
 
     @Override
-    public Map<Uid, Integer> calcWonSets(Map<Uid, List<Integer>> participantScores) {
-        final List<Uid> uids = new ArrayList<>(participantScores.keySet());
-        if (uids.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        final Uid uidA = uids.get(0);
-        if (uids.size() == 1) {
-            return ImmutableMap.of(uidA, 0);
-        }
-        final List<Integer> setsA = participantScores.get(uidA);
-        final Uid uidB = uids.get(1);
-        final List<Integer> setsB = participantScores.get(uidB);
-        int wonsA = 0;
-        int wonsB = 0;
-        for (int i = 0; i < setsA.size(); ++i) {
-            if (setsA.get(i) > setsB.get(i)) {
-                ++wonsA;
-            } else {
-                ++wonsB;
-            }
-        }
-        return ImmutableMap.of(uidA, wonsA, uidB, wonsB);
-    }
-
-    @Override
     public Optional<Uid> findWinnerId(PingPongMatchRules rules, Map<Uid, Integer> wonSets) {
         return wonSets.entrySet().stream()
                 .filter(e -> e.getValue() >= rules.getSetsToWin())
                 .map(Map.Entry::getKey)
                 .findAny();
-    }
-
-    public Optional<Uid> findStronger(Map<Uid, Integer> wonSets) {
-        if (wonSets.size() == 1) {
-            return wonSets.keySet().stream().findFirst();
-        }
-        final List<Uid> uids = new ArrayList<>(wonSets.keySet());
-        final int scoreA = wonSets.get(uids.get(0));
-        final int scoreB = wonSets.get(uids.get(1));
-        if (scoreA < scoreB) {
-            return Optional.of(uids.get(1));
-        } else if (scoreA > scoreB) {
-            return Optional.of(uids.get(0));
-        } else {
-            return Optional.empty();
-        }
     }
 
     public void checkWonSets(PingPongMatchRules rules, Map<Uid, Integer> uidWonSets) {

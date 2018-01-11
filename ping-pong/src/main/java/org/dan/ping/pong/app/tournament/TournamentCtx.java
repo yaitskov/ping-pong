@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import org.dan.ping.pong.app.tournament.rules.GroupRuleValidator;
-import org.dan.ping.pong.app.tournament.rules.MatchRuleValidator;
+import org.dan.ping.pong.app.tournament.rules.PingPongMatchRuleValidator;
 import org.dan.ping.pong.app.tournament.rules.TournamentRulesValidator;
 import org.springframework.context.annotation.Import;
 
@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Import;
         TournamentAccessor.class,
         TournamentRulesValidator.class,
         GroupRuleValidator.class,
-        MatchRuleValidator.class,
+        PingPongMatchRuleValidator.class,
         TournamentService.class})
 public class TournamentCtx {
 }

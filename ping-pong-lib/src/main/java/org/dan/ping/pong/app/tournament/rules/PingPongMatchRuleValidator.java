@@ -7,7 +7,7 @@ import static org.dan.ping.pong.app.tournament.rules.ValidationError.ofTemplate;
 import com.google.common.collect.Multimap;
 import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 
-public class MatchRuleValidator {
+public class PingPongMatchRuleValidator {
     private static final String MATCH_RULE = "match-rule";
     private static final String SET_TO_WIN = ".set-to-win";
     private static final String MIN_POSSIBLE_GAMES = ".min-possible-games";

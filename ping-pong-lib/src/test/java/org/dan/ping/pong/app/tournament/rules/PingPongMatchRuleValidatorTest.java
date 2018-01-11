@@ -7,8 +7,8 @@ import static org.junit.Assert.assertEquals;
 import com.google.common.collect.Multimap;
 import org.junit.Test;
 
-public class MatchRuleValidatorTest {
-    private MatchRuleValidator sut = new MatchRuleValidator();
+public class PingPongMatchRuleValidatorTest {
+    private PingPongMatchRuleValidator sut = new PingPongMatchRuleValidator();
     private final Multimap<String, ValidationError> EMPTY = create();
 
     @Test

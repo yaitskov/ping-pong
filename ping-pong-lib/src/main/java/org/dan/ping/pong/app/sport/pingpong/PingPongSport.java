@@ -9,7 +9,7 @@ import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.sport.Sport;
 import org.dan.ping.pong.app.sport.SportType;
-import org.dan.ping.pong.app.tournament.rules.MatchRuleValidator;
+import org.dan.ping.pong.app.tournament.rules.PingPongMatchRuleValidator;
 import org.dan.ping.pong.app.tournament.rules.ValidationError;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
 
     @Override
     public void validate(Multimap<String, ValidationError> errors, PingPongMatchRules rules) {
-        MatchRuleValidator.validate(errors, rules);
+        PingPongMatchRuleValidator.validate(errors, rules);
     }
 
     @Override

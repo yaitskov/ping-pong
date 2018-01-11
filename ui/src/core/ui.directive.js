@@ -47,7 +47,7 @@ angular.module('core.ui').
        [ bs-toggle-target="#anchor" ]
        [ bs-toggle-options=="$ctrl.bsToggleOptions" ]
     */
-    directive('bsToggle', ['$timeout', function ($timeout) {
+    directive('bsToggle', ['$anchorScroll', '$timeout', function ($anchorScroll, $timeout) {
         return {
             require: 'ngModel',
             restrict: 'A',
@@ -57,7 +57,7 @@ angular.module('core.ui').
             },
             link: function (scope, element, attrs, ngModel) {
                 function init(on, off) {
-                    var options = Object.assign({on: on, off: off},
+                    var options = Object.assign({on: on, off: off, size: 'mini'},
                                                 scope.bsToggleOptions() || {});
                     $(element[0]).bootstrapToggle(options);
                     $(element[0]).change(function () {
@@ -67,13 +67,18 @@ angular.module('core.ui').
                     if (attrs.bsToggleDisabled) {
                         $(element[0]).bootstrapToggle('disable');
                     }
+                    attrs.enabled = false;
                     scope.$watch(
                         function () {
                             return ngModel.$modelValue;
                         },
                         function (checked) {
+                            if (attrs.enabled && attrs.bsTogglerAnchor) {
+                               $timeout(() => $anchorScroll(attrs.bsTogglerAnchor), 50);
+                            }
                             $(element[0]).prop('checked', checked).change();
                         });
+                    $timeout(() => attrs.enabled = true, 100);
                 }
                 init(attrs.bsToggleOn, attrs.bsToggleOff);
             }

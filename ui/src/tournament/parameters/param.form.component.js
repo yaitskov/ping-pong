@@ -5,7 +5,7 @@ import template from './param.form.template.html';
 const defaultGroupRules = {
     quits: 1,
     groupSize: 8,
-    disambiguation: 'CMP_WIN_AND_LOSE',
+    disambiguation: 'CMP_WIN_MINUS_LOSE',
     schedule: {
         size2Schedule: {2: [0,1]}
     }

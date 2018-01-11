@@ -85,6 +85,14 @@
     </a>
   </div>
   <div id="match-parameters" class="toggle-panel in">
+    <div class="form-group" ng-show="$ctrl.rules.match['@type'] == 'Tennis'">
+      <label>{{ 'Super tie break games' | translate }}</label>
+      <div touch-spin options="$ctrl.options.sets"
+           ng-model="$ctrl.rules.match.superTieBreakGames"></div>
+      <p class="help-block">
+        {{ 'super-time-break-games-help' | translate }}
+      </p>
+    </div>
     <div class="form-group">
       <label>{{ 'Sets to win a match' | translate }}</label>
       <div touch-spin options="$ctrl.options.sets"
@@ -139,10 +147,11 @@
       </a>
     </div>
   </div>
-  <div class="form-group toggle-btn">
+  <div class="form-group toggle-btn" id="group-parameters-toggler">
     <label>{{ 'group-lbl' | translate }}</label>
     <input type="checkbox"
            data-size="small"
+           bs-toggler-anchor="group-parameters-toggler"
            ng-model="$ctrl.useGroup"
            bs-toggle-on="{{ 'yes-lbl' | translate }}"
            bs-toggle-off="{{ 'no-lbl' | translate }}"
@@ -209,10 +218,11 @@
       </p>
     </div>
   </div>
-  <div class="form-group toggle-btn">
+  <div class="form-group toggle-btn" id="play-off-parameters-toggler">
     <label>{{ 'play-off-lbl' | translate }}</label>
     <input type="checkbox"
            data-size="small"
+           bs-toggler-anchor="play-off-parameters-toggler"
            ng-model="$ctrl.usePlayOff"
            bs-toggle-on="{{ 'yes-lbl' | translate }}"
            bs-toggle-off="{{ 'no-lbl' | translate }}"

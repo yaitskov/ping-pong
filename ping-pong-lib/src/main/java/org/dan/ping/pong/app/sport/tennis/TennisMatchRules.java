@@ -22,7 +22,7 @@ public class TennisMatchRules implements MatchRules {
     private int minAdvanceInGames; // 2
     private int minPossibleGames; // 0
     private int setsToWin; // 2
-    private int tieBreakGames;  // 10
+    private int superTieBreakGames;  // 10
 
     public SportType sport() {
         return SportType.Tennis;
@@ -33,7 +33,7 @@ public class TennisMatchRules implements MatchRules {
         return MyPendingMatchTennisSport.builder()
                 .minAdvanceInGames(minAdvanceInGames)
                 .minGamesToWin(minGamesToWin)
-                .tieBreakGames(tieBreakGames)
+                .superTieBreakGames(superTieBreakGames)
                 .build();
     }
 }

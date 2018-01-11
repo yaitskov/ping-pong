@@ -2,6 +2,19 @@
 <div class="container new-tournament">
   <form novalidate name="$ctrl.form" ng-submit="$ctrl.showTournamentParameters()">
     <div class="form-group"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.sport.$dirty) && $ctrl.form.sport.$invalid}">
+      <label for="sport">{{ 'sport name' | translate }}</label>
+      <select class="form-control"
+              ng-model="$ctrl.tournament.sport"
+              required name="sport" id="sport">
+        <option value="Tennis" translate="tennis-lbl"/>
+        <option value="PingPong" translate="ping-pong-lbl"/>
+      </select>
+      <p class="help-block" ng-show="$ctrl.form.sport.$error.required">
+        {{ 'Sport is required' | translate }}
+      </p>
+    </div>
+    <div class="form-group"
          ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.name.$dirty) && $ctrl.form.name.$invalid}">
       <label for="name">{{ 'tournament name' | translate }}</label>
       <input type="text" class="form-control"

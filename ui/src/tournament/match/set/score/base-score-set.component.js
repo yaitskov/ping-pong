@@ -29,11 +29,13 @@ angular.
                                  self.winnerIdx = (winScore == self.scores[0]) ? 0 : 1;
                                  self.scores[self.winnerIdx] = winScore;
                                  self.scores[1 - self.winnerIdx] = lostScore;
-                                 for (var i = 0; i <= Math.max(self.match.minGamesToWin - self.match.minAdvanceInGames, lostScore); ++i) {
+                                 const sport = self.match.sport;
+                                 const limit = Math.max(sport.minGamesToWin - sport.minAdvanceInGames, lostScore);
+                                 for (var i = 0; i <= limit; ++i) {
                                      self.possibleLostScores.push(i);
                                  }
-                                 var winLimit = Math.max(self.match.minGamesToWin, winScore);
-                                 for (var i = self.match.minGamesToWin; i <= winLimit; ++i) {
+                                 var winLimit = Math.max(sport.minGamesToWin, winScore);
+                                 for (var i = sport.minGamesToWin; i <= winLimit; ++i) {
                                      self.possibleWinScores.push(i);
                                  }
                              } else {
@@ -42,10 +44,11 @@ angular.
                              }
                          }
                          self.noBalance = function () {
-                             self.possibleWinScores = [self.match.minGamesToWin];
+                             const sport = self.match.sport;
+                             self.possibleWinScores = [sport.minGamesToWin];
                              self.possibleLostScores = [];
-                             self.scores[self.winnerIdx] = self.match.minGamesToWin;
-                             for (var i = 0 ; i <= self.match.minGamesToWin - self.match.minAdvanceInGames; ++i) {
+                             self.scores[self.winnerIdx] = sport.minGamesToWin;
+                             for (var i = 0 ; i <= sport.minGamesToWin - sport.minAdvanceInGames; ++i) {
                                  self.possibleLostScores.push(i);
                              }
                          };
@@ -53,22 +56,23 @@ angular.
                              self.possibleLostScores.length = 0;
                              var last = self.possibleWinScores[self.possibleWinScores.length - 1];
                              self.possibleWinScores.length = 0;
-                             self.possibleWinScores.push(self.match.minGamesToWin);
+                             self.possibleWinScores.push(self.match.sport.minGamesToWin);
                              for (var i = 0; i < 3; ++i) {
                                  self.possibleWinScores.push(++last);
                              }
                          };
                          self.pick = (idx, score, noEvent) => {
                              self.scores[idx] = score;
-                             if (score > self.match.minGamesToWin) {
-                                 self.scores[1 - idx] = score - self.match.minAdvanceInGames;
+                             const sport = self.match.sport;
+                             if (score > sport.minGamesToWin) {
+                                 self.scores[1 - idx] = score - sport.minAdvanceInGames;
                                  $rootScope.$broadcast('event.base.match.set.pick.lost',
                                                        {setOrdNumber: self.match.playedSets,
                                                         scores: findScores()});
-                             } else if (score == self.match.minGamesToWin && self.possibleWinScores.length > 1) {
+                             } else if (score == sport.minGamesToWin && self.possibleWinScores.length > 1) {
                                  self.noBalance();
-                                 if (self.scores[1 - idx] > score - self.match.minAdvanceInGames) {
-                                     self.scores[1 - idx] = score - self.match.minAdvanceInGames;
+                                 if (self.scores[1 - idx] > score - sport.minAdvanceInGames) {
+                                     self.scores[1 - idx] = score - sport.minAdvanceInGames;
                                  }
                              }
                          };

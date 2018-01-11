@@ -1,39 +1,7 @@
 import angular from 'angular';
 import template from './new-tr-param.template.html';
-
-const defaultRules = {
-    casting: {
-        policy: 'ProvidedRating',
-        direction: 'Decrease',
-        splitPolicy: 'BalancedMix',
-        providedRankOptions: {
-            label: 'rating',
-            minValue: 0,
-            maxValue: 1000000
-        }
-    },
-    match: {
-        minGamesToWin: 11,
-        minAdvanceInGames: 2,
-        minPossibleGames: 0,
-        setsToWin: 3
-    },
-    group: {
-        disambiguation: 'CMP_WIN_AND_LOSE',
-        quits: 2,
-        groupSize: 8,
-        schedule: {
-            size2Schedule: {
-                2: [0, 1],
-                3: [0, 2, 0, 1, 1, 2]
-            }
-        }
-    },
-    playOff: {
-        losings: 1,
-        thirdPlaceMatch: 1
-    }
-};
+import defaultMatchRules from './default-match-rules.js';
+import defaultTournamentRules from './default-tournament-rules.js';
 
 angular.
     module('tournament').
@@ -43,11 +11,14 @@ angular.
                      'pageCtx', 'requestStatus', 'moment', 'groupSchedule',
                      '$scope', '$rootScope', 'binder',
                      function (auth, mainMenu, $http, $location,
-                      pageCtx, requestStatus, $moment, groupSchedule,
-                      $scope, $rootScope, binder) {
+                               pageCtx, requestStatus, $moment, groupSchedule,
+                               $scope, $rootScope, binder) {
                          var self = this;
                          self.tournament = pageCtx.get('newTournament') || {};
-                         self.tournament.rules = Object.assign({}, defaultRules, self.tournament.rules || {});
+                         self.tournament.rules = Object.assign({},
+                             defaultTournamentRules,
+                             {match: defaultMatchRules[self.tournament.sport]},
+                             self.tournament.rules || {});
                          self.published = self.tournament.tid;
 
                          binder($scope, {

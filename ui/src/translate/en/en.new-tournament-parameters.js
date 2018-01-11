@@ -19,6 +19,8 @@ module.exports = {
     'seeding-lbl': 'Seeding',
     'rank-direction-lbl': 'Order',
     'Sets to win a match': 'Number of sets',
+    'super-time-break-games-help': 'How much balls to get to win to the tiebreak',
+    'Super tie break games': 'Super tie break games',
     'group-schedule-help': 'Sets up an order for playing matches in a group.'
         + ' One line per case with a specified number of participants.'
         + ' An example for 3 participants in a group is'

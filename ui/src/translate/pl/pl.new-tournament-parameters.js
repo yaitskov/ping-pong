@@ -18,6 +18,8 @@ module.exports = {
     'seeding-lbl': 'Rozstawenia',
     'rank-direction-lbl': 'Sortować',
     'Sets to win a match': 'Ilość setów',
+    'super-time-break-games-help': 'Ile pilek zdobyć, żeby wygrać tajbrejk',
+    'Super tie break games': 'Super tajbrejk gemy',
     'group-schedule-help': 'Nadaje kolejność gier w grupie w zależności od ilość uczestników.'
         + ' Każdy wypadek na własnej linijkę zaczyna z ilości osób.'
         + ' Naprzykład dla 3 uczestników w grupie: "3: 1-2, 1-3, 2-3".'

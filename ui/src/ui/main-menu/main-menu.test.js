@@ -1,7 +1,7 @@
 describe('main-menu', function () {
-    beforeEach(module('pingPong'));
+    beforeEach(angular.mock.module('pingPong'));
 
-    beforeEach(module(function ($provide) {
+    beforeEach(angular.mock.module(function ($provide) {
         $provide.value('auth', {
             myName: () => 'gost',
             userType: function () {

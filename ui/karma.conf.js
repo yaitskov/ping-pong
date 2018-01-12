@@ -4,13 +4,15 @@ module.exports = (config) => {
         frameworks: ['jasmine'],
         files: [
             'dist/bundle.js',
+            'node_modules/angular-mocks/angular-mocks.js',
             'src/**/*.test.js'],
+        webpack: require("./webpack.config.js"),
         exclude: [],
         preprocessors: {
             'src/**/*.test.js': 'webpack',
-            'dist/bundle.js': 'coverage'
+            //'dist/bundle.js': 'coverage'
         },
-        reporters: ['progress', 'coverage', 'kjhtml', 'mocha', 'html'],
+        reporters: ['progress', /*'coverage', 'kjhtml', 'mocha', 'html'*/],
         htmlReporter: {
             outputFile: 'tests/units.html',
             // Optional
@@ -20,7 +22,7 @@ module.exports = (config) => {
             useCompactStyle: true,
             useLegacyStyle: true
         },
-        webpack: require("./webpack.config.js"),
+
         colors: true,
         logLevel: config.LOG_INFO,
         autoWatch: false,
@@ -31,7 +33,7 @@ module.exports = (config) => {
         //         debug: true,
         //     },
         // },
-        singleRun: false,
+        singleRun: true,
         concurrency: Infinity
     })
 }

@@ -1,13 +1,9 @@
-import angular from 'angular';
-
-            // 'node_modules/angular/angular.js',
-import mocks from  'angular-mocks/angular-mocks.js';
-
 describe('main-menu', function () {
-    beforeEach(module('mainMenu'));
+    beforeEach(module('pingPong'));
 
     beforeEach(module(function ($provide) {
         $provide.value('auth', {
+            myName: () => 'gost',
             userType: function () {
                 console.log('mock is called');
                 return 'Admin';
@@ -16,14 +12,16 @@ describe('main-menu', function () {
     }));
 
     var $controller;
+    var $componentController;
 
-    beforeEach(inject(function(_$controller_) {
+    beforeEach(inject(function(_$controller_,_$componentController_) {
         $controller = _$controller_;
+        $componentController = _$componentController_;
     }));
 
     describe('isAdmin', function () {
         it('isAdmin true if user type Admin', function () {
-            var controller = $controller('mainMenu',{});
+            var controller = $componentController('mainMenu', {});
             expect(controller.isAdmin()).toBe(true);
         });
     });

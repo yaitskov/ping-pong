@@ -10,9 +10,9 @@ module.exports = (config) => {
         exclude: [],
         preprocessors: {
             'src/**/*.test.js': 'webpack',
-            //'dist/bundle.js': 'coverage'
+            'dist/bundle.js': [/*'sourcemap',*/ 'coverage']
         },
-        reporters: ['progress', /*'coverage', 'kjhtml', 'mocha', 'html'*/],
+        reporters: ['progress', 'coverage', 'kjhtml', 'mocha', 'html'],
         htmlReporter: {
             outputFile: 'tests/units.html',
             // Optional

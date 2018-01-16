@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const OfflinePlugin = require('offline-plugin');
-
+const WebpackSourceMapSupport = require("webpack-source-map-support");
 
 module.exports = {
     cache: true,
@@ -51,7 +51,7 @@ module.exports = {
                 loader: 'babel-loader',
                 query: {
                     presets: ["es2015", "es2016", 'es2017'],
-                    plugins: [//'transform-runtime'
+                    plugins: [ 'source-map-support' //'transform-runtime'
                         //"transform-es2015-for-of",
                         //"transform-es2015-block-scoping", "transform-strict-mode",
                         //"transform-object-rest-spread"
@@ -63,6 +63,7 @@ module.exports = {
     devtool: 'source-map',
     plugins:[
         new HardSourceWebpackPlugin(),
+        //new WebpackSourceMapSupport(),
         // new webpack.DefinePlugin({
         //     'process.env': {
         //         'NODE_ENV': JSON.stringify('production'),

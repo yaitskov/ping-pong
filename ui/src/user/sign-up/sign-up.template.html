@@ -1,6 +1,6 @@
 <main-menu></main-menu>
 <div class="container">
-  <form novalidate name="$ctrl.form" ng-submit="$ctrl.signUp()">
+  <form novalidate name="$ctrl.form" ng-submit="$ctrl.signUp($ctrl.form, $event)">
     <div class="form-group" ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.firstName.$dirty) && $ctrl.form.firstName.$invalid}">
       <label for="firstName">{{ 'First name' | translate }}</label>
       <input type="text" class="form-control"

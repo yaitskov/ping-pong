@@ -11,17 +11,14 @@ angular.
                 binder($scope, {
                     'event.main.menu.ready': (e) => mainMenu.setTitle('Sign Up btn')});
                 this.form = {};
-
                 var self = this;
-                this.getFirstName = () => this.fisrtName;
-
-                this.signUp = function (form) {
+                this.signUp = function (form, event) {
+                    event.preventDefault();
                     self.form.$setSubmitted();
                     if (!self.form.$valid) {
                         console.log('form is not valid');
                         return;
                     }
-                    console.log('sending http');
                     requestStatus.startLoading('Registering account');
                     var userName = self.firstName + ' ' + self.lastName;
                     $http.post('/api/anonymous/user/register',

@@ -31,13 +31,13 @@ module.exports = (config) => {
         jsPreprocessors.push('sourcemap');
     }
     if (config.fan) {
-        browsers.clear();
+        browsers.length = 0;
         browsers.push('PhantomJS');
     }
 
     config.set({
         basePath: '',
-        frameworks: ['jasmine'],
+        frameworks: ['jasmine', 'jasmine-matchers'],
         files: [
             'dist/bundle.js',
             'node_modules/angular-mocks/angular-mocks.js',

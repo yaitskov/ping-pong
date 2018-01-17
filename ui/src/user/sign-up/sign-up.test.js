@@ -12,19 +12,16 @@ describe('sign-up', () => {
         expect(ctx.find('#firstName').val()).toBe('321');
     });
 
-    it('sign-up just by name', angular.mock.inject(($httpBackend, $location) => {
+    it('sign-up just by name', angular.mock.inject((jsHttpBackend, $location) => {
         spyOn($location, 'path');
-        $httpBackend.whenPOST(/api.anonymous.user.register/,
-                              (data) => {
-                                  let d = JSON.parse(data);
-                                  return d.name == 'daniil iaitskov';
-                              }).
-            respond(JSON.stringify({session: '123456', uid: 1, type: 'Admin'}));
+        jsHttpBackend.onPost(/api.anonymous.user.register/,
+                             (data) => data.name == 'daniil iaitskov').
+            respondObject({session: '123456', uid: 1, type: 'Admin'});
         ctx.find('#firstName').val('daniil').triggerHandler('input');
         ctx.find('#lastName').val('iaitskov').triggerHandler('input');
         ctx.find('form').submit();
 
-        $httpBackend.flush();
+        jsHttpBackend.flush();
         expect($location.path).toHaveBeenCalledWith('/');
     }));
 });

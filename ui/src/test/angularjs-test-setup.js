@@ -2,6 +2,17 @@
 
 angular.module('pingPongE2e', ['pingPong', 'ngMock', 'pingPongE2e.templates']);
 
+angular.module('pingPongE2e')
+    .service('jsHttpBackend', ['$httpBackend', function ($httpBackend) {
+        this.onPost = (url, callback) => {
+            const requestHandler = $httpBackend.whenPOST(url, (data) => callback(JSON.parse(data)));
+            return new function () {
+                this.respondObject = (obj) => requestHandler.respond(JSON.stringify(obj));
+            };
+        };
+        this.flush = () => $httpBackend.flush();
+    }]);
+
 function camelCase(name, separator) {
     return name.split(separator).map((word, i) => i ? word[0] + word.substr(1) : word).join('');
 }

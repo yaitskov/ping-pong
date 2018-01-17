@@ -1,33 +1,23 @@
-
-angular.module('pingPongE2e', ['pingPong', 'ngMockE2E', 'pingPongE2e.templates']);
+import setupAngularJs from 'test/angularjs-test-setup.js';
 
 describe('sign-up', function () {
-    var $httpBackend, createController, authRequestHandler, signUp, scope;
-    beforeEach(angular.mock.module('pingPongE2e'));
+    var ctx = setupAngularJs('sign-up');
 
-    var controller;
-    var scope;
-    var element;
-
-    beforeEach(angular.mock.inject(function($rootScope, $compile) {
-        scope = $rootScope.$new();
-
-        element = angular.element('<sign-up></sign-up>');
-        element = $compile(element)(scope);
-        scope.$digest();
-
-        controller = element.controller('signUp');
-        console.log("controller element " + element + " controller " + controller);
-        scope.$apply();
-    }));
-
-    it('sign up successfully', function() {
-        expect(element.find('input').val()).toBe('');
-        element.find('input').val('123');
-        expect(element.find('#firstName').val()).toBe('123');
-
-
-            //expect(signUp.getFirstName()).toBe('dan');
+    it('controller and dom', () => {
+        expect(ctx.element.find('input').val()).toBe('');
+        ctx.scope.$digest();
+        ctx.scope.$digest();
+        ctx.element.find('input').val('123');
+        ctx.scope.$digest();
+        ctx.scope.$digest();
+        expect(ctx.element.find('#firstName').val()).toBe('123');
+        expect(ctx.ctrl.firstName).toBe('123');
+        ctx.scope.$digest();
+        ctx.scope.$digest();
+        ctx.ctrl.firstName = '321';
+        ctx.scope.$digest();
+        ctx.scope.$digest();
+        expect(ctx.element.find('#firstName').val()).toBe('321');
             //expect(ctrl.label).toBe('Delete');
 /*
             let scope = $rootScope.$new();

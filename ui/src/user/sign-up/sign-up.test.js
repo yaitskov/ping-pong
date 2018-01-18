@@ -16,21 +16,23 @@ describe('sign-up', () => {
     ij('sign-up just by name', (jsHttpBackend, $location, LocalStorage) => {
         LocalStorage.clearAll();
         spyOn($location, 'path');
+        const name = 'daniil iaitskov';
+        const session = '123456';
         jsHttpBackend.onPostMatch(/api.anonymous.user.register/,
-                                  [e => e.toEqual(jasmine.objectContaining({name: jasmine.stringMatching(/^daniil iaitskov$/),
+                                  [e => e.toEqual(jasmine.objectContaining({name: jasmine.stringMatching(new RegExp(`^${name}$`)),
                                                                             sessionPart: jasmine.stringMatching(/^[a-f0-9]{20}$/)})),
                                    e => e.not.toContain('phone'),
                                    e => e.not.toContain('email')]).
-            respondObject({session: '123456', uid: 1, type: 'Admin'});
+            respondObject({session: session, uid: 1, type: 'Admin'});
         ctx.findSetInput(baseFormData);
         ctx.find('form').submit();
 
         jsHttpBackend.flush();
         expect($location.path).toHaveBeenCalledWith('/');
 
-        expect(LocalStorage.get('mySession')).toBe('123456');
+        expect(LocalStorage.get('mySession')).toBe(session);
         expect(LocalStorage.get('myUid')).toBe('1');
-        expect(LocalStorage.get('myName')).toBe('daniil iaitskov');
+        expect(LocalStorage.get('myName')).toBe(name);
         expect(LocalStorage.get('myEmail')).toBeNull();
         expect(LocalStorage.get('myType')).toBe('Admin');
         expect(ctx.ctrl.form.firstName.$error.required).toBeUndefined();
@@ -41,7 +43,7 @@ describe('sign-up', () => {
         spyOn($location, 'path');
         const email = 'daniil@gmail.com';
         jsHttpBackend.onPostMatch(/api.anonymous.user.register/,
-                                  [e => e.toEqual(jasmine.objectContaining({email: jasmine.stringMatching(/^daniil@gmail.com$/),
+                                  [e => e.toEqual(jasmine.objectContaining({email: jasmine.stringMatching(new RegExp(`^${email}$`)),
                                                                             phone: jasmine.stringMatching(/^911$/)}))]).
             respondObject({session: '123456', uid: 1, type: 'Admin'});
         ctx.findSetInput(Object.assign({'#email': email, '#phone': '911'},

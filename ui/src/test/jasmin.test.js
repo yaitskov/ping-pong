@@ -6,6 +6,6 @@ describe('jasmine features', () => {
     });
     it('asymmetric', () => {
         expect({a: 1, b: 'x'}).toEqual(
-            jasmine.objectContaining({a: any.oddNumber(), b: /./}));
+            jasmine.objectContaining({a: any.oddNumber(), b: jasmine.stringMatching(/./)}));
     });
 });

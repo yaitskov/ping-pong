@@ -1,5 +1,7 @@
 import setupAngularJs from 'test/angularjs-test-setup.js';
 
+const inject = angular.mock.inject;
+
 describe('sign-up', () => {
     const ctx = setupAngularJs('sign-up');
 
@@ -12,7 +14,8 @@ describe('sign-up', () => {
         expect(ctx.find('#firstName').val()).toBe('321');
     });
 
-    it('sign-up just by name', angular.mock.inject((jsHttpBackend, $location, LocalStorage) => {
+    it('sign-up just by name', inject((jsHttpBackend, $location, LocalStorage) => {
+        LocalStorage.clearAll();
         spyOn($location, 'path');
         jsHttpBackend.onPostMatch(/api.anonymous.user.register/,
                                   [e => e.toEqual(jasmine.objectContaining({name: jasmine.stringMatching(/^daniil iaitskov$/),
@@ -34,4 +37,10 @@ describe('sign-up', () => {
         expect(LocalStorage.get('myType')).toBe('Admin');
     }));
 
+    it('sign-up validation fails due empty first name', inject((LocalStorage) => {
+        LocalStorage.clearAll();
+        ctx.find('#lastName').val('iaitskov').triggerHandler('input');
+        ctx.find('form').submit();
+        expect(LocalStorage.get('mySession')).toBeNull();
+    }));
 });

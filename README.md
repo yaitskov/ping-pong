@@ -59,8 +59,15 @@ mvn -pl ping-pong -P run-server -DskipTests install
 
 Rebuilding ui part:
 ```
+cd ui && grunt
+```
+
+Ui Tests:
+```
 cd ui
-grunt
+karma start
+karma start --kstest=sign-up.test.js
+karma start --help
 ```
 
 Example of Nginx configuration for serving static connected and

@@ -35,6 +35,7 @@ describe('sign-up', () => {
         expect(LocalStorage.get('myName')).toBe('daniil iaitskov');
         expect(LocalStorage.get('myEmail')).toBeNull();
         expect(LocalStorage.get('myType')).toBe('Admin');
+        expect(ctx.ctrl.form.firstName.$error.required).toBeUndefined();
     }));
 
     it('sign-up validation fails due empty first name', inject((LocalStorage) => {
@@ -42,5 +43,6 @@ describe('sign-up', () => {
         ctx.find('#lastName').val('iaitskov').triggerHandler('input');
         ctx.find('form').submit();
         expect(LocalStorage.get('mySession')).toBeNull();
+        expect(ctx.ctrl.form.firstName.$error.required).toBeTrue();
     }));
 });

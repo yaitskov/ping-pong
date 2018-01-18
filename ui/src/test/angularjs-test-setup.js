@@ -37,6 +37,12 @@ class Ctx {
         return this.element.find(q);
     }
 
+    findSetInput(m) {
+        for (let [anchor, val] of m) {
+            this.find(anchor).val(val).triggerHandler('input');
+        }
+    }
+
     sync() {
         this.scope.$digest();
     }

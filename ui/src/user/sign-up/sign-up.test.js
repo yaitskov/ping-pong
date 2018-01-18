@@ -12,7 +12,7 @@ describe('sign-up', () => {
         expect(ctx.find('#firstName').val()).toBe('321');
     });
 
-    it('sign-up just by name', angular.mock.inject((jsHttpBackend, $location) => {
+    it('sign-up just by name', angular.mock.inject((jsHttpBackend, $location, LocalStorage) => {
         spyOn($location, 'path');
         jsHttpBackend.onPostMatch(/api.anonymous.user.register/,
                                   [e => e.toEqual(jasmine.objectContaining({name: jasmine.stringMatching(/^daniil iaitskov$/),
@@ -27,6 +27,11 @@ describe('sign-up', () => {
         jsHttpBackend.flush();
         expect($location.path).toHaveBeenCalledWith('/');
 
+        expect(LocalStorage.get('mySession')).toBe('123456');
+        expect(LocalStorage.get('myUid')).toBe('1');
+        expect(LocalStorage.get('myName')).toBe('daniil iaitskov');
+        expect(LocalStorage.get('myEmail')).toBeNull();
+        expect(LocalStorage.get('myType')).toBe('Admin');
     }));
 
 });

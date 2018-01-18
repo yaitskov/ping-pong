@@ -16,7 +16,9 @@ describe('sign-up', () => {
         spyOn($location, 'path');
         jsHttpBackend.onPostMatch(/api.anonymous.user.register/,
                                   [e => e.toEqual(jasmine.objectContaining({name: jasmine.stringMatching(/^daniil iaitskov$/),
-                                                                            sessionPart: jasmine.stringMatching(/^[a-f0-9]{20}$/)}))]).
+                                                                            sessionPart: jasmine.stringMatching(/^[a-f0-9]{20}$/)})),
+                                   e => e.not.toContain('phone'),
+                                   e => e.not.toContain('email')]).
             respondObject({session: '123456', uid: 1, type: 'Admin'});
         ctx.find('#firstName').val('daniil').triggerHandler('input');
         ctx.find('#lastName').val('iaitskov').triggerHandler('input');
@@ -24,6 +26,7 @@ describe('sign-up', () => {
 
         jsHttpBackend.flush();
         expect($location.path).toHaveBeenCalledWith('/');
+
     }));
 
 });

@@ -14,8 +14,9 @@ describe('sign-up', () => {
 
     it('sign-up just by name', angular.mock.inject((jsHttpBackend, $location) => {
         spyOn($location, 'path');
-        jsHttpBackend.onPost(/api.anonymous.user.register/,
-                             (data) => data.name == 'daniil iaitskov').
+        jsHttpBackend.onPostMatch(/api.anonymous.user.register/,
+                                  [e => e.toEqual(jasmine.objectContaining({name: any.containing('daniil iaitskov'),
+                                                                            sessionPart: any.thatMatch(/^[a-f0-9]{20}$/)}))]).
             respondObject({session: '123456', uid: 1, type: 'Admin'});
         ctx.find('#firstName').val('daniil').triggerHandler('input');
         ctx.find('#lastName').val('iaitskov').triggerHandler('input');
@@ -24,4 +25,5 @@ describe('sign-up', () => {
         jsHttpBackend.flush();
         expect($location.path).toHaveBeenCalledWith('/');
     }));
+
 });

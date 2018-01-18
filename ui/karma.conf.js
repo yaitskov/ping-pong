@@ -38,9 +38,17 @@ module.exports = (config) => {
     config.set({
         basePath: '',
         frameworks: ['jasmine', 'jasmine-matchers'],
+        // plugins: [
+        //     'karma-jasmine',
+        //     'webpack',
+        //     'ng-html2js',
+        //     'karma-jasmine-matchers'
+        // ],
+
         files: [
             'dist/bundle.js',
             'node_modules/angular-mocks/angular-mocks.js',
+            //'node_modules/jasmine-expect/dist/jasmine-matchers.js',
             'dist/*.html',
             config.kstest ?  `src/**/${config.kstest}` : 'src/**/*.test.js'],
         exclude: [],

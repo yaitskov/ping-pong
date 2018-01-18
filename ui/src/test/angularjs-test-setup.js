@@ -4,11 +4,20 @@ angular.module('pingPongE2e', ['pingPong', 'ngMock', 'pingPongE2e.templates']);
 
 angular.module('pingPongE2e')
     .service('jsHttpBackend', ['$httpBackend', function ($httpBackend) {
+        const self = this;
         this.onPost = (url, callback) => {
             const requestHandler = $httpBackend.whenPOST(url, (data) => callback(JSON.parse(data)));
             return new function () {
                 this.respondObject = (obj) => requestHandler.respond(JSON.stringify(obj));
             };
+        };
+        this.onPostMatch = (url, matchersF) => {
+            return self.onPost(url, (obj) => {
+                for (let matcherF of matchersF) {
+                    matcherF(expect(obj));
+                }
+                return true;
+            });
         };
         this.flush = () => $httpBackend.flush();
     }]);

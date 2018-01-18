@@ -59,6 +59,7 @@
         "grunt-exec": "^3.0.0",
         "grunt-html-build": "^0.7.1",
         "grunt-install-dependencies": "^0.2.0",
+        "grunt-karma": "^2.0.0",
         "grunt-webpack": "^3.0.2",
         "html-loader": "^0.5.1",
         "html-webpack-plugin": "^2.30.1",

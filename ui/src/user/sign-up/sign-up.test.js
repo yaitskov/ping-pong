@@ -1,6 +1,4 @@
-import setupAngularJs from 'test/angularjs-test-setup.js';
-
-const inject = angular.mock.inject;
+import { setupAngularJs, ij } from 'test/angularjs-test-setup.js';
 
 describe('sign-up', () => {
     const ctx = setupAngularJs('sign-up');
@@ -14,7 +12,7 @@ describe('sign-up', () => {
         expect(ctx.find('#firstName').val()).toBe('321');
     });
 
-    it('sign-up just by name', inject((jsHttpBackend, $location, LocalStorage) => {
+    ij('sign-up just by name', (jsHttpBackend, $location, LocalStorage) => {
         LocalStorage.clearAll();
         spyOn($location, 'path');
         jsHttpBackend.onPostMatch(/api.anonymous.user.register/,
@@ -36,13 +34,13 @@ describe('sign-up', () => {
         expect(LocalStorage.get('myEmail')).toBeNull();
         expect(LocalStorage.get('myType')).toBe('Admin');
         expect(ctx.ctrl.form.firstName.$error.required).toBeUndefined();
-    }));
+    });
 
-    it('sign-up validation fails due empty first name', inject((LocalStorage) => {
+    ij('sign-up validation fails due empty first name', (LocalStorage) => {
         LocalStorage.clearAll();
         ctx.find('#lastName').val('iaitskov').triggerHandler('input');
         ctx.find('form').submit();
         expect(LocalStorage.get('mySession')).toBeNull();
         expect(ctx.ctrl.form.firstName.$error.required).toBeTrue();
-    }));
+    });
 });

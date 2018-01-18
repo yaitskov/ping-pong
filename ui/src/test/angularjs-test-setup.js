@@ -42,7 +42,7 @@ class Ctx {
     }
 }
 
-export default function setupAngularJs(ctrlElementId) {
+export function setupAngularJs(ctrlElementId) {
     beforeEach(angular.mock.module('pingPongE2e'));
 
     const ctx = new Ctx();
@@ -60,4 +60,8 @@ export default function setupAngularJs(ctrlElementId) {
     }));
 
     return ctx;
+}
+
+export function ij(name, f) {
+    it(name, angular.mock.inject(f));
 }

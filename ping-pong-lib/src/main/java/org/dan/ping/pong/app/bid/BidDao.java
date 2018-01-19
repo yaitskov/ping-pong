@@ -32,6 +32,8 @@ public interface BidDao {
 
     void setGroupForUids(int gid, Tid tid, List<ParticipantMemState> groupBids);
 
+    void setGroupForUids(DbUpdater batch, int gid, Tid tid, List<ParticipantMemState> groupBids);
+
     void enlist(ParticipantMemState bid, Optional<Integer> providedRank, DbUpdater batch);
 
     List<ParticipantState> findEnlisted(Tid tid);

@@ -134,8 +134,8 @@ public class JustPlayOff2DefeatsJerseyTest extends AbstractSpringJerseyTest {
                 .quitsGroup(p1, p2, p3, p4, p5, p6, p7, p8)
                 // first round
                 .win(p1, p8)
-                .win(p4, p5)
-                .win(p3, p6)
+                .custom(game(p4, p5, 11, 1))
+                .custom(game(p3, p6, 11, 7))
                 .win(p2, p7)
                 // second round
                 .win(p1, p4)

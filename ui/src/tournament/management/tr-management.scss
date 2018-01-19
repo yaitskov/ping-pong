@@ -1,0 +1,18 @@
+@import "~css/media-mixin.scss";
+
+.icon-image {
+    width: 18px;
+}
+
+@include desktop-media {
+    .my-tournament-admin {
+        table tr td:first-child {
+            width: 30%;
+        }
+        .form-group .btn-group {
+            a {
+                margin-right: 4px;
+            }
+        }
+    }
+}

@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.category;
 
 import static java.util.stream.Collectors.toList;
-import static ord.dan.ping.pong.jooq.tables.Category.CATEGORY;
+import static org.dan.ping.pong.jooq.tables.Category.CATEGORY;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;

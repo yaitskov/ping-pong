@@ -1,7 +1,9 @@
 module.exports = {
     'Set won name': 'Zwycięzca',
-    'Win set score': 'Gemy wygrane',
-    'Lost set score': 'Gemy przegrane',
+    'Win set score': 'Piłki wygrane',
+    'Lost set score': 'Piłki przegrane',
+    'Win set games': 'Gemy wygrane',
+    'Lost set games': 'Gemy przegrane',
     'Match Review': 'Recenzja meczu',
     'Judge next': 'Kolejny mecz',
     'match-is-complete-info': 'Ten mecz jest zakończony. Sprawdź wynik i przechodź do kolejnego meczu.',

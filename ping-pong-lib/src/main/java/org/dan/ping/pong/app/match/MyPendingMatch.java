@@ -25,7 +25,6 @@ public class MyPendingMatch {
     private Optional<UserLink> enemy;
     private MatchType matchType;
     private Optional<TableLink> table;
-    private int minGamesToWin;
-    private int minAdvanceInGames;
+    private MyPendingMatchSport sport;
     private int playedSets;
 }

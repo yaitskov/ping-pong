@@ -1,8 +1,14 @@
 module.exports = {
     'disambiguation-group-lbl': 'Gdy ilość wygranych meczy podobna',
-    'CMP_WIN_AND_LOSE': 'Porównywać wygrane i przegrane gemy',
-    'CMP_WIN_MINUS_LOSE': 'Porównywać wygrane minus przegrane gemy',
-    'disambiguation-group-help': 'Decyduje jak wybierać uczestników'
+    'CMP_WIN_AND_LOSE': 'Porównywać wygrane i przegrane',
+    'CMP_WIN_MINUS_LOSE': 'Porównywać wygrane minus przegrane',
+    'Tennis-disambiguation-group-help': 'Decyduje jak wybierać uczestników'
+        + ' gdy ilość wygranych meczy taka sama. W razie "wygrane i przegrane" '
+        + ' liczy się suma wygranych piłek we wszystkich meczach.'
+        + ' Jeśli oni są też podobny wtedy liczy się suma przegranych piłek.'
+        + ' A w razie "wygrane minus przegrane" liczy się suma wygranych piłek z'
+        + ' odejmowaniem sumy przeganych piłek.',
+    'PingPong-disambiguation-group-help': 'Decyduje jak wybierać uczestników'
         + ' gdy ilość wygranych meczy taka sama. W razie "wygrane i przegrane" '
         + ' liczy się suma wygranych gemów we wszystkich meczach.'
         + ' Jeśli oni są też podobny wtedy liczy się suma przegranych gemów.'
@@ -18,15 +24,20 @@ module.exports = {
     'seeding-lbl': 'Rozstawenia',
     'rank-direction-lbl': 'Sortować',
     'Sets to win a match': 'Ilość setów',
+    'super-time-break-games-help': 'Ile gemów zdobyć, żeby wygrać tajbrejk',
+    'Super tie break games': 'Super tajbrejk gemy',
     'group-schedule-help': 'Nadaje kolejność gier w grupie w zależności od ilość uczestników.'
         + ' Każdy wypadek na własnej linijkę zaczyna z ilości osób.'
         + ' Naprzykład dla 3 uczestników w grupie: "3: 1-2, 1-3, 2-3".'
         + ' Jeśli nie ma odpowiedniego wariantu wtedy '
         + ' meczi są odgrywane zgodnie z regulaminem PZTS 2016.',
     'Min score to win a set': 'Min ilość punktów',
+    'Min games to win a set': 'Min ilość gemów',
     'min-score-to-win-set-help': 'Minimalna ilośc punktów do zdobycia seta',
+    'min-games-to-win-set-help': 'Minimalna ilośc gemów do zdobycia seta',
     'Min score advance to win a set': 'Min przewaga',
     'min-score-advance-help': 'Minimalna przewaga w punktach do zdobycia seta',
+    'min-games-advance-help': 'Minimalna przewaga w gemach do zdobycia seta',
     'decreasing-lbl': 'Malejąco',
     'increasing-lbl': 'Rosnąco',
     'rank-policy-lbl': 'Sposób rankingu',

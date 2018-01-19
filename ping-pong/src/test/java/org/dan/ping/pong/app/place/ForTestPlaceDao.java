@@ -1,8 +1,8 @@
 package org.dan.ping.pong.app.place;
 
-import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
-import static ord.dan.ping.pong.jooq.tables.PlaceAdmin.PLACE_ADMIN;
-import static ord.dan.ping.pong.jooq.tables.Tables.TABLES;
+import static org.dan.ping.pong.jooq.Tables.TOURNAMENT;
+import static org.dan.ping.pong.jooq.tables.PlaceAdmin.PLACE_ADMIN;
+import static org.dan.ping.pong.jooq.tables.Tables.TABLES;
 import static org.dan.ping.pong.app.table.TableState.Free;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 

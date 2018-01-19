@@ -160,9 +160,8 @@ public class MatchInfo {
         return setScore;
     }
 
-    public Optional<Uid> addSetScore(List<IdentifiedScore> scores, MatchValidationRule rule) {
+    public void addSetScore(List<IdentifiedScore> scores) {
         scores.forEach(score -> participantIdScore.get(score.getUid()).add(score.getScore()));
-        return rule.findWinnerId(rule.calcWonSets(getParticipantIdScore()));
     }
 
     public Set<Uid> getUids() {

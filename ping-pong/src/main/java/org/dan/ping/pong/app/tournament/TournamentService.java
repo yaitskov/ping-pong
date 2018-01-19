@@ -4,7 +4,6 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
@@ -25,7 +24,6 @@ import static org.dan.ping.pong.app.tournament.TournamentType.Classic;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
-import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -112,10 +110,13 @@ public class TournamentService {
             if (enlist.getBidState() != Wait) {
                 throw badRequest("Bid state should be Wait");
             }
-            int gid = enlist.getGroupId()
-                    .orElseThrow(() -> badRequest("group is no set"));
-            if (!groupService.isNotCompleteGroup(tournament, gid)) {
-                throw badRequest("group is complete");
+            final Optional<Integer> ogid = enlist.getGroupId();
+            if (ogid.isPresent()) {
+                if (!groupService.isNotCompleteGroup(tournament, ogid.get())) {
+                    throw badRequest("group is complete");
+                }
+            } else {
+                groupService.ensureThatNewGroupCouldBeAdded(tournament, enlist.getCid());
             }
         } else {
             throw notDraftError(tournament);
@@ -389,6 +390,9 @@ public class TournamentService {
         if (!CONFIGURABLE_STATES.contains(tournament.getState())) {
             throw badRequest("Tournament could be modified until it's open");
         }
+        if (tournament.getSport() != parameters.getRules().getMatch().sport()) {
+            throw badRequest("sport mismatch");
+        }
         tournament.setRule(parameters.getRules());
         tournamentDao.updateParams(tournament.getTid(), tournament.getRule(), batch);
     }
@@ -469,6 +473,10 @@ public class TournamentService {
                 .name(enlistment.getName())
                 .build());
         final Instant now = clocker.get();
+        if (tournament.getState() == Open && !enlistment.getGroupId().isPresent()) {
+            enlistment.setGroupId(Optional.of(
+                    castingLotsService.addGroup(tournament, batch, enlistment.getCid())));
+        }
         tournament.getParticipants().put(participantUid, ParticipantMemState.builder()
                 .bidState(enlistment.getBidState())
                 .enlistedAt(now)

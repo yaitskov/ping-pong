@@ -3,9 +3,16 @@
   <request-status></request-status>
   <div class="form-group">
     <a class="btn btn-primary"
+       title="change group"
+       ng-show="$ctrl.participant"
+       href="#!/my/tournament/{{$ctrl.tournamentId}}/change-group/{{$ctrl.participant.user.uid}}">
+      A → B
+    </a>
+    <a class="btn btn-primary"
        ng-show="$ctrl.participant"
        href="#!/my/tournament/{{$ctrl.tournamentId}}/change-category/{{$ctrl.participant.user.uid}}">
-      {{ 'Change category' | translate }}
+      <span class="glyphicon glyphicon-step-forward"/>
+      {{ 'category-lbl' | translate }}
     </a>
     <a class="btn btn-default" back-button>
       {{ 'Back btn' | translate }}

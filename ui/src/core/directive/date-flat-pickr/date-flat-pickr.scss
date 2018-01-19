@@ -1,0 +1,8 @@
+@import '~flatpickr/dist/flatpickr.css';
+
+.flatpickr-next-month, .flatpickr-prev-month {
+    border: 1px solid #eee;
+    width: 55px;
+    padding-top: 6px;
+    font-weight: bold;
+}

@@ -12,9 +12,11 @@ angular.
                     'event.main.menu.ready': (e) => mainMenu.setTitle('Sign Up btn')});
                 this.form = {};
                 var self = this;
-                this.signUp = function (form) {
+                this.signUp = function (form, event) {
+                    event.preventDefault();
                     self.form.$setSubmitted();
                     if (!self.form.$valid) {
+                        console.log('form is not valid');
                         return;
                     }
                     requestStatus.startLoading('Registering account');

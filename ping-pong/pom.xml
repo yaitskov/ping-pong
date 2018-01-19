@@ -5,8 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.dan.ping.pong</groupId>
-        <artifactId>aggregator</artifactId>
+        <artifactId>build-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../build-parent/pom.xml</relativePath>
     </parent>
     <artifactId>ping-pong</artifactId>
     <packaging>war</packaging>
@@ -33,6 +34,13 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dan.ping.pong</groupId>
+            <artifactId>ping-pong-lib</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.dan.ping.pong</groupId>
@@ -68,7 +76,7 @@
         </dependency>
         <dependency>
             <groupId>org.dan.ping.pong</groupId>
-            <artifactId>setup-env</artifactId>
+            <artifactId>docker-containers</artifactId>
             <version>${project.parent.version}</version>
             <type>pom</type>
         </dependency>
@@ -478,6 +486,11 @@
                                     <binding>org.dan.ping.pong.sys.db.converters.PidConverter</binding>
                                 </customType>
                                 <customType>
+                                    <name>SportType</name>
+                                    <type>org.dan.ping.pong.app.sport.SportType</type>
+                                    <binding>org.dan.ping.pong.app.sport.SportTypeConverter</binding>
+                                </customType>
+                                <customType>
                                     <name>DisputeStatus</name>
                                     <type>org.dan.ping.pong.app.match.dispute.DisputeStatus</type>
                                     <binding>org.dan.ping.pong.app.match.dispute.DisputeStateConverter</binding>
@@ -627,6 +640,11 @@
                                 <forcedType>
                                     <name>Pid</name>
                                     <expression>.*place\.(pid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>SportType</name>
+                                    <expression>.*tournament\.(sport)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
@@ -855,7 +873,7 @@
                             <relations>true</relations>
                         </generate>
                         <target>
-                            <packageName>ord.dan.ping.pong.jooq</packageName>
+                            <packageName>org.dan.ping.pong.jooq</packageName>
                             <directory>target/generated-sources/</directory>
                         </target>
                     </generator>

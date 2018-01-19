@@ -17,7 +17,8 @@
   </div>
 </div>
 <div class="form-group">
-  <label translate="Win set score"/>
+  <label translate="Win set score" ng-show="$ctrl.match.sport['@type'] == 'PingPong'"/>
+  <label translate="Win set games" ng-show="$ctrl.match.sport['@type'] == 'Tennis'"/>
   <div>
     <a class="btn btn-default score"
        ng-repeat="score in $ctrl.possibleWinScores"
@@ -26,13 +27,15 @@
       {{score}}
     </a>
     <a class="btn btn-default score"
+       ng-show="$ctrl.match.sport.showExtend()"
        ng-click="$ctrl.extendWinScore()">
       ...
     </a>
   </div>
 </div>
 <div class="form-group" ng-show="$ctrl.possibleLostScores.length">
-  <label translate="Lost set score"/>
+  <label translate="Lost set score" ng-show="$ctrl.match.sport['@type'] == 'PingPong'"/>
+  <label translate="Lost set games" ng-show="$ctrl.match.sport['@type'] == 'Tennis'"/>
   <div>
     <a class="btn btn-default score"
        ng-repeat="score in $ctrl.possibleLostScores"

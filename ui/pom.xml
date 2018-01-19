@@ -17,6 +17,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>${sure.fire.version}</version>
                 <configuration>
                     <failIfNoTests>false</failIfNoTests>
                 </configuration>
@@ -24,6 +25,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec.maven.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>run-grunt</id>

@@ -65,7 +65,7 @@ public class PlayOffGenerator {
                     2, 127, 63, 66, 31, 98, 34, 95,
                     15, 114, 50, 79, 18, 111, 47, 82))
             .build();
-    private static final int FIRST_PLAY_OFF_MATCH_LEVEL = 1;
+    public static final int FIRST_PLAY_OFF_MATCH_LEVEL = 1;
     public static final Mid MID0 = new Mid(0);
 
     private final TournamentMemState tournament;

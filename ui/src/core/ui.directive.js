@@ -1,6 +1,7 @@
 import angular from 'angular';
+import './directive/directive.import.js';
 
-angular.module('core.ui', ['ngResource']).
+angular.module('core.ui').
     directive('backButton', function () {
         return {
             restrict: 'A',
@@ -46,7 +47,7 @@ angular.module('core.ui', ['ngResource']).
        [ bs-toggle-target="#anchor" ]
        [ bs-toggle-options=="$ctrl.bsToggleOptions" ]
     */
-    directive('bsToggle', ['$timeout', function ($timeout) {
+    directive('bsToggle', ['$anchorScroll', '$timeout', function ($anchorScroll, $timeout) {
         return {
             require: 'ngModel',
             restrict: 'A',
@@ -56,7 +57,7 @@ angular.module('core.ui', ['ngResource']).
             },
             link: function (scope, element, attrs, ngModel) {
                 function init(on, off) {
-                    var options = Object.assign({on: on, off: off},
+                    var options = Object.assign({on: on, off: off, size: 'mini'},
                                                 scope.bsToggleOptions() || {});
                     $(element[0]).bootstrapToggle(options);
                     $(element[0]).change(function () {
@@ -66,13 +67,18 @@ angular.module('core.ui', ['ngResource']).
                     if (attrs.bsToggleDisabled) {
                         $(element[0]).bootstrapToggle('disable');
                     }
+                    attrs.enabled = false;
                     scope.$watch(
                         function () {
                             return ngModel.$modelValue;
                         },
                         function (checked) {
+                            if (attrs.enabled && attrs.bsTogglerAnchor) {
+                               $timeout(() => $anchorScroll(attrs.bsTogglerAnchor), 50);
+                            }
                             $(element[0]).prop('checked', checked).change();
                         });
+                    $timeout(() => attrs.enabled = true, 100);
                 }
                 init(attrs.bsToggleOn, attrs.bsToggleOff);
             }
@@ -92,60 +98,6 @@ angular.module('core.ui', ['ngResource']).
             }
         };
     }]).
-    directive('clockPicker', ['$timeout', '$q', function ($timeout, $q) {
-        return {
-            restrict: 'A',
-            link: function (scope, element, attr) {
-                var ctx = {};
-                ctx.e = element.clockpicker({twelvehour: true,
-                                             vibrate: false,
-                                             placement: 'bottom',
-                                             align: 'right',
-                                             afterShow: function () {
-                                                 var val = $(ctx.e).data('clockpicker').input.val();
-                                                 if (val && val.indexOf("PM") > 0) {
-                                                     $('.pm-button').addClass('btn-primary');
-                                                     $('.am-button').removeClass('btn-primary');
-                                                 } else {
-                                                     $('.am-button').addClass('btn-primary');
-                                                     $('.pm-button').removeClass('btn-primary');
-                                                 }
-                                                 $('.am-button').click(function () {
-                                                         $(this).addClass('btn-primary');
-                                                         $('.pm-button').removeClass('btn-primary');
-                                                     });
-                                                 $('.pm-button').click(function (a, b, c) {
-                                                     $(this).addClass('btn-primary');
-                                                     $('.am-button').removeClass('btn-primary');
-                                                 });
-                                             }});
-                $(ctx.e).data('clockpicker').amOrPm = ' AM';
-            }
-        };
-    }]).
-    /**  input ng-flatpickr
-                 fp-opts="$ctrl.dateOpts"
-                 fp-on-setup="$ctrl.dataPickerUi"
-    */
-    directive('ngFlatpickr', [function() {
-        return {
-            require: 'ngModel',
-            restrict : 'A',
-            scope : {
-                fpOpts : '&',
-                fpOnSetup : '&'
-            },
-            link : function(scope, element, attrs, ngModel) {
-                var vp = new FlatpickrInstance(element[0], scope.fpOpts());
-                if (scope.fpOnSetup) {
-                    scope.fpOnSetup().fpItem = vp;
-                }
-                element.on('$destroy',function(){
-                    vp.destroy();
-                });
-            }
-        };
-    }]).
     directive('you', [function () {
         return {
             template: '<span ng-show="name == \'*you*\'">' +
@@ -157,40 +109,6 @@ angular.module('core.ui', ['ngResource']).
             restrict: 'E',
             scope: {
                 name: '='
-            }
-        };
-    }]).
-    directive('clickable', ['$location', function ($location) {
-        return {
-            scope: {},
-            restrict: 'A',
-            link: function (scope, elem, attrs) {
-                var moved = false;
-                elem.on('mouseover', function () {
-                    elem.addClass('hover');
-                });
-                elem.on('mouseout', function () {
-                    elem.removeClass('hover');
-                });
-                elem.on('mousedown', function () {
-                    moved = false;
-                    elem.addClass('clicked');
-                });
-                elem.on('mousemove', function () {
-                    moved = true;
-                });
-                elem.on('mouseup', function () {
-                    elem.removeClass('clicked');
-                    if (moved) {
-                        return;
-                    }
-                    var url = attrs.clickable;
-                    if (url) {
-                        scope.$apply(function () {
-                            $location.path(url);
-                        });
-                    }
-                });
             }
         };
     }]);

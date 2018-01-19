@@ -1,4 +1,5 @@
 import 'angular';
+import './classic-group-view.scss';
 import template from './classic-group-view.template.html';
 
 angular.
@@ -17,6 +18,7 @@ angular.
                          self.scoreShowMode = 'sets';
                          self.rowOrder = 'seed'; // final | abc
                          self.loadData = function (tournament) {
+                             self.showBalance = false;
                              self.participants = tournament.participants;
                              for (var pi in self.participants) {
                                  var p = self.participants[pi];

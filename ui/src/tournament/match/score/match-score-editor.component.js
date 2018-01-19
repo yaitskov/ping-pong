@@ -1,4 +1,5 @@
 import 'angular';
+import '../admin-score.scss';
 import template from './match-score-editor.template.html';
 
 angular.

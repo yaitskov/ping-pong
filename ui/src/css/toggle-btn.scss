@@ -1,0 +1,53 @@
+@import "core-const";
+
+.toggle-btn {
+    padding-left: 20px;
+    margin-bottom: 3px;
+    a.arrow {
+        margin-top: 7px;
+        padding-right: 10px;
+    }
+
+    > label {
+        color: $section-panel-label-color;
+        margin-top: 6px;
+    }
+
+    .collapsed {
+        .glyphicon-menu-down {
+            display: inherit;
+        }
+        .glyphicon-menu-up {
+            display: none;
+        }
+    }
+    .glyphicon-menu-down {
+        display: none;
+    }
+    .glyphicon-menu-up {
+        display: inherit;
+    }
+
+    div.toggle {
+        float: right;
+    }
+}
+
+.toggle-panel {
+    border: 1px solid $section-panel-border-color;
+    padding: 10px;
+    padding-bottom: 0px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    label.toggle-option {
+        padding-right: 10px;
+        min-width: 200px;
+    }
+
+    .toggle-on {
+        line-height: 1.8;
+    }
+}

@@ -1,7 +1,18 @@
+[![Build Status](https://travis-ci.org/yaitskov/ping-pong.svg?branch=master)](https://travis-ci.org/yaitskov/ping-pong)
+[![codecov](https://codecov.io/gh/yaitskov/ping-pong/branch/master/graph/badge.svg)](https://codecov.io/gh/yaitskov/ping-pong)
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/cloud-sport-org)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/a0215c65e53967d7c18e/test_coverage)](https://codeclimate.com/github/yaitskov/ping-pong/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/a0215c65e53967d7c18e/maintainability)](https://codeclimate.com/github/yaitskov/ping-pong/maintainability)
+
+
 #  Cloud-Sport application
 
 Cloud-Sport application is designed for conducting sport tournaments
 in sports like ping-pong, tennis, squash and badminton.
+
+
+[3 minute video explaning the main goal](https://www.youtube.com/watch?v=4-dI_iO-GBo&t=110s)
+
 
 ## Building
 
@@ -30,7 +41,7 @@ a specific situation in a tournament to debug and test UI and server
 logic manually.
 
 ```
-mvn install -DskipTests -P simulate -Dtest=OneCategorySim#tournamentOf2
+mvn install -pl ping-pong -P simulate -Dtest=OneCategorySim#tournamentOf2
 ```
 
 Next logical step is to authenticate as an admin or a participant with dev handle:
@@ -48,8 +59,15 @@ mvn -pl ping-pong -P run-server -DskipTests install
 
 Rebuilding ui part:
 ```
+cd ui && grunt
+```
+
+Ui Tests:
+```
 cd ui
-grunt
+karma start
+karma start --kstest=sign-up.test.js
+karma start --help
 ```
 
 Example of Nginx configuration for serving static connected and
@@ -85,4 +103,10 @@ server {
            alias /home/egnyte/pro/ping-pong/code/ui/src/dev;
         }
 }
+```
+
+## Mysql
+
+```
+mysql -u root -proot -H 127.0.0.1 ping_pong
 ```

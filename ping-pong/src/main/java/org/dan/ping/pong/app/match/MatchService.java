@@ -50,6 +50,7 @@ import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.sched.TablesDiscovery;
+import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -101,7 +102,7 @@ public class MatchService {
     @Inject
     private Clocker clocker;
 
-    public int roundPlayOffBase(int bids) {
+    public static int roundPlayOffBase(int bids) {
         int places = 1;
         while (places < bids) {
             places *= 2;
@@ -113,9 +114,11 @@ public class MatchService {
     @Named(SCHEDULE_SELECTOR)
     private ScheduleService scheduleService;
 
+    @Inject
+    private Sports sports;
+
     public SetScoreResult scoreSet(TournamentMemState tournament, Uid uid,
             SetScoreReq score, Instant now, DbUpdater batch) {
-        tournament.getRule().getMatch().validateSet(score.getSetOrdNumber(), score.getScores());
         final MatchInfo matchInfo = tournament.getMatchById(score.getMid());
         try {
             checkPermissions(tournament, uid, matchInfo, score);
@@ -127,7 +130,15 @@ public class MatchService {
                             : MatchContinues,
                     matchInfo);
         }
-        final Optional<Uid> winUidO = matchDao.scoreSet(tournament, matchInfo, batch, score.getScores());
+
+        final MatchInfo matchInfoForValidation = matchInfo.clone();
+        matchInfoForValidation.addSetScore(score.getScores());
+        sports.validateMatch(tournament, matchInfoForValidation);
+
+        matchInfo.addSetScore(score.getScores());
+        final Map<Uid, Integer> wonSets = sports.calcWonSets(tournament, matchInfo);
+        final Optional<Uid> winUidO = sports.findWinnerId(tournament, wonSets);
+        matchDao.scoreSet(tournament, matchInfo, batch, score.getScores());
         winUidO.ifPresent(winUid -> matchWinnerDetermined(tournament, matchInfo, winUid, batch, EXPECTED_MATCH_STATES));
 
         scheduleService.afterMatchComplete(tournament, batch, now);
@@ -266,27 +277,25 @@ public class MatchService {
             DbUpdater batch, Collection<BidState> expected) {
         final int gid = matchInfo.getGid().get();
         final Set<Uid> uids = matchInfo.getParticipantIdScore().keySet();
-        final List<MatchInfo> matches = groupService.findMatchesInGroup(tournament, gid);
-        final long completedMatches = matches.stream()
-                .map(MatchInfo::getState)
-                .filter(Over::equals)
-                .count();
         uids.stream()
                 .map(tournament::getBidOrQuit)
                 .filter(b -> expected.contains(b.getState()))
                 .forEach(b -> bidService.setBidState(b,
                         completeGroupMatchBidState(tournament, b),
                         expected, batch));
-        if (completedMatches < matches.size()) {
-            log.debug("Matches {} left to play in the group {}",
-                    matches.size() - completedMatches, gid);
-            return;
-        }
-        completeParticipationLeftBids(
-                gid,
-                tournament,
-                completeGroup(gid, tournament, matches, batch),
-                batch);
+        tryToCompleteGroup(tournament, gid, batch);
+    }
+
+    public void tryToCompleteGroup(TournamentMemState tournament, int gid, DbUpdater batch) {
+        final Optional<List<MatchInfo>> oMatches = groupService
+                .checkGroupComplete(tournament, gid);
+
+        oMatches.ifPresent(matches ->
+                completeParticipationLeftBids(
+                        gid,
+                        tournament,
+                        completeGroup(gid, tournament, oMatches.get(), batch),
+                        batch));
     }
 
     public BidState completeGroupMatchBidState(TournamentMemState tournament, ParticipantMemState b) {
@@ -390,8 +399,9 @@ public class MatchService {
                     + expectedPlayOffMatches + " !=" + playOffMatches.size()
                     + " group " + iGru.getGid());
         }
+        final int roundedGroups = roundPlayOffBase(groups.size());
         final List<Integer> matchIndexes = PlayOffMatcherFromGroup.find(
-                quits, iGru.getOrdNumber(), groups.size());
+                quits, iGru.getOrdNumber(), roundedGroups);
         for (int iQuitter = 0; iQuitter < quits; ++iQuitter) {
             int matchIdx = matchIndexes.get(iQuitter);
             assignBidToMatch(tournament, playOffMatches.get(matchIdx).getMid(),
@@ -580,8 +590,7 @@ public class MatchService {
                     .stream()
                     .collect(toMap(o -> o, o -> 0));
         }
-        return tournament.getRule().getMatch()
-                .calcWonSets(matchInfo.getParticipantIdScore());
+        return sports.calcWonSets(tournament, matchInfo);
     }
 
     public static final Set<MatchState> incompleteMatchStates = ImmutableSet.of(Draft, Place, Game);
@@ -636,10 +645,7 @@ public class MatchService {
                         .map(m -> OpenMatchForWatch.builder()
                                 .mid(m.getMid())
                                 .started(m.getStartedAt().get())
-                                .score(tournament.getRule().getMatch()
-                                        .calcWonSets(m.getParticipantIdScore())
-                                        .values()
-                                        .stream().collect(toList()))
+                                .score(sports.calcWonSets(tournament, m).values().stream().collect(toList()))
                                 .category(tournament.getCategory(m.getCid()))
                                 .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
                                 .type(m.getType())
@@ -663,7 +669,6 @@ public class MatchService {
                                         ? noTablesParticipantMatchComparator(tournament, uid)
                                         : PARTICIPANT_MATCH_COMPARATOR)
                                 .map(m -> {
-                                    final MatchValidationRule matchRules = tournament.getRule().getMatch();
                                     return MyPendingMatch.builder()
                                             .mid(m.getMid())
                                             .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
@@ -671,8 +676,7 @@ public class MatchService {
                                             .playedSets(m.getPlayedSets())
                                             .tid(tournament.getTid())
                                             .matchType(m.getType())
-                                            .minAdvanceInGames(matchRules.getMinAdvanceInGames())
-                                            .minGamesToWin(matchRules.getMinGamesToWin())
+                                            .sport(tournament.getRule().getMatch().toMyPendingMatchSport())
                                             .enemy(m.getOpponentUid(uid).map(ouid ->
                                                     ofNullable(tournament.getBid(ouid))
                                                             .orElseThrow(() -> internalError("no opponent for "
@@ -756,7 +760,6 @@ public class MatchService {
 
     public MatchResult matchResult(TournamentMemState tournament, Mid mid, Optional<Uid> ouid) {
         final MatchInfo m = tournament.getMatchById(mid);
-        final MatchValidationRule matchRules = tournament.getRule().getMatch();
         return MatchResult.builder()
                 .participants(m.getParticipantIdScore().keySet().stream()
                         .map(uid -> tournament.getBidOrExpl(uid).toLink())
@@ -769,8 +772,7 @@ public class MatchService {
                 .category(tournament.getCategory(m.getCid()))
                 .tid(tournament.getTid())
                 .playedSets(m.getPlayedSets())
-                .minGamesToWin(matchRules.getMinGamesToWin())
-                .minAdvanceInGames(matchRules.getMinAdvanceInGames())
+                .sport(tournament.getRule().getMatch().toMyPendingMatchSport())
                 .build();
     }
 
@@ -794,12 +796,10 @@ public class MatchService {
     private OpenMatchForJudge getMatchForJudge(
             TournamentMemState tournament, MatchInfo m,
             TablesDiscovery tablesDiscovery) {
-        final MatchValidationRule matchRules = tournament.getRule().getMatch();
         return OpenMatchForJudge.builder()
                 .mid(m.getMid())
                 .tid(tournament.getTid())
-                .minGamesToWin(matchRules.getMinGamesToWin())
-                .minAdvanceInGames(matchRules.getMinAdvanceInGames())
+                .sport(tournament.getRule().getMatch().toMyPendingMatchSport())
                 .playedSets(m.getPlayedSets())
                 .started(m.getStartedAt())
                 .matchType(m.getType())

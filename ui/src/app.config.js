@@ -1,5 +1,7 @@
 import angular from 'angular';
 import jQuery from 'jquery';
+import AppLang from './ui/lang.js';
+
 var translateTables = require('./translate/translate.js');
 
 angular.module('pingPong').
@@ -43,7 +45,7 @@ angular.module('pingPong').
                     // .useSanitizeValueStrategy(null)
                     .translations('en', translateTables.en)
                     .translations('pl', translateTables.pl)
-                    .preferredLanguage(localStorage.getItem('myLang') || 'pl');
+                    .preferredLanguage(AppLang.getLanguage());
                 $locationProvider.hashPrefix('!');
                 $routeProvider.
                     when('/tournament/draft/list', {
@@ -114,6 +116,9 @@ angular.module('pingPong').
                     }).
                     when('/my/tournament/:tournamentId/change-category/:participantId', {
                         template: '<tr-category-membery-switcher/>'
+                    }).
+                    when('/my/tournament/:tournamentId/change-group/:participantId', {
+                        template: '<tr-group-member-switcher/>'
                     }).
                     when('/my/matches/judgement/:tournamentId', {
                         template: '<judge-match-list-to-judge/>'

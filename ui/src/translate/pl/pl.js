@@ -22,6 +22,8 @@ module.exports = merge.apply(
      require('./pl.arena.js'),
      require('./pl.dispute.js'),
      require('./pl.category.js'),
+     require('./pl.group.js'),
+     require('./pl.sport.js'),
      require('./pl.tournament.js'),
      require('./pl.participant.js'),
      require('./pl.tournament-online-draft.js'),

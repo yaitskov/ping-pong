@@ -62,6 +62,7 @@ public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> 
                 .groups(groupDao.load(tid))
                 .matches(combineMatchesAndSets(matchDao.load(tid), matchScoreDao.load(tid)))
                 .tid(tid)
+                .sport(row.getSport())
                 .adminIds(tournamentDao.loadAdmins(tid))
                 .state(row.getState())
                 .ticketPrice(row.getTicketPrice())

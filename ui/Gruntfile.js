@@ -19,8 +19,14 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-install-dependencies');
     grunt.loadNpmTasks('grunt-webpack');
     grunt.loadNpmTasks('grunt-exec');
+    grunt.loadNpmTasks('grunt-karma');
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        karma: {
+            unit: {
+                configFile: 'karma.conf.js'
+            }
+        },
         webpack: {
             options: {
                 stats: !process.env.NODE_ENV || process.env.NODE_ENV === 'development'
@@ -35,6 +41,7 @@ module.exports = function(grunt) {
             remove_cache: 'sed -i "/^CACHE:/d" dist/appcache/manifest.appcache'
         }
     });
-    grunt.registerTask('all', ['install-dependencies', 'webpack', 'exec']);
+    grunt.registerTask('all', ['install-dependencies', 'webpack',
+                               'karma:unit:start', 'exec']);
     grunt.registerTask('default', ['all']);
 };

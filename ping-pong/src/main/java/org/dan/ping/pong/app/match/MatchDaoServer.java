@@ -3,11 +3,11 @@ package org.dan.ping.pong.app.match;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static ord.dan.ping.pong.jooq.Tables.BID;
-import static ord.dan.ping.pong.jooq.Tables.SET_SCORE;
-import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
-import static ord.dan.ping.pong.jooq.Tables.USERS;
-import static ord.dan.ping.pong.jooq.tables.Matches.MATCHES;
+import static org.dan.ping.pong.jooq.Tables.BID;
+import static org.dan.ping.pong.jooq.Tables.SET_SCORE;
+import static org.dan.ping.pong.jooq.Tables.TOURNAMENT;
+import static org.dan.ping.pong.jooq.Tables.USERS;
+import static org.dan.ping.pong.jooq.tables.Matches.MATCHES;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
@@ -22,8 +22,8 @@ import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
-import ord.dan.ping.pong.jooq.tables.Users;
-import ord.dan.ping.pong.jooq.tables.records.MatchesRecord;
+import org.dan.ping.pong.jooq.tables.Users;
+import org.dan.ping.pong.jooq.tables.records.MatchesRecord;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.bid.Uid;
@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,12 +91,9 @@ public class MatchDaoServer implements MatchDao {
     }
 
     @Override
-    public Optional<Uid> scoreSet(TournamentMemState tournament, MatchInfo matchInfo,
+    public void scoreSet(TournamentMemState tournament, MatchInfo matchInfo,
             DbUpdater batch, List<IdentifiedScore> scores) {
-        final Optional<Uid> winUidO = matchInfo.addSetScore(
-                scores, tournament.getRule().getMatch());
         insertSetScore(batch, matchInfo.getMid(), scores);
-        return winUidO;
     }
 
     @Override
@@ -197,6 +195,25 @@ public class MatchDaoServer implements MatchDao {
                         .builder()
                         .name(r.get(USERS.NAME))
                         .uid(r.get(BID.UID))
+                        .build());
+    }
+
+    @Override
+    public void deleteByIds(Collection<Mid> mids, DbUpdater batch) {
+        if (mids.isEmpty()) {
+            return;
+        }
+        log.info("Remove mids {}", mids);
+        batch
+                .exec(DbUpdateSql.builder()
+                        .mustAffectRows(empty())
+                        .query(jooq.deleteFrom(SET_SCORE)
+                                .where(SET_SCORE.MID.in(mids)))
+                        .build())
+                .exec(DbUpdateSql.builder()
+                        .mustAffectRows(NON_ZERO_ROWS)
+                        .query(jooq.deleteFrom(MATCHES)
+                                .where(MATCHES.MID.in(mids)))
                         .build());
     }
 

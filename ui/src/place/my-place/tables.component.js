@@ -1,4 +1,5 @@
 import angular from 'angular';
+import './tables.scss';
 import template from './tables.template.html';
 
 angular.

@@ -34,6 +34,5 @@ angular.
                 }
                 return result;
             };
-
         };
     }]);

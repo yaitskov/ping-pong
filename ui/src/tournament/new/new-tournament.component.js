@@ -1,4 +1,5 @@
 import angular from 'angular';
+import '../tournament.scss';
 import template from './new-tournament.template.html';
 
 angular.
@@ -9,7 +10,7 @@ angular.
                      function (auth, mainMenu, $http, $location, placePicker, pageCtx, $scope, binder) {
                          binder($scope, {
                              'event.main.menu.ready': (e) => mainMenu.setTitle('New Tournament')});
-                         this.tournament = pageCtx.get('newTournament') || {ticketPrice: 30};
+                         this.tournament = pageCtx.get('newTournament') || {ticketPrice: 30, sport: 'Tennis'};
                          if (this.tournament.tid) {
                              delete this.tournament.tid;
                          }

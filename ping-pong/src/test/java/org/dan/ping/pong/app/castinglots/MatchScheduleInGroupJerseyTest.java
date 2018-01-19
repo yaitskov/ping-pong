@@ -16,11 +16,10 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.group.DisambiguationPolicy;
 import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.group.GroupSchedule;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
-import org.dan.ping.pong.app.match.MatchValidationRule;
+import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.mock.simulator.Player;
@@ -63,14 +62,14 @@ public class MatchScheduleInGroupJerseyTest extends AbstractSpringJerseyTest {
 
     public static final GroupRules G8Q2_M = G8Q2.withDisambiguation(CMP_WIN_MINUS_LOSE);
 
-    public static final MatchValidationRule S1A2G11 = MatchValidationRule.builder()
+    public static final PingPongMatchRules S1A2G11 = PingPongMatchRules.builder()
             .setsToWin(1)
             .minAdvanceInGames(2)
             .minPossibleGames(0)
             .minGamesToWin(11)
             .build();
 
-    public static final MatchValidationRule S3A2G11 = MatchValidationRule.builder()
+    public static final PingPongMatchRules S3A2G11 = PingPongMatchRules.builder()
             .setsToWin(3)
             .minAdvanceInGames(2)
             .minPossibleGames(0)

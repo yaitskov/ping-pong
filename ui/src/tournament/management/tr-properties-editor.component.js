@@ -1,4 +1,5 @@
 import angular from 'angular';
+import '../tournament.scss';
 import template from './tr-properties-editor.template.html';
 
 angular.

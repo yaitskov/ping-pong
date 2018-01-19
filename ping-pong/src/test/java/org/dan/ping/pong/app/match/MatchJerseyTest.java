@@ -49,6 +49,7 @@ import org.dan.ping.pong.app.place.ForTestPlaceDao;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceRules;
 import org.dan.ping.pong.app.score.MatchScoreDao;
+import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentDao;
@@ -235,7 +236,9 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
     public void adminCompleteOnlyMatchIn1Group() {
         final Pid placeId = daoGenerator.genPlace(1);
         final Tid tid = daoGenerator.genTournament(placeId,
-                TournamentProps.builder().rules(RULES_G8Q1_S1A2G11).build());
+                TournamentProps.builder()
+                        .sport(SportType.PingPong)
+                        .rules(RULES_G8Q1_S1A2G11).build());
         final int cid = daoGenerator.genCategory(tid);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
         restGenerator.enlistParticipants(tid, cid, participants);
@@ -379,9 +382,10 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                                     SetScoreReq.builder()
                                             .tid(s.getTid())
                                             .mid(meta.getOpenMatch().getMid())
+                                            .setOrdNumber(0)
                                             .scores(asList(
                                                     IdentifiedScore.builder()
-                                                            .score(s.getRules().getMatch().getMinGamesToWin())
+                                                            .score(11)
                                                             .uid(s.getPlayersSessions().get(p1).getUid())
                                                             .build(),
                                                     IdentifiedScore.builder()
@@ -416,7 +420,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                                             .mid(meta.getOpenMatch().getMid())
                                             .scores(asList(
                                                     IdentifiedScore.builder()
-                                                            .score(s.getRules().getMatch().getMinGamesToWin())
+                                                            .score(11)
                                                             .uid(s.getPlayersSessions().get(p1).getUid())
                                                             .build(),
                                                     IdentifiedScore.builder()

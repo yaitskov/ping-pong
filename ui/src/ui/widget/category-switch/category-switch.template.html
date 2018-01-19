@@ -1,10 +1,10 @@
-<div class="form-group" ng-show="$ctrl.categories > 1">
+<div class="form-group" ng-show="$ctrl.categories.length > 1">
   <label>{{ 'Categories' | translate }}</label>
   <div class="btn-group">
     <a ng-click="$ctrl.pickCategory(category.cid)"
-       class="btn"
+       class="btn btn-default"
        ng-repeat="category in $ctrl.categories | orderBy : 'name'"
-       ng-class="{'btn-default': $ctrl.currentCid != category.cid, 'btn-primary': $ctrl.currentCid == category.cid}">
+       ng-class="{'btn-primary': $ctrl.currentCid == category.cid}">
       {{category.name}}
     </a>
   </div>

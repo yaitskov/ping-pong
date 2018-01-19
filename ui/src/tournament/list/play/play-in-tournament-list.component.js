@@ -1,4 +1,6 @@
 import angular from 'angular';
+import '../../open-tournament.scss';
+import '../../list.scss';
 import template from './play-in-tournament-list.template.html';
 
 angular.module('tournament').

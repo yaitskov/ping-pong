@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.dan.ping.pong.app.place.Pid;
+import org.dan.ping.pong.app.sport.SportType;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import java.util.Optional;
 public class TournamentRow {
     private Tid tid;
     private Pid pid;
+    private SportType sport;
     private String name;
     private TournamentType type;
     private Instant startedAt;

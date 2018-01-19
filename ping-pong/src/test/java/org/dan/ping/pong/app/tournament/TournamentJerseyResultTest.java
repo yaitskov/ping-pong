@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_LIST;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_RESULT;
 import static org.dan.ping.pong.app.match.DisambiguateGroupScoreJerseyTest.RULES_G8Q2_S1A2G11_M;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G3Q2_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
@@ -19,6 +20,7 @@ import static org.dan.ping.pong.mock.simulator.Player.p5;
 import static org.dan.ping.pong.mock.simulator.Player.p6;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c2;
+import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 import static org.junit.Assert.assertEquals;
 
 import org.dan.ping.pong.JerseySpringTest;
@@ -55,7 +57,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
 
     @Test
     public void tournamentResult() {
-        final TournamentScenario scenario = TournamentScenario.begin()
+        final TournamentScenario scenario = begin()
                 .name("tournamentResult")
                 .rules(RULES_G8Q2_S3A2G11)
                 .category(c1, p1, p2, p3)
@@ -96,7 +98,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
 
     @Test
     public void winMinusLose() {
-        final TournamentScenario scenario = TournamentScenario.begin()
+        final TournamentScenario scenario = begin()
                 .name("ResultWinMinusLose")
                 .rules(RULES_G8Q2_S1A2G11_M)
                 .category(c1, p1, p2, p3)
@@ -141,7 +143,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
 
     @Test
     public void playOffIncomplete() {
-        final TournamentScenario scenario = TournamentScenario.begin()
+        final TournamentScenario scenario = begin()
                 .name("ResultPlayOffIncomplete")
                 .ignoreUnexpectedGames()
                 .rules(RULES_G8Q2_S1A2G11_M.withPlayOff(Optional.of(Losing1)))
@@ -178,12 +180,32 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
 
     @Test
     public void justPlayOff3() {
-        final TournamentScenario tournament = TournamentScenario.begin()
+        final TournamentScenario tournament = begin()
                 .name("justPlayOff3")
                 .rules(RULES_JP_S1A2G11)
                 .category(c1, p1, p2, p3);
         final ImperativeSimulator simulator = isf.create(tournament);
         simulator.run(c -> c.beginTournament()
                 .checkResult(p1, p2, p3));
+    }
+
+    @Test
+    public void expelP3When2Groups() { // incomplete match between 2 participants with the same points
+        isf.create(begin().name("expelP3When2Groups")
+                .rules(RULES_G3Q2_S1A2G11.withPlace(Optional.empty()))
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p3, 3)
+                        .expelPlayer(p3)
+                        .getTournamentResult());
+    }
+
+    @Test
+    public void groupOf2() { // incomplete match between 2 participants with the same points
+        isf.create(begin().name("groupOf2")
+                .rules(RULES_G3Q2_S1A2G11.withPlace(Optional.empty()))
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .getTournamentResult());
     }
 }

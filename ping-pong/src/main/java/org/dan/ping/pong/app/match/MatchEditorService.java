@@ -1,6 +1,5 @@
 package org.dan.ping.pong.app.match;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
@@ -31,6 +30,7 @@ import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
+import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentService;
@@ -115,21 +115,19 @@ public class MatchEditorService {
 
     private Optional<Uid> findNewWinnerUid(TournamentMemState tournament,
             Map<Uid, List<Integer>> newSets, MatchInfo minfo) {
-        final MatchValidationRule matchRule = tournament.getRule().getMatch();
-
         if (minfo.getWinnerId().isPresent()) {
-            final Optional<Uid> actualPracticalWinnerUid = matchRule.findWinner(minfo);
+            final Optional<Uid> actualPracticalWinnerUid = sports.findWinner(tournament, minfo);
             // actual uid always = formal uid if actual one is presented,
             // because walkover can happen if match has no scored sets
             // or presented sets are not enough to find out winner
             if (actualPracticalWinnerUid.isPresent()) {
                 // match complete normally (by score)
-                return matchRule.findWinnerByScores(newSets);
+                return sports.findWinnerByScores(tournament, newSets);
             } else {
                 return minfo.getWinnerId(); // walkover, quit or expel
             }
         } else {
-            return matchRule.findWinnerByScores(newSets);
+            return sports.findWinnerByScores(tournament, newSets);
         }
     }
 
@@ -148,7 +146,7 @@ public class MatchEditorService {
         rescoredGroupMatches.add(rescoredMatch);
 
         rescoredMatch.setParticipantIdScore(newSets);
-        tournament.getRule().getMatch().findWinnerByScores(newSets)
+        sports.findWinnerByScores(tournament, newSets)
                 .ifPresent(wUid -> rescoredMatch.setWinnerId(Optional.of(wUid)));
 
         if (!rescoredMatch.getWinnerId().isPresent()) {
@@ -379,6 +377,9 @@ public class MatchEditorService {
 
     private static final Set<TournamentState> openOrClose = ImmutableSet.of(Open, Close);
 
+    @Inject
+    private Sports sports;
+
     private void validateRescoreMatch(TournamentMemState tournament, MatchInfo mInfo,
             Map<Uid, List<Integer>> newSets) {
         if (!openOrClose.contains(tournament.getState())) {
@@ -390,7 +391,6 @@ public class MatchEditorService {
         if (!mInfo.getParticipantIdScore().keySet().equals(newSets.keySet())) {
             throw badRequest("match has different participants");
         }
-        final MatchValidationRule matchRules = tournament.getRule().getMatch();
         final Iterator<Uid> uidIterator = newSets.keySet().iterator();
         final Uid uid1 = uidIterator.next();
         final Uid uid2 = uidIterator.next();
@@ -402,19 +402,12 @@ public class MatchEditorService {
         if (score1.size() == 0) {
             throw badRequest("new match score has no any set");
         }
-        for (int iset = 0; iset < score2.size(); ++iset) {
-            matchRules.validateSet(
-                    iset,
-                    asList(IdentifiedScore.builder()
-                                    .score(score1.get(iset))
-                                    .uid(uid1)
-                                    .build(),
-                            IdentifiedScore.builder()
-                                    .score(score2.get(iset))
-                                    .uid(uid2)
-                                    .build()));
-        }
-        matchRules.checkWonSets(matchRules.calcWonSets(newSets));
+
+        final MatchInfo mInfoExpectedAfter = mInfo.clone();
+        mInfoExpectedAfter.setParticipantIdScore(newSets);
+
+        sports.validateMatch(tournament, mInfoExpectedAfter);
+        sports.checkWonSets(tournament, sports.calcWonSets(tournament, mInfoExpectedAfter));
     }
 
     public void resetMatchScore(TournamentMemState tournament, ResetSetScore reset, DbUpdater batch) {

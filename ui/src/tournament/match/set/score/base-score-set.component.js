@@ -1,5 +1,6 @@
 import angular from 'angular';
 import template from './base-score-set.template.html';
+import possibleScoresStrategies from './possibleScoresStrategy.js';
 
 angular.
     module('scoreSet').
@@ -22,53 +23,52 @@ angular.
                          self.reset = function () {
                              if (self.match.setScores) {
                                  self.scores = self.match.setScores.slice();
-                                 var winScore = Math.max.apply(null, self.scores);
-                                 var lostScore = Math.min.apply(null, self.scores);
-                                 self.possibleWinScores = [];
-                                 self.possibleLostScores = [];
+                                 let winScore = Math.max.apply(null, self.scores);
+                                 let lostScore = Math.min.apply(null, self.scores);
                                  self.winnerIdx = (winScore == self.scores[0]) ? 0 : 1;
                                  self.scores[self.winnerIdx] = winScore;
                                  self.scores[1 - self.winnerIdx] = lostScore;
-                                 for (var i = 0; i <= Math.max(self.match.minGamesToWin - self.match.minAdvanceInGames, lostScore); ++i) {
-                                     self.possibleLostScores.push(i);
-                                 }
-                                 var winLimit = Math.max(self.match.minGamesToWin, winScore);
-                                 for (var i = self.match.minGamesToWin; i <= winLimit; ++i) {
-                                     self.possibleWinScores.push(i);
-                                 }
+                                 const sport = self.match.sport;
+                                 self.possibleWinScores = self.scoreStrategy.winnerOptions(
+                                     sport, self.match.playedSets);
+                                 self.possibleLostScores = self.scoreStrategy.loserOptions(
+                                     sport, winScore, self.match.playedSets);
                              } else {
                                  self.scores = [-1, -1];
                                  self.noBalance();
                              }
                          }
                          self.noBalance = function () {
-                             self.possibleWinScores = [self.match.minGamesToWin];
-                             self.possibleLostScores = [];
-                             self.scores[self.winnerIdx] = self.match.minGamesToWin;
-                             for (var i = 0 ; i <= self.match.minGamesToWin - self.match.minAdvanceInGames; ++i) {
-                                 self.possibleLostScores.push(i);
-                             }
+                             const sport = self.match.sport;
+                             self.possibleWinScores = self.scoreStrategy.winnerOptions(sport, self.match.playedSets);
+                             self.scores[self.winnerIdx] = self.scoreStrategy.defaultWinnerScore(sport, self.match.playedSets);
+                             self.possibleLostScores = self.scoreStrategy.loserOptions(sport,
+                                 self.scores[self.winnerIdx],
+                                 self.match.playedSets);
                          };
                          self.extendWinScore = function () {
                              self.possibleLostScores.length = 0;
                              var last = self.possibleWinScores[self.possibleWinScores.length - 1];
                              self.possibleWinScores.length = 0;
-                             self.possibleWinScores.push(self.match.minGamesToWin);
+                             self.possibleWinScores.push(self.match.sport.minGamesToWin);
                              for (var i = 0; i < 3; ++i) {
                                  self.possibleWinScores.push(++last);
                              }
                          };
                          self.pick = (idx, score, noEvent) => {
                              self.scores[idx] = score;
-                             if (score > self.match.minGamesToWin) {
-                                 self.scores[1 - idx] = score - self.match.minAdvanceInGames;
+                             const sport = self.match.sport;
+                             self.possibleLostScores = self.scoreStrategy.loserOptions(sport, score, self.match.playedSets);
+                             if (self.possibleLostScores.length == 1) {
+                                 self.scores[1 - idx] = self.possibleLostScores[0];
                                  $rootScope.$broadcast('event.base.match.set.pick.lost',
                                                        {setOrdNumber: self.match.playedSets,
                                                         scores: findScores()});
-                             } else if (score == self.match.minGamesToWin && self.possibleWinScores.length > 1) {
-                                 self.noBalance();
-                                 if (self.scores[1 - idx] > score - self.match.minAdvanceInGames) {
-                                     self.scores[1 - idx] = score - self.match.minAdvanceInGames;
+                             } else {
+                                 if (self.possibleLostScores[self.possibleLostScores.lenth - 1] < self.scores[1 - idx]) {
+                                     self.scores[1 - idx] = -1;
+                                 } else if (self.possibleLostScores[0] > self.scores[1 - idx]) {
+                                     self.scores[1 - idx] = -1;
                                  }
                              }
                          };
@@ -87,6 +87,7 @@ angular.
                          self.onMatchSet = function (match) {
                              console.log("caught event.match.set");
                              self.match = match;
+                             self.scoreStrategy = possibleScoresStrategies[match.sport['@type']];
                              self.participants = match.participants;
                              self.tournamentId = match.tid;
                              self.nextScoreUpdated();

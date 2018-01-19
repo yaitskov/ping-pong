@@ -1,4 +1,7 @@
 import angular from 'angular';
+import 'css/medal.scss';
+import '../tournament-result.scss';
+import './tr-result.scss';
 import template from './tr-result.template.html';
 
 angular.

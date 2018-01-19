@@ -3,6 +3,7 @@ import './profile/participant-profile.component.js';
 import './enlist/enlist.offline.component.js';
 import './enlist/enlist.online.component.js';
 import './group/participant-group.component.js';
+import './group/tr-group-switcher.component.js';
 import './enlist/enlisted-participants.component.js';
 import './management/manage-one.component.js';
 import './management/state-management-list/par-state-mgmt-list.component.js';

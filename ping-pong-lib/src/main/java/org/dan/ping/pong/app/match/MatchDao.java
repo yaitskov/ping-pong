@@ -7,6 +7,7 @@ import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -20,7 +21,7 @@ public interface MatchDao {
 
     void changeStatus(Mid mid, MatchState state, DbUpdater batch);
 
-    Optional<Uid> scoreSet(TournamentMemState tournament, MatchInfo matchInfo,
+    void scoreSet(TournamentMemState tournament, MatchInfo matchInfo,
             DbUpdater batch, List<IdentifiedScore> scores);
 
     void completeMatch(Mid mid, Uid winUid, Instant now, DbUpdater batch, Set<MatchState> expected);
@@ -32,6 +33,8 @@ public interface MatchDao {
     List<UserLink> findWinners(Tid tid);
 
     void deleteAllByTid(TournamentMemState tournament, DbUpdater batch, int size);
+
+    void deleteByIds(Collection<Mid> mids, DbUpdater batch);
 
     void setParticipant(int n, Mid mid, Uid uid, DbUpdater batch);
 

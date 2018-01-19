@@ -61,9 +61,11 @@ export default class VisLadder {
             nodes.push(this.createMatchNode(tournament, match));
         }
         let edges = [];
-        for (let edge of tournament.transitions) {
-            edge.arrow = 'to';
-            edges.push(edge);
+        if (tournament.transitions) {
+           for (let edge of tournament.transitions) {
+               edge.arrow = 'to';
+               edges.push(edge);
+           }
         }
         return {
             nodes: new vis.DataSet(nodes),

@@ -69,7 +69,6 @@ import javax.ws.rs.core.Response;
 
 @Slf4j
 public class Simulator {
-
     private TestUserSession testAdmin;
 
     @Inject
@@ -318,7 +317,7 @@ public class Simulator {
                 Iterator<Player> iterator = players.iterator();
                 return Optional.of(GameEnd.game(iterator.next(),
                         scenario.getAutoResolution().get().choose(players),
-                        iterator.next(), scenario.getRules().getMatch()));
+                        iterator.next()));
             }
             if (scenario.isIgnoreUnexpectedGames()) {
                 return empty();
@@ -367,6 +366,7 @@ public class Simulator {
         final Tid tid = daoGenerator.genTournament(prefix, testAdmin.getUid(),
                 scenario.getPlaceId(), TournamentProps.builder()
                         .rules(scenario.getRules())
+                        .sport(scenario.getSport())
                         .state(TournamentState.Draft)
                         .build());
         scenario.setTid(tid);

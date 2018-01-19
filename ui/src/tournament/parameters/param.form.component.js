@@ -1,4 +1,5 @@
 import angular from 'angular';
+import 'css/toggle-btn.scss';
 import template from './param.form.template.html';
 
 const defaultGroupRules = {
@@ -85,7 +86,6 @@ angular.
                              rules.playOff = rules.playOff || defaultPlayOffRules;
                              rules.casting.providedRankOptions = (rules.casting.providedRankOptions
                                                                   || defaultProvidedRankOptions);
-                             rules.casting.policy = 'ProvidedRating';
                              if (!rules.group.schedule || !rules.group.schedule.size2Schedule) {
                                  rules.group.schedule = defaultGroupRules.schedule;
                              }

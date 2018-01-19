@@ -1,0 +1,16 @@
+@import "~css/core-const.scss";
+
+.hover {
+    background-color: $active-background-color;
+    cursor: pointer;
+}
+.clickable {
+    cursor: pointer;
+}
+.clicked {
+    background-color: $active-background-color - #151515;
+}
+
+ul li a {
+    cursor: pointer;
+}

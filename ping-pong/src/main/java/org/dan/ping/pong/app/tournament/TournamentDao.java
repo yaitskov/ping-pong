@@ -4,12 +4,12 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
-import static ord.dan.ping.pong.jooq.Tables.BID;
-import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
-import static ord.dan.ping.pong.jooq.Tables.MATCHES;
-import static ord.dan.ping.pong.jooq.Tables.PLACE;
-import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT;
-import static ord.dan.ping.pong.jooq.Tables.TOURNAMENT_ADMIN;
+import static org.dan.ping.pong.jooq.Tables.BID;
+import static org.dan.ping.pong.jooq.Tables.CATEGORY;
+import static org.dan.ping.pong.jooq.Tables.MATCHES;
+import static org.dan.ping.pong.jooq.Tables.PLACE;
+import static org.dan.ping.pong.jooq.Tables.TOURNAMENT;
+import static org.dan.ping.pong.jooq.Tables.TOURNAMENT_ADMIN;
 import static org.dan.ping.pong.app.bid.BidDao.TERMINAL_BID_STATES;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
@@ -88,7 +88,8 @@ public class TournamentDao {
                 TOURNAMENT.RULES,
                 TOURNAMENT.TICKET_PRICE,
                 TOURNAMENT.NAME,
-                TOURNAMENT.TYPE)
+                TOURNAMENT.TYPE,
+                TOURNAMENT.SPORT)
                 .values(hidden,
                         newTournament.getOpensAt(),
                         newTournament.getPlaceId(),
@@ -96,6 +97,7 @@ public class TournamentDao {
                         newTournament.getRules(),
                         newTournament.getTicketPrice(),
                         newTournament.getName(),
+                        newTournament.getSport(),
                         Classic)
                 .returning(TOURNAMENT.TID)
                 .fetchOne()
@@ -469,7 +471,7 @@ public class TournamentDao {
 
     public Optional<TournamentRow> getRow(Tid tid) {
         return ofNullable(jooq
-                .select(TOURNAMENT.PID, TOURNAMENT.TYPE, TOURNAMENT.RULES,
+                .select(TOURNAMENT.PID, TOURNAMENT.TYPE, TOURNAMENT.SPORT, TOURNAMENT.RULES,
                         TOURNAMENT.COMPLETE_AT, TOURNAMENT.OPENS_AT,
                         TOURNAMENT.NAME, TOURNAMENT.STATE, TOURNAMENT.TICKET_PRICE,
                         TOURNAMENT.PREVIOUS_TID)
@@ -478,6 +480,7 @@ public class TournamentDao {
                 .fetchOne())
                 .map(r -> TournamentRow.builder()
                         .pid(r.get(TOURNAMENT.PID))
+                        .sport(r.get(TOURNAMENT.SPORT))
                         .endedAt(r.get(TOURNAMENT.COMPLETE_AT))
                         .startedAt(r.get(TOURNAMENT.OPENS_AT))
                         .name(r.get(TOURNAMENT.NAME))

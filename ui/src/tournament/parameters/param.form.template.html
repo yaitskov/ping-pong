@@ -40,8 +40,8 @@
       <input type="text" class="form-control"
              ng-model="$ctrl.rules.casting.providedRankOptions.label"
              ng-maxlength="100"
-             name="name"
-             id="name"
+             name="rankName"
+             id="rankName"
              placeholder="{{ 'rank-name-lbl' | translate }}" />
       <p class="help-block"
          ng-show="$ctrl.form.rankName.$error.minlength || $ctrl.form.rankName.$error.maxlength">
@@ -85,6 +85,14 @@
     </a>
   </div>
   <div id="match-parameters" class="toggle-panel in">
+    <div class="form-group" ng-show="$ctrl.rules.match['@type'] == 'Tennis'">
+      <label>{{ 'Super tie break games' | translate }}</label>
+      <div touch-spin options="$ctrl.options.sets"
+           ng-model="$ctrl.rules.match.superTieBreakGames"></div>
+      <p class="help-block">
+        {{ 'super-time-break-games-help' | translate }}
+      </p>
+    </div>
     <div class="form-group">
       <label>{{ 'Sets to win a match' | translate }}</label>
       <div touch-spin options="$ctrl.options.sets"
@@ -95,27 +103,39 @@
     </div>
     <div class="form-group"
          ng-class="{'has-error': $ctrl.errors['match-rule.min-games-to-win']}">
-      <label>{{ 'Min score to win a set' | translate }}</label>
+      <label ng-show="$ctrl.rules.match['@type'] == 'Tennis'">
+        {{ 'Min games to win a set' | translate }}
+      </label>
+      <label ng-show="$ctrl.rules.match['@type'] == 'PingPong'">
+        {{ 'Min score to win a set' | translate }}
+      </label>
       <div touch-spin options="$ctrl.options.score"
            ng-model="$ctrl.rules.match.minGamesToWin"></div>
       <p class="help-block" ng-repeat="error in $ctrl.errors['match-rule.min-games-to-win']">
         {{ error.message | translate : error.params }}
       </p>
-      <p class="help-block">
+      <p class="help-block" ng-show="$ctrl.rules.match['@type'] == 'PingPong'">
         {{ 'min-score-to-win-set-help' | translate }}
+      </p>
+      <p class="help-block" ng-show="$ctrl.rules.match['@type'] == 'Tennis'">
+        {{ 'min-games-to-win-set-help' | translate }}
       </p>
     </div>
     <div class="form-group">
       <label>{{ 'Min score advance to win a set' | translate }}</label>
       <div touch-spin options="$ctrl.options.advance"
            ng-model="$ctrl.rules.match.minAdvanceInGames"></div>
-      <p class="help-block">
-        {{ 'min-score-advance-help' | translate }}
-      </p>
+      <p class="help-block"
+         translate="min-score-advance-help"
+         ng-show="$ctrl.rules.match['@type'] == 'PingPong'"/>
+      <p class="help-block"
+         translate="min-games-advance-help"
+         ng-show="$ctrl.rules.match['@type'] == 'Tennis'"/>
     </div>
   </div>
   <div class="form-group toggle-btn">
-    <label>{{ 'arena-lbl' | translate }}</label>
+    <label ng-show="$ctrl.rules.match['@type'] == 'Tennis'" translate="tennis-arena-lbl"/>
+    <label ng-show="$ctrl.rules.match['@type'] == 'PingPong'" translate="ping-pong-arena-lbl"/>
     <a class="pull-right arrow"
        simple-toggler="#arena-parameters">
       <span class="glyphicon glyphicon-menu-down"></span>
@@ -124,9 +144,12 @@
   </div>
   <div id="arena-parameters" class="toggle-panel in">
     <div class="form-group">
-      <label class="toggle-option">
-        {{ 'Schedule tables' | translate }}
-      </label>
+      <label class="toggle-option"
+             ng-show="$ctrl.rules.match['@type'] == 'PingPong'"
+             translate="Schedule tables"/>
+      <label class="toggle-option"
+             ng-show="$ctrl.rules.match['@type'] == 'Tennis'"
+             translate="Schedule courts"/>
       <a class="btn btn-default"
          ng-click="$ctrl.rules.place.arenaDistribution = 'GLOBAL'"
          ng-class="{'btn-primary': $ctrl.rules.place.arenaDistribution == 'GLOBAL'}">
@@ -139,10 +162,11 @@
       </a>
     </div>
   </div>
-  <div class="form-group toggle-btn">
+  <div class="form-group toggle-btn" id="group-parameters-toggler">
     <label>{{ 'group-lbl' | translate }}</label>
     <input type="checkbox"
            data-size="small"
+           bs-toggler-anchor="group-parameters-toggler"
            ng-model="$ctrl.useGroup"
            bs-toggle-on="{{ 'yes-lbl' | translate }}"
            bs-toggle-off="{{ 'no-lbl' | translate }}"
@@ -151,21 +175,17 @@
   </div>
   <div id="group-parameters" class="toggle-panel" ng-show="$ctrl.useGroup">
     <div class="form-group">
-      <label>{{ 'disambiguation-group-lbl' | translate }}</label>
+      <label translate="disambiguation-group-lbl"/>
       <div>
-        <a class="btn btn-default"
+        <a class="btn btn-default" translate="CMP_WIN_MINUS_LOSE"
            ng-click="$ctrl.rules.group.disambiguation = 'CMP_WIN_MINUS_LOSE'"
-           ng-class="{'btn-primary': $ctrl.rules.group.disambiguation == 'CMP_WIN_MINUS_LOSE'}">
-          {{ 'CMP_WIN_MINUS_LOSE' | translate }}
-        </a>
-        <a class="btn btn-default"
+           ng-class="{'btn-primary': $ctrl.rules.group.disambiguation == 'CMP_WIN_MINUS_LOSE'}"/>
+        <a class="btn btn-default" translate="CMP_WIN_AND_LOSE"
            ng-click="$ctrl.rules.group.disambiguation = 'CMP_WIN_AND_LOSE'"
-           ng-class="{'btn-primary': $ctrl.rules.group.disambiguation == 'CMP_WIN_AND_LOSE'}">
-          {{ 'CMP_WIN_AND_LOSE' | translate }}
-        </a>
+           ng-class="{'btn-primary': $ctrl.rules.group.disambiguation == 'CMP_WIN_AND_LOSE'}"/>
       </div>
       <p class="help-block">
-        {{ 'disambiguation-group-help' | translate }}
+        {{ ($ctrl.rules.match['@type'] + '-disambiguation-group-help') | translate }}
       </p>
     </div>
     <div class="form-group" ng-show="$ctrl.usePlayOff">
@@ -238,10 +258,11 @@
          translate="configure-console-tournament"/>
     </div>
   </div>
-  <div class="form-group toggle-btn">
+  <div class="form-group toggle-btn" id="play-off-parameters-toggler">
     <label>{{ 'play-off-lbl' | translate }}</label>
     <input type="checkbox"
            data-size="small"
+           bs-toggler-anchor="play-off-parameters-toggler"
            ng-model="$ctrl.usePlayOff"
            bs-toggle-on="{{ 'yes-lbl' | translate }}"
            bs-toggle-off="{{ 'no-lbl' | translate }}"

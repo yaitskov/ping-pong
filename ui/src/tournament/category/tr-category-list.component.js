@@ -1,4 +1,5 @@
 import angular from 'angular';
+import './tr-category-list.scss';
 import template from './tr-category-list.template.html';
 
 angular.module('tournamentCategory').

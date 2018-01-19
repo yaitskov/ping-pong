@@ -4,15 +4,19 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
+import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.FIRST_PLAY_OFF_MATCH_LEVEL;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.PLAY_OFF_SEEDS;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
+import static org.dan.ping.pong.app.playoff.PlayOffRule.L1_3P;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -28,13 +32,18 @@ import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
+import org.dan.ping.pong.app.group.GroupService;
+import org.dan.ping.pong.app.group.PlayOffMatcherFromGroup;
+import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.user.UserLink;
@@ -47,6 +56,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -79,6 +89,23 @@ public class CastingLotsService {
 
     @Inject
     private GroupDivider groupDivider;
+
+    @Inject
+    private TournamentDao tournamentDao;
+
+    private void generatePlayOffRules(TournamentMemState tournament, DbUpdater batch) {
+        tournament.getRule().setPlayOff(Optional.of(L1_3P));
+        tournamentDao.updateParams(tournament.getTid(), tournament.getRule(), batch);
+    }
+
+    public int addGroup(TournamentMemState tournament, DbUpdater batch, int cid) {
+        if (!tournament.getRule().getPlayOff().isPresent()) {
+            generatePlayOffRules(tournament, batch);
+        }
+        final int gid = groupService.createGroup(tournament, cid);
+        recreatePlayOff(tournament, cid, batch);
+        return gid;
+    }
 
     @Transactional(TRANSACTION_MANAGER)
     public void seed(TournamentMemState tournament) {
@@ -169,6 +196,9 @@ public class CastingLotsService {
         }
     }
 
+    @Inject
+    private GroupService groupService;
+
     private void seedJustGroupTournament(TournamentRules rules,
             TournamentMemState tournament,
             List<ParticipantMemState> readyBids) {
@@ -178,7 +208,7 @@ public class CastingLotsService {
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
             validateBidsNumberInACategory(bids);
             final List<ParticipantMemState> orderedBids = rankingService.sort(bids, rules.getCasting());
-            final String groupLabel = "Group 1";
+            final String groupLabel = GroupService.sortToLabel(0);
             final int groupIdx = 0;
             final int gid = groupDao.createGroup(tid, cid, groupLabel, quits, groupIdx);
             tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
@@ -200,12 +230,12 @@ public class CastingLotsService {
                     rankingService.sort(bids, rules.getCasting()));
             int basePlayOffPriority = 0;
             for (int gi : bidsByGroups.keySet().stream().sorted().collect(toList())) {
-                final String groupLabel = "Group " + (1 + gi);
+                final String groupLabel = GroupService.sortToLabel(gi);
                 final int gid = groupDao.createGroup(tid, cid, groupLabel, quits, gi);
                 tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
                         .ordNumber(gi).label(groupLabel).build());
                 final List<ParticipantMemState> groupBids = bidsByGroups.get(gi);
-                if (groupBids.size() <= quits) {
+                if (groupBids.size() < quits) {
                     throw badRequest("Category should have more participants than quits from a group");
                 }
                 groupBids.forEach(bid -> bid.setGid(Optional.of(gid)));
@@ -279,5 +309,60 @@ public class CastingLotsService {
                                             : Optional.empty());
                         });
         scheduleService.afterMatchComplete(tournament, batch,  clocker.get());
+    }
+
+    public void recreatePlayOff(TournamentMemState tournament, int cid, DbUpdater batch) {
+        log.info("Recreate play off in tid {} cid {}", tournament.getTid(), cid);
+        final int basePriority = removePlayOffMatchesInCategory(tournament, cid, batch);
+
+        final int quits = tournament.getRule().getGroup().get().getQuits();
+        final int quittersForRealGroups = tournament.getGroupsByCategory(cid).size() * quits;
+        final int roundedQuitters = matchService.roundPlayOffBase(quittersForRealGroups);
+        castingLotsDao.generatePlayOffMatches(tournament, cid,
+                roundedQuitters, basePriority);
+        if (quittersForRealGroups < roundedQuitters) {
+            final List<MatchInfo> playOffMatches = playOffService.findMatchesByLevelAndCid(
+                    FIRST_PLAY_OFF_MATCH_LEVEL, cid,
+                    tournament.getMatches().values().stream())
+                    .sorted(Comparator.comparing(MatchInfo::getMid))
+                    .collect(toList());
+            final int realGroups = quittersForRealGroups / quits;
+            final int totalGroups = roundedQuitters / quits;
+            log.info("Walkover matches with playes from fake groups {}", totalGroups - realGroups);
+            for (int iGroup = realGroups; iGroup < totalGroups; ++iGroup) {
+                final List<Integer> matchIndexes = PlayOffMatcherFromGroup.find(quits, iGroup, totalGroups);
+                for (int iQuitter = 0; iQuitter < quits; ++iQuitter) {
+                    int matchIdx = matchIndexes.get(iQuitter);
+                    matchService.assignBidToMatch(tournament,
+                            playOffMatches.get(matchIdx).getMid(),
+                            FILLER_LOSER_UID, batch);
+                }
+            }
+        }
+    }
+
+    private int removePlayOffMatchesInCategory(TournamentMemState tournament, int cid, DbUpdater batch) {
+        log.info("Remove play of matches in category {}", cid);
+        final List<MatchInfo> matchesToBeRemoved = tournament
+                .getMatches().values().stream()
+                .filter(m -> m.getCid() == cid && !m.getGid().isPresent())
+                .collect(toList());
+
+        final Set<Mid> midsForRemoval = matchesToBeRemoved.stream()
+                .map(MatchInfo::getMid).collect(toSet());
+        filterMatches(tournament, midsForRemoval);
+        matchDao.deleteByIds(midsForRemoval, batch);
+        return matchesToBeRemoved.stream().map(MatchInfo::getPriority).min(Integer::compare).orElse(0);
+    }
+
+    @Inject
+    private MatchDao matchDao;
+
+    private void filterMatches(TournamentMemState tournament, Set<Mid> midsForRemoval) {
+        tournament.setMatches(tournament.getMatches()
+                .values()
+                .stream()
+                .filter(m -> !midsForRemoval.contains(m.getMid()))
+                .collect(toMap(MatchInfo::getMid, m -> m)));
     }
 }

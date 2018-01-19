@@ -30,8 +30,7 @@ public class OpenMatchForJudge {
     private Optional<TableLink> table = empty();
     private List<UserLink> participants = emptyList();
     private Optional<Instant> started = empty();
-    private int minGamesToWin;
-    private int minAdvanceInGames;
+    private MyPendingMatchSport sport;
     private int playedSets;
     private MatchType matchType;
 

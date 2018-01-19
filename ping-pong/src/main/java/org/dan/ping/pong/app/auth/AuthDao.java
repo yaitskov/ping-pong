@@ -1,10 +1,10 @@
 package org.dan.ping.pong.app.auth;
 
 import static java.util.Optional.ofNullable;
-import static ord.dan.ping.pong.jooq.Tables.SESSIONS;
-import static ord.dan.ping.pong.jooq.Tables.SESSION_KEY;
-import static ord.dan.ping.pong.jooq.Tables.SYS_ADMIN;
-import static ord.dan.ping.pong.jooq.Tables.USERS;
+import static org.dan.ping.pong.jooq.Tables.SESSIONS;
+import static org.dan.ping.pong.jooq.Tables.SESSION_KEY;
+import static org.dan.ping.pong.jooq.Tables.SYS_ADMIN;
+import static org.dan.ping.pong.jooq.Tables.USERS;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.notAuthorized;
 

@@ -13,6 +13,7 @@ module.exports = {
     'to-score': 'Ocenić',
     'Match management': 'Zarządzanie meczem',
     'Schedule tables': 'Planować stoły',
+    'Schedule courts': 'Planować korty',
 
     'Rescore match': 'Ocenić mecz ponownie',
     'play-off-match-will-replayed': 'W razie gwałtownej zmiany wyniku zależny meczi w play off będą odwołany, ale będziesz mięć okzję zobaczyć konsekwencji',
@@ -24,8 +25,6 @@ module.exports = {
     'no-played-matches-in-tournament': 'Nie ma zagranych meczi w turnieju',
 
     'Total': 'Suma',
-
-    'Difference between games cannot be less than': 'W secie {{set+1}} różnica między gemami nie może być mniej niż {{minAdvanceInGames}}',
 
     'Sets': 'Sety',
     'Set': 'Set',

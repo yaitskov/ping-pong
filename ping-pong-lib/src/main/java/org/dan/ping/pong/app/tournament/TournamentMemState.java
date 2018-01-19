@@ -27,6 +27,7 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.dispute.DisputeMemState;
 import org.dan.ping.pong.app.place.Pid;
+import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.sys.error.PiPoEx;
 
@@ -44,6 +45,7 @@ public class TournamentMemState {
     public static final String EXPECTED_TOURNAMENT_STATE = "expected_state";
     public static final String TOURNAMENT_STATE = "state";
 
+    private SportType sport;
     private Tid tid;
     private String name;
     private TournamentType type;

@@ -1,5 +1,4 @@
 module.exports = {
-        // participant-presence
     'nobody has enlisted': 'Nikt jeszcze nie zgłosił się.',
     'Tournament btn': 'Turniej',
     'participant name': 'Uczestnik',

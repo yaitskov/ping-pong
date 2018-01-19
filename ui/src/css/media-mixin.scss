@@ -1,0 +1,14 @@
+$max-desktop-resolution: 119dpi;
+$min-mobile-resolution: 120dpi;
+
+@mixin desktop-media {
+    @media all and (max-resolution: $max-desktop-resolution) {
+         @content;
+    }
+}
+
+@mixin mobile-media {
+    @media all and (min-resolution: $min-mobile-resolution) {
+         @content;
+    }
+}

@@ -13,6 +13,7 @@ module.exports = {
     'to-score': 'Score',
     'Match management': 'Match management',
     'Schedule tables': 'Schedule tables',
+    'Schedule courts': 'Schedule courts',
 
     'Rescore match': 'Rescore match',
 
@@ -25,8 +26,6 @@ module.exports = {
     'no-played-matches-in-tournament': 'Tournament has no played matches',
 
     'Total': 'Total',
-
-    'Difference between games cannot be less than': 'Difference between games in the set {{set+1}} cannot be less than {{minAdvanceInGames}}',
 
     'Sets': 'Sets',
     'Set': 'Set',

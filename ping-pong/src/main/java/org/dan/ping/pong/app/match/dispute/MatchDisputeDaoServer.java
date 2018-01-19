@@ -1,6 +1,6 @@
 package org.dan.ping.pong.app.match.dispute;
 
-import static ord.dan.ping.pong.jooq.Tables.MATCH_DISPUTE;
+import static org.dan.ping.pong.jooq.Tables.MATCH_DISPUTE;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import org.dan.ping.pong.app.tournament.Tid;

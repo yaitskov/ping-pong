@@ -8,8 +8,8 @@ import lombok.Setter;
 import lombok.experimental.Wither;
 import org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy;
 import org.dan.ping.pong.app.group.GroupRules;
-import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.playoff.PlayOffRule;
+import org.dan.ping.pong.app.sport.MatchRules;
 
 import java.util.Optional;
 
@@ -21,7 +21,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class CustomConsoleRules {
     private GroupSplitPolicy splitPolicy;
-    private MatchValidationRule match;
+    private MatchRules match;
     private Optional<PlayOffRule> playOff = Optional.empty();
     private Optional<GroupRules> group = Optional.empty();
     private Optional<RewardRules> rewards = Optional.empty();

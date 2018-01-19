@@ -1,0 +1,36 @@
+<main-menu></main-menu>
+<div class="container">
+  <request-status></request-status>
+  <div class="form-group" ng-show="$ctrl.bid">
+    <div class="alert alert-info">
+      Pick group for participant
+      <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{$ctrl.participantId}}">
+        {{$ctrl.bid.name}}
+      </a>
+    </div>
+  </div>
+  <div class="form-group" ng-show="$ctrl.groups.length == 0">
+    <div class="alert alert-info" >
+      No groups
+    </div>
+  </div>
+  <div class="form-group" ng-show="$ctrl.groups">
+    <ul>
+      <li ng-repeat="group in $ctrl.groups">
+          <a title="Pick" class="btn btn-default"
+             ng-class="{'btn-primary': $ctrl.bid.group.gid == group.gid}"
+             ng-click="$ctrl.assignGroup(group.gid)">
+            {{group.label}}
+          </a>
+      </li>
+      <li>
+        <a title="Pick" class="btn btn-default"
+           ng-class="{'btn-primary': $ctrl.bid.group.gid == 0}"
+           ng-click="$ctrl.assignGroup(0)">
+          <span class="glyphicon glyphicon-plus-sign"/>
+          {{ 'put-into-new-group' | translate }}
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>

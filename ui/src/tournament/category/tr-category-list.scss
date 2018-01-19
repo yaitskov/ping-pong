@@ -1,0 +1,33 @@
+@import "~css/media-mixin.scss";
+
+@include desktop-media {
+    .categories {
+        tr td:first-child {
+            width: 10%;
+        }
+        tr td:nth-child(2) {
+            a {
+                font-size: 18px;
+            }
+        }
+        tr td {
+            a.btn {
+                padding: 2px 8px;
+            }
+            vertical-align: middle;
+        }
+    }
+}
+
+@include mobile-media {
+    .admin-categories {
+        input {
+            width: 80%;
+            margin-right: 8px;
+        }
+
+        table tr td {
+            vertical-align: middle;
+        }
+    }
+}

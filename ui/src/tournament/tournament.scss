@@ -1,0 +1,32 @@
+@import "~css/media-mixin.scss";
+
+.new-tournament {
+    .date-picker {
+        margin-right: 15px;
+    }
+}
+
+@include desktop-media {
+    .new-tournament {
+        .date-picker {
+            width: 219px;
+            input { width: 169px; }
+
+        }
+        .time-picker {
+            width: 136px;
+        }
+    }
+}
+
+@include mobile-media {
+    .new-tournament {
+        .date-picker {
+            width: 160px;
+            input { width: 110px; }
+        }
+        .time-picker {
+            width: 85px;
+        }
+    }
+}

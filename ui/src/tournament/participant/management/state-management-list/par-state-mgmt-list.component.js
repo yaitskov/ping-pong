@@ -1,4 +1,5 @@
 import angular from 'angular';
+import './participant-presence.scss';
 import template from './par-state-mgmt-list.template.html';
 
 angular.module('participant').

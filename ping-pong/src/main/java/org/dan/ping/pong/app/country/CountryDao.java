@@ -1,6 +1,6 @@
 package org.dan.ping.pong.app.country;
 
-import static ord.dan.ping.pong.jooq.Tables.COUNTRY;
+import static org.dan.ping.pong.jooq.Tables.COUNTRY;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;

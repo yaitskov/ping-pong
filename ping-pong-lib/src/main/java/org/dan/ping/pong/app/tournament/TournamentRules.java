@@ -11,9 +11,9 @@ import lombok.Setter;
 import lombok.experimental.Wither;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.group.GroupRules;
-import org.dan.ping.pong.app.match.MatchValidationRule;
 import org.dan.ping.pong.app.place.PlaceRules;
 import org.dan.ping.pong.app.playoff.PlayOffRule;
+import org.dan.ping.pong.app.sport.MatchRules;
 
 import java.util.Optional;
 
@@ -26,7 +26,7 @@ import java.util.Optional;
 public class TournamentRules {
     public static final int FIRST_VERSION = 2;
     private int version = FIRST_VERSION;
-    private MatchValidationRule match;
+    private MatchRules match;
     private CastingLotsRule casting;
     private Optional<PlayOffRule> playOff = Optional.empty();
     private Optional<GroupRules> group = Optional.empty();

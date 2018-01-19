@@ -1,0 +1,47 @@
+@import "~css/core-const.scss";
+@import "~css/media-mixin.scss";
+
+.admin-judgement {
+    table tbody tr td {
+        vertical-align: middle;
+    }
+    .tables {
+        padding-left: 5px;
+        button {
+            margin-top: 5px;
+            margin-right: 5px;
+        }
+    }
+    .participant-names {
+        a {
+            white-space: initial;
+            background-color: $success-bg-color;
+            border: none;
+        }
+        a:first-child {
+            background-color: $info-bg-color;
+        }
+    }
+}
+
+@include desktop-media {
+    .admin-judgement {
+        .participant-names a:first-child {
+            margin-right: 8px;
+        }
+    }
+}
+
+@include mobile-media {
+    .admin-judgement {
+        .form-group {
+            margin-bottom: 0px;
+        }
+        .tables {
+            display: inline-block;
+        }
+        .match-cell {
+            display: none;
+        }
+    }
+}

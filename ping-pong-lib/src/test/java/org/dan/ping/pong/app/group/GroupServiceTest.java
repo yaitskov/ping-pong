@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.group;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.dan.ping.pong.app.group.DisambiguationPolicy.CMP_WIN_MINUS_LOSE;
+import static org.dan.ping.pong.app.sport.SportType.PingPong;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.AllOf.allOf;
@@ -15,13 +16,17 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.match.MatchValidationRule;
+import org.dan.ping.pong.app.sport.SportType;
+import org.dan.ping.pong.app.sport.Sports;
+import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
+import org.dan.ping.pong.app.sport.pingpong.PingPongSport;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +47,10 @@ public class GroupServiceTest {
 
     @Before
     public void setUp() {
-        sut = new GroupService();
+        sut = GroupService
+                .builder()
+                .sports(new Sports(ImmutableMap.of(PingPong, new PingPongSport())))
+                .build();
     }
 
     @Test
@@ -72,7 +80,7 @@ public class GroupServiceTest {
                         .groups(groups).build();
     }
 
-    public static final MatchValidationRule S1A2G11 = MatchValidationRule.builder()
+    public static final PingPongMatchRules S1A2G11 = PingPongMatchRules.builder()
             .setsToWin(1)
             .minAdvanceInGames(2)
             .minPossibleGames(0)
@@ -131,15 +139,22 @@ public class GroupServiceTest {
     @Test
     public void countPointsUidWithoutWins0() {
         Map<Uid, Integer> got = sut.countPoints(
-                S1A2G11,
+                tournamentWithSport(),
                 MatchListBuilder.matches().m(UID1, 11, UID2, 0).build());
         assertEquals(ImmutableMap.of(UID1, 2, UID2, 1), got);
+    }
+
+    private TournamentMemState tournamentWithSport() {
+        return TournamentMemState.builder()
+                .sport(PingPong)
+                .rule(TournamentRules.builder()
+                        .match(S1A2G11).build()).build();
     }
 
     @Test
     public void countPoints2WinsAnd1() {
         Map<Uid, Integer> got = sut.countPoints(
-                S1A2G11,
+                tournamentWithSport(),
                 MatchListBuilder.matches()
                         .m(UID1, 11, UID2, 0)
                         .m(UID1, 11, UID3, 2)
@@ -169,6 +184,7 @@ public class GroupServiceTest {
 
     private TournamentMemState tournamentForOrder() {
         return TournamentMemState.builder()
+                .sport(PingPong)
                 .rule(TournamentRules.builder()
                         .match(S1A2G11)
                         .group(

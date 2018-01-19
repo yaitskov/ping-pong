@@ -1,20 +1,5 @@
-$base-font-color: black;
-$active-background-color: #f5f5f5;
-$infinitPx: 9999px;
-$base-red-color: red;
-$primary-btn-back-color: #337ab7;
-$primary-btn-font-color: #fff;
-$default-btn-back-color: #e6e6e6;
-$default-btn-font-color: #000;
-$medial-size: 32px;
-$info-bg-color: #d9edf7;
-$success-bg-color: #dff0d8;
-$section-panel-border-color: #d2d2d2;
-$section-panel-label-color: #666;
-
-tr.even-row {
-    background-color: $active-background-color;
-}
+@import "core-const";
+@import "mixin";
 
 /* begin of no side space */
 .view-container .container-fluid {
@@ -38,102 +23,6 @@ tr.even-row {
 }
 /* end of main toolbar */
 
-/* begin of main menu */
-.view-container .dropdown-menu > li > a {
-    line-height: 1.4;
-    padding: 1px 10px;
-}
-.view-container .dropdown-menu .divider {
-    margin: 4px 0px;
-}
-/* end of main menu */
-
-/* begin of clickable directive */
-.hover {
-    background-color: $active-background-color;
-    cursor: pointer;
-}
-.clickable {
-    cursor: pointer;
-}
-.clicked {
-    background-color: $active-background-color - #151515;
-}
-
-ul li a {
-    cursor: pointer;
-}
-
-/* end of clickable directive */
-
-/* begin of open tournament list */
-.open-tournament {
-    min-height: 0px;
-
-    legend {
-        margin-bottom: 5px;
-        font-size: 16px;
-        border-bottom: none;
-    }
-
-    fieldset table tbody tr td:first-child {
-        font-size: 22px;
-        text-align: center;
-    }
-
-    fieldset table tr td {
-        border-top: none;
-        padding: 1px;
-        vertical-align: middle;
-    }
-}
-
-.list-item .completeness {
-    font-size: 14px;
-    width: 57px;
-    color: $base-red-color;
-}
-/* end of open tournament list */
-
-/* begin of enlist form */
-.enlist-form {
-    .date {
-        padding-right: 10px;
-        color: $base-red-color;
-    }
-    .time {
-        font-size: 12px;
-        color: gray;
-    }
-    .category-label {
-        width: 33%;
-    }
-    .category-value {
-        max-width: 60%;
-        overflow: wrap;
-    }
-    a.category.btn-primary {
-        color: $primary-btn-font-color;
-        background-color: $primary-btn-back-color;
-    }
-    a.category {
-        min-width: 200px;
-        margin-bottom: 3px;
-    }
-}
-
-/* end of enlist form */
-
-@media all and (max-resolution: 119dpi) {
-    @import "desktop/app-desktop.scss";
-}
-
-/* begin of debugging and tracing */
-.border {
-    border: 1px solid black;
-}
-/* end of debugging and tracing */
-
 .alert-info a {
     text-decoration: underline !important;
 }
@@ -142,46 +31,8 @@ ul li a {
    text-decoration: none !important;
 }
 
-.match-scoring {
-    .btn {
-        min-width: 150px;
-    }
-    .form-group label {
-        font-weight: normal;
-    }
-}
-
 .top-buffer {
     padding-top: 20px !important;
-}
-
-.active .circle {
-    opacity: 1;
-}
-
-.btn .circle {
-    margin-right: 10px;
-}
-
-.circle {
-    width: 10px;
-    opacity: 0;
-    height: 10px;
-    display: inline-block;
-    background: white;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-}
-
-.match-state-description {
-    tbody tr td:first-child {
-        font-weight: bold;
-    }
-}
-
-td.match-state-description.text-danger {
-    font-weight: bold;
 }
 
 tr.bottom-line td {
@@ -192,13 +43,44 @@ tr.bottom-line td {
     font-size: 75%;
 }
 
-@media all and (min-resolution: 120dpi) {
-    @import "mobile/app-mobile.scss";
+@include desktop-media {
+    .container {
+        max-width: 800px;
+        padding-top: 15px;
+    }
+
+    .modal-dialog .modal-body .container {
+        width: initial;
+    }
+
+    .table-number {
+        padding-left: 22px !important;
+    }
+
+    .input-group-addon {
+        padding: 8px 12px;
+        width: 45px;
+        display: inline-block;
+    }
+}
+
+@include mobile-media {
+    .container {
+        padding-top: 15px;
+    }
+
+    .wrap-long {
+        white-space: initial !important;
+    }
+
+    .input-group-addon {
+        padding: 8px 10px;
+        width: 40px;
+        display: inline-block;
+    }
 }
 
 @import "spinner.scss";
-@import "dice.scss";
-@import "medal.scss";
 
 .table hr.half-cell {
    margin: 5px 0px;
@@ -206,4 +88,9 @@ tr.bottom-line td {
 
 .text-black {
    color: #333;
+}
+
+.help-block {
+    margin-left: 8px;
+    margin-bottom: 0px;
 }

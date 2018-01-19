@@ -1,3 +1,4 @@
+import './request-status.scss';
 import angular from 'angular';
 import template from './request-status.template.html';
 

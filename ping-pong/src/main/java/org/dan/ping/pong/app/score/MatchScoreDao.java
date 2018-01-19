@@ -1,8 +1,8 @@
 package org.dan.ping.pong.app.score;
 
 import static java.util.Collections.singletonList;
-import static ord.dan.ping.pong.jooq.Tables.MATCHES;
-import static ord.dan.ping.pong.jooq.Tables.SET_SCORE;
+import static org.dan.ping.pong.jooq.Tables.MATCHES;
+import static org.dan.ping.pong.jooq.Tables.SET_SCORE;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.match.Mid;

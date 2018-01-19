@@ -14,19 +14,29 @@ import static org.dan.ping.pong.app.group.ParticipantMatchState.Pending;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.Run;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.WalkOver;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.WalkWiner;
+import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.tournament.CumulativeScore.createComparator;
+import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.match.MatchValidationRule;
+import org.dan.ping.pong.app.match.MatchState;
+import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.tournament.CumulativeScore;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -51,7 +61,29 @@ import javax.inject.Inject;
 
 
 @Slf4j
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class GroupService {
+    public Optional<List<MatchInfo>> checkGroupComplete(
+            TournamentMemState tournament, int gid) {
+        final List<MatchInfo> matches = findMatchesInGroup(tournament, gid);
+        if (matches.isEmpty()) {
+            return Optional.empty();
+        }
+        final long completedMatches = matches.stream()
+                .map(MatchInfo::getState)
+                .filter(Over::equals)
+                .count();
+
+        if (completedMatches < matches.size()) {
+            log.debug("Matches {} left to play in the group {}",
+                    matches.size() - completedMatches, gid);
+            return Optional.empty();
+        }
+        return Optional.of(matches);
+    }
+
     public Map<Uid, BidSuccessInGroup> emptyMatchesState(
             Function<Uid, BidState> participantState,
             Collection<MatchInfo> allMatchesInGroup) {
@@ -81,7 +113,7 @@ public class GroupService {
 
     public List<Uid> orderUidsInGroup(TournamentMemState tournament,
             List<MatchInfo> allMatchesInGroup) {
-        final Map<Uid, Integer> uid2Points = countPoints(tournament.getRule().getMatch(), allMatchesInGroup);
+        final Map<Uid, Integer> uid2Points = countPoints(tournament, allMatchesInGroup);
         final ExtraUidOrderInGroup strongerExtraOrder = findStrongerExtraOrder(tournament,
                 uid2Points, allMatchesInGroup);
         final List<Uid> result = orderUidsByPointsAndExtraOrder(uid2Points,
@@ -112,7 +144,7 @@ public class GroupService {
             final int numUids = uids.size();
             if (numUids == 2) {
                 Iterator<Uid> uidIterator = uids.iterator();
-                compareDirectMatch(matches, uidIterator.next(),
+                compareDirectMatch(tournament, matches, uidIterator.next(),
                         uidIterator.next(), strongerExtraOrder);
             } else if (numUids > 2) {
                 compareMatchesBetweenMany(tournament, matches, uids, strongerExtraOrder);
@@ -138,8 +170,7 @@ public class GroupService {
         final List<MatchInfo> matchesWithUids = filterMatchesByUids(matches, uids);
 
         final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(uid -> Play, matchesWithUids);
-        final MatchValidationRule matchRule = tournament.getRule().getMatch();
-        matchesWithUids.forEach(minfo -> aggMatch(uid2Stat, minfo, matchRule));
+        matchesWithUids.forEach(minfo -> aggMatch(tournament, uid2Stat, minfo));
         strongerExtraOrder.getUid2SetsAndBalls().putAll(uid2Stat);
         orderTwiceAmbiguous(tournament, matches, uids,
                 strongerExtraOrder, matchesWithUids, uid2Stat);
@@ -186,7 +217,7 @@ public class GroupService {
             final int numUids = subUids.size();
             if (numUids == 2) {
                 Iterator<Uid> uidIterator = uids.iterator();
-                compareDirectMatch(matches, uidIterator.next(),
+                compareDirectMatch(tournament, matches, uidIterator.next(),
                         uidIterator.next(), strongerExtraOrder);
             } else if (numUids > 2) {
                 if (numUids == uids.size()) { // all uids
@@ -221,24 +252,31 @@ public class GroupService {
         }
     }
 
-    private void compareDirectMatch(List<MatchInfo> matches, Uid uidA, Uid uidB,
+    private void compareDirectMatch(TournamentMemState tournament, List<MatchInfo> matches,
+            Uid uidA, Uid uidB,
             ExtraUidOrderInGroup strongerExtraOrder) {
         final MatchInfo abMatch = matches.stream()
                 .filter(m -> m.hasParticipant(uidA) && m.hasParticipant(uidB))
                 .findAny().orElseThrow(() -> internalError(
                         "no match between " + uidA + " and " + uidB));
         final Uid winnerUid = abMatch.getWinnerId()
-                .orElseThrow(() -> internalError("no winner in match " + abMatch.getMid()));
+                .orElseGet(() ->
+                        sports.findStronger(tournament, abMatch)
+                                .orElseGet(() -> {
+                                 strongerExtraOrder.getDiced()
+                                         .addAll(abMatch.getParticipantIdScore().keySet());
+                                    return ObjectUtils.min(uidA, uidB);
+                                }));
         strongerExtraOrder.getStrongerOf().put(winnerUid, abMatch.getOpponentUid(winnerUid)
                 .orElseThrow(() -> internalError("no opponent in match " + abMatch.getMid())));
     }
 
-    Map<Uid, Integer> countPoints(MatchValidationRule rules, List<MatchInfo> allMatchesInGroup) {
+    Map<Uid, Integer> countPoints(TournamentMemState tournament, List<MatchInfo> allMatchesInGroup) {
         CounterMap<Uid> counters = new CounterMap<>();
-        allMatchesInGroup.stream().forEach(m ->
+        allMatchesInGroup.forEach(m ->
                 m.getWinnerId().ifPresent(winnerId -> {
                     counters.increment2(winnerId);
-                    if (rules.findWinner(m).equals(m.getWinnerId())) {
+                    if (sports.findWinner(tournament, m).equals(m.getWinnerId())) {
                         counters.increment(m.getOpponentUid(winnerId).get());
                     }
                 }));
@@ -263,8 +301,11 @@ public class GroupService {
         return result;
     }
 
-    public void aggMatch(Map<Uid, BidSuccessInGroup> uid2Stat,
-            MatchInfo minfo, MatchValidationRule matchRule) {
+    @Inject
+    private Sports sports;
+
+    public void aggMatch(TournamentMemState tournament, Map<Uid, BidSuccessInGroup> uid2Stat,
+            MatchInfo minfo) {
         if (!minfo.getWinnerId().isPresent()) {
             log.error("Match {} is not complete", minfo.getMid());
             return;
@@ -283,7 +324,7 @@ public class GroupService {
         minfo.getParticipantScore(lostUid)
                 .forEach(winner::lostBalls);
 
-        final Map<Uid, Integer> uid2Sets = matchRule.calcWonSets(minfo.getParticipantIdScore());
+        final Map<Uid, Integer> uid2Sets = sports.calcWonSets(tournament, minfo);
 
         loser.wonSets(uid2Sets.get(lostUid));
         loser.lostSets(uid2Sets.get(winUid));
@@ -291,7 +332,7 @@ public class GroupService {
         winner.lostSets(uid2Sets.get(lostUid));
 
         winner.win();
-        matchRule.findWinnerId(uid2Sets)
+        sports.findWinnerId(tournament, uid2Sets)
                 .ifPresent(uid -> loser.lost()); // walkover = 0
     }
 
@@ -316,11 +357,13 @@ public class GroupService {
 
     public boolean isNotCompleteGroup(TournamentMemState tournament, int gid) {
         final Optional<Integer> ogid = Optional.of(gid);
+        int[] c = new int[1];
         return tournament.getMatches()
                 .values()
                 .stream()
-                .anyMatch(m -> ogid.equals(m.getGid())
-                        && m.getState() != Over);
+                .filter(m -> ogid.equals(m.getGid()))
+                .peek(m -> ++c[0])
+                .anyMatch(m -> m.getState() != Over) || c[0] == 0;
     }
 
     public GroupWithMembers members(TournamentMemState tournament, int gid) {
@@ -345,7 +388,7 @@ public class GroupService {
         final List<ParticipantMemState> bids = groupBids(tournament, gid);
         final TournamentRules rules = tournament.getRule();
 
-        final Map<Uid, Integer> uid2Points = countPoints(rules.getMatch(), matches);
+        final Map<Uid, Integer> uid2Points = countPoints(tournament, matches);
         final ExtraUidOrderInGroup strongerExtraOrder = findStrongerExtraOrder(tournament, uid2Points, matches);
         final List<Uid> finalUidsOrder = orderUidsByPointsAndExtraOrder(uid2Points,
                 strongerExtraOrder.getStrongerOf());
@@ -394,10 +437,8 @@ public class GroupService {
     private GroupMatchResult matchResult(Uid uid, TournamentMemState tournament, MatchInfo m) {
         final Uid oUid = m.getOpponentUid(uid)
                 .orElseThrow(() -> internalError("no opponent uid" + uid));
-        final MatchValidationRule matchRule = tournament.getRule().getMatch();
-        final Map<Uid, List<Integer>> scores = m.getParticipantIdScore();
-        final Map<Uid, Integer> uid2WonSets = matchRule.calcWonSets(scores);
-        final Optional<Uid> scoreWinner = matchRule.findWinnerId(uid2WonSets);
+        final Map<Uid, Integer> uid2WonSets = sports.calcWonSets(tournament, m);
+        final Optional<Uid> scoreWinner = sports.findWinnerId(tournament, uid2WonSets);
         return GroupMatchResult.builder()
                 .state(participantMatchState(uid, scoreWinner, m))
                 .mid(m.getMid())
@@ -405,7 +446,7 @@ public class GroupService {
                         .his(uid2WonSets.get(uid))
                         .enemy(uid2WonSets.get(oUid))
                         .build())
-                .games(pairGames(uid, oUid, scores))
+                .games(pairGames(uid, oUid, m.getParticipantIdScore()))
                 .build();
     }
 
@@ -451,17 +492,20 @@ public class GroupService {
         return result;
     }
 
+    private static final Set<MatchState> GameOrOverOrPlace = ImmutableSet.of(Over, Game, Place);
+
     public List<TournamentResultEntry> resultOfAllGroupsInCategory(TournamentMemState tournament, int cid) {
         final List<GroupInfo> groups = tournament.getGroupsByCategory(cid);
-        final MatchValidationRule matchRules = tournament.getRule().getMatch();
         return tournament.getRule().getGroup().map(groupRules ->
                 newArrayList(
                         mergeSorted(groups.stream()
                                         .map(groupInfo -> {
                                             final List<MatchInfo> completeGroupMatches = findMatchesInGroup(tournament, groupInfo.getGid())
-                                                    .stream().filter(m -> m.getState() == Over).collect(toList());
+                                                    .stream()
+                                                    .filter(m -> GameOrOverOrPlace.contains(m.getState()))
+                                                    .collect(toList());
                                             final Map<Uid, CumulativeScore> uidLevel = new HashMap<>();
-                                            ranksLevelMatches(tournament, 0, uidLevel, completeGroupMatches, matchRules);
+                                            ranksLevelMatches(tournament, 0, uidLevel, completeGroupMatches);
                                             return orderUidsInGroup(tournament, completeGroupMatches).stream()
                                                     .map(uidLevel::get).collect(toList());
                                         })
@@ -486,10 +530,10 @@ public class GroupService {
 
     public void ranksLevelMatches(TournamentMemState tournament, int level,
             Map<Uid, CumulativeScore> uidLevel,
-            Collection<MatchInfo> matches, MatchValidationRule rules) {
+            Collection<MatchInfo> matches) {
         final Map<Uid, BidSuccessInGroup> uid2Stat = emptyMatchesState(
                 uid -> tournament.getBidOrExpl(uid).getState(), matches);
-        matches.forEach(m -> aggMatch(uid2Stat, m, rules));
+        matches.forEach(m -> aggMatch(tournament, uid2Stat, m));
         uid2Stat.forEach((uid, stat) ->
                 uidLevel.merge(uid,
                         CumulativeScore.builder()
@@ -503,5 +547,35 @@ public class GroupService {
     public boolean notExpelledInGroup(TournamentMemState tournament, ParticipantMemState b) {
         return b.getState() != Expl || tournament.participantMatches(b.getUid())
                 .anyMatch(m -> !m.getGid().isPresent());
+    }
+
+    public void ensureThatNewGroupCouldBeAdded(TournamentMemState tournament, int cid) {
+        final List<GroupInfo> categoryGroups = tournament.getGroupsByCategory(cid);
+        categoryGroups.forEach(groupInfo -> {
+            if (!isNotCompleteGroup(tournament, groupInfo.getGid())) {
+                throw badRequest("category-has-complete-group", "link", groupInfo.toLink());
+            }
+        });
+    }
+
+    public static String sortToLabel(int sort) {
+        return "Group " + (1 + sort);
+    }
+
+    @Inject
+    private GroupDao groupDao;
+
+    public int createGroup(TournamentMemState tournament, int cid) {
+        final int sort = tournament.getGroups().values().stream()
+                .map(GroupInfo::getOrdNumber)
+                .max(Integer::compare).orElse(-1) + 1;
+        final String label = sortToLabel(sort);
+        final int gid = groupDao.createGroup(tournament.getTid(), cid, label,
+                tournament.getRule().getGroup().get().getQuits(), sort);
+        log.info("New group {}/{} is created in tid/cid {}/{}",
+                gid, label, tournament.getTid(), cid);
+        tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
+                .ordNumber(sort).label(label).build());
+        return gid;
     }
 }

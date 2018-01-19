@@ -21,16 +21,6 @@ angular.
                                  LocalStorage.clearAll();
                                  $location.path('/');
                              };
-                             this.myLang = function () {
-                                 return LocalStorage.get('myLang') || 'pl';
-                             };
-                             this.setMyLang = function (lang) {
-                                 if (self.myLang() == lang) {
-                                     return;
-                                 }
-                                 LocalStorage.store('myLang', lang);
-                                 $window.location.reload();
-                             };
                              this.myEmail = function () {
                                  return LocalStorage.get('myEmail');
                              };

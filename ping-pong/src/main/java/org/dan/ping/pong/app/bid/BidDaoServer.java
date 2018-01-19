@@ -1,12 +1,13 @@
 package org.dan.ping.pong.app.bid;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static ord.dan.ping.pong.jooq.Tables.BID;
-import static ord.dan.ping.pong.jooq.Tables.CATEGORY;
-import static ord.dan.ping.pong.jooq.Tables.USERS;
+import static org.dan.ping.pong.jooq.Tables.BID;
+import static org.dan.ping.pong.jooq.Tables.CATEGORY;
+import static org.dan.ping.pong.jooq.Tables.USERS;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
@@ -17,6 +18,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.jooq.tables.records.BidRecord;
 import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -25,6 +27,7 @@ import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdateSql;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.jooq.DSLContext;
+import org.jooq.UpdateConditionStep;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -80,15 +83,31 @@ public class BidDaoServer implements BidDao {
     }
 
     @Override
+    public void setGroupForUids(DbUpdater batch, int gid, Tid tid,
+            List<ParticipantMemState> groupBids) {
+        batch.exec(DbUpdateSql.builder()
+                .query(setGid(gid, tid, groupBids))
+                .logBefore(() -> log.info("update gid {} for {}", gid,
+                        groupBids.stream()
+                                .map(ParticipantMemState::getUid)
+                                .collect(toList())))
+                .mustAffectRows(of(1))
+                .build());
+    }
+
+    @Override
     public void setGroupForUids(int gid, Tid tid, List<ParticipantMemState> groupBids) {
-        jooq.update(BID)
+        setGid(gid, tid, groupBids).execute();
+    }
+
+    private UpdateConditionStep<BidRecord> setGid(int gid, Tid tid, List<ParticipantMemState> groupBids) {
+        return jooq.update(BID)
                 .set(BID.GID, Optional.of(gid))
                 .where(BID.TID.eq(tid),
                         BID.UID.in(groupBids.stream()
                                 .map(ParticipantMemState::getUid)
                                 .map(Uid::getId)
-                                .collect(Collectors.toList())))
-                .execute();
+                                .collect(Collectors.toList())));
     }
 
     @Override
@@ -97,13 +116,14 @@ public class BidDaoServer implements BidDao {
                 .logBefore(() -> log.info("User {} enlisted to tournament {}", bid.getUid(), bid.getTid()))
                 .mustAffectRows(NON_ZERO_ROWS)
                 .query(jooq.insertInto(BID, BID.CID, BID.TID, BID.UID,
-                        BID.STATE, BID.PROVIDED_RANK, BID.CREATED, BID.UPDATED)
+                        BID.STATE, BID.PROVIDED_RANK, BID.CREATED, BID.UPDATED, BID.GID)
                         .values(bid.getCid(), bid.getTid(), bid.getUid(),
                                 bid.getBidState(), providedRank, bid.getEnlistedAt(),
-                                Optional.of(bid.getUpdatedAt()))
+                                Optional.of(bid.getUpdatedAt()), bid.getGid())
                         .onDuplicateKeyUpdate()
                         .set(BID.STATE, bid.getBidState())
                         .set(BID.UPDATED, Optional.of(bid.getUpdatedAt()))
+                        .set(BID.GID, bid.getGid())
                         .set(BID.PROVIDED_RANK, providedRank)
                         .set(BID.CID, bid.getCid()))
                 .build());

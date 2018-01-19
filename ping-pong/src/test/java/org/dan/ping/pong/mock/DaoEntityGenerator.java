@@ -147,6 +147,7 @@ public class DaoEntityGenerator {
                 .previousTid(Optional.empty())
                 .rules(props.getRules())
                 .ticketPrice(Optional.empty())
+                .sport(props.getSport())
                 .build());
         forTestTournamentDao.setState(tid, props.getState());
         return tid;

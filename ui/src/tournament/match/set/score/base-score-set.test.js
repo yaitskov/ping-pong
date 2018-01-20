@@ -26,6 +26,8 @@ const PingPongZeroSets = {
     }
 };
 
+const PingPongLostDefault = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
 describe('base-score-set', () => {
     var initEventFired = false;
 
@@ -51,7 +53,22 @@ describe('base-score-set', () => {
         expect(ctx.ctrl.scores).toEqual([11, -1]);
         expect(ctx.ctrl.winnerIdx).toBe(0);
         expect(ctx.ctrl.possibleWinScores).toEqual([11]);
-        expect(ctx.ctrl.possibleLostScores).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        expect(ctx.ctrl.possibleLostScores).toEqual(PingPongLostDefault);
+
+        expect(ctx.element.find('#extend-win-score').hasClass("ng-hide")).toBeFalse();
+    });
+
+    ij('set event is handled for scored ping pong set', ($rootScope) => {
+        $rootScope.$broadcast('event.match.set',
+                              Object.assign(
+                                  {setScores: [3, 11]},
+                                  PingPongZeroSets));
+        ctx.sync();
+
+        expect(ctx.ctrl.scores).toEqual([3, 11]);
+        expect(ctx.ctrl.winnerIdx).toBe(1);
+        expect(ctx.ctrl.possibleWinScores).toEqual([11]);
+        expect(ctx.ctrl.possibleLostScores).toEqual(PingPongLostDefault);
 
         expect(ctx.element.find('#extend-win-score').hasClass("ng-hide")).toBeFalse();
     });

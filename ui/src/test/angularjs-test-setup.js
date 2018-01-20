@@ -48,14 +48,16 @@ class Ctx {
     }
 }
 
-export function setupAngularJs(ctrlElementId) {
+export function setupAngularJs(ctrlElementId, initCb) {
     beforeEach(angular.mock.module('pingPongE2e'));
 
     const ctx = new Ctx();
 
     beforeEach(angular.mock.inject(function($rootScope, $compile) {
         ctx.scope = $rootScope.$new();
-
+        if (initCb) {
+            initCb(ctx.scope);
+        }
         ctx.element = angular.element(`<${ctrlElementId}></${ctrlElementId}>`);
         ctx.element = $compile(ctx.element)(ctx.scope);
         ctx.scope.$digest();

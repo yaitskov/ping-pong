@@ -43,6 +43,10 @@ describe('base-score-set', () => {
         expect(initEventFired).toBeTrue();
     });
 
+    function checkExtendWinScoreVisible(ctx) {
+        expect(ctx.element.find('#extend-win-score').hasClass("ng-hide")).toBeFalse();
+    }
+
     ij('set event is handled for new ping pong match', ($rootScope) => {
         $rootScope.$broadcast('event.match.set', PingPongZeroSets);
         ctx.sync();
@@ -55,7 +59,7 @@ describe('base-score-set', () => {
         expect(ctx.ctrl.possibleWinScores).toEqual([11]);
         expect(ctx.ctrl.possibleLostScores).toEqual(PingPongLostDefault);
 
-        expect(ctx.element.find('#extend-win-score').hasClass("ng-hide")).toBeFalse();
+        checkExtendWinScoreVisible(ctx);
     });
 
     ij('set event is handled for scored ping pong set', ($rootScope) => {
@@ -70,6 +74,21 @@ describe('base-score-set', () => {
         expect(ctx.ctrl.possibleWinScores).toEqual([11]);
         expect(ctx.ctrl.possibleLostScores).toEqual(PingPongLostDefault);
 
-        expect(ctx.element.find('#extend-win-score').hasClass("ng-hide")).toBeFalse();
+        checkExtendWinScoreVisible(ctx);
+    });
+
+    ij('set event is handled for scored ping pong advance set', ($rootScope) => {
+        $rootScope.$broadcast('event.match.set',
+                              Object.assign(
+                                  {setScores: [10, 12]},
+                                  PingPongZeroSets));
+        ctx.sync();
+
+        expect(ctx.ctrl.scores).toEqual([10, 12]);
+        expect(ctx.ctrl.winnerIdx).toBe(1);
+        expect(ctx.ctrl.possibleWinScores).toEqual([11, 12, 13, 14]);
+        expect(ctx.ctrl.possibleLostScores).toEqual([10]);
+
+        checkExtendWinScoreVisible(ctx);
     });
 });

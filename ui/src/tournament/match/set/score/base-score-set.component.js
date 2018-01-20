@@ -30,7 +30,7 @@ angular.
                                  self.scores[1 - self.winnerIdx] = lostScore;
                                  const sport = self.match.sport;
                                  self.possibleWinScores = self.scoreStrategy.winnerOptions(
-                                     sport, self.match.playedSets);
+                                     sport, winScore, self.match.playedSets);
                                  self.possibleLostScores = self.scoreStrategy.loserOptions(
                                      sport, winScore, self.match.playedSets);
                              } else {
@@ -40,8 +40,9 @@ angular.
                          }
                          self.noBalance = function () {
                              const sport = self.match.sport;
-                             self.possibleWinScores = self.scoreStrategy.winnerOptions(sport, self.match.playedSets);
-                             self.scores[self.winnerIdx] = self.scoreStrategy.defaultWinnerScore(sport, self.match.playedSets);
+                             const winScore = self.scoreStrategy.defaultWinnerScore(sport, self.match.playedSets);
+                             self.scores[self.winnerIdx] = winScore;
+                             self.possibleWinScores = self.scoreStrategy.winnerOptions(sport, winScore, self.match.playedSets);
                              self.possibleLostScores = self.scoreStrategy.loserOptions(sport,
                                  self.scores[self.winnerIdx],
                                  self.match.playedSets);

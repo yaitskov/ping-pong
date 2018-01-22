@@ -2,17 +2,17 @@ export default class TennisScoresStrategy {
     showExtend() {
         return false;
     }
-    isSuperTieBreak(rules, playedSets) {
-        return playedSets == rules.setsToWin;
+    _isSuperTieBreak(rules, playedSets) {
+        return playedSets == (rules.setsToWin - 1) * 2;
     }
     winnerOptions(rules, winScore, playedSets) {
-        if (this.isSuperTieBreak(rules, playedSets)) {
+        if (this._isSuperTieBreak(rules, playedSets)) {
             return [rules.superTieBreakGames];
         }
         return [rules.minGamesToWin, rules.minGamesToWin + 1];
     }
     loserOptions(rules, winnerOption, playedSets) {
-        if (this.isSuperTieBreak(rules, playedSets)) {
+        if (this._isSuperTieBreak(rules, playedSets)) {
            let result = [];
            for (let i of rules.superTieBreakGames) {
                result.push(i);
@@ -34,9 +34,10 @@ export default class TennisScoresStrategy {
            }
            return result;
         }
+        throw new RangeError('winner got to much games: ' + winnerOption);
     }
     defaultWinnerScore(rules, playedSets) {
-        if (this.isSuperTieBreak(rules, playedSets)) {
+        if (this._isSuperTieBreak(rules, playedSets)) {
            return rules.superTieBreakGames;
         }
         return rules.minGamesToWin;

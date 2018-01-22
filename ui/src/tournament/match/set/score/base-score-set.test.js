@@ -91,4 +91,45 @@ describe('base-score-set', () => {
 
         checkExtendWinScoreVisible(ctx);
     });
+
+    ij('extend win balls in ping pong match', ($rootScope) => {
+        $rootScope.$broadcast('event.match.set', PingPongZeroSets);
+
+        const captured = [];
+        ctx.scope.$on('event.base.match.set.pick.lost', (e, data) => captured.push(data));
+        ctx.sync();
+        ctx.element.find('#extend-win-score').click();
+
+        expect(ctx.ctrl.scores).toEqual([12, 10]);
+        expect(ctx.ctrl.possibleWinScores).toEqual([11, 12, 13, 14]);
+        expect(ctx.ctrl.possibleLostScores).toEqual([10]);
+        expect(captured[0]).toEqual({setOrdNumber: 0, scores: [{uid: UidA, score: 12}, {uid: UidB, score: 10}]});
+
+        ctx.element.find('#extend-win-score').click();
+
+        expect(ctx.ctrl.scores).toEqual([15, 13]);
+        expect(ctx.ctrl.possibleWinScores).toEqual([14, 15, 16, 17]);
+        expect(ctx.ctrl.possibleLostScores).toEqual([13]);
+        expect(captured[1]).toEqual({setOrdNumber: 0, scores: [{uid: UidA, score: 15}, {uid: UidB, score: 13}]});
+    });
+
+    ij('shrink win balls in ping pong match', ($rootScope) => {
+        $rootScope.$broadcast('event.match.set', PingPongZeroSets);
+
+        ctx.ctrl.scores = [15, 13];
+        ctx.ctrl.possibleWinScores = [14, 15, 16, 17];
+        ctx.ctrl.possibleLostScores = [13];
+
+        ctx.ctrl.pick(ctx.ctrl.winnerIdx, 14);
+
+        expect(ctx.ctrl.possibleWinScores).toEqual([11, 12, 13, 14]);
+        expect(ctx.ctrl.possibleLostScores).toEqual([12]);
+        expect(ctx.ctrl.scores).toEqual([14, 12]);
+
+        ctx.ctrl.pick(ctx.ctrl.winnerIdx, 11);
+
+        expect(ctx.ctrl.scores).toEqual([11, -1]);
+        expect(ctx.ctrl.possibleWinScores).toEqual([11]);
+        expect(ctx.ctrl.possibleLostScores).toEqual(PingPongLostDefault);
+    });
 });

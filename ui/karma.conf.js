@@ -9,6 +9,7 @@ Custom keys:
   --srcmap      - generate source map
   --cover       - generate coverage report
   --fan         - use phantom js runner
+  --debugfan    - launch phantom js
 `);
     process.exit(1);
 }
@@ -33,6 +34,10 @@ module.exports = (config) => {
     if (config.fan) {
         browsers.length = 0;
         browsers.push('PhantomJS');
+    }
+    if (config.debugfan) {
+        browsers.length = 0;
+        browsers.push('PhantomJS_debug');
     }
 
     config.set({
@@ -83,6 +88,12 @@ module.exports = (config) => {
                 // console.log("cacheIdFromPath " + filepath);
                 return filepath.substr(filepath.lastIndexOf('/') + 1);
             },
+        },
+        customLaunchers: {
+            'PhantomJS_debug': {
+                base: 'PhantomJS',
+                debug: true
+            }
         }
     })
 }

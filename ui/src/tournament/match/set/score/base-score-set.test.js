@@ -158,7 +158,7 @@ describe('base-score-set', () => {
             expect(requestStatus.validationFailed).toHaveBeenCalledWith("Participants cannot have same scores");
         });
 
-        ij('event.match.set.scored is emitted', ($routeParams, $rootScope) => {
+        ij('event.match.set.scored is emitted', ($rootScope) => {
             $rootScope.$broadcast('event.match.set', PingPongZeroSets);
 
             const captured = [];
@@ -170,5 +170,12 @@ describe('base-score-set', () => {
                                        setOrdNumber: 0,
                                        scores: [{uid: UidA, score: 11}, {uid: UidB, score: 0}]}]);
         });
+    });
+
+    ij('event.match.set.next updates set number', ($rootScope) => {
+        $rootScope.$broadcast('event.match.set', PingPongZeroSets);
+        expect(ctx.ctrl.match.playedSets).toBe(0);
+        $rootScope.$broadcast('event.match.set.next', {nextSetNumberToScore: 2});
+        expect(ctx.ctrl.match.playedSets).toBe(2);
     });
 });

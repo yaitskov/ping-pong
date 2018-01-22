@@ -151,5 +151,24 @@ describe('base-score-set', () => {
             $rootScope.$broadcast('event.match.set.score');
             expect(requestStatus.validationFailed).toHaveBeenCalledWith("Not all participants have been scored");
         });
+        ij('validation reject due not all participants are equally strong', (requestStatus, $rootScope) => {
+            spyOn(requestStatus, 'validationFailed');
+            ctx.ctrl.scores = [11, 11];
+            $rootScope.$broadcast('event.match.set.score');
+            expect(requestStatus.validationFailed).toHaveBeenCalledWith("Participants cannot have same scores");
+        });
+
+        ij('event.match.set.scored is emitted', ($routeParams, $rootScope) => {
+            $rootScope.$broadcast('event.match.set', PingPongZeroSets);
+
+            const captured = [];
+            ctx.scope.$on('event.match.set.scored', (e, data) => captured.push(data));
+            ctx.ctrl.scores = [11, 0];
+            $rootScope.$broadcast('event.match.set.score');
+            expect(captured).toEqual([{mid: undefined,
+                                       tid: Tid,
+                                       setOrdNumber: 0,
+                                       scores: [{uid: UidA, score: 11}, {uid: UidB, score: 0}]}]);
+        });
     });
 });

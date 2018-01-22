@@ -178,4 +178,14 @@ describe('base-score-set', () => {
         $rootScope.$broadcast('event.match.set.next', {nextSetNumberToScore: 2});
         expect(ctx.ctrl.match.playedSets).toBe(2);
     });
+
+    ij('event.match.score.raise.conflict emit and enrich event.match.score.conflict', ($rootScope) => {
+        $rootScope.$broadcast('event.match.set', PingPongZeroSets);
+
+        const captured = [];
+        ctx.scope.$on('event.match.score.conflict', (e, data) => captured.push(data));
+
+        $rootScope.$broadcast('event.match.score.raise.conflict', {data: {}});
+        expect(captured.length).toBe(1);
+    });
 });

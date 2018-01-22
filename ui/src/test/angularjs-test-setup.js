@@ -38,7 +38,7 @@ class Ctx {
     }
 
     findSetInput(m) {
-        for (let [anchor, val] of m) {
+        for (let [anchor, val] of Object.entries(m)) {
             this.find(anchor).val(val).triggerHandler('input');
         }
     }

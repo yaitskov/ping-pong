@@ -9,6 +9,7 @@ Custom keys:
   --srcmap      - generate source map
   --cover       - generate coverage report
   --fan         - use phantom js runner
+  --chrom       - use chrome js runner
   --debugfan    - launch phantom js
 `);
     process.exit(1);
@@ -20,7 +21,7 @@ module.exports = (config) => {
     }
     const jsPreprocessors = [];
     const reporters = ['progress'];
-    const browsers = ['Chromium']; // Chromium Firefox PhantomJS];
+    const browsers = ['PhantomJS']; // Chromium Firefox ];
 
     if (config.cover) {
         for (let reporter of ['coverage', 'kjhtml', 'mocha', 'html']) {
@@ -34,6 +35,10 @@ module.exports = (config) => {
     if (config.fan) {
         browsers.length = 0;
         browsers.push('PhantomJS');
+    }
+    if (config.chrom) {
+        browsers.length = 0;
+        browsers.push('Chromium');
     }
     if (config.debugfan) {
         browsers.length = 0;

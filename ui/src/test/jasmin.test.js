@@ -8,4 +8,11 @@ describe('jasmine features', () => {
         expect({a: 1, b: 'x'}).toEqual(
             jasmine.objectContaining({a: any.oddNumber(), b: jasmine.stringMatching(/./)}));
     });
+    it('createSpyOn', () => {
+        const s = jasmine.createSpyObj('s1', ['moveTo']);
+        s.moveTo.and.returnValue(2);
+        expect(s.moveTo).not.toHaveBeenCalled();
+        expect(s.moveTo()).toBe(2);
+        expect(s.moveTo).toHaveBeenCalled();
+    });
 });

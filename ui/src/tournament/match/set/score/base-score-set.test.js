@@ -132,4 +132,24 @@ describe('base-score-set', () => {
         expect(ctx.ctrl.possibleWinScores).toEqual([11]);
         expect(ctx.ctrl.possibleLostScores).toEqual(PingPongLostDefault);
     });
+
+    describe('pickLost', () => {
+        ij('send msg', ($rootScope) => {
+            $rootScope.$broadcast('event.match.set', PingPongZeroSets);
+            const captured = [];
+            ctx.scope.$on('event.base.match.set.pick.lost', (e, data) => captured.push(data));
+            ctx.ctrl.scores = [-1, -1];
+            ctx.ctrl.pickLost(1, 777);
+            expect(captured).toEqual([{setOrdNumber: 0, scores: [{uid: UidA, score: -1}, {uid: UidB, score: 777}]}]);
+        });
+    });
+
+    describe('event.match.set.score', () => {
+        ij('validation reject due not all participants are scored', (requestStatus, $rootScope) => {
+            spyOn(requestStatus, 'validationFailed');
+            ctx.ctrl.scores = [-1, -1];
+            $rootScope.$broadcast('event.match.set.score');
+            expect(requestStatus.validationFailed).toHaveBeenCalledWith("Not all participants have been scored");
+        });
+    });
 });

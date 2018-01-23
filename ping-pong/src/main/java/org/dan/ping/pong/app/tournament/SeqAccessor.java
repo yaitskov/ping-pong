@@ -26,8 +26,12 @@ public class SeqAccessor<K, V> {
         });
     }
 
+    protected K mapSyncKey(K key) {
+        return key;
+    }
+
     public <R> void update(K key, AsyncResponse response, BiFunction<V, DbUpdater, R> act) {
-        sequentialExecutor.execute(key, () -> {
+        sequentialExecutor.execute(mapSyncKey(key), () -> {
             final DbUpdater batch = dbUpdaterFactory.create()
                     .onFailure(() -> cache.invalidate(key));
             try {
@@ -46,7 +50,7 @@ public class SeqAccessor<K, V> {
     }
 
     public <R> void read(K key, AsyncResponse response, Function<V, R> act) {
-        sequentialExecutor.execute(key, () -> {
+        sequentialExecutor.execute(mapSyncKey(key), () -> {
             try {
                 final V v = cache.load(key);
                 final R retVal = act.apply(v);

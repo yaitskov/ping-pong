@@ -4,6 +4,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
+import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.Console;
 import static org.dan.ping.pong.jooq.Tables.BID;
 import static org.dan.ping.pong.jooq.Tables.CATEGORY;
 import static org.dan.ping.pong.jooq.Tables.MATCHES;
@@ -26,6 +27,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.app.tournament.TournamentState.Replaced;
 import static org.dan.ping.pong.app.tournament.TournamentType.Classic;
+import static org.dan.ping.pong.jooq.Tables.TOURNAMENT_RELATION;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
@@ -35,6 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.place.PlaceLink;
+import org.dan.ping.pong.app.tournament.console.TournamentRelationType;
+import org.dan.ping.pong.jooq.tables.TournamentRelation;
 import org.dan.ping.pong.sys.db.DbUpdateSql;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.jooq.DSLContext;
@@ -64,6 +68,8 @@ public class TournamentDao {
     private static final String GAMES_COMPLETE = "gamesComplete";
     private static final int DAYS_TO_SHOW_PAST_TOURNAMENT = 30;
     private static final String CATEGORIES = "categories";
+    private static final TournamentRelation CHILD_TID_REL = TOURNAMENT_RELATION.as("child_tid_rel");
+    private static final TournamentRelation MASTER_TID_REL = TOURNAMENT_RELATION.as("master_tid_rel");
 
     @Inject
     private DSLContext jooq;
@@ -97,8 +103,8 @@ public class TournamentDao {
                         newTournament.getRules(),
                         newTournament.getTicketPrice(),
                         newTournament.getName(),
-                        newTournament.getSport(),
-                        Classic)
+                        Classic,
+                        newTournament.getSport())
                 .returning(TOURNAMENT.TID)
                 .fetchOne()
                 .getTid();
@@ -469,13 +475,41 @@ public class TournamentDao {
                 .collect(toSet());
     }
 
+    public RelatedTids getRelatedTids(Tid tid) {
+        return ofNullable(jooq.select(
+                CHILD_TID_REL.CHILD_TID,
+                MASTER_TID_REL.CHILD_TID)
+                .from(TOURNAMENT)
+                .leftJoin(CHILD_TID_REL)
+                .on(TOURNAMENT.TID.eq(CHILD_TID_REL.PARENT_TID)
+                        .and(CHILD_TID_REL.TYPE.eq(Console)))
+                .leftJoin(MASTER_TID_REL)
+                .on(TOURNAMENT.TID.eq(MASTER_TID_REL.CHILD_TID)
+                        .and(MASTER_TID_REL.TYPE.eq(Console)))
+                .where(TOURNAMENT.TID.eq(tid))
+                .fetchOne())
+                .map(r -> RelatedTids.builder()
+                        .child(ofNullable(r.get(CHILD_TID_REL.CHILD_TID)))
+                        .parent(ofNullable(r.get(MASTER_TID_REL.CHILD_TID)))
+                        .build())
+                .orElseThrow(() -> notFound("tournament " + tid + " not found"));
+    }
+
     public Optional<TournamentRow> getRow(Tid tid) {
         return ofNullable(jooq
                 .select(TOURNAMENT.PID, TOURNAMENT.TYPE, TOURNAMENT.SPORT, TOURNAMENT.RULES,
                         TOURNAMENT.COMPLETE_AT, TOURNAMENT.OPENS_AT,
                         TOURNAMENT.NAME, TOURNAMENT.STATE, TOURNAMENT.TICKET_PRICE,
-                        TOURNAMENT.PREVIOUS_TID)
+                        TOURNAMENT.PREVIOUS_TID,
+                        CHILD_TID_REL.CHILD_TID,
+                        MASTER_TID_REL.CHILD_TID)
                 .from(TOURNAMENT)
+                .leftJoin(CHILD_TID_REL)
+                .on(TOURNAMENT.TID.eq(CHILD_TID_REL.PARENT_TID)
+                        .and(CHILD_TID_REL.TYPE.eq(Console)))
+                .leftJoin(MASTER_TID_REL)
+                .on(TOURNAMENT.TID.eq(MASTER_TID_REL.CHILD_TID)
+                        .and(MASTER_TID_REL.TYPE.eq(Console)))
                 .where(TOURNAMENT.TID.eq(tid))
                 .fetchOne())
                 .map(r -> TournamentRow.builder()
@@ -487,6 +521,8 @@ public class TournamentDao {
                         .type(r.get(TOURNAMENT.TYPE))
                         .state(r.get(TOURNAMENT.STATE))
                         .rules(r.get(TOURNAMENT.RULES))
+                        .consoleTid(ofNullable(r.get(CHILD_TID_REL.CHILD_TID)))
+                        .masterTid(ofNullable(r.get(MASTER_TID_REL.CHILD_TID)))
                         .ticketPrice(r.get(TOURNAMENT.TICKET_PRICE))
                         .previousTid(r.get(TOURNAMENT.PREVIOUS_TID).map(Tid::new))
                         .tid(tid)

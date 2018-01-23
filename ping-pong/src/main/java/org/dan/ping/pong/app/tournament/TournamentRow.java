@@ -24,4 +24,6 @@ public class TournamentRow {
     private TournamentRules rules;
     private Optional<Double> ticketPrice;
     private Optional<Tid> previousTid;
+    private Optional<Tid> consoleTid;
+    private Optional<Tid> masterTid;
 }

@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BalancedMix;
+import static org.dan.ping.pong.app.group.ConsoleTournament.NO;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -42,5 +43,9 @@ public class TournamentRules {
         CastingLotsRule casting = CastingLotsRule.builder()
                 .splitPolicy(BalancedMix)
                 .build();
+    }
+
+    public boolean consoleP() {
+        return group.map(GroupRules::getConsole).orElse(NO) != NO;
     }
 }

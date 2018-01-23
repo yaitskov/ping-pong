@@ -70,6 +70,8 @@ public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> 
                 .previousTid(row.getPreviousTid())
                 .completeAt(row.getEndedAt())
                 .pid(row.getPid())
+                .consoleTid(row.getConsoleTid())
+                .masterTid(row.getMasterTid())
                 .rule(row.getRules())
                 .build();
     }

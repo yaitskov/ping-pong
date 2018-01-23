@@ -565,6 +565,11 @@
                                     <type>org.dan.ping.pong.app.tournament.TournamentType</type>
                                     <binding>org.dan.ping.pong.app.tournament.TournamentTypeConverter</binding>
                                 </customType>
+                                <customType>
+                                    <name>TournamentRelationType</name>
+                                    <type>org.dan.ping.pong.app.tournament.console.TournamentRelationType</type>
+                                    <binding>org.dan.ping.pong.app.tournament.console.TournamentRelationTypeConverter</binding>
+                                </customType>
                             </customTypes>
                             <forcedTypes>
                                 <forcedType>
@@ -705,6 +710,16 @@
                                 <forcedType>
                                     <name>Tid</name>
                                     <expression>.*tournament\.(tid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Tid</name>
+                                    <expression>.*tournament_relation\.(parent_tid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Tid</name>
+                                    <expression>.*tournament_relation\.(child_tid)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
@@ -860,6 +875,11 @@
                                 <forcedType>
                                     <name>TournamentType</name>
                                     <expression>.*tournament\.(type)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>TournamentRelationType</name>
+                                    <expression>.*tournament_relation\.(type)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

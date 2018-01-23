@@ -58,6 +58,7 @@ import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentProgress;
 import org.dan.ping.pong.app.tournament.TournamentService;
+import org.dan.ping.pong.app.tournament.console.ConsoleStrategy;
 import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.TriFunc;
@@ -276,8 +277,8 @@ public class MatchService {
     public void tryToCompleteGroup(TournamentMemState tournament, MatchInfo matchInfo,
             DbUpdater batch, Collection<BidState> expected) {
         final int gid = matchInfo.getGid().get();
-        final Set<Uid> uids = matchInfo.getParticipantIdScore().keySet();
-        uids.stream()
+        final Set<Uid> matchUids = matchInfo.getParticipantIdScore().keySet();
+        matchUids.stream()
                 .map(tournament::getBidOrQuit)
                 .filter(b -> expected.contains(b.getState()))
                 .forEach(b -> bidService.setBidState(b,
@@ -307,13 +308,12 @@ public class MatchService {
         return Wait;
     }
 
+    @Inject
+    private ConsoleStrategy consoleStrategy;
+
     private void completeParticipationLeftBids(int gid, TournamentMemState tournament,
             Set<Uid> quitUids, DbUpdater batch) {
-        tournament.getParticipants().values().stream()
-                .filter(bid -> bid.getGid().equals(of(gid)))
-                .filter(bid -> !quitUids.contains(bid.getUid()))
-                .filter(bid -> !isPyrrhic(bid))
-                .forEach(bid -> bidService.setBidState(bid, Lost, asList(Wait, Rest), batch));
+        consoleStrategy.onGroupComplete(gid, tournament, quitUids, batch);
     }
 
     @Inject
@@ -411,7 +411,7 @@ public class MatchService {
 
     private static final Set<BidState> quitOrExpl = ImmutableSet.of(Quit, Expl);
 
-    public boolean isPyrrhic(ParticipantMemState bid) {
+    public static boolean isPyrrhic(ParticipantMemState bid) {
         return bid.getUid().equals(FILLER_LOSER_UID)
                 || quitOrExpl.contains(bid.getState());
     }

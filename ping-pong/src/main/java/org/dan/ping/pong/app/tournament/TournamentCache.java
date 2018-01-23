@@ -15,10 +15,6 @@ public class TournamentCache implements Cache<Tid, TournamentMemState> {
     @Named(TOURNAMENT_CACHE)
     private LoadingCache<Tid, TournamentMemState> tournamentCache;
 
-    public TournamentMemState load(int tid) {
-        return load(new Tid(tid));
-    }
-
     @SneakyThrows
     public TournamentMemState load(Tid tid) {
         try {

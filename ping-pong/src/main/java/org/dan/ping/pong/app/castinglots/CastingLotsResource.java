@@ -52,7 +52,7 @@ public class CastingLotsResource {
         final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("User {} does casting lots in tournament {}",
                 uid, doCastingLots.getTid());
-        sequentialExecutor.execute(new Tid(doCastingLots.getTid()), () -> {
+        sequentialExecutor.execute(doCastingLots.getTid(), () -> {
             try {
                 castingLotsService.seed(tournamentCache.load(doCastingLots.getTid()));
                 response.resume("");

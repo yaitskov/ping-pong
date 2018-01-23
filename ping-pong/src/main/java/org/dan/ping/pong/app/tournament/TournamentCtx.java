@@ -1,14 +1,20 @@
 package org.dan.ping.pong.app.tournament;
 
+import org.dan.ping.pong.app.tournament.console.ConsoleCtx;
+import org.dan.ping.pong.app.tournament.console.TournamentRelationCacheFactory;
+import org.dan.ping.pong.app.tournament.console.TournamentRelationCacheLoader;
 import org.dan.ping.pong.app.tournament.rules.GroupRuleValidator;
 import org.dan.ping.pong.app.tournament.rules.PingPongMatchRuleValidator;
 import org.dan.ping.pong.app.tournament.rules.TournamentRulesValidator;
 import org.springframework.context.annotation.Import;
 
 @Import({TournamentDao.class, TournamentResource.class,
+        TournamentRelationCacheFactory.class,
+        TournamentRelationCacheLoader.class,
         TournamentCacheFactory.class,
         TournamentCacheLoader.class,
         TournamentCache.class,
+        ConsoleCtx.class,
         TournamentAccessor.class,
         TournamentRulesValidator.class,
         GroupRuleValidator.class,

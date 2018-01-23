@@ -62,6 +62,8 @@ public class TournamentMemState {
     private Optional<Tid> previousTid;
     private Instant opensAt;
     private List<DisputeMemState> disputes;
+    private Optional<Tid> consoleTid;
+    private Optional<Tid> masterTid;
 
     public Optional<MatchInfo> maybeMatchById(Mid mid) {
         return ofNullable(matches.get(mid));

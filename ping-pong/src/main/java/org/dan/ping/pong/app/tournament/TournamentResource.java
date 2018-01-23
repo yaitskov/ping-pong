@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
-import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.tournament.rules.TournamentRulesValidator;
 import org.dan.ping.pong.app.tournament.rules.ValidationError;
 import org.dan.ping.pong.app.user.UserInfo;
@@ -66,6 +65,7 @@ public class TournamentResource {
     public static final String RESULT_CATEGORY = "/category/";
     public static final String TOURNAMENT_COMPLETE = "/tournament/complete/";
     public static final String TOURNAMENT_PLAY_OFF_MATCHES = "/tournament/play-off-matches/";
+    public static final String TOURNAMENT_CONSOLE_CREATE = "/tournament/console/create";
 
     @Inject
     private TournamentService tournamentService;
@@ -88,10 +88,27 @@ public class TournamentResource {
         if (newTournament.getSport() != newTournament.getRules().getMatch().sport()) {
             throw badRequest("sport type mismatch");
         }
+        if (newTournament.getType() != TournamentType.Classic) {
+            throw badRequest("Tournament type is not Classic but " + newTournament.getType());
+        }
         validate(newTournament.getRules());
         return tournamentService.create(
                 authService.userInfoBySession(session).getUid(),
                 newTournament);
+    }
+
+    @POST
+    @Path(TOURNAMENT_CONSOLE_CREATE)
+    @Consumes(APPLICATION_JSON)
+    public void createConsole(
+            @HeaderParam(SESSION) String session,
+            @Suspended AsyncResponse response,
+            Tid parentId) {
+        final UserInfo user = authService.userInfoBySession(session);
+        tournamentAccessor.update(parentId, response, (tournament, batch) -> {
+            tournament.checkAdmin(user.getUid());
+            return tournamentService.createConsoleFor(tournament, user);
+        });
     }
 
     private void validate(TournamentRules rules) {

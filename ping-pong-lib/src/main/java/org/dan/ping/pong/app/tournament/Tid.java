@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class Tid {
+public class Tid implements Comparable<Tid> {
     @Getter(onMethod = @__(@JsonValue))
     private final int tid;
 
@@ -24,5 +24,10 @@ public class Tid {
 
     public String toString() {
         return String.valueOf(tid);
+    }
+
+    @Override
+    public int compareTo(Tid o) {
+        return Integer.compare(tid, o.tid);
     }
 }

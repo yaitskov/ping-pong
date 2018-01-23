@@ -21,10 +21,13 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.app.tournament.TournamentType.Classic;
+import static org.dan.ping.pong.app.tournament.TournamentType.Console;
+import static org.dan.ping.pong.app.tournament.console.TournamentRelationCacheFactory.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
@@ -523,5 +526,42 @@ public class TournamentService {
 
     public PlayOffMatches playOffMatches(TournamentMemState tournament, int cid) {
         return playOffService.playOffMatches(tournament, cid);
+    }
+
+    @Inject
+    @Named(TOURNAMENT_RELATION_CACHE)
+    private LoadingCache<Tid, RelatedTids> tournamentRelations;
+
+    public Tid createConsoleFor(TournamentMemState tournament, UserInfo user) {
+        if (tournament.getConsoleTid().isPresent()) {
+            return tournament.getConsoleTid().get();
+        }
+        if (tournament.getType() != Classic) {
+            throw badRequest("Tournament " + tournament.getType()
+                    + " does not support console tournaments");
+        }
+        final Tid consoleTid = create(user.getUid(),
+                CreateTournament.builder()
+                        .sport(tournament.getSport())
+                        .ticketPrice(tournament.getTicketPrice())
+                        .name(tournament.getName())
+                        .placeId(tournament.getPid())
+                        .opensAt(tournament.getOpensAt())
+                        .previousTid(Optional.of(tournament.getTid()))
+                        .type(Console)
+                        .rules(TournamentRules.builder()
+                                .place(tournament.getRule().getPlace())
+                                .match(tournament.getRule().getMatch())
+                                .playOff(tournament.getRule().getPlayOff())
+                                .casting(tournament.getRule().getCasting())
+                                .rewards(Optional.empty())
+                                .group(Optional.empty())
+                                .build())
+                        .build());
+
+        tournamentDao.createRelation(tournament.getTid(), consoleTid);
+        tournament.setConsoleTid(Optional.of(consoleTid));
+        tournamentRelations.invalidate(tournament.getTid());
+        return consoleTid;
     }
 }

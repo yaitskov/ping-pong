@@ -23,6 +23,7 @@ public class MyTournamentInfo {
     private String name;
     private TournamentState state;
     private PlaceLink place;
+    private TournamentType type;
     private Optional<Double> price;
     private Instant opensAt;
     private int categories;

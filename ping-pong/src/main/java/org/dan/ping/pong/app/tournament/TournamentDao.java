@@ -103,7 +103,7 @@ public class TournamentDao {
                         newTournament.getRules(),
                         newTournament.getTicketPrice(),
                         newTournament.getName(),
-                        Classic,
+                        newTournament.getType(),
                         newTournament.getSport())
                 .returning(TOURNAMENT.TID)
                 .fetchOne()
@@ -196,7 +196,7 @@ public class TournamentDao {
         return ofNullable(jooq.select(TOURNAMENT.NAME,
                 TOURNAMENT.STATE, TOURNAMENT.PID, PLACE.NAME,
                 TOURNAMENT.OPENS_AT, TOURNAMENT.TICKET_PRICE,
-                TOURNAMENT.PREVIOUS_TID,
+                TOURNAMENT.PREVIOUS_TID, TOURNAMENT.TYPE,
                 DSL.selectCount().from(CATEGORY)
                         .where(CATEGORY.TID.eq(tid))
                         .asField(CATEGORIES),
@@ -211,6 +211,7 @@ public class TournamentDao {
                 .fetchOne())
                 .map(r -> MyTournamentInfo.builder()
                         .tid(tid)
+                        .type(r.get(TOURNAMENT.TYPE))
                         .name(r.get(TOURNAMENT.NAME))
                         .enlisted(r.get(ENLISTED, Integer.class))
                         .categories(r.get(CATEGORIES, Integer.class))
@@ -431,16 +432,17 @@ public class TournamentDao {
 
     private Tid copyTournamentRow(CopyTournament copyTournament) {
         final Tid originTid = copyTournament.getOriginTid();
-        final MyTournamentInfo tinfo = getMyTournamentInfo(originTid)
+        final MyTournamentInfo tInfo = getMyTournamentInfo(originTid)
                 .orElseThrow(() -> notFound("Tournament " + originTid + " not found"));
         final TournamentRules rules = getTournamentRules(originTid)
                 .orElseThrow(() -> notFound("Tournament " + originTid + " not found"));
         return justCreate(CreateTournament.builder()
                 .name(copyTournament.getName())
                 .rules(rules)
+                .type(tInfo.getType())
                 .opensAt(copyTournament.getOpensAt())
-                .placeId(tinfo.getPlace().getPid())
-                .ticketPrice(tinfo.getPrice())
+                .placeId(tInfo.getPlace().getPid())
+                .ticketPrice(tInfo.getPrice())
                 .previousTid(of(originTid))
                 .build(), Draft);
     }
@@ -527,5 +529,14 @@ public class TournamentDao {
                         .previousTid(r.get(TOURNAMENT.PREVIOUS_TID).map(Tid::new))
                         .tid(tid)
                         .build());
+    }
+
+    public void createRelation(Tid tid, Tid consoleTid) {
+        jooq.insertInto(TOURNAMENT_RELATION,
+                TOURNAMENT_RELATION.TYPE,
+                TOURNAMENT_RELATION.PARENT_TID,
+                TOURNAMENT_RELATION.CHILD_TID)
+                .values(TournamentRelationType.Console, tid, consoleTid)
+                .execute();
     }
 }

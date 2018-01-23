@@ -8,6 +8,6 @@ import java.util.Optional;
 @Getter
 @Builder
 public class RelatedTids {
-    private Optional<Tid> parent;
-    private Optional<Tid> child;
+    private final Optional<Tid> parent;
+    private final Optional<Tid> child;
 }

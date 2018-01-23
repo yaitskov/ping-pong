@@ -4,6 +4,7 @@ import static org.dan.ping.pong.app.sport.SportType.PingPong;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +18,7 @@ import org.dan.ping.pong.app.sport.SportType;
 @Setter
 @Wither
 @Builder
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class PingPongMatchRules implements MatchRules {

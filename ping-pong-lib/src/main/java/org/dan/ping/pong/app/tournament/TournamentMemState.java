@@ -62,8 +62,6 @@ public class TournamentMemState {
     private Optional<Tid> previousTid;
     private Instant opensAt;
     private List<DisputeMemState> disputes;
-    private Optional<Tid> consoleTid;
-    private Optional<Tid> masterTid;
 
     public Optional<MatchInfo> maybeMatchById(Mid mid) {
         return ofNullable(matches.get(mid));
@@ -132,7 +130,8 @@ public class TournamentMemState {
     }
 
     public CategoryLink getCategory(int cid) {
-        return categories.get(cid);
+        return ofNullable(categories.get(cid))
+                .orElseThrow(() -> internalError("No category " + cid + " in tid " + tid));
     }
 
     public void checkCategory(int cid) {
@@ -174,5 +173,17 @@ public class TournamentMemState {
     public DisambiguationPolicy disambiguationPolicy() {
         return getRule().getGroup().map(GroupRules::getDisambiguation)
                 .orElse(DisambiguationPolicy.CMP_WIN_AND_LOSE);
+    }
+
+    public Optional<Integer> findCidByName(String name) {
+        return categories.values().stream()
+                .filter(category -> category.getName().equals(name))
+                .findAny()
+                .map(CategoryLink::getCid);
+    }
+
+    public GroupInfo getGroup(int gid) {
+        return ofNullable(groups.get(gid))
+                .orElseThrow(() -> internalError("Tournament " + tid + " has no group " + gid));
     }
 }

@@ -43,7 +43,7 @@ import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.tournament.TournamentDao;
+import org.dan.ping.pong.app.tournament.TournamentDaoMySql;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.user.UserLink;
@@ -91,7 +91,7 @@ public class CastingLotsService {
     private GroupDivider groupDivider;
 
     @Inject
-    private TournamentDao tournamentDao;
+    private TournamentDaoMySql tournamentDao;
 
     private void generatePlayOffRules(TournamentMemState tournament, DbUpdater batch) {
         tournament.getRule().setPlayOff(Optional.of(L1_3P));
@@ -107,8 +107,8 @@ public class CastingLotsService {
         return gid;
     }
 
-    @Transactional(TRANSACTION_MANAGER)
-    public void seed(TournamentMemState tournament) {
+    //@Transactional(TRANSACTION_MANAGER)
+    public void seed(TournamentMemState tournament, DbUpdater batch) {
         log.info("Begin seeding tournament {}", tournament.getTid());
         final TournamentRules rules = tournament.getRule();
         final List<ParticipantMemState> readyBids = findBidsReadyToPlay(tournament);
@@ -117,7 +117,7 @@ public class CastingLotsService {
         if (!rules.getPlayOff().isPresent()) {
             seedJustGroupTournament(rules, tournament, readyBids);
         } else if (!rules.getGroup().isPresent()) {
-            seedJustPlayOffTournament(rules, tournament, readyBids);
+            seedJustPlayOffTournament(rules, tournament, readyBids, batch);
         } else {
             seedTournamentWithGroupsAndPlayOff(rules, tournament, readyBids);
         }
@@ -132,16 +132,14 @@ public class CastingLotsService {
 
     private void seedJustPlayOffTournament(TournamentRules rules,
             TournamentMemState tournament,
-            List<ParticipantMemState> readyBids) {
+            List<ParticipantMemState> readyBids, DbUpdater batch) {
         log.info("Seed tid {} as playoff", tournament.getTid());
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
             validateBidsNumberInACategory(bids);
-            final List<ParticipantMemState> orderedBids = rankingService.sort(bids, rules.getCasting());
+            final List<ParticipantMemState> orderedBids = rankingService.sort(bids, rules.getCasting(), tournament);
             final int basePositions = matchService.roundPlayOffBase(orderedBids.size());
             castingLotsDao.generatePlayOffMatches(tournament, cid, basePositions, 1);
-            final DbUpdaterSql updater = dbUpdaterFactory.create();
-            assignBidsToBaseMatches(cid, basePositions, orderedBids, tournament, updater);
-            updater.flush();
+            assignBidsToBaseMatches(cid, basePositions, orderedBids, tournament, batch);
         });
     }
 
@@ -163,7 +161,7 @@ public class CastingLotsService {
 
     private void assignBidsToBaseMatches(Integer cid, int basePositions,
             List<ParticipantMemState> orderedBids,
-            TournamentMemState tournament, DbUpdaterSql batch) {
+            TournamentMemState tournament, DbUpdater batch) {
         final List<Integer> seeds = ofNullable(PLAY_OFF_SEEDS.get(basePositions))
                 .orElseThrow(() -> internalError("No seeding for "
                         + orderedBids.size() + " participants"));
@@ -207,7 +205,8 @@ public class CastingLotsService {
         final int quits = rules.getGroup().get().getQuits();
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
             validateBidsNumberInACategory(bids);
-            final List<ParticipantMemState> orderedBids = rankingService.sort(bids, rules.getCasting());
+            final List<ParticipantMemState> orderedBids = rankingService.sort(
+                    bids, rules.getCasting(), tournament);
             final String groupLabel = GroupService.sortToLabel(0);
             final int groupIdx = 0;
             final int gid = groupDao.createGroup(tid, cid, groupLabel, quits, groupIdx);
@@ -227,7 +226,7 @@ public class CastingLotsService {
             validateBidsNumberInACategory(bids);
             final Map<Integer, List<ParticipantMemState>> bidsByGroups = groupDivider.divide(
                     rules.getCasting(), rules.getGroup().get(),
-                    rankingService.sort(bids, rules.getCasting()));
+                    rankingService.sort(bids, rules.getCasting(), tournament));
             int basePlayOffPriority = 0;
             for (int gi : bidsByGroups.keySet().stream().sorted().collect(toList())) {
                 final String groupLabel = GroupService.sortToLabel(gi);

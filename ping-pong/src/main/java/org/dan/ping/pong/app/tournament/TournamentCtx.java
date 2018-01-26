@@ -8,7 +8,7 @@ import org.dan.ping.pong.app.tournament.rules.PingPongMatchRuleValidator;
 import org.dan.ping.pong.app.tournament.rules.TournamentRulesValidator;
 import org.springframework.context.annotation.Import;
 
-@Import({TournamentDao.class, TournamentResource.class,
+@Import({TournamentDaoMySql.class, TournamentResource.class,
         TournamentRelationCacheFactory.class,
         TournamentRelationCacheLoader.class,
         TournamentCacheFactory.class,

@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.user.UserLink;
+import org.dan.ping.pong.app.user.UserLinkIf;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -15,7 +16,7 @@ import java.util.Optional;
 @Getter
 @Setter
 @Builder
-public class ParticipantMemState {
+public class ParticipantMemState implements UserLinkIf {
     public static final Uid FILLER_LOSER_UID = new Uid(1);
 
     private final Tid tid;

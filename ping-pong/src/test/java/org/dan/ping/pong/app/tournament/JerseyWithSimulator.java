@@ -12,7 +12,7 @@ import org.dan.ping.pong.app.place.ForTestPlaceDao;
 import org.dan.ping.pong.app.place.PlaceCtx;
 import org.dan.ping.pong.app.sched.ScheduleCtx;
 import org.dan.ping.pong.app.score.MatchScoreCtx;
-import org.dan.ping.pong.app.score.MatchScoreDao;
+import org.dan.ping.pong.app.score.MatchScoreDaoMysql;
 import org.dan.ping.pong.app.sport.SportCtx;
 import org.dan.ping.pong.app.table.TableCtx;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Import;
         TournamentCtx.class, BidCtx.class, CastingLotsCtx.class,
         MatchCtx.class, MatchScoreCtx.class, TableCtx.class,
         ScheduleCtx.class,
-        GroupCtx.class, MatchScoreDao.class, ForTestMatchDao.class,
+        GroupCtx.class, MatchScoreDaoMysql.class, ForTestMatchDao.class,
         ForTestBidDao.class, ForTestPlaceDao.class, Simulator.class,
         ImperativeSimulatorFactory.class})
 public class JerseyWithSimulator {}

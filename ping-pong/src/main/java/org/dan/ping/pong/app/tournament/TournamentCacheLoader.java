@@ -26,7 +26,7 @@ import javax.inject.Inject;
 
 
 @Slf4j
-public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> {
+public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState>  {
     public static final String TOURNAMENT_NOT_FOUND = "tournament not found";
 
     @Inject
@@ -70,8 +70,6 @@ public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> 
                 .previousTid(row.getPreviousTid())
                 .completeAt(row.getEndedAt())
                 .pid(row.getPid())
-                .consoleTid(row.getConsoleTid())
-                .masterTid(row.getMasterTid())
                 .rule(row.getRules())
                 .build();
     }

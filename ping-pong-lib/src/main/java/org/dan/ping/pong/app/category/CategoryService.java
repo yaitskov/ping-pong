@@ -9,11 +9,14 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
+import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import javax.inject.Inject;
 
 @Slf4j
 public class CategoryService {
@@ -45,5 +48,24 @@ public class CategoryService {
                         .map(ParticipantMemState::toLink)
                         .collect(toList()))
                 .build();
+    }
+
+    @Inject
+    private CategoryDao categoryDao;
+
+    public int createCategory(TournamentMemState tournament, String name, DbUpdater batch) {
+        log.info("Add category [{}] to tid {}", name, tournament.getTid());
+        final int cid = categoryDao.create(
+                NewCategory.builder()
+                        .name(name)
+                        .tid(tournament.getTid())
+                        .build());
+        log.info("Category [{}] got id {}", name, cid);
+        tournament.getCategories().put(cid, CategoryLink.builder()
+                .name(name)
+                .cid(cid)
+                .build());
+        batch.markDirty();
+        return cid;
     }
 }

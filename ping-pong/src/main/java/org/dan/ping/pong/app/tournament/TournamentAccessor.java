@@ -1,6 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
-import static org.dan.ping.pong.app.tournament.console.TournamentRelationCacheFactory.TOURNAMENT_RELATION_CACHE;
+import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 
 import com.google.common.cache.LoadingCache;
 import lombok.SneakyThrows;

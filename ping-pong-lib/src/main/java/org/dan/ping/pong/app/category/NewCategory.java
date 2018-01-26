@@ -16,7 +16,6 @@ import org.dan.ping.pong.app.tournament.Tid;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class NewCategory {
-    private int cid;
     private String name;
     private Tid tid;
 }

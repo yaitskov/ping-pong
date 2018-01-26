@@ -18,10 +18,11 @@ import java.util.Map;
 import javax.inject.Inject;
 
 @Slf4j
-public class MatchScoreDao {
+public class MatchScoreDaoMysql implements MatchScoreDao {
     @Inject
     private DSLContext jooq;
 
+    @Override
     public Map<Mid, Map<Uid, List<Integer>>> load(Tid tid) {
         final Map<Mid, Map<Uid, List<Integer>>> result = new HashMap<>();
         jooq.select(SET_SCORE.MID, SET_SCORE.UID, SET_SCORE.GAMES)

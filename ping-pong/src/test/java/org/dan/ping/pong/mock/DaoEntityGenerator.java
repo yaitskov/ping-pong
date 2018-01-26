@@ -19,8 +19,8 @@ import org.dan.ping.pong.app.table.TableDao;
 import org.dan.ping.pong.app.tournament.CreateTournament;
 import org.dan.ping.pong.app.tournament.ForTestTournamentDao;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.tournament.TournamentDaoMySql;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserRegRequest;
@@ -126,7 +126,7 @@ public class DaoEntityGenerator {
     }
 
     @Inject
-    private TournamentDao tournamentDao;
+    private TournamentDaoMySql tournamentDao;
 
     @Inject
     private ForTestTournamentDao forTestTournamentDao;

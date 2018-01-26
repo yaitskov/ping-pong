@@ -56,7 +56,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 @Slf4j
-public class TournamentDao {
+public class TournamentDaoMySql implements TournamentDao {
     public static final String AUTHOR = "author";
     private static final SelectField[] DATED_DIGEST_FIELDS = {
             TOURNAMENT.OPENS_AT,
@@ -467,6 +467,7 @@ public class TournamentDao {
                 .build());
     }
 
+    @Override
     public Set<Uid> loadAdmins(Tid tid) {
         return jooq.select(TOURNAMENT_ADMIN.UID)
                 .from(TOURNAMENT_ADMIN)
@@ -497,21 +498,14 @@ public class TournamentDao {
                 .orElseThrow(() -> notFound("tournament " + tid + " not found"));
     }
 
+    @Override
     public Optional<TournamentRow> getRow(Tid tid) {
         return ofNullable(jooq
                 .select(TOURNAMENT.PID, TOURNAMENT.TYPE, TOURNAMENT.SPORT, TOURNAMENT.RULES,
                         TOURNAMENT.COMPLETE_AT, TOURNAMENT.OPENS_AT,
                         TOURNAMENT.NAME, TOURNAMENT.STATE, TOURNAMENT.TICKET_PRICE,
-                        TOURNAMENT.PREVIOUS_TID,
-                        CHILD_TID_REL.CHILD_TID,
-                        MASTER_TID_REL.CHILD_TID)
+                        TOURNAMENT.PREVIOUS_TID)
                 .from(TOURNAMENT)
-                .leftJoin(CHILD_TID_REL)
-                .on(TOURNAMENT.TID.eq(CHILD_TID_REL.PARENT_TID)
-                        .and(CHILD_TID_REL.TYPE.eq(Console)))
-                .leftJoin(MASTER_TID_REL)
-                .on(TOURNAMENT.TID.eq(MASTER_TID_REL.CHILD_TID)
-                        .and(MASTER_TID_REL.TYPE.eq(Console)))
                 .where(TOURNAMENT.TID.eq(tid))
                 .fetchOne())
                 .map(r -> TournamentRow.builder()
@@ -523,8 +517,6 @@ public class TournamentDao {
                         .type(r.get(TOURNAMENT.TYPE))
                         .state(r.get(TOURNAMENT.STATE))
                         .rules(r.get(TOURNAMENT.RULES))
-                        .consoleTid(ofNullable(r.get(CHILD_TID_REL.CHILD_TID)))
-                        .masterTid(ofNullable(r.get(MASTER_TID_REL.CHILD_TID)))
                         .ticketPrice(r.get(TOURNAMENT.TICKET_PRICE))
                         .previousTid(r.get(TOURNAMENT.PREVIOUS_TID).map(Tid::new))
                         .tid(tid)

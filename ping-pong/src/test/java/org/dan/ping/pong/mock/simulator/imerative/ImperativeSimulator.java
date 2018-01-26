@@ -2,11 +2,14 @@ package org.dan.ping.pong.mock.simulator.imerative;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.parallelSetAll;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidResource.ENLISTED_BIDS;
+import static org.dan.ping.pong.app.category.CategoryResource.CATEGORIES_BY_TID;
+import static org.dan.ping.pong.app.category.CategoryResource.CATEGORY_MEMBERS;
 import static org.dan.ping.pong.app.match.MatchEditorService.DONT_CHECK_HASH;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_RESULT;
 import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
@@ -26,6 +29,7 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
@@ -36,6 +40,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.ParticipantState;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.category.CategoryInfo;
+import org.dan.ping.pong.app.category.CategoryLink;
+import org.dan.ping.pong.app.category.CategoryResource;
 import org.dan.ping.pong.app.match.IdentifiedScore;
 import org.dan.ping.pong.app.match.MatchResult;
 import org.dan.ping.pong.app.match.MatchState;
@@ -49,13 +56,14 @@ import org.dan.ping.pong.app.tournament.ExpelParticipant;
 import org.dan.ping.pong.app.tournament.MyTournamentInfo;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 import org.dan.ping.pong.app.tournament.TournamentState;
+import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.mock.MyRest;
 import org.dan.ping.pong.mock.RestEntityGenerator;
 import org.dan.ping.pong.mock.simulator.Player;
+import org.dan.ping.pong.mock.simulator.PlayerCategory;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +81,7 @@ public class ImperativeSimulator {
     private final Simulator simulator;
     private final RestEntityGenerator restGenerator;
     private final TournamentScenario scenario;
+    private TournamentScenario consoleScenario;
     private final MyRest myRest;
     private final Map<Set<Player>, Mid> matchMap = new HashMap<>();
     private boolean matchMapAutoReload;
@@ -99,6 +108,34 @@ public class ImperativeSimulator {
         restGenerator.beginTournament(scenario.getTestAdmin(), scenario.getTid());
         reloadMatchMap();
         return this;
+    }
+
+    public ImperativeSimulator createConsoleTournament() {
+        assertNull(consoleScenario);
+        scenario.consoleTid(restGenerator.createConsoleTournament(scenario, scenario.getTid()));
+        consoleScenario = scenario.createConsoleTournament();
+        return this;
+    }
+
+    public ImperativeSimulator resolveCategories() {
+        final int tid = consoleScenario.getTid().getTid();
+        final List<CategoryLink> categories = myRest.get(CATEGORIES_BY_TID + tid,
+                new GenericType<List<CategoryLink>>(){});
+
+        categories.forEach(category -> {
+            final CategoryInfo catInfo = myRest.get(
+                    CATEGORY_MEMBERS + tid + "/" + category.getCid(),
+                    CategoryInfo.class);
+            for (UserLink userLink : catInfo.getUsers()) {
+                final Player player = scenario.getUidPlayer().get(userLink.getUid());
+                final PlayerCategory catLabel = scenario.getPlayersCategory().get(player);
+                consoleScenario.getCategoryDbId().put(catLabel, category.getCid());
+                consoleScenario.getPlayersByCategories().put(catLabel, player);
+            }
+        });
+
+        return new ImperativeSimulator(simulator, restGenerator, consoleScenario, myRest)
+                .reloadMatchMap();
     }
 
     public ImperativeSimulator checkMatchStatus(Player p1, Player p2, MatchState state) {

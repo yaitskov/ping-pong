@@ -312,8 +312,8 @@ public class MatchService {
     private ConsoleStrategy consoleStrategy;
 
     private void completeParticipationLeftBids(int gid, TournamentMemState tournament,
-            Set<Uid> quitUids, DbUpdater batch) {
-        consoleStrategy.onGroupComplete(gid, tournament, quitUids, batch);
+            Set<Uid> loserUids, DbUpdater batch) {
+        consoleStrategy.onGroupComplete(gid, tournament, loserUids, batch);
     }
 
     @Inject
@@ -349,7 +349,8 @@ public class MatchService {
             List<MatchInfo> matches, DbUpdater batch) {
         log.info("Pick bids for playoff from gid {} in tid {}", gid, tournament.getTid());
         final int quits = tournament.getRule().getGroup().get().getQuits();
-        final List<Uid> quitUids = selectQuitingUids(gid, tournament, matches, quits);
+        final List<Uid> orderedUids = groupService.orderUidsInGroup(tournament, matches);
+        final List<Uid> quitUids = selectQuitingUids(gid, tournament, orderedUids, quits);
         final GroupInfo iGru = tournament.getGroups().get(gid);
         final List<MatchInfo> playOffMatches = playOffMatches(tournament, iGru);
         if (playOffMatches.isEmpty()) {
@@ -358,7 +359,9 @@ public class MatchService {
             distributeGroupQuittersBetweenPlayOffMatches(tournament, batch, quits,
                     quitUids, iGru, playOffMatches);
         }
-        return new HashSet<>(quitUids);
+        return orderedUids.stream()
+                .filter(uid -> !quitUids.contains(uid))
+                .collect(toSet());
     }
 
     private List<MatchInfo> playOffMatches(TournamentMemState tournament, GroupInfo iGru) {
@@ -370,9 +373,7 @@ public class MatchService {
     }
 
     private List<Uid> selectQuitingUids(Integer gid, TournamentMemState tournament,
-            List<MatchInfo> matches, int quits) {
-        final List<Uid> orderUids = groupService.orderUidsInGroup(tournament, matches);
-
+            List<Uid> orderUids, int quits) {
         final List<Uid> quitUids = orderUids.stream()
                 .map(tournament::getBidOrExpl)
                 .filter(b -> groupService.notExpelledInGroup(tournament, b))

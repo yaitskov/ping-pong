@@ -11,6 +11,8 @@ import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.MasterOutcome;
+import static org.dan.ping.pong.app.group.ConsoleTournament.INDEPENDENT_RULES;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.table.TableService.STATE;
@@ -22,7 +24,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.app.tournament.TournamentType.Classic;
 import static org.dan.ping.pong.app.tournament.TournamentType.Console;
-import static org.dan.ping.pong.app.tournament.console.TournamentRelationCacheFactory.TOURNAMENT_RELATION_CACHE;
+import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -30,6 +32,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidService;
@@ -40,6 +43,7 @@ import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryService;
+import org.dan.ping.pong.app.group.ConsoleTournament;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchDao;
@@ -53,6 +57,7 @@ import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
+import org.dan.ping.pong.app.user.UserLinkIf;
 import org.dan.ping.pong.app.user.UserRegRequest;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.sys.error.PiPoEx;
@@ -82,7 +87,7 @@ public class TournamentService {
     private static final List<BidState> VALID_ENLIST_BID_STATES = asList(Want, Paid, Here);
 
     @Inject
-    private TournamentDao tournamentDao;
+    private TournamentDaoMySql tournamentDao;
 
     @Inject
     private PlaceDao placeDao;
@@ -155,14 +160,18 @@ public class TournamentService {
     }
 
     public void enlistOnline(EnlistTournament enlistment,
-            TournamentMemState tournament, UserInfo user, DbUpdater batch) {
+            TournamentMemState tournament, UserLinkIf user, DbUpdater batch) {
         validateEnlistOnline(tournament, enlistment);
+        enlistOnlineWithoutValidation(enlistment, tournament, user, batch);
+    }
+
+    public void enlistOnlineWithoutValidation(EnlistTournament enlistment, TournamentMemState tournament, UserLinkIf user, DbUpdater batch) {
         log.info("Uid {} enlists to tid {} in cid {}",
                 user.getUid(), tournament.getTid(), enlistment.getCategoryId());
         final Uid uid = user.getUid();
         final Instant now = clocker.get();
         tournament.getParticipants().put(uid, ParticipantMemState.builder()
-                .bidState(Want)
+                .bidState(enlistment.getBidState())
                 .uid(uid)
                 .name(user.getName())
                 .updatedAt(now)
@@ -204,7 +213,7 @@ public class TournamentService {
         if (tournament.getState() != TournamentState.Draft) {
             throw notDraftError(tournament);
         }
-        castingLotsService.seed(tournament);
+        castingLotsService.seed(tournament, batch);
         tournament.setState(TournamentState.Open);
         tournamentDao.setState(tournament, batch);
         final Instant now = clocker.get();
@@ -532,36 +541,48 @@ public class TournamentService {
     @Named(TOURNAMENT_RELATION_CACHE)
     private LoadingCache<Tid, RelatedTids> tournamentRelations;
 
-    public Tid createConsoleFor(TournamentMemState tournament, UserInfo user) {
-        if (tournament.getConsoleTid().isPresent()) {
-            return tournament.getConsoleTid().get();
+    @SneakyThrows
+    public Tid createConsoleFor(TournamentMemState masterTournament, UserInfo user, DbUpdater batch) {
+        final RelatedTids relatedTids = tournamentRelations.get(masterTournament.getTid());
+        if (relatedTids.getChild().isPresent()) {
+            return relatedTids.getChild().get();
         }
-        if (tournament.getType() != Classic) {
-            throw badRequest("Tournament " + tournament.getType()
+        if (masterTournament.getType() != Classic) {
+            throw badRequest("Tournament " + masterTournament.getType()
                     + " does not support console tournaments");
+        }
+        if (!masterTournament.getRule().getGroup().isPresent()) {
+            throw badRequest("Tournament " + masterTournament.getTid()
+                    + " has no groups");
         }
         final Tid consoleTid = create(user.getUid(),
                 CreateTournament.builder()
-                        .sport(tournament.getSport())
-                        .ticketPrice(tournament.getTicketPrice())
-                        .name(tournament.getName())
-                        .placeId(tournament.getPid())
-                        .opensAt(tournament.getOpensAt())
-                        .previousTid(Optional.of(tournament.getTid()))
+                        .sport(masterTournament.getSport())
+                        .ticketPrice(masterTournament.getTicketPrice())
+                        .name(masterTournament.getName())
+                        .placeId(masterTournament.getPid())
+                        .opensAt(masterTournament.getOpensAt())
+                        .previousTid(Optional.of(masterTournament.getTid()))
                         .type(Console)
                         .rules(TournamentRules.builder()
-                                .place(tournament.getRule().getPlace())
-                                .match(tournament.getRule().getMatch())
-                                .playOff(tournament.getRule().getPlayOff())
-                                .casting(tournament.getRule().getCasting())
+                                .place(masterTournament.getRule().getPlace())
+                                .match(masterTournament.getRule().getMatch())
+                                .playOff(masterTournament.getRule().getPlayOff())
+                                .casting(masterTournament.getRule()
+                                        .getCasting().withPolicy(MasterOutcome))
                                 .rewards(Optional.empty())
                                 .group(Optional.empty())
                                 .build())
                         .build());
 
-        tournamentDao.createRelation(tournament.getTid(), consoleTid);
-        tournament.setConsoleTid(Optional.of(consoleTid));
-        tournamentRelations.invalidate(tournament.getTid());
+        tournamentDao.createRelation(masterTournament.getTid(), consoleTid);
+
+        masterTournament.setRule(masterTournament.getRule().withGroup(masterTournament.getRule().getGroup()
+                .map(g -> g.withConsole(INDEPENDENT_RULES))));
+        tournamentDao.updateParams(masterTournament.getTid(), masterTournament.getRule(), batch);
+
+        tournamentRelations.invalidate(masterTournament.getTid());
+
         return consoleTid;
     }
 }

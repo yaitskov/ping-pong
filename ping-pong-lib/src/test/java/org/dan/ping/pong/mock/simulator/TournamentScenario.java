@@ -71,11 +71,30 @@ public class TournamentScenario implements SessionAware {
     private boolean begin = true;
     @Setter
     private Tid tid;
+    private Optional<Tid> consoleTid = Optional.empty();
     @Setter
     private Pid placeId;
     private int tables = 1;
     @Setter
     private TestUserSession testAdmin;
+
+    public TournamentScenario consoleTid(Tid tid) {
+        consoleTid = Optional.of(tid);
+        return this;
+    }
+
+    public TournamentScenario createConsoleTournament() {
+        final TournamentScenario result = new TournamentScenario();
+        result.setTestAdmin(testAdmin);
+        result.setPlaceId(placeId);
+        result.getUidPlayer().putAll(uidPlayer);
+        result.getPlayersByCategories().putAll(playersByCategories);
+        result.name(name.get()).tables(tables).sport(sport)
+                .getPlayersSessions().putAll(playersSessions);
+        result.setTid(consoleTid.get());
+        // category mapping is not know yet
+        return result;
+    }
 
     public String getSession() {
         return testAdmin.getSession();

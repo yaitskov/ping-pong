@@ -10,11 +10,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Wither;
 
 import java.util.Optional;
 
 @Getter
 @Setter
+@Wither
 @Builder
 @ToString
 @NoArgsConstructor

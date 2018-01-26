@@ -116,6 +116,8 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .place(Optional.of(GLOBAL))
             .build();
 
+    public static final TournamentRules RULES_G8Q1_S1A2G11_NP = RULES_G8Q1_S1A2G11.withPlace(Optional.empty());
+
     public static final TournamentRules RULES_G2Q1_S1A2G11_PRNK = TournamentRules
             .builder()
             .match(S1A2G11)

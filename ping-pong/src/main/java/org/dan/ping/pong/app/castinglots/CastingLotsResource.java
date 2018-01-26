@@ -5,10 +5,11 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.TournamentAccessor;
 import org.dan.ping.pong.app.tournament.TournamentCache;
-import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 
 import java.util.List;
@@ -42,6 +43,9 @@ public class CastingLotsResource {
     @Inject
     private DbUpdaterFactory dbUpdaterFactory;
 
+    @Inject
+    private TournamentAccessor tournamentAccessor;
+
     @POST
     @Path(CASTING_LOTS)
     @Consumes(APPLICATION_JSON)
@@ -52,14 +56,9 @@ public class CastingLotsResource {
         final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("User {} does casting lots in tournament {}",
                 uid, doCastingLots.getTid());
-        sequentialExecutor.execute(doCastingLots.getTid(), () -> {
-            try {
-                castingLotsService.seed(tournamentCache.load(doCastingLots.getTid()));
-                response.resume("");
-            } catch (Exception e) {
-                tournamentCache.invalidate(doCastingLots.getTid());
-                response.resume(e);
-            }
+        tournamentAccessor.update(doCastingLots.getTid(), response, (tournament, batch) -> {
+            castingLotsService.seed(tournamentCache.load(doCastingLots.getTid()), batch);
+            return "";
         });
     }
 

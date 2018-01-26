@@ -28,7 +28,6 @@ import com.google.common.collect.SetMultimap;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.dan.ping.pong.app.bid.BidState;
@@ -394,7 +393,7 @@ public class GroupService {
                 strongerExtraOrder.getStrongerOf());
 
         final List<ParticipantMemState> seedBidsOrder = rankingService
-                .sort(bids, rules.getCasting());
+                .sort(bids, rules.getCasting(), tournament);
         final Map<Uid, GroupParticipantResult> result = bids.stream().collect(toMap(
                 ParticipantMemState::getUid,
                 bid -> GroupParticipantResult.builder()

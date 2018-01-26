@@ -7,5 +7,5 @@ import org.dan.ping.pong.sys.db.DbUpdater;
 import java.util.Set;
 
 public interface ConsoleStrategy {
-    void onGroupComplete(int gid, TournamentMemState tournament, Set<Uid> quitUids, DbUpdater batch);
+    void onGroupComplete(int gid, TournamentMemState tournament, Set<Uid> loserUids, DbUpdater batch);
 }

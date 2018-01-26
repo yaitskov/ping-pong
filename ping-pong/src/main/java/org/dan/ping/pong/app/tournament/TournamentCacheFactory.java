@@ -1,6 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
-import static org.dan.ping.pong.app.tournament.console.TournamentRelationCacheFactory.TOURNAMENT_RELATION_CACHE;
+import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
@@ -13,8 +13,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 public class TournamentCacheFactory {
-    public static final String TOURNAMENT_CACHE = "tournament-cache";
-
     @Inject
     private TournamentCacheLoader loader;
 
@@ -25,7 +23,7 @@ public class TournamentCacheFactory {
     @Value("${expire.tournament.seconds}")
     private int expireTournamentSeconds;
 
-    @Bean(name = TOURNAMENT_CACHE)
+    @Bean(name = TournamentCache.TOURNAMENT_CACHE)
     public LoadingCache<Tid, TournamentMemState> create() {
         return CacheBuilder.newBuilder()
                 .expireAfterAccess(expireTournamentSeconds, TimeUnit.SECONDS)

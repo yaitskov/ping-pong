@@ -10,7 +10,7 @@ import java.util.Optional;
 @Getter
 @Builder
 @AllArgsConstructor
-public class UserInfo {
+public class UserInfo implements UserLinkIf {
     private String name;
     private final Uid uid;
     private Optional<String> phone;

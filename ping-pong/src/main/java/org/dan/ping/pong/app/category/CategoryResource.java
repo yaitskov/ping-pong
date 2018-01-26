@@ -34,13 +34,15 @@ public class CategoryResource {
     public static final String CATEGORY_MEMBERS = CATEGORY + "find/members/";
     public static final String CID_JP = "{cid}";
     public static final String CID = "cid";
+    public static final String CATEGORIES_BY_TID = "/category/find/by/tid/";
+    public static final String CATEGORY_CREATE = "/category/create";
 
     @Inject
     private CategoryDao categoryDao;
 
     @GET
-    @Path(CATEGORY + "find/by/tid/{tid}")
-    public List<CategoryLink> findByTid(@PathParam("tid") Tid tid) {
+    @Path(CATEGORIES_BY_TID + TID_JP)
+    public List<CategoryLink> findByTid(@PathParam(TID) Tid tid) {
         return categoryDao.listCategoriesByTid(tid);
     }
 
@@ -67,13 +69,18 @@ public class CategoryResource {
     private AuthService authService;
 
     @POST
-    @Path(CATEGORY + "create")
+    @Path(CATEGORY_CREATE)
     @Consumes(APPLICATION_JSON)
-    public int create(@HeaderParam(SESSION) String session, NewCategory newCategory) {
-        final UserInfo user = authService.userInfoBySession(session);
-        // check perms
-        log.info("Add category to tid {}", newCategory.getTid());
-        return categoryDao.create(newCategory);
+    public void create(
+            @HeaderParam(SESSION) String session,
+            @Suspended AsyncResponse response,
+            NewCategory newCategory) {
+        final UserInfo userInfo = authService.userInfoBySession(session);
+        tournamentAccessor.update(newCategory.getTid(), response,
+                (tournament, batch) -> {
+                    tournament.checkAdmin(userInfo.getUid());
+                    return categoryService.createCategory(tournament, newCategory.getName(), batch);
+                });
     }
 
     @POST

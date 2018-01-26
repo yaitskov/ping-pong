@@ -14,7 +14,7 @@ import org.dan.ping.pong.app.bid.Uid;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserLink {
+public class UserLink implements UserLinkIf {
     private Uid uid;
     private String name;
 }

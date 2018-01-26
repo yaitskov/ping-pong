@@ -5,7 +5,7 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.app.category.CategoryResource.CID;
 import static org.dan.ping.pong.app.category.CategoryResource.CID_JP;
 import static org.dan.ping.pong.app.match.MatchResource.TID_JP;
-import static org.dan.ping.pong.app.tournament.TournamentCacheFactory.TOURNAMENT_CACHE;
+import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentService.TID;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
@@ -70,7 +70,7 @@ public class TournamentResource {
     @Inject
     private TournamentService tournamentService;
     @Inject
-    private TournamentDao tournamentDao;
+    private TournamentDaoMySql tournamentDao;
     @Inject
     private AuthService authService;
     @Inject
@@ -107,7 +107,7 @@ public class TournamentResource {
         final UserInfo user = authService.userInfoBySession(session);
         tournamentAccessor.update(parentId, response, (tournament, batch) -> {
             tournament.checkAdmin(user.getUid());
-            return tournamentService.createConsoleFor(tournament, user);
+            return tournamentService.createConsoleFor(tournament, user, batch);
         });
     }
 
@@ -160,6 +160,9 @@ public class TournamentResource {
             EnlistTournament enlistment) {
         if (enlistment.getCategoryId() < 1) {
             throw badRequest("Category is not set");
+        }
+        if (enlistment.getBidState() != BidState.Want) {
+            throw badRequest("Bid state must be " + BidState.Want);
         }
         final UserInfo user = authService.userInfoBySession(session);
         tournamentAccessor.update(enlistment.getTid(), response, (tournament, batch) -> {

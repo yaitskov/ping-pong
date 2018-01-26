@@ -14,10 +14,11 @@ import java.util.List;
 import javax.inject.Inject;
 
 @Slf4j
-public class CategoryDao {
+public class CategoryDaoMysql implements CategoryDao {
     @Inject
     private DSLContext jooq;
 
+    @Override
     @Transactional(TRANSACTION_MANAGER)
     public int create(NewCategory newCategory) {
         final int cid = jooq.insertInto(CATEGORY, CATEGORY.NAME, CATEGORY.TID)
@@ -29,6 +30,7 @@ public class CategoryDao {
         return cid;
     }
 
+    @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<CategoryLink> listCategoriesByTid(Tid tid) {
         return jooq.select(CATEGORY.CID, CATEGORY.NAME)
@@ -41,6 +43,7 @@ public class CategoryDao {
                         .build());
     }
 
+    @Override
     @Transactional(TRANSACTION_MANAGER)
     public void delete(int cid) {
         log.info("Delete category {}", cid);
@@ -49,6 +52,7 @@ public class CategoryDao {
                 .execute();
     }
 
+    @Override
     @Transactional(TRANSACTION_MANAGER)
     public void copy(Tid originTid, Tid tid) {
         final List<CategoryLink> categories = listCategoriesByTid(originTid);

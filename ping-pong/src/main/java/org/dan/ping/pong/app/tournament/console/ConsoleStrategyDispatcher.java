@@ -18,11 +18,10 @@ public class ConsoleStrategyDispatcher implements ConsoleStrategy {
     private ConsoleStrategyImpl consoleStrategy;
 
     @Override
-    public void onGroupComplete(int gid, TournamentMemState tournament, Set<Uid> quitUids, DbUpdater batch) {
+    public void onGroupComplete(int gid, TournamentMemState tournament, Set<Uid> loserUids, DbUpdater batch) {
         if (tournament.getRule().consoleP()) {
-            consoleStrategy.onGroupComplete(gid, tournament, quitUids, batch);
-        } else {
-            noConsoleStrategy.onGroupComplete(gid, tournament, quitUids, batch);
+            consoleStrategy.onGroupComplete(gid, tournament, loserUids, batch);
         }
+        noConsoleStrategy.onGroupComplete(gid, tournament, loserUids, batch);
     }
 }

@@ -1,7 +1,5 @@
 package org.dan.ping.pong.app.tournament;
 
-import static org.dan.ping.pong.app.tournament.TournamentCacheFactory.TOURNAMENT_CACHE;
-
 import com.google.common.cache.LoadingCache;
 import lombok.SneakyThrows;
 
@@ -11,6 +9,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 public class TournamentCache implements Cache<Tid, TournamentMemState> {
+    public static final String TOURNAMENT_CACHE = "tournament-cache";
+    public static final String TOURNAMENT_RELATION_CACHE = "tournament-relation-cache";
+
     @Inject
     @Named(TOURNAMENT_CACHE)
     private LoadingCache<Tid, TournamentMemState> tournamentCache;

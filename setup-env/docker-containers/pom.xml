@@ -72,12 +72,15 @@
                                     <verbose>true</verbose>
                                     <images>
                                         <image>
-                                            <name>ping-pong-mysql:5.6</name>
+                                            <name>mysql:5.6.39</name>
                                             <alias>${network.mysql}</alias>
                                             <run>
                                                 <ports>
                                                     <port>${mysql.port}:${mysql.port}</port>
                                                 </ports>
+                                                <env>
+                                                  <MYSQL_ROOT_PASSWORD>root</MYSQL_ROOT_PASSWORD>
+                                                </env>
                                                 <namingStrategy>alias</namingStrategy>
                                                 <net>${network.name}</net>
                                                 <wait>

@@ -6,9 +6,12 @@ import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.table.TableState.Busy;
 import static org.dan.ping.pong.app.table.TableState.Free;
+import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
+import com.google.common.cache.LoadingCache;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidState;
@@ -18,18 +21,22 @@ import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
+import org.dan.ping.pong.app.tournament.RelatedTids;
+import org.dan.ping.pong.app.tournament.TournamentCache;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 @Slf4j
 public class TableService {
@@ -75,9 +82,21 @@ public class TableService {
                 .collect(toList());
     }
 
+    @Inject
+    @Named(TOURNAMENT_RELATION_CACHE)
+    private LoadingCache<Tid, RelatedTids> tournamentRelatedCache;
+
+    @Inject
+    private TournamentCache tournamentCache;
+
+    @SneakyThrows
     void freeTablesForCompleteMatches(TournamentMemState tournament, PlaceMemState place, DbUpdater batch) {
+        final Set<Mid> parentMatches = tournamentRelatedCache.get(tournament.getTid()).getParent()
+                .map(ptid -> tournamentCache.load(ptid))
+                .map(parentTournament -> parentTournament.getMatches().keySet())
+                .orElseGet(Collections::emptySet);
         place.getTables().values().stream()
-                .filter(t -> t.getMid().isPresent())
+                .filter(t -> t.getMid().filter(mid -> !parentMatches.contains(mid)).isPresent())
                 .forEach(t -> {
                     final MatchInfo match = tournament.getMatchById(t.getMid().get());
                     switch (match.getState()) {
@@ -88,7 +107,7 @@ public class TableService {
                         case Draft:
                         case Place:
                             if (t.getState() == Busy) {
-                                freeTable(batch,t );
+                                freeTable(batch, t);
                             }
                             break;
                         case Game:

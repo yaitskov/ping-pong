@@ -481,7 +481,7 @@ public class TournamentDaoMySql implements TournamentDao {
     public RelatedTids getRelatedTids(Tid tid) {
         return ofNullable(jooq.select(
                 CHILD_TID_REL.CHILD_TID,
-                MASTER_TID_REL.CHILD_TID)
+                MASTER_TID_REL.PARENT_TID)
                 .from(TOURNAMENT)
                 .leftJoin(CHILD_TID_REL)
                 .on(TOURNAMENT.TID.eq(CHILD_TID_REL.PARENT_TID)
@@ -493,7 +493,7 @@ public class TournamentDaoMySql implements TournamentDao {
                 .fetchOne())
                 .map(r -> RelatedTids.builder()
                         .child(ofNullable(r.get(CHILD_TID_REL.CHILD_TID)))
-                        .parent(ofNullable(r.get(MASTER_TID_REL.CHILD_TID)))
+                        .parent(ofNullable(r.get(MASTER_TID_REL.PARENT_TID)))
                         .build())
                 .orElseThrow(() -> notFound("tournament " + tid + " not found"));
     }

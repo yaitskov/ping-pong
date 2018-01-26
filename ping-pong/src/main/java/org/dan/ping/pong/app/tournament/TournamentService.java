@@ -216,11 +216,14 @@ public class TournamentService {
         castingLotsService.seed(tournament, batch);
         tournament.setState(TournamentState.Open);
         tournamentDao.setState(tournament, batch);
-        final Instant now = clocker.get();
         findReadyToStartTournamentBid(tournament).forEach(bid ->
                 bidService.setBidState(bid, BidState.Wait,
                         singletonList(bid.getBidState()), batch));
-        scheduleService.beginTournament(tournament, batch, now);
+    }
+
+    public void beginAndSchedule(TournamentMemState tournament, DbUpdater batch) {
+        begin(tournament, batch);
+        scheduleService.beginTournament(tournament, batch, clocker.get());
     }
 
     private List<ParticipantMemState> findReadyToStartTournamentBid(TournamentMemState tournament) {

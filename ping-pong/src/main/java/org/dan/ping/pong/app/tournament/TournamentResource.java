@@ -351,7 +351,7 @@ public class TournamentResource {
         log.info("Uid {} begins tid {}", uid, tid);
         tournamentAccessor.update(new Tid(tid), response, (tournament, batch) -> {
             tournament.checkAdmin(uid);
-            tournamentService.begin(tournament, batch);
+            tournamentService.beginAndSchedule(tournament, batch);
         });
     }
 

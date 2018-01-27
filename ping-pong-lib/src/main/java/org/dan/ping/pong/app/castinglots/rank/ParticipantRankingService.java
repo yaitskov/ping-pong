@@ -56,6 +56,7 @@ public class ParticipantRankingService {
 
     @Inject
     @Named(TOURNAMENT_RELATION_CACHE)
+
     private LoadingCache<Tid, RelatedTids> tournamentRelationCache;
 
     @Inject
@@ -92,8 +93,8 @@ public class ParticipantRankingService {
             return UidIdx.builder()
                     .index(ofNullable(uid2Position.get(bid.getUid()))
                             .orElseGet(() -> {
-                        log.warn("no uid {} in cid {}", bid.getUid(), masterCid);
-                        return 0;
+                                log.warn("no uid {} in cid {}", bid.getUid(), masterCid);
+                                return 0;
                             }))
                     .uid(bid.getUid())
                     .build();

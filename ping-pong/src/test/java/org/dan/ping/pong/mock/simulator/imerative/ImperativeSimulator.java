@@ -35,6 +35,7 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidState;
@@ -81,6 +82,7 @@ public class ImperativeSimulator {
     private final Simulator simulator;
     private final RestEntityGenerator restGenerator;
     private final TournamentScenario scenario;
+    @Getter
     private TournamentScenario consoleScenario;
     private final MyRest myRest;
     private final Map<Set<Player>, Mid> matchMap = new HashMap<>();

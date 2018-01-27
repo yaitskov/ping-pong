@@ -13,11 +13,11 @@ public class OneTimeCondActions {
     private List<OneTimeCondAction> onScheduleTables;
 
     public void runSchedule(Tid tid) {
-        log.info("Run {} one time schedule actions for {}",
-                onScheduleTables.size(), tid);
         if (onScheduleTables.isEmpty()) {
             return;
         }
+        log.info("Run {} one time schedule actions for {}",
+                onScheduleTables.size(), tid);
         onScheduleTables.forEach(OneTimeCondAction::fire);
         onScheduleTables.clear();
     }

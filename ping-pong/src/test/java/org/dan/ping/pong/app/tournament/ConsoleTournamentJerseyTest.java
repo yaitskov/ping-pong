@@ -151,7 +151,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                             .resolveCategories();
 
                     console.checkTournamentComplete(restState(Expl).bid(p2, Win1))
-                            .checkResult();
+                            .checkResult(p2, p3);
                 });
     }
 }

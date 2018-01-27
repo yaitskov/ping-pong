@@ -105,7 +105,7 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
         tournamentService.begin(consoleTournament, batch);
         masterTournament.getCondActions().getOnScheduleTables().add(
                 () -> {
-                    log.info("Schedule console tournament {}", consoleTournament.getTid());
+                    log.info("Begin console tournament {}", consoleTournament.getTid());
                     scheduleService.beginTournament(consoleTournament, batch, clocker.get());
                 });
     }

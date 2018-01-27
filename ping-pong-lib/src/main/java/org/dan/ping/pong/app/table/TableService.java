@@ -26,6 +26,7 @@ import org.dan.ping.pong.app.tournament.TournamentCache;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.tournament.TournamentTerminator;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.time.Instant;
@@ -125,6 +126,9 @@ public class TableService {
         matchDao.markAsSchedule(match, batch);
     }
 
+    @Inject
+    private TournamentTerminator tournamentTerminator;
+
     public int scheduleFreeTables(TournamentMemState tournament, PlaceMemState place,
             Instant now, DbUpdater batch) {
         log.info("Schedule matches in tid {}", tournament.getTid());
@@ -147,6 +151,9 @@ public class TableService {
             throw badRequest("Tournament " + tournament.getTid()
                     + " doesn't have any table. "
                     + "Add tables to the place and schedule matches again.");
+        }
+        if (matches.isEmpty()) {
+            tournamentTerminator.endOfTournamentCategory(tournament, -1, batch);
         }
         return tablesToAllocate;
     }

@@ -77,7 +77,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 @Slf4j
-public class TournamentService {
+public class TournamentService implements TournamentTerminator {
     private static final ImmutableSet<TournamentState> EDITABLE_STATES = ImmutableSet.of(Hidden, Announce, Draft);
     private static final ImmutableSet<TournamentState> CONFIGURABLE_STATES = EDITABLE_STATES;
     private static final int DAYS_TO_SHOW_COMPLETE_BIDS = 30;
@@ -522,7 +522,9 @@ public class TournamentService {
     @Inject
     private CategoryService categoryService;
 
-    public boolean endOfTournamentCategory(TournamentMemState tournament, int cid, DbUpdater batch) {
+    @Override
+    public boolean endOfTournamentCategory(
+            TournamentMemState tournament, int cid, DbUpdater batch) {
         final Tid tid = tournament.getTid();
         log.info("Tid {} complete in cid {}", tid, cid);
         Set<Integer> incompleteCids = categoryService.findIncompleteCategories(tournament);

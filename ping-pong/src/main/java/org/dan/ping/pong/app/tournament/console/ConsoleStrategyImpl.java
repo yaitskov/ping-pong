@@ -1,6 +1,8 @@
 package org.dan.ping.pong.app.tournament.console;
 
+import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
+import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
@@ -8,8 +10,10 @@ import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATI
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableSet;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.sched.ScheduleService;
@@ -61,6 +65,8 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
     @Inject
     private Clocker clocker;
 
+    private static final Set<BidState> terminalState = ImmutableSet.of(Expl, Quit);
+
     @Override
     @SneakyThrows
     public void onGroupComplete(
@@ -78,11 +84,16 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
         log.info("Enlist loser bids {} to console tournament {}",
                 loserUids, consoleTournament.getTid());
         consoleTournament.setState(Draft);
-        loserUids.stream().map(masterTournament::getParticipant).forEach(bid ->
+        loserUids.stream()
+                .map(masterTournament::getParticipant)
+                .forEach(bid ->
                         tournamentService.enlistOnlineWithoutValidation(
                                 EnlistTournament.builder()
                                         .categoryId(cid)
-                                        .bidState(Here)
+                                        .bidState(
+                                                terminalState.contains(bid.getBidState())
+                                                        ? bid.getBidState()
+                                                        : Here)
                                         .providedRank(Optional.empty())
                                         .build(),
                                 consoleTournament, bid, batch));

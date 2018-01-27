@@ -179,12 +179,16 @@ public class TournamentService {
                 .cid(enlistment.getCategoryId())
                 .tid(tournament.getTid())
                 .build());
-        enlist(tournament, uid, enlistment.getProvidedRank(), batch);
+        enlist(tournament, uid, enlistment.getProvidedRank(), batch, Optional.empty());
     }
 
     private void enlist(TournamentMemState tournament, Uid uid,
-            Optional<Integer> providedRank, DbUpdater batch) {
+            Optional<Integer> providedRank, DbUpdater batch, Optional<Integer> oGid) {
         bidDao.enlist(tournament.getParticipant(uid), providedRank, batch);
+        if (tournament.getState() == Open) {
+            oGid.ifPresent(gid ->
+                    castingLotsService.addParticipant(uid, tournament, batch));
+        }
     }
 
     public List<TournamentDigest> findInWithEnlisted(Uid uid, int days) {
@@ -502,12 +506,9 @@ public class TournamentService {
                 .gid(enlistment.getGroupId())
                 .tid(tournament.getTid())
                 .build());
-        enlist(tournament, participantUid, enlistment.getProvidedRank(), batch);
+        enlist(tournament, participantUid, enlistment.getProvidedRank(),
+                batch, enlistment.getGroupId());
 
-        if (tournament.getState() == Open) {
-            enlistment.getGroupId().ifPresent(gid ->
-                    castingLotsService.addParticipant(participantUid, tournament, batch));
-        }
         return participantUid;
     }
 

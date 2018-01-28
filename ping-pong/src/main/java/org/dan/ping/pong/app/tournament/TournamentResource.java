@@ -22,11 +22,14 @@ import org.dan.ping.pong.app.tournament.rules.TournamentRulesValidator;
 import org.dan.ping.pong.app.tournament.rules.ValidationError;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.sys.error.ValidationErrors;
+import org.dan.ping.pong.sys.validation.TidBodyRequired;
 
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -52,7 +55,7 @@ public class TournamentResource {
     public static final String GET_TOURNAMENT_RULES = TOURNAMENT_RULES + "/";
     public static final String EDITABLE_TOURNAMENTS = TOURNAMENT + "editable/by/me";
     public static final String TOURNAMENT_CREATE = TOURNAMENT + "create";
-    public static final String TOURNAMENT_INVALIDATE_CACHE = TOURNAMENT + "invalidate/cache";
+    public static final String TOURNAMENT_INVALIDATE_CACHE = "/tournament/invalidate/cache";
     public static final String TOURNAMENT_COPY = TOURNAMENT + "copy";
     public static final String TOURNAMENT_ENLIST = TOURNAMENT + "enlist";
     public static final String TOURNAMENT_ENLIST_OFFLINE = TOURNAMENT + "enlist-offline";
@@ -160,7 +163,7 @@ public class TournamentResource {
     public void invalidateCache(
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
-            Tid tid) {
+            @TidBodyRequired @Valid Tid tid) {
         final Uid adminUid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(tid, response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);

@@ -4,3 +4,4 @@ ui/package-lock.json
 ui/.tmp
 ui/coverage
 ui/tests
+/logs

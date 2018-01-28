@@ -43,7 +43,6 @@ import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryService;
-import org.dan.ping.pong.app.group.ConsoleTournament;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchDao;
@@ -355,10 +354,10 @@ public class TournamentService implements TournamentTerminator {
                 bidService.setBidState(bid, target, singletonList(bid.getBidState()), batch);
             }
         } else {
+            bidService.setBidState(bid, target, singletonList(bid.getBidState()), batch);
             for (MatchInfo match : incompleteMy) {
                 matchService.walkOver(tournament, uid, match, batch);
             }
-            bidService.setBidState(bid, target, singletonList(bid.getBidState()), batch);
         }
         scheduleService.participantLeave(tournament, batch, now);
     }

@@ -131,7 +131,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
 
                     console.checkTournament(Open, restState(Play).bid(p4, Expl))
                             .scoreSet(p2, 11, p3, 5)
-                            .checkResult(p2, p3/* , p4  expelled before any match */)
+                            .checkResult(p2, p3, p4)
                             .checkTournamentComplete(restState(Expl).bid(p2, Win1).bid(p3, Win2));
                 });
     }
@@ -152,6 +152,29 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
 
                     console.checkTournamentComplete(restState(Expl).bid(p2, Win1))
                             .checkResult(p2, p3);
+                });
+    }
+
+    @Test
+    public void expelOnLastMatchInTournament() {
+        final TournamentScenario scenario = begin().name("expelOnLastMatch")
+                .rules(RULES_G8Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4);
+        isf.create(scenario)
+                .run(c -> {
+                    final ImperativeSimulator console = c.beginTournament()
+                            .createConsoleTournament()
+                            .scoreSet(p1, 11, p3, 4)
+                            .scoreSet(p1, 11, p2, 3)
+                            .scoreSet(p2, 11, p3, 5)
+                            .expelPlayer(p4)
+                            .checkTournamentComplete(restState(Lost).bid(p4, Expl).bid(p1, Win1))
+                            .resolveCategories();
+
+                    console.checkTournament(Open, restState(Play).bid(p4, Expl))
+                            .scoreSet(p2, 11, p3, 5)
+                            .checkResult(p2, p3, p4)
+                            .checkTournamentComplete(restState(Expl).bid(p2, Win1).bid(p3, Win2));
                 });
     }
 }

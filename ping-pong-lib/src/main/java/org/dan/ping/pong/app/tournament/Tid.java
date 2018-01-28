@@ -6,10 +6,15 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import javax.validation.constraints.Min;
+
 @EqualsAndHashCode
 @RequiredArgsConstructor
 public class Tid {
+    public static final String TOURNAMENT_ID_SHOULD_BE_A_POSITIVE_NUMBER = "tournament id should be a positive number";
+
     @Getter(onMethod = @__(@JsonValue))
+    @Min(value = 1, message = TOURNAMENT_ID_SHOULD_BE_A_POSITIVE_NUMBER)
     private final int tid;
 
     // jax-rsp

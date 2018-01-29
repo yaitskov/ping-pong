@@ -2,6 +2,7 @@ package org.dan.ping.pong.simulate;
 
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q2_M;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G3Q2_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
@@ -283,5 +284,14 @@ public class OneCategorySim {
                 .category(c1, p1, p2, p3, p4, p5))
                 .run(c -> c.beginTournament()
                         .scoreSet(p1, 11, p3, 3));
+    }
+
+    @Test
+    public void playOffDraft() {
+        isf.create(begin().name("playOffDraft")
+                .rules(RULES_G2Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p2, 3));
     }
 }

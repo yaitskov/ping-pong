@@ -23,7 +23,9 @@ angular.module('participant').
                          this.expel = function (enlisted) {
                              requestStatus.startLoading('Expelling');
                              Tournament.expel(
-                                 {uid: enlisted.user.uid, tid: self.tournamentId},
+                                 {uid: enlisted.user.uid,
+                                  tid: self.tournamentId,
+                                  targetBidState: 'Expl'},
                                  function (ok) {
                                      requestStatus.complete();
                                      enlisted.state = 'Expl';

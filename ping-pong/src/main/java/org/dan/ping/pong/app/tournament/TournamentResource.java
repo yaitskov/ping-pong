@@ -12,6 +12,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
@@ -25,6 +26,7 @@ import org.dan.ping.pong.sys.error.ValidationErrors;
 import org.dan.ping.pong.sys.validation.TidBodyRequired;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -221,19 +223,25 @@ public class TournamentResource {
     @Inject
     private TournamentAccessor tournamentAccessor;
 
+    private static final Set<BidState> acceptableBidExpelTargetStates
+            = ImmutableSet.of(BidState.Expl, BidState.Quit);
+
     @POST
     @Path(TOURNAMENT_EXPEL)
     @Consumes(APPLICATION_JSON)
     public void expel(
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
-            ExpelParticipant expelParticipant) {
+            @Valid ExpelParticipant expelParticipant) {
+        if (!acceptableBidExpelTargetStates.contains(expelParticipant.getTargetBidState())) {
+            throw badRequest("bid target state is out of range");
+        }
         final Uid uid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(expelParticipant.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(uid);
             tournamentService.leaveTournament(
                     tournament.getParticipant(expelParticipant.getUid()),
-                    tournament, BidState.Expl, batch);
+                    tournament, expelParticipant.getTargetBidState(), batch);
         });
     }
 

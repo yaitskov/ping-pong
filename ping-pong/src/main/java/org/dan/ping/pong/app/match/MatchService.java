@@ -620,9 +620,9 @@ public class MatchService {
             changeStatus(batch, mInfo, Auto);
             if (mInfo.getType() == Gold) {
                 ParticipantMemState bid = tournament.getBidOrQuit(walkoverUid);
-                if (bid.getBidState() == Quit) {
+                //if (bid.getBidState() == Quit) {
                     bidService.setBidState(bid, Win2, singleton(bid.getBidState()), batch);
-                }
+                //}
             }
             mInfo.getLoserMid()
                     .ifPresent(lmid -> assignBidToMatch(tournament, lmid, walkoverUid, batch));

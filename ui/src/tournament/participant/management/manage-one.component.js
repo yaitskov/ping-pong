@@ -1,6 +1,8 @@
 import angular from 'angular';
 import template from './manage-one.template.html';
 
+const BidTerminalStates = new Set(['Quit', 'Expl', 'Win1', 'Win2', 'Win3']);
+
 angular.module('participant').
     component('manageOneParticipant', {
         templateUrl: template,
@@ -15,6 +17,7 @@ angular.module('participant').
                              self.participant.tid = self.tournamentId;
                              $rootScope.$broadcast('event.confirm-participant-expel.confirm', self.participant);
                          };
+                         this.BidTerminalStates = BidTerminalStates;
                          binder($scope, {
                              'event.main.menu.ready': (e) => {
                                  var ctxMenu = {};

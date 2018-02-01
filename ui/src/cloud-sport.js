@@ -1,4 +1,3 @@
-import './hacks/hacks.js';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'jquery-ui-dist/jquery-ui.css';
 import 'clockpicker/dist/bootstrap-clockpicker.css';

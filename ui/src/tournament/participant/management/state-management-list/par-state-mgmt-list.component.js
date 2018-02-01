@@ -6,30 +6,17 @@ angular.module('participant').
     component('parStateMgmtList', {
         templateUrl: template,
         controller: ['$http', 'mainMenu', '$routeParams', 'auth', 'requestStatus',
-                     'Participant', 'Tournament', 'binder', '$scope',
+                     'Participant', 'Tournament', 'binder', '$scope', '$rootScope',
                      function ($http, mainMenu, $routeParams, auth, requestStatus,
-                               Participant, Tournament, binder, $scope) {
+                               Participant, Tournament, binder, $scope, $rootScope) {
                          this.tournamentId = $routeParams.tournamentId;
                          this.enlisted = null;
                          this.toBeExpelled = null;
                          var self = this;
-                         this.expelUrl = function (tid, uid) {
-                             return '#!/my/tournament/' + tid + '/participant/' + uid;
-                         };
                          this.confirmExpel = function (enlisted) {
-                             self.toBeExpelled = enlisted;
-                             jQuery('#confirmParticipantExpel').modal('show');
-                         }
-                         this.expel = function (enlisted) {
-                             requestStatus.startLoading('Expelling');
-                             Tournament.expel(
-                                 {uid: enlisted.user.uid, tid: self.tournamentId},
-                                 function (ok) {
-                                     requestStatus.complete();
-                                     enlisted.state = 'Expl';
-                                 },
-                                 requestStatus.failed);
-                         }
+                             enlisted.tid = self.tournamentId;
+                             $rootScope.$broadcast('event.confirm-participant-expel.confirm', enlisted);
+                         };
                          this.canExpel = function (participant) {
                              var state = participant.state;
                              return state != 'Expl' && state != 'Quit';
@@ -56,7 +43,7 @@ angular.module('participant').
                                  },
                                  requestStatus.failed);
                          };
-                         this.participantIsHere= function (participant) {
+                         this.participantIsHere = function (participant) {
                              requestStatus.startLoading("Marking participant presence");
                              Participant.setState(
                                  {uid: participant.user.uid,

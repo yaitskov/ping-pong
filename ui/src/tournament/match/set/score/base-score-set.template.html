@@ -26,8 +26,8 @@
        ng-class="{'btn-primary': score == $ctrl.scores[$ctrl.winnerIdx]}">
       {{score}}
     </a>
-    <a class="btn btn-default score"
-       ng-show="$ctrl.match.sport.showExtend()"
+    <a class="btn btn-default score" id="extend-win-score"
+       ng-show="$ctrl.scoreStrategy.showExtend()"
        ng-click="$ctrl.extendWinScore()">
       ...
     </a>

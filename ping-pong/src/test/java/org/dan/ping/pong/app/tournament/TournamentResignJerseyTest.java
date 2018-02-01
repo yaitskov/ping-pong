@@ -4,6 +4,8 @@ import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
+import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
@@ -85,6 +87,21 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
 
     @Inject
     private ImperativeSimulatorFactory isf;
+
+    @Test
+    public void resignInGoldDraft() {
+        isf.create(TournamentScenario.begin()
+                .name("resignInGoldDraft")
+                .rules(RULES_G2Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p2, 0)
+                        .expelPlayer(p1, Quit)
+                        .scoreSet(p3, 11, p4, 5)
+                        .checkTournamentComplete(BidStatesDesc
+                                .restState(Lost).bid(p3, Win1).bid(p1, Win2))
+                        .checkResult(p3, p1, p4, p2));
+    }
 
     @Test
     public void resignInGroupMiddle() {

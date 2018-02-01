@@ -1,5 +1,8 @@
 module.exports = {
     'participant-lbl': 'Participant',
+    'participants-lbl': 'Participants',
+
+    'mark participant quit': 'mark participant quit',
 
     'Bid state': 'Participant state',
 

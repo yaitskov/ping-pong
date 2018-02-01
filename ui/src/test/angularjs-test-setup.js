@@ -5,6 +5,12 @@ angular.module('pingPongE2e', ['pingPong', 'ngMock', 'pingPongE2e.templates']);
 angular.module('pingPongE2e')
     .service('jsHttpBackend', ['$httpBackend', function ($httpBackend) {
         const self = this;
+        this.onGet = (url) => {
+            const requestHandler = $httpBackend.whenGET(url);
+            return new function () {
+                this.respondObject = (obj) => requestHandler.respond(JSON.stringify(obj));
+            };
+        };
         this.onPost = (url, callback) => {
             const requestHandler = $httpBackend.whenPOST(url, (data) => callback(JSON.parse(data)));
             return new function () {
@@ -38,7 +44,7 @@ class Ctx {
     }
 
     findSetInput(m) {
-        for (let [anchor, val] of m) {
+        for (let [anchor, val] of Object.entries(m)) {
             this.find(anchor).val(val).triggerHandler('input');
         }
     }
@@ -48,14 +54,16 @@ class Ctx {
     }
 }
 
-export function setupAngularJs(ctrlElementId) {
+export function setupAngularJs(ctrlElementId, initCb) {
     beforeEach(angular.mock.module('pingPongE2e'));
 
     const ctx = new Ctx();
 
-    beforeEach(angular.mock.inject(function($rootScope, $compile) {
+    beforeEach(angular.mock.inject(function($rootScope, $compile, jsHttpBackend) {
         ctx.scope = $rootScope.$new();
-
+        if (initCb) {
+            initCb(ctx.scope, jsHttpBackend);
+        }
         ctx.element = angular.element(`<${ctrlElementId}></${ctrlElementId}>`);
         ctx.element = $compile(ctx.element)(ctx.scope);
         ctx.scope.$digest();

@@ -12,6 +12,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
@@ -21,11 +22,15 @@ import org.dan.ping.pong.app.tournament.rules.TournamentRulesValidator;
 import org.dan.ping.pong.app.tournament.rules.ValidationError;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.sys.error.ValidationErrors;
+import org.dan.ping.pong.sys.validation.TidBodyRequired;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -51,7 +56,7 @@ public class TournamentResource {
     public static final String GET_TOURNAMENT_RULES = TOURNAMENT_RULES + "/";
     public static final String EDITABLE_TOURNAMENTS = TOURNAMENT + "editable/by/me";
     public static final String TOURNAMENT_CREATE = TOURNAMENT + "create";
-    public static final String TOURNAMENT_INVALIDATE_CACHE = TOURNAMENT + "invalidate/cache";
+    public static final String TOURNAMENT_INVALIDATE_CACHE = "/tournament/invalidate/cache";
     public static final String TOURNAMENT_COPY = TOURNAMENT + "copy";
     public static final String TOURNAMENT_ENLIST = TOURNAMENT + "enlist";
     public static final String TOURNAMENT_ENLIST_OFFLINE = TOURNAMENT + "enlist-offline";
@@ -180,7 +185,7 @@ public class TournamentResource {
     public void invalidateCache(
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
-            Tid tid) {
+            @TidBodyRequired @Valid Tid tid) {
         final Uid adminUid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(tid, response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
@@ -238,19 +243,25 @@ public class TournamentResource {
     @Inject
     private TournamentAccessor tournamentAccessor;
 
+    private static final Set<BidState> acceptableBidExpelTargetStates
+            = ImmutableSet.of(BidState.Expl, BidState.Quit);
+
     @POST
     @Path(TOURNAMENT_EXPEL)
     @Consumes(APPLICATION_JSON)
     public void expel(
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
-            ExpelParticipant expelParticipant) {
+            @Valid ExpelParticipant expelParticipant) {
+        if (!acceptableBidExpelTargetStates.contains(expelParticipant.getTargetBidState())) {
+            throw badRequest("bid target state is out of range");
+        }
         final Uid uid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(expelParticipant.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(uid);
             tournamentService.leaveTournament(
                     tournament.getParticipant(expelParticipant.getUid()),
-                    tournament, BidState.Expl, batch);
+                    tournament, expelParticipant.getTargetBidState(), batch);
         });
     }
 

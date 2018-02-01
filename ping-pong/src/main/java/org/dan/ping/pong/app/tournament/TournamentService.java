@@ -347,13 +347,12 @@ public class TournamentService {
         log.info("activeParticipantLeave uid {} incomplete {}", uid, incompleteMy.size());
         if (incompleteMy.isEmpty()) {
             matchService.leaveFromPlayOff(bid, tournament, batch);
-            if (bid.getBidState() != Win2 || target == Expl) {
-                bidService.setBidState(bid, target, singletonList(bid.getBidState()), batch);
-            }
         } else {
             for (MatchInfo match : incompleteMy) {
                 matchService.walkOver(tournament, uid, match, batch);
             }
+        }
+        if (bid.getBidState() != Win2 || target == Expl) {
             bidService.setBidState(bid, target, singletonList(bid.getBidState()), batch);
         }
         scheduleService.participantLeave(tournament, batch, now);

@@ -2,7 +2,7 @@ import './vis-menu.css';
 
 export default class NodeMenuManager {
     updatePositions() {
-        for (let [nodeId, mn] of this.menus) {
+        for (let [nodeId, mn] of Object.entries(this.menus)) {
             mn.moveTo(this.nodeMenuPosition(nodeId));
         }
     }
@@ -14,7 +14,7 @@ export default class NodeMenuManager {
     }
 
     removeMenus(nodeIds) {
-        for (let [nodeId, menu] of this.menus) {
+        for (let [nodeId, menu] of Object.entries(this.menus)) {
             if (nodeIds.indexOf(nodeId) < 0) {
                 this.removeMenu(nodeId);
             }

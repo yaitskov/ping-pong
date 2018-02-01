@@ -30,34 +30,38 @@ angular.
                                  self.scores[1 - self.winnerIdx] = lostScore;
                                  const sport = self.match.sport;
                                  self.possibleWinScores = self.scoreStrategy.winnerOptions(
-                                     sport, self.match.playedSets);
+                                     sport, winScore, self.match.playedSets);
                                  self.possibleLostScores = self.scoreStrategy.loserOptions(
                                      sport, winScore, self.match.playedSets);
                              } else {
                                  self.scores = [-1, -1];
                                  self.noBalance();
                              }
-                         }
+                         };
                          self.noBalance = function () {
                              const sport = self.match.sport;
-                             self.possibleWinScores = self.scoreStrategy.winnerOptions(sport, self.match.playedSets);
-                             self.scores[self.winnerIdx] = self.scoreStrategy.defaultWinnerScore(sport, self.match.playedSets);
+                             const winScore = self.scoreStrategy.defaultWinnerScore(sport, self.match.playedSets);
+                             self.scores[self.winnerIdx] = winScore;
+                             self.possibleWinScores = self.scoreStrategy.winnerOptions(sport, winScore, self.match.playedSets);
                              self.possibleLostScores = self.scoreStrategy.loserOptions(sport,
                                  self.scores[self.winnerIdx],
                                  self.match.playedSets);
                          };
-                         self.extendWinScore = function () {
-                             self.possibleLostScores.length = 0;
-                             var last = self.possibleWinScores[self.possibleWinScores.length - 1];
-                             self.possibleWinScores.length = 0;
-                             self.possibleWinScores.push(self.match.sport.minGamesToWin);
-                             for (var i = 0; i < 3; ++i) {
-                                 self.possibleWinScores.push(++last);
-                             }
+                         self.extendWinScore = () => {
+                             const max = self.possibleWinScores[self.possibleWinScores.length - 1];
+                             self.pick(self.winnerIdx, max + 1);
                          };
-                         self.pick = (idx, score, noEvent) => {
+                         self.isLostToBig = (playerIdx) =>
+                             self.possibleLostScores[self.possibleLostScores.length - 1] < self.scores[playerIdx];
+                         self.isLostToSmall = (playerIdx) => self.possibleLostScores[0] > self.scores[playerIdx];
+                         self.otherPlayer = (playerIdx) => 1 - playerIdx;
+                         self.resetPlayerScore = (playerIdx) => {
+                             self.scores[playerIdx] = -1;
+                         };
+                         self.pick = (idx, score) => {
                              self.scores[idx] = score;
                              const sport = self.match.sport;
+                             self.possibleWinScores = self.scoreStrategy.winnerOptions(sport, score, self.match.playedSets);
                              self.possibleLostScores = self.scoreStrategy.loserOptions(sport, score, self.match.playedSets);
                              if (self.possibleLostScores.length == 1) {
                                  self.scores[1 - idx] = self.possibleLostScores[0];
@@ -65,10 +69,9 @@ angular.
                                                        {setOrdNumber: self.match.playedSets,
                                                         scores: findScores()});
                              } else {
-                                 if (self.possibleLostScores[self.possibleLostScores.lenth - 1] < self.scores[1 - idx]) {
-                                     self.scores[1 - idx] = -1;
-                                 } else if (self.possibleLostScores[0] > self.scores[1 - idx]) {
-                                     self.scores[1 - idx] = -1;
+                                 const otherPlayerIdx = self.otherPlayer(idx);
+                                 if (self.isLostToBig(otherPlayerIdx) || self.isLostToSmall(otherPlayerIdx)) {
+                                     self.resetPlayerScore(otherPlayerIdx);
                                  }
                              }
                          };

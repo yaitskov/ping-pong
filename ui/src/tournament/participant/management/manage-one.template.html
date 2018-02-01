@@ -15,10 +15,18 @@
       {{ 'category-lbl' | translate }}
     </a>
     <a class="btn btn-default" back-button>
-      {{ 'Back btn' | translate }}
+      <span class="glyphicon glyphicon-circle-arrow-left"/>
     </a>
-    <a class="btn btn-default" href="#!/my/tournament/{{$ctrl.tournamentId}}">
-      {{ 'Tournament btn' | translate }}
+    <a class="btn btn-default"
+       href="#!/my/tournament/{{$ctrl.tournamentId}}">
+      <span class="glyphicon glyphicon-home"/>
+    </a>
+    <a class="btn btn-danger"
+       ng-show="!$ctrl.BidTerminalStates.has($ctrl.participant.state)"
+       id="expel-participant-btn"
+       ng-click="$ctrl.expel()"
+       title="{{ 'Expel participant' | translate }}">
+      <span class="glyphicon glyphicon-remove"></span>
     </a>
   </div>
   <div class="form-group" ng-show="$ctrl.participant">
@@ -59,4 +67,5 @@
       </tr>
     </table>
   </div>
+  <confirm-participant-expel/>
 </div>

@@ -5,6 +5,7 @@ import './enlist/enlist.online.component.js';
 import './group/participant-group.component.js';
 import './group/tr-group-switcher.component.js';
 import './enlist/enlisted-participants.component.js';
+import './management/confirm-participant-expel/confirm-participant-expel.component.js';
 import './management/manage-one.component.js';
 import './management/state-management-list/par-state-mgmt-list.component.js';
 import './rank/rank-manually.component.js';

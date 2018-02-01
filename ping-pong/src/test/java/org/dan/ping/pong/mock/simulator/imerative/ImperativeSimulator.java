@@ -233,11 +233,16 @@ public class ImperativeSimulator {
     }
 
     public ImperativeSimulator expelPlayer(Player p) {
+        return expelPlayer(p, BidState.Expl);
+    }
+
+    public ImperativeSimulator expelPlayer(Player p, BidState targetState) {
         myRest.voidPost(TOURNAMENT_EXPEL,
                 scenario.getTestAdmin(),
                 ExpelParticipant.builder()
                         .tid(scenario.getTid())
                         .uid(scenario.player2Uid(p))
+                        .targetBidState(targetState)
                         .build());
         reloadMatchMap();
         return this;

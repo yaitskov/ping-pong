@@ -5,23 +5,15 @@ angular.module('participant').
     component('manageOneParticipant', {
         templateUrl: template,
         controller: ['$http', 'mainMenu', '$routeParams', 'auth', 'requestStatus',
-                     'pageCtx', 'Participant', 'binder', '$scope', 'Tournament',
+                     'Participant', 'binder', '$scope', '$rootScope',
                      function ($http, mainMenu, $routeParams, auth, requestStatus,
-                               pageCtx, Participant, binder, $scope, Tournament) {
+                               Participant, binder, $scope, $rootScope) {
                          this.tournamentId = $routeParams.tournamentId;
                          this.participant = null;
                          const self = this;
-                         self.setState = (state) => {
-                             requestStatus.startLoading();
-                             Tournament.expel(
-                                 {uid: self.participant.user.uid,
-                                  targetBidState: state,
-                                  tid: self.tournamentId},
-                                 function (ok) {
-                                     requestStatus.complete();
-                                     participant.state = state;
-                                 },
-                                 requestStatus.failed);
+                         self.expel = () => {
+                             self.participant.tid = self.tournamentId;
+                             $rootScope.$broadcast('event.confirm-participant-expel.confirm', self.participant);
                          };
                          binder($scope, {
                              'event.main.menu.ready': (e) => {

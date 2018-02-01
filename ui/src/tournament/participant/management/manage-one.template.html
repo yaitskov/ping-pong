@@ -22,12 +22,8 @@
       <span class="glyphicon glyphicon-home"/>
     </a>
     <a class="btn btn-danger"
-       ng-click="$ctrl.setState('Quit')"
-       title="{{ 'mark participant quit' | translate }}">
-      <span class="glyphicon glyphicon-log-out"></span>
-    </a>
-    <a class="btn btn-danger"
-       ng-click="$ctrl.setState('Expl')"
+       id="expel-participant-btn"
+       ng-click="$ctrl.expel()"
        title="{{ 'Expel participant' | translate }}">
       <span class="glyphicon glyphicon-remove"></span>
     </a>
@@ -70,4 +66,5 @@
       </tr>
     </table>
   </div>
+  <confirm-participant-expel/>
 </div>

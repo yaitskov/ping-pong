@@ -7,6 +7,7 @@ import static org.dan.ping.pong.app.bid.BidState.Wait;
 
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
@@ -20,8 +21,10 @@ public class NoConsoleStrategy implements ConsoleStrategy {
 
     @Override
     public void onGroupComplete(int gid, TournamentMemState tournament, Set<Uid> loserUids, DbUpdater batch) {
-        loserUids.forEach(luid ->
-             bidService.setBidState(tournament.getParticipant(luid), Lost, asList(Wait, Rest), batch)
-        );
+        loserUids.stream()
+                .map(tournament::getParticipant)
+                .filter(bid -> !MatchService.isPyrrhic(bid))
+                .forEach(bid ->
+                        bidService.setBidState(bid, Lost, asList(Wait, Rest), batch));
     }
 }

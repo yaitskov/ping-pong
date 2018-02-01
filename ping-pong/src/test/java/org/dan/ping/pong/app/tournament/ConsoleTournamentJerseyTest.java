@@ -84,7 +84,6 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 });
     }
 
-
     @Test
     public void consoleTourRankByResult() {
         final TournamentScenario scenario = begin().name("consoleTourRankByResult")

@@ -2,6 +2,7 @@ package org.dan.ping.pong.mock;
 
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BalancedMix;
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BestToBest;
+import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.Manual;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.ProvidedRating;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.SignUp;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.GLOBAL;
@@ -36,6 +37,13 @@ public class DaoEntityGeneratorWithAdmin {
     public static final CastingLotsRule INCREASE_SIGNUP_MIX
             = CastingLotsRule.builder()
             .policy(SignUp)
+            .direction(OrderDirection.Increase)
+            .splitPolicy(BalancedMix)
+            .build();
+
+    public static final CastingLotsRule BALANCED_MANUAL
+            = CastingLotsRule.builder()
+            .policy(Manual)
             .direction(OrderDirection.Increase)
             .splitPolicy(BalancedMix)
             .build();

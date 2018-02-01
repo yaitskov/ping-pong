@@ -53,10 +53,10 @@ export function setupAngularJs(ctrlElementId, initCb) {
 
     const ctx = new Ctx();
 
-    beforeEach(angular.mock.inject(function($rootScope, $compile) {
+    beforeEach(angular.mock.inject(function($rootScope, $compile, jsHttpBackend) {
         ctx.scope = $rootScope.$new();
         if (initCb) {
-            initCb(ctx.scope);
+            initCb(ctx.scope, jsHttpBackend);
         }
         ctx.element = angular.element(`<${ctrlElementId}></${ctrlElementId}>`);
         ctx.element = $compile(ctx.element)(ctx.scope);

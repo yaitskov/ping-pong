@@ -43,7 +43,6 @@ import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryService;
-import org.dan.ping.pong.app.group.ConsoleTournament;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchDao;
@@ -77,7 +76,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 @Slf4j
-public class TournamentService {
+public class TournamentService implements TournamentTerminator {
     private static final ImmutableSet<TournamentState> EDITABLE_STATES = ImmutableSet.of(Hidden, Announce, Draft);
     private static final ImmutableSet<TournamentState> CONFIGURABLE_STATES = EDITABLE_STATES;
     private static final int DAYS_TO_SHOW_COMPLETE_BIDS = 30;
@@ -179,12 +178,16 @@ public class TournamentService {
                 .cid(enlistment.getCategoryId())
                 .tid(tournament.getTid())
                 .build());
-        enlist(tournament, uid, enlistment.getProvidedRank(), batch);
+        enlist(tournament, uid, enlistment.getProvidedRank(), batch, Optional.empty());
     }
 
     private void enlist(TournamentMemState tournament, Uid uid,
-            Optional<Integer> providedRank, DbUpdater batch) {
+            Optional<Integer> providedRank, DbUpdater batch, Optional<Integer> oGid) {
         bidDao.enlist(tournament.getParticipant(uid), providedRank, batch);
+        if (tournament.getState() == Open) {
+            oGid.ifPresent(gid ->
+                    castingLotsService.addParticipant(uid, tournament, batch));
+        }
     }
 
     public List<TournamentDigest> findInWithEnlisted(Uid uid, int days) {
@@ -348,6 +351,7 @@ public class TournamentService {
         if (incompleteMy.isEmpty()) {
             matchService.leaveFromPlayOff(bid, tournament, batch);
         } else {
+            bidService.setBidState(bid, target, singletonList(bid.getBidState()), batch);
             for (MatchInfo match : incompleteMy) {
                 matchService.walkOver(tournament, uid, match, batch);
             }
@@ -501,12 +505,9 @@ public class TournamentService {
                 .gid(enlistment.getGroupId())
                 .tid(tournament.getTid())
                 .build());
-        enlist(tournament, participantUid, enlistment.getProvidedRank(), batch);
+        enlist(tournament, participantUid, enlistment.getProvidedRank(),
+                batch, enlistment.getGroupId());
 
-        if (tournament.getState() == Open) {
-            enlistment.getGroupId().ifPresent(gid ->
-                    castingLotsService.addParticipant(participantUid, tournament, batch));
-        }
         return participantUid;
     }
 
@@ -520,7 +521,9 @@ public class TournamentService {
     @Inject
     private CategoryService categoryService;
 
-    public boolean endOfTournamentCategory(TournamentMemState tournament, int cid, DbUpdater batch) {
+    @Override
+    public boolean endOfTournamentCategory(
+            TournamentMemState tournament, int cid, DbUpdater batch) {
         final Tid tid = tournament.getTid();
         log.info("Tid {} complete in cid {}", tid, cid);
         Set<Integer> incompleteCids = categoryService.findIncompleteCategories(tournament);

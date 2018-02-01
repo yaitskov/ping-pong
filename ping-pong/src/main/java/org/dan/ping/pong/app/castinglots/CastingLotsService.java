@@ -14,6 +14,7 @@ import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.FIRST_PLAY_OFF_MATCH_LEVEL;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.PLAY_OFF_SEEDS;
+import static org.dan.ping.pong.app.match.MatchService.roundPlayOffBase;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.L1_3P;
@@ -68,6 +69,8 @@ public class CastingLotsService {
     private static final ImmutableSet<BidState> WANT_PAID_HERE = ImmutableSet.of(Want, Paid, Here);
     private static final ImmutableSet<BidState> WANT_PAID = ImmutableSet.of(Want, Paid);
     private static final ImmutableSet<BidState> QUIT_EXPELLED = ImmutableSet.of(Quit, Expl);
+    private static final ImmutableSet<BidState> WANT_PAID_HERE_QUIT_EXPELLED
+            = new ImmutableSet.Builder().addAll(QUIT_EXPELLED).addAll(WANT_PAID_HERE).build();
 
     public static Map<Integer, List<ParticipantMemState>> groupByCategories(
             List<ParticipantMemState> bids) {
@@ -107,7 +110,6 @@ public class CastingLotsService {
         return gid;
     }
 
-    //@Transactional(TRANSACTION_MANAGER)
     public void seed(TournamentMemState tournament, DbUpdater batch) {
         log.info("Begin seeding tournament {}", tournament.getTid());
         final TournamentRules rules = tournament.getRule();
@@ -137,7 +139,7 @@ public class CastingLotsService {
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
             validateBidsNumberInACategory(bids);
             final List<ParticipantMemState> orderedBids = rankingService.sort(bids, rules.getCasting(), tournament);
-            final int basePositions = matchService.roundPlayOffBase(orderedBids.size());
+            final int basePositions = roundPlayOffBase(orderedBids.size());
             castingLotsDao.generatePlayOffMatches(tournament, cid, basePositions, 1);
             assignBidsToBaseMatches(cid, basePositions, orderedBids, tournament, batch);
         });
@@ -159,6 +161,8 @@ public class CastingLotsService {
     @Inject
     private BidService bidService;
 
+    private static final Set<BidState> terminalBidState = ImmutableSet.of(Expl, Quit);
+
     private void assignBidsToBaseMatches(Integer cid, int basePositions,
             List<ParticipantMemState> orderedBids,
             TournamentMemState tournament, DbUpdater batch) {
@@ -179,17 +183,21 @@ public class CastingLotsService {
             final int iStrongBid = Math.min(iBid1, iBid2);
             final int iWeakBid = Math.max(iBid1, iBid2);
 
-            bidService.setBidState(orderedBids.get(iStrongBid), Wait,
-                    singletonList(Here), batch);
+            final ParticipantMemState strongBid = orderedBids.get(iStrongBid);
+            if (!terminalBidState.contains(strongBid.getBidState())) {
+                bidService.setBidState(strongBid, Wait, singletonList(Here), batch);
+            }
             matchService.assignBidToMatch(tournament, match.getMid(),
-                    orderedBids.get(iStrongBid).getUid(), batch);
+                    strongBid.getUid(), batch);
 
             if (iWeakBid >= orderedBids.size()) {
                 matchService.assignBidToMatch(tournament, match.getMid(), FILLER_LOSER_UID, batch);
             } else {
-                bidService.setBidState(orderedBids.get(iWeakBid), Wait, singletonList(Here), batch);
-                matchService.assignBidToMatch(tournament, match.getMid(),
-                        orderedBids.get(iWeakBid).getUid(), batch);
+                final ParticipantMemState weakBid = orderedBids.get(iWeakBid);
+                if (!terminalBidState.contains(weakBid.getBidState())) {
+                    bidService.setBidState(weakBid, Wait, singletonList(Here), batch);
+                }
+                matchService.assignBidToMatch(tournament, match.getMid(), weakBid.getUid(), batch);
             }
         }
     }
@@ -244,7 +252,7 @@ public class CastingLotsService {
                 bidDao.setGroupForUids(gid, tid, groupBids);
             }
             castingLotsDao.generatePlayOffMatches(tournament, cid,
-                    matchService.roundPlayOffBase(bidsByGroups.size() * quits),
+                    roundPlayOffBase(bidsByGroups.size() * quits),
                     basePlayOffPriority + 1);
         });
     }
@@ -257,7 +265,7 @@ public class CastingLotsService {
 
     private List<ParticipantMemState> findBidsReadyToPlay(TournamentMemState tournament) {
         return tournament.getParticipants().values().stream()
-                .filter(bid -> WANT_PAID_HERE.contains(bid.getBidState()))
+                .filter(bid -> WANT_PAID_HERE_QUIT_EXPELLED.contains(bid.getBidState()))
                 .collect(toList());
     }
 
@@ -316,7 +324,7 @@ public class CastingLotsService {
 
         final int quits = tournament.getRule().getGroup().get().getQuits();
         final int quittersForRealGroups = tournament.getGroupsByCategory(cid).size() * quits;
-        final int roundedQuitters = matchService.roundPlayOffBase(quittersForRealGroups);
+        final int roundedQuitters = roundPlayOffBase(quittersForRealGroups);
         castingLotsDao.generatePlayOffMatches(tournament, cid,
                 roundedQuitters, basePriority);
         if (quittersForRealGroups < roundedQuitters) {

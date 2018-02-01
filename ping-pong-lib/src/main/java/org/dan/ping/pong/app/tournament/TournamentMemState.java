@@ -32,6 +32,7 @@ import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.sys.error.PiPoEx;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,6 +63,7 @@ public class TournamentMemState {
     private Optional<Tid> previousTid;
     private Instant opensAt;
     private List<DisputeMemState> disputes;
+    private OneTimeCondActions condActions;
 
     public Optional<MatchInfo> maybeMatchById(Mid mid) {
         return ofNullable(matches.get(mid));

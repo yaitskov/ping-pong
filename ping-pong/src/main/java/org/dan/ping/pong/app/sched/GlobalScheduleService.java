@@ -11,6 +11,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.tournament.RelatedTids;
@@ -29,6 +30,7 @@ import java.util.function.Function;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+@Slf4j
 public class GlobalScheduleService implements ScheduleService {
     public static final Set<TournamentState> TERMINAL_STATE = ImmutableSet.of(Close, Canceled, Replaced);
 
@@ -95,6 +97,7 @@ public class GlobalScheduleService implements ScheduleService {
             DbUpdater batch, Instant now) {
         sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
                 place -> {
+                    log.info("Schedule tournament {}", tournament.getTid());
                     batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
                     if (GlobalScheduleService.TERMINAL_STATE.contains(tournament.getState())) {
                         tableService.bindPlace(place, batch, Optional.empty());

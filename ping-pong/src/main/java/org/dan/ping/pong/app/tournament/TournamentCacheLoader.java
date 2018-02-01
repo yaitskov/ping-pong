@@ -19,6 +19,7 @@ import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +56,10 @@ public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> 
                 .orElseThrow(() -> notFound(TOURNAMENT_NOT_FOUND, TID, tid));
         return TournamentMemState.builder()
                 .name(row.getName())
+                .condActions(OneTimeCondActions
+                        .builder()
+                        .onScheduleTables(new ArrayList<>())
+                        .build())
                 .type(row.getType())
                 .participants(bidDao.loadParticipants(tid))
                 .categories(categoryDao.listCategoriesByTid(tid).stream()

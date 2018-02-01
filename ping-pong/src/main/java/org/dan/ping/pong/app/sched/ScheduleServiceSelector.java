@@ -21,21 +21,25 @@ public class ScheduleServiceSelector implements ScheduleService {
     @Override
     public void beginTournament(TournamentMemState tournament, DbUpdater batch, Instant now) {
         dispatch(tournament).beginTournament(tournament, batch, now);
+        tournament.getCondActions().runSchedule(tournament.getTid());
     }
 
     @Override
     public void cancelTournament(TournamentMemState tournament, DbUpdater batch, Instant now) {
         dispatch(tournament).cancelTournament(tournament, batch, now);
+        tournament.getCondActions().runSchedule(tournament.getTid());
     }
 
     @Override
     public void participantLeave(TournamentMemState tournament, DbUpdater batch, Instant now) {
         dispatch(tournament).participantLeave(tournament, batch, now);
+        tournament.getCondActions().runSchedule(tournament.getTid());
     }
 
     @Override
     public void afterMatchComplete(TournamentMemState tournament, DbUpdater batch, Instant now) {
         dispatch(tournament).afterMatchComplete(tournament, batch, now);
+        tournament.getCondActions().runSchedule(tournament.getTid());
     }
 
     @Override

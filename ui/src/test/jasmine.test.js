@@ -15,4 +15,17 @@ describe('jasmine features', () => {
         expect(s.moveTo()).toBe(2);
         expect(s.moveTo).toHaveBeenCalled();
     });
+    it('have been called with a generic matcher', () => {
+        {
+            const s = jasmine.createSpyObj('s1', ['moveTo']);
+            s.moveTo('hello');
+            expect(s.moveTo).toHaveBeenCalledWith(jasmine.any(String));
+        }
+
+        {
+            const s = jasmine.createSpyObj('s1', ['moveTo']);
+            s.moveTo(123);
+            expect(s.moveTo).not.toHaveBeenCalledWith(jasmine.any(String));
+        }
+    });
 });

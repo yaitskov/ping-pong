@@ -5,6 +5,12 @@ angular.module('pingPongE2e', ['pingPong', 'ngMock', 'pingPongE2e.templates']);
 angular.module('pingPongE2e')
     .service('jsHttpBackend', ['$httpBackend', function ($httpBackend) {
         const self = this;
+        this.onGet = (url) => {
+            const requestHandler = $httpBackend.whenGET(url);
+            return new function () {
+                this.respondObject = (obj) => requestHandler.respond(JSON.stringify(obj));
+            };
+        };
         this.onPost = (url, callback) => {
             const requestHandler = $httpBackend.whenPOST(url, (data) => callback(JSON.parse(data)));
             return new function () {

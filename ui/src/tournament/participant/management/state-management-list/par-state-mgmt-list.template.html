@@ -65,30 +65,5 @@
     </tbody>
   </table>
 
-  <div id="confirmParticipantExpel" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">{{ 'Participant Expel title' | translate }}</h4>
-        </div>
-        <div class="modal-body">
-          <p translate="expel-warn"
-             translate-values="{url: $ctrl.expelUrl($ctrl.tournamentId, $ctrl.toBeExpelled.user.uid), name: $ctrl.toBeExpelled.user.name}">
-          </p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default"
-                  data-dismiss="modal">
-            {{ 'Cancel btn' | translate }}
-          </button>
-          <button type="button" class="btn btn-danger"
-                  ng-click="$ctrl.expel($ctrl.toBeExpelled)"
-                  data-dismiss="modal">
-            {{ 'Expel btn' | translate }}
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <confirm-participant-expel/>
 </div>

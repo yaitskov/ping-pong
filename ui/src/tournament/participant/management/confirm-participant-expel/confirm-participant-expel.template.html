@@ -1,0 +1,28 @@
+<div id="confirmParticipantExpel" class="modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">{{ 'Participant Expel title' | translate }}</h4>
+            </div>
+            <div class="modal-body">
+                <p translate="expel-warn"
+                   translate-values="{url: $ctrl.expelUrl($ctrl.bid.tid, $ctrl.bid.user.uid), name: $ctrl.bid.user.name}">
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default"
+                        data-dismiss="modal" translate="Cancel btn"/>
+                <button type="button" class="btn btn-danger"
+                        ng-click="$ctrl.expelAs('Expl')"
+                        data-dismiss="modal"
+                        translate="Expel btn"/>
+                <button type="button" class="btn btn-danger" id="expel-as-quit"
+                        ng-click="$ctrl.expelAs('Quit')"
+                        data-dismiss="modal">
+                    Mark as Quit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

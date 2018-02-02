@@ -46,10 +46,11 @@ public class Kw04FirstTournamentJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     private Simulator simulator;
 
-    public static final TournamentRules RULES_G8Q1_S1A2G11 = TournamentRules
+    public static final TournamentRules RULES_G8Q1_S1A2G11_NP = TournamentRules
             .builder()
             .match(S1A2G11)
             .group(Optional.of(G8Q1))
+            .place(Optional.empty())
             .casting(CastingLotsRule.builder()
                     .policy(ParticipantRankingPolicy.Manual)
                     .direction(OrderDirection.Decrease)
@@ -65,7 +66,7 @@ public class Kw04FirstTournamentJerseyTest extends AbstractSpringJerseyTest {
         final TournamentScenario scenario = TournamentScenario.begin()
                 .doNotBegin()
                 .tables(6)
-                .rules(RULES_G8Q1_S1A2G11)
+                .rules(RULES_G8Q1_S1A2G11_NP)
                 .category(c1, p1, p2, p3, p4, p5, p6, p7)
                 .name("kw04-tournament-1");
 

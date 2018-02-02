@@ -1,6 +1,5 @@
 package org.dan.ping.pong.app.castinglots;
 
-import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -10,7 +9,6 @@ import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
-import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.FIRST_PLAY_OFF_MATCH_LEVEL;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.PLAY_OFF_SEEDS;
@@ -20,7 +18,6 @@ import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.L1_3P;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
-import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
@@ -49,9 +46,7 @@ import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdater;
-import org.dan.ping.pong.sys.db.DbUpdaterSql;
 import org.dan.ping.pong.util.time.Clocker;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -69,8 +64,6 @@ public class CastingLotsService {
     private static final ImmutableSet<BidState> WANT_PAID_HERE = ImmutableSet.of(Want, Paid, Here);
     private static final ImmutableSet<BidState> WANT_PAID = ImmutableSet.of(Want, Paid);
     private static final ImmutableSet<BidState> QUIT_EXPELLED = ImmutableSet.of(Quit, Expl);
-    private static final ImmutableSet<BidState> WANT_PAID_HERE_QUIT_EXPELLED
-            = new ImmutableSet.Builder().addAll(QUIT_EXPELLED).addAll(WANT_PAID_HERE).build();
 
     public static Map<Integer, List<ParticipantMemState>> groupByCategories(
             List<ParticipantMemState> bids) {
@@ -184,9 +177,6 @@ public class CastingLotsService {
             final int iWeakBid = Math.max(iBid1, iBid2);
 
             final ParticipantMemState strongBid = orderedBids.get(iStrongBid);
-            if (!terminalBidState.contains(strongBid.getBidState())) {
-                bidService.setBidState(strongBid, Wait, singletonList(Here), batch);
-            }
             matchService.assignBidToMatch(tournament, match.getMid(),
                     strongBid.getUid(), batch);
 
@@ -194,9 +184,6 @@ public class CastingLotsService {
                 matchService.assignBidToMatch(tournament, match.getMid(), FILLER_LOSER_UID, batch);
             } else {
                 final ParticipantMemState weakBid = orderedBids.get(iWeakBid);
-                if (!terminalBidState.contains(weakBid.getBidState())) {
-                    bidService.setBidState(weakBid, Wait, singletonList(Here), batch);
-                }
                 matchService.assignBidToMatch(tournament, match.getMid(), weakBid.getUid(), batch);
             }
         }
@@ -265,7 +252,7 @@ public class CastingLotsService {
 
     private List<ParticipantMemState> findBidsReadyToPlay(TournamentMemState tournament) {
         return tournament.getParticipants().values().stream()
-                .filter(bid -> WANT_PAID_HERE_QUIT_EXPELLED.contains(bid.getBidState()))
+                .filter(bid -> WANT_PAID_HERE.contains(bid.getBidState()))
                 .collect(toList());
     }
 

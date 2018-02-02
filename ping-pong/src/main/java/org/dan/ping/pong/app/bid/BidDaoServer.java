@@ -66,13 +66,17 @@ public class BidDaoServer implements BidDao {
             Collection<Uid> uids, Instant now, DbUpdater batch) {
         final List<Uid> finalUids = uids.stream()
                 .map(tournament::getBid)
-                .filter(bid -> bid.getState() != Play)
+                .filter(bid -> bid.getState() == Wait)
                 .peek(bid -> bid.setBidState(Play))
                 .map(ParticipantMemState::getUid)
                 .collect(toList());
+        if (finalUids.isEmpty()) {
+            return;
+        }
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(Optional.of(finalUids.size()))
                 .onFailure(u -> internalError("One of uids " + finalUids + " was busy"))
+                .logBefore(() -> log.info("Make uids {} as playing if it's waiting", finalUids))
                 .query(jooq.update(BID)
                         .set(BID.STATE, Play)
                         .set(BID.UPDATED, Optional.of(now))

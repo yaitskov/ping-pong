@@ -4,7 +4,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.match.MatchResource.MY_PENDING_MATCHES;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
-import static org.dan.ping.pong.app.tournament.Kw04FirstTournamentJerseyTest.RULES_G8Q1_S1A2G11;
+import static org.dan.ping.pong.app.tournament.Kw04FirstTournamentJerseyTest.RULES_G8Q1_S1A2G11_NP;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
@@ -40,7 +40,7 @@ public class PlayerPendingMatchesJerseyTest extends AbstractSpringJerseyTest {
         final TournamentScenario scenario = TournamentScenario.begin()
                 .ignoreUnexpectedGames()
                 .tables(0)
-                .rules(RULES_G8Q1_S1A2G11)
+                .rules(RULES_G8Q1_S1A2G11_NP)
                 .category(c1, p1, p2)
                 .name("noTables2Players");
 

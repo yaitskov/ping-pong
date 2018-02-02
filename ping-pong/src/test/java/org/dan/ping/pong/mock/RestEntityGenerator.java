@@ -9,10 +9,13 @@ import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_CONSOLE_CREATE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_EXPEL;
 
 import org.dan.ping.pong.app.bid.BidId;
+import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
+import org.dan.ping.pong.app.tournament.ExpelParticipant;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.mock.simulator.EnlistMode;
 import org.dan.ping.pong.mock.simulator.ProvidedRank;
@@ -91,6 +94,22 @@ public class RestEntityGenerator {
                         BidId.builder()
                                 .tid(tid)
                                 .uid(userSession.getUid())
+                                .build());
+            }
+            if (enlistMode == EnlistMode.Expel) {
+                myRest.voidPost(TOURNAMENT_EXPEL, adminSession,
+                        ExpelParticipant.builder()
+                                .tid(tid)
+                                .uid(userSession.getUid())
+                                .targetBidState(BidState.Expl)
+                                .build());
+            }
+            if (enlistMode == EnlistMode.Quit) {
+                myRest.voidPost(TOURNAMENT_EXPEL, adminSession,
+                        ExpelParticipant.builder()
+                                .tid(tid)
+                                .uid(userSession.getUid())
+                                .targetBidState(BidState.Quit)
                                 .build());
             }
         }

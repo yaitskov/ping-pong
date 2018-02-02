@@ -10,6 +10,7 @@ import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
+import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.MasterOutcome;
 import static org.dan.ping.pong.app.group.ConsoleTournament.INDEPENDENT_RULES;
@@ -19,6 +20,7 @@ import static org.dan.ping.pong.app.table.TableService.STATE;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
+import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
@@ -214,7 +216,20 @@ public class TournamentService {
         if (tournament.getState() != TournamentState.Draft) {
             throw notDraftError(tournament);
         }
-        castingLotsService.seed(tournament, batch);
+        final List<ParticipantMemState> readyBids = castingLotsService.findBidsReadyToPlay(tournament);
+        castingLotsService.checkAllThatAllHere(readyBids);
+        if (readyBids.isEmpty()) {
+            tournament.setState(TournamentState.Close);
+            tournamentDao.setState(tournament, batch);
+            return;
+        } else if (readyBids.size() == 1) {
+            bidService.setBidState(readyBids.get(0), BidState.Win1,
+                    singletonList(readyBids.get(0).getBidState()), batch);
+            tournament.setState(TournamentState.Close);
+            tournamentDao.setState(tournament, batch);
+            return;
+        }
+        castingLotsService.seed(tournament, readyBids, batch);
         tournament.setState(TournamentState.Open);
         tournamentDao.setState(tournament, batch);
         findReadyToStartTournamentBid(tournament).forEach(bid ->
@@ -431,7 +446,20 @@ public class TournamentService {
     public List<TournamentResultEntry> tournamentResult(TournamentMemState tournament, int cid) {
         final List<TournamentResultEntry> groupOrdered = groupService.resultOfAllGroupsInCategory(tournament, cid);
         final List<TournamentResultEntry> playOffResult = playOffService.playOffResult(tournament, cid, groupOrdered);
+
         if (playOffResult.isEmpty()) {
+            if (groupOrdered.isEmpty() && tournament.getState() == Close) {
+                return tournament.getParticipants().values().stream()
+                        .filter(bid -> bid.getState() == Win1 && bid.getCid() == cid)
+                        .map(bid -> TournamentResultEntry.builder()
+                                .user(bid.toLink())
+                                .playOffStep(Optional.empty())
+                                .state(Win1)
+                                .punkts(0)
+                                .score(null)
+                                .build())
+                        .collect(toList());
+            }
             return enumerate(tournament, groupOrdered);
         } else {
             playOffResult.addAll(groupOrdered);

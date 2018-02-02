@@ -47,22 +47,6 @@ public class CastingLotsResource {
     private TournamentAccessor tournamentAccessor;
 
     @POST
-    @Path(CASTING_LOTS)
-    @Consumes(APPLICATION_JSON)
-    public void makeGroups(
-            @Suspended AsyncResponse response,
-            @HeaderParam(SESSION) String session,
-            DoCastingLots doCastingLots) {
-        final Uid uid = authService.userInfoBySession(session).getUid();
-        log.info("User {} does casting lots in tournament {}",
-                uid, doCastingLots.getTid());
-        tournamentAccessor.update(doCastingLots.getTid(), response, (tournament, batch) -> {
-            castingLotsService.seed(tournamentCache.load(doCastingLots.getTid()), batch);
-            return "";
-        });
-    }
-
-    @POST
     @Path(ORDER_BIDS_MANUALLY)
     @Consumes(APPLICATION_JSON)
     public void orderBidsManually(

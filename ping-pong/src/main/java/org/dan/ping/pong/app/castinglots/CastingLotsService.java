@@ -103,11 +103,10 @@ public class CastingLotsService {
         return gid;
     }
 
-    public void seed(TournamentMemState tournament, DbUpdater batch) {
+    public void seed(TournamentMemState tournament, List<ParticipantMemState> readyBids, DbUpdater batch) {
         log.info("Begin seeding tournament {}", tournament.getTid());
         final TournamentRules rules = tournament.getRule();
-        final List<ParticipantMemState> readyBids = findBidsReadyToPlay(tournament);
-        checkAllThatAllHere(readyBids);
+
         checkAtLeast(readyBids);
         if (!rules.getPlayOff().isPresent()) {
             seedJustGroupTournament(rules, tournament, readyBids);
@@ -250,13 +249,13 @@ public class CastingLotsService {
         }
     }
 
-    private List<ParticipantMemState> findBidsReadyToPlay(TournamentMemState tournament) {
+    public List<ParticipantMemState> findBidsReadyToPlay(TournamentMemState tournament) {
         return tournament.getParticipants().values().stream()
                 .filter(bid -> WANT_PAID_HERE.contains(bid.getBidState()))
                 .collect(toList());
     }
 
-    private void checkAllThatAllHere(List<ParticipantMemState> readyBids) {
+    public void checkAllThatAllHere(List<ParticipantMemState> readyBids) {
         final List<UserLink> notHere = readyBids.stream()
                 .filter(bid -> WANT_PAID.contains(bid.getState()))
                 .map(ParticipantMemState::toLink)

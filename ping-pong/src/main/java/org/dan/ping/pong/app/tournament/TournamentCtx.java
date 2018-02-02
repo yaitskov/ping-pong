@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Import;
         TournamentRulesValidator.class,
         GroupRuleValidator.class,
         PingPongMatchRuleValidator.class,
+        TournamentTerminator.class,
         TournamentService.class})
 public class TournamentCtx {
 }

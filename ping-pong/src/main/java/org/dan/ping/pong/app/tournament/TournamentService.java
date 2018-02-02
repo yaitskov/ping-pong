@@ -16,15 +16,14 @@ import static org.dan.ping.pong.app.group.ConsoleTournament.INDEPENDENT_RULES;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.table.TableService.STATE;
+import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
-import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.app.tournament.TournamentType.Classic;
 import static org.dan.ping.pong.app.tournament.TournamentType.Console;
-import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -69,14 +68,13 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 @Slf4j
-public class TournamentService implements TournamentTerminator {
+public class TournamentService {
     private static final ImmutableSet<TournamentState> EDITABLE_STATES = ImmutableSet.of(Hidden, Announce, Draft);
     private static final ImmutableSet<TournamentState> CONFIGURABLE_STATES = EDITABLE_STATES;
     private static final int DAYS_TO_SHOW_COMPLETE_BIDS = 30;
@@ -362,20 +360,6 @@ public class TournamentService implements TournamentTerminator {
         scheduleService.participantLeave(tournament, batch, now);
     }
 
-    public void setTournamentState(TournamentMemState tournament, TournamentState target, DbUpdater batch) {
-        log.info("Switch tid {} from state {} to {}",
-                tournament.getTid(), tournament.getState(), target);
-        if (tournament.getState() != target) {
-            tournament.setState(target);
-            tournamentDao.setState(tournament, batch);
-        }
-    }
-
-    public void setTournamentCompleteAt(TournamentMemState tournament, Instant now, DbUpdater batch) {
-        tournament.setCompleteAt(Optional.of(now));
-        tournamentDao.setCompleteAt(tournament.getTid(), tournament.getCompleteAt(), batch);
-    }
-
     public List<OpenTournamentDigest> findRunning(int completeInLastDays) {
         return tournamentDao.findRunning(
                 clocker.get().minus(completeInLastDays, DAYS));
@@ -425,8 +409,8 @@ public class TournamentService implements TournamentTerminator {
         final Instant now = clocker.get();
 
         final Tid tid = tournament.getTid();
-        setTournamentState(tournament, Canceled, batch);
-        setTournamentCompleteAt(tournament, clocker.get(), batch);
+        tournamentTerminator.setTournamentState(tournament, Canceled, batch);
+        tournamentTerminator.setTournamentCompleteAt(tournament, clocker.get(), batch);
         scheduleService.cancelTournament(tournament, batch, now);
         matchDao.deleteAllByTid(tournament, batch, tournament.getMatches().size());
         tournament.getParticipants().values().stream()
@@ -521,22 +505,8 @@ public class TournamentService implements TournamentTerminator {
     @Inject
     private CategoryService categoryService;
 
-    @Override
-    public boolean endOfTournamentCategory(
-            TournamentMemState tournament, int cid, DbUpdater batch) {
-        final Tid tid = tournament.getTid();
-        log.info("Tid {} complete in cid {}", tid, cid);
-        Set<Integer> incompleteCids = categoryService.findIncompleteCategories(tournament);
-        if (incompleteCids.isEmpty()) {
-            log.info("All matches of tid {} are complete", tid);
-            setTournamentCompleteAt(tournament, clocker.get(), batch);
-            setTournamentState(tournament, Close, batch);
-            return true;
-        } else {
-            log.info("Tid {} is fully complete", tid);
-            return false;
-        }
-    }
+    @Inject
+    private TournamentTerminator tournamentTerminator;
 
     public PlayOffMatches playOffMatches(TournamentMemState tournament, int cid) {
         return playOffService.playOffMatches(tournament, cid);

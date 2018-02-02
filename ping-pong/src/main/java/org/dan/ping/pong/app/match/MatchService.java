@@ -58,6 +58,7 @@ import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentProgress;
 import org.dan.ping.pong.app.tournament.TournamentService;
+import org.dan.ping.pong.app.tournament.TournamentTerminator;
 import org.dan.ping.pong.app.tournament.console.ConsoleStrategy;
 import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.sys.db.DbUpdater;
@@ -241,6 +242,9 @@ public class MatchService {
         }
     }
 
+    @Inject
+    private TournamentTerminator tournamentTerminator;
+
     private void completePlayOffMatch(TournamentMemState tournament, MatchInfo mInfo,
             Uid winUid, DbUpdater batch) {
         final PlayOffRule playOffRule = tournament.getRule().getPlayOff().get();
@@ -265,7 +269,7 @@ public class MatchService {
         if (mInfo.getWinnerMid().isPresent()) {
             return;
         }
-        tournamentService.endOfTournamentCategory(tournament, mInfo.getCid(), batch);
+        tournamentTerminator.endOfTournamentCategory(tournament, mInfo.getCid(), batch);
     }
 
     @Inject
@@ -334,7 +338,7 @@ public class MatchService {
                                 : Lost,
                         asList(Play, Wait, Quit, Lost, Rest), batch);
             }
-            tournamentService.endOfTournamentCategory(tournament, iGru.getCid(), batch);
+            tournamentTerminator.endOfTournamentCategory(tournament, iGru.getCid(), batch);
         } else {
             throw internalError("Tournament " +
                     tournament.getTid() + " in category " + iGru.getCid()
@@ -435,7 +439,7 @@ public class MatchService {
             bidService.setBidState(bid,
                     stateF.apply(tournament.getRule().getPlayOff().get(), mInfo, bid),
                     singleton(bid.getBidState()), batch);
-            tournamentService.endOfTournamentCategory(tournament, bid.getCid(), batch);
+            tournamentTerminator.endOfTournamentCategory(tournament, bid.getCid(), batch);
         }
     }
 
@@ -506,12 +510,12 @@ public class MatchService {
             case Brnz:
                 checkSinkMatch(mInfo);
                 bidService.setBidState(tournament.getBidOrQuit(winUid), Win3, asList(Play, Wait, Rest), batch);
-                tournamentService.endOfTournamentCategory(tournament, mInfo.getCid(), batch);
+                tournamentTerminator.endOfTournamentCategory(tournament, mInfo.getCid(), batch);
                 break;
             case Gold:
                 checkSinkMatch(mInfo);
                 bidService.setBidState(tournament.getBidOrQuit(winUid), Win1, asList(Play, Wait, Rest), batch);
-                tournamentService.endOfTournamentCategory(tournament, mInfo.getCid(), batch);
+                tournamentTerminator.endOfTournamentCategory(tournament, mInfo.getCid(), batch);
                 break;
             case POff:
                 mInfo.getWinnerMid()

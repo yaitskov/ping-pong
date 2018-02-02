@@ -381,6 +381,9 @@ public class TournamentResource {
         });
     }
 
+    @Inject
+    private TournamentTerminator tournamentTerminator;
+
     @POST
     @Path(TOURNAMENT_STATE)
     @Consumes(APPLICATION_JSON)
@@ -392,7 +395,7 @@ public class TournamentResource {
         log.info("Uid {} sets status {} for tid {}", uid,
                 stateUpdate.getState(), stateUpdate.getTid());
         tournamentAccessor.update(stateUpdate.getTid(), response, (tournament, batch) -> {
-            tournamentService.setTournamentState(tournament, stateUpdate.getState(), batch);
+            tournamentTerminator.setTournamentState(tournament, stateUpdate.getState(), batch);
         });
     }
 

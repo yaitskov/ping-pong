@@ -170,6 +170,7 @@ public class TournamentDaoMySql implements TournamentDao {
                 .map(this::mapToDatedDigest);
     }
 
+    @Override
     public void setState(TournamentMemState tournament, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .logBefore(() -> log.info("Switch tournament {} into {} state.",
@@ -459,6 +460,7 @@ public class TournamentDaoMySql implements TournamentDao {
                                         r.get(TOURNAMENT_ADMIN.TYPE)))).execute();
     }
 
+    @Override
     public void setCompleteAt(Tid tid, Optional<Instant> now, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(TOURNAMENT)

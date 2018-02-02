@@ -35,6 +35,7 @@ import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.app.tournament.TournamentState;
+import org.dan.ping.pong.app.tournament.TournamentTerminator;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
@@ -344,11 +345,14 @@ public class MatchEditorService {
                 });
     }
 
+    @Inject
+    private TournamentTerminator tournamentTerminator;
+
     private void reopenTournamentIfClosed(TournamentMemState tournament, DbUpdater batch,
             List<MatchUid> affectedMatches, Optional<Uid> newWinner) {
         if (tournament.getState() == Close) {
             if (!affectedMatches.isEmpty() || !newWinner.isPresent()) {
-                tournamentService.setTournamentState(tournament, Open, batch);
+                tournamentTerminator.setTournamentState(tournament, Open, batch);
             }
         }
     }

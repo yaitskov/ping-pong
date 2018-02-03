@@ -90,26 +90,6 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
     }
 
     @Test
-    public void failedToBeginDueNotEnoughParticipants() {
-        final TournamentScenario scenario = TournamentScenario.begin()
-                .doNotBegin()
-                .rules(RULES_G8Q1_S1A2G11)
-                .name("failBeginNoParticipants")
-                .category(c1, p1);
-
-        simulator.simulate(scenario);
-
-        final Response response = myRest().post(BEGIN_TOURNAMENT,
-                scenario.getTestAdmin().getSession(), scenario.getTid());
-        assertEquals(400, response.getStatus());
-        assertThat(
-                response.readEntity(TemplateError.class),
-                allOf(
-                        hasProperty("message", is(NOT_ENOUGH_PARTICIPANTS)),
-                        hasProperty("params", hasEntry(N, 1))));
-    }
-
-    @Test
     public void failDuePlaceIsBusy() {
         final TournamentScenario scenario1 = TournamentScenario.begin()
                 .doNotBegin()

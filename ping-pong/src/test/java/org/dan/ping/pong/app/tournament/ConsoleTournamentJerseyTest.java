@@ -130,7 +130,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
 
                     console.checkTournament(Open, restState(Play).bid(p4, Expl))
                             .scoreSet(p2, 11, p3, 5)
-                            .checkResult(p2, p3, p4)
+                            .checkResult(p2, p3)
                             .checkTournamentComplete(restState(Expl).bid(p2, Win1).bid(p3, Win2));
                 });
     }
@@ -150,7 +150,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                             .resolveCategories();
 
                     console.checkTournamentComplete(restState(Expl).bid(p2, Win1))
-                            .checkResult(p2, p3);
+                            .checkResult(p2);
                 });
     }
 
@@ -172,7 +172,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
 
                     console.checkTournament(Open, restState(Play).bid(p4, Expl))
                             .scoreSet(p2, 11, p3, 5)
-                            .checkResult(p2, p3, p4)
+                            .checkResult(p2, p3)
                             .checkTournamentComplete(restState(Expl).bid(p2, Win1).bid(p3, Win2));
                 });
     }

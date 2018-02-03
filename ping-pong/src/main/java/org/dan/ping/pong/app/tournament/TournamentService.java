@@ -229,24 +229,17 @@ public class TournamentService {
             tournamentDao.setState(tournament, batch);
             return;
         }
+        readyBids.forEach(bid ->
+                bidService.setBidState(bid, BidState.Wait,
+                        singletonList(bid.getBidState()), batch));
         castingLotsService.seed(tournament, readyBids, batch);
         tournament.setState(TournamentState.Open);
         tournamentDao.setState(tournament, batch);
-        findReadyToStartTournamentBid(tournament).forEach(bid ->
-                bidService.setBidState(bid, BidState.Wait,
-                        singletonList(bid.getBidState()), batch));
     }
 
     public void beginAndSchedule(TournamentMemState tournament, DbUpdater batch) {
         begin(tournament, batch);
         scheduleService.beginTournament(tournament, batch, clocker.get());
-    }
-
-    private List<ParticipantMemState> findReadyToStartTournamentBid(TournamentMemState tournament) {
-        return tournament.getParticipants().values()
-                .stream()
-                .filter(bid -> bid.getBidState() == Here)
-                .collect(toList());
     }
 
     @Inject

@@ -25,6 +25,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
@@ -165,11 +166,16 @@ public class ImperativeSimulator {
             case Canceled:
             case Close:
             case Replaced:
-                assertThat(openMatchForJudgeList,
-                        allOf(
-                                hasProperty("progress",
-                                        hasProperty("leftMatches", is(0L))),
-                                hasProperty("matches", empty())));
+                if (scenario.getConsoleTid().isPresent()) {
+                    assertThat(openMatchForJudgeList,
+                            hasProperty("matches", not(hasItem(hasProperty("tid", is(scenario.getTid()))))));
+                } else {
+                    assertThat(openMatchForJudgeList,
+                            allOf(
+                                    hasProperty("progress",
+                                            hasProperty("leftMatches", is(0L))),
+                                    hasProperty("matches", empty())));
+                }
                 break;
             case Open:
                 assertThat(openMatchForJudgeList,

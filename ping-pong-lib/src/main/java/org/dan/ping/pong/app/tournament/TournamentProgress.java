@@ -16,4 +16,11 @@ import lombok.ToString;
 public class TournamentProgress {
     private long totalMatches;
     private long leftMatches;
+
+    public TournamentProgress merge(TournamentProgress progress) {
+        return TournamentProgress.builder()
+                .totalMatches(totalMatches + progress.getTotalMatches())
+                .leftMatches(leftMatches + progress.getLeftMatches())
+                .build();
+    }
 }

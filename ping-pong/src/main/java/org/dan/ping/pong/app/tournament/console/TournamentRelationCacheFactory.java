@@ -6,13 +6,11 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
 import org.dan.ping.pong.app.tournament.RelatedTids;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.tournament.TournamentCache;
 import org.springframework.context.annotation.Bean;
 
 import javax.inject.Inject;
 
 public class TournamentRelationCacheFactory {
-
     @Inject
     private TournamentRelationCacheLoader loader;
 

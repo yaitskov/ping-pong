@@ -83,7 +83,7 @@ public class MatchResource {
             @PathParam(TID) Tid tid) {
         final Uid uid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.read(tid, response,
-                tournament -> matchService.findPendingMatches(tournament, uid));
+                tournament -> matchService.findPendingMatchesIncludeConsole(tournament, uid));
     }
 
     @GET
@@ -94,7 +94,7 @@ public class MatchResource {
             @PathParam(TID) Tid tid,
             @PathParam(UID) Uid uid) {
         tournamentAccessor.read(tid, response,
-                tournament -> matchService.findPendingMatches(tournament, uid));
+                tournament -> matchService.findPendingMatchesIncludeConsole(tournament, uid));
     }
 
     @GET
@@ -209,7 +209,7 @@ public class MatchResource {
     public void findOpenMatchesForJudge(
             @PathParam(TID) Tid tid,
             @Suspended AsyncResponse response) {
-        tournamentAccessor.read(tid, response, matchService::findOpenMatchesForJudgeList);
+        tournamentAccessor.read(tid, response, matchService::findOpenMatchesFurJudgeIncludingConsole);
     }
 
     @GET

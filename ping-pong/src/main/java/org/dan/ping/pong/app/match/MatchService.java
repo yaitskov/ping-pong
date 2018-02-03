@@ -3,7 +3,6 @@ package org.dan.ping.pong.app.match;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -29,6 +28,7 @@ import static org.dan.ping.pong.app.place.ArenaDistributionPolicy.NO;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.app.tournament.SetScoreResultName.MatchContinues;
+import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.app.user.UserRole.Admin;
 import static org.dan.ping.pong.app.user.UserRole.Participant;
 import static org.dan.ping.pong.app.user.UserRole.Spectator;
@@ -36,7 +36,9 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
@@ -54,7 +56,10 @@ import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
+import org.dan.ping.pong.app.tournament.RelatedTids;
 import org.dan.ping.pong.app.tournament.SetScoreResultName;
+import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.TournamentCache;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentProgress;
 import org.dan.ping.pong.app.tournament.TournamentService;
@@ -68,7 +73,6 @@ import org.dan.ping.pong.util.time.Clocker;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -663,6 +667,31 @@ public class MatchService {
                         .collect(toList()));
     }
 
+    @Inject
+    @Named(TOURNAMENT_RELATION_CACHE)
+    private LoadingCache<Tid, RelatedTids> relatedTidCache;
+
+    @Inject
+    private TournamentCache tournamentCache;
+
+    @SneakyThrows
+    public MyPendingMatchList findPendingMatchesIncludeConsole(
+            TournamentMemState tournament, Uid uid) {
+        final MyPendingMatchList masterResult = findPendingMatches(tournament, uid);
+        if (!masterResult.getMatches().isEmpty() || !tournament.getRule().consoleP()) {
+            return masterResult;
+        }
+        final RelatedTids relatedTids = relatedTidCache.get(tournament.getTid());
+        return relatedTids.getChild()
+                .map(tournamentCache::load)
+                .map(consoleTournament ->
+                        consoleTournament.getBid(uid) == null
+                                ? masterResult
+                                : findPendingMatches(consoleTournament, uid))
+                .orElseThrow(() -> internalError("Tournament " + tournament.getTid()
+                        + " has no console tournament"));
+    }
+
     public MyPendingMatchList findPendingMatches(
             TournamentMemState tournament, Uid uid) {
         return scheduleService.withPlaceTables(tournament, tablesDiscovery ->
@@ -673,22 +702,20 @@ public class MatchService {
                                         .map(PlaceRules::getArenaDistribution).orElse(NO) == NO
                                         ? noTablesParticipantMatchComparator(tournament, uid)
                                         : PARTICIPANT_MATCH_COMPARATOR)
-                                .map(m -> {
-                                    return MyPendingMatch.builder()
-                                            .mid(m.getMid())
-                                            .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
-                                            .state(m.getState())
-                                            .playedSets(m.getPlayedSets())
-                                            .tid(tournament.getTid())
-                                            .matchType(m.getType())
-                                            .sport(tournament.getRule().getMatch().toMyPendingMatchSport())
-                                            .enemy(m.getOpponentUid(uid).map(ouid ->
-                                                    ofNullable(tournament.getBid(ouid))
-                                                            .orElseThrow(() -> internalError("no opponent for "
-                                                                    + uid + " in " + m)))
-                                                    .map(ParticipantMemState::toLink))
-                                            .build();
-                                })
+                                .map(m -> MyPendingMatch.builder()
+                                        .mid(m.getMid())
+                                        .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
+                                        .state(m.getState())
+                                        .playedSets(m.getPlayedSets())
+                                        .tid(tournament.getTid())
+                                        .matchType(m.getType())
+                                        .sport(tournament.getRule().getMatch().toMyPendingMatchSport())
+                                        .enemy(m.getOpponentUid(uid).map(ouid ->
+                                                ofNullable(tournament.getBid(ouid))
+                                                        .orElseThrow(() -> internalError("no opponent for "
+                                                                + uid + " in " + m)))
+                                                .map(ParticipantMemState::toLink))
+                                        .build())
                                 .collect(toList()))
                         .showTables(tournament.getRule().getPlace().map(PlaceRules::getArenaDistribution)
                                 .orElse(NO) != NO)
@@ -723,6 +750,21 @@ public class MatchService {
                 .filter(m -> m.getState() == Game)
                 .map(m -> getMatchForJudge(tournament, m, tablesDiscovery))
                 .collect(toList())));
+    }
+
+    @SneakyThrows
+    public OpenMatchForJudgeList findOpenMatchesFurJudgeIncludingConsole(TournamentMemState tournament) {
+        final OpenMatchForJudgeList masterResult = findOpenMatchesForJudgeList(tournament);
+        if (!tournament.getRule().consoleP()) {
+            return masterResult;
+        }
+        final RelatedTids relatedTids = relatedTidCache.get(tournament.getTid());
+        final OpenMatchForJudgeList consoleResult = relatedTids.getChild()
+                .map(tournamentCache::load)
+                .map(this::findOpenMatchesForJudgeList)
+                .orElseThrow(() -> internalError("Tournament " + tournament.getTid()
+                        + " has no console tournament"));
+        return masterResult.merge(consoleResult);
     }
 
     public OpenMatchForJudgeList findOpenMatchesForJudgeList(TournamentMemState tournament) {

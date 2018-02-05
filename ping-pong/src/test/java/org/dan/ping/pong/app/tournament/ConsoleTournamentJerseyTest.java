@@ -7,6 +7,7 @@ import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchResource.BID_PENDING_MATCHES;
@@ -225,6 +226,28 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                                     hasProperty("participants", hasItems(
                                             hasProperty("uid", is(scenario.player2Uid(p2))),
                                             hasProperty("uid", is(scenario.player2Uid(p3)))))))));
+                });
+    }
+
+    @Test
+    public void masterTour2Groups() {
+        final TournamentScenario scenario = begin().name("masterTour2Groups")
+                .rules(RULES_G2Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4);
+        isf.create(scenario)
+                .run(c -> {
+                    final ImperativeSimulator console = c.beginTournament()
+                            .createConsoleTournament()
+                            .scoreSet(p1, 11, p2, 3)
+                            .scoreSet(p3, 11, p4, 7)
+                            .scoreSet(p1, 11, p3, 4)
+                            .checkTournamentComplete(restState(Lost).bid(p3, Win2).bid(p1, Win1))
+                            .resolveCategories();
+
+                    console.checkTournament(Open, restState(Play))
+                            .scoreSet(p2, 11, p4, 6)
+                            .checkResult(p2, p4)
+                            .checkTournamentComplete(restState(Lost).bid(p2, Win1).bid(p4, Win2));
                 });
     }
 }

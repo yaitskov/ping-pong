@@ -1,6 +1,5 @@
 package org.dan.ping.pong.app.group;
 
-import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BalancedMix;
 import static org.dan.ping.pong.app.group.ConsoleTournament.NO;
 import static org.dan.ping.pong.app.group.DisambiguationPolicy.CMP_WIN_AND_LOSE;
 
@@ -11,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Wither;
-import org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy;
 
 import java.util.Optional;
 
@@ -35,7 +33,6 @@ public class GroupRules {
     public static class GroupRulesBuilder {
         DisambiguationPolicy disambiguation = CMP_WIN_AND_LOSE;
         Optional<GroupSchedule> schedule = Optional.empty();
-        GroupSplitPolicy splitPolicy = BalancedMix;
         ConsoleTournament console = NO;
     }
 }

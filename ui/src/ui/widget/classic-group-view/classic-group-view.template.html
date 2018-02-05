@@ -12,11 +12,11 @@
                 {{ $index + 1 }} {{participant.name | initials}}
             </a>
         </td>
-        <td ng-show="$ctrl.showBalance" title="set balance" class="text-center">
+        <td ng-show="$ctrl.showBalance" title="set balance" class="text-center cloud-sport-font">
             <span>⚖</span>
             <span>⚔</span>
         </td>
-        <td ng-show="$ctrl.showBalance" title="ball balance" class="text-center">
+        <td ng-show="$ctrl.showBalance" title="ball balance" class="text-center cloud-sport-font">
             <span>⚖</span>
             <span>⚪/⚫</span>
         </td>
@@ -29,7 +29,7 @@
         <td>
             <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}"
                ng-class="{'text-success': participant.finishPosition < $ctrl.quitsGroup, 'text-danger': participant.state == 'Expl'}">
-                <span ng-show="participant.state == 'Expl'">
+                <span ng-show="participant.state == 'Expl'"  class="cloud-sport-font">
                     ☠
                 </span>
                 {{participant.name}}
@@ -76,11 +76,11 @@
                     </span>
                     <span ng-show="participant.matches[p2.uid].state == 'WalkOver'" class="text-danger"
                           title="participant walked over the match">
-                        <span class="walk-over">⚐</span>
+                        <span class="walk-over cloud-sport-font">⚐</span>
                     </span>
                     <span ng-show="participant.matches[p2.uid].state == 'WalkWiner'" class="text-success"
                           title="enemy walked over the match">
-                        <span class="win-over">☺</span>
+                        <span class="win-over cloud-sport-font">☺</span>
                     </span>
                 </a>
             </span>
@@ -137,7 +137,7 @@
         </td>
         <td class="text-center">
             {{participant.punkts}}
-            <div class="dice-set text-warning" ng-show="participant.dice"
+            <div class="dice-set text-warning cloud-sport-font" ng-show="participant.dice"
                  title="{{ 'dice-comment' | translate }}">
                 <div class="dice">
                     ⚂

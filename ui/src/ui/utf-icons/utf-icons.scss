@@ -1,0 +1,41 @@
+/**
+   special utf symbols
+   symbol  meaning
+   ⚔  + tournament
+   ⚖  + scale
+   ⚪  - won balls
+   ⚫  - lost balls
+   ⚂   + random
+   ⚄   +
+   ☠   + expel
+   𝄞   + pause
+   ☺   + enemy walked over
+   ⚐   + match walk over
+   🎾  - tennis  u1f3be
+   🏓   - ping -pong u1f3d3
+   🥇    -  u1f947
+   🥈
+   🥉
+   🎫
+   🏆   - trophy  u1f3c6
+   🏅    -  medal  u1f3c5
+   🎲   -  game die  u1f3b2
+   🏁
+*/
+@font-face {
+  font-family: 'Cloud Sport Icons';
+  src: url('cloud-sport-icons.woff') format('woff');
+}
+
+.cloud-sport-font {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Cloud Sport Icons';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

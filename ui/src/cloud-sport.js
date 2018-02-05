@@ -21,6 +21,7 @@ import 'bootstrap/dist/js/bootstrap.js';
 import 'clockpicker/dist/bootstrap-clockpicker.js';
 import 'bootstrap-toggle/js/bootstrap-toggle.js';
 
+import './ui/utf-icons/utf-icons.scss';
 import './app.module.js';
 import './app.config.js';
 

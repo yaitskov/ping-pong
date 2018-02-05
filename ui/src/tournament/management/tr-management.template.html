@@ -6,6 +6,12 @@
       <a class="btn btn-default" title="back" back-button>
         <span class="glyphicon glyphicon-circle-arrow-left"></span>
       </a>
+      <a class="btn btn-default"
+         ng-show="$ctrl.tournament.masterTid"
+         href="#!/my/tournament/{{$ctrl.tournament.masterTid}}"
+         title="{{ 'master-tournament-hint' | translate }}">
+        <span class="glyphicon cloud-sport-font">√</span>
+      </a>
       <a class="btn btn-success"
          ng-click="$ctrl.open()"
          ng-show="$ctrl.isDrafting()"
@@ -76,6 +82,12 @@
          href="#!/tournament/copy/{{$ctrl.tournament.tid}}"
          title="{{ 'copy-tournament-hint' | translate }}">
         <span class="glyphicon glyphicon-duplicate"></span>
+      </a>
+      <a class="btn btn-default"
+         ng-show="$ctrl.tournament.consoleTid"
+         href="#!/my/tournament/{{$ctrl.tournament.consoleTid}}"
+         title="{{ 'console-tournament-hint' | translate }}">
+        <span class="glyphicon cloud-sport-font">😭</span>
       </a>
     </div>
   </div>

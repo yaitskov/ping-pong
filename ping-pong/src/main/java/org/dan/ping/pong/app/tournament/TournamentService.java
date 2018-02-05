@@ -276,7 +276,9 @@ public class TournamentService {
                         .build());
     }
 
+    @SneakyThrows
     public MyTournamentInfo getMyTournamentInfo(TournamentMemState tournament) {
+        final RelatedTids relatedTids = tournamentRelations.get(tournament.getTid());
         return sequentialExecutor.executeSync(placeCache.load(tournament.getPid()),
                 place -> MyTournamentInfo.builder()
                         .categories(tournament.getCategories().size())
@@ -288,6 +290,8 @@ public class TournamentService {
                         .enlisted(tournament.getParticipants().size())
                         .name(tournament.getName())
                         .tid(tournament.getTid())
+                        .consoleTid(relatedTids.getChild())
+                        .masterTid(relatedTids.getParent())
                         .build());
     }
 

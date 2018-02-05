@@ -29,4 +29,6 @@ public class MyTournamentInfo {
     private int categories;
     private int enlisted;
     private Optional<Tid> previousTid = Optional.empty();
+    private Optional<Tid> consoleTid = Optional.empty();
+    private Optional<Tid> masterTid = Optional.empty();
 }

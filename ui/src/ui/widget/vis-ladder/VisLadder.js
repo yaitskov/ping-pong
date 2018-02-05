@@ -56,16 +56,21 @@ export default class VisLadder {
     }
 
     data(tournament) {
-        let nodes = [];
-        for (let match of tournament.matches) {
-            nodes.push(this.createMatchNode(tournament, match));
+        const nodes = [];
+        if (!tournament.matches || !tournament.matches.length) {
+            nodes.push({id: 'message',
+                        level: 1,
+                        label: 'No matches in PlayOff',
+                        shape: 'box'});
+        } else {
+            for (let match of tournament.matches) {
+                nodes.push(this.createMatchNode(tournament, match));
+            }
         }
-        let edges = [];
-        if (tournament.transitions) {
-           for (let edge of tournament.transitions) {
-               edge.arrow = 'to';
-               edges.push(edge);
-           }
+        const edges = [];
+        for (let edge of tournament.transitions || []) {
+            edge.arrow = 'to';
+            edges.push(edge);
         }
         return {
             nodes: new vis.DataSet(nodes),

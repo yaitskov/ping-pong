@@ -6,21 +6,21 @@ angular.
     component('trParametersEditor', {
         templateUrl: template,
         controller: ['mainMenu', '$scope', 'Tournament', 'requestStatus',
-                     '$routeParams', '$rootScope', 'binder',
+                     '$routeParams', '$rootScope', 'binder', '$q',
                      function (mainMenu, $scope, Tournament, requestStatus,
-                               $routeParams, $rootScope, binder) {
+                               $routeParams, $rootScope, binder, $q) {
                          var self = this;
                          binder($scope, {
                              'event.main.menu.ready': (e) => mainMenu.setTitle('Tournament Modification'),
-                             'event.tournament.rules.update': function (event, rules) {
+                             'event.tournament.rules.update': (e, rules) => {
                                  requestStatus.startLoading('Saving changes');
                                  Tournament.updateParams(
                                      {tid: $routeParams.tournamentId, rules: rules},
-                                     function (ok) {
+                                     (ok) => {
                                          requestStatus.complete();
                                          history.back();
                                      },
-                                     function (resp) {
+                                     (resp) => {
                                          if (resp.data && resp.data.field2Errors) {
                                              $rootScope.$broadcast('event.tournament.rules.errors',
                                                                    resp.data.field2Errors);
@@ -39,7 +39,7 @@ angular.
                                              requestStatus.complete();
                                              $rootScope.$broadcast('event.tournament.rules.set',
                                                                    Object.assign({}, responses[1].toJSON(),
-                                                                                 {rules: response[0].toJSON()}));
+                                                                                 {rules: responses[0].toJSON()}));
                                          },
                                          requestStatus.failed);
                              }

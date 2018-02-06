@@ -30,7 +30,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -71,6 +70,7 @@ public class TournamentResource {
     public static final String TOURNAMENT_COMPLETE = "/tournament/complete/";
     public static final String TOURNAMENT_PLAY_OFF_MATCHES = "/tournament/play-off-matches/";
     public static final String TOURNAMENT_CONSOLE_CREATE = "/tournament/console/create";
+    public static final String TOURNAMENT_FOLLOWING = "/tournament/following/";
 
     @Inject
     private TournamentService tournamentService;
@@ -442,5 +442,11 @@ public class TournamentResource {
             @PathParam(CID) int cid) {
         tournamentAccessor.read(tid, response,
                 (tournament) -> tournamentService.playOffMatches(tournament, cid));
+    }
+
+    @GET
+    @Path(TOURNAMENT_FOLLOWING + TID_JP)
+    public List<TournamentDigest> following(@Valid @PathParam(TID) Tid tid) {
+        return tournamentService.findFollowingFrom(tid);
     }
 }

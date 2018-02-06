@@ -17,6 +17,12 @@ angular.
                                        cache: false,
                                        isArray: true
                                    },
+                                   following: {
+                                       url: '/api/tournament/following/:tournamentId',
+                                       method: 'GET',
+                                       cache: false,
+                                       isArray: true
+                                   },
                                    administered: {
                                        url: '/api/tournament/editable/by/me/:completeInDays',
                                        method: 'GET',

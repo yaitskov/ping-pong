@@ -3,11 +3,13 @@ package org.dan.ping.pong.app.tournament;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.DRAFTING;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_COPY;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_FOLLOWING;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.mock.Generators.genStr;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
@@ -25,9 +27,11 @@ import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.GenericType;
 
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = JerseyWithSimulator.class)
@@ -73,5 +77,14 @@ public class TournamentCopyJerseyTest extends AbstractSpringJerseyTest {
         scenario.getCategoryDbId().keySet().forEach(cid -> assertThat(
                 tinfo.getCategories(), hasItem(
                         hasProperty("name", containsString(cid.toString())))));
+
+
+        final List<TournamentDigest> following = myRest()
+                .get(TOURNAMENT_FOLLOWING + scenario.getTid().getTid(),
+                        new GenericType<List<TournamentDigest>>(){});
+
+        assertThat(following, hasItem(allOf(
+                hasProperty("tid", is(copyTid)),
+                hasProperty("name", is(newName)))));
     }
 }

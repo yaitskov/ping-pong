@@ -120,6 +120,9 @@ angular.module('pingPong').
                     when('/my/tournament/:tournamentId/change-group/:participantId', {
                         template: '<tr-group-member-switcher/>'
                     }).
+                    when('/subsequent/tournaments/:tournamentId', {
+                        template: '<sequel-tournament-list/>'
+                    }).
                     when('/my/matches/judgement/:tournamentId', {
                         template: '<judge-match-list-to-judge/>'
                     }).

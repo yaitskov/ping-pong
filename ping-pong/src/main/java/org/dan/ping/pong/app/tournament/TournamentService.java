@@ -585,4 +585,8 @@ public class TournamentService {
 
         return consoleTid;
     }
+
+    public List<TournamentDigest> findFollowingFrom(Tid tid) {
+        return tournamentDao.findFollowingFrom(tid);
+    }
 }

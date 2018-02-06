@@ -34,6 +34,7 @@ import './watch/watch-tournament.component.js';
 import './rules/tournament-rules.component.js';
 import './list/watch/watch-tournament-list.component.js';
 import './list/manage/manage-tr-list.component.js';
+import './list/sequel/sequel-tr-list.component.js';
 import './new/copy-tournament.component.js';
 import './new/new-tournament.component.js';
 import './management/tr-properties-editor.component.js';

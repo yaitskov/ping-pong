@@ -4,13 +4,6 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
-import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.Console;
-import static org.dan.ping.pong.jooq.Tables.BID;
-import static org.dan.ping.pong.jooq.Tables.CATEGORY;
-import static org.dan.ping.pong.jooq.Tables.MATCHES;
-import static org.dan.ping.pong.jooq.Tables.PLACE;
-import static org.dan.ping.pong.jooq.Tables.TOURNAMENT;
-import static org.dan.ping.pong.jooq.Tables.TOURNAMENT_ADMIN;
 import static org.dan.ping.pong.app.bid.BidDao.TERMINAL_BID_STATES;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
@@ -27,6 +20,13 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.app.tournament.TournamentState.Replaced;
 import static org.dan.ping.pong.app.tournament.TournamentType.Classic;
+import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.Console;
+import static org.dan.ping.pong.jooq.Tables.BID;
+import static org.dan.ping.pong.jooq.Tables.CATEGORY;
+import static org.dan.ping.pong.jooq.Tables.MATCHES;
+import static org.dan.ping.pong.jooq.Tables.PLACE;
+import static org.dan.ping.pong.jooq.Tables.TOURNAMENT;
+import static org.dan.ping.pong.jooq.Tables.TOURNAMENT_ADMIN;
 import static org.dan.ping.pong.jooq.Tables.TOURNAMENT_RELATION;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
@@ -99,7 +99,7 @@ public class TournamentDaoMySql implements TournamentDao {
                 .values(hidden,
                         newTournament.getOpensAt(),
                         newTournament.getPlaceId(),
-                        newTournament.getPreviousTid().map(Tid::getTid),
+                        newTournament.getPreviousTid().orElse(null),
                         newTournament.getRules(),
                         newTournament.getTicketPrice(),
                         newTournament.getName(),
@@ -223,7 +223,7 @@ public class TournamentDaoMySql implements TournamentDao {
                         .state(r.get(TOURNAMENT.STATE))
                         .price(r.get(TOURNAMENT.TICKET_PRICE))
                         .opensAt(r.get(TOURNAMENT.OPENS_AT))
-                        .previousTid(r.get(TOURNAMENT.PREVIOUS_TID).map(Tid::new))
+                        .previousTid(ofNullable(r.get(TOURNAMENT.PREVIOUS_TID)))
                         .build());
     }
 
@@ -520,7 +520,7 @@ public class TournamentDaoMySql implements TournamentDao {
                         .state(r.get(TOURNAMENT.STATE))
                         .rules(r.get(TOURNAMENT.RULES))
                         .ticketPrice(r.get(TOURNAMENT.TICKET_PRICE))
-                        .previousTid(r.get(TOURNAMENT.PREVIOUS_TID).map(Tid::new))
+                        .previousTid(ofNullable(r.get(TOURNAMENT.PREVIOUS_TID)))
                         .tid(tid)
                         .build());
     }
@@ -532,5 +532,22 @@ public class TournamentDaoMySql implements TournamentDao {
                 TOURNAMENT_RELATION.CHILD_TID)
                 .values(TournamentRelationType.Console, tid, consoleTid)
                 .execute();
+    }
+
+    @Transactional(transactionManager = TRANSACTION_MANAGER)
+    public List<TournamentDigest> findFollowingFrom(Tid tid) {
+        return jooq
+                .select(TOURNAMENT.TID, TOURNAMENT.STATE,
+                        TOURNAMENT.OPENS_AT, TOURNAMENT.NAME)
+                .from(TOURNAMENT)
+                .where(TOURNAMENT.PREVIOUS_TID.eq(tid))
+                .fetch()
+                .map(r -> TournamentDigest
+                        .builder()
+                        .name(r.get(TOURNAMENT.NAME))
+                        .tid(r.get(TOURNAMENT.TID))
+                        .opensAt(r.get(TOURNAMENT.OPENS_AT))
+                        .state(r.get(TOURNAMENT.STATE))
+                        .build());
     }
 }

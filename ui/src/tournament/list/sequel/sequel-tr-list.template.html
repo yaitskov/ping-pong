@@ -1,0 +1,29 @@
+<main-menu></main-menu>
+<div class="container" ng-show="$ctrl.tournaments.length == 0">
+  <div class="alert alert-info" translate="no-following-tournaments"/>
+</div>
+
+<div class="container-fluid list judge">
+  <request-status></request-status>
+  <div ng-repeat="tournament in $ctrl.tournaments"
+       clickable="/my/tournament/{{tournament.tid}}"
+       ng-class="{'complete': tournament.state == 'Close'}"
+       class="list-item tournament clearfix">
+    <div class="name pull-left">
+      <a href="#!/my/tournament/{{tournament.tid}}">
+        {{tournament.name}}
+      </a>
+    </div>
+    <div class="datetime pull-right">
+      <span class="time" ng-show="tournament.state != 'Close'">
+        {{tournament.opensAt|weekSmartMinute}}
+      </span>
+      <span class="date" ng-show="tournament.state != 'Close'">
+        {{tournament.opensAt|shortDate}}
+      </span>
+      <span ng-show="tournament.state == 'Close'">
+        {{ 'complete status' | translate }}
+      </span>
+    </div>
+  </div>
+</div>

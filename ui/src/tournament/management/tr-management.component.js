@@ -51,10 +51,12 @@ angular.
                                      requestStatus.failed);
                              }
                          });
-                         this.canBeginDrafting = function () {
-                             return self.tournament && (self.tournament.state == 'Hidden'
-                                                        || self.tournament.state == 'Announce');
-                         };
+                         this.haveFollowingTournaments = () => self.tournament &&
+                             (self.tournament.state == 'Close' ||
+                              self.tournament.state == 'Canceled') && !self.tournament.masterTid;
+                         this.canBeginDrafting = () => self.tournament &&
+                              (self.tournament.state == 'Hidden' ||
+                               self.tournament.state == 'Announce');
                          this.isDrafting = function () {
                              return self.tournament && self.tournament.state == 'Draft';
                          };

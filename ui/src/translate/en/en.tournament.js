@@ -10,5 +10,9 @@ module.exports = {
     'tournament not found': 'Tournament {{tid}} does not exist',
 
     'console-tournament-hint': 'Console tournament',
-    'master-tournament-hint': 'Main tournament'
+    'master-tournament-hint': 'Main tournament',
+
+    'List of consequent tournaments in the seria': 'List of consequent tournaments in the seria',
+    'Following Tournaments': 'Following Tournaments',
+    'no-following-tournaments': 'No following tournaments'
 };

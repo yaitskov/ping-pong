@@ -739,7 +739,7 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
-                                    <name>OptionalInteger</name>
+                                    <name>Tid</name>
                                     <expression>.*tournament\.(previous_tid)</expression>
                                     <types>.*</types>
                                 </forcedType>

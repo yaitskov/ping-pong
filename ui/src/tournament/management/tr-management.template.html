@@ -80,6 +80,7 @@
       </a>
       <a class="btn btn-primary"
          href="#!/tournament/copy/{{$ctrl.tournament.tid}}"
+         ng-show="!$ctrl.tournament.masterTid"
          title="{{ 'copy-tournament-hint' | translate }}">
         <span class="glyphicon glyphicon-duplicate"></span>
       </a>
@@ -88,6 +89,12 @@
          href="#!/my/tournament/{{$ctrl.tournament.consoleTid}}"
          title="{{ 'console-tournament-hint' | translate }}">
         <span class="glyphicon cloud-sport-font">😭</span>
+      </a>
+      <a class="btn btn-default"
+         title="{{ 'List of consequent tournaments in the seria' | translate }}"
+         href="#!/subsequent/tournaments/{{$ctrl.tournament.tid}}"
+         ng-show="$ctrl.haveFollowingTournaments()">
+        <span class="glyphicon glyphicon-step-forward"></span>
       </a>
     </div>
   </div>

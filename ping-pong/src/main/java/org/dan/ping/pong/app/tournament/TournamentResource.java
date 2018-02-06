@@ -108,7 +108,7 @@ public class TournamentResource {
     public void createConsole(
             @HeaderParam(SESSION) String session,
             @Suspended AsyncResponse response,
-            Tid parentId) {
+            @TidBodyRequired @Valid Tid parentId) {
         final UserInfo user = authService.userInfoBySession(session);
         tournamentAccessor.update(parentId, response, (tournament, batch) -> {
             tournament.checkAdmin(user.getUid());

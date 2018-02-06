@@ -5,6 +5,7 @@ import './match/set/score/base-score-set.component.js';
 import './match/set/score/score-set.component.js';
 
 import './tournament.module.js';
+import './parameters/console-tr-params.component.js';
 import './parameters/param.form.component.js';
 import './new/new-tr-param.component.js';
 import './participant/participant.import.js';

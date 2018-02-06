@@ -66,7 +66,7 @@ angular.
                                  window.history.back();
                              },
                              'event.tournament.rules.ready': (event) => $rootScope.$broadcast('event.tournament.rules.set',
-                                                               self.tournament.rules),
+                                                               self.tournament),
                          });
                      }
                     ]});

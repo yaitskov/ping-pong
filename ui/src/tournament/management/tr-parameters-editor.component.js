@@ -28,18 +28,20 @@ angular.
                                          requestStatus.failed(resp);
                                      });
                              },
-                             'event.tournament.rules.cancel': function (event, rules) {
-                                 window.history.back();
-                             },
-                             'event.tournament.rules.ready': function () {
+                             'event.tournament.rules.cancel': window.history.back,
+                             'event.tournament.rules.ready': () => {
                                  requestStatus.startLoading();
-                                 Tournament.parameters(
-                                     {tournamentId: $routeParams.tournamentId},
-                                     function (rules) {
-                                         requestStatus.complete();
-                                         $rootScope.$broadcast('event.tournament.rules.set', rules.toJSON());
-                                     },
-                                     requestStatus.failed);
+                                 const req = {tournamentId: $routeParams.tournamentId};
+                                 $q.all([Tournament.parameters(req).$promise,
+                                         Tournament.aMine(req).$promise]).
+                                     then(
+                                         (responses) => {
+                                             requestStatus.complete();
+                                             $rootScope.$broadcast('event.tournament.rules.set',
+                                                                   Object.assign({}, responses[1].toJSON(),
+                                                                                 {rules: response[0].toJSON()}));
+                                         },
+                                         requestStatus.failed);
                              }
                          });
                      }]});

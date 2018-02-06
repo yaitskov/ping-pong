@@ -10,6 +10,7 @@ angular.
             };
 
             this.failed = function (response, meta) {
+                console.log(`req failed response = [${JSON.stringify(response)}]`);
                 $rootScope.$broadcast('event.request.failed', response, meta);
             };
 

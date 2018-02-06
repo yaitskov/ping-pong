@@ -14,5 +14,7 @@ module.exports = {
 
     'List of consequent tournaments in the seria': 'List of consequent tournaments in the seria',
     'Following Tournaments': 'Following Tournaments',
-    'no-following-tournaments': 'No following tournaments'
+    'no-following-tournaments': 'No following tournaments',
+    'configure-console-tournament': 'Configure console tournament',
+    'creating-console-tournament': 'Creating console tournament'
 };

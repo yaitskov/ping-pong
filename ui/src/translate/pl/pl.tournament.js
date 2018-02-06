@@ -14,5 +14,7 @@ module.exports = {
 
     'List of consequent tournaments in the seria': 'Lista kolejnych turnei w serii',
     'Following Tournaments': 'Kolejnyje Turnei',
-    'no-following-tournaments': 'Nie ma kolejnych turnei'
+    'no-following-tournaments': 'Nie ma kolejnych turnei',
+    'configure-console-tournament': 'Skonfigurować turniej pocieszenia',
+    'creating-console-tournament': 'Tworzenie turnieju pocieszenia'
 };

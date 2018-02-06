@@ -14,7 +14,8 @@ angular.module('pingPongE2e')
         this.onPost = (url, callback) => {
             const requestHandler = $httpBackend.whenPOST(url, (data) => callback(JSON.parse(data)));
             return new function () {
-                this.respondObject = (obj) => requestHandler.respond(JSON.stringify(obj));
+                this.respondObject = (obj) => requestHandler.respond(
+                    200, JSON.stringify(obj), {'Content-Type': 'application/json'});
             };
         };
         this.onPostMatch = (url, matchersF) => {

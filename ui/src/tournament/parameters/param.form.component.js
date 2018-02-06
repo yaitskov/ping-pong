@@ -94,7 +94,8 @@ angular.
                          };
                          binder($scope, {
                              'event.tournament.rules.errors': (event, errors) => self.errors = errors,
-                             'event.tournament.rules.set': (event, rules) => self.onRulesSet(rules)
+                             'event.tournament.rules.set': (event, tournament) => self.onRulesSet(tournament.rules),
+                             'event.tournament.rules.console.ready': (event) => $rootScope.$broadcast('event.tournament.rules.ready')
                          });
                          self.back = function () {
                              $rootScope.$broadcast('event.tournament.rules.back', self.rules);
@@ -102,5 +103,4 @@ angular.
                          self.cancel = function () {
                              $rootScope.$broadcast('event.tournament.rules.cancel', self.rules);
                          };
-                         $rootScope.$broadcast('event.tournament.rules.ready');
                      }]});

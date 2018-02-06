@@ -1,0 +1,26 @@
+<div id="console-tournament-toggler"
+     class="form-group toggle-btn"
+     ng-show="$ctrl.tournament">
+    <label translate="console-tournament-hint"/>
+    <input type="checkbox"
+           data-size="small"
+           ng-model="$ctrl.playConsoleTournament"
+           bs-toggle-on="{{ 'yes-lbl' | translate }}"
+           bs-toggle-off="{{ 'no-lbl' | translate }}"
+           bs-toggle-target="#console-tournament-parameters"
+           bs-toggle/>
+</div>
+<div id="console-tournament-parameters" class="toggle-panel"
+     ng-show="$ctrl.playConsoleTournament">
+    <div class="form-group">
+        <a class="btn btn-default"
+           ng-show="!$ctrl.tournament.consoleTid">
+            <span class="glyphicon glyphicon-refresh spinning-slow"/>
+            <span translate="creating-console-tournament"/>
+        </a>
+        <a class="btn btn-primary"
+           ng-show="$ctrl.tournament.consoleTid"
+           href="#!/my/tournament/parameters/{{$ctrl.tournament.consoleTid}}"
+           translate="configure-console-tournament"/>
+    </div>
+</div>

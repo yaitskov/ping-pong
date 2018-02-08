@@ -2,6 +2,9 @@ import angular from 'angular';
 import 'css/toggle-btn.scss';
 import template from './param.form.template.html';
 
+import './seeding-tr-params.component.js';
+import './console-tr-params.component.js';
+
 const defaultGroupRules = {
     quits: 1,
     groupSize: 8,
@@ -17,8 +20,8 @@ angular.
     module('tournament').
     component('tournamentParametersForm', {
         templateUrl: template,
-        controller: ['$scope', '$routeParams', 'groupSchedule', '$timeout', '$rootScope', 'binder', 'requestStatus',
-                     function ($scope, $routeParams, groupSchedule, $timeout, $rootScope, binder, requestStatus) {
+        controller: ['$scope', '$routeParams', 'groupSchedule', '$timeout', '$rootScope', 'binder', 'requestStatus', 'eBarier',
+                     function ($scope, $routeParams, groupSchedule, $timeout, $rootScope, binder, requestStatus, eBarier) {
                          this.tournamentId = $routeParams.tournamentId;
                          this.groupScheduleErrors = [];
                          this.options = {
@@ -92,10 +95,13 @@ angular.
                              self.groupSchedule = groupSchedule.convertToText(
                                  rules.group.schedule.size2Schedule);
                          };
+                         const allReady = eBarier.create('allReady', ['console', 'seeding'],
+                                                         () => $rootScope.$broadcast('event.tournament.rules.ready'));
                          binder($scope, {
                              'event.tournament.rules.errors': (event, errors) => self.errors = errors,
                              'event.tournament.rules.set': (event, tournament) => self.onRulesSet(tournament.rules),
-                             'event.tournament.rules.console.ready': (event) => $rootScope.$broadcast('event.tournament.rules.ready')
+                             'event.tournament.rules.seeding.ready': (event) => allReady.got('seeding'),
+                             'event.tournament.rules.console.ready': (event) => allReady.got('console')
                          });
                          self.back = function () {
                              $rootScope.$broadcast('event.tournament.rules.back', self.rules);

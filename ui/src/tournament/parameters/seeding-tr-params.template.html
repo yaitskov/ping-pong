@@ -1,0 +1,63 @@
+<div class="form-group toggle-btn">
+    <label translate="seeding-lbl"/>
+    <a class="pull-right arrow"
+       simple-toggler="#seeding-parameters">
+        <span class="glyphicon glyphicon-menu-down"/>
+        <span class="glyphicon glyphicon-menu-up"/>
+    </a>
+</div>
+<div id="seeding-parameters" class="toggle-panel in">
+    <div class="form-group">
+        <label class="toggle-option" translate="rank-policy-lbl"/>
+        <a class="btn btn-default"
+           translate="provided-rating-policy"
+           ng-click="$ctrl.rules.casting.policy = 'ProvidedRating'"
+           ng-class="{'btn-primary': $ctrl.rules.casting.policy == 'ProvidedRating'}"/>
+        <a class="btn btn-default"
+           translate="manual-rating-policy"
+           ng-click="$ctrl.rules.casting.policy = 'Manual'"
+           ng-class="{'btn-primary': $ctrl.rules.casting.policy == 'Manual'}"/>
+        <a class="btn btn-default"
+           translate="sign-up-policy"
+           ng-click="$ctrl.rules.casting.policy = 'SignUp'"
+           ng-class="{'btn-primary': $ctrl.rules.casting.policy == 'SignUp'}"/>
+    </div>
+    <div class="form-group"
+         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.rankName.$dirty) && $ctrl.form.rankName.$invalid}"
+         ng-show="$ctrl.rules.casting.policy == 'ProvidedRating'">
+        <label for="rankName" class="toggle-option" translate="rank-name-lbl"/>
+        <input type="text" class="form-control"
+               ng-model="$ctrl.rules.casting.providedRankOptions.label"
+               ng-maxlength="100"
+               name="rankName"
+               id="rankName"
+               placeholder="{{ 'rank-name-lbl' | translate }}" />
+        <p class="help-block"
+           ng-show="$ctrl.form.rankName.$error.minlength || $ctrl.form.rankName.$error.maxlength">
+            {{ 'rank-name-length' | translate : '{max: 100}' }}
+        </p>
+    </div>
+    <div class="form-group"
+         ng-show="$ctrl.rules.casting.policy == 'ProvidedRating'">
+        <label translate="Minimal allowed rank value"/>
+        <div touch-spin options="$ctrl.options.rank"
+             ng-model="$ctrl.rules.casting.providedRankOptions.minValue"/>
+    </div>
+    <div class="form-group"
+         ng-show="$ctrl.rules.casting.policy == 'ProvidedRating'">
+        <label translate="Maximum allowed rank value"/>
+        <div touch-spin options="$ctrl.options.rank"
+             ng-model="$ctrl.rules.casting.providedRankOptions.maxValue"/>
+    </div>
+    <div class="form-group" ng-show="$ctrl.rules.casting.policy != 'Manual'">
+        <label class="toggle-option" translate="rank-direction-lbl"/>
+        <a class="btn btn-default"
+           translate="decreasing-lbl"
+           ng-click="$ctrl.rules.casting.direction = 'Decrease'"
+           ng-class="{'btn-primary': $ctrl.rules.casting.direction == 'Decrease'}"/>
+        <a class="btn btn-default"
+           translate="increasing-lbl"
+           ng-click="$ctrl.rules.casting.direction = 'Increase'"
+           ng-class="{'btn-primary': $ctrl.rules.casting.direction == 'Increase'}"/>
+    </div>
+</div>

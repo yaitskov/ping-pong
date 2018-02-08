@@ -80,5 +80,22 @@ describe('angularjs', () => {
             expect(() => new C(null, undefined)).toThrow(new Error(
                 "Dependency [A] of class [C] is [null]"));
         });
+
+        it('injectArgs fails due dependency type mismatch', () => {
+            class B {}
+            class A {}
+
+            class C {
+                static get $inject() {
+                    return ['A', 'B'];
+                }
+                constructor() {
+                    injectArgs(this, arguments);
+                }
+            }
+
+            expect(() => new C(new B(), new A())).toThrow(new Error(
+                "Dependency [A] of class [C] is [B]"));
+        });
     });
 });

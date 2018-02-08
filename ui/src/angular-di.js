@@ -9,7 +9,10 @@ export default function injectArgs(obj, constructorArgs) {
         const dependency = constructorArgs[i];
         if (!dependency) {
             throw new Error(`Dependency [${depNames[i]}] of class [${clazz.name}] is [${dependency}]`);
+        } else if (dependency.constructor && dependency.constructor.name != depNames[i]) {
+            throw new Error(`Dependency [${depNames[i]}] of class [${clazz.name}] is [${dependency.constructor.name}]`);
         }
+
         obj[depNames[i]] = dependency;
     }
 }

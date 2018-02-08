@@ -66,5 +66,19 @@ describe('angularjs', () => {
                 "Mismatch between dependencies names"
                     + " and dependencies slots in class: [C]"));
         });
+
+        it('injectArgs fails due dependency is null', () => {
+            class C {
+                static get $inject() {
+                    return ['A', 'B'];
+                }
+                constructor() {
+                    injectArgs(this, arguments);
+                }
+            }
+
+            expect(() => new C(null, undefined)).toThrow(new Error(
+                "Dependency [A] of class [C] is [null]"));
+        });
     });
 });

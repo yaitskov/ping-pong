@@ -6,6 +6,10 @@ export default function injectArgs(obj, constructorArgs) {
                         + ` and dependencies slots in class: [${clazz.name}]`);
     }
     for (let i = 0; i < depNames.length; ++i) {
-        obj[depNames[i]] = constructorArgs[i];
+        const dependency = constructorArgs[i];
+        if (!dependency) {
+            throw new Error(`Dependency [${depNames[i]}] of class [${clazz.name}] is [${dependency}]`);
+        }
+        obj[depNames[i]] = dependency;
     }
 }

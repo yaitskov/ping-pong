@@ -1,16 +1,22 @@
 describe('java script', () => {
     describe('classes', () => {
         describe('method', () => {
+            class Base {
+                get g() { return 'A'; }
+                f() { return 'A'; }
+            }
+
+            class Next extends Base {
+                get g() { return 'N' + super.g; }
+                f() { return 'B' + super.f(); }
+            }
+
             it('call overridden', () => {
-                class Base {
-                    f() { return 'A'; }
-                }
-
-                class Next extends Base {
-                    f() { return 'B' + super.f(); }
-                }
-
                 expect(new Next().f()).toBe('BA');
+            });
+
+            it('call overridden getter', () => {
+                expect(new Next().g).toBe('NA');
             });
         });
         describe('constructor', () => {

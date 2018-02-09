@@ -1,6 +1,6 @@
 import injectArgs from 'angular-di.js';
 
-export default class SeedingTournamentParamsCtrl {
+export default class MatchParamsCtrl {
     static get $inject() {
         return ['$scope', '$rootScope', 'binder'];
     }
@@ -15,6 +15,6 @@ export default class SeedingTournamentParamsCtrl {
         this.binder(this.$scope, {
             'event.tournament.rules.set': (e, t) => this.onTournamentSet(t)
         });
-        this.$rootScope.$broadcast('event.tournament.rules.seeding.ready');
+        this.$rootScope.$broadcast('event.tournament.rules.match.ready');
     }
 }

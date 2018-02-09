@@ -2,64 +2,8 @@
       ng-submit="$ctrl.update()"
       default-button-type
       ng-show="!$ctrl.published">
-  <seedingTrParams/>
-  <div class="form-group toggle-btn">
-    <label>{{ 'match-lbl' | translate }}</label>
-    <a class="pull-right arrow"
-       simple-toggler="#match-parameters">
-      <span class="glyphicon glyphicon-menu-down"></span>
-      <span class="glyphicon glyphicon-menu-up"></span>
-    </a>
-  </div>
-  <div id="match-parameters" class="toggle-panel in">
-    <div class="form-group" ng-show="$ctrl.rules.match['@type'] == 'Tennis'">
-      <label>{{ 'Super tie break games' | translate }}</label>
-      <div touch-spin options="$ctrl.options.sets"
-           ng-model="$ctrl.rules.match.superTieBreakGames"></div>
-      <p class="help-block">
-        {{ 'super-time-break-games-help' | translate }}
-      </p>
-    </div>
-    <div class="form-group">
-      <label>{{ 'Sets to win a match' | translate }}</label>
-      <div touch-spin options="$ctrl.options.sets"
-           ng-model="$ctrl.rules.match.setsToWin"></div>
-      <p class="help-block">
-        {{ 'match-score-help' | translate }}
-      </p>
-    </div>
-    <div class="form-group"
-         ng-class="{'has-error': $ctrl.errors['match-rule.min-games-to-win']}">
-      <label ng-show="$ctrl.rules.match['@type'] == 'Tennis'">
-        {{ 'Min games to win a set' | translate }}
-      </label>
-      <label ng-show="$ctrl.rules.match['@type'] == 'PingPong'">
-        {{ 'Min score to win a set' | translate }}
-      </label>
-      <div touch-spin options="$ctrl.options.score"
-           ng-model="$ctrl.rules.match.minGamesToWin"></div>
-      <p class="help-block" ng-repeat="error in $ctrl.errors['match-rule.min-games-to-win']">
-        {{ error.message | translate : error.params }}
-      </p>
-      <p class="help-block" ng-show="$ctrl.rules.match['@type'] == 'PingPong'">
-        {{ 'min-score-to-win-set-help' | translate }}
-      </p>
-      <p class="help-block" ng-show="$ctrl.rules.match['@type'] == 'Tennis'">
-        {{ 'min-games-to-win-set-help' | translate }}
-      </p>
-    </div>
-    <div class="form-group">
-      <label>{{ 'Min score advance to win a set' | translate }}</label>
-      <div touch-spin options="$ctrl.options.advance"
-           ng-model="$ctrl.rules.match.minAdvanceInGames"></div>
-      <p class="help-block"
-         translate="min-score-advance-help"
-         ng-show="$ctrl.rules.match['@type'] == 'PingPong'"/>
-      <p class="help-block"
-         translate="min-games-advance-help"
-         ng-show="$ctrl.rules.match['@type'] == 'Tennis'"/>
-    </div>
-  </div>
+  <seeding-tr-params/>
+  <match-params/>
   <div class="form-group toggle-btn">
     <label ng-show="$ctrl.rules.match['@type'] == 'Tennis'" translate="tennis-arena-lbl"/>
     <label ng-show="$ctrl.rules.match['@type'] == 'PingPong'" translate="ping-pong-arena-lbl"/>

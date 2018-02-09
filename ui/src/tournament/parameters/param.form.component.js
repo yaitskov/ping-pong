@@ -4,6 +4,7 @@ import template from './param.form.template.html';
 
 import './seeding-tr-params.component.js';
 import './console-tr-params.component.js';
+import './match-params.component.js';
 
 const defaultGroupRules = {
     quits: 1,
@@ -95,12 +96,13 @@ angular.
                              self.groupSchedule = groupSchedule.convertToText(
                                  rules.group.schedule.size2Schedule);
                          };
-                         const allReady = eBarier.create('allReady', ['console', 'seeding'],
+                         const allReady = eBarier.create(['console', 'seeding', 'match'],
                                                          () => $rootScope.$broadcast('event.tournament.rules.ready'));
                          binder($scope, {
                              'event.tournament.rules.errors': (event, errors) => self.errors = errors,
                              'event.tournament.rules.set': (event, tournament) => self.onRulesSet(tournament.rules),
                              'event.tournament.rules.seeding.ready': (event) => allReady.got('seeding'),
+                             'event.tournament.rules.match.ready': (event) => allReady.got('match'),
                              'event.tournament.rules.console.ready': (event) => allReady.got('console')
                          });
                          self.back = function () {

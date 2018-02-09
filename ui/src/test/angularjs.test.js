@@ -1,4 +1,5 @@
 import injectArgs from 'angular-di.js';
+import { setupAngularJs } from 'test/angularjs-test-setup.js';
 
 describe('angularjs', () => {
     describe('injection', () => {
@@ -79,6 +80,55 @@ describe('angularjs', () => {
 
             expect(() => new C(null, undefined)).toThrow(new Error(
                 "Dependency [A] of class [C] is [null]"));
+        });
+    });
+
+    describe('controller', () => {
+        describe('parent-child', () => {
+
+            class ChildCtrl {
+                constructor() {
+                    console.log("child constructor");
+                }
+                $onInit() {
+                    console.log("child onInit");
+                    this.parent.register(this);
+                }
+            }
+
+            class ParentCtrl {
+                constructor() {
+                    console.log("parent constructor");
+                    this.children = [];
+                }
+                $onInit() {
+                    console.log("parent onInit");
+                }
+                register(child) {
+                    console.log(`register  ${child.constructor.name}`);
+                    this.children.push(child);
+                }
+            }
+
+            angular.module('pingPongE2e').
+                component('testChild', {
+                    template: '<p>child</p>',
+                    require: {
+                        parent: '^^testParent'
+                    },
+                    controller: ChildCtrl
+                }).
+                component('testParent', {
+                    template: '<div><test-child/></div>',
+                    controller: ParentCtrl
+                });
+
+            const ctx = setupAngularJs('test-parent');
+
+            it('parent gets reference to child component', () => {
+                console.log("CHECK");
+                expect(ctx.ctrl.children[0].constructor.name).toBe('ChildCtrl');
+            });
         });
     });
 });

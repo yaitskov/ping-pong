@@ -17,6 +17,7 @@ export default class TournamentRulesCtrl {
     update() {
         this.form.$setSubmitted();
         if (this.form.$valid && this.isValid) {
+            console.log('Rules have been updated');
             this.broadcast('event.tournament.rules.update', this.tournament.rules);
         }
     }

@@ -12,7 +12,7 @@ export default class SeedingTournamentParamsCtrl extends BaseTrParamsCtrl {
     watchForPolicy() {
         this.$scope.$watch('$ctrl.rules.casting.policy', (newValue, oldValue) => {
             console.log(`rules.casting.policy: new value ${newValue} old value ${oldValue}`);
-            if (!newValue) {
+            if (!newValue || !oldValue) {
                 return;
             }
             if (newValue == 'ProvidedRating') {

@@ -76,17 +76,30 @@ describe('tournament-parameters-form', () => {
 
     ij('set event', ($rootScope) => {
         $rootScope.$broadcast('event.tournament.rules.set',
-                              {tid: 9, rules: {}});
-        expect(ctx.ctrl.tournamentId).toBe(9);
+                              {tid: 9, rules: defaultTournamentRules('PingPong')});
+        expect(ctx.ctrl.tournament.tid).toBe(9);
     });
 
     ij('default new tr rules pass', ($rootScope) => {
         const tournament = {rules: defaultTournamentRules('PingPong')};
         $rootScope.$broadcast('event.tournament.rules.set', tournament);
         ctx.sync();
+
         const spy = spyOn($rootScope, '$broadcast');
         ctx.element.find('#create-tournament').click();
         expect(spy).toHaveBeenCalledWith('event.tournament.rules.update',
                                          tournament.rules);
+    });
+
+    ij('child component validation works', ($rootScope) => {
+        const tournament = {rules: defaultTournamentRules('PingPong')};
+        const veryLongLabel = ''.padEnd(111, 'x');
+        tournament.rules.casting.providedRankOptions.label = veryLongLabel; // to long
+        $rootScope.$broadcast('event.tournament.rules.set', tournament);
+        ctx.sync();
+
+        const spy = spyOn($rootScope, '$broadcast');
+        ctx.element.find('#create-tournament').click();
+        expect(spy).not.toHaveBeenCalledWith('event.tournament.rules.update', jasmine.any(Object));
     });
 });

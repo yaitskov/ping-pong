@@ -33,9 +33,4 @@ export default class SeedingTournamentParamsCtrl extends BaseTrParamsCtrl {
         this.providedRankOptionsBackup = null;
         this.watchForPolicy();
     }
-
-    onTournamentSet(tournament) {
-        super.onTournamentSet(tournament);
-        this.rules.splitPolicy = 'BalancedMix';
-    }
 }

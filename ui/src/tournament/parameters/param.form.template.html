@@ -9,24 +9,17 @@
   <console-tr-params/>
   <play-off-tr-params/>
   <div class="form-group top-buffer">
-    <div ng-show="$ctrl.tournamentId">
-      <button class="btn btn-primary" type="submit">
-        {{ 'Update btn' | translate }}
-      </button>
-      <a class="btn btn-danger" ng-click="$ctrl.cancel()">
-        {{ 'Cancel btn' | translate }}
-      </a>
-    </div>
-    <div ng-show="!$ctrl.tournamentId">
-      <button class="btn btn-primary" type="submit">
-        {{ 'Create & Open Draft' | translate }}
-      </button>
-      <a class="btn btn-default" ng-click="$ctrl.back()">
-        {{ 'Back btn' | translate }}
-      </a>
-      <a ng-click="$ctrl.cancel()" class="btn btn-danger">
-        {{ 'Cancel btn' | translate }}
-      </a>
+    <div>
+      <button id="create-tournament" class="btn btn-primary"
+              translate="Create & Open Draft"
+              type="submit" ng-show="!$ctrl.tournamentId"/>
+      <button id="update-tournament-rules" class="btn btn-primary"
+              type="submit" translate="Update btn'"/>
+      <a id="back-to-tournament-properties" class="btn btn-default"
+         ng-show="!$ctrl.tournamentId" ng-click="$ctrl.back()"
+         translate="Back btn"/>
+      <a id="discard-rules-changes" ng-click="$ctrl.cancel()"
+         class="btn btn-danger" translate="Cancel btn"/>
     </div>
   </div>
   <div id="form-bottom" class="form-group">

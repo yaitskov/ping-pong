@@ -17,7 +17,7 @@ export default class TournamentRulesCtrl {
     update() {
         this.form.$setSubmitted();
         if (this.form.$valid && this.isValid) {
-            this.broadcast('event.tournament.rules.update', rules);
+            this.broadcast('event.tournament.rules.update', this.rules);
         }
     }
 
@@ -45,11 +45,11 @@ export default class TournamentRulesCtrl {
     }
 
     back() {
-        this.broadcast('event.tournament.rules.back', self.rules);
+        this.broadcast('event.tournament.rules.back', this.rules);
     }
 
     cancel() {
-        this.broadcast('event.tournament.rules.cancel', self.rules);
+        this.broadcast('event.tournament.rules.cancel', this.rules);
     }
 
     broadcast(topic, data) {

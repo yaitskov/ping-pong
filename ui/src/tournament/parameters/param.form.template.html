@@ -12,11 +12,11 @@
     <div>
       <button id="create-tournament" class="btn btn-primary"
               translate="Create & Open Draft"
-              type="submit" ng-show="!$ctrl.tournamentId"/>
+              type="submit" ng-show="!$ctrl.tournament.tid"/>
       <button id="update-tournament-rules" class="btn btn-primary"
-              ng-show="$ctrl.tournamentId" type="submit" translate="Update btn'"/>
+              ng-show="$ctrl.tournament.tid" type="submit" translate="Update btn'"/>
       <a id="back-to-tournament-properties" class="btn btn-default"
-         ng-show="!$ctrl.tournamentId" ng-click="$ctrl.back()"
+         ng-show="!$ctrl.tournament.tid" ng-click="$ctrl.back()"
          translate="Back btn"/>
       <a id="discard-rules-changes" ng-click="$ctrl.cancel()"
          class="btn btn-danger" translate="Cancel btn"/>

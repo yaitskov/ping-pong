@@ -1,7 +1,6 @@
 import angular from 'angular';
 import template from './new-tr-param.template.html';
-import defaultMatchRules from './default-match-rules.js';
-import defaultTournamentRules from './default-tournament-rules.js';
+import defaultTournamentRules from './defaultTournamentRules.js';
 
 angular.
     module('tournament').
@@ -15,9 +14,8 @@ angular.
                                $scope, $rootScope, binder) {
                          var self = this;
                          self.tournament = pageCtx.get('newTournament') || {};
-                         self.tournament.rules = Object.assign({},
-                             defaultTournamentRules,
-                             {match: defaultMatchRules[self.tournament.sport]},
+                         self.tournament.rules = Object.assign(
+                             defaultTournamentRules(self.tournament.sport),
                              self.tournament.rules || {});
                          self.published = self.tournament.tid;
 
@@ -66,7 +64,7 @@ angular.
                                  window.history.back();
                              },
                              'event.tournament.rules.ready': (event) => $rootScope.$broadcast('event.tournament.rules.set',
-                                                               self.tournament),
+                                                                                              self.tournament),
                          });
                      }
                     ]});

@@ -17,7 +17,7 @@ export default class TournamentRulesCtrl {
     update() {
         this.form.$setSubmitted();
         if (this.form.$valid && this.isValid) {
-            this.broadcast('event.tournament.rules.update', this.rules);
+            this.broadcast('event.tournament.rules.update', this.tournament.rules);
         }
     }
 
@@ -30,7 +30,7 @@ export default class TournamentRulesCtrl {
                                           () => this.broadcast('event.tournament.rules.ready'));
         this.binder(this.$scope, {
             'event.tournament.rules.errors': (e, errors) => this.errors = errors,
-            'event.tournament.rules.set': (e, tournament) => this.tournamentId = tournament.tid,
+            'event.tournament.rules.set': (e, tournament) => this.tournament = tournament,
             'event.tournament.rules.seeding.ready': (e) => ready.got('seeding'),
             'event.tournament.rules.match.ready': (e) => ready.got('match'),
             'event.tournament.rules.group.ready': (e) => ready.got('group'),

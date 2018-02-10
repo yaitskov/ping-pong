@@ -3,7 +3,7 @@ export default function injectArgs(obj, constructorArgs) {
     const depNames = clazz.$inject;
     if (depNames.length != constructorArgs.length) {
         throw new Error(`Mismatch between dependencies names`
-                        + ` and dependencies slots in class: [${clazz.name}]`);
+                        + ` and dependencies slots in class: [${clazz.name}] ${depNames.length} != ${constructorArgs.length}`);
     }
     for (let i = 0; i < depNames.length; ++i) {
         const dependency = constructorArgs[i];

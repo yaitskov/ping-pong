@@ -7,5 +7,7 @@ angular.
     module('tournament').
     component('seedingTrParams', {
         templateUrl: template,
+        require: {
+            parent: '^^tournamentParametersForm'
+        },
         controller: SeedingTournamentParamsCtrl});
-

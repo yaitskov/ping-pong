@@ -1,33 +1,12 @@
-'use strict';
+import JsHttpBackend from './JsHttpBackend.js';
 
-angular.module('pingPongE2e', ['pingPong', 'ngMock', 'pingPongE2e.templates']);
+export function defineAppModule(moduleName) {
+    angular.module(moduleName, ['pingPong', 'ngMock', 'pingPongE2e.templates']);
+    angular.module(moduleName).service('jsHttpBackend', JsHttpBackend);
+    return moduleName;
+}
 
-angular.module('pingPongE2e')
-    .service('jsHttpBackend', ['$httpBackend', function ($httpBackend) {
-        const self = this;
-        this.onGet = (url) => {
-            const requestHandler = $httpBackend.whenGET(url);
-            return new function () {
-                this.respondObject = (obj) => requestHandler.respond(JSON.stringify(obj));
-            };
-        };
-        this.onPost = (url, callback) => {
-            const requestHandler = $httpBackend.whenPOST(url, (data) => callback(JSON.parse(data)));
-            return new function () {
-                this.respondObject = (obj) => requestHandler.respond(
-                    200, JSON.stringify(obj), {'Content-Type': 'application/json'});
-            };
-        };
-        this.onPostMatch = (url, matchersF) => {
-            return self.onPost(url, (obj) => {
-                for (let matcherF of matchersF) {
-                    matcherF(expect(obj));
-                }
-                return true;
-            });
-        };
-        this.flush = () => $httpBackend.flush();
-    }]);
+defineAppModule('pingPongE2e');
 
 function camelCase(name, separator) {
     return name.split(separator).map((word, i) => i ? word[0] + word.substr(1) : word).join('');
@@ -55,8 +34,8 @@ class Ctx {
     }
 }
 
-export function setupAngularJs(ctrlElementId, initCb) {
-    beforeEach(angular.mock.module('pingPongE2e'));
+export function setupAngularJs(ctrlElementId, initCb, moduleName) {
+    beforeEach(angular.mock.module(moduleName || 'pingPongE2e'));
 
     const ctx = new Ctx();
 

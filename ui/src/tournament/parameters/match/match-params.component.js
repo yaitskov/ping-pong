@@ -7,4 +7,7 @@ angular.
     module('tournament').
     component('matchParams', {
         templateUrl: template,
+        require: {
+            parent: '^^tournamentParametersForm'
+        },
         controller: MatchParamsCtrl});

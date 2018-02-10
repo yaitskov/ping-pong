@@ -1,5 +1,5 @@
 import injectArgs from 'angular-di.js';
-import { setupAngularJs } from 'test/angularjs-test-setup.js';
+import { setupAngularJs, defineAppModule } from 'test/angularjs-test-setup.js';
 
 describe('angularjs', () => {
     describe('injection', () => {
@@ -65,7 +65,7 @@ describe('angularjs', () => {
 
             expect(() => new C()).toThrow(new Error(
                 "Mismatch between dependencies names"
-                    + " and dependencies slots in class: [C]"));
+                    + " and dependencies slots in class: [C] 2 != 0"));
         });
 
         it('injectArgs fails due dependency is null', () => {
@@ -85,7 +85,6 @@ describe('angularjs', () => {
 
     describe('controller', () => {
         describe('parent-child', () => {
-
             class ChildCtrl {
                 constructor() {
                     console.log("child constructor");
@@ -110,7 +109,8 @@ describe('angularjs', () => {
                 }
             }
 
-            angular.module('pingPongE2e').
+            const ajModule = defineAppModule('angularComponentHierarchyTest'); //';
+            angular.module(ajModule). //).
                 component('testChild', {
                     template: '<p>child</p>',
                     require: {
@@ -123,10 +123,9 @@ describe('angularjs', () => {
                     controller: ParentCtrl
                 });
 
-            const ctx = setupAngularJs('test-parent');
+            const ctx = setupAngularJs('test-parent', null, ajModule);
 
             it('parent gets reference to child component', () => {
-                console.log("CHECK");
                 expect(ctx.ctrl.children[0].constructor.name).toBe('ChildCtrl');
             });
         });

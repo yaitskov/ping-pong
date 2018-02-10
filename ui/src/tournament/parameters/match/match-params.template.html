@@ -9,13 +9,13 @@
 <div id="match-parameters" class="toggle-panel in">
     <div class="form-group" ng-show="$ctrl.rules.match['@type'] == 'Tennis'">
         <label translate="Super tie break games"/>
-        <div touch-spin options="$ctrl.options.sets"
+        <div touch-spin options="$ctrl.sets"
              ng-model="$ctrl.rules.match.superTieBreakGames"></div>
         <p class="help-block" translate="super-time-break-games-help"/>
     </div>
     <div class="form-group">
         <label translate="Sets to win a match"/>
-        <div touch-spin options="$ctrl.options.sets"
+        <div touch-spin options="$ctrl.sets"
              ng-model="$ctrl.rules.match.setsToWin"/>
         <p class="help-block" translate="match-score-help"/>
     </div>
@@ -25,7 +25,7 @@
                translate="Min games to win a set"/>
         <label ng-show="$ctrl.rules.match['@type'] == 'PingPong'"
                translate="Min score to win a set"/>
-        <div touch-spin options="$ctrl.options.score"
+        <div touch-spin options="$ctrl.score"
              ng-model="$ctrl.rules.match.minGamesToWin"/>
         <p class="help-block" ng-repeat="error in $ctrl.errors['match-rule.min-games-to-win']">
             {{ error.message | translate : error.params }}
@@ -37,7 +37,7 @@
     </div>
     <div class="form-group">
         <label translate="Min score advance to win a set"/>
-        <div touch-spin options="$ctrl.options.advance"
+        <div touch-spin options="$ctrl.advance"
              ng-model="$ctrl.rules.match.minAdvanceInGames"/>
         <p class="help-block"
            translate="min-score-advance-help"

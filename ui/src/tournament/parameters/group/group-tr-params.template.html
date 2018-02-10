@@ -1,0 +1,59 @@
+<div class="form-group toggle-btn" id="group-parameters-toggler">
+    <label translate="group-lbl"/>
+    <input type="checkbox"
+           data-size="small"
+           bs-toggler-anchor="group-parameters-toggler"
+           ng-model="$ctrl.useGroup"
+           bs-toggle-on="{{ 'yes-lbl' | translate }}"
+           bs-toggle-off="{{ 'no-lbl' | translate }}"
+           bs-toggle-target="#group-parameters"
+           bs-toggle/>
+</div>
+<div id="group-parameters" class="toggle-panel" ng-show="$ctrl.useGroup">
+    <div class="form-group">
+        <label translate="disambiguation-group-lbl"/>
+        <div>
+            <a class="btn btn-default" translate="CMP_WIN_MINUS_LOSE"
+               ng-click="$ctrl.rules.group.disambiguation = 'CMP_WIN_MINUS_LOSE'"
+               ng-class="{'btn-primary': $ctrl.rules.group.disambiguation == 'CMP_WIN_MINUS_LOSE'}"/>
+            <a class="btn btn-default" translate="CMP_WIN_AND_LOSE"
+               ng-click="$ctrl.rules.group.disambiguation = 'CMP_WIN_AND_LOSE'"
+               ng-class="{'btn-primary': $ctrl.rules.group.disambiguation == 'CMP_WIN_AND_LOSE'}"/>
+        </div>
+        <p class="help-block">
+            {{ ($ctrl.rules.match['@type'] + '-disambiguation-group-help') | translate }}
+        </p>
+    </div>
+    <div class="form-group" ng-show="$ctrl.usePlayOff">
+        <label translate="Quits from a group"/>
+        <div>
+            <a class="btn btn-default"
+               translate="first-best"
+               ng-click="$ctrl.rules.group.quits = 1"
+               ng-class="{'btn-primary': $ctrl.rules.group.quits == 1}"/>
+            <a class="btn btn-default"
+               translate="first-2-best"
+               ng-click="$ctrl.rules.group.quits = 2"
+               ng-class="{'btn-success': $ctrl.rules.group.quits == 2}"/>
+        </div>
+        <p class="help-block" translate="quits-group-help"/>
+    </div>
+    <div class="form-group" ng-show="$ctrl.usePlayOff">
+        <label translate="Max group size"/>
+        <div touch-spin options="$ctrl.maxGroupSize"
+             ng-model="$ctrl.rules.group.groupSize"/>
+        <p class="help-block" translate="max-group-size-help"/>
+    </div>
+    <div class="form-group">
+        <label translate="Match schedule in a group"/>
+        <textarea class="form-control" name="groupSchedule"
+                  rows="3" ng-model="$ctrl.groupScheduleJson"></textarea>
+        <p class="help-block alert-danger" ng-repeat="error in $ctrl.errors['group-rule.schedule']">
+            {{ error.message | translate : $ctrl.formatScheduleError(error.params) }}
+        </p>
+        <p class="help-block alert-danger" ng-repeat="error in $ctrl.groupScheduleErrors">
+            {{ error.message | translate : error.params }}
+        </p>
+        <p class="help-block" translate="group-schedule-help"/>
+    </div>
+</div>

@@ -40,13 +40,13 @@
     <div class="form-group"
          ng-show="$ctrl.rules.casting.policy == 'ProvidedRating'">
         <label translate="Minimal allowed rank value"/>
-        <div touch-spin options="$ctrl.options.rank"
+        <div touch-spin options="$ctrl.rank"
              ng-model="$ctrl.rules.casting.providedRankOptions.minValue"/>
     </div>
     <div class="form-group"
          ng-show="$ctrl.rules.casting.policy == 'ProvidedRating'">
         <label translate="Maximum allowed rank value"/>
-        <div touch-spin options="$ctrl.options.rank"
+        <div touch-spin options="$ctrl.rank"
              ng-model="$ctrl.rules.casting.providedRankOptions.maxValue"/>
     </div>
     <div class="form-group" ng-show="$ctrl.rules.casting.policy != 'Manual'">

@@ -14,7 +14,7 @@
               translate="Create & Open Draft"
               type="submit" ng-show="!$ctrl.tournamentId"/>
       <button id="update-tournament-rules" class="btn btn-primary"
-              type="submit" translate="Update btn'"/>
+              ng-show="$ctrl.tournamentId" type="submit" translate="Update btn'"/>
       <a id="back-to-tournament-properties" class="btn btn-default"
          ng-show="!$ctrl.tournamentId" ng-click="$ctrl.back()"
          translate="Back btn"/>

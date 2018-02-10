@@ -41,4 +41,29 @@ describe('tournament-parameters-form', () => {
             expect(ctx.element.find('#back-to-tournament-properties').hasClass('ng-hide')).toBeFalse();
         });
     });
+
+    describe('existing tournament', () => {
+        ij('update button is not visible', ($rootScope) => {
+            $rootScope.$broadcast('event.tournament.rules.set', {tid: 9, rules: {}});
+            ctx.sync();
+            expect(ctx.element.find('#update-tournament-rules').hasClass('ng-hide')).toBeFalse();
+        });
+
+        ij('create button is visible', ($rootScope) => {
+            $rootScope.$broadcast('event.tournament.rules.set', {tid: 9, rules: {}});
+            ctx.sync();
+            expect(ctx.element.find('#create-tournament').hasClass('ng-hide')).toBeTrue();
+        });
+
+        ij('back button is visible', ($rootScope) => {
+            $rootScope.$broadcast('event.tournament.rules.set', {tid: 9, rules: {}});
+            ctx.sync();
+            expect(ctx.element.find('#back-to-tournament-properties').hasClass('ng-hide')).toBeTrue();
+        });
+    });
+
+    ij('set event', ($rootScope) => {
+        $rootScope.$broadcast('event.tournament.rules.set', {tid: 9, rules: {}});
+        expect(ctx.ctrl.tournamentId).toBe(9);
+    });
 });

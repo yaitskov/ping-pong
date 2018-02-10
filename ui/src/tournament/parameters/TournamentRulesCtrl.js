@@ -24,9 +24,10 @@ export default class TournamentRulesCtrl {
     constructor() {
         injectArgs(this, arguments);
         this.sections = [];
+
         const ready = this.eBarier.create(['console', 'seeding', 'match',
-                                      'group', 'play-off', 'arena'],
-                                     () => this.broadcast('event.tournament.rules.ready'));
+                                           'group', 'play-off', 'arena'],
+                                          () => this.broadcast('event.tournament.rules.ready'));
         this.binder(this.$scope, {
             'event.tournament.rules.errors': (e, errors) => this.errors = errors,
             'event.tournament.rules.set': (e, tournament) => this.tournamentId = tournament.tid,

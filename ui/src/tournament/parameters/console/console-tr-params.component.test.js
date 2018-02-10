@@ -28,6 +28,15 @@ describe('console-tr-params', () => {
         expect(ctx.element.find('#console-tournament-parameters').hasClass('ng-hide')).toBeTrue();
     });
 
+    const tournamentWithoutGroup = () => { return {tid: 1, rules: {}}; };
+
+    ij('toggler component is not visible if tournament has no group', ($rootScope) => {
+        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithoutGroup());
+        ctx.sync();
+        expect(ctx.element.find('#console-tournament-toggler').hasClass('ng-hide')).toBeTrue();
+        expect(ctx.element.find('#console-tournament-parameters').hasClass('ng-hide')).toBeTrue();
+    });
+
     const tournamentWithoutConsole = () => { return {tid: 1, rules: {group: {console: 'NO'}}}; };
 
     ij('component is visible if tournament has groups', ($rootScope) => {

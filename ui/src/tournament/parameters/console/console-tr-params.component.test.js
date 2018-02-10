@@ -18,6 +18,16 @@ describe('console-tr-params', () => {
         expect(ctx.element.find('#console-tournament-parameters').hasClass('ng-hide')).toBeTrue();
     });
 
+    const newTournament = () => { return {rules: {group: {console: 'NO'}}}; };
+
+    ij('component is not visible if new tournament', ($rootScope) => {
+        $rootScope.$broadcast('event.tournament.rules.set', newTournament());
+        ctx.sync();
+
+        expect(ctx.element.find('#console-tournament-toggler').hasClass('ng-hide')).toBeTrue();
+        expect(ctx.element.find('#console-tournament-parameters').hasClass('ng-hide')).toBeTrue();
+    });
+
     const tournamentWithoutConsole = () => { return {tid: 1, rules: {group: {console: 'NO'}}}; };
 
     ij('component is visible if tournament has groups', ($rootScope) => {

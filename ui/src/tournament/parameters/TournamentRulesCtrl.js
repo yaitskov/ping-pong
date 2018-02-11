@@ -1,6 +1,6 @@
-import injectArgs from 'core/angular/di.js';
+import AngularBean from 'core/angular/AngularBean.js';
 
-export default class TournamentRulesCtrl {
+export default class TournamentRulesCtrl extends AngularBean {
     static get $inject() {
         return ['$scope', '$rootScope', 'binder', 'eBarier'];
     }
@@ -23,7 +23,7 @@ export default class TournamentRulesCtrl {
     }
 
     constructor() {
-        injectArgs(this, arguments);
+        super(...arguments);
         this.sections = [];
 
         const ready = this.eBarier.create(['console', 'seeding', 'match',

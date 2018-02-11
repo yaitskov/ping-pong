@@ -1,4 +1,4 @@
-import injectArgs from 'core/angular/di.js';
+import AngularBean from 'core/angular/AngularBean.js';
 import { setupAngularJs, defineAppModule } from 'test/angularjs-test-setup.js';
 
 describe('angularjs', () => {
@@ -34,11 +34,8 @@ describe('angularjs', () => {
         });
 
         it('inject with injectArgs', () => {
-            class DependOn {
+            class DependOn extends AngularBean {
                 static get $inject() { return ['ItIsMe']; }
-                constructor() {
-                    injectArgs(this, arguments);
-                }
                 get itIsHim() {
                     return this.ItIsMe.itIsMe;
                 }
@@ -54,12 +51,9 @@ describe('angularjs', () => {
         });
 
         it('injectArgs fails due number of dependencies mismatch', () => {
-            class C {
+            class C extends AngularBean {
                 static get $inject() {
                     return ['A', 'B'];
-                }
-                constructor() {
-                    injectArgs(this, arguments);
                 }
             }
 
@@ -69,12 +63,9 @@ describe('angularjs', () => {
         });
 
         it('injectArgs fails due dependency is null', () => {
-            class C {
+            class C extends AngularBean {
                 static get $inject() {
                     return ['A', 'B'];
-                }
-                constructor() {
-                    injectArgs(this, arguments);
                 }
             }
 

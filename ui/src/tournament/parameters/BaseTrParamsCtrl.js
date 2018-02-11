@@ -1,6 +1,6 @@
-import injectArgs from 'core/angular/di.js';
+import AngularBean from 'core/angular/AngularBean.js';
 
-export default class BaseTrParamsCtrl {
+export default class BaseTrParamsCtrl extends AngularBean {
     static get $inject() {
         return ['$scope', '$rootScope', 'binder'];
     }
@@ -25,9 +25,5 @@ export default class BaseTrParamsCtrl {
             'event.tournament.rules.set': (e, t) => this.onTournamentSet(t)
         });
         this.$rootScope.$broadcast(this.readyEvent);
-    }
-
-    constructor() {
-        injectArgs(this, arguments);
     }
 }

@@ -5,11 +5,6 @@ export default class ComposableCtrl extends AngularBean {
         return ['$rootScope'];
     }
 
-    get readyEvent() {
-        throw new Error("implement me");
-        // return `event.${this.constructor.name}.ready`;
-    }
-
     get isValid() {
         return true;
     }
@@ -21,7 +16,7 @@ export default class ComposableCtrl extends AngularBean {
     $onInit() {
         this.parent.registerChildCtrl(this);
         this.onInitChild();
-        this.broadcast(this.readyEvent);
+        this.broadcast(this.constructor.readyEvent);
     }
 
     broadcast() {

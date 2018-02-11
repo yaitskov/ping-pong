@@ -1,49 +1,34 @@
-import AngularBean from 'core/angular/AngularBean.js';
+import CompositeCtrl from 'core/angular/CompositeCtrl.js';
 
-export default class TournamentRulesCtrl extends AngularBean {
-    static get $inject() {
-        return ['$scope', '$rootScope', 'binder', 'eBarier'];
-    }
+import SeedingTournamentParamsCtrl from './seeding/SeedingTournamentParamsCtrl.js';
+import PlayOffParamsCtrl from './play-off/PlayOffParamsCtrl.js';
+import MatchParamsCtrl from './match/MatchParamsCtrl.js';
+import GroupParamsCtrl from './group/GroupParamsCtrl.js';
+import ArenaParamsCtrl from './arena/ArenaParamsCtrl.js';
 
-    get isValid() {
-        for (let section of this.sections) {
-            if (!section.isValid) {
-                return false;
-            }
-        }
-        return true;
-    }
-
+export default class TournamentRulesCtrl extends CompositeCtrl {
     update() {
         this.form.$setSubmitted();
         if (this.form.$valid && this.isValid) {
-            console.log('Rules have been updated');
             this.broadcast('event.tournament.rules.update', this.tournament.rules);
         }
     }
 
-    constructor() {
-        super(...arguments);
-        this.sections = [];
-
-        const ready = this.eBarier.create(['console', 'seeding', 'match',
-                                           'group', 'play-off', 'arena'],
-                                          () => this.broadcast('event.tournament.rules.ready'));
-        this.binder(this.$scope, {
-            'event.tournament.rules.errors': (e, errors) => this.errors = errors,
-            'event.tournament.rules.set': (e, tournament) => this.tournament = tournament,
-            'event.tournament.rules.seeding.ready': (e) => ready.got('seeding'),
-            'event.tournament.rules.match.ready': (e) => ready.got('match'),
-            'event.tournament.rules.group.ready': (e) => ready.got('group'),
-            'event.tournament.rules.arena.ready': (e) => ready.got('arena'),
-            'event.tournament.rules.play-off.ready': (e) => ready.got('play-off'),
-            'event.tournament.rules.console.ready': (e) => ready.got('console')
-        });
+    static get readyEvent() {
+        return 'event.tournament.rules.ready';
     }
 
-    registerChildCtrl(childCtrl) {
-        console.log(`register ctrl ${childCtrl.constructor.name}`);
-        this.sections.push(childCtrl);
+    get expectedChildCtrls() {
+        return [SeedingTournamentParamsCtrl, PlayOffParamsCtrl,
+                MatchParamsCtrl, GroupParamsCtrl, ArenaParamsCtrl];
+    }
+
+    constructor() {
+        super(...arguments);
+        this.$bind({
+            'event.tournament.rules.errors': (e, errors) => this.errors = errors,
+            'event.tournament.rules.set': (e, tournament) => this.tournament = tournament
+        });
     }
 
     back() {
@@ -52,9 +37,5 @@ export default class TournamentRulesCtrl extends AngularBean {
 
     cancel() {
         this.broadcast('event.tournament.rules.cancel', this.rules);
-    }
-
-    broadcast(topic, data) {
-        this.$rootScope.$broadcast(topic, data);
     }
 }

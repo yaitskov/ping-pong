@@ -1,5 +1,6 @@
 import angular from 'angular';
 import EventBarrierFactory from './angular/EventBarrierFactory.js';
+import eventBinder from './angular/eventBinder.js';
 
 var humanizeDuration = require('humanize-duration');
 
@@ -199,16 +200,7 @@ angular.
             $timeout(callback, 0);
         };
     }]).
-    factory('binder', ['$rootScope', function ($rootScope) {
-        return ($scope, listenerMap) => {
-            var cleaners = [];
-            for (var topic in listenerMap) {
-                cleaners.push($scope.$on(topic, listenerMap[topic]));
-            }
-            $scope.$on('$destroy', () => cleaners.forEach(cleaner => cleaner()));
-            return cleaners;
-        };
-    }]).
+    factory('binder', () => eventBinder).
     factory('countDown', ['$interval', function ($interval) {
         return new function () {
             var self = this;

@@ -16,10 +16,6 @@ export default class GroupParamsCtrl extends BaseTrParamsCtrl {
         return ['requestStatus', 'groupSchedule'].concat(super.$inject);
     }
 
-    get readyEvent() {
-        return 'event.tournament.rules.group.ready';
-    }
-
     get isValid() {
          if (!this.rules.group) {
              return true;

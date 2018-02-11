@@ -1,4 +1,21 @@
 describe('java script', () => {
+    describe('api', () => {
+        class X {
+            static get myName() {
+                return this.name;
+            }
+        }
+        it('class static getter name reflection', () => expect(X.myName).toBe('X'));
+        it('class has name field', () => expect(X.name).toBe('X'));
+        it('array map', () => expect([1, 2].map(n => n * 2)).toEqual([2, 4]));
+        it('object map entries', () => expect(Object.entries({1: 2}).map(([k, v]) => `${k}-${v}`)).toEqual(['1-2']));
+        it('no object map', () => {
+            const m = {1: 2};
+            expect(m.map).toBeUndefined();
+        });
+        function sum(a, b) { return a + b; }
+        it('call function', () => expect(sum.apply(null, [1, 2])).toBe(3));
+    });
     describe('classes', () => {
         describe('method', () => {
             class Base {

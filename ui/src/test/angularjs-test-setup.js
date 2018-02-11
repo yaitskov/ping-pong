@@ -35,14 +35,21 @@ class Ctx {
 }
 
 export function setupAngularJs(ctrlElementId, initCb, moduleName) {
-    beforeEach(angular.mock.module(moduleName || 'cloudSportE2e'));
+    beforeEach(() => angular.mock.module(moduleName || 'cloudSportE2e'));
 
     const ctx = new Ctx();
 
-    beforeEach(angular.mock.inject(function($rootScope, $compile, jsHttpBackend, $routeParams) {
+    beforeEach(() => angular.mock.inject(function($rootScope, $compile, $injector) {
         ctx.scope = $rootScope.$new();
         if (initCb) {
-            initCb(ctx.scope, jsHttpBackend, $routeParams);
+            const args = [ctx.scope];
+            if (initCb.length > 1) {
+                args.push($injector.get('jsHttpBackend'));
+            }
+            if (initCb.length > 2) {
+                args.push($injector.get('$routeParams'));
+            }
+            initCb.apply(null, args);
         }
         ctx.element = angular.element(`<${ctrlElementId}></${ctrlElementId}>`);
         ctx.element = $compile(ctx.element)(ctx.scope);

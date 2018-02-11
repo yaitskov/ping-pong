@@ -35,10 +35,6 @@ export default class PlayOffParamsCtrl extends BaseTrParamsCtrl {
         this.usePlayOff = this.rules.playOff;
     }
 
-    get readyEvent() {
-        return 'event.tournament.rules.play-off.ready';
-    }
-
     constructor() {
         super(...arguments);
         this.playOffBackup = null;

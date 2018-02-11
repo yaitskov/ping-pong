@@ -5,10 +5,6 @@ function defaultProvidedRankOptions() {
 }
 
 export default class SeedingTournamentParamsCtrl extends BaseTrParamsCtrl {
-    get readyEvent() {
-        return 'event.tournament.rules.seeding.ready';
-    }
-
     watchForPolicy() {
         this.$scope.$watch('$ctrl.rules.casting.policy', (newValue, oldValue) => {
             console.log(`rules.casting.policy: new value ${newValue} old value ${oldValue}`);

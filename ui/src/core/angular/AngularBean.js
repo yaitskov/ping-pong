@@ -8,4 +8,8 @@ export default class AngularBean {
     constructor() {
         injectArgs(this, arguments);
     }
+
+    static get readyEvent() {
+        return `event.${this.name}.ready`;
+    }
 }

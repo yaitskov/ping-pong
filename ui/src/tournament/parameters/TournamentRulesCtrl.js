@@ -41,9 +41,9 @@ export default class TournamentRulesCtrl extends AngularBean {
         });
     }
 
-    registerSection(sectionCtrl) {
-        console.log(`register ctrl ${sectionCtrl.constructor.name}`);
-        this.sections.push(sectionCtrl);
+    registerChildCtrl(childCtrl) {
+        console.log(`register ctrl ${childCtrl.constructor.name}`);
+        this.sections.push(childCtrl);
     }
 
     back() {

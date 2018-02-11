@@ -1,4 +1,4 @@
-import injectArgs from 'angular-di.js';
+import injectArgs from 'core/angular/di.js';
 import { setupAngularJs, defineAppModule } from 'test/angularjs-test-setup.js';
 
 describe('angularjs', () => {

@@ -1,5 +1,5 @@
 import angular from 'angular';
-import EventBarrierFactory from './EventBarrierFactory.js';
+import EventBarrierFactory from './angular/EventBarrierFactory.js';
 
 var humanizeDuration = require('humanize-duration');
 

@@ -1,4 +1,4 @@
-import injectArgs from 'angular-di.js';
+import injectArgs from 'core/angular/di.js';
 
 export default class BaseTrParamsCtrl {
     static get $inject() {

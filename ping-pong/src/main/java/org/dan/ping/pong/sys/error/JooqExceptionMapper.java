@@ -23,8 +23,10 @@ public class JooqExceptionMapper implements ExceptionMapper<DataAccessException>
     public Response toResponse(DataAccessException exception) {
         if (exception.getCause() instanceof SQLIntegrityConstraintViolationException) {
             if (exception.getCause().getMessage().contains("Duplicate entry")) {
+                Error error = new Error("entity is already exist");
+                log.error("Duplicate entity eid={}", error.getId(), exception);
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(new Error(":entity is already exist"))
+                        .entity(error)
                         .type(APPLICATION_JSON)
                         .build();
             }

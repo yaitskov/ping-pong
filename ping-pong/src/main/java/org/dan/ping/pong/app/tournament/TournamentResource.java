@@ -339,7 +339,7 @@ public class TournamentResource {
     @POST
     @Path(TOURNAMENT_RULES)
     @Consumes(APPLICATION_JSON)
-    public void updateTournamentParams(
+    public void updateTournamentRules(
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             TidIdentifiedRules parameters) {

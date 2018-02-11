@@ -15,6 +15,7 @@
     <description>This module will handle ping-pong</description>
     <url>http://maven.apache.org</url>
     <properties>
+        <skip.jooq>false</skip.jooq>
         <httpcomponents.version>4.5.2</httpcomponents.version>
         <jooq.version>3.8.4</jooq.version>
         <aspectj.version>1.8.8</aspectj.version>
@@ -445,6 +446,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <skip>${skip.jooq}</skip>
                     <jdbc>
                         <driver>com.mysql.jdbc.Driver</driver>
                         <url>jdbc:mysql://127.0.0.1:${mysql.port}/ping_pong</url>
@@ -913,6 +915,12 @@
         </plugins>
     </build>
     <profiles>
+        <profile>
+            <id>stest</id>
+            <properties>
+                <skip.jooq>true</skip.jooq>
+            </properties>
+        </profile>
         <profile>
             <id>simulate</id>
             <properties>

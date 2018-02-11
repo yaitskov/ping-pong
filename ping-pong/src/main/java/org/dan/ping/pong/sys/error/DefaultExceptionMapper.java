@@ -15,7 +15,7 @@ public class DefaultExceptionMapper implements ExceptionMapper<Throwable> {
     @Override
     public Response toResponse(Throwable exception) {
         final Error error = new Error("Internal server error");
-        log.error("Internal server error: {}", error.getId(), exception);
+        log.error("Internal server error: eid={}", error.getId(), exception);
         return Response.status(INTERNAL_SERVER_ERROR)
                 .entity(error)
                 .type(APPLICATION_JSON)

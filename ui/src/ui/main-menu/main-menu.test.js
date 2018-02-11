@@ -1,5 +1,5 @@
 describe('main-menu', function () {
-    beforeEach(angular.mock.module('pingPong'));
+    beforeEach(angular.mock.module('cloudSport'));
 
     beforeEach(angular.mock.module(function ($provide) {
         $provide.value('auth', {

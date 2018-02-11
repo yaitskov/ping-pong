@@ -1,12 +1,12 @@
 import JsHttpBackend from './JsHttpBackend.js';
 
 export function defineAppModule(moduleName) {
-    angular.module(moduleName, ['pingPong', 'ngMock', 'pingPongE2e.templates']);
+    angular.module(moduleName, ['cloudSport', 'ngMock', 'cloudSportE2e.templates']);
     angular.module(moduleName).service('jsHttpBackend', JsHttpBackend);
     return moduleName;
 }
 
-defineAppModule('pingPongE2e');
+defineAppModule('cloudSportE2e');
 
 function camelCase(name, separator) {
     return name.split(separator).map((word, i) => i ? word[0] + word.substr(1) : word).join('');
@@ -35,7 +35,7 @@ class Ctx {
 }
 
 export function setupAngularJs(ctrlElementId, initCb, moduleName) {
-    beforeEach(angular.mock.module(moduleName || 'pingPongE2e'));
+    beforeEach(angular.mock.module(moduleName || 'cloudSportE2e'));
 
     const ctx = new Ctx();
 

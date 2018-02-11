@@ -88,7 +88,7 @@ module.exports = (config) => {
         concurrency: Infinity,
 
         ngHtml2JsPreprocessor: {
-            moduleName: 'pingPongE2e.templates',
+            moduleName: 'cloudSportE2e.templates',
             cacheIdFromPath: function(filepath) {
                 // console.log("cacheIdFromPath " + filepath);
                 return filepath.substr(filepath.lastIndexOf('/') + 1);

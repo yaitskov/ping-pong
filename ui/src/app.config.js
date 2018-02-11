@@ -4,7 +4,7 @@ import AppLang from './ui/lang.js';
 
 var translateTables = require('./translate/translate.js');
 
-angular.module('pingPong').
+angular.module('cloudSport').
     config(['$httpProvider', function($httpProvider) {
         if (!$httpProvider.defaults.headers.get) {
             $httpProvider.defaults.headers.get = {};

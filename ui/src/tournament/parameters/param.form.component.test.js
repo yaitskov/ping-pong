@@ -91,6 +91,17 @@ describe('tournament-parameters-form', () => {
                                          tournament.rules);
     });
 
+    ij('default update tr rules pass', ($rootScope) => {
+        const tournament = {tid: 1, rules: defaultTournamentRules('PingPong')};
+        $rootScope.$broadcast('event.tournament.rules.set', tournament);
+        ctx.sync();
+
+        const spy = spyOn($rootScope, '$broadcast');
+        ctx.element.find('#update-tournament-rules').click();
+        expect(spy).toHaveBeenCalledWith('event.tournament.rules.update',
+                                         tournament.rules);
+    });
+
     ij('child component validation works', ($rootScope) => {
         const tournament = {rules: defaultTournamentRules('PingPong')};
         const veryLongLabel = ''.padEnd(111, 'x');

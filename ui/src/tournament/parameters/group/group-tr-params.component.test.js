@@ -133,7 +133,7 @@ describe('group-tr-params', () => {
             toBe('Maximum number of players, which could be in a group.');
     });
 
-    ij('schedule is serialized to JSON', ($rootScope) => {
+    ij('schedule is serialized to JSON on set rules', ($rootScope) => {
         const tournament = tournamentWithPlayOff();
         tournament.rules.group.schedule.size2Schedule = {2: [0, 1]};
         $rootScope.$broadcast('event.tournament.rules.set', tournament);
@@ -141,4 +141,18 @@ describe('group-tr-params', () => {
         expect(ctx.ctrl.groupScheduleJson).toBe("2: 1-2\n");
         expect(ctx.element.find('textarea[name=groupSchedule]').val()).toBe("2: 1-2\n");
     });
+
+    ij('schedule is serialized to JSON on rules restore', ($rootScope) => {
+        const tournament = tournamentWithPlayOff();
+        tournament.rules.group.schedule.size2Schedule = {2: [0, 1]};
+        $rootScope.$broadcast('event.tournament.rules.set', tournament);
+        ctx.sync();
+        ctx.element.find('#group-parameters-toggler input').bootstrapToggle('off');
+        ctx.sync();
+        ctx.element.find('#group-parameters-toggler input').bootstrapToggle('on');
+        ctx.sync();
+        expect(ctx.ctrl.groupScheduleJson).toBe("2: 1-2\n");
+        expect(ctx.element.find('textarea[name=groupSchedule]').val()).toBe("2: 1-2\n");
+    });
+
 });

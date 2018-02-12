@@ -127,4 +127,9 @@ describe('group-tr-params', () => {
         ctx.sync();
         expect(ctx.ctrl.rules.group.groupSize).toBe(7);
     });
+
+    ij('translate works for max group size help', () => {
+        expect(ctx.element.find('#max-group-size p').text()).
+            toBe('Maximum number of players, which could be in a group.');
+    });
 });

@@ -155,4 +155,14 @@ describe('group-tr-params', () => {
         expect(ctx.element.find('textarea[name=groupSchedule]').val()).toBe("2: 1-2\n");
     });
 
+    ij('schedule is updated from JSON on validate', ($rootScope) => {
+        const tournament = tournamentWithPlayOff();
+        $rootScope.$broadcast('event.tournament.rules.set', tournament);
+        ctx.sync();
+        ctx.element.find('textarea[name=groupSchedule]').val("2: 2-1\n").trigger('change');
+        ctx.sync();
+        expect(ctx.ctrl.groupScheduleJson).toBe("2: 2-1");
+        expect(ctx.ctrl.groupScheduleIsValid).toBeTrue();
+        expect(ctx.ctrl.rules.group.schedule.size2Schedule).toEqual({2: [1, 0]});
+    });
 });

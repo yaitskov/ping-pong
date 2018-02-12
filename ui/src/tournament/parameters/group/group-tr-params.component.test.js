@@ -128,8 +128,17 @@ describe('group-tr-params', () => {
         expect(ctx.ctrl.rules.group.groupSize).toBe(7);
     });
 
-    ij('translate works for max group size help', () => {
+    it('translate works for max group size help', () => {
         expect(ctx.element.find('#max-group-size p').text()).
             toBe('Maximum number of players, which could be in a group.');
+    });
+
+    ij('schedule is serialized to JSON', ($rootScope) => {
+        const tournament = tournamentWithPlayOff();
+        tournament.rules.group.schedule.size2Schedule = {2: [0, 1]};
+        $rootScope.$broadcast('event.tournament.rules.set', tournament);
+        ctx.sync();
+        expect(ctx.ctrl.groupScheduleJson).toBe("2: 1-2\n");
+        expect(ctx.element.find('textarea[name=groupSchedule]').val()).toBe("2: 1-2\n");
     });
 });

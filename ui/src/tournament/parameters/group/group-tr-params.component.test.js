@@ -84,4 +84,13 @@ describe('group-tr-params', () => {
         expect(ctx.ctrl.rules.group.groupSize).toBe(9);
         expect(ctx.ctrl.rules.group.quits).toBe(1);
     });
+
+    ij('enable disabled group panel', ($rootScope) => {
+        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.element.find('#group-parameters-toggler input').bootstrapToggle('off');
+        ctx.element.find('#group-parameters-toggler input').bootstrapToggle('on');
+        ctx.sync();
+        expect(ctx.ctrl.rules.group.groupSize).toBe(8);
+        expect(ctx.ctrl.rules.group.quits).toBe(2);
+    });
 });

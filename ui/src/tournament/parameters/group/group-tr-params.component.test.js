@@ -34,11 +34,15 @@ describe('group-tr-params', () => {
 
     ij('disambiguate strategy toggles', ($rootScope) => {
         $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        expect(ctx.ctrl.rules.group.disambiguation).toBe('CMP_WIN_MINUS_LOSE');
         ctx.element.find('#disambiguate-strategy .btn-primary').click();
+        ctx.sync();
         expect(ctx.ctrl.rules.group.disambiguation).toBe('CMP_WIN_MINUS_LOSE');
         ctx.element.find('#disambiguate-strategy :not(.btn-primary)').click();
+        ctx.sync();
         expect(ctx.ctrl.rules.group.disambiguation).toBe('CMP_WIN_AND_LOSE');
         ctx.element.find('#disambiguate-strategy :not(.btn-primary)').click();
+        ctx.sync();
         expect(ctx.ctrl.rules.group.disambiguation).toBe('CMP_WIN_MINUS_LOSE');
     });
 
@@ -56,5 +60,20 @@ describe('group-tr-params', () => {
         ctx.sync();
         expect(ctx.element.find('#how-much-quits-group').hasClass('ng-hide')).toBeTrue();
         expect(ctx.element.find('#max-group-size').hasClass('ng-hide')).toBeTrue();
+    });
+
+    ij('quits group toggles', ($rootScope) => {
+        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.sync();
+        expect(ctx.ctrl.rules.group.quits).toBe(2);
+        ctx.element.find('#how-much-quits-group .btn-success').click();
+        ctx.sync();
+        expect(ctx.ctrl.rules.group.quits).toBe(2);
+        ctx.element.find('#how-much-quits-group a:not(.btn-success)').click();
+        ctx.sync();
+        expect(ctx.ctrl.rules.group.quits).toBe(1);
+        ctx.element.find('#how-much-quits-group a:not(.btn-primary)').click();
+        ctx.sync();
+        expect(ctx.ctrl.rules.group.quits).toBe(2);
     });
 });

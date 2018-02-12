@@ -3,7 +3,7 @@ import BaseTrParamsCtrl from 'tournament/parameters/BaseTrParamsCtrl.js';
 function defaultGroupRules() {
     return {
         quits: 1,
-        groupSize: 8,
+        groupSize: 9,
         disambiguation: 'CMP_WIN_MINUS_LOSE',
         console: 'NO',
         schedule: {
@@ -38,7 +38,9 @@ export default class GroupParamsCtrl extends BaseTrParamsCtrl {
                 return;
             }
             if (newValue) {
-                this.rules.group = this.groupRuleBackup || defaultGroupRules();
+                if (!this.rules.group) {
+                    this.rules.group = this.groupRuleBackup || defaultGroupRules();
+                }
             } else {
                 this.groupRuleBackup = this.rules.group;
             }

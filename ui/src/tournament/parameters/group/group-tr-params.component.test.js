@@ -79,6 +79,7 @@ describe('group-tr-params', () => {
 
     ij('enable group panel', ($rootScope) => {
         $rootScope.$broadcast('event.tournament.rules.set', tournamentWithoutGroup());
+        ctx.sync();
         ctx.element.find('#group-parameters-toggler input').bootstrapToggle('on');
         ctx.sync();
         expect(ctx.ctrl.rules.group.groupSize).toBe(9);
@@ -87,10 +88,20 @@ describe('group-tr-params', () => {
 
     ij('enable disabled group panel', ($rootScope) => {
         $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.sync();
         ctx.element.find('#group-parameters-toggler input').bootstrapToggle('off');
+        ctx.sync();
+        expect(ctx.ctrl.groupRuleBackup.groupSize).toBe(8);
+        expect(ctx.ctrl.groupRuleBackup.quits).toBe(2);
         ctx.element.find('#group-parameters-toggler input').bootstrapToggle('on');
         ctx.sync();
         expect(ctx.ctrl.rules.group.groupSize).toBe(8);
         expect(ctx.ctrl.rules.group.quits).toBe(2);
+    });
+
+    ij('max group size binding', ($rootScope) => {
+        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.sync();
+        expect(ctx.element.find('#max-group-size input').val()).toBe('8');
     });
 });

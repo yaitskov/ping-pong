@@ -77,6 +77,7 @@ export default class GroupParamsCtrl extends BaseTrParamsCtrl {
     onTournamentSet(tournament) {
         super.onTournamentSet(tournament);
         const group = this.rules.group;
+        this.useGroups = !!group;
         if (!group) {
             return;
         }

@@ -24,9 +24,9 @@
             {{ ($ctrl.rules.match['@type'] + '-disambiguation-group-help') | translate }}
         </p>
     </div>
-    <div class="form-group" ng-show="$ctrl.usePlayOff">
+    <div class="form-group" id="how-much-quits-group" ng-show="$ctrl.rules.playOff">
         <label translate="Quits from a group"/>
-        <div id="how-much-quits-group">
+        <div>
             <a class="btn btn-default"
                translate="first-best"
                ng-click="$ctrl.rules.group.quits = 1"
@@ -38,7 +38,7 @@
         </div>
         <p class="help-block" translate="quits-group-help"/>
     </div>
-    <div class="form-group" ng-show="$ctrl.usePlayOff">
+    <div class="form-group" id="max-group-size" ng-show="$ctrl.rules.playOff">
         <label translate="Max group size"/>
         <div touch-spin options="$ctrl.maxGroupSize"
              ng-model="$ctrl.rules.group.groupSize"/>

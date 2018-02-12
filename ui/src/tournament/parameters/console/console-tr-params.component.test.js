@@ -1,13 +1,13 @@
 import { setupAngularJs, ij } from 'test/angularjs-test-setup.js';
+import ConsoleParamsCtrl from './ConsoleParamsCtrl.js';
 
 describe('console-tr-params', () => {
     var initEventFired = false;
 
-    const ctx = setupAngularJs('console-tr-params', (scope) => {
-        scope.$on('event.tournament.rules.console.ready', ($event) => {
-            initEventFired = true;
-        });
-    });
+    const ctx = setupAngularJs(
+        'console-tr-params',
+        {onInit: s => s.$on(ConsoleParamsCtrl.readyEvent, e => initEventFired = true),
+         parentCtrl: 'tournament-parameters-form'});
 
     it('ready event is emitted', () => {
         expect(initEventFired).toBeTrue();

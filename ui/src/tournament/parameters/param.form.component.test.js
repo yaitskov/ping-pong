@@ -3,11 +3,13 @@ import defaultTournamentRules from 'tournament/new/defaultTournamentRules.js';
 
 describe('tournament-parameters-form', () => {
     var initEventFired = false;
-    const ctx = setupAngularJs('tournament-parameters-form', (scope) => {
-        scope.$on('event.tournament.rules.ready', ($event) => {
-            initEventFired = true;
-        });
-    });
+    const ctx = setupAngularJs(
+        'tournament-parameters-form',
+        {onInit: (scope) => {
+            scope.$on('event.tournament.rules.ready', ($event) => {
+                initEventFired = true;
+            });
+        }});
 
     it('init event fired', () => expect(initEventFired).toBeTrue());
 

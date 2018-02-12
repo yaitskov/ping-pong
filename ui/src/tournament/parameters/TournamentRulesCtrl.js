@@ -5,6 +5,7 @@ import PlayOffParamsCtrl from './play-off/PlayOffParamsCtrl.js';
 import MatchParamsCtrl from './match/MatchParamsCtrl.js';
 import GroupParamsCtrl from './group/GroupParamsCtrl.js';
 import ArenaParamsCtrl from './arena/ArenaParamsCtrl.js';
+import ConsoleParamsCtrl from './console/ConsoleParamsCtrl.js';
 
 export default class TournamentRulesCtrl extends CompositeCtrl {
     update() {
@@ -20,7 +21,8 @@ export default class TournamentRulesCtrl extends CompositeCtrl {
 
     get expectedChildCtrls() {
         return [SeedingTournamentParamsCtrl, PlayOffParamsCtrl,
-                MatchParamsCtrl, GroupParamsCtrl, ArenaParamsCtrl];
+                MatchParamsCtrl, GroupParamsCtrl, ArenaParamsCtrl,
+                ConsoleParamsCtrl];
     }
 
     constructor() {

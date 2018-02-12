@@ -34,29 +34,38 @@ class Ctx {
     }
 }
 
-export function setupAngularJs(ctrlElementId, initCb, moduleName) {
-    beforeEach(() => angular.mock.module(moduleName || 'cloudSportE2e'));
+export function setupAngularJs(ctrlElementId, extra) {
+    extra = extra || {};
+    beforeEach(() => angular.mock.module(extra.moduleName || 'cloudSportE2e'));
 
     const ctx = new Ctx();
 
     beforeEach(() => angular.mock.inject(function($rootScope, $compile, $injector) {
         ctx.scope = $rootScope.$new();
-        if (initCb) {
+        if (extra.onInit) {
             const args = [ctx.scope];
-            if (initCb.length > 1) {
+            if (extra.onInit.length > 1) {
                 args.push($injector.get('jsHttpBackend'));
             }
-            if (initCb.length > 2) {
+            if (extra.onInit.length > 2) {
                 args.push($injector.get('$routeParams'));
             }
-            initCb.apply(null, args);
+            extra.onInit.apply(null, args);
         }
-        ctx.element = angular.element(`<${ctrlElementId}></${ctrlElementId}>`);
+        ctx.element = angular.element(extra.parentCtrl
+                                      ? `<${extra.parentCtrl}><${ctrlElementId}/></${extra.parentCtrl}>`
+                                      : `<${ctrlElementId}/>>`);
         ctx.element = $compile(ctx.element)(ctx.scope);
         ctx.scope.$digest();
-
+        if (extra.parentCtrl) {
+            ctx.parentScope = ctx.scope;
+            ctx.parentElement = ctx.element;
+            ctx.element = ctx.element.find(ctrlElementId);
+            ctx.scope = ctx.element.isolateScope();
+            ctx.parentCtrl = ctx.parentElement.controller(camelCase(extra.parentCtrl));
+            ctx.parentScope.$apply();
+        }
         ctx.ctrl = ctx.element.controller(camelCase(ctrlElementId));
-        // console.log("controller element " + ctx.element + " controller " + ctx.ctrl);
         ctx.scope.$apply();
     }));
 

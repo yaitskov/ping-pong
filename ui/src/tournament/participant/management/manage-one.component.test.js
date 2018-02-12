@@ -4,9 +4,11 @@ describe('manage-one-participant', () => {
     describe('waiting participant', () => {
         const waitingBid = {user: {name: 'p1', uid: 2}, state: 'Wait', tid: 1};
 
-        const ctx = setupAngularJs('manage-one-participant', (scope, jsHttpBackend) => {
-            jsHttpBackend.onGet(/api.bid.state/).respondObject(Object.assign({}, waitingBid));
-        });
+        const ctx = setupAngularJs(
+            'manage-one-participant',
+            {onInit: (scope, jsHttpBackend) => {
+                jsHttpBackend.onGet(/api.bid.state/).respondObject(Object.assign({}, waitingBid));
+            }});
 
         ij('expel emits confirm event', ($rootScope, jsHttpBackend) => {
             jsHttpBackend.flush();
@@ -26,9 +28,11 @@ describe('manage-one-participant', () => {
     describe('quit participant', () => {
         const quitBid = {user: {name: 'p1', uid: 2}, state: 'Quit', tid: 1};
 
-        const ctx = setupAngularJs('manage-one-participant', (scope, jsHttpBackend) => {
-            jsHttpBackend.onGet(/api.bid.state/).respondObject(Object.assign({}, quitBid));
-        });
+        const ctx = setupAngularJs(
+            'manage-one-participant',
+            {onInit: (scope, jsHttpBackend) => {
+                jsHttpBackend.onGet(/api.bid.state/).respondObject(Object.assign({}, quitBid));
+            }});
 
         ij('expel button is not visible for bid in a terminal state', (jsHttpBackend) => {
             jsHttpBackend.flush();

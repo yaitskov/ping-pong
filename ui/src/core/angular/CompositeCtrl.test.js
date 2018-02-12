@@ -44,9 +44,9 @@ describe('CompositeCtrl', () => {
     var compositeReadyEventCounter = 0;
     const ctx = setupAngularJs(
         'test-composite',
-        ($scope) => $scope.$on(MyCompositeCtrl.readyEvent,
-                               () => compositeReadyEventCounter += 1),
-        ajModule);
+        {onInit: ($scope) => $scope.$on(MyCompositeCtrl.readyEvent,
+                                        () => compositeReadyEventCounter += 1),
+         moduleName: ajModule});
     it('ready event fired once all children are ready', () => {
         expect(compositeReadyEventCounter).toBe(1);
     });

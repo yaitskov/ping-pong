@@ -114,7 +114,7 @@ describe('angularjs', () => {
                     controller: ParentCtrl
                 });
 
-            const ctx = setupAngularJs('test-parent', null, ajModule);
+            const ctx = setupAngularJs('test-parent', {moduleName: ajModule});
 
             it('parent gets reference to child component', () => {
                 expect(ctx.ctrl.children[0].constructor.name).toBe('ChildCtrl');

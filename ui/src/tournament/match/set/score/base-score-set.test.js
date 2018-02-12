@@ -31,13 +31,15 @@ const PingPongLostDefault = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 describe('base-score-set', () => {
     var initEventFired = false;
 
-    const ctx = setupAngularJs('base-score-set', (scope) => {
-        console.log("bind to ready event");
-        scope.$on('event.base.match.set.ready', ($event) => {
-            console.log("ready event is fired");
-            initEventFired = true;
-        });
-    });
+    const ctx = setupAngularJs(
+        'base-score-set',
+        {onInit: (scope) => {
+            console.log("bind to ready event");
+            scope.$on('event.base.match.set.ready', ($event) => {
+                console.log("ready event is fired");
+                initEventFired = true;
+            });
+        }});
 
     it('ready event is emitted', () => {
         expect(initEventFired).toBeTrue();

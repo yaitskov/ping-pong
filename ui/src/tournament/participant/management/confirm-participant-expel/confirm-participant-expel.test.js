@@ -3,11 +3,11 @@ import { setupAngularJs, ij } from 'test/angularjs-test-setup.js';
 describe('confirm-participant-expel', () => {
     var initEventFired = false;
 
-    const ctx = setupAngularJs('confirm-participant-expel', (scope) => {
-        scope.$on('event.confirm-participant-expel.ready', ($event) => {
-            initEventFired = true;
-        });
-    });
+    const ctx = setupAngularJs(
+        'confirm-participant-expel',
+        {onInit: (scope) => {
+            scope.$on('event.confirm-participant-expel.ready', e => initEventFired = true);
+        }});
 
     it('ready event is emitted', () => {
         expect(initEventFired).toBeTrue();

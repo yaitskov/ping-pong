@@ -76,4 +76,12 @@ describe('group-tr-params', () => {
         ctx.sync();
         expect(ctx.ctrl.rules.group.quits).toBe(2);
     });
+
+    ij('enable group panel', ($rootScope) => {
+        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithoutGroup());
+        ctx.element.find('#group-parameters-toggler input').bootstrapToggle('on');
+        ctx.sync();
+        expect(ctx.ctrl.rules.group.groupSize).toBe(9);
+        expect(ctx.ctrl.rules.group.quits).toBe(1);
+    });
 });

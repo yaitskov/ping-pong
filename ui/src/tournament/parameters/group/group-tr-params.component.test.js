@@ -165,4 +165,24 @@ describe('group-tr-params', () => {
         expect(ctx.ctrl.groupScheduleIsValid).toBeTrue();
         expect(ctx.ctrl.rules.group.schedule.size2Schedule).toEqual({2: [1, 0]});
     });
+
+    ij('validation pass for tournament without group', ($rootScope) => {
+        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithoutGroup());
+        ctx.sync();
+        expect(ctx.ctrl.isValid).toBeTrue();
+    });
+
+    ij('validation fails due group size <= quits', ($rootScope) => {
+        $rootScope.$broadcast('event.tournament.rules.set',
+                              Object.assign(tournamentWithPlayOff(),
+                                            {rules:{group:{quits:3, groupSize:3}}}));
+        expect(ctx.ctrl.isValid).toBeFalse();
+    });
+
+    ij('validation fails due group size <= quits', ($rootScope) => {
+        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.ctrl.groupScheduleJson = "2: 1";
+        expect(ctx.ctrl.groupScheduleIsValid).toBeFalse();
+        expect(ctx.ctrl.isValid).toBeFalse();
+    });
 });

@@ -20,12 +20,16 @@ describe('group-tr-params', () => {
     ij('group panel is not visible if tournament has no group', ($rootScope) => {
         $rootScope.$broadcast('event.tournament.rules.set', tournamentWithoutGroup());
         ctx.sync();
+        expect(ctx.ctrl.useGroups).toBeFalse();
         expect(ctx.element.find('#group-parameters').hasClass('ng-hide')).toBeTrue();
+        expect(ctx.element.find('#group-parameters-toggler input').prop('checked')).toBeFalse();
     });
 
     ij('group panel is visible if tournament has group', ($rootScope) => {
         $rootScope.$broadcast('event.tournament.rules.set', tournamentWithoutPlayOff());
         ctx.sync();
+        expect(ctx.ctrl.useGroups).toBeTrue();
         expect(ctx.element.find('#group-parameters').hasClass('ng-hide')).toBeFalse();
+        expect(ctx.element.find('#group-parameters-toggler input').prop('checked')).toBeTrue();
     });
 });

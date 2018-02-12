@@ -30,7 +30,11 @@ class Ctx {
     }
 
     sync() {
-        this.scope.$digest();
+        if (this.parentScope) {
+            this.parentScope.$digest();
+        } else {
+            this.scope.$digest();
+        }
     }
 }
 

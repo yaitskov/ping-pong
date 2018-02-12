@@ -12,7 +12,7 @@
 <div id="group-parameters" class="toggle-panel" ng-show="$ctrl.useGroups">
     <div class="form-group">
         <label translate="disambiguation-group-lbl"/>
-        <div>
+        <div id="disambiguate-strategy">
             <a class="btn btn-default" translate="CMP_WIN_MINUS_LOSE"
                ng-click="$ctrl.rules.group.disambiguation = 'CMP_WIN_MINUS_LOSE'"
                ng-class="{'btn-primary': $ctrl.rules.group.disambiguation == 'CMP_WIN_MINUS_LOSE'}"/>
@@ -26,7 +26,7 @@
     </div>
     <div class="form-group" ng-show="$ctrl.usePlayOff">
         <label translate="Quits from a group"/>
-        <div>
+        <div id="how-much-quits-group">
             <a class="btn btn-default"
                translate="first-best"
                ng-click="$ctrl.rules.group.quits = 1"

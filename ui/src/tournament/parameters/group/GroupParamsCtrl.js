@@ -5,6 +5,7 @@ function defaultGroupRules() {
         quits: 1,
         groupSize: 8,
         disambiguation: 'CMP_WIN_MINUS_LOSE',
+        console: 'NO',
         schedule: {
             size2Schedule: {2: [0, 1]}
         }

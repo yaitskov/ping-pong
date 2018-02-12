@@ -104,4 +104,27 @@ describe('group-tr-params', () => {
         ctx.sync();
         expect(ctx.element.find('#max-group-size input').val()).toBe('8');
     });
+
+    ij('button up increase group size', ($rootScope) => {
+        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.sync();
+        const increaseBtn = ctx.element.find(
+            '#max-group-size button[ng-class="vm.touchSpinOptions.buttonUpClass"]');
+        increaseBtn.mousedown();
+        increaseBtn.mouseup();
+        ctx.sync();
+        expect(ctx.ctrl.rules.group.groupSize).toBe(9);
+    });
+
+
+    ij('button down decrease group size', ($rootScope) => {
+        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.sync();
+        const decreaseBtn = ctx.element.find(
+            '#max-group-size button[ng-class="vm.touchSpinOptions.buttonDownClass"]');
+        decreaseBtn.mousedown();
+        decreaseBtn.mouseup();
+        ctx.sync();
+        expect(ctx.ctrl.rules.group.groupSize).toBe(7);
+    });
 });

@@ -11,6 +11,16 @@ export default class AngularTestContext {
         this.sync();
     }
 
+    toggleOn(jqueryPredicate) {
+        this.element.find(jqueryPredicate).bootstrapToggle('on');
+        this.sync();
+    }
+
+    toggleOff(jqueryPredicate) {
+        this.element.find(jqueryPredicate).bootstrapToggle('off');
+        this.sync();
+    }
+
     checked(jqueryPredicate) {
         expect(this.element.find(jqueryPredicate).prop('checked')).toBeTrue();
     }

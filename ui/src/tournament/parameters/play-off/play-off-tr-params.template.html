@@ -10,7 +10,7 @@
            bs-toggle/>
 </div>
 <div id="play-off-parameters" class="toggle-panel" ng-show="$ctrl.usePlayOff">
-    <div class="form-group">
+    <div class="form-group" id="max-losses-in-play-off">
         <label class="toggle-option" translate="max-losses"/>
         <a class="btn btn-default"
            translate="up-to-1-loss"
@@ -21,7 +21,7 @@
            ng-click="$ctrl.rules.playOff.losings = 2"
            ng-class="{'btn-success': $ctrl.rules.playOff.losings == 2}"/>
     </div>
-    <div class="form-group" ng-show="$ctrl.rules.playOff.losings == 1">
+    <div class="form-group" id="third-place-match" ng-show="$ctrl.rules.playOff.losings == 1">
         <label class="toggle-option" translate="Match for 3rd place"/>
         <a class="btn btn-default"
            translate="yes-lbl"

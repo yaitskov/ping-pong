@@ -14,8 +14,11 @@ export default class PlayOffParamsCtrl extends BaseTrParamsCtrl {
     }
 
     watchForPlayOff() {
-        this.$scope.$watch('$ctrl.rules.usePlayOff', (newValue, oldValue) => {
+        this.$scope.$watch('$ctrl.usePlayOff', (newValue, oldValue) => {
             console.log(`usePlayOff change ${newValue} ${oldValue}`);
+            if (!this.rules) {
+                return;
+            }
             if (newValue) {
                 if (this.rules.playOff) {
                     return;
@@ -32,12 +35,13 @@ export default class PlayOffParamsCtrl extends BaseTrParamsCtrl {
 
     onTournamentSet(tournament) {
         super.onTournamentSet(tournament);
-        this.usePlayOff = this.rules.playOff;
+        this.usePlayOff = !!this.rules.playOff;
     }
 
     constructor() {
         super(...arguments);
         this.playOffBackup = null;
         this.usePlayOff = false;
+        this.watchForPlayOff();
     }
 }

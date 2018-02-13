@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.time.temporal.ChronoUnit.DAYS;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
@@ -423,7 +424,6 @@ public class TournamentDaoMySql implements TournamentDao {
                 .build());
     }
 
-    @Transactional(TRANSACTION_MANAGER)
     public Tid copy(CopyTournament copyTournament) {
         final Tid originTid = copyTournament.getOriginTid();
         final Tid newTid = copyTournamentRow(copyTournament);
@@ -449,7 +449,8 @@ public class TournamentDaoMySql implements TournamentDao {
     }
 
     private void copyPermissions(Tid originTid, Tid newTid) {
-       jooq.batch(jooq.select(TOURNAMENT_ADMIN.TYPE, TOURNAMENT_ADMIN.UID)
+        log.info("Copy tournament permission {} => {}", originTid, newTid);
+        jooq.batch(jooq.select(TOURNAMENT_ADMIN.TYPE, TOURNAMENT_ADMIN.UID)
                 .from(TOURNAMENT_ADMIN)
                 .where(TOURNAMENT_ADMIN.TID.eq(originTid))
                 .fetch()

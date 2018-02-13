@@ -1,24 +1,32 @@
 package org.dan.ping.pong.app.tournament;
 
+import static com.spotify.hamcrest.optional.OptionalMatchers.emptyOptional;
+import static com.spotify.hamcrest.optional.OptionalMatchers.optionalWithValue;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.DRAFTING;
+import static org.dan.ping.pong.app.tournament.TournamentResource.MY_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_COPY;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_FOLLOWING;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.mock.Generators.genStr;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
+import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
+import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
+import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulator;
+import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
 import org.dan.ping.pong.util.time.Clocker;
 import org.hamcrest.Matchers;
@@ -42,9 +50,49 @@ public class TournamentCopyJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     private Clocker clocker;
 
+    @Inject
+    private ImperativeSimulatorFactory isf;
+
     @Test
-    public void tournamentResult() {
-        final TournamentScenario scenario = TournamentScenario.begin()
+    public void copyWithConsoleTour() {
+        final TournamentScenario scenario = begin().name("copyWithConsoleTour")
+                .rules(RULES_G8Q1_S1A2G11)
+                .category(c1, p1, p2, p3);
+        isf.create(scenario)
+                .run(c -> {
+                    final ImperativeSimulator consoleOrigin = c.beginTournament()
+                            .createConsoleTournament()
+                            .resolveCategories();
+
+                    final String copyName = scenario.getName() + " copy";
+                    final Tid copyMasterTid = c.copyTournament(copyName, clocker.get());
+
+                    final MyTournamentInfo masterCopyInfo = myRest().get(
+                            MY_TOURNAMENT + copyMasterTid.getTid(),
+                            scenario.getTestAdmin(), MyTournamentInfo.class);
+
+                    assertThat(masterCopyInfo.getConsoleTid(),
+                            not(optionalWithValue(is(consoleOrigin.getScenario().getTid()))));
+                    assertThat(masterCopyInfo.getConsoleTid(),
+                            not(emptyOptional()));
+                    assertThat(masterCopyInfo.getPreviousTid(),
+                            is(Optional.of(scenario.getTid())));
+
+                    final MyTournamentInfo consoleCopyInfo = myRest().get(
+                            MY_TOURNAMENT + masterCopyInfo.getConsoleTid().get(),
+                            scenario.getTestAdmin(), MyTournamentInfo.class);
+
+                    assertThat(consoleCopyInfo.getMasterTid(),
+                            is(Optional.of(copyMasterTid)));
+                    assertThat(consoleCopyInfo.getPreviousTid(),
+                            optionalWithValue(is(consoleOrigin.getScenario().getTid())));
+                    assertThat(consoleCopyInfo.getName(), is(copyName));
+                });
+    }
+
+    @Test
+    public void copyCompleteTour() {
+        final TournamentScenario scenario = begin()
                 .name("copyCompleteTour")
                 .rules(RULES_G8Q1_S1A2G11)
                 .category(c1, p1, p2)

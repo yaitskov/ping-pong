@@ -131,6 +131,7 @@ public class TournamentResource {
             @HeaderParam(SESSION) String session,
             CopyTournament copyTournament) {
         final Uid uid = authService.userInfoBySession(session).getUid();
+        log.info("User {} copies tournament {}", uid, copyTournament.getOriginTid());
         if (tournamentDao.isAdminOf(uid, copyTournament.getOriginTid())) {
             return tournamentService.copy(copyTournament);
         } else {

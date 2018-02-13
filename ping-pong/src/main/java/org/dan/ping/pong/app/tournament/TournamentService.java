@@ -520,11 +520,18 @@ public class TournamentService {
         return participantUid;
     }
 
+    @SneakyThrows
     @Transactional(TRANSACTION_MANAGER)
     public Tid copy(CopyTournament copyTournament) {
-        final Tid tid = tournamentDao.copy(copyTournament);
-        categoryDao.copy(copyTournament.getOriginTid(), tid);
-        return tid;
+        final Tid masterCopyTid = tournamentDao.copy(copyTournament);
+        categoryDao.copy(copyTournament.getOriginTid(), masterCopyTid);
+        final RelatedTids relatedTids = tournamentRelations
+                .get(copyTournament.getOriginTid());
+        relatedTids.getChild().ifPresent(childTid -> {
+            final Tid consoleCopyTid = copy(copyTournament.withOriginTid(childTid));
+            tournamentDao.createRelation(masterCopyTid, consoleCopyTid);
+        });
+        return masterCopyTid;
     }
 
     @Inject

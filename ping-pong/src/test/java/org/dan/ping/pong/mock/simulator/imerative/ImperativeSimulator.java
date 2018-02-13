@@ -18,6 +18,7 @@ import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
 import static org.dan.ping.pong.app.tournament.SetScoreResultName.MatchContinues;
 import static org.dan.ping.pong.app.tournament.TournamentResource.MY_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.RESULT_CATEGORY;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_COPY;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_EXPEL;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
@@ -54,8 +55,10 @@ import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
 import org.dan.ping.pong.app.match.RescoreMatch;
 import org.dan.ping.pong.app.match.SetScoreReq;
 import org.dan.ping.pong.app.match.SetScoreResult;
+import org.dan.ping.pong.app.tournament.CopyTournament;
 import org.dan.ping.pong.app.tournament.ExpelParticipant;
 import org.dan.ping.pong.app.tournament.MyTournamentInfo;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.user.UserLink;
@@ -66,6 +69,7 @@ import org.dan.ping.pong.mock.simulator.PlayerCategory;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +86,7 @@ import javax.ws.rs.core.Response;
 public class ImperativeSimulator {
     private final Simulator simulator;
     private final RestEntityGenerator restGenerator;
+    @Getter
     private final TournamentScenario scenario;
     @Getter
     private TournamentScenario consoleScenario;
@@ -415,5 +420,15 @@ public class ImperativeSimulator {
                         .collect(toSet()),
                 OpenMatchForJudge::getMid)));
         return this;
+    }
+
+    public Tid copyTournament(String name, Instant opensAt) {
+        return myRest.post(TOURNAMENT_COPY, scenario.getTestAdmin(),
+                CopyTournament.builder()
+                        .name(name)
+                        .opensAt(opensAt)
+                        .originTid(scenario.getTid())
+                        .build())
+                .readEntity(Tid.class);
     }
 }

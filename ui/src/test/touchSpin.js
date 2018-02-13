@@ -17,6 +17,11 @@ export function checkTouchSpinIncrease(ctx, jqueryPrefix, valueF) {
                    valueF(ctx) + 1, "buttonUpClass");
 }
 
+export function checkTouchSpinID(ctx, jqueryPrefix, valueF) {
+    checkTouchSpinIncrease(ctx, jqueryPrefix, valueF);
+    checkTouchSpinDecrease(ctx, jqueryPrefix, valueF);
+}
+
 export function checkTouchSpinNotDecrease(ctx, jqueryPrefix, valueF) {
     checkTouchSpin(ctx, jqueryPrefix, valueF,
                    valueF(ctx), "buttonDownClass");

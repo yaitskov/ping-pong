@@ -1,4 +1,5 @@
 import JsHttpBackend from './JsHttpBackend.js';
+import AngularTestContext from './AngularTestContext.js';
 
 export function defineAppModule(moduleName) {
     angular.module(moduleName, ['cloudSport', 'ngMock', 'cloudSportE2e.templates']);
@@ -12,39 +13,14 @@ function camelCase(name, separator) {
     return name.split(separator).map((word, i) => i ? word[0] + word.substr(1) : word).join('');
 }
 
-class Ctx {
-    constructor() {
-        this.scope = null;
-        this.element = null;
-        this.ctrl = null;
-    }
-
-    find(q) {
-        return this.element.find(q);
-    }
-
-    findSetInput(m) {
-        for (let [anchor, val] of Object.entries(m)) {
-            this.find(anchor).val(val).triggerHandler('input');
-        }
-    }
-
-    sync() {
-        if (this.parentScope) {
-            this.parentScope.$digest();
-        } else {
-            this.scope.$digest();
-        }
-    }
-}
-
 export function setupAngularJs(ctrlElementId, extra) {
     extra = extra || {};
     beforeEach(() => angular.mock.module(extra.moduleName || 'cloudSportE2e'));
 
-    const ctx = new Ctx();
+    const ctx = new AngularTestContext();
 
     beforeEach(() => angular.mock.inject(function($rootScope, $compile, $injector) {
+        ctx.$rootScope = $rootScope;
         ctx.scope = $rootScope.$new();
         if (extra.onInit) {
             const args = [ctx.scope];

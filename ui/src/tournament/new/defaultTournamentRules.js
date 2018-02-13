@@ -3,6 +3,7 @@ import defaultMatchRules from './defaultMatchRules.js';
 export default function defaultTournamentRules(sport) {
     return {
         match: defaultMatchRules(sport),
+        place: {arenaDistribution: 'NO'},
         casting: {
             policy: 'ProvidedRating',
             direction: 'Decrease',

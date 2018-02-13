@@ -1,4 +1,4 @@
-import { setupAngularJs, ij } from 'test/angularjs-test-setup.js';
+import { setupAngularJs } from 'test/angularjs-test-setup.js';
 import { checkTouchSpinIncrease, checkTouchSpinDecrease } from 'test/touchSpin.js';
 import GroupParamsCtrl from './GroupParamsCtrl.js';
 import defaultTournamentRules from 'tournament/new/defaultTournamentRules.js';
@@ -18,23 +18,22 @@ describe('group-tr-params', () => {
     const tournamentWithoutGroup = () => { return {rules: {}}; };
     const tournamentWithPlayOff = () => { return {rules: defaultTournamentRules('PingPong')}; };
 
-    ij('group panel is not visible if tournament has no group', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithoutGroup());
+    it('group panel is not visible if tournament has no group', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithoutGroup());
         expect(ctx.ctrl.useGroups).toBeFalse();
-        expect(ctx.element.find('#group-parameters').hasClass('ng-hide')).toBeTrue();
-        expect(ctx.element.find('#group-parameters-toggler input').prop('checked')).toBeFalse();
+        ctx.hidden('#group-parameters');
+        ctx.unchecked('#group-parameters-toggler input');
     });
 
-    ij('group panel is visible if tournament has group', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
-        ctx.sync();
+    it('group panel is visible if tournament has group', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
         expect(ctx.ctrl.useGroups).toBeTrue();
-        expect(ctx.element.find('#group-parameters').hasClass('ng-hide')).toBeFalse();
-        expect(ctx.element.find('#group-parameters-toggler input').prop('checked')).toBeTrue();
+        ctx.visible('#group-parameters');
+        ctx.checked('#group-parameters-toggler input');
     });
 
-    ij('disambiguate strategy toggles', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+    it('disambiguate strategy toggles', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
         expect(ctx.ctrl.rules.group.disambiguation).toBe('CMP_WIN_MINUS_LOSE');
         ctx.element.find('#disambiguate-strategy .btn-primary').click();
         ctx.sync();
@@ -47,25 +46,22 @@ describe('group-tr-params', () => {
         expect(ctx.ctrl.rules.group.disambiguation).toBe('CMP_WIN_MINUS_LOSE');
     });
 
-    ij('how much quits group and its size are visible if tournament has play off', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
-        ctx.sync();
-        expect(ctx.element.find('#how-much-quits-group').hasClass('ng-hide')).toBeFalse();
-        expect(ctx.element.find('#max-group-size').hasClass('ng-hide')).toBeFalse();
+    it('how much quits group and its size are visible if tournament has play off', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.visible('#how-much-quits-group');
+        ctx.visible('#max-group-size');
     });
 
-    ij('how much quits group and its size are not visible if tournament has no play off', ($rootScope) => {
+    it('how much quits group and its size are not visible if tournament has no play off', () => {
         const tournament = tournamentWithPlayOff();
         delete tournament.rules.playOff;
-        $rootScope.$broadcast('event.tournament.rules.set', tournament);
-        ctx.sync();
-        expect(ctx.element.find('#how-much-quits-group').hasClass('ng-hide')).toBeTrue();
-        expect(ctx.element.find('#max-group-size').hasClass('ng-hide')).toBeTrue();
+        ctx.broadcast('event.tournament.rules.set', tournament);
+        ctx.hidden('#how-much-quits-group');
+        ctx.hidden('#max-group-size');
     });
 
-    ij('quits group toggles', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
-        ctx.sync();
+    it('quits group toggles', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
         expect(ctx.ctrl.rules.group.quits).toBe(2);
         ctx.element.find('#how-much-quits-group .btn-success').click();
         ctx.sync();
@@ -78,18 +74,16 @@ describe('group-tr-params', () => {
         expect(ctx.ctrl.rules.group.quits).toBe(2);
     });
 
-    ij('enable group panel', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithoutGroup());
-        ctx.sync();
+    it('enable group panel', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithoutGroup());
         ctx.element.find('#group-parameters-toggler input').bootstrapToggle('on');
         ctx.sync();
         expect(ctx.ctrl.rules.group.groupSize).toBe(9);
         expect(ctx.ctrl.rules.group.quits).toBe(1);
     });
 
-    ij('enable disabled group panel', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
-        ctx.sync();
+    it('enable disabled group panel', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
         ctx.element.find('#group-parameters-toggler input').bootstrapToggle('off');
         ctx.sync();
         expect(ctx.ctrl.groupRuleBackup.groupSize).toBe(8);
@@ -100,21 +94,18 @@ describe('group-tr-params', () => {
         expect(ctx.ctrl.rules.group.quits).toBe(2);
     });
 
-    ij('max group size binding', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
-        ctx.sync();
+    it('max group size binding', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
         expect(ctx.element.find('#max-group-size input').val()).toBe('8');
     });
 
-    ij('button up increase group size', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
-        ctx.sync();
+    it('button up increase group size', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
         checkTouchSpinIncrease(ctx, '#max-group-size', () => ctx.ctrl.rules.group.groupSize);
     });
 
-    ij('button down decrease group size', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
-        ctx.sync();
+    it('button down decrease group size', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
         checkTouchSpinDecrease(ctx, '#max-group-size', () => ctx.ctrl.rules.group.groupSize);
     });
 
@@ -123,20 +114,18 @@ describe('group-tr-params', () => {
             toBe('Maximum number of players, which could be in a group.');
     });
 
-    ij('schedule is serialized to JSON on set rules', ($rootScope) => {
+    it('schedule is serialized to JSON on set rules', () => {
         const tournament = tournamentWithPlayOff();
         tournament.rules.group.schedule.size2Schedule = {2: [0, 1]};
-        $rootScope.$broadcast('event.tournament.rules.set', tournament);
-        ctx.sync();
+        ctx.broadcast('event.tournament.rules.set', tournament);
         expect(ctx.ctrl.groupScheduleJson).toBe("2: 1-2\n");
         expect(ctx.element.find('textarea[name=groupSchedule]').val()).toBe("2: 1-2\n");
     });
 
-    ij('schedule is serialized to JSON on rules restore', ($rootScope) => {
+    it('schedule is serialized to JSON on rules restore', () => {
         const tournament = tournamentWithPlayOff();
         tournament.rules.group.schedule.size2Schedule = {2: [0, 1]};
-        $rootScope.$broadcast('event.tournament.rules.set', tournament);
-        ctx.sync();
+        ctx.broadcast('event.tournament.rules.set', tournament);
         ctx.element.find('#group-parameters-toggler input').bootstrapToggle('off');
         ctx.sync();
         ctx.element.find('#group-parameters-toggler input').bootstrapToggle('on');
@@ -145,10 +134,9 @@ describe('group-tr-params', () => {
         expect(ctx.element.find('textarea[name=groupSchedule]').val()).toBe("2: 1-2\n");
     });
 
-    ij('schedule is updated from JSON on validate', ($rootScope) => {
+    it('schedule is updated from JSON on validate', () => {
         const tournament = tournamentWithPlayOff();
-        $rootScope.$broadcast('event.tournament.rules.set', tournament);
-        ctx.sync();
+        ctx.broadcast('event.tournament.rules.set', tournament);
         ctx.element.find('textarea[name=groupSchedule]').val("2: 2-1\n").trigger('change');
         ctx.sync();
         expect(ctx.ctrl.groupScheduleJson).toBe("2: 2-1");
@@ -156,21 +144,20 @@ describe('group-tr-params', () => {
         expect(ctx.ctrl.rules.group.schedule.size2Schedule).toEqual({2: [1, 0]});
     });
 
-    ij('validation pass for tournament without group', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithoutGroup());
-        ctx.sync();
+    it('validation pass for tournament without group', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithoutGroup());
         expect(ctx.ctrl.isValid).toBeTrue();
     });
 
-    ij('validation fails due group size <= quits', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set',
-                              Object.assign(tournamentWithPlayOff(),
-                                            {rules:{group:{quits:3, groupSize:3}}}));
+    it('validation fails due group size <= quits', () => {
+        ctx.broadcast('event.tournament.rules.set',
+                      Object.assign(tournamentWithPlayOff(),
+                                    {consoleTid: 3, rules: {group: {quits:3, groupSize:3}}}));
         expect(ctx.ctrl.isValid).toBeFalse();
     });
 
-    ij('validation fails due group size <= quits', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+    it('validation fails due group schedule has sytax error', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
         ctx.ctrl.groupScheduleJson = "2: 1";
         expect(ctx.ctrl.groupScheduleIsValid).toBeFalse();
         expect(ctx.ctrl.isValid).toBeFalse();

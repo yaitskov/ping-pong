@@ -11,6 +11,14 @@ export default class AngularTestContext {
         this.sync();
     }
 
+    checked(jqueryPredicate) {
+        expect(this.element.find(jqueryPredicate).prop('checked')).toBeTrue();
+    }
+
+    unchecked(jqueryPredicate) {
+        expect(this.element.find(jqueryPredicate).prop('checked')).toBeFalse();
+    }
+
     _visible(jqueryPredicate, yes) {
         expect(this.element.find(jqueryPredicate).hasClass('ng-hide')).toBe(!yes);
     }

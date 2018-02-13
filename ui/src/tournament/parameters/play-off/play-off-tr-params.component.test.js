@@ -44,4 +44,12 @@ describe('play-off-tr-params', () => {
                                   {default: {clazz: 'btn-primary', value: 1},
                                    other: {clazz: 'btn-success', value: 2}});
     });
+
+    it('3rd place match toggles', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.btnTogglesDiffClasses('#third-place-match',
+                                  () => ctx.ctrl.rules.playOff.thirdPlaceMatch,
+                                  {default: {clazz: 'btn-primary', value: 1},
+                                   other: {clazz: 'btn-danger', value: 0}});
+    });
 });

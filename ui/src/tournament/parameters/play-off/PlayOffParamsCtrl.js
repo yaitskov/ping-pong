@@ -27,7 +27,7 @@ export default class PlayOffParamsCtrl extends BaseTrParamsCtrl {
                     ? this.playOffBackup
                     : defaultPlayOffRules());
             } else {
-                this.playOffBackup = oldValue;
+                this.playOffBackup = this.rules.playOff;
                 delete this.rules.playOff;
             }
         });

@@ -37,6 +37,14 @@ describe('play-off-tr-params', () => {
         expect(ctx.ctrl.rules.playOff.losings).toBe(1);
     });
 
+    it('disable / enable play off panel', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.toggleOff('#play-off-parameters-toggler input');
+        expect(ctx.ctrl.rules.playOff).toBeUndefined();
+        ctx.toggleOn('#play-off-parameters-toggler input');
+        expect(ctx.ctrl.rules.playOff.thirdPlaceMatch).toBe(1);
+    });
+
     it('max losses in play off toggles', () => {
         ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
         ctx.btnTogglesDiffClasses('#max-losses-in-play-off',

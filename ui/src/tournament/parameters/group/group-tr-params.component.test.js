@@ -1,4 +1,5 @@
 import { setupAngularJs, ij } from 'test/angularjs-test-setup.js';
+import { checkTouchSpinIncrease, checkTouchSpinDecrease } from 'test/touchSpin.js';
 import GroupParamsCtrl from './GroupParamsCtrl.js';
 import defaultTournamentRules from 'tournament/new/defaultTournamentRules.js';
 
@@ -108,24 +109,13 @@ describe('group-tr-params', () => {
     ij('button up increase group size', ($rootScope) => {
         $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
         ctx.sync();
-        const increaseBtn = ctx.element.find(
-            '#max-group-size button[ng-class="vm.touchSpinOptions.buttonUpClass"]');
-        increaseBtn.mousedown();
-        increaseBtn.mouseup();
-        ctx.sync();
-        expect(ctx.ctrl.rules.group.groupSize).toBe(9);
+        checkTouchSpinIncrease(ctx, '#max-group-size', () => ctx.ctrl.rules.group.groupSize);
     });
-
 
     ij('button down decrease group size', ($rootScope) => {
         $rootScope.$broadcast('event.tournament.rules.set', tournamentWithPlayOff());
         ctx.sync();
-        const decreaseBtn = ctx.element.find(
-            '#max-group-size button[ng-class="vm.touchSpinOptions.buttonDownClass"]');
-        decreaseBtn.mousedown();
-        decreaseBtn.mouseup();
-        ctx.sync();
-        expect(ctx.ctrl.rules.group.groupSize).toBe(7);
+        checkTouchSpinDecrease(ctx, '#max-group-size', () => ctx.ctrl.rules.group.groupSize);
     });
 
     it('translate works for max group size help', () => {

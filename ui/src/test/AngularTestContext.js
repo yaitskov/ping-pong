@@ -21,6 +21,21 @@ export default class AngularTestContext {
         this.sync();
     }
 
+    btnTogglesDiffClasses(jqueryPrefix, valueF, options) {
+        expect(valueF()).toBe(options.default.value);
+        this.click(`${jqueryPrefix} .${options.default.clazz}`);
+        expect(valueF()).toBe(options.default.value);
+        this.click(`${jqueryPrefix} .btn:not(.${options.default.clazz})`);
+        expect(valueF()).toBe(options.other.value);
+        this.click(`${jqueryPrefix} .btn:not(.${options.other.clazz})`);
+        expect(valueF()).toBe(options.default.value);
+    }
+
+    click(jqueryPredicate) {
+        this.element.find(jqueryPredicate).click();
+        this.sync();
+    }
+
     checked(jqueryPredicate) {
         expect(this.element.find(jqueryPredicate).prop('checked')).toBeTrue();
     }

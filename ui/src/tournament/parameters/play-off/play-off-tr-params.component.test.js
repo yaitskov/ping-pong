@@ -36,4 +36,12 @@ describe('play-off-tr-params', () => {
         ctx.toggleOn('#play-off-parameters-toggler input');
         expect(ctx.ctrl.rules.playOff.losings).toBe(1);
     });
+
+    it('max losses in play off toggles', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.btnTogglesDiffClasses('#max-losses-in-play-off',
+                                  () => ctx.ctrl.rules.playOff.losings,
+                                  {default: {clazz: 'btn-primary', value: 1},
+                                   other: {clazz: 'btn-success', value: 2}});
+    });
 });

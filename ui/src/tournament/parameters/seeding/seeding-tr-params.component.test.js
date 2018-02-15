@@ -27,6 +27,10 @@ describe('seeding-tr-params', () => {
     it('rank name is visible for policy provided rank', () => {
         ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
         ctx.visible('#rank-name-field');
+        ctx.visible('#max-rank-value');
+        ctx.visible('#min-rank-value');
+        ctx.visible('#rank-axis-direction');
+
         expect(ctx.element.find('#rankName').val()).
             toBe(ctx.ctrl.rules.casting.providedRankOptions.label);
     });
@@ -41,6 +45,9 @@ describe('seeding-tr-params', () => {
     it('rank name is not visible for policy other than provided rank', () => {
         ctx.broadcast('event.tournament.rules.set', tournamentWithManualRanking());
         ctx.hidden('#rank-name-field');
+        ctx.hidden('#max-rank-value');
+        ctx.hidden('#min-rank-value');
+        ctx.hidden('#rank-axis-direction');
     });
 
     it('rank name length validation', () => {

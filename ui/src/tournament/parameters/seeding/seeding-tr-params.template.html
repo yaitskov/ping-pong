@@ -37,19 +37,20 @@
             {{ 'rank-name-length' | translate : '{max: 100}' }}
         </p>
     </div>
-    <div class="form-group"
+    <div class="form-group" id="min-rank-value"
          ng-show="$ctrl.rules.casting.policy == 'ProvidedRating'">
         <label translate="Minimal allowed rank value"/>
         <div touch-spin options="$ctrl.rank"
              ng-model="$ctrl.rules.casting.providedRankOptions.minValue"/>
     </div>
-    <div class="form-group"
+    <div class="form-group" id="max-rank-value"
          ng-show="$ctrl.rules.casting.policy == 'ProvidedRating'">
         <label translate="Maximum allowed rank value"/>
         <div touch-spin options="$ctrl.rank"
              ng-model="$ctrl.rules.casting.providedRankOptions.maxValue"/>
     </div>
-    <div class="form-group" ng-show="$ctrl.rules.casting.policy != 'Manual'">
+    <div class="form-group" id="rank-axis-direction"
+         ng-show="$ctrl.rules.casting.policy != 'Manual'">
         <label class="toggle-option" translate="rank-direction-lbl"/>
         <a class="btn btn-default"
            translate="decreasing-lbl"

@@ -31,6 +31,10 @@ export default class AngularTestContext {
         expect(valueF()).toBe(options.default.value);
     }
 
+    btnToggles(jqueryPrefix, valueF, options) {
+        this.btnTogglesDiffClasses(jqueryPrefix, valueF, options);
+    }
+
     click(jqueryPredicate) {
         this.element.find(jqueryPredicate).click();
         this.sync();

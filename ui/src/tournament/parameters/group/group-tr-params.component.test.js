@@ -34,16 +34,10 @@ describe('group-tr-params', () => {
 
     it('disambiguate strategy toggles', () => {
         ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
-        expect(ctx.ctrl.rules.group.disambiguation).toBe('CMP_WIN_MINUS_LOSE');
-        ctx.element.find('#disambiguate-strategy .btn-primary').click();
-        ctx.sync();
-        expect(ctx.ctrl.rules.group.disambiguation).toBe('CMP_WIN_MINUS_LOSE');
-        ctx.element.find('#disambiguate-strategy :not(.btn-primary)').click();
-        ctx.sync();
-        expect(ctx.ctrl.rules.group.disambiguation).toBe('CMP_WIN_AND_LOSE');
-        ctx.element.find('#disambiguate-strategy :not(.btn-primary)').click();
-        ctx.sync();
-        expect(ctx.ctrl.rules.group.disambiguation).toBe('CMP_WIN_MINUS_LOSE');
+        ctx.btnToggles('#disambiguate-strategy',
+                       () => ctx.ctrl.rules.group.disambiguation,
+                       {default: {value: 'CMP_WIN_MINUS_LOSE', clazz: 'btn-primary'},
+                        other: {value: 'CMP_WIN_AND_LOSE', clazz: 'btn-primary'}});
     });
 
     it('how much quits group and its size are visible if tournament has play off', () => {
@@ -62,16 +56,10 @@ describe('group-tr-params', () => {
 
     it('quits group toggles', () => {
         ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
-        expect(ctx.ctrl.rules.group.quits).toBe(2);
-        ctx.element.find('#how-much-quits-group .btn-success').click();
-        ctx.sync();
-        expect(ctx.ctrl.rules.group.quits).toBe(2);
-        ctx.element.find('#how-much-quits-group a:not(.btn-success)').click();
-        ctx.sync();
-        expect(ctx.ctrl.rules.group.quits).toBe(1);
-        ctx.element.find('#how-much-quits-group a:not(.btn-primary)').click();
-        ctx.sync();
-        expect(ctx.ctrl.rules.group.quits).toBe(2);
+        ctx.btnToggles('#how-much-quits-group',
+                       () => ctx.ctrl.rules.group.quits,
+                       {default: {clazz: 'btn-success', value: 2},
+                        other: {clazz: 'btn-primary', value: 1}});
     });
 
     it('enable group panel', () => {

@@ -12,6 +12,9 @@ export default class SeedingTournamentParamsCtrl extends BaseTrParamsCtrl {
                 return;
             }
             if (newValue == 'ProvidedRating') {
+                if (this.rules.casting.providedRankOptions) {
+                    return;
+                }
                 this.rules.casting.providedRankOptions = (
                    this.providedRankOptionsBackup
                       ? this.providedRankOptionsBackup

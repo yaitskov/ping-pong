@@ -31,6 +31,17 @@ export default class AngularTestContext {
         expect(valueF()).toBe(options.default.value);
     }
 
+    btnArrayToggles(jqueryPrefix, valueF, expectedValues) {
+        const buttons = this.element.find(jqueryPrefix);
+        expect(buttons.length).toBe(expectedValues.length);
+
+        for (let i = 0; i < expectedValues.length; ++i) {
+            buttons.get(i).click();
+            this.sync();
+            expect(valueF()).toBe(expectedValues[i]);
+        }
+    }
+
     btnToggles(jqueryPrefix, valueF, options) {
         this.btnTogglesDiffClasses(jqueryPrefix, valueF, options);
     }

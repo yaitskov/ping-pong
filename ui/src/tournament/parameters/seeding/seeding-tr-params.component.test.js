@@ -60,4 +60,12 @@ describe('seeding-tr-params', () => {
         ctx.hidden('#rank-name-field .help-block');
         ctx.hasNoClass('#rank-name-field', 'has-error');
     });
+
+    it('rank axis direction toggles', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.btnTogglesDiffClasses('#rank-axis-direction',
+                                  () => ctx.ctrl.rules.casting.direction,
+                                  {default: {clazz: 'btn-primary', value: 'Decrease'},
+                                   other: {clazz: 'btn-primary', value: 'Increase'}});
+    });
 });

@@ -9,6 +9,7 @@ export default function manyButtonToggler() {
             selectedClass: '@'
         },
         link: function (scope, element, attrs, ngModel) {
+            scope.selectedClasss = scope.selectedClasss || 'btn-primary';
             scope.up = (val) => {
                 ngModel.$setViewValue(val);
                 ngModel.$render();

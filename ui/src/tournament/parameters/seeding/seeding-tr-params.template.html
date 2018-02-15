@@ -7,21 +7,9 @@
     </a>
 </div>
 <div id="seeding-parameters" class="toggle-panel in">
-    <div class="form-group" id="ranking-policy">
-        <label class="toggle-option" translate="rank-policy-lbl"/>
-        <a class="btn btn-default"
-           translate="provided-rating-policy"
-           ng-click="$ctrl.rules.casting.policy = 'ProvidedRating'"
-           ng-class="{'btn-primary': $ctrl.rules.casting.policy == 'ProvidedRating'}"/>
-        <a class="btn btn-default"
-           translate="manual-rating-policy"
-           ng-click="$ctrl.rules.casting.policy = 'Manual'"
-           ng-class="{'btn-primary': $ctrl.rules.casting.policy == 'Manual'}"/>
-        <a class="btn btn-default"
-           translate="sign-up-policy"
-           ng-click="$ctrl.rules.casting.policy = 'SignUp'"
-           ng-class="{'btn-primary': $ctrl.rules.casting.policy == 'SignUp'}"/>
-    </div>
+    <many-button-toggler domain="['ProvidedRating', 'Manual', 'SignUp']"
+                         id="ranking-policy" label="rank-policy-lbl"
+                         ng-model="$ctrl.rules.casting.policy"/>
     <div class="form-group" id="rank-name-field"
          ng-class="{'has-error': $ctrl.showError('rankName')}"
          ng-show="$ctrl.rules.casting.policy == 'ProvidedRating'">
@@ -49,16 +37,8 @@
         <div touch-spin options="$ctrl.rank"
              ng-model="$ctrl.rules.casting.providedRankOptions.maxValue"/>
     </div>
-    <div class="form-group" id="rank-axis-direction"
-         ng-show="$ctrl.rules.casting.policy != 'Manual'">
-        <label class="toggle-option" translate="rank-direction-lbl"/>
-        <a class="btn btn-default"
-           translate="decreasing-lbl"
-           ng-click="$ctrl.rules.casting.direction = 'Decrease'"
-           ng-class="{'btn-primary': $ctrl.rules.casting.direction == 'Decrease'}"/>
-        <a class="btn btn-default"
-           translate="increasing-lbl"
-           ng-click="$ctrl.rules.casting.direction = 'Increase'"
-           ng-class="{'btn-primary': $ctrl.rules.casting.direction == 'Increase'}"/>
-    </div>
+    <many-button-toggler domain="['Decrease', 'Increase']" label="rank-direction-lbl"
+                         id="rank-axis-direction"
+                         ng-show="$ctrl.rules.casting.policy != 'Manual'"
+                         ng-model="$ctrl.rules.casting.direction" selected-class="btn-primary"/>
 </div>

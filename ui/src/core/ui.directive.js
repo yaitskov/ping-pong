@@ -1,7 +1,9 @@
 import angular from 'angular';
 import './directive/directive.import.js';
+import manyButtonToggler from './angular/many-button-toggler/manyButtonToggler.js';
 
 angular.module('core.ui').
+    directive('manyButtonToggler', manyButtonToggler).
     directive('backButton', function () {
         return {
             restrict: 'A',

@@ -42,6 +42,19 @@ export default class AngularTestContext {
         }
     }
 
+    setValue(jqueryPrefix, value) {
+        this.element.find(jqueryPrefix).val(value).trigger('change');
+        this.sync();
+    }
+
+    hasClass(jqueryPrefix, cssClass) {
+       expect(this.element.find(jqueryPrefix).hasClass(cssClass)).toBeTrue();
+    }
+
+    hasNoClass(jqueryPrefix, cssClass) {
+       expect(this.element.find(jqueryPrefix).hasClass(cssClass)).toBeFalse();
+    }
+
     btnToggles(jqueryPrefix, valueF, options) {
         this.btnTogglesDiffClasses(jqueryPrefix, valueF, options);
     }

@@ -10,6 +10,10 @@ export default class BaseTrParamsCtrl extends ComposableCtrl {
         this.rules = tournament.rules;
     }
 
+    showError(field) {
+        return this.parent.showError(field);
+    }
+
     onInitChild() {
         this.binder(this.$scope, {
             'event.tournament.rules.errors': (e, errors) => this.errors = errors,

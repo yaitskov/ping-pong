@@ -15,6 +15,10 @@ export default class TournamentRulesCtrl extends CompositeCtrl {
         }
     }
 
+    showError(field) {
+        return (this.form.$submitted || this.form[field].$dirty) && this.form[field].$invalid;
+    }
+
     static get readyEvent() {
         return 'event.tournament.rules.ready';
     }

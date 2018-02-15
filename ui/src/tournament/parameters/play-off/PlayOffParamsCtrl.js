@@ -1,4 +1,5 @@
 import BaseTrParamsCtrl from 'tournament/parameters/BaseTrParamsCtrl.js';
+import backedUpValue from 'core/backedUpValue.js';
 
 function defaultPlayOffRules() {
    return {thirdPlaceMatch: 0, losings: 1};
@@ -14,34 +15,21 @@ export default class PlayOffParamsCtrl extends BaseTrParamsCtrl {
     }
 
     watchForPlayOff() {
-        this.$scope.$watch('$ctrl.usePlayOff', (newValue, oldValue) => {
-            console.log(`usePlayOff change ${newValue} ${oldValue}`);
-            if (!this.rules) {
-                return;
-            }
-            if (newValue) {
-                if (this.rules.playOff) {
-                    return;
-                }
-                this.rules.playOff = (this.playOffBackup
-                    ? this.playOffBackup
-                    : defaultPlayOffRules());
-            } else {
-                this.playOffBackup = this.rules.playOff;
-                delete this.rules.playOff;
-            }
+        this.$scope.$watch('$ctrl.usePlayOff', (newValue) => {
+            console.log(`usePlayOff change ${newValue}`);
+            this.rules.playOff = this.playOffBackup.map(newValue);
         });
     }
 
     onTournamentSet(tournament) {
         super.onTournamentSet(tournament);
+        this.watchForPlayOff();
         this.usePlayOff = !!this.rules.playOff;
     }
 
     constructor() {
         super(...arguments);
-        this.playOffBackup = null;
+        this.playOffBackup = backedUpValue(defaultPlayOffRules, () => this.rules.playOff);
         this.usePlayOff = false;
-        this.watchForPlayOff();
     }
 }

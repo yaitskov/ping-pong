@@ -1,4 +1,5 @@
 import BaseTrParamsCtrl from 'tournament/parameters/BaseTrParamsCtrl.js';
+import backedUpValue from 'core/backedUpValue.js';
 
 function defaultGroupRules() {
     return {
@@ -34,16 +35,7 @@ export default class GroupParamsCtrl extends BaseTrParamsCtrl {
     watchForUseGroups() {
         this.$scope.$watch('$ctrl.useGroups', (newValue, oldValue) => {
             console.log(`useGroups change ${newValue} ${oldValue}`);
-            if (!this.rules) {
-                return;
-            }
-            if (newValue) {
-                if (!this.rules.group) {
-                    this.rules.group = this.groupRuleBackup || defaultGroupRules();
-                }
-            } else {
-                this.groupRuleBackup = this.rules.group;
-            }
+            this.rules.group = this.groupRuleBackup.map(newValue);
             this.generateGroupSchedule();
         });
     }
@@ -79,6 +71,7 @@ export default class GroupParamsCtrl extends BaseTrParamsCtrl {
 
     onTournamentSet(tournament) {
         super.onTournamentSet(tournament);
+        this.watchForUseGroups();
         const group = this.rules.group;
         this.useGroups = !!group;
         if (!group) {
@@ -93,10 +86,9 @@ export default class GroupParamsCtrl extends BaseTrParamsCtrl {
     constructor() {
         super(...arguments);
         this.maxGroupSize = {min: 2, max: 20};
-        this.groupRuleBackup = null;
+        this.groupRuleBackup = backedUpValue(defaultGroupRules, () => this.rules.group);
         this.useGroups = false;
         this.groupScheduleErrors = [];
         this.formatScheduleError = this.groupSchedule.formatScheduleError;
-        this.watchForUseGroups();
     }
 }

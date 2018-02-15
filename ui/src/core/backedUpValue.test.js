@@ -1,6 +1,12 @@
-import backedUpValue from './BackedUpValue.js';
+import backedUpValue from './backedUpValue.js';
 
-describe('BackedUpValue', () => {
+describe('backedUpValue', () => {
+    it('custom keep on disable / enable', () => {
+        let x = {a: 2};
+        const backup = backedUpValue(() => 1, () => x.a, 'Ok');
+        expect(x.a = backup.map(true)).toBeUndefined();
+        expect(backup.map('Ok')).toBe(2);
+    });
     it('disable / enable', () => {
         let x = {a: 2};
         const backup = backedUpValue(() => 1, () => x.a);

@@ -74,8 +74,7 @@ describe('group-tr-params', () => {
         ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
         ctx.element.find('#group-parameters-toggler input').bootstrapToggle('off');
         ctx.sync();
-        expect(ctx.ctrl.groupRuleBackup.groupSize).toBe(8);
-        expect(ctx.ctrl.groupRuleBackup.quits).toBe(2);
+        expect(ctx.ctrl.rules.group).toBeUndefined();
         ctx.element.find('#group-parameters-toggler input').bootstrapToggle('on');
         ctx.sync();
         expect(ctx.ctrl.rules.group.groupSize).toBe(8);

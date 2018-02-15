@@ -11,7 +11,7 @@ export default function defaultTournamentRules(sport) {
             providedRankOptions: {
                 label: 'rating',
                 minValue: 0,
-                maxValue: 1000000
+                maxValue: 500000
             }
         },
         group: {

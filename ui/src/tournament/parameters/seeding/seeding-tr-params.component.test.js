@@ -1,5 +1,5 @@
 import { setupAngularJs } from 'test/angularjs-test-setup.js';
-import { checkTouchSpinIncrease, checkTouchSpinDecrease } from 'test/touchSpin.js';
+import { checkTouchSpinID } from 'test/touchSpin.js';
 import SeedingTournamentParamsCtrl from './SeedingTournamentParamsCtrl.js';
 import defaultTournamentRules from 'tournament/new/defaultTournamentRules.js';
 
@@ -67,5 +67,17 @@ describe('seeding-tr-params', () => {
                                   () => ctx.ctrl.rules.casting.direction,
                                   {default: {clazz: 'btn-primary', value: 'Decrease'},
                                    other: {clazz: 'btn-primary', value: 'Increase'}});
+    });
+
+    it('max rank increase/decrease', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        checkTouchSpinID(ctx, '#max-rank-value',
+                         () => ctx.ctrl.rules.casting.providedRankOptions.maxValue);
+    });
+
+    it('min rank increase/decrease', () => {
+        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        checkTouchSpinID(ctx, '#min-rank-value',
+                         () => ctx.ctrl.rules.casting.providedRankOptions.minValue);
     });
 });

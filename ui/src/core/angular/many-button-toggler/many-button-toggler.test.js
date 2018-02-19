@@ -116,4 +116,30 @@ describe('manyButtonToggler', () => {
             expect(btnB().hasClass('btn-primary')).toBeTrue();
         });
     });
+
+    describe('bind to click event', () => {
+        angular.module('test-many-button-toggler').
+            component('useManyButtonTogglerWithBind', {
+                template: `<many-button-toggler domain="['A', 'B']" ng-model="$ctrl.model"
+ label="input-label" on-click="$ctrl.callMe"/>`,
+                controller: function () {
+                    this.model = 'A';
+                    this.callHistory = [];
+                    this.callMe = (index) => this.callHistory.push(index);
+                }
+            });
+
+        const ctx = setupAngularJs('use-many-button-toggler-with-bind',
+                                   {moduleName: 'test-many-button-toggler'});
+
+        const btnA = () => ctx.element.find('a').slice(0, 1);
+        const btnB = () => ctx.element.find('a').slice(1, 2);
+
+        it('callMe is invoked', () => {
+            expect(ctx.ctrl.callHistory).toEqual([]);
+            ctx.click(btnB());
+            ctx.click(btnA());
+            expect(ctx.ctrl.callHistory).toEqual([1, 0]);
+        });
+    });
 });

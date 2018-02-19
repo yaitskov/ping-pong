@@ -8,8 +8,8 @@ describe('manyButtonToggler', () => {
         config(['$translateProvider', ($translateProvider) => {
             $translateProvider.translations(
                 'en', {'input-label': 'inputLabel',
-                       'A-value-label': 'A label',
-                       'B-value-label': 'B label'});
+                       'input-label-A': 'A label',
+                       'input-label-B': 'B label'});
             $translateProvider.preferredLanguage('en');
         }]).
         directive('manyButtonToggler', manyButtonToggler).

@@ -24,7 +24,7 @@ export default function manyButtonToggler() {
                             ng-click="up(domainValue)"
                             ng-repeat="domainValue in domain"
                             ng-class="{'{{selectedClass}}': getValue123() == domainValue}">{{
-                              (domainValue + '-value-label') | translate }}</a>
+                              (label + '-' + domainValue) | translate }}</a>
                    </div>`
     };
 }

@@ -121,7 +121,7 @@ describe('manyButtonToggler', () => {
         angular.module('test-many-button-toggler').
             component('useManyButtonTogglerWithBind', {
                 template: `<many-button-toggler domain="['A', 'B']" ng-model="$ctrl.model"
- label="input-label" on-click="$ctrl.callMe"/>`,
+ label="input-label" on-click="[$ctrl.callMe]"/>`,
                 controller: function () {
                     this.model = 'A';
                     this.callHistory = [];
@@ -139,7 +139,7 @@ describe('manyButtonToggler', () => {
             expect(ctx.ctrl.callHistory).toEqual([]);
             ctx.click(btnB());
             ctx.click(btnA());
-            expect(ctx.ctrl.callHistory).toEqual([1, 0]);
+            expect(ctx.ctrl.callHistory).toEqual([0]);
         });
     });
 });

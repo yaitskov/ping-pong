@@ -7,13 +7,18 @@ export default function manyButtonToggler() {
             domain: '=',
             label: '@',
             selectedClass: '=',
-            onClick: '='
+            onClick: '=',
+            onClick1: '='
         },
         link: function (scope, element, attrs, ngModel) {
             scope.up = (val) => {
                 if (scope.onClick) {
                     const idx = scope.domain.indexOf(val);
-                    if (idx >= 0) {
+                    if (scope.onClick.length) {
+                        if (scope.onClick[idx]) {
+                            scope.onClick[idx](idx);
+                        }
+                    } else {
                         scope.onClick(idx);
                     }
                 }

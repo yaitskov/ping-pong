@@ -6,13 +6,21 @@ export default function manyButtonToggler() {
             id: '@',
             domain: '=',
             label: '@',
-            selectedClass: '@'
+            selectedClass: '='
         },
         link: function (scope, element, attrs, ngModel) {
-            scope.selectedClasss = scope.selectedClasss || 'btn-primary';
             scope.up = (val) => {
                 ngModel.$setViewValue(val);
                 ngModel.$render();
+            };
+            scope.pickSelectedClass = (index) => {
+                if (!scope.selectedClass) {
+                    return 'btn-primary';
+                }
+                if (typeof scope.selectedClass === 'string') {
+                    return scope.selectedClass;
+                }
+                return scope.selectedClass[index];
             };
             scope.getValue123 = () => {
                 return ngModel.$modelValue;
@@ -23,7 +31,7 @@ export default function manyButtonToggler() {
                          <a class="btn btn-default"
                             ng-click="up(domainValue)"
                             ng-repeat="domainValue in domain"
-                            ng-class="{'{{selectedClass}}': getValue123() == domainValue}">{{
+                            ng-class="{'{{pickSelectedClass($index)}}': getValue123() == domainValue}">{{
                               (label + '-' + domainValue) | translate }}</a>
                    </div>`
     };

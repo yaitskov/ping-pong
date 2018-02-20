@@ -7,6 +7,9 @@ describe('defaultMatchRules', () => {
     it('for ping-pong', () => {
         expect(defaultMatchRules('PingPong').minGamesToWin).toBe(11);
     });
+    it('default sport is ping-pong', () => {
+        expect(defaultMatchRules()['@type']).toBe('PingPong');
+    });
     it('exception for unknown sport', () => {
         expect(() => defaultMatchRules('Badminton')).
             toThrow(new Error('Sport [Badminton] is not supported'));

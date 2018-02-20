@@ -1,5 +1,6 @@
 export default function defaultMatchRules(sport) {
     switch (sport) {
+    case undefined:
     case 'PingPong':
         return {
             '@type': 'PingPong',

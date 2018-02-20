@@ -40,11 +40,13 @@ export default function manyButtonToggler() {
         },
         template: `<div class="form-group">
                          <label class="toggle-option">{{ label | translate }}</label>
-                         <a class="btn btn-default"
-                            ng-click="up(domainValue)"
-                            ng-repeat="domainValue in domain"
-                            ng-class="{'{{pickSelectedClass($index)}}': getValue123() == domainValue}">{{
-                              (label + '-' + domainValue) | translate }}</a>
+                         <div class="btn-toolbar">
+                            <a class="btn btn-default"
+                               ng-click="up(domainValue)"
+                               ng-repeat="domainValue in domain"
+                               ng-class="{'{{pickSelectedClass($index)}}': getValue123() == domainValue}">{{
+                                 (label + '-' + domainValue) | translate }}</a>
+                         </div>
                    </div>`
     };
 }

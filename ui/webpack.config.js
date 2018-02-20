@@ -54,7 +54,7 @@ module.exports = {
                     plugins: [ 'source-map-support' //'transform-runtime'
                         //"transform-es2015-for-of",
                         //"transform-es2015-block-scoping", "transform-strict-mode",
-                        //"transform-object-rest-spread"
+                               ,"transform-object-rest-spread"
                     ]
                 }
             }

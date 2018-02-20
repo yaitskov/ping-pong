@@ -17,6 +17,21 @@ describe('java script', () => {
         it('call function', () => expect(sum.apply(null, [1, 2])).toBe(3));
     });
     describe('syntax', () => {
+        describe('map', () => {
+            it('spread', () => {
+                const m1 = {a: 1, b: 2};
+                const m2 = {c: 3, b: 8};
+                expect({...m1, ...m2}).toEqual({a: 1, b: 8, c: 3});
+                expect(m1.b).toBe(2);
+            });
+            it('nested spread', () => {
+                const m1 = {a: {a: 1, b: 2}, b: 2};
+                const m2 = {a: {c: 3, b: 8}, c: 4};
+                expect({...m1, ...m2, a: {...m1.a, ...m2.a}}).
+                    toEqual({a: {a: 1, b: 8, c: 3}, b: 2, c: 4});
+                expect(m1.a.b).toBe(2);
+            });
+        });
         describe('switch', () => {
             it('undefined literal in case', () => {
                 let executed;

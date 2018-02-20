@@ -10,10 +10,6 @@ export default class PlayOffParamsCtrl extends BaseTrParamsCtrl {
         return ['$timeout'].concat(super.$inject);
     }
 
-    scrollBottom() {
-        this.$timeout(() => window.scrollTo(0, document.body.scrollHeight), 100);
-    }
-
     watchForPlayOff() {
         this.$scope.$watch('$ctrl.usePlayOff', (newValue) => {
             console.log(`usePlayOff change ${newValue}`);
@@ -31,5 +27,6 @@ export default class PlayOffParamsCtrl extends BaseTrParamsCtrl {
         super(...arguments);
         this.playOffBackup = backedUpValue(defaultPlayOffRules, () => this.rules.playOff);
         this.usePlayOff = false;
+        this.scrollBottom = () => this.$timeout(() => window.scrollTo(0, document.body.scrollHeight), 100);
     }
 }

@@ -61,6 +61,8 @@ module.exports = {
     'Match score': 'Match score',
     'match-score-help': 'Determines how many sets an opponent should take, to win the match.',
     'Match for 3rd place': 'Match for 3rd place',
+    'Match for 3rd place-1': 'yes',
+    'Match for 3rd place-0': 'no',
     'Back btn': 'Back',
     'Create & Open Draft': 'Create & Open Draft',
     'yes': 'yes',

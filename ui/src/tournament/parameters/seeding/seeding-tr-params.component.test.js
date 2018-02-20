@@ -1,7 +1,7 @@
 import { setupAngularJs } from 'test/angularjs-test-setup.js';
 import { checkTouchSpinID } from 'test/touchSpin.js';
 import SeedingTournamentParamsCtrl from './SeedingTournamentParamsCtrl.js';
-import defaultTournamentRules from 'tournament/new/defaultTournamentRules.js';
+import { newTournamentWithPlayOff } from 'test/defaultTournaments.js';
 
 describe('seeding-tr-params', () => {
     var initEventFired = false;
@@ -15,17 +15,15 @@ describe('seeding-tr-params', () => {
         expect(initEventFired).toBeTrue();
     });
 
-    const tournamentWithPlayOff = () => { return {rules: defaultTournamentRules('PingPong')}; };
-
     it('ranking policy toggles', () => {
-        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff());
         ctx.btnArrayToggles('#ranking-policy a',
                             () => ctx.ctrl.rules.casting.policy,
                             ['ProvidedRating', 'Manual', 'SignUp']);
     });
 
     it('rank name is visible for policy provided rank', () => {
-        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff());
         ctx.visible('#rank-name-field');
         ctx.visible('#max-rank-value');
         ctx.visible('#min-rank-value');
@@ -36,7 +34,7 @@ describe('seeding-tr-params', () => {
     });
 
     const tournamentWithManualRanking = () => {
-        const tournament = tournamentWithPlayOff();
+        const tournament = newTournamentWithPlayOff();
         delete tournament.rules.casting.providedRankOptions;
         tournament.rules.casting.policy = 'Manual';
         return tournament;
@@ -51,7 +49,7 @@ describe('seeding-tr-params', () => {
     });
 
     it('rank name length validation', () => {
-        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff());
         ctx.setValue('#rankName', ''.padEnd(101, 'x'));
         ctx.visible('#rank-name-field .help-block');
         ctx.hasClass('#rank-name-field', 'has-error');
@@ -62,7 +60,7 @@ describe('seeding-tr-params', () => {
     });
 
     it('rank axis direction toggles', () => {
-        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff());
         ctx.btnTogglesDiffClasses('#rank-axis-direction',
                                   () => ctx.ctrl.rules.casting.direction,
                                   {default: {clazz: 'btn-primary', value: 'Decrease'},
@@ -70,13 +68,13 @@ describe('seeding-tr-params', () => {
     });
 
     it('max rank increase/decrease', () => {
-        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff());
         checkTouchSpinID(ctx, '#max-rank-value',
                          () => ctx.ctrl.rules.casting.providedRankOptions.maxValue);
     });
 
     it('min rank increase/decrease', () => {
-        ctx.broadcast('event.tournament.rules.set', tournamentWithPlayOff());
+        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff());
         checkTouchSpinID(ctx, '#min-rank-value',
                          () => ctx.ctrl.rules.casting.providedRankOptions.minValue);
     });

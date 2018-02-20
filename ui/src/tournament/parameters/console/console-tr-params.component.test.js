@@ -1,5 +1,7 @@
 import { setupAngularJs, ij } from 'test/angularjs-test-setup.js';
 import ConsoleParamsCtrl from './ConsoleParamsCtrl.js';
+import { newTournament, existingTournamentWithoutGroup, existingTournamentWithoutConsole,
+         existingTournamentWithConsole, existingTournamentRequiresConsole } from 'test/defaultTournaments.js';
 
 describe('console-tr-params', () => {
     var initEventFired = false;
@@ -13,69 +15,49 @@ describe('console-tr-params', () => {
         expect(initEventFired).toBeTrue();
     });
 
-    it('component is hidden initially', () => {
-        expect(ctx.element.find('#console-tournament-toggler').hasClass('ng-hide')).toBeTrue();
-        expect(ctx.element.find('#console-tournament-parameters').hasClass('ng-hide')).toBeTrue();
+    it('console panel is hidden initially', () => {
+        ctx.hidden('#console-tournament-toggler');
+        ctx.hidden('#console-tournament-parameters');
     });
 
-    const newTournament = () => { return {rules: {group: {console: 'NO'}}}; };
-
-    ij('component is not visible if new tournament', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', newTournament());
-        ctx.sync();
-
-        expect(ctx.element.find('#console-tournament-toggler').hasClass('ng-hide')).toBeTrue();
-        expect(ctx.element.find('#console-tournament-parameters').hasClass('ng-hide')).toBeTrue();
+    it('console panel is not visible if new tournament', () => {
+        ctx.broadcast('event.tournament.rules.set', newTournament());
+        ctx.hidden('#console-tournament-toggler');
+        ctx.hidden('#console-tournament-parameters');
     });
 
-    const tournamentWithoutGroup = () => { return {tid: 1, rules: {}}; };
-
-    ij('toggler component is not visible if tournament has no group', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithoutGroup());
-        ctx.sync();
-        expect(ctx.element.find('#console-tournament-toggler').hasClass('ng-hide')).toBeTrue();
-        expect(ctx.element.find('#console-tournament-parameters').hasClass('ng-hide')).toBeTrue();
+    it('console panel is not visible if tournament has no group', () => {
+        ctx.broadcast('event.tournament.rules.set', existingTournamentWithoutGroup());
+        ctx.hidden('#console-tournament-toggler');
+        ctx.hidden('#console-tournament-parameters');
     });
 
-    const tournamentWithoutConsole = () => { return {tid: 1, rules: {group: {console: 'NO'}}}; };
-
-    ij('component is visible if tournament has groups', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithoutConsole());
-        ctx.sync();
-
+    it('console options are not visible if tournament has no console tournament', () => {
+        ctx.broadcast('event.tournament.rules.set', existingTournamentWithoutConsole());
         expect(ctx.ctrl.playConsoleTournament).toBeFalse();
-        expect(ctx.element.find('#console-tournament-toggler').hasClass('ng-hide')).toBeFalse();
-        expect(ctx.element.find('#console-tournament-parameters').hasClass('ng-hide')).toBeTrue();
+        ctx.visible('#console-tournament-toggler');
+        ctx.hidden('#console-tournament-parameters');
     });
 
-    const tournamentRequiresConsole = () => { return {tid: 1, rules: {group: {console: 'INDEPENDENT_RULES'}}}; };
-
-    ij('console rules link is visible', ($rootScope) => {
-        const tournamentWithConsole = Object.assign({consoleTid: 2}, tournamentRequiresConsole());
-        $rootScope.$broadcast('event.tournament.rules.set', tournamentWithConsole);
-        ctx.sync();
-
+    it('console rules link is visible', () => {
+        ctx.broadcast('event.tournament.rules.set', existingTournamentWithConsole());
         expect(ctx.ctrl.playConsoleTournament).toBeTrue();
-        expect(ctx.element.find('#console-tournament-toggler').hasClass('ng-hide')).toBeFalse();
-        expect(ctx.element.find('#console-tournament-parameters').hasClass('ng-hide')).toBeFalse();
-        expect(ctx.element.find('#console-tournament-parameters .btn-primary').hasClass('ng-hide')).toBeFalse();
+        ctx.visible('#console-tournament-toggler');
+        ctx.visible('#console-tournament-parameters');
+        ctx.visible('#console-tournament-parameters .btn-primary');
     });
 
-    ij('console tournament is created consoleTid is missing', ($rootScope, jsHttpBackend) => {
-        const tour = tournamentRequiresConsole();
+    ij('console tournament is created consoleTid is missing', (jsHttpBackend) => {
+        const tour = existingTournamentRequiresConsole();
         const consoleTid = 2;
-
-        $rootScope.$broadcast('event.tournament.rules.set', tour);
 
         jsHttpBackend.onPostMatch(/api.tournament.console.create/, [e => e.toBe(tour.tid)]).
             respondObject(consoleTid);
 
-        ctx.sync(); // watcher
+        ctx.broadcast('event.tournament.rules.set', tour);
 
-        expect(ctx.element.find('#console-tournament-parameters .btn-primary').
-               hasClass('ng-hide')).toBeTrue();
-        expect(ctx.element.find('#console-tournament-parameters .btn-default').
-               hasClass('ng-hide')).toBeFalse();
+        ctx.hidden('#console-tournament-parameters .btn-primary');
+        ctx.visible('#console-tournament-parameters .btn-default');
 
         jsHttpBackend.flush(); // response callback
 
@@ -83,16 +65,14 @@ describe('console-tr-params', () => {
         expect(tour.consoleTid).toEqual(consoleTid);
         expect(ctx.element.find('#console-tournament-parameters .btn-primary').
                attr('href')).toBe(`#!/my/tournament/parameters/${consoleTid}`);
-        expect(ctx.element.find('#console-tournament-parameters .btn-primary').
-               hasClass('ng-hide')).toBeFalse();
-        expect(ctx.element.find('#console-tournament-parameters .btn-default').
-               hasClass('ng-hide')).toBeTrue();
+        ctx.visible('#console-tournament-parameters .btn-primary');
+        ctx.hidden('#console-tournament-parameters .btn-default');
     });
 
-    ij('console tournament is created by toggle', ($rootScope, jsHttpBackend) => {
-        const tour = tournamentWithoutConsole();
-        $rootScope.$broadcast('event.tournament.rules.set', tour);
-        ctx.sync(); // watcher
+    ij('console tournament is created by toggle', (jsHttpBackend) => {
+        const tour = existingTournamentWithoutConsole();
+        ctx.broadcast('event.tournament.rules.set', tour);
+
         jsHttpBackend.onPostMatch(/api.tournament.console.create/, [e => e.toBe(tour.tid)]).
             respondObject(2/*consoleTid*/);
         ctx.element.find('#console-tournament-toggler input').bootstrapToggle('on');

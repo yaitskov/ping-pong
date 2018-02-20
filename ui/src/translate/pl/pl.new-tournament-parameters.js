@@ -57,6 +57,8 @@ module.exports = {
     'Match score': 'Ilość punktów',
     'match-score-help': 'Ile setów uczestnik musi zdobyć, żeby wygrać mecz.',
     'Match for 3rd place': 'Mecz za 3 miejsce',
+    'Match for 3rd place-1': 'tak',
+    'Match for 3rd place-0': 'nie',
     'Back btn': 'Cofni',
     'Create & Open Draft': 'Ztworzyć & Zacząć rekrutacje',
     'yes': 'tak',

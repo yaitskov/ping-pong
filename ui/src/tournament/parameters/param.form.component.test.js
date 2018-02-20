@@ -1,5 +1,5 @@
 import { setupAngularJs, ij } from 'test/angularjs-test-setup.js';
-import defaultTournamentRules from 'tournament/new/defaultTournamentRules.js';
+import { existingTournament, newTournament } from 'test/defaultTournaments.js';
 
 describe('tournament-parameters-form', () => {
     var initEventFired = false;
@@ -34,58 +34,35 @@ describe('tournament-parameters-form', () => {
     });
 
     describe('new tournament', () => {
-        it('update button is not visible', () => {
-            expect(ctx.element.find('#update-tournament-rules')
-                   .hasClass('ng-hide')).toBeTrue();
-        });
-
-        it('create button is visible', () => {
-            expect(ctx.element.find('#create-tournament')
-                   .hasClass('ng-hide')).toBeFalse();
-        });
-
-        it('back button is visible', () => {
-            expect(ctx.element.find('#back-to-tournament-properties')
-                   .hasClass('ng-hide')).toBeFalse();
-        });
+        it('update button is not visible', () => ctx.hidden('#update-tournament-rules'));
+        it('create button is visible', () => ctx.visible('#create-tournament'));
+        it('back button is visible', () => ctx.visible('#back-to-tournament-properties'));
     });
 
     describe('existing tournament', () => {
-        ij('update button is not visible', ($rootScope) => {
-            $rootScope.$broadcast('event.tournament.rules.set',
-                                  {tid: 9, rules: {}});
-            ctx.sync();
-            expect(ctx.element.find('#update-tournament-rules')
-                   .hasClass('ng-hide')).toBeFalse();
+        it('update button is not visible', () => {
+            ctx.broadcast('event.tournament.rules.set', existingTournament());
+            ctx.visible('#update-tournament-rules');
         });
-
-        ij('create button is visible', ($rootScope) => {
-            $rootScope.$broadcast('event.tournament.rules.set',
-                                  {tid: 9, rules: {}});
-            ctx.sync();
-            expect(ctx.element.find('#create-tournament')
-                   .hasClass('ng-hide')).toBeTrue();
+        it('create button is visible', () => {
+            ctx.broadcast('event.tournament.rules.set', existingTournament());
+            ctx.hidden('#create-tournament');
         });
-
-        ij('back button is visible', ($rootScope) => {
-            $rootScope.$broadcast('event.tournament.rules.set',
-                                  {tid: 9, rules: {}});
-            ctx.sync();
-            expect(ctx.element.find('#back-to-tournament-properties')
-                   .hasClass('ng-hide')).toBeTrue();
+        it('back button is visible', () => {
+            ctx.broadcast('event.tournament.rules.set', existingTournament());
+            ctx.hidden('#back-to-tournament-properties');
         });
     });
 
-    ij('set event', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set',
-                              {tid: 9, rules: defaultTournamentRules('PingPong')});
-        expect(ctx.ctrl.tournament.tid).toBe(9);
+    it('set event', () => {
+        const tournament = existingTournament('PingPong');
+        ctx.broadcast('event.tournament.rules.set', tournament);
+        expect(ctx.ctrl.tournament.tid).toBe(tournament.tid);
     });
 
     ij('default new tr rules pass', ($rootScope) => {
-        const tournament = {rules: defaultTournamentRules('PingPong')};
-        $rootScope.$broadcast('event.tournament.rules.set', tournament);
-        ctx.sync();
+        const tournament = newTournament('PingPong');
+        ctx.broadcast('event.tournament.rules.set', tournament);
 
         const spy = spyOn($rootScope, '$broadcast');
         ctx.element.find('#create-tournament').click();
@@ -94,10 +71,8 @@ describe('tournament-parameters-form', () => {
     });
 
     ij('default update tr rules pass', ($rootScope) => {
-        const tournament = {tid: 1, rules: defaultTournamentRules('PingPong')};
-        $rootScope.$broadcast('event.tournament.rules.set', tournament);
-        ctx.sync();
-
+        const tournament = existingTournament('PingPong');
+        ctx.broadcast('event.tournament.rules.set', tournament);
         const spy = spyOn($rootScope, '$broadcast');
         ctx.element.find('#update-tournament-rules').click();
         expect(spy).toHaveBeenCalledWith('event.tournament.rules.update',
@@ -105,11 +80,10 @@ describe('tournament-parameters-form', () => {
     });
 
     ij('child component validation works', ($rootScope) => {
-        const tournament = {rules: defaultTournamentRules('PingPong')};
+        const tournament = newTournament('PingPong');
         const veryLongLabel = ''.padEnd(111, 'x');
         tournament.rules.casting.providedRankOptions.label = veryLongLabel; // to long
-        $rootScope.$broadcast('event.tournament.rules.set', tournament);
-        ctx.sync();
+        ctx.broadcast('event.tournament.rules.set', tournament);
 
         const spy = spyOn($rootScope, '$broadcast');
         ctx.element.find('#create-tournament').click();

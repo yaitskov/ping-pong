@@ -1,6 +1,6 @@
-import { setupAngularJs, ij } from 'test/angularjs-test-setup.js';
+import { setupAngularJs } from 'test/angularjs-test-setup.js';
 import ArenaParamsCtrl from './ArenaParamsCtrl.js';
-import defaultTournamentRules from 'tournament/new/defaultTournamentRules.js';
+import { newTournament } from 'test/defaultTournaments.js';
 
 describe('arena-params', () => {
     var initEventFired = false;
@@ -14,34 +14,28 @@ describe('arena-params', () => {
         expect(initEventFired).toBeTrue();
     });
 
-    const tennisTournament = () => { return {rules: defaultTournamentRules('Tennis')}; };
-    const pingPongTournament = () => { return {rules: defaultTournamentRules('PingPong')}; };
+    const tennisTournament = () => newTournament('Tennis');
+    const pingPongTournament = () => newTournament('PingPong');
 
-    ij('disambiguate strategy toggles', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tennisTournament());
-        ctx.sync();
+    it('disambiguate strategy toggles', () => {
+        ctx.broadcast('event.tournament.rules.set', tennisTournament());
         expect(ctx.ctrl.rules.place.arenaDistribution).toBe('NO');
-        ctx.element.find('#arena-parameters .btn-danger').click();
-        ctx.sync();
+        ctx.click('#arena-parameters .btn-danger');
         expect(ctx.ctrl.rules.place.arenaDistribution).toBe('NO');
-        ctx.element.find('#arena-parameters a:not(.btn-danger)').click();
-        ctx.sync();
+        ctx.click('#arena-parameters a:not(.btn-danger)');
         expect(ctx.ctrl.rules.place.arenaDistribution).toBe('GLOBAL');
-        ctx.element.find('#arena-parameters a:not(.btn-primary)').click();
-        ctx.sync();
+        ctx.click('#arena-parameters a:not(.btn-primary)');
         expect(ctx.ctrl.rules.place.arenaDistribution).toBe('NO');
     });
 
-    ij('tennis arena label is only visible', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', tennisTournament());
-        ctx.sync();
+    it('tennis arena label is only visible', () => {
+        ctx.broadcast('event.tournament.rules.set', tennisTournament());
         expect(ctx.element.find('.toggle-btn label.ng-hide').text()).toBe('Tables');
         expect(ctx.element.find('.toggle-btn label:not(.ng-hide)').text()).toBe('Courts');
     });
 
-    ij('ping-pong arena label is only visible', ($rootScope) => {
-        $rootScope.$broadcast('event.tournament.rules.set', pingPongTournament());
-        ctx.sync();
+    it('ping-pong arena label is only visible', () => {
+        ctx.broadcast('event.tournament.rules.set', pingPongTournament());
         expect(ctx.element.find('.toggle-btn label.ng-hide').text()).toBe('Courts');
         expect(ctx.element.find('.toggle-btn label:not(.ng-hide)').text()).toBe('Tables');
     });

@@ -3,7 +3,7 @@ import manyButtonToggler from './ manyButtonToggler.js';
 
 angular.module('core.ui').
     /**
-       <many-button-toggler domain="['SignUp']" model="$ctrl.rules.casting.policy"
+       <many-button-toggler domain="['SignUp']" ng-model="$ctrl.rules.casting.policy"
                             selected-class="btn-primary"
                             label="rank-policy-lbl"/>
 

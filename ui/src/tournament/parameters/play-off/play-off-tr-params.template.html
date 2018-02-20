@@ -10,26 +10,10 @@
            bs-toggle/>
 </div>
 <div id="play-off-parameters" class="toggle-panel" ng-show="$ctrl.usePlayOff">
-    <div class="form-group" id="max-losses-in-play-off">
-        <label class="toggle-option" translate="max-losses"/>
-        <a class="btn btn-default"
-           translate="up-to-1-loss"
-           ng-click="$ctrl.rules.playOff.losings = 1; $ctrl.scrollBottom()"
-           ng-class="{'btn-primary': $ctrl.rules.playOff.losings == 1}"/>
-        <a class="btn btn-default"
-           translate="up-to-2-losses"
-           ng-click="$ctrl.rules.playOff.losings = 2"
-           ng-class="{'btn-success': $ctrl.rules.playOff.losings == 2}"/>
-    </div>
-    <div class="form-group" id="third-place-match" ng-show="$ctrl.rules.playOff.losings == 1">
-        <label class="toggle-option" translate="Match for 3rd place"/>
-        <a class="btn btn-default"
-           translate="yes-lbl"
-           ng-click="$ctrl.rules.playOff.thirdPlaceMatch = 1"
-           ng-class="{'btn-primary': $ctrl.rules.playOff.thirdPlaceMatch == 1}"/>
-        <a class="btn btn-default"
-           translate="no-lbl"
-           ng-click="$ctrl.rules.playOff.thirdPlaceMatch = 0"
-           ng-class="{'btn-danger': $ctrl.rules.playOff.thirdPlaceMatch == 0}"/>
-    </div>
+  <many-button-toggler id="max-losses-in-play-off" ng-model="$ctrl.rules.playOff.losings"
+                       domain="[1, 2]" selected-class="['btn-primary', 'btn-success']"
+                       label="max-losses" on-click="[$ctrl.scrollBottom]"/>
+  <many-button-toggler id="third-place-match" ng-show="$ctrl.rules.playOff.losings == 1"
+                       domain="[1, 0]" selected-class="['btn-primary', 'btn-danger']"
+                       label="Match for 3rd place" ng-model="$ctrl.rules.playOff.thirdPlaceMatch"/>
 </div>

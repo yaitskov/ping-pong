@@ -5,14 +5,19 @@ describe('java script', () => {
                 return this.name;
             }
         }
+        describe('map', () => {
+            it('Object.assign does not merge nested maps', () => {
+                expect(Object.assign({}, {a: {a: 1}}, {a: {b: 2}})).toEqual({a: {b: 2}});
+            });
+            it('array map', () => expect([1, 2].map(n => n * 2)).toEqual([2, 4]));
+            it('object map entries', () => expect(Object.entries({1: 2}).map(([k, v]) => `${k}-${v}`)).toEqual(['1-2']));
+            it('no object map', () => {
+                   const m = {1: 2};
+                expect(m.map).toBeUndefined();
+            });
+        });
         it('class static getter name reflection', () => expect(X.myName).toBe('X'));
         it('class has name field', () => expect(X.name).toBe('X'));
-        it('array map', () => expect([1, 2].map(n => n * 2)).toEqual([2, 4]));
-        it('object map entries', () => expect(Object.entries({1: 2}).map(([k, v]) => `${k}-${v}`)).toEqual(['1-2']));
-        it('no object map', () => {
-            const m = {1: 2};
-            expect(m.map).toBeUndefined();
-        });
         function sum(a, b) { return a + b; }
         it('call function', () => expect(sum.apply(null, [1, 2])).toBe(3));
     });

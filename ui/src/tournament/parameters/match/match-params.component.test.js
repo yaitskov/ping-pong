@@ -1,7 +1,7 @@
 import { setupAngularJs, ij } from 'test/angularjs-test-setup.js';
 import { checkTouchSpinID, checkTouchSpinNotIncrease } from 'test/touchSpin.js';
 import MatchParamsCtrl from './MatchParamsCtrl.js';
-import defaultTournamentRules from 'tournament/new/defaultTournamentRules.js';
+import { newTournament } from 'test/defaultTournaments.js';
 
 describe('match-params', () => {
     var initEventFired = false;
@@ -15,8 +15,8 @@ describe('match-params', () => {
         expect(initEventFired).toBeTrue();
     });
 
-    const tennisTournament = () => { return {rules: defaultTournamentRules('Tennis')}; };
-    const pingPongTournament = () => { return {rules: defaultTournamentRules('PingPong')}; };
+    const tennisTournament = () => newTournament('Tennis');
+    const pingPongTournament = () => newTournament('PingPong');
 
     it('min game advance increase/decrease', () => {
         ctx.broadcast('event.tournament.rules.set', pingPongTournament());
@@ -47,9 +47,9 @@ describe('match-params', () => {
 
     it('min game advance not increase limit', () => {
         expect(ctx.ctrl.advance.max).toBe(1000);
-        ctx.broadcast('event.tournament.rules.set',
-                      Object.assign(pingPongTournament(),
-                                    {rules: {match: {minAdvanceInGames: 1000}}}));
+        const tournament = pingPongTournament();
+        tournament.rules.match.minAdvanceInGames = 1000;
+        ctx.broadcast('event.tournament.rules.set', tournament);
         checkTouchSpinNotIncrease(ctx, '#min-game-advance',
                                   () => ctx.ctrl.rules.match.minAdvanceInGames);
     });

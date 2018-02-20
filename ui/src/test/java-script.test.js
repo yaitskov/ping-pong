@@ -16,6 +16,21 @@ describe('java script', () => {
         function sum(a, b) { return a + b; }
         it('call function', () => expect(sum.apply(null, [1, 2])).toBe(3));
     });
+    describe('syntax', () => {
+        describe('switch', () => {
+            it('undefined literal in case', () => {
+                let executed;
+                switch (undefined) {
+                case undefined:
+                    executed = 'undefined';
+                    break;
+                default:
+                    executed = 'default';
+                }
+                expect(executed).toBe('undefined');
+            });
+        });
+    });
     describe('classes', () => {
         describe('method', () => {
             class Base {

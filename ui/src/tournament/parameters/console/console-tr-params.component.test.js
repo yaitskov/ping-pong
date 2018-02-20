@@ -1,7 +1,8 @@
 import { setupAngularJs, ij } from 'test/angularjs-test-setup.js';
 import ConsoleParamsCtrl from './ConsoleParamsCtrl.js';
 import { newTournament, existingTournamentWithoutGroup, existingTournamentWithoutConsole,
-         existingTournamentWithConsole, existingTournamentRequiresConsole } from 'test/defaultTournaments.js';
+         existingTournamentWithConsole, existingTournamentRequiresConsole,
+         existingTournamentWithGroup } from 'test/defaultTournaments.js';
 
 describe('console-tr-params', () => {
     var initEventFired = false;
@@ -28,6 +29,14 @@ describe('console-tr-params', () => {
 
     it('console panel is not visible if tournament has no group', () => {
         ctx.broadcast('event.tournament.rules.set', existingTournamentWithoutGroup());
+        ctx.hidden('#console-tournament-toggler');
+        ctx.hidden('#console-tournament-parameters');
+    });
+
+    it('console panel disappears once group is disabled', () => {
+        ctx.broadcast('event.tournament.rules.set', existingTournamentWithGroup());
+        delete ctx.ctrl.rules.group;
+        ctx.sync();
         ctx.hidden('#console-tournament-toggler');
         ctx.hidden('#console-tournament-parameters');
     });

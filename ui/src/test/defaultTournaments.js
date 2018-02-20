@@ -16,6 +16,10 @@ export function existingTournamentWithoutGroup(sport) {
     return tournament;
 }
 
+export function existingTournamentWithGroup(sport) {
+    return existingTournament(sport);
+}
+
 export function newTournamentWithoutGroup(sport) {
     const tournament = newTournament(sport);
     delete tournament.rules.group;

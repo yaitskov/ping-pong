@@ -26,8 +26,13 @@ export default class ConsoleParamsCtrl extends BaseTrParamsCtrl {
             if (!this.tournament) {
                 return;
             }
-            if (newv && !this.tournament.consoleTid) {
-                this.createConsoleTournament(this.tournament.tid);
+            if (newv) {
+                if (this.tournament.consoleTid) {
+                    console.log(`console tid is alread exist. just set connsole`);
+                    this.tournament.rules.group.console = 'INDEPENDENT_RULES';
+                } else {
+                    this.createConsoleTournament(this.tournament.tid);
+                }
             } else if (!newv && this.tournament.rules.group) {
                 this.tournament.rules.group.console = 'NO';
             }
@@ -38,11 +43,11 @@ export default class ConsoleParamsCtrl extends BaseTrParamsCtrl {
         super.onTournamentSet(...arguments);
         this.playConsoleTournament = this.tournament.rules.group &&
             this.rules.group.console != 'NO';
+        this.watchForPlayConsoleTournament();
     }
 
     constructor() {
         super(...arguments);
         this.playConsoleTournament = false;
-        this.watchForPlayConsoleTournament();
     }
 }

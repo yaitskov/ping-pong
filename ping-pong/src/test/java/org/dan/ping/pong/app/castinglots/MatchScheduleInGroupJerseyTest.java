@@ -53,6 +53,7 @@ public class MatchScheduleInGroupJerseyTest extends AbstractSpringJerseyTest {
             .build();
 
     public static final GroupRules G3Q2 = G8Q2.withGroupSize(3);
+    public static final GroupRules G3Q1 = G3Q2.withQuits(1);
 
     public static final GroupRules G2Q1 = GroupRules.builder()
             .groupSize(2)

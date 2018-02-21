@@ -13,8 +13,7 @@ public enum GroupSplitPolicy {
      *  group A => (master group A 2, master group B 2),
      *  group B => (master group A 3, ,master group B 3)
      *
-     *  though actually console tournament in that case does not have groups
-     *  Groups are represented with branches of root match (JOIN type)
+     *  though actually console tournament in that case does not have groups.
      */
     ConsoleLayered
 }

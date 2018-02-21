@@ -8,6 +8,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G2Q1;
+import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G3Q1;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G3Q2;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q1;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q2;
@@ -26,6 +27,7 @@ import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
 import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_PROVIDED_RANKING;
 import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
 import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_MIX;
+import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.LAYERED_CONSOLE_CASTING;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -136,6 +138,15 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
             .place(Optional.of(GLOBAL))
             .build();
 
+    public static final TournamentRules RULES_LC_S1A2G11_NP = TournamentRules
+            .builder()
+            .match(S1A2G11)
+            .group(Optional.empty())
+            .casting(LAYERED_CONSOLE_CASTING)
+            .playOff(Optional.of(Losing1))
+            .place(Optional.empty())
+            .build();
+
     public static final TournamentRules RULES_G2Q1_S1A2G11_NP = RULES_G2Q1_S1A2G11.withPlace(Optional.empty());
     public static final TournamentRules RULES_G_S1A2G11 = RULES_G8Q1_S1A2G11.withPlayOff(Optional.empty());
     public static final TournamentRules RULES_JP_S1A2G11 = RULES_G8Q1_S1A2G11.withGroup(Optional.empty());
@@ -179,6 +190,12 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
 
     public static final TournamentRules RULES_G3Q2_S1A2G11 = RULES_G8Q2_S1A2G11
             .withGroup(Optional.of(G3Q2));
+
+    public static final TournamentRules RULES_G3Q1_S1A2G11 = RULES_G8Q2_S1A2G11
+            .withGroup(Optional.of(G3Q1));
+
+    public static final TournamentRules RULES_G3Q1_S1A2G11_NP = RULES_G3Q1_S1A2G11
+            .withPlace(Optional.empty());
 
     public static final TournamentRules RULES_G8Q2_S3A2G11 = TournamentRules
             .builder()

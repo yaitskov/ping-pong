@@ -56,7 +56,6 @@ public class ParticipantRankingService {
 
     @Inject
     @Named(TOURNAMENT_RELATION_CACHE)
-
     private LoadingCache<Tid, RelatedTids> tournamentRelationCache;
 
     @Inject

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
+import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.match.MatchType;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -72,6 +73,7 @@ public class PlayOffGenerator {
     private final int cid;
     private final boolean thirdPlaceMatch;
     private final MatchDao matchDao;
+    private final MatchTag tag;
 
     public Optional<Mid> generateTree(int level, Optional<Mid> parentMid,
             int priority, TypeChain types, Optional<Mid> loserMid) {
@@ -96,7 +98,7 @@ public class PlayOffGenerator {
     private Optional<Mid> createMatch(Optional<Mid> winMid, Optional<Mid> loserMid,
             int priority, int level, MatchType type) {
         final Mid mid = matchDao.createPlayOffMatch(
-                tournament.getTid(), cid, winMid, loserMid, priority, level, type);
+                tournament.getTid(), cid, winMid, loserMid, priority, level, type, tag);
         final Optional<Mid> omid = Optional.of(mid);
         tournament.getMatches().put(mid, MatchInfo.builder()
                 .tid(tournament.getTid())
@@ -107,6 +109,7 @@ public class PlayOffGenerator {
                 .gid(Optional.empty())
                 .participantIdScore(new HashMap<>())
                 .type(type)
+                .tag(tag)
                 .winnerMid(winMid)
                 .loserMid(loserMid)
                 .cid(cid)

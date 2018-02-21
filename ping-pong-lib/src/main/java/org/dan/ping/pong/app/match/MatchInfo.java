@@ -42,6 +42,7 @@ public class MatchInfo {
     private Tid tid;
     private int cid;
     private MatchType type;
+    private MatchTag tag;
     private Optional<Integer> gid;
     private MatchState state;
     private Optional<Mid> loserMid;

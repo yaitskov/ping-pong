@@ -539,6 +539,11 @@
                                     <binding>org.dan.ping.pong.sys.db.converters.OptionalInstantConverter</binding>
                                 </customType>
                                 <customType>
+                                    <name>MatchTag</name>
+                                    <type>org.dan.ping.pong.app.match.MatchTag</type>
+                                    <binding>org.dan.ping.pong.app.match.MatchTagConverter</binding>
+                                </customType>
+                                <customType>
                                     <name>MatchType</name>
                                     <type>org.dan.ping.pong.app.match.MatchType</type>
                                     <binding>org.dan.ping.pong.app.match.MatchTypeConverter</binding>
@@ -763,6 +768,11 @@
                                 <forcedType>
                                     <name>OptionalMid</name>
                                     <expression>.*matches\.(win_mid|lose_mid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>MatchTag</name>
+                                    <expression>.*matches\.(tag)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

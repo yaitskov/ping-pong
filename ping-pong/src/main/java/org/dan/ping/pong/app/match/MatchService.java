@@ -360,7 +360,7 @@ public class MatchService {
         final List<Uid> orderedUids = groupService.orderUidsInGroup(tournament, matches);
         final List<Uid> quitUids = selectQuitingUids(gid, tournament, orderedUids, quits);
         final GroupInfo iGru = tournament.getGroups().get(gid);
-        final List<MatchInfo> playOffMatches = playOffMatches(tournament, iGru);
+        final List<MatchInfo> playOffMatches = playOffMatches(tournament, iGru, null);
         if (playOffMatches.isEmpty()) {
             completeMiniTournamentGroup(tournament, iGru, quitUids, batch);
         } else {
@@ -372,9 +372,10 @@ public class MatchService {
                 .collect(toSet());
     }
 
-    private List<MatchInfo> playOffMatches(TournamentMemState tournament, GroupInfo iGru) {
+    private List<MatchInfo> playOffMatches(TournamentMemState tournament, GroupInfo iGru,
+            MatchTag tag) {
         return playOffService
-                .findBaseMatches(tournament, iGru.getCid())
+                .findBaseMatches(tournament, iGru.getCid(), tag)
                 .stream()
                 .sorted(Comparator.comparing(MatchInfo::getMid))
                 .collect(toList());

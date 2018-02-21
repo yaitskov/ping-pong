@@ -13,6 +13,7 @@ import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.tournament.CumulativeScore;
@@ -35,8 +36,8 @@ import javax.inject.Inject;
 
 @Slf4j
 public class PlayOffService {
-    public List<MatchInfo> findBaseMatches(TournamentMemState tournament, int cid) {
-        return findBaseMatches(findPlayOffMatches(tournament, cid));
+    public List<MatchInfo> findBaseMatches(TournamentMemState tournament, int cid, MatchTag tag) {
+        return findBaseMatches(findPlayOffMatches(tournament, cid, tag));
     }
 
     public List<MatchInfo> findBaseMatches(List<MatchInfo> cidMatches) {
@@ -63,8 +64,9 @@ public class PlayOffService {
                 .values();
     }
 
-    public List<MatchInfo> findPlayOffMatches(TournamentMemState tournament, int cid) {
+    public List<MatchInfo> findPlayOffMatches(TournamentMemState tournament, int cid, MatchTag tag) {
         return tournament.getMatches().values().stream()
+                .filter(matchInfo -> tag == null || tag.equals(matchInfo.getTag()))
                 .filter(minfo -> minfo.getCid() == cid)
                 .filter(minfo -> !minfo.getGid().isPresent())
                 .sorted(Comparator.comparing(MatchInfo::getMid))
@@ -149,12 +151,12 @@ public class PlayOffService {
     @Inject
     private Sports sports;
 
-    public PlayOffMatches playOffMatches(TournamentMemState tournament, int cid) {
+    public PlayOffMatches playOffMatches(TournamentMemState tournament, int cid, MatchTag tag) {
         final List<MatchLink> transitions = new ArrayList<>();
         final List<PlayOffMatch> matches = new ArrayList<>();
         final Map<Uid, String> participants = new HashMap<>();
 
-        findPlayOffMatches(tournament, cid)
+        findPlayOffMatches(tournament, cid, tag)
                 .stream()
                 .filter(m -> !m.isLosersMeet())
                 .forEach(m -> {

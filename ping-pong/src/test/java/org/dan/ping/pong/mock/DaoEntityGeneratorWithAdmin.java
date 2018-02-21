@@ -2,7 +2,9 @@ package org.dan.ping.pong.mock;
 
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BalancedMix;
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BestToBest;
+import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.ConsoleLayered;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.Manual;
+import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.MasterOutcome;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.ProvidedRating;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.SignUp;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.GLOBAL;
@@ -27,6 +29,20 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 public class DaoEntityGeneratorWithAdmin {
+    public static final CastingLotsRule CONSOLE_CASTING
+            = CastingLotsRule.builder()
+            .policy(MasterOutcome)
+            .direction(OrderDirection.Increase)
+            .splitPolicy(BalancedMix)
+            .build();
+
+    public static final CastingLotsRule LAYERED_CONSOLE_CASTING
+            = CastingLotsRule.builder()
+            .policy(MasterOutcome)
+            .direction(OrderDirection.Increase)
+            .splitPolicy(ConsoleLayered)
+            .build();
+
     public static final CastingLotsRule INCREASE_SIGNUP_CASTING
             = CastingLotsRule.builder()
             .policy(SignUp)

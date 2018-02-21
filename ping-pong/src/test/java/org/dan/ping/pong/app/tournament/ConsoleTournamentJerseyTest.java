@@ -8,17 +8,24 @@ import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11_NP;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G3Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11_NP;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_LC_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchResource.BID_PENDING_MATCHES;
 import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.GET_TOURNAMENT_RULES;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_CONSOLE_CREATE;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RULES;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
+import static org.dan.ping.pong.mock.simulator.Player.p5;
+import static org.dan.ping.pong.mock.simulator.Player.p6;
+import static org.dan.ping.pong.mock.simulator.Player.p7;
+import static org.dan.ping.pong.mock.simulator.Player.p8;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 import static org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc.restState;
@@ -248,6 +255,115 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                             .scoreSet(p2, 11, p4, 6)
                             .checkResult(p2, p4)
                             .checkTournamentComplete(restState(Lost).bid(p2, Win1).bid(p4, Win2));
+                });
+    }
+
+
+    @Test
+    public void layeredConsoleTournament() {
+        final TournamentScenario scenario = begin().name("layeredConsoleTournament")
+                .rules(RULES_G2Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4);
+        isf.create(scenario)
+                .run(c -> {
+                    c.beginTournament()
+                            .createConsoleTournament();
+
+                    myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
+                            TidIdentifiedRules.builder()
+                                    .tid(c.getConsoleScenario().getTid())
+                                    .rules(RULES_LC_S1A2G11_NP)
+                                    .build());
+
+                    final ImperativeSimulator console = c
+                            .scoreSet(p1, 11, p2, 3)
+                            .scoreSet(p3, 11, p4, 7)
+                            .scoreSet(p1, 11, p3, 4)
+                            .checkTournamentComplete(restState(Lost).bid(p3, Win2).bid(p1, Win1))
+                            .resolveCategories();
+
+                    console.checkTournament(Open, restState(Play))
+                            .scoreSet(p2, 11, p4, 6)
+                            .checkResult(p2, p4)
+                            .checkTournamentComplete(restState(Lost).bid(p4, Win2).bid(p2, Win1));
+                });
+    }
+
+    @Test
+    public void layeredConsoleTournament2Steps() {
+        final TournamentScenario scenario = begin().name("layeredConsoleTour2Steps")
+                .rules(RULES_G2Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4, p5, p6, p7, p8);
+        isf.create(scenario)
+                .run(c -> {
+                    c.beginTournament()
+                            .createConsoleTournament();
+
+                    myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
+                            TidIdentifiedRules.builder()
+                                    .tid(c.getConsoleScenario().getTid())
+                                    .rules(RULES_LC_S1A2G11_NP)
+                                    .build());
+
+                    final ImperativeSimulator console = c
+                            .scoreSet(p1, 11, p2, 3)
+                            .scoreSet(p3, 11, p4, 7)
+                            .scoreSet(p5, 11, p6, 1)
+                            .scoreSet(p7, 11, p8, 1)
+                            .reloadMatchMap()
+                            .scoreSet(p1, 11, p7, 4)
+                            .scoreSet(p3, 11, p5, 2)
+                            .reloadMatchMap()
+                            .scoreSet(p1, 11, p3, 6)
+                            .checkTournamentComplete(restState(Lost).bid(p3, Win2).bid(p1, Win1))
+                            .resolveCategories();
+
+                    console.checkTournament(Open, restState(Play))
+                            .reloadMatchMap()
+                            .scoreSet(p2, 11, p8, 6)
+                            .scoreSet(p4, 11, p6, 2)
+                            .reloadMatchMap()
+                            .scoreSet(p2, 11, p4, 6)
+                            .checkTournamentComplete(restState(Lost).bid(p4, Win2).bid(p2, Win1));
+                });
+    }
+
+    @Test
+    public void layeredConsoleTournament2Tags() {
+        final TournamentScenario scenario = begin().name("layeredConsoleTour2Tags")
+                .rules(RULES_G3Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4, p5, p6);
+        isf.create(scenario)
+                .run(c -> {
+                    c.beginTournament()
+                            .createConsoleTournament();
+
+                    myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
+                            TidIdentifiedRules.builder()
+                                    .tid(c.getConsoleScenario().getTid())
+                                    .rules(RULES_LC_S1A2G11_NP)
+                                    .build());
+
+                    final ImperativeSimulator console = c
+                            .scoreSet(p1, 11, p3, 4)
+                            .scoreSet(p2, 11, p3, 5)
+                            .scoreSet(p1, 11, p2, 3)
+
+                            .scoreSet(p4, 11, p6, 2)
+                            .scoreSet(p5, 11, p6, 1)
+                            .scoreSet(p4, 11, p5, 9)
+                            .reloadMatchMap()
+                            .scoreSet(p1, 11, p4, 5)
+                            .checkTournamentComplete(restState(Lost).bid(p4, Win2).bid(p1, Win1))
+                            .resolveCategories();
+
+                    console.checkTournament(Open, restState(Play))
+                            .reloadMatchMap()
+                            .scoreSet(p2, 11, p5, 7)
+                            .scoreSet(p3, 11, p6, 9)
+                            .checkTournamentComplete(restState(Lost)
+                                    .bid(p6, Win2).bid(p3, Win1)
+                                    .bid(p5, Win2).bid(p2, Win1));
                 });
     }
 }

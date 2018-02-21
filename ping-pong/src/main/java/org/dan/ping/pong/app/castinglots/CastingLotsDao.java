@@ -24,6 +24,7 @@ import org.dan.ping.pong.app.group.GroupSchedule;
 import org.dan.ping.pong.app.match.MatchDaoServer;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
+import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -102,6 +103,11 @@ public class CastingLotsDao implements CastingLotsDaoIf {
 
     public Mid generatePlayOffMatches(TournamentMemState tInfo, Integer cid,
             int playOffStartPositions, int basePlayOffPriority) {
+        return generatePlayOffMatches(tInfo, cid,playOffStartPositions, basePlayOffPriority, null);
+    }
+
+    public Mid generatePlayOffMatches(TournamentMemState tInfo, Integer cid,
+            int playOffStartPositions, int basePlayOffPriority, MatchTag tag) {
         final Tid tid = tInfo.getTid();
         log.info("Generate play off matches for {} bids in tid {}",
                 playOffStartPositions, tid);
@@ -123,6 +129,7 @@ public class CastingLotsDao implements CastingLotsDaoIf {
                 .cid(cid)
                 .thirdPlaceMatch(playOffRule.getThirdPlaceMatch() == 1)
                 .matchDao(matchDao)
+                .tag(tag)
                 .build();
         switch (playOffRule.getLosings()) {
             case 1:

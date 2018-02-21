@@ -541,7 +541,7 @@ public class TournamentService {
     private TournamentTerminator tournamentTerminator;
 
     public PlayOffMatches playOffMatches(TournamentMemState tournament, int cid) {
-        return playOffService.playOffMatches(tournament, cid);
+        return playOffService.playOffMatches(tournament, cid, null);
     }
 
     @Inject

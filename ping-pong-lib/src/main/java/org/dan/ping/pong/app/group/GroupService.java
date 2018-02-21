@@ -383,14 +383,10 @@ public class GroupService {
     private ParticipantRankingService rankingService;
 
     public GroupParticipants result(TournamentMemState tournament, int gid) {
-        final List<MatchInfo> matches = findMatchesInGroup(tournament, gid);
         final List<ParticipantMemState> bids = groupBids(tournament, gid);
         final TournamentRules rules = tournament.getRule();
 
-        final Map<Uid, Integer> uid2Points = countPoints(tournament, matches);
-        final ExtraUidOrderInGroup strongerExtraOrder = findStrongerExtraOrder(tournament, uid2Points, matches);
-        final List<Uid> finalUidsOrder = orderUidsByPointsAndExtraOrder(uid2Points,
-                strongerExtraOrder.getStrongerOf());
+        final OrderUidsInGroupCmd orderCmd = new OrderUidsInGroupCmd(tournament, gid, this);
 
         final List<ParticipantMemState> seedBidsOrder = rankingService
                 .sort(bids, rules.getCasting(), tournament);
@@ -400,22 +396,22 @@ public class GroupService {
                         .name(bid.getName())
                         .uid(bid.getUid())
                         .state(bid.getState())
-                        .dice(strongerExtraOrder.getDiced().contains(bid.getUid()))
+                        .dice(orderCmd.getStrongerExtraOrder().getDiced().contains(bid.getUid()))
                         .setsAndBalls(ofNullable(
-                                strongerExtraOrder.getUid2SetsAndBalls()
+                                orderCmd.getStrongerExtraOrder().getUid2SetsAndBalls()
                                         .get(bid.getUid()))
                                 .map(BidSuccessInGroup::toSetsAndBalls))
-                        .punkts(uid2Points.get(bid.getUid()))
-                        .matches(matches.stream()
+                        .punkts(orderCmd.getUid2Points().get(bid.getUid()))
+                        .matches(orderCmd.getMatches().stream()
                                 .filter(m -> m.hasParticipant(bid.getUid()))
                                 .collect(toMap(
                                         m -> m.getOpponentUid(bid.getUid()).get(),
                                         m -> matchResult(bid.getUid(), tournament, m))))
                         .build()));
 
-        range(0, finalUidsOrder.size()).forEach(
-                i -> result.get(finalUidsOrder.get(i)).setFinishPosition(i));
-        range(0, finalUidsOrder.size()).forEach(
+        range(0, orderCmd.getFinalUidsOrder().size()).forEach(
+                i -> result.get(orderCmd.getFinalUidsOrder().get(i)).setFinishPosition(i));
+        range(0,  orderCmd.getFinalUidsOrder().size()).forEach(
                 i -> result.get(seedBidsOrder.get(i).getUid()).setSeedPosition(i));
 
         final GroupRules groupRules = tournament.getRule().getGroup().get();

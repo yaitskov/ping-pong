@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.min;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -175,7 +176,7 @@ public class MatchEditorService {
                 tournament, minfo, newSets, groupMatches);
 
         final List<MatchInfo> basePlayOffMatches = playOffService
-                .findBaseMatches(tournament, minfo.getCid());
+                .findBaseMatches(tournament, minfo.getCid(), minfo.getTag());
 
         final List<MatchUid> result = new ArrayList<>();
         movedDisappearedUids.forEach(

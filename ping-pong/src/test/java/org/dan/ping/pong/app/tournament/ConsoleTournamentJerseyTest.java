@@ -2,9 +2,11 @@ package org.dan.ping.pong.app.tournament;
 
 import static com.spotify.hamcrest.optional.OptionalMatchers.optionalWithValue;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
+import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
+import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11_NP;
@@ -17,6 +19,7 @@ import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.GET_TOURNAMENT_RULES;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_CONSOLE_CREATE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RULES;
+import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -77,6 +80,32 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                             allOf(hasProperty("group", is(Optional.empty())),
                                     hasProperty("match", is(RULES_G8Q1_S1A2G11.getMatch())),
                                     hasProperty("playOff", is(RULES_G8Q1_S1A2G11.getPlayOff()))));
+                });
+    }
+
+    @Test
+    public void createConsoleTournamentForClosedTournament() {
+        final TournamentScenario scenario = begin().name("consoleAfterGetClosed")
+                .rules(RULES_G8Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3);
+        isf.create(scenario)
+                .run(c -> {
+                    final ImperativeSimulator console = c.beginTournament()
+                            .scoreSet(p1, 11, p2, 3)
+                            .scoreSet(p2, 11, p3, 5)
+                            .scoreSet(p1, 11, p3, 4)
+                            .checkTournamentComplete(restState(Lost).bid(p1, Win1))
+                            .createConsoleTournament()
+                            .resolveCategories();
+                    console.checkTournament(Draft, restState(Want).bid(p2, Here).bid(p3, Here));
+                    myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
+                            TidIdentifiedRules.builder()
+                                    .tid(c.getConsoleScenario().getTid())
+                                    .rules(RULES_LC_S1A2G11_NP)
+                                    .build());
+                    console.beginTournament()
+                            .checkTournamentComplete(restState(Win1)
+                                    .bid(p2, Win1).bid(p3, Win1));
                 });
     }
 

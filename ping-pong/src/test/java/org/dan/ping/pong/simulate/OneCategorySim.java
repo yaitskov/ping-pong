@@ -317,4 +317,19 @@ public class OneCategorySim {
                         .checkTournamentComplete(restState(Lost).bid(p2, Win2).bid(p1, Win1))
                         .resolveCategories());
     }
+
+    @Test
+    public void withLayeredConsoleTournament() {
+        final TournamentScenario scenario = begin().name("withLayeredConsoleTour")
+                .rules(RULES_G8Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3);
+        isf.create(scenario)
+                .run(c -> c.beginTournament()
+                        .createConsoleTournament()
+                        .scoreSet(p1, 11, p2, 3)
+                        .scoreSet(p2, 11, p3, 5)
+                        .scoreSet(p1, 11, p3, 4)
+                        .checkTournamentComplete(restState(Lost).bid(p2, Win2).bid(p1, Win1))
+                        .resolveCategories());
+    }
 }

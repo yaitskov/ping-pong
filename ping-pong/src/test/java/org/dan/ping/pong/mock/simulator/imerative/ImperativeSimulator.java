@@ -189,6 +189,10 @@ public class ImperativeSimulator {
                                         hasProperty("leftMatches", greaterThan(0L))),
                                 hasProperty("matches", not(empty()))));
                 break;
+            case Draft:
+                break; // ok
+            case Hidden:
+                break; // ok
             default:
                 throw new IllegalArgumentException("state " + expectedTournamentState);
         }

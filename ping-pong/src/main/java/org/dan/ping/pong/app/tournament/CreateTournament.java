@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.tournament;
 
 import static lombok.AccessLevel.PRIVATE;
 import static org.dan.ping.pong.app.sport.SportType.PingPong;
+import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentType.Classic;
 
 import lombok.AllArgsConstructor;
@@ -31,11 +32,13 @@ public class CreateTournament {
     private Optional<Double> ticketPrice = Optional.empty();
     private SportType sport = PingPong;
     private TournamentType type = Classic;
+    private TournamentState state = Hidden;
 
     public static class CreateTournamentBuilder {
         Optional<Double> ticketPrice = Optional.empty();
         Optional<Tid> previousTid = Optional.empty();
         SportType sport = PingPong;
         TournamentType type = Classic;
+        TournamentState state = Hidden;
     }
 }

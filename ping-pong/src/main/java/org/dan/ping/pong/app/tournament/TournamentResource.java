@@ -96,6 +96,9 @@ public class TournamentResource {
         if (newTournament.getType() != TournamentType.Classic) {
             throw badRequest("Tournament type is not Classic but " + newTournament.getType());
         }
+        if (newTournament.getState() != TournamentState.Hidden) {
+            throw badRequest("Tournament state is not Hidden");
+        }
         validate(newTournament.getRules());
         return tournamentService.create(
                 authService.userInfoBySession(session).getUid(),

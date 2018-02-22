@@ -1,5 +1,9 @@
 package org.dan.ping.pong.app.bid;
 
+import com.google.common.collect.ImmutableSet;
+
+import java.util.Set;
+
 public enum BidState {
     Want, // User is willing to participate in the tournament
     Paid, // once he paid for the ticket
@@ -29,4 +33,6 @@ public enum BidState {
     public int score() {
         return 4;
     }
+
+    public static final Set<BidState> TERMINAL_STATE = ImmutableSet.of(Expl, Quit);
 }

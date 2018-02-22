@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.time.temporal.ChronoUnit.DAYS;
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
@@ -77,7 +76,7 @@ public class TournamentDaoMySql implements TournamentDao {
 
     @Transactional(TRANSACTION_MANAGER)
     public Tid create(Uid uid, CreateTournament newTournament) {
-        final Tid tid = justCreate(newTournament, Hidden);
+        final Tid tid = justCreate(newTournament);
         log.info("User {} created tournament {}", uid, tid);
 
         jooq.insertInto(TOURNAMENT_ADMIN, TOURNAMENT_ADMIN.TID,
@@ -87,7 +86,7 @@ public class TournamentDaoMySql implements TournamentDao {
         return tid;
     }
 
-    private Tid justCreate(CreateTournament newTournament, TournamentState hidden) {
+    private Tid justCreate(CreateTournament newTournament) {
         return jooq.insertInto(TOURNAMENT, TOURNAMENT.STATE,
                 TOURNAMENT.OPENS_AT,
                 TOURNAMENT.PID,
@@ -97,7 +96,7 @@ public class TournamentDaoMySql implements TournamentDao {
                 TOURNAMENT.NAME,
                 TOURNAMENT.TYPE,
                 TOURNAMENT.SPORT)
-                .values(hidden,
+                .values(newTournament.getState(),
                         newTournament.getOpensAt(),
                         newTournament.getPlaceId(),
                         newTournament.getPreviousTid().orElse(null),
@@ -440,12 +439,13 @@ public class TournamentDaoMySql implements TournamentDao {
         return justCreate(CreateTournament.builder()
                 .name(copyTournament.getName())
                 .rules(rules)
+                .state(Draft)
                 .type(tInfo.getType())
                 .opensAt(copyTournament.getOpensAt())
                 .placeId(tInfo.getPlace().getPid())
                 .ticketPrice(tInfo.getPrice())
                 .previousTid(of(originTid))
-                .build(), Draft);
+                .build());
     }
 
     private void copyPermissions(Tid originTid, Tid newTid) {

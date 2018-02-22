@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.tournament.console;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
+import static org.dan.ping.pong.app.bid.BidState.TERMINAL_STATE;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
@@ -47,25 +48,12 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
     @Named(TOURNAMENT_RELATION_CACHE)
     public LoadingCache<Tid, RelatedTids> tournamentRelationCache;
 
-    private int findCidOrCreate(TournamentMemState tournament, int gid,
-            TournamentMemState consoleTournament, DbUpdater batch) {
-        final int masterCid = tournament.getGroup(gid).getCid();
-        final String categoryName = tournament.getCategory(masterCid).getName();
-        final Optional<Integer> oCid = consoleTournament.findCidByName(categoryName);
-        if (oCid.isPresent()) {
-            return oCid.get();
-        }
-        return categoryService.createCategory(consoleTournament, categoryName, batch);
-    }
-
     @Inject
     @Named(SCHEDULE_SELECTOR)
     private ScheduleService scheduleService;
 
     @Inject
     private Clocker clocker;
-
-    private static final Set<BidState> terminalState = ImmutableSet.of(Expl, Quit);
 
     @Override
     @SneakyThrows
@@ -78,12 +66,11 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
                 relatedTids.getChild().orElseThrow(() -> internalError("tournament  "
                         + masterTournament.getTid() + " has no console tournament")));
 
-        final int cid = findCidOrCreate(masterTournament, gid, consoleTournament, batch);
+        final int cid = categoryService.findCidOrCreate(masterTournament, gid, consoleTournament, batch);
 
         batch.onFailure(() -> tournamentCache.invalidate(consoleTournament.getTid()));
         log.info("Enlist loser bids {} to console tournament {}",
                 loserUids, consoleTournament.getTid());
-        consoleTournament.setState(Draft);
         loserUids.stream()
                 .map(masterTournament::getParticipant)
                 .forEach(bid ->
@@ -91,7 +78,7 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
                                 EnlistTournament.builder()
                                         .categoryId(cid)
                                         .bidState(
-                                                terminalState.contains(bid.getBidState())
+                                                TERMINAL_STATE.contains(bid.getBidState())
                                                         ? bid.getBidState()
                                                         : Here)
                                         .providedRank(Optional.empty())
@@ -102,6 +89,8 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
         }
         log.info("All group matches of tid {} are over, so begin console tournament {}",
                 masterTournament.getTid(), consoleTournament.getTid());
+        // consoleTournament.setState(Draft);
+
         tournamentService.begin(consoleTournament, batch);
         masterTournament.getCondActions().getOnScheduleTables().add(
                 () -> {

@@ -5,6 +5,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
@@ -102,6 +103,12 @@ public class GroupService {
                 .stream()
                 .limit(groupRules.getQuits())
                 .collect(toList());
+    }
+
+    public Map<Integer, List<MatchInfo>> groupMatchesByGroup(TournamentMemState tournament) {
+        return tournament.getMatches().values().stream()
+                .filter(minfo -> minfo.getGid().isPresent())
+                .collect(groupingBy(mInfo -> mInfo.getGid().get()));
     }
 
     public List<MatchInfo> findMatchesInGroup(TournamentMemState tournament, int gid) {
@@ -572,5 +579,13 @@ public class GroupService {
         tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
                 .ordNumber(sort).label(label).build());
         return gid;
+    }
+
+    public Set<Integer> findIncompleteGroups(TournamentMemState tournament) {
+        return tournament.getMatches().values().stream()
+                .filter(mInfo -> mInfo.getGid().isPresent() && mInfo.getState() != Over)
+                .collect(toMap(mInfo -> mInfo.getGid().get(),
+                        o -> o, (a, b) -> a))
+                .keySet();
     }
 }

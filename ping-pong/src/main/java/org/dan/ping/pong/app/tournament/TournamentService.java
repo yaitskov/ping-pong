@@ -8,6 +8,7 @@ import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
+import static org.dan.ping.pong.app.bid.BidState.TERMINAL_STATE;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
@@ -20,7 +21,6 @@ import static org.dan.ping.pong.app.table.TableService.STATE;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
-import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
@@ -68,8 +68,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import javax.inject.Inject;
@@ -407,6 +409,9 @@ public class TournamentService {
         if (tournament.getSport() != parameters.getRules().getMatch().sport()) {
             throw badRequest("sport mismatch");
         }
+        if (tournament.getType() == Console && parameters.getRules().getGroup().isPresent()) {
+            throw badRequest("console tournament cannot have groups");
+        }
         tournament.setRule(parameters.getRules());
         tournamentDao.updateParams(tournament.getTid(), tournament.getRule(), batch);
     }
@@ -548,8 +553,12 @@ public class TournamentService {
     @Named(TOURNAMENT_RELATION_CACHE)
     private LoadingCache<Tid, RelatedTids> tournamentRelations;
 
+    @Inject
+    private TournamentCache tournamentCache;
+
     @SneakyThrows
-    public Tid createConsoleFor(TournamentMemState masterTournament, UserInfo user, DbUpdater batch) {
+    public Tid createConsoleFor(TournamentMemState masterTournament, UserInfo user,
+            DbUpdater batch) {
         final RelatedTids relatedTids = tournamentRelations.get(masterTournament.getTid());
         if (relatedTids.getChild().isPresent()) {
             return relatedTids.getChild().get();
@@ -570,6 +579,7 @@ public class TournamentService {
                         .placeId(masterTournament.getPid())
                         .opensAt(masterTournament.getOpensAt())
                         .previousTid(Optional.of(masterTournament.getTid()))
+                        .state(Draft)
                         .type(Console)
                         .rules(TournamentRules.builder()
                                 .place(masterTournament.getRule().getPlace())
@@ -584,13 +594,45 @@ public class TournamentService {
 
         tournamentDao.createRelation(masterTournament.getTid(), consoleTid);
 
-        masterTournament.setRule(masterTournament.getRule().withGroup(masterTournament.getRule().getGroup()
-                .map(g -> g.withConsole(INDEPENDENT_RULES))));
+        masterTournament.setRule(masterTournament.getRule()
+                .withGroup(masterTournament.getRule().getGroup()
+                        .map(g -> g.withConsole(INDEPENDENT_RULES))));
         tournamentDao.updateParams(masterTournament.getTid(), masterTournament.getRule(), batch);
 
+        masterTournament.getRule().getGroup().ifPresent(groupRules ->
+                enlistPlayersFromCompleteGroups(masterTournament,
+                        tournamentCache.load(consoleTid),
+                        batch));
         tournamentRelations.invalidate(masterTournament.getTid());
 
         return consoleTid;
+    }
+
+    private void enlistPlayersFromCompleteGroups(TournamentMemState masterTournament,
+            TournamentMemState consoleTournament, DbUpdater batch) {
+        final Map<Integer, List<MatchInfo>> matchesByGroup = groupService.groupMatchesByGroup(masterTournament);
+        final Set<Integer> incompleteGroups = groupService.findIncompleteGroups(masterTournament);
+        incompleteGroups.forEach(matchesByGroup::remove);
+
+        matchesByGroup.forEach((gid, groupMatches) -> {
+            final int quitsGroup = masterTournament.getRule().getGroup().get().getQuits();
+            final List<Uid> orderedGroupUids = groupService.orderUidsInGroup(masterTournament, groupMatches);
+            final int consoleCid = categoryService.findCidOrCreate(masterTournament, gid, consoleTournament, batch);
+
+            orderedGroupUids.stream().skip(quitsGroup)
+                    .map(masterTournament::getBidOrQuit)
+                    .forEach(bid ->
+                            enlistOnlineWithoutValidation(
+                                    EnlistTournament.builder()
+                                            .categoryId(consoleCid)
+                                            .bidState(
+                                                    TERMINAL_STATE.contains(bid.getBidState())
+                                                            ? bid.getBidState()
+                                                            : Here)
+                                            .providedRank(Optional.empty())
+                                            .build(),
+                                    consoleTournament, bid, batch));
+        });
     }
 
     public List<TournamentDigest> findFollowingFrom(Tid tid) {

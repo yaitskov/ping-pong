@@ -20,6 +20,17 @@ import javax.inject.Inject;
 
 @Slf4j
 public class CategoryService {
+    public int findCidOrCreate(TournamentMemState tournament, int gid,
+            TournamentMemState consoleTournament, DbUpdater batch) {
+        final int masterCid = tournament.getGroup(gid).getCid();
+        final String categoryName = tournament.getCategory(masterCid).getName();
+        final Optional<Integer> oCid = consoleTournament.findCidByName(categoryName);
+        if (oCid.isPresent()) {
+            return oCid.get();
+        }
+        return createCategory(consoleTournament, categoryName, batch);
+    }
+
     public Set<Integer> findIncompleteCategories(TournamentMemState tournament) {
         return tournament.getMatches().values().stream()
                 .filter(minfo -> minfo.getState() != MatchState.Over)

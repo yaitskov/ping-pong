@@ -3,13 +3,10 @@ package org.dan.ping.pong.app.sched;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentService.PLACE_IS_BUSY;
 import static org.dan.ping.pong.app.tournament.TournamentService.TID;
-import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
-import static org.dan.ping.pong.app.tournament.TournamentState.Close;
-import static org.dan.ping.pong.app.tournament.TournamentState.Replaced;
+import static org.dan.ping.pong.app.tournament.TournamentState.TERMINAL_STATE;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableSet;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.place.PlaceService;
@@ -17,14 +14,12 @@ import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.tournament.RelatedTids;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
-import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -32,8 +27,6 @@ import javax.inject.Named;
 
 @Slf4j
 public class GlobalScheduleService implements ScheduleService {
-    public static final Set<TournamentState> TERMINAL_STATE = ImmutableSet.of(Close, Canceled, Replaced);
-
     @Inject
     private SequentialExecutor sequentialExecutor;
 
@@ -99,7 +92,7 @@ public class GlobalScheduleService implements ScheduleService {
                 place -> {
                     log.info("Schedule tournament {}", tournament.getTid());
                     batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));
-                    if (GlobalScheduleService.TERMINAL_STATE.contains(tournament.getState())) {
+                    if (TERMINAL_STATE.contains(tournament.getState())) {
                         tableService.bindPlace(place, batch, Optional.empty());
                     }
                     batch.onFailure(() -> placeCache.invalidate(tournament.getPid()));

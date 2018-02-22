@@ -90,6 +90,7 @@ public class ImperativeSimulator {
     private final TournamentScenario scenario;
     @Getter
     private TournamentScenario consoleScenario;
+    @Getter
     private final MyRest myRest;
     private final Map<Set<Player>, Mid> matchMap = new HashMap<>();
     private boolean matchMapAutoReload;

@@ -404,7 +404,9 @@ public class TournamentService {
     public void updateTournamentParams(TournamentMemState tournament,
             TidIdentifiedRules parameters, DbUpdater batch) {
         if (!CONFIGURABLE_STATES.contains(tournament.getState())) {
-            throw badRequest("Tournament could be modified until it's open");
+            throw badRequest("Tournament cannot be modified in state",
+                    ImmutableMap.of(TID, tournament.getTid(),
+                            "state", tournament.getState()));
         }
         if (tournament.getSport() != parameters.getRules().getMatch().sport()) {
             throw badRequest("sport mismatch");

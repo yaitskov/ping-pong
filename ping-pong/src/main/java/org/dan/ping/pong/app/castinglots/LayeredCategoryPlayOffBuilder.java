@@ -19,6 +19,7 @@ import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.RelatedTids;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
+import org.dan.ping.pong.jooq.tables.Bid;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.util.Comparator;
@@ -75,12 +76,12 @@ public class LayeredCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
                 .orElseThrow(() -> internalError("Tournament " + masterTournament.getTid()
                         + " has no groups")).getQuits();
              i < bidsByFinalGroupPosition.keySet().size(); ++i) {
+            final List<ParticipantMemState> bidsInTag = bidsByFinalGroupPosition.get(i).stream()
+                    .map(tournament::getBid)
+                    .filter(Objects::nonNull) // exclude master bid
+                    .collect(toList());
             flatCategoryPlayOffBuilder.build(tournament, cid,
-                    bidsByFinalGroupPosition.get(i).stream()
-                            .map(tournament::getBid)
-                            .filter(Objects::nonNull) // exclude master bid
-                            .collect(toList()),
-                    batch,
+                    bidsInTag, batch,
                     MatchTag.builder().prefix("L").number(i).build());
         }
     }

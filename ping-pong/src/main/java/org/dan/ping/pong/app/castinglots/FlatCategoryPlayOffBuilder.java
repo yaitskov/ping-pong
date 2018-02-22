@@ -1,7 +1,9 @@
 package org.dan.ping.pong.app.castinglots;
 
+import static java.util.Collections.singleton;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.PLAY_OFF_SEEDS;
 import static org.dan.ping.pong.app.match.MatchService.roundPlayOffBase;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
@@ -9,6 +11,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
@@ -41,9 +44,26 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
         build(tournament, cid, orderedBids, batch, null);
     }
 
+    @Inject
+    private BidService bidService;
+
+    private boolean oneParticipantInCategory(TournamentMemState tournament, Integer cid,
+            List<ParticipantMemState> bids, DbUpdater batch, MatchTag tag) {
+        if (bids.size() > 1) {
+            return false;
+        }
+        log.info("Autocomplete category {} with tag {} in tid {} due it has 1 participant",
+                cid, tag, tournament.getTid());
+        bidService.setBidState(bids.get(0), Win1, singleton(bids.get(0).getState()), batch);
+        return true;
+    }
+
     public void build(TournamentMemState tournament, Integer cid,
             List<ParticipantMemState> orderedBids, DbUpdater batch, MatchTag tag) {
         validateBidsNumberInACategory(orderedBids);
+        if (oneParticipantInCategory(tournament, cid, orderedBids, batch, tag)) {
+            return;
+        }
         final int basePositions = roundPlayOffBase(orderedBids.size());
         castingLotsDao.generatePlayOffMatches(tournament, cid, basePositions, 1, tag);
         assignBidsToBaseMatches(cid, basePositions, orderedBids, tournament, batch, tag);
@@ -56,10 +76,6 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
     private PlayOffService playOffService;
 
     public static void validateBidsNumberInACategory(List<ParticipantMemState> bids) {
-        if (bids.size() < 2) {
-            throw badRequest("There is a category with 1 participant."
-                    + " Expel him/her or move into another category.");
-        }
         if (bids.size() > 128) {
             throw badRequest("Category has more than 128 participants");
         }

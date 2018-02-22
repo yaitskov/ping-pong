@@ -445,7 +445,7 @@ public class TournamentService {
         final List<TournamentResultEntry> playOffResult = playOffService.playOffResult(tournament, cid, groupOrdered);
 
         if (playOffResult.isEmpty()) {
-            if (groupOrdered.isEmpty() && tournament.getState() == Close) {
+            if (groupOrdered.isEmpty()) {
                 return tournament.getParticipants().values().stream()
                         .filter(bid -> bid.getState() == Win1 && bid.getCid() == cid)
                         .map(bid -> TournamentResultEntry.builder()

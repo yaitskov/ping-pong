@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.castinglots;
 
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -9,6 +10,7 @@ import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Want;
+import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.castinglots.FlatCategoryPlayOffBuilder.validateBidsNumberInACategory;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.FIRST_PLAY_OFF_MATCH_LEVEL;
 import static org.dan.ping.pong.app.match.MatchService.roundPlayOffBase;
@@ -46,6 +48,7 @@ import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -107,11 +110,11 @@ public class CastingLotsService {
 
         checkAtLeast(readyBids);
         if (!rules.getPlayOff().isPresent()) {
-            seedJustGroupTournament(rules, tournament, readyBids);
+            seedJustGroupTournament(rules, tournament, readyBids, batch);
         } else if (!rules.getGroup().isPresent()) {
-            seedJustPlayOffTournament(rules, tournament, readyBids, batch);
+            seedJustPlayOffTournament(tournament, readyBids, batch);
         } else {
-            seedTournamentWithGroupsAndPlayOff(rules, tournament, readyBids);
+            seedTournamentWithGroupsAndPlayOff(rules, tournament, readyBids, batch);
         }
         log.info("Seeding for tid {} is complete", tournament.getTid());
     }
@@ -125,11 +128,13 @@ public class CastingLotsService {
     @Inject
     private DbUpdaterFactory dbUpdaterFactory;
 
-    private void seedJustPlayOffTournament(TournamentRules rules,
-            TournamentMemState tournament,
+    private void seedJustPlayOffTournament(TournamentMemState tournament,
             List<ParticipantMemState> readyBids, DbUpdater batch) {
         log.info("Seed tid {} as playoff", tournament.getTid());
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
+            if (oneParticipantInCategory(tournament, cid, bids, batch)) {
+                return;
+            }
             categoryPlayOffBuilder.build(tournament, cid, bids, batch);
         });
     }
@@ -147,12 +152,15 @@ public class CastingLotsService {
 
     private void seedJustGroupTournament(TournamentRules rules,
             TournamentMemState tournament,
-            List<ParticipantMemState> readyBids) {
+            List<ParticipantMemState> readyBids, DbUpdater batch) {
         log.info("Seed tid {} as group", tournament.getTid());
         final Tid tid = tournament.getTid();
         final int quits = rules.getGroup().get().getQuits();
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
             validateBidsNumberInACategory(bids);
+            if (oneParticipantInCategory(tournament, cid, bids, batch)) {
+                return;
+            }
             final List<ParticipantMemState> orderedBids = rankingService.sort(
                     bids, rules.getCasting(), tournament);
             final String groupLabel = GroupService.sortToLabel(0);
@@ -166,12 +174,25 @@ public class CastingLotsService {
         });
     }
 
+    private boolean oneParticipantInCategory(TournamentMemState tournament, Integer cid, List<ParticipantMemState> bids, DbUpdater batch) {
+        if (bids.size() > 1) {
+            return false;
+        }
+        log.info("Autocomplete category {} in tid {} due it has 1 participant",
+                cid, tournament.getTid());
+        bidService.setBidState(bids.get(0), Win1, singleton(bids.get(0).getState()), batch);
+        return true;
+    }
+
     private void seedTournamentWithGroupsAndPlayOff(TournamentRules rules,
-            TournamentMemState tournament, List<ParticipantMemState> readyBids) {
+            TournamentMemState tournament, List<ParticipantMemState> readyBids, DbUpdater batch) {
         final Tid tid = tournament.getTid();
         final int quits = rules.getGroup().get().getQuits();
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
             validateBidsNumberInACategory(bids);
+            if (oneParticipantInCategory(tournament, cid, bids, batch)) {
+                return;
+            }
             final Map<Integer, List<ParticipantMemState>> bidsByGroups = groupDivider.divide(
                     rules.getCasting(), rules.getGroup().get(),
                     rankingService.sort(bids, rules.getCasting(), tournament));

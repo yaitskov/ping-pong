@@ -4,7 +4,9 @@ import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11_NP;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
+import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
+import static org.dan.ping.pong.mock.simulator.PlayerCategory.c2;
 import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 
 import org.dan.ping.pong.JerseySpringTest;
@@ -48,5 +50,20 @@ public class SmallTournamentAutoCompleteJerseyTest extends AbstractSpringJerseyT
                 .run(c -> c.beginTournament()
                         .checkResult(p1)
                         .checkTournamentComplete(BidStatesDesc.restState(Win1)));
+    }
+
+    @Test
+    public void autoCloseWith2ActiveParticipantsInDifferentCategories() {
+        final TournamentScenario scenario = begin().name("autoCloseWhen2PlayersDiffCat")
+                .rules(RULES_G8Q1_S1A2G11_NP)
+                .category(c1, p1)
+                .category(c2, p2);
+
+        isf.create(scenario)
+                .run(c -> c.beginTournament()
+                        .checkResult(c1, p1)
+                        .checkResult(c2, p2)
+                        .checkTournamentComplete(BidStatesDesc.restState(Win1)
+                                .bid(p1, Win1).bid(p2, Win1)));
     }
 }

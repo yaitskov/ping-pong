@@ -267,7 +267,16 @@ public class ImperativeSimulator {
     }
 
     public ImperativeSimulator checkResult(Player... p) {
-        final List<TournamentResultEntry> tournamentResult = getTournamentResult();
+        return checkResult(getOnlyCid(), p);
+    }
+
+    public ImperativeSimulator checkResult(PlayerCategory category, Player... p) {
+        return checkResult(ofNullable(getScenario().getCategoryDbId()
+                .get(category)).orElseThrow(() -> new RuntimeException("no category " + category)), p);
+    }
+
+    public ImperativeSimulator checkResult(int categoryId, Player... p) {
+        final List<TournamentResultEntry> tournamentResult = getTournamentResult(categoryId);
         try {
             assertThat(tournamentResult.stream()
                             .map(tr -> uid2Player(tr.getUser().getUid())).collect(toList()),

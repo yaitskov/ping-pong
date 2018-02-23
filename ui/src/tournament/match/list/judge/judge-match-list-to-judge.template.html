@@ -78,6 +78,7 @@
           <td class="match-cell">
             <a class="btn btn-default" ng-click="$ctrl.completeMatch(match)">
               {{match.matchType | translate}}
+              <sup ng-show="$ctrl.tournamentId != match.tid">😭</sup>
             </a>
           </td>
           <td ng-show="$ctrl.showTables">
@@ -98,6 +99,7 @@
                title="{{ 'to-score' | translate }}"
                ng-click="$ctrl.completeMatch(match)">
               {{match.enemy.name}}
+              <sup ng-show="$ctrl.tournamentId != match.tid">😭</sup>
             </a>
           </td>
           <td>

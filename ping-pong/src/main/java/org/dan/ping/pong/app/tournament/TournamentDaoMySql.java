@@ -117,6 +117,7 @@ public class TournamentDaoMySql implements TournamentDao {
                 .innerJoin(TOURNAMENT_ADMIN)
                 .on(TOURNAMENT.TID.eq(TOURNAMENT_ADMIN.TID))
                 .where(TOURNAMENT_ADMIN.UID.eq(uid),
+                        TOURNAMENT.TYPE.eq(Classic),
                         TOURNAMENT.STATE.in(Hidden, Announce, Draft, Open)
                                 .or(TOURNAMENT.OPENS_AT.ge(after)))
                 .fetch()

@@ -110,6 +110,36 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
     }
 
     @Test
+    public void createConsoleTourWhen1GroupIsCompleteAndOtherNot() {
+        final TournamentScenario scenario = begin().name("consoleGroupSandwich")
+                .rules(RULES_G2Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4);
+        isf.create(scenario)
+                .run(c -> {
+                    c.beginTournament()
+                            .scoreSet(p1, 11, p2, 3);
+
+                    final ImperativeSimulator console = c.createConsoleTournament()
+                            .resolveCategories();
+                    myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
+                            TidIdentifiedRules.builder()
+                                    .tid(c.getConsoleScenario().getTid())
+                                    .rules(RULES_LC_S1A2G11_NP)
+                                    .build());
+
+                    c.scoreSet(p3, 11, p4, 7)
+                            .scoreSet(p1, 11, p3, 4)
+                            .checkTournamentComplete(restState(Lost).bid(p3, Win2).bid(p1, Win1));
+
+                    console.checkTournament(Open, restState(Want).bid(p2, Play).bid(p4, Play));
+                    console.reloadMatchMap()
+                            .scoreSet(p2, 11, p4, 6)
+                            .checkTournamentComplete(restState(Lost)
+                                    .bid(p2, Win1).bid(p4, Win2));
+                });
+    }
+
+    @Test
     public void consoleTourByDefaultRules3() {
         final TournamentScenario scenario = begin().name("consoleTourByDefaultRules3")
                 .rules(RULES_G8Q1_S1A2G11_NP)

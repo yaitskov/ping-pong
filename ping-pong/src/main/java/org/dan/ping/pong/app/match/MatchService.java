@@ -20,6 +20,7 @@ import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.match.MatchState.Auto;
 import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
+import static org.dan.ping.pong.app.match.MatchState.INCOMPLETE_MATCH_STATES;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
@@ -603,13 +604,11 @@ public class MatchService {
         return sports.calcWonSets(tournament, matchInfo);
     }
 
-    public static final Set<MatchState> incompleteMatchStates = ImmutableSet.of(Draft, Place, Game);
-
     public List<MatchInfo> bidIncompleteGroupMatches(Uid uid, TournamentMemState tournament) {
         return tournament.getMatches().values().stream()
                 .filter(minfo -> minfo.getParticipantIdScore().containsKey(uid))
                 .filter(minfo -> minfo.getGid().isPresent())
-                .filter(minfo -> incompleteMatchStates.contains(minfo.getState()))
+                .filter(minfo -> INCOMPLETE_MATCH_STATES.contains(minfo.getState()))
                 .collect(toList());
     }
 
@@ -644,7 +643,7 @@ public class MatchService {
                 .stream()
                 .filter(minfo -> minfo.hasParticipant(uid))
                 .filter(minfo -> !minfo.getGid().isPresent())
-                .filter(minfo -> incompleteMatchStates.contains(minfo.getState()))
+                .filter(minfo -> INCOMPLETE_MATCH_STATES.contains(minfo.getState()))
                 .findAny();
     }
 
@@ -698,7 +697,7 @@ public class MatchService {
         return scheduleService.withPlaceTables(tournament, tablesDiscovery ->
                 MyPendingMatchList.builder()
                         .matches(tournament.participantMatches(uid)
-                                .filter(m -> incompleteMatchStates.contains(m.getState()))
+                                .filter(m -> INCOMPLETE_MATCH_STATES.contains(m.getState()))
                                 .sorted(tournament.getRule().getPlace()
                                         .map(PlaceRules::getArenaDistribution).orElse(NO) == NO
                                         ? noTablesParticipantMatchComparator(tournament, uid)
@@ -729,7 +728,7 @@ public class MatchService {
         return TournamentProgress.builder()
                 .leftMatches(tournament.participantMatches(uid)
                         .map(MatchInfo::getState)
-                        .filter(incompleteMatchStates::contains)
+                        .filter(INCOMPLETE_MATCH_STATES::contains)
                         .count())
                 .totalMatches(tournament.participantMatches(uid).count())
                 .build();
@@ -739,7 +738,7 @@ public class MatchService {
         return TournamentProgress.builder()
                 .leftMatches(tournament.getMatches().values().stream()
                         .map(MatchInfo::getState)
-                        .filter(incompleteMatchStates::contains)
+                        .filter(INCOMPLETE_MATCH_STATES::contains)
                         .count())
                 .totalMatches(tournament.getMatches().size())
                 .build();

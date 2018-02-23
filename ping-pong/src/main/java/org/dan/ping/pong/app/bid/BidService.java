@@ -14,7 +14,7 @@ import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
-import static org.dan.ping.pong.app.match.MatchService.incompleteMatchStates;
+import static org.dan.ping.pong.app.match.MatchState.INCOMPLETE_MATCH_STATES;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
@@ -32,6 +32,7 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.sched.ScheduleService;
+import org.dan.ping.pong.app.tournament.ChildTournamentProvider;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -44,6 +45,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -103,14 +105,26 @@ public class BidService {
                 target, expected, clocker.get(), batch);
     }
 
+    @Inject
+    private ChildTournamentProvider childTournamentProvider;
+
     public List<UserLink> findByState(TournamentMemState tournament, List<BidState> states) {
+        return Stream.concat(
+                childTournamentProvider.getChild(tournament)
+                        .map(consoleTournament -> findByStateNonRecursive(consoleTournament, states))
+                        .orElseGet(Stream::empty),
+                findByStateNonRecursive(tournament, states))
+                .sorted(Comparator.comparing(UserLink::getName))
+                .collect(toList());
+    }
+
+    public Stream<UserLink> findByStateNonRecursive(TournamentMemState tournament,
+            List<BidState> states) {
         return tournament.getParticipants().values().stream()
                 .filter(p -> states.contains(p.getState()))
                 .filter(p -> tournament.participantMatches(p.getUid())
-                        .anyMatch(m -> incompleteMatchStates.contains(m.getState())))
-                .map(ParticipantMemState::toLink)
-                .sorted(Comparator.comparing(UserLink::getName))
-                .collect(toList());
+                        .anyMatch(m -> INCOMPLETE_MATCH_STATES.contains(m.getState())))
+                .map(ParticipantMemState::toLink);
     }
 
     public List<UserLink> findWithMatch(TournamentMemState tournament) {
@@ -128,8 +142,6 @@ public class BidService {
 
     @Inject
     private CastingLotsService castingLotsService;
-
-
 
     public void changeGroup(TournamentMemState tournament, ChangeGroupReq req, DbUpdater batch) {
         log.info("Change group {}");

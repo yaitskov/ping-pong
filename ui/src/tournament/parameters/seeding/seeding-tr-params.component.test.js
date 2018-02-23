@@ -1,7 +1,7 @@
 import { setupAngularJs } from 'test/angularjs-test-setup.js';
 import { checkTouchSpinID } from 'test/touchSpin.js';
 import SeedingTournamentParamsCtrl from './SeedingTournamentParamsCtrl.js';
-import { newTournamentWithPlayOff } from 'test/defaultTournaments.js';
+import { newTournamentWithPlayOff, existingLayeredConsoleTournament } from 'test/defaultTournaments.js';
 
 describe('seeding-tr-params', () => {
     var initEventFired = false;
@@ -77,5 +77,15 @@ describe('seeding-tr-params', () => {
         ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff());
         checkTouchSpinID(ctx, '#min-rank-value',
                          () => ctx.ctrl.rules.casting.providedRankOptions.minValue);
+    });
+
+    it('ranking policy is hidden if ConsoleLayered', () => {
+        const tournament = existingLayeredConsoleTournament();
+        tournament.rules.casting.policy = 'SignUp';
+        tournament.rules.casting.splitPolicy = 'ConsoleLayered';
+        ctx.broadcast('event.tournament.rules.set', tournament);
+        ctx.hidden('#ranking-policy');
+        ctx.hidden('#rank-axis-direction');
+        ctx.visible('#split-policy');
     });
 });

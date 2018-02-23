@@ -2,7 +2,7 @@ import { setupAngularJs } from 'test/angularjs-test-setup.js';
 import { checkTouchSpinIncrease, checkTouchSpinDecrease } from 'test/touchSpin.js';
 import GroupParamsCtrl from './GroupParamsCtrl.js';
 import { newTournamentWithGroup, newTournamentWithoutGroup, newTournamentWithoutPlayOff,
-         existingTournamentWithConsole } from 'test/defaultTournaments.js';
+         existingTournamentWithConsole, existingLayeredConsoleTournament } from 'test/defaultTournaments.js';
 
 describe('group-tr-params', () => {
     var initEventFired = false;
@@ -140,5 +140,10 @@ describe('group-tr-params', () => {
         ctx.ctrl.groupScheduleJson = "2: 1";
         expect(ctx.ctrl.groupScheduleIsValid).toBeFalse();
         expect(ctx.ctrl.isValid).toBeFalse();
+    });
+
+    it('group toggler is hidden for console tournament', () => {
+        ctx.broadcast('event.tournament.rules.set', existingLayeredConsoleTournament());
+        ctx.hidden('#group-parameters-toggler');
     });
 });

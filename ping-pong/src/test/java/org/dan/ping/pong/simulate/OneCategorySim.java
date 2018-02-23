@@ -1,12 +1,11 @@
 package org.dan.ping.pong.simulate;
 
 import static org.dan.ping.pong.app.bid.BidState.Lost;
-import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
-import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q2_M;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11_NP;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G3Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G3Q2_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11_NP;
@@ -16,11 +15,13 @@ import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11_3P;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_LC_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RULES;
-import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.mock.simulator.AutoResolution.RANDOM;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Hook.BeforeScore;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
+import static org.dan.ping.pong.mock.simulator.Player.p10;
+import static org.dan.ping.pong.mock.simulator.Player.p11;
+import static org.dan.ping.pong.mock.simulator.Player.p12;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
@@ -28,6 +29,7 @@ import static org.dan.ping.pong.mock.simulator.Player.p5;
 import static org.dan.ping.pong.mock.simulator.Player.p6;
 import static org.dan.ping.pong.mock.simulator.Player.p7;
 import static org.dan.ping.pong.mock.simulator.Player.p8;
+import static org.dan.ping.pong.mock.simulator.Player.p9;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 import static org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc.restState;
@@ -333,6 +335,41 @@ public class OneCategorySim {
                             .scoreSet(p2, 11, p3, 5)
                             .scoreSet(p1, 11, p3, 4)
                             .checkTournamentComplete(restState(Lost).bid(p1, Win1))
+                            .createConsoleTournament()
+                            .resolveCategories();
+
+                    console.getMyRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
+                            TidIdentifiedRules.builder()
+                                    .tid(console.getScenario().getTid())
+                                    .rules(RULES_LC_S1A2G11_NP)
+                                    .build());
+                });
+    }
+
+    @Test
+    public void withLayeredConsoleTournament2Layers() {
+        final TournamentScenario scenario = begin().name("with2LayeredConsoleTour")
+                .rules(RULES_G3Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
+        isf.create(scenario)
+                .run(c -> {
+                    final ImperativeSimulator console = c.beginTournament()
+                            .scoreSet(p1, 11, p2, 3)
+                            .scoreSet(p2, 11, p3, 5)
+                            .scoreSet(p1, 11, p3, 4)
+
+                            .scoreSet(p4, 11, p5, 3)
+                            .scoreSet(p5, 11, p6, 5)
+                            .scoreSet(p4, 11, p6, 4)
+
+                            .scoreSet(p7, 11, p8, 3)
+                            .scoreSet(p8, 11, p9, 5)
+                            .scoreSet(p7, 11, p9, 4)
+
+                            .scoreSet(p10, 11, p11, 3)
+                            .scoreSet(p11, 11, p12, 5)
+                            .scoreSet(p10, 11, p12, 4)
+
                             .createConsoleTournament()
                             .resolveCategories();
 

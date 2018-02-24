@@ -5,14 +5,12 @@ import matchLabel from './matchLabel.js';
 export default function (tournament) {
     return new vis.DataSet(
         mapO(tournament.matches,
-             (match) => {
-                 return {
-                     id: match.id,
-                     level: match.level,
-                     label: matchLabel(tournament.participants, match),
-                     shape: 'box'
-                 };
-             },
+             (match) => ({
+                 id: match.id,
+                 level: match.level,
+                 label: matchLabel(tournament.participants, match),
+                 shape: 'box'
+             }),
              [{id: 'message',
                level: 1,
                label: 'No matches in PlayOff',

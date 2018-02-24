@@ -22,6 +22,14 @@ describe('java script', () => {
         it('call function', () => expect(sum.apply(null, [1, 2])).toBe(3));
     });
     describe('syntax', () => {
+        describe('function', () => {
+            describe('lmabda', () => {
+                it('return literal object', () => {
+                    const f = () => ({x: 1});
+                    expect(f()).toEqual({x: 1});
+                });
+            });
+        });
         describe('map', () => {
             it('spread', () => {
                 const m1 = {a: 1, b: 2};

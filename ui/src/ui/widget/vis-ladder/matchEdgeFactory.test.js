@@ -1,17 +1,14 @@
 import matchEdgeFactory from './matchEdgeFactory.js';
+import * as ds from 'test/visDataSet.js';
 
 describe('matchEdgeFactory', () => {
-    function items(ds) {
-        return ds.get(ds.getIds());
-    }
     it('tranistions are undefined',
        () => {
-           const ds = matchEdgeFactory({});
-           expect(items(ds)).toEqual([]);
+           expect(ds.items(matchEdgeFactory({}))).toEqual([]);
        });
     it('exend transitions with arrow and id',
        () => {
-           const ds = matchEdgeFactory({transitions: [{from: 3}]});
-           expect(items(ds)).toEqual([{from: 3, id: 1, arrow: 'to'}]);
+           expect(ds.items(matchEdgeFactory({transitions: [{from: 3}]}))).
+               toEqual([{from: 3, id: 1, arrow: 'to'}]);
        });
 });

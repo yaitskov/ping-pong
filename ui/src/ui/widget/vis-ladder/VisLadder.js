@@ -1,80 +1,19 @@
 import vis from 'vis';
-import matchLabel from './match-label.js';
 import NodeMenuManager from 'ui/vis-popup-menu/NodeMenuManager.js';
 import MatchManagementLinkFactory from 'ui/vis-popup-menu/MatchManagementLinkFactory.js';
+import playOffVisLadderOptions from './playOffVisLadderOptions.js';
+import matchNodeFactory from './matchNodeFactory.js';
+import matchEdgeFactory from './matchEdgeFactory.js';
 
 export default class VisLadder {
-    createMatchNode(tournament, match) {
-        return {id: match.id, level: match.level,
-                label: matchLabel(tournament, match),
-                shape: 'box'};
-    };
-
     get options() {
-        return {
-            autoResize: true,
-            height: '100%',
-            width: '100%',
-            manipulation: false,
-            nodes: {
-                font: {
-                    face: 'mono',
-                    size: 20,
-                    color: 'black',
-                    align: 'left'
-                },
-                color: {
-                    background: '#bbb',
-                    border: 'black'
-                },
-                margin: {
-                    right: 10
-                }
-            },
-            edges: {
-                arrows: 'to',
-                color: {
-                    color: 'green',
-                    inherit: false
-                }
-            },
-            layout: {
-                hierarchical: {
-                    direction: 'LR',
-                    enabled: true,
-                    levelSeparation: 400,
-                    sortMethod: "directed"
-                },
-                //randomSeed: 2
-            },
-            physics: {
-                hierarchicalRepulsion: {
-                    nodeDistance: 80,
-                }
-            }
-        };
+        return playOffVisLadderOptions();
     }
 
     data(tournament) {
-        const nodes = [];
-        if (!tournament.matches || !tournament.matches.length) {
-            nodes.push({id: 'message',
-                        level: 1,
-                        label: 'No matches in PlayOff',
-                        shape: 'box'});
-        } else {
-            for (let match of tournament.matches) {
-                nodes.push(this.createMatchNode(tournament, match));
-            }
-        }
-        const edges = [];
-        for (let edge of tournament.transitions || []) {
-            edge.arrow = 'to';
-            edges.push(edge);
-        }
         return {
-            nodes: new vis.DataSet(nodes),
-            edges: new vis.DataSet(edges)
+            nodes: matchNodeFactory(tournament),
+            edges: matchEdgeFactory(tournament)
         };
     }
 

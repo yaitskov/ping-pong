@@ -1,17 +1,21 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.util.Collections.emptyList;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
+import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_LC_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_PLAY_OFF_MATCHES;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RULES;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
+import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
@@ -25,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 import com.google.common.collect.ImmutableMap;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.playoff.PlayOffMatches;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
@@ -47,7 +52,7 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void playOff1Defeat2Guys() {
-        final TournamentScenario scenario = TournamentScenario.begin().name("playOff1Defeat2Guys")
+        final TournamentScenario scenario = begin().name("playOff1Defeat2Guys")
                 .rules(RULES_JP_S1A2G11)
                 .category(c1, p1, p2);
         final ImperativeSimulator simulator = isf.create(scenario);
@@ -73,7 +78,7 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void playOff1Defeat4Guys() {
-        final TournamentScenario scenario = TournamentScenario.begin().name("playOff1Defeat4Guys")
+        final TournamentScenario scenario = begin().name("playOff1Defeat4Guys")
                 .tables(2)
                 .rules(RULES_JP_S1A2G11)
                 .category(c1, p1, p2, p3, p4);
@@ -198,7 +203,7 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void justPlayOff3() {
-        final TournamentScenario scenario = TournamentScenario.begin()
+        final TournamentScenario scenario = begin()
                 .name("justPlayOff3")
                 .rules(RULES_JP_S1A2G11)
                 .category(c1, p1, p2, p3);
@@ -240,5 +245,42 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
                 allOf(
                         not(hasItem(FILLER_LOSER_UID)),
                         hasItems(uid1, uid2, uid3)));
+    }
+
+    @Test
+    public void layeredPlayOff() {
+        final TournamentScenario scenario = begin().name("layeredPlayOff")
+                .rules(RULES_G2Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4);
+        isf.create(scenario)
+                .run(c -> {
+                    c.beginTournament()
+                            .createConsoleTournament();
+
+                    myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
+                            TidIdentifiedRules.builder()
+                                    .tid(c.getConsoleScenario().getTid())
+                                    .rules(RULES_LC_S1A2G11_NP)
+                                    .build());
+
+                    final ImperativeSimulator console = c
+                            .scoreSet(p1, 11, p2, 3)
+                            .scoreSet(p3, 11, p4, 7)
+                            .scoreSet(p1, 11, p3, 4)
+                            .resolveCategories()
+                            .reloadMatchMap();
+
+                    final PlayOffMatches matches = matches(console.getScenario());
+                    assertThat(matches.getRootTaggedMatches(),
+                            hasItem(
+                                    allOf(
+                                            hasProperty("level", is(1)),
+                                            hasProperty("mid", is(console.resolveMid(p2, p4))),
+                                            hasProperty("tag", is(MatchTag.builder().prefix("L").number(1).build())))));
+                    assertThat(matches.getMatches(),
+                            hasItem(hasProperty("id", is(console.resolveMid(p2, p4)))));
+                    assertThat(matches.getTransitions(),
+                            not(hasItem(hasProperty("to", is(console.resolveMid(p2, p4))))));
+                });
     }
 }

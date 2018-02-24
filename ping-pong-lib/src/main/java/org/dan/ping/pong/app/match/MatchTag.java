@@ -1,16 +1,21 @@
 package org.dan.ping.pong.app.match;
 
 import static java.lang.String.format;
+import static lombok.AccessLevel.PRIVATE;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Builder
 @EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor(access = PRIVATE)
 public class MatchTag {
     private String prefix;
     private int number;

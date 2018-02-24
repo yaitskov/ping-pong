@@ -317,7 +317,6 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 });
     }
 
-
     @Test
     public void layeredConsoleTournament() {
         final TournamentScenario scenario = begin().name("layeredConsoleTournament")

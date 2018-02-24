@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.playoff.RootTaggedMatch;
 import org.dan.ping.pong.app.tournament.Tid;
 
 import java.time.Duration;
@@ -139,6 +140,14 @@ public class MatchInfo {
         return participantIdScore.entrySet().stream()
                 .collect(toMap(Map.Entry::getKey,
                         e -> e.getValue().subList(0, setNumber)));
+    }
+
+    public RootTaggedMatch toRootTaggedMatch() {
+        return RootTaggedMatch.builder()
+                .mid(mid)
+                .tag(tag)
+                .level(level)
+                .build();
     }
 
     public static class MatchInfoBuilder {

@@ -1,11 +1,14 @@
 package org.dan.ping.pong.app.playoff;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.MID0;
+import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.ConsoleLayered;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.tournament.CumulativeScore.createComparator;
+import static org.dan.ping.pong.app.tournament.GroupMaxMap.findMaxes;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +17,8 @@ import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchTag;
-import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.match.Mid;
+import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.tournament.CumulativeScore;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -151,6 +154,16 @@ public class PlayOffService {
     @Inject
     private Sports sports;
 
+    private Map<MatchTag, MatchInfo> findRootMatches(TournamentMemState tournament) {
+        if (tournament.getRule().getCasting().getSplitPolicy() == ConsoleLayered) {
+            return findMaxes(MatchInfo::getTag,
+                    Comparator.comparing(MatchInfo::getLevel),
+                    tournament.getMatches().values().stream()
+                            .filter(matchInfo -> matchInfo.getTag() != null));
+        }
+        return emptyMap();
+    }
+
     public PlayOffMatches playOffMatches(TournamentMemState tournament, int cid, MatchTag tag) {
         final List<MatchLink> transitions = new ArrayList<>();
         final List<PlayOffMatch> matches = new ArrayList<>();
@@ -189,9 +202,14 @@ public class PlayOffService {
                             .winnerId(m.getWinnerId())
                             .build());
                 });
+
         return PlayOffMatches.builder()
                 .transitions(transitions)
                 .matches(matches)
+                .rootTaggedMatches(findRootMatches(tournament)
+                        .values().stream()
+                        .map(MatchInfo::toRootTaggedMatch)
+                        .collect(toList()))
                 .participants(participants)
                 .build();
     }

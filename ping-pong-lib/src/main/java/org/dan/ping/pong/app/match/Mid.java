@@ -32,4 +32,8 @@ public class Mid implements Comparable<Mid> {
     public int compareTo(Mid o) {
         return compare(id, o.id);
     }
+
+    public Mid negate() {
+        return new Mid(-id);
+    }
 }

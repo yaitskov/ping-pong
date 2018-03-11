@@ -2,8 +2,8 @@ import vis from 'vis';
 import NodeMenuManager from 'ui/vis-popup-menu/NodeMenuManager.js';
 import MatchManagementLinkFactory from 'ui/vis-popup-menu/MatchManagementLinkFactory.js';
 import playOffVisLadderOptions from './playOffVisLadderOptions.js';
-import matchNodeFactory from './matchNodeFactory.js';
-import matchEdgeFactory from './matchEdgeFactory.js';
+import injectTagNodes from './injectTagNodes.js';
+import injectTagEdges from './injectTagEdges.js';
 
 export default class VisLadder {
     get options() {
@@ -12,8 +12,8 @@ export default class VisLadder {
 
     data(tournament) {
         return {
-            nodes: matchNodeFactory(tournament),
-            edges: matchEdgeFactory(tournament)
+            nodes: injectTagNodes(tournament),
+            edges: injectTagEdges(tournament)
         };
     }
 

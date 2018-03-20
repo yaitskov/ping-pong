@@ -62,25 +62,29 @@ angular.module('core.ui').
                     var options = Object.assign({on: on, off: off, size: 'mini'},
                                                 scope.bsToggleOptions() || {});
                     $(element[0]).bootstrapToggle(options);
+                    $(element[0]).parent().click(() => {
+                        const checked = $(element[0]).prop('checked');
+                        if (!checked) {
+                            $timeout(() => $anchorScroll(attrs.bsTogglerAnchor), 50);
+                        }
+                    });
                     $(element[0]).change(function () {
-                        var checked = $(this).prop('checked');
+                        const checked = $(this).prop('checked');
                         ngModel.$setViewValue(checked);
                     });
                     if (attrs.bsToggleDisabled) {
                         $(element[0]).bootstrapToggle('disable');
                     }
-                    attrs.enabled = false;
-                    scope.$watch(
-                        function () {
-                            return ngModel.$modelValue;
-                        },
-                        function (checked) {
-                            if (attrs.enabled && attrs.bsTogglerAnchor) {
-                               $timeout(() => $anchorScroll(attrs.bsTogglerAnchor), 50);
-                            }
-                            $(element[0]).prop('checked', checked).change();
-                        });
-                    $timeout(() => attrs.enabled = true, 100);
+                    $timeout(() => {
+                        scope.$watch(
+                            function () {
+                                return ngModel.$modelValue;
+                            },
+                            function (checked) {
+                                console.log(`set initial value ${checked}`);
+                                $(element[0]).prop('checked', checked).change();
+                            });
+                    }, 0);
                 }
                 init(attrs.bsToggleOn, attrs.bsToggleOff);
             }

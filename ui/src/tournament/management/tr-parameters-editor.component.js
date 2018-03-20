@@ -28,7 +28,10 @@ angular.
                                          requestStatus.failed(resp);
                                      });
                              },
-                             'event.tournament.rules.cancel': window.history.back,
+                             'event.tournament.rules.cancel': () => {
+                                 console.log("Go Back");
+                                 window.history.back();
+                             },
                              'event.tournament.rules.ready': () => {
                                  requestStatus.startLoading();
                                  const req = {tournamentId: $routeParams.tournamentId};

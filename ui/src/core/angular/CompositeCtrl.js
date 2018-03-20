@@ -1,4 +1,5 @@
 import AngularBean from 'core/angular/AngularBean.js';
+import childrenReadyBarier from './childrenReadyBarier.js';
 
 export default class CompositeCtrl extends AngularBean {
     static get $inject() {
@@ -18,14 +19,7 @@ export default class CompositeCtrl extends AngularBean {
         super(...arguments);
         this.childControllers = [];
 
-        const eventNames = this.expectedChildCtrls.map(cls => cls.readyEvent);
-        const readyChildCtrls = this.eBarier.create(
-            eventNames, () => this.broadcast(this.constructor.readyEvent));
-        const eventHandlers = {};
-        for (let event of eventNames) {
-            eventHandlers[event] = (e) => readyChildCtrls.got(event);
-        }
-        this.$bind(eventHandlers);
+        childrenReadyBarier(this);
     }
 
     $bind(eventHandlers) {

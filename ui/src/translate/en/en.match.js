@@ -15,6 +15,10 @@ module.exports = {
     'Schedule tables': 'Schedule tables',
     'Schedule courts': 'Schedule courts',
 
+    'Count only sets lbl': 'Count only sets',
+    'Count only sets lbl-true': 'Yes',
+    'Count only sets lbl-false': 'No',
+
     'Rescore match': 'Rescore match',
 
     'play-off-match-will-replayed': 'Dependent play off matches will be replayed, but you will have an opportunity to see consequences in advance.',

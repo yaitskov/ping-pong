@@ -45,6 +45,15 @@ describe('match-params', () => {
         ctx.hidden('#supertie-break-games');
     });
 
+    it('3rd place match toggles', () => {
+        ctx.broadcast('event.tournament.rules.set', pingPongTournament());
+        ctx.btnTogglesDiffClasses('#count-only-sets',
+                                  () => ctx.ctrl.rules.match.countOnlySets,
+                                  {default: {clazz: 'btn-primary', value: false},
+                                   other: {clazz: 'btn-success', value: true}});
+    });
+
+
     it('min game advance not increase limit', () => {
         expect(ctx.ctrl.advance.max).toBe(1000);
         const tournament = pingPongTournament();

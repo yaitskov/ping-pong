@@ -7,7 +7,8 @@ export default function defaultMatchRules(sport) {
             minGamesToWin: 11,
             minAdvanceInGames: 2,
             minPossibleGames: 0,
-            setsToWin: 3
+            setsToWin: 3,
+            countOnlySets: false
         };
     case 'Tennis':
         return {

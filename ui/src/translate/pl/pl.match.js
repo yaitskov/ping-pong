@@ -15,6 +15,10 @@ module.exports = {
     'Schedule tables': 'Planować stoły',
     'Schedule courts': 'Planować korty',
 
+    'Count only sets lbl': 'Liczyć tylko sety',
+    'Count only sets lbl-true': 'Tak',
+    'Count only sets lbl-false': 'Nie',
+
     'Rescore match': 'Ocenić mecz ponownie',
     'play-off-match-will-replayed': 'W razie gwałtownej zmiany wyniku zależny meczi w play off będą odwołany, ale będziesz mięć okzję zobaczyć konsekwencji',
     'click-score-to-change': 'Kliknij oceniony set, żeby go zmienić.',

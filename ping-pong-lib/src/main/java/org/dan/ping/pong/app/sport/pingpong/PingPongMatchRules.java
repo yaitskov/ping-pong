@@ -26,6 +26,7 @@ public class PingPongMatchRules implements MatchRules {
     private int minAdvanceInGames;
     private int minPossibleGames;
     private int setsToWin;
+    private boolean countOnlySets;
 
     public SportType sport() {
         return PingPong;

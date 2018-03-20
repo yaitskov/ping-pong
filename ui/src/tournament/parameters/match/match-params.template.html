@@ -46,4 +46,7 @@
            translate="min-games-advance-help"
            ng-show="$ctrl.rules.match['@type'] == 'Tennis'"/>
     </div>
+    <many-button-toggler id="count-only-sets" ng-show="$ctrl.rules.match['@type'] == 'PingPong'"
+                         domain="[false, true]" selected-class="['btn-primary', 'btn-success']"
+                         label="Count only sets lbl" ng-model="$ctrl.rules.match.countOnlySets"/>
 </div>

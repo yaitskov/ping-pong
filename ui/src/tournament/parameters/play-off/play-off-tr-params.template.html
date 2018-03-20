@@ -1,15 +1,13 @@
-<div class="form-group toggle-btn" id="play-off-parameters-toggler">
+<div class="form-group toggle-btn" ng-show="!$ctrl.tournament.masterTid" id="play-off-parameters-toggler">
   <label translate="play-off-lbl"/>
-  <div ng-show="!$ctrl.tournament.masterTid">
-    <input type="checkbox"
-           data-size="small"
-           bs-toggler-anchor="play-off-parameters-toggler"
-           ng-model="$ctrl.usePlayOff"
-           bs-toggle-on="{{ 'yes-lbl' | translate }}"
-           bs-toggle-off="{{ 'no-lbl' | translate }}"
-           bs-toggle-target="#play-off-parameters"
-           bs-toggle/>
-    </div>
+  <input type="checkbox"
+         data-size="small"
+         bs-toggler-anchor="play-off-parameters-toggler"
+         ng-model="$ctrl.usePlayOff"
+         bs-toggle-on="{{ 'yes-lbl' | translate }}"
+         bs-toggle-off="{{ 'no-lbl' | translate }}"
+         bs-toggle-target="#play-off-parameters"
+         bs-toggle/>
 </div>
 <div id="play-off-parameters" class="toggle-panel" ng-show="$ctrl.usePlayOff">
   <many-button-toggler id="max-losses-in-play-off" ng-model="$ctrl.rules.playOff.losings"

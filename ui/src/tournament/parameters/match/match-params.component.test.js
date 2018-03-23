@@ -45,6 +45,19 @@ describe('match-params', () => {
         ctx.hidden('#supertie-break-games');
     });
 
+    it('min sets to win is not visible if countOnlySets', () => {
+        const tournament = pingPongTournament();
+        ctx.broadcast('event.tournament.rules.set', tournament);
+        ctx.visible('#sets-to-win-match');
+        ctx.visible('#min-games-to-win');
+        ctx.visible('#min-game-advance');
+        tournament.rules.match.countOnlySets = true;
+        ctx.broadcast('event.tournament.rules.set', tournament);
+        ctx.hidden('#sets-to-win-match');
+        ctx.hidden('#min-games-to-win');
+        ctx.hidden('#min-game-advance');
+    });
+
     it('3rd place match toggles', () => {
         ctx.broadcast('event.tournament.rules.set', pingPongTournament());
         ctx.btnTogglesDiffClasses('#count-only-sets',
@@ -52,7 +65,6 @@ describe('match-params', () => {
                                   {default: {clazz: 'btn-primary', value: false},
                                    other: {clazz: 'btn-success', value: true}});
     });
-
 
     it('min game advance not increase limit', () => {
         expect(ctx.ctrl.advance.max).toBe(1000);

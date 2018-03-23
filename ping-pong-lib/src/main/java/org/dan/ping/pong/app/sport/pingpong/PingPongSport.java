@@ -1,12 +1,16 @@
 package org.dan.ping.pong.app.sport.pingpong;
 
+import static java.util.Arrays.asList;
 import static org.dan.ping.pong.app.sport.SportType.PingPong;
+import static org.dan.ping.pong.app.sport.tennis.TennisSport.SET_LENGTH_MISMATCH;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.match.IdentifiedScore;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.SetScoreReq;
 import org.dan.ping.pong.app.sport.Sport;
 import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.tournament.rules.PingPongMatchRuleValidator;
@@ -14,7 +18,6 @@ import org.dan.ping.pong.app.tournament.rules.ValidationError;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +43,12 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
         final Uid uidA = uidIterator.next();
         final Uid uidB = uidIterator.next();
         final int[] wonSets = new int[2];
-        for (int iSet = 0; iSet < scores.get(uidA).size(); ++iSet) {
+        final int bSets = scores.get(uidB).size();
+        final int aSets = scores.get(uidA).size();
+        if (bSets != aSets) {
+            throw badRequest(SET_LENGTH_MISMATCH);
+        }
+        for (int iSet = 0; iSet < aSets; ++iSet) {
             ++wonSets[validate(rules, iSet,
                     scores.get(uidA).get(iSet),
                     scores.get(uidB).get(iSet))];
@@ -107,5 +115,45 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
         if (winners > 1) {
             throw badRequest("winners are more that 1");
         }
+    }
+
+    @Override
+    public List<SetScoreReq> expandScoreSet(PingPongMatchRules rules, SetScoreReq score) {
+        final List<SetScoreReq> result = new ArrayList<>();
+        final int uidIdxA = 0;
+        final int uidIdxB = 1;
+        int winnerIdx;
+        int loserIdx;
+        if (score.getScores().get(uidIdxA).getScore() < score.getScores().get(uidIdxB).getScore()) {
+            winnerIdx = uidIdxB;
+            loserIdx = uidIdxA;
+        } else {
+            winnerIdx = uidIdxA;
+            loserIdx = uidIdxB;
+        }
+        final int loserWonSets = score.getScores().get(loserIdx).getScore();
+        if (loserWonSets > 0) {
+            final List<IdentifiedScore> loserScores = asList(
+                    buildScore(score, winnerIdx, 0),
+                    buildScore(score, loserIdx, rules.getMinGamesToWin()));
+            for (int i = 0; i < loserWonSets; ++i) {
+                result.add(score.atomic(i, loserScores));
+            }
+        }
+        final int winnerWonSets = score.getScores().get(winnerIdx).getScore();
+        final List<IdentifiedScore> winnerScores = asList(
+                buildScore(score, loserIdx, 0),
+                buildScore(score, winnerIdx, rules.getMinGamesToWin()));
+        for (int i = 0; i < winnerWonSets; ++i) {
+            result.add(score.atomic(loserWonSets + i, winnerScores));
+        }
+        return result;
+    }
+
+    private IdentifiedScore buildScore(SetScoreReq scores, int loserIdx, int score) {
+        return IdentifiedScore.builder()
+                .uid(scores.getScores().get(loserIdx).getUid())
+                .score(score)
+                .build();
     }
 }

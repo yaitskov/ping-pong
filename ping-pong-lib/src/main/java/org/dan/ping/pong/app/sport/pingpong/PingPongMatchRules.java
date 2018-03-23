@@ -33,9 +33,20 @@ public class PingPongMatchRules implements MatchRules {
     }
 
     public MyPendingMatchSport toMyPendingMatchSport() {
+        if (countOnlySets) {
+            return MyPendingMatchPingPongSport.builder()
+                    .countOnlySets(countOnlySets)
+                    .setsToWin(setsToWin)
+                    .build();
+        }
         return MyPendingMatchPingPongSport.builder()
                 .minGamesToWin(minGamesToWin)
                 .minAdvanceInGames(minAdvanceInGames)
                 .build();
+    }
+
+    @Override
+    public boolean countOnlySets() {
+        return countOnlySets;
     }
 }

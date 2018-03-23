@@ -22,7 +22,8 @@ const PingPongZeroSets = {
     sport: {
         '@type': 'PingPong',
         minGamesToWin: 11,
-        minAdvanceInGames: 2
+        minAdvanceInGames: 2,
+        countOnlySets: false
     }
 };
 
@@ -105,14 +106,18 @@ describe('base-score-set', () => {
         expect(ctx.ctrl.scores).toEqual([12, 10]);
         expect(ctx.ctrl.possibleWinScores).toEqual([11, 12, 13, 14]);
         expect(ctx.ctrl.possibleLostScores).toEqual([10]);
-        expect(captured[0]).toEqual({setOrdNumber: 0, scores: [{uid: UidA, score: 12}, {uid: UidB, score: 10}]});
+        expect(captured[0]).toEqual({setOrdNumber: 0,
+                                     scores: [{uid: UidA, score: 12},
+                                              {uid: UidB, score: 10}]});
 
         ctx.element.find('#extend-win-score').click();
 
         expect(ctx.ctrl.scores).toEqual([15, 13]);
         expect(ctx.ctrl.possibleWinScores).toEqual([14, 15, 16, 17]);
         expect(ctx.ctrl.possibleLostScores).toEqual([13]);
-        expect(captured[1]).toEqual({setOrdNumber: 0, scores: [{uid: UidA, score: 15}, {uid: UidB, score: 13}]});
+        expect(captured[1]).toEqual({setOrdNumber: 0,
+                                     scores: [{uid: UidA, score: 15},
+                                              {uid: UidB, score: 13}]});
     });
 
     ij('shrink win balls in ping pong match', ($rootScope) => {
@@ -142,7 +147,9 @@ describe('base-score-set', () => {
             ctx.scope.$on('event.base.match.set.pick.lost', (e, data) => captured.push(data));
             ctx.ctrl.scores = [-1, -1];
             ctx.ctrl.pickLost(1, 777);
-            expect(captured).toEqual([{setOrdNumber: 0, scores: [{uid: UidA, score: -1}, {uid: UidB, score: 777}]}]);
+            expect(captured).toEqual([{setOrdNumber: 0,
+                                       scores: [{uid: UidA, score: -1},
+                                                {uid: UidB, score: 777}]}]);
         });
     });
 

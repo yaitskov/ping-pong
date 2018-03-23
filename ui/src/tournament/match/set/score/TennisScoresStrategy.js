@@ -1,4 +1,6 @@
-export default class TennisScoresStrategy {
+import BaseScoresStrategy from './BaseScoresStrategy.js';
+
+export default class TennisScoresStrategy extends BaseScoresStrategy {
     showExtend() {
         return false;
     }

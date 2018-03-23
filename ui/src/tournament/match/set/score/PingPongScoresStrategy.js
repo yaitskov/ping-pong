@@ -1,4 +1,6 @@
-export default class PingPongScoresStrategy {
+import BaseScoresStrategy from './BaseScoresStrategy.js';
+
+export default class PingPongScoresStrategy extends BaseScoresStrategy {
     showExtend() {
         return true;
     }

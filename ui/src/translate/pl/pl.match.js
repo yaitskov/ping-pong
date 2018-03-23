@@ -1,4 +1,6 @@
 module.exports = {
+    'Match does not have enough participants': 'Mecz nie ma wystarczająco uczestników',
+
     'Matches played by me': 'Zagrane meczi przeze mnie',
 
     'Opponent': 'Przeciwnik',
@@ -18,6 +20,8 @@ module.exports = {
     'Count only sets lbl': 'Liczyć tylko sety',
     'Count only sets lbl-true': 'Tak',
     'Count only sets lbl-false': 'Nie',
+
+    'score match lbl': 'Ocenić mecz',
 
     'Rescore match': 'Ocenić mecz ponownie',
     'play-off-match-will-replayed': 'W razie gwałtownej zmiany wyniku zależny meczi w play off będą odwołany, ale będziesz mięć okzję zobaczyć konsekwencji',

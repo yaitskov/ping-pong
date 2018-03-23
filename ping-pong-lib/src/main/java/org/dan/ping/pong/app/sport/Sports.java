@@ -7,6 +7,7 @@ import com.google.common.collect.Multimap;
 import lombok.RequiredArgsConstructor;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.SetScoreReq;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.rules.ValidationError;
 
@@ -55,5 +56,10 @@ public class Sports {
     public void checkWonSets(TournamentMemState tournament, Map<Uid, Integer> uidWonSets) {
         final Sport sport = get(tournament.getSport());
         sport.checkWonSets(tournament.getRule().getMatch(), uidWonSets);
+    }
+
+    public List<SetScoreReq> expandScoreSet(TournamentMemState tournament, SetScoreReq score) {
+        final Sport sport = get(tournament.getSport());
+        return sport.expandScoreSet(tournament.getRule().getMatch(), score);
     }
 }

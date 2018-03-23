@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.match;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -17,6 +18,7 @@ import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
+import static org.dan.ping.pong.app.match.MatchResource.UID;
 import static org.dan.ping.pong.app.match.MatchState.Auto;
 import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
@@ -72,6 +74,7 @@ import org.dan.ping.pong.util.TriFunc;
 import org.dan.ping.pong.util.time.Clocker;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -138,6 +141,28 @@ public class MatchService {
                     matchInfo);
         }
 
+        final List<SetScoreReq> scoredSets = expandScoreSet(tournament, score);
+        Optional<Uid> winUidO = empty();
+        for (SetScoreReq atomicSetScore : scoredSets) {
+            winUidO.ifPresent((winUid) -> { throw internalError("preliminary match winner", UID, winUid); });
+            winUidO = applyAtomicSetScore(tournament, atomicSetScore, now, batch, matchInfo);
+        }
+        return setScoreResult(tournament,
+                winUidO.map(u -> tournament.matchScoreResult())
+                        .orElse(SetScoreResultName.MatchContinues),
+                matchInfo);
+    }
+
+    private List<SetScoreReq> expandScoreSet(TournamentMemState tournament, SetScoreReq score) {
+        if (tournament.getRule().getMatch().countOnlySets()) {
+            return sports.expandScoreSet(tournament, score);
+        } else {
+            return singletonList(score);
+        }
+    }
+
+    private Optional<Uid> applyAtomicSetScore(TournamentMemState tournament, SetScoreReq score,
+            Instant now, DbUpdater batch, MatchInfo matchInfo) {
         final MatchInfo matchInfoForValidation = matchInfo.clone();
         matchInfoForValidation.addSetScore(score.getScores());
         sports.validateMatch(tournament, matchInfoForValidation);
@@ -146,13 +171,10 @@ public class MatchService {
         final Map<Uid, Integer> wonSets = sports.calcWonSets(tournament, matchInfo);
         final Optional<Uid> winUidO = sports.findWinnerId(tournament, wonSets);
         matchDao.scoreSet(tournament, matchInfo, batch, score.getScores());
-        winUidO.ifPresent(winUid -> matchWinnerDetermined(tournament, matchInfo, winUid, batch, EXPECTED_MATCH_STATES));
-
+        winUidO.ifPresent(winUid -> matchWinnerDetermined(tournament, matchInfo,
+                winUid, batch, EXPECTED_MATCH_STATES));
         scheduleService.afterMatchComplete(tournament, batch, now);
-        return setScoreResult(tournament,
-                winUidO.map(u -> tournament.matchScoreResult())
-                        .orElse(SetScoreResultName.MatchContinues),
-                matchInfo);
+        return winUidO;
     }
 
     SetScoreResult setScoreResult(TournamentMemState tournament, SetScoreResultName name, MatchInfo matchInfo) {
@@ -337,7 +359,7 @@ public class MatchService {
         if (iGru.getOrdNumber() == 0) {
             log.info("Set terminal bid states in mini tid {}", tournament.getTid());
             for (int i = 0; i < quitUids.size(); ++i) {
-                bidService.setBidState(tournament.getParticipant(quitUids.get(i)),
+                bidService.setBidState(tournament.getBidOrQuit(quitUids.get(i)),
                         i < WIN_STATES.size()
                                 ? WIN_STATES.get(i)
                                 : Lost,
@@ -572,6 +594,11 @@ public class MatchService {
         final int playedSets = matchInfo.getPlayedSets();
         if (playedSets < score.getSetOrdNumber()) {
             throw badRequest("Set " + playedSets + " needs to be scored first");
+        }
+        if (tournament.getRule().getMatch().countOnlySets()) {
+            if (playedSets > 0)  {
+                throw badRequest("match with countOnlySets has scored sets");
+            }
         }
         if (playedSets > score.getSetOrdNumber()) {
             final Map<Uid, Integer> setScore = matchInfo.getSetScore(score.getSetOrdNumber());

@@ -70,7 +70,6 @@ export default class JudgeMatchListCtrl extends AngularBean {
         this.Tournament.parameters(
             {tournamentId: this.$routeParams.tournamentId},
             (rules) => {
-                this.countOnlySets = rules.match.countOnlySets;
                 if (rules.place && rules.place.arenaDistribution == 'GLOBAL') {
                     this.loadRunningMatches();
                 } else {

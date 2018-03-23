@@ -19,4 +19,13 @@ public class SetScoreReq {
     private Mid mid;
     private int setOrdNumber;
     private List<IdentifiedScore> scores;
+
+    public SetScoreReq atomic(int setOrdNumber, List<IdentifiedScore> scores) {
+        return SetScoreReq.builder()
+                .tid(tid)
+                .mid(mid)
+                .setOrdNumber(setOrdNumber)
+                .scores(scores)
+                .build();
+    }
 }

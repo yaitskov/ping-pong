@@ -1,4 +1,6 @@
 module.exports = {
+    'Match does not have enough participants': 'Match does not have enough participants.',
+
     'Matches played by me': 'Matches played by me',
 
     'Opponent': 'Opponent',
@@ -18,6 +20,8 @@ module.exports = {
     'Count only sets lbl': 'Count only sets',
     'Count only sets lbl-true': 'Yes',
     'Count only sets lbl-false': 'No',
+
+    'score match lbl': 'Score match',
 
     'Rescore match': 'Rescore match',
 

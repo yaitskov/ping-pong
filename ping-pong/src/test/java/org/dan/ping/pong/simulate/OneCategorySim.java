@@ -3,6 +3,7 @@ package org.dan.ping.pong.simulate;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q2_M;
+import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S3;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G3Q1_S1A2G11_NP;
@@ -161,6 +162,16 @@ public class OneCategorySim {
                 .ignoreUnexpectedGames()
                 .rules(RULES_G8Q1_S1A2G11)
                 .name("tournamentOf2")
+                .category(c1, p1, p2));
+    }
+
+    @Test
+    public void tournamentOf2CountOnlySets() {
+        simulator.simulate(begin()
+                .ignoreUnexpectedGames()
+                .tables(0)
+                .rules(RULES_G8Q1_S1A2G11_NP.withMatch(S3))
+                .name("tOf2CountOnlySets")
                 .category(c1, p1, p2));
     }
 

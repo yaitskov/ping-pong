@@ -1,15 +1,21 @@
 package org.dan.ping.pong.app.tournament;
 
-import static com.google.common.primitives.Ints.asList;
+import static java.util.Arrays.asList;
+import static org.dan.ping.pong.app.match.IdentifiedScore.scoreOf;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.Mid;
+import org.dan.ping.pong.app.match.SetScoreReq;
 import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.sport.pingpong.PingPongSport;
 import org.dan.ping.pong.app.sport.tennis.TennisSport;
@@ -133,5 +139,42 @@ public class PingPongSportUnitTest {
         assertEquals(Optional.of(new Uid(111)),
                 PING_PONG_SPORT.findWinnerId(PING_PONG_RULE, ImmutableMap.of(
                         new Uid(111), 3, new Uid(222), 1)));
+    }
+
+    @Test
+    public void expandCompositeScore() {
+        final Mid mid = Mid.of(3);
+        final Tid tid = Tid.of(2);
+        assertThat(
+                PING_PONG_SPORT.expandScoreSet(
+                        PING_PONG_RULE,
+                        SetScoreReq
+                                .builder()
+                                .tid(tid)
+                                .setOrdNumber(0)
+                                .mid(mid)
+                                .scores(asList(scoreOf(UID_A, 1), scoreOf(UID_B, 3)))
+                                .build()),
+                hasItems(
+                        allOf(
+                                hasProperty("tid", is(tid)),
+                                hasProperty("mid", is(mid)),
+                                hasProperty("setOrdNumber", is(0)),
+                                hasProperty("scores", hasItems(
+                                        allOf(
+                                                hasProperty("uid", is(UID_A)),
+                                                hasProperty("score", is(PING_PONG_RULE.getMinGamesToWin()))),
+                                        allOf(
+                                                hasProperty("uid", is(UID_B)),
+                                                hasProperty("score", is(PING_PONG_RULE.getMinPossibleGames())))))),
+                        allOf(
+                                hasProperty("setOrdNumber", is(1)),
+                                hasProperty("scores", hasItems(
+                                        allOf(
+                                                hasProperty("uid", is(UID_A)),
+                                                hasProperty("score", is(PING_PONG_RULE.getMinPossibleGames()))),
+                                        allOf(
+                                                hasProperty("uid", is(UID_B)),
+                                                hasProperty("score", is(PING_PONG_RULE.getMinGamesToWin()))))))));
     }
 }

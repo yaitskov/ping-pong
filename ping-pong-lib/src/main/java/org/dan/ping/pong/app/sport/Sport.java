@@ -4,7 +4,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.SetScoreReq;
 import org.dan.ping.pong.app.tournament.rules.ValidationError;
+import org.dan.ping.pong.sys.error.PiPoEx;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,4 +64,8 @@ public interface Sport<T extends MatchRules> {
     }
 
     void checkWonSets(T rules, Map<Uid, Integer> uidWonSets);
+
+    default List<SetScoreReq> expandScoreSet(T rules, SetScoreReq score) {
+        throw PiPoEx.badRequest("Sport does not support countOnlySets feature");
+    }
 }

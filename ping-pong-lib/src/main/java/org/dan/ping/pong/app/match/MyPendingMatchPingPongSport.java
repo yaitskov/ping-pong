@@ -16,4 +16,6 @@ import lombok.ToString;
 public class MyPendingMatchPingPongSport implements MyPendingMatchSport {
     private int minGamesToWin;
     private int minAdvanceInGames;
+    private boolean countOnlySets;
+    private int setsToWin;
 }

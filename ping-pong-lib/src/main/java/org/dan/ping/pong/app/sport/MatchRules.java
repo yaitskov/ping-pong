@@ -19,4 +19,6 @@ public interface MatchRules {
     SportType sport();
 
     MyPendingMatchSport toMyPendingMatchSport();
+
+    boolean countOnlySets();
 }

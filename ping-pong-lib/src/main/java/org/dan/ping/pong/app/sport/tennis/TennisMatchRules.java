@@ -39,4 +39,9 @@ public class TennisMatchRules implements MatchRules {
                 .superTieBreakGames(superTieBreakGames)
                 .build();
     }
+
+    @Override
+    public boolean countOnlySets() {
+        return false;
+    }
 }

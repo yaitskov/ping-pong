@@ -11,17 +11,13 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.tournament.rules.TournamentRulesValidator;
-import org.dan.ping.pong.app.tournament.rules.ValidationError;
 import org.dan.ping.pong.app.user.UserInfo;
-import org.dan.ping.pong.sys.error.ValidationErrors;
 import org.dan.ping.pong.sys.validation.TidBodyRequired;
 
 import java.util.List;
@@ -99,7 +95,7 @@ public class TournamentResource {
         if (newTournament.getState() != TournamentState.Hidden) {
             throw badRequest("Tournament state is not Hidden");
         }
-        validate(newTournament.getRules());
+        rulesValidator.validate(newTournament.getRules());
         return tournamentService.create(
                 authService.userInfoBySession(session).getUid(),
                 newTournament);
@@ -117,14 +113,6 @@ public class TournamentResource {
             tournament.checkAdmin(user.getUid());
             return tournamentService.createConsoleFor(tournament, user, batch);
         });
-    }
-
-    private void validate(TournamentRules rules) {
-        final Multimap<String, ValidationError> errors = HashMultimap.create();
-        rulesValidator.validate(rules, errors);
-        if (!errors.isEmpty()) {
-            throw badRequest(new ValidationErrors("tournament-rules-are-wrong", errors));
-        }
     }
 
     @POST
@@ -347,7 +335,7 @@ public class TournamentResource {
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             TidIdentifiedRules parameters) {
-        validate(parameters.getRules());
+        rulesValidator.validate(parameters.getRules());
         Uid uid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(parameters.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(uid);

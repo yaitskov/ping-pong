@@ -144,7 +144,8 @@ public class MatchService {
 
         matchInfo.addSetScore(score.getScores());
         final Map<Uid, Integer> wonSets = sports.calcWonSets(tournament, matchInfo);
-        final Optional<Uid> winUidO = sports.findWinnerId(tournament, wonSets);
+        final Optional<Uid> winUidO = sports.findWinnerId(
+                tournament.selectMatchRule(matchInfo), wonSets);
         matchDao.scoreSet(tournament, matchInfo, batch, score.getScores());
         winUidO.ifPresent(winUid -> matchWinnerDetermined(tournament, matchInfo, winUid, batch, EXPECTED_MATCH_STATES));
 
@@ -709,7 +710,7 @@ public class MatchService {
                                         .playedSets(m.getPlayedSets())
                                         .tid(tournament.getTid())
                                         .matchType(m.getType())
-                                        .sport(tournament.getRule().getMatch().toMyPendingMatchSport())
+                                        .sport(tournament.selectMatchRule(m).toMyPendingMatchSport())
                                         .enemy(m.getOpponentUid(uid).map(ouid ->
                                                 ofNullable(tournament.getBid(ouid))
                                                         .orElseThrow(() -> internalError("no opponent for "
@@ -819,7 +820,7 @@ public class MatchService {
                 .category(tournament.getCategory(m.getCid()))
                 .tid(tournament.getTid())
                 .playedSets(m.getPlayedSets())
-                .sport(tournament.getRule().getMatch().toMyPendingMatchSport())
+                .sport(tournament.selectMatchRule(m).toMyPendingMatchSport())
                 .build();
     }
 
@@ -846,7 +847,7 @@ public class MatchService {
         return OpenMatchForJudge.builder()
                 .mid(m.getMid())
                 .tid(tournament.getTid())
-                .sport(tournament.getRule().getMatch().toMyPendingMatchSport())
+                .sport(tournament.selectMatchRule(m).toMyPendingMatchSport())
                 .playedSets(m.getPlayedSets())
                 .started(m.getStartedAt())
                 .matchType(m.getType())

@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.Wither;
 import org.dan.ping.pong.app.sport.MatchRules;
 
 import java.util.Optional;

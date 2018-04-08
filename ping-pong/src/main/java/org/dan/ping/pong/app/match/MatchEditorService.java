@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.min;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -124,12 +123,12 @@ public class MatchEditorService {
             // or presented sets are not enough to find out winner
             if (actualPracticalWinnerUid.isPresent()) {
                 // match complete normally (by score)
-                return sports.findWinnerByScores(tournament, newSets);
+                return sports.findWinnerByScores(tournament.selectMatchRule(minfo), newSets);
             } else {
                 return minfo.getWinnerId(); // walkover, quit or expel
             }
         } else {
-            return sports.findWinnerByScores(tournament, newSets);
+            return sports.findWinnerByScores(tournament.selectMatchRule(minfo), newSets);
         }
     }
 
@@ -148,7 +147,7 @@ public class MatchEditorService {
         rescoredGroupMatches.add(rescoredMatch);
 
         rescoredMatch.setParticipantIdScore(newSets);
-        sports.findWinnerByScores(tournament, newSets)
+        sports.findWinnerByScores(tournament.selectMatchRule(mInfo), newSets)
                 .ifPresent(wUid -> rescoredMatch.setWinnerId(Optional.of(wUid)));
 
         if (!rescoredMatch.getWinnerId().isPresent()) {
@@ -412,7 +411,8 @@ public class MatchEditorService {
         mInfoExpectedAfter.setParticipantIdScore(newSets);
 
         sports.validateMatch(tournament, mInfoExpectedAfter);
-        sports.checkWonSets(tournament, sports.calcWonSets(tournament, mInfoExpectedAfter));
+        sports.checkWonSets(tournament.selectMatchRule(mInfo),
+                sports.calcWonSets(tournament, mInfoExpectedAfter));
     }
 
     public void resetMatchScore(TournamentMemState tournament, ResetSetScore reset, DbUpdater batch) {

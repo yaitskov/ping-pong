@@ -338,7 +338,7 @@ public class GroupService {
         winner.lostSets(uid2Sets.get(lostUid));
 
         winner.win();
-        sports.findWinnerId(tournament, uid2Sets)
+        sports.findWinnerId(tournament.selectMatchRule(minfo), uid2Sets)
                 .ifPresent(uid -> loser.lost()); // walkover = 0
     }
 
@@ -440,7 +440,8 @@ public class GroupService {
         final Uid oUid = m.getOpponentUid(uid)
                 .orElseThrow(() -> internalError("no opponent uid" + uid));
         final Map<Uid, Integer> uid2WonSets = sports.calcWonSets(tournament, m);
-        final Optional<Uid> scoreWinner = sports.findWinnerId(tournament, uid2WonSets);
+        final Optional<Uid> scoreWinner = sports.findWinnerId(
+                tournament.selectMatchRule(m), uid2WonSets);
         return GroupMatchResult.builder()
                 .state(participantMatchState(uid, scoreWinner, m))
                 .mid(m.getMid())

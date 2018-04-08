@@ -28,24 +28,25 @@ public class Sports {
     }
 
     public void validateMatch(TournamentMemState tournament, MatchInfo match) {
-        get(tournament.getSport()).validate(tournament.getRule().getMatch(), match);
+        get(tournament.getSport()).validate(tournament.selectMatchRule(match), match);
     }
 
-    public Map<Uid, Integer> calcWonSets(TournamentMemState tournament,MatchInfo matchInfo) {
+    public Map<Uid, Integer> calcWonSets(TournamentMemState tournament, MatchInfo matchInfo) {
         return get(tournament.getSport()).calcWonSets(matchInfo.getParticipantIdScore());
     }
 
-    public Optional<Uid> findWinnerId(TournamentMemState tournament, Map<Uid, Integer> wonSets) {
-        return get(tournament.getSport()).findWinnerId(tournament.getRule().getMatch(), wonSets);
+    public Optional<Uid> findWinnerId(MatchRules rules, Map<Uid, Integer> wonSets) {
+        return get(rules.sport()).findWinnerId(rules, wonSets);
     }
 
     public Optional<Uid> findWinner(TournamentMemState tournament, MatchInfo matchInfo) {
-        return findWinnerByScores(tournament, matchInfo.getParticipantIdScore());
+        return findWinnerByScores(tournament.selectMatchRule(matchInfo),
+                matchInfo.getParticipantIdScore());
     }
 
-    public Optional<Uid> findWinnerByScores(TournamentMemState tournament, Map<Uid, List<Integer>> sets) {
-        final Sport sport = get(tournament.getSport());
-        return sport.findWinnerId(tournament.getRule().getMatch(), sport.calcWonSets(sets));
+    public Optional<Uid> findWinnerByScores(MatchRules rules, Map<Uid, List<Integer>> sets) {
+        final Sport sport = get(rules.sport());
+        return sport.findWinnerId(rules, sport.calcWonSets(sets));
     }
 
     public Optional<Uid> findStronger(TournamentMemState tournament, MatchInfo mInfo) {
@@ -53,9 +54,9 @@ public class Sports {
         return sport.findStronger(sport.calcWonSets(mInfo.getParticipantIdScore()));
     }
 
-    public void checkWonSets(TournamentMemState tournament, Map<Uid, Integer> uidWonSets) {
-        final Sport sport = get(tournament.getSport());
-        sport.checkWonSets(tournament.getRule().getMatch(), uidWonSets);
+    public void checkWonSets(MatchRules rules, Map<Uid, Integer> uidWonSets) {
+        final Sport sport = get(rules.sport());
+        sport.checkWonSets(rules, uidWonSets);
     }
 
     public List<SetScoreReq> expandScoreSet(TournamentMemState tournament, SetScoreReq score) {

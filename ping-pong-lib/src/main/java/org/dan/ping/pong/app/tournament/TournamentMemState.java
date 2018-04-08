@@ -27,6 +27,8 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.dispute.DisputeMemState;
 import org.dan.ping.pong.app.place.Pid;
+import org.dan.ping.pong.app.playoff.PlayOffRule;
+import org.dan.ping.pong.app.sport.MatchRules;
 import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.sys.error.PiPoEx;
@@ -186,5 +188,14 @@ public class TournamentMemState {
     public GroupInfo getGroup(int gid) {
         return ofNullable(groups.get(gid))
                 .orElseThrow(() -> internalError("Tournament " + tid + " has no group " + gid));
+    }
+
+    public MatchRules selectMatchRule(MatchInfo match) {
+        if (match.getGid().isPresent()) {
+            return rule.getMatch();
+        }
+        return rule.getPlayOff().map(po -> po.getMatch().orElse(rule.getMatch()))
+                .orElseThrow(() -> internalError("match " + match.getMid()
+                        + " without group in tid  " + tid));
     }
 }

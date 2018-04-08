@@ -7,6 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Wither;
+import org.dan.ping.pong.app.sport.MatchRules;
+
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -18,6 +22,7 @@ import lombok.ToString;
 public class PlayOffRule {
     private int thirdPlaceMatch;
     private int losings;
+    private Optional<MatchRules> match = Optional.empty();
 
     public static final PlayOffRule L1_3P = PlayOffRule.builder()
             .losings(1)
@@ -33,4 +38,8 @@ public class PlayOffRule {
             .losings(2)
             .thirdPlaceMatch(1) // has no sense
             .build();
+
+    public static class PlayOffRuleBuilder {
+        Optional<MatchRules> match = Optional.empty();
+    }
 }

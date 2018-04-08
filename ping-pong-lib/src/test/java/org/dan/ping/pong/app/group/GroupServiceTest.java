@@ -16,7 +16,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.sport.pingpong.PingPongSport;
@@ -26,7 +25,6 @@ import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,6 +92,7 @@ public class GroupServiceTest {
         final ExtraUidOrderInGroup got = sut.findStrongerExtraOrder(tournament,
                 ImmutableMap.<Uid, Integer>builder().put(UID1, 1).put(UID2, 1).put(UID3, 1).build(),
                 MatchListBuilder.matches()
+                        .ogid(1)
                         .m(UID1, 11, UID2, 0)
                         .m(UID3, 1, UID2, 11)
                         .m(UID3, 14, UID1, 12)
@@ -140,7 +139,7 @@ public class GroupServiceTest {
     public void countPointsUidWithoutWins0() {
         Map<Uid, Integer> got = sut.countPoints(
                 tournamentWithSport(),
-                MatchListBuilder.matches().m(UID1, 11, UID2, 0).build());
+                MatchListBuilder.matches().ogid(1).m(UID1, 11, UID2, 0).build());
         assertEquals(ImmutableMap.of(UID1, 2, UID2, 1), got);
     }
 
@@ -156,6 +155,7 @@ public class GroupServiceTest {
         Map<Uid, Integer> got = sut.countPoints(
                 tournamentWithSport(),
                 MatchListBuilder.matches()
+                        .ogid(1)
                         .m(UID1, 11, UID2, 0)
                         .m(UID1, 11, UID3, 2)
                         .m(UID3, 11, UID2, 1)
@@ -170,6 +170,7 @@ public class GroupServiceTest {
         assertEquals(asList(UID1, UID4, UID3, UID2),
                 sut.orderUidsInGroup(tournament,
                         MatchListBuilder.matches()
+                                .ogid(1)
                                 .m(UID1, 11, UID3, 1)
                                 .m(UID1, 11, UID4, 1)
 
@@ -202,6 +203,7 @@ public class GroupServiceTest {
         assertEquals(asList(UID2, UID1, UID3),
                 sut.orderUidsInGroup(tournament,
                         MatchListBuilder.matches()
+                                .ogid(1)
                                 .m(UID1, 11, UID3, 1)
                                 .m(UID1, 2, UID2, 11)
                                 .m(UID3, 11, UID2, 3)

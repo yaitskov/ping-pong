@@ -5,7 +5,7 @@ export default class TennisScoresStrategy extends BaseScoresStrategy {
         return false;
     }
     _isSuperTieBreak(rules, playedSets) {
-        return playedSets == (rules.setsToWin - 1) * 2;
+        return playedSets > 0 && playedSets == (rules.setsToWin - 1) * 2;
     }
     winnerOptions(rules, winScore, playedSets) {
         if (this._isSuperTieBreak(rules, playedSets)) {

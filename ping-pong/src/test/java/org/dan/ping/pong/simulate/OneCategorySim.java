@@ -206,8 +206,8 @@ public class OneCategorySim {
     private ImperativeSimulatorFactory isf;
 
     @Test
-    public void twoGroupsBy2AlmostComplete() {
-        isf.create(begin().name("2GroupsBy2AlmostCompleteS1")
+    public void twoGroupsBy3AlmostComplete() {
+        isf.create(begin().name("2GroupsBy3AlmostCompleteS1")
                 .rules(RULES_G3Q2_S1A2G11)
                 .category(c1, p1, p2, p3, p4, p5, p6))
                 .run(c -> c.beginTournament()
@@ -222,6 +222,16 @@ public class OneCategorySim {
 
                         .scoreSet(p1, 11, p5, 5)
                         .scoreSet(p4, 11, p2, 2));
+    }
+
+    @Test
+    public void twoGroupsBy2AlmostComplete() {
+        isf.create(begin().name("2GroupsBy2AlmostCompleteS1")
+                .rules(RULES_G2Q1_S1A2G11)
+                .category(c1, p1, p2, p3, p4))
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p2, 3)
+                        .scoreSet(p3, 11, p4, 7));
     }
 
     @Test

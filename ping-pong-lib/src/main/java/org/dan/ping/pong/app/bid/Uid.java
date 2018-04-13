@@ -8,13 +8,15 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.dan.ping.pong.sys.hash.HashAggregator;
+import org.dan.ping.pong.sys.hash.Hashable;
 
 import javax.validation.constraints.Min;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class Uid implements Comparable<Uid> {
+public class Uid implements Comparable<Uid>, Hashable {
     public static final String USER_ID_MUST_BE_GREATER_THAN_2 = "user id must be greater than 2";
 
     @Getter(onMethod = @__(@JsonValue))
@@ -30,5 +32,10 @@ public class Uid implements Comparable<Uid> {
     @Override
     public int compareTo(Uid o) {
         return compare(id, o.id);
+    }
+
+    @Override
+    public void hashTo(HashAggregator sink) {
+        sink.hash(id);
     }
 }

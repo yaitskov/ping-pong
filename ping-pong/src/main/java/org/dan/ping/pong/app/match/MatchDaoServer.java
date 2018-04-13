@@ -69,11 +69,11 @@ public class MatchDaoServer implements MatchDao {
     @Transactional(TRANSACTION_MANAGER)
     public Mid createPlayOffMatch(Tid tid, Integer cid,
             Optional<Mid> winMid, Optional<Mid> loseMid,
-            int priority, int level, MatchType type, MatchTag tag) {
+            int priority, int level, MatchType type, Optional<MatchTag> tag) {
         return jooq.insertInto(MATCHES, MATCHES.TID, MATCHES.CID,
                 MATCHES.PRIORITY, MATCHES.STATE,
                 MATCHES.WIN_MID, MATCHES.LOSE_MID, MATCHES.LEVEL, MATCHES.TYPE, MATCHES.TAG)
-                .values(tid, cid, priority, Draft, winMid, loseMid, level, type, tag)
+                .values(tid, cid, priority, Draft, winMid, loseMid, level, type, tag.orElse(null))
                 .returning()
                 .fetchOne()
                 .getMid();
@@ -275,7 +275,7 @@ public class MatchDaoServer implements MatchDao {
                             .mid(r.get(MATCHES.MID))
                             .cid(r.get(MATCHES.CID))
                             .gid(r.get(MATCHES.GID))
-                            .tag(r.get(MATCHES.TAG))
+                            .tag(Optional.ofNullable(r.get(MATCHES.TAG)))
                             .state(r.get(MATCHES.STATE))
                             .type(r.get(MATCHES.TYPE))
                             .loserMid(r.get(MATCHES.LOSE_MID))

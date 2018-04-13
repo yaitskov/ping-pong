@@ -74,7 +74,6 @@ import org.dan.ping.pong.util.TriFunc;
 import org.dan.ping.pong.util.time.Clocker;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -322,18 +321,26 @@ public class MatchService {
         final Optional<List<MatchInfo>> oMatches = groupService
                 .checkGroupComplete(tournament, gid);
 
-        oMatches.ifPresent(matches ->
-                completeParticipationLeftBids(
-                        gid,
-                        tournament,
-                        completeGroup(gid, tournament, oMatches.get(), batch),
-                        batch));
+        try {
+            oMatches.ifPresent(matches ->
+                    completeParticipationLeftBids(
+                            gid,
+                            tournament,
+                            completeGroup(gid, tournament, oMatches.get(), batch),
+                            batch));
+        } catch (NoDisambiguateMatchesException e) {
+            groupService.createDisambiguateMatches(e, tournament,
+                    oMatches.orElseThrow(() -> internalError("No matches in group")));
+        }
     }
 
-    public BidState completeGroupMatchBidState(TournamentMemState tournament, ParticipantMemState b) {
+    public BidState completeGroupMatchBidState(
+            TournamentMemState tournament,
+            ParticipantMemState b) {
         if (b.getGid().map(gid ->
                 tournament.participantMatches(b.getUid())
-                        .anyMatch(m -> m.getState() == Game && m.getGid().equals(b.getGid()))).orElse(false)) {
+                        .anyMatch(m -> m.getState() == Game
+                                && m.getGid().equals(b.getGid()))).orElse(false)) {
             return Play;
         }
         return Wait;
@@ -380,10 +387,10 @@ public class MatchService {
             List<MatchInfo> matches, DbUpdater batch) {
         log.info("Pick bids for playoff from gid {} in tid {}", gid, tournament.getTid());
         final int quits = tournament.getRule().getGroup().get().getQuits();
-        final List<Uid> orderedUids = groupService.orderUidsInGroup(tournament, matches);
+        final List<Uid> orderedUids = groupService.orderUidsInGroup(gid, tournament, matches);
         final List<Uid> quitUids = selectQuitingUids(gid, tournament, orderedUids, quits);
         final GroupInfo iGru = tournament.getGroups().get(gid);
-        final List<MatchInfo> playOffMatches = playOffMatches(tournament, iGru, null);
+        final List<MatchInfo> playOffMatches = playOffMatches(tournament, iGru, empty());
         if (playOffMatches.isEmpty()) {
             completeMiniTournamentGroup(tournament, iGru, quitUids, batch);
         } else {
@@ -396,7 +403,7 @@ public class MatchService {
     }
 
     private List<MatchInfo> playOffMatches(TournamentMemState tournament, GroupInfo iGru,
-            MatchTag tag) {
+            Optional<MatchTag> tag) {
         return playOffService
                 .findBaseMatches(tournament, iGru.getCid(), tag)
                 .stream()

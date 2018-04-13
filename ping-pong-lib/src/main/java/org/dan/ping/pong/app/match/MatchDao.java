@@ -17,7 +17,7 @@ public interface MatchDao {
 
     Mid createPlayOffMatch(Tid tid, Integer cid,
             Optional<Mid> winMid, Optional<Mid> loseMid,
-            int priority, int level, MatchType type, MatchTag tag);
+            int priority, int level, MatchType type, Optional<MatchTag> tag);
 
     void changeStatus(Mid mid, MatchState state, DbUpdater batch);
 

@@ -62,8 +62,10 @@ public class CastingLotsDao implements CastingLotsDaoIf {
                         .orElseThrow(() -> internalError("No schedule for group of " + groupBids.size())));
     }
 
+    @Override
     public int generateGroupMatches(TournamentMemState tournament, int gid,
-            List<ParticipantMemState> groupBids, int priorityGroup) {
+            List<ParticipantMemState> groupBids, int priorityGroup,
+            Optional<MatchTag> tag) {
         final Tid tid = tournament.getTid();
         log.info("Generate matches for group {} in tournament {}", gid, tid);
         final List<Integer> schedule = pickSchedule(tournament, groupBids);
@@ -72,14 +74,15 @@ public class CastingLotsDao implements CastingLotsDaoIf {
             final int bidIdxB = schedule.get(i++);
             final ParticipantMemState bid1 = groupBids.get(bidIdxA);
             final ParticipantMemState bid2 = groupBids.get(bidIdxB);
-            priorityGroup = addGroupMatch(tournament, priorityGroup, bid1, bid2, Place, Optional.empty());
+            priorityGroup = addGroupMatch(tournament, priorityGroup, bid1, bid2,
+                    Place, Optional.empty(), tag);
         }
         return priorityGroup;
     }
 
     public int addGroupMatch(TournamentMemState tournament, int priorityGroup,
             ParticipantMemState bid1, ParticipantMemState bid2,
-            MatchState state, Optional<Uid> winnerId) {
+            MatchState state, Optional<Uid> winnerId, Optional<MatchTag> tag) {
         final Mid mid = matchDao.createGroupMatch(bid1.getTid(),
                 bid1.getGid().get(), bid1.getCid(), ++priorityGroup,
                 bid1.getUid(), bid2.getUid());
@@ -89,6 +92,7 @@ public class CastingLotsDao implements CastingLotsDaoIf {
                 .level(0)
                 .priority(priorityGroup)
                 .state(state)
+                .tag(tag)
                 .winnerId(winnerId)
                 .gid(bid1.getGid())
                 .participantIdScore(ImmutableMap.of(
@@ -103,11 +107,11 @@ public class CastingLotsDao implements CastingLotsDaoIf {
 
     public Mid generatePlayOffMatches(TournamentMemState tInfo, Integer cid,
             int playOffStartPositions, int basePlayOffPriority) {
-        return generatePlayOffMatches(tInfo, cid,playOffStartPositions, basePlayOffPriority, null);
+        return generatePlayOffMatches(tInfo, cid,playOffStartPositions, basePlayOffPriority, empty());
     }
 
     public Mid generatePlayOffMatches(TournamentMemState tInfo, Integer cid,
-            int playOffStartPositions, int basePlayOffPriority, MatchTag tag) {
+            int playOffStartPositions, int basePlayOffPriority, Optional<MatchTag> tag) {
         final Tid tid = tInfo.getTid();
         log.info("Generate play off matches for {} bids in tid {}",
                 playOffStartPositions, tid);

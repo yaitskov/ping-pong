@@ -73,7 +73,7 @@ public class PlayOffGenerator {
     private final int cid;
     private final boolean thirdPlaceMatch;
     private final MatchDao matchDao;
-    private final MatchTag tag;
+    private final Optional<MatchTag> tag;
 
     public Optional<Mid> generateTree(int level, Optional<Mid> parentMid,
             int priority, TypeChain types, Optional<Mid> loserMid) {

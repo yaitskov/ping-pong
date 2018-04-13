@@ -32,7 +32,6 @@ public class BidResultService {
             final TournamentResultEntry entry = resultEntries.get(iPos);
             if (entry.getUser().getUid().equals(uid)) {
                 return BidResult.builder()
-                        .normal(Optional.of(entry.getScore().getRating()))
                         .user(entry.getUser())
                         .position(Optional.of(iPos))
                         .state(participant.getState())

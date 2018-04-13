@@ -20,13 +20,13 @@ import lombok.Setter;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryLink;
-import org.dan.ping.pong.app.group.DisambiguationPolicy;
 import org.dan.ping.pong.app.group.GroupInfo;
-import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.dispute.DisputeMemState;
+import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.place.Pid;
+import org.dan.ping.pong.app.playoff.PowerRange;
 import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.sys.error.PiPoEx;
@@ -44,6 +44,7 @@ import java.util.stream.Stream;
 public class TournamentMemState {
     public static final String EXPECTED_TOURNAMENT_STATE = "expected_state";
     public static final String TOURNAMENT_STATE = "state";
+    public static final String TID = "tid";
 
     private SportType sport;
     private Tid tid;
@@ -63,6 +64,7 @@ public class TournamentMemState {
     private Instant opensAt;
     private List<DisputeMemState> disputes;
     private OneTimeCondActions condActions;
+    private PowerRange powerRange;
 
     public Optional<MatchInfo> maybeMatchById(Mid mid) {
         return ofNullable(matches.get(mid));
@@ -171,11 +173,6 @@ public class TournamentMemState {
         return getRule().getRewards().orElse(RewardRules.defaultRewards);
     }
 
-    public DisambiguationPolicy disambiguationPolicy() {
-        return getRule().getGroup().map(GroupRules::getDisambiguation)
-                .orElse(DisambiguationPolicy.CMP_WIN_AND_LOSE);
-    }
-
     public Optional<Integer> findCidByName(String name) {
         return categories.values().stream()
                 .filter(category -> category.getName().equals(name))
@@ -186,5 +183,26 @@ public class TournamentMemState {
     public GroupInfo getGroup(int gid) {
         return ofNullable(groups.get(gid))
                 .orElseThrow(() -> internalError("Tournament " + tid + " has no group " + gid));
+    }
+
+    public boolean disambiguationMatchNotPossible() {
+        return !rule.getGroup()
+                .orElseThrow(() -> internalError("Tournament has no groups", TID, tid))
+                .getDisambiguationMatch().isPresent();
+    }
+
+    public List<GroupOrderRule> orderRules() {
+        return rule.group().getOrderRules();
+    }
+
+    public List<ParticipantMemState> findBidsByCategory(int cid) {
+        return participants.values().stream()
+                .filter(bid -> bid.getCid() == cid)
+                .collect(toList());
+    }
+
+    public List<MatchInfo> findGroupMatchesByCategory(int cid) {
+        return matches.values().stream().filter(m -> m.getCid() == cid)
+                .collect(toList());
     }
 }

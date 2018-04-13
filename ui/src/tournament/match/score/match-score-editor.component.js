@@ -31,7 +31,7 @@ angular.
                                  (errRes) => {
                                      if (errRes.status == 400 && errRes.data.error == 'effectHashMismatch') {
                                          self.effectHash = errRes.data.effectHash;
-                                         self.effect = errRes.data.effectedMatches;
+                                         self.effect = errRes.data.matchesToBeReset;
                                          requestStatus.complete();
                                      } else {
                                          requestStatus.failed(errRes);

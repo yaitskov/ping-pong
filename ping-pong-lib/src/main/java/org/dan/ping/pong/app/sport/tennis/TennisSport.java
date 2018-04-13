@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.sport.tennis;
 
+import static java.lang.Math.max;
 import static org.dan.ping.pong.app.sport.SportType.Tennis;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
@@ -80,7 +81,7 @@ public class TennisSport implements Sport<TennisMatchRules> {
     }
 
     private int validateUsualSet(TennisMatchRules rules, int iSet, int aGames, int bGames) {
-        final int maxGames = Math.max(aGames, bGames);
+        final int maxGames = max(aGames, bGames);
         final int minGames = Math.min(aGames, bGames);
         if (minGames == maxGames) {
             throw badRequest(GAMES_CANNOT_BE_EQUAL, SET, iSet);
@@ -116,8 +117,9 @@ public class TennisSport implements Sport<TennisMatchRules> {
         return PlayerA;
     }
 
-    private void validateSuperTieBreakSet(TennisMatchRules rules, int iSet, int aGames, int bGames) {
-        final int maxGames = Math.max(aGames, bGames);
+    private void validateSuperTieBreakSet(
+            TennisMatchRules rules, int iSet, int aGames, int bGames) {
+        final int maxGames = max(aGames, bGames);
         final int minGames = Math.min(aGames, bGames);
         if (minGames < rules.getMinPossibleGames()) {
             throw badRequest(GAMES_CANNOT_BE_LESS_THAN,
@@ -159,5 +161,17 @@ public class TennisSport implements Sport<TennisMatchRules> {
         if (winners > 1) {
             throw badRequest(WINNERS_ARE_MORE_THAT_1);
         }
+    }
+
+    @Override
+    public int maxUpLimitSetsDiff(TennisMatchRules rules) {
+        return rules.getSetsToWin();
+    }
+
+    @Override
+    public int maxUpLimitBallsDiff(TennisMatchRules rules) {
+        return rules.getSuperTieBreakGames()
+                + max(rules.getMinGamesToWin(), rules.getMinAdvanceInGames())
+                * (2 * rules.getSetsToWin() - 1);
     }
 }

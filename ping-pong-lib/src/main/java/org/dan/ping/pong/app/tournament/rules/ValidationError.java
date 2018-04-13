@@ -25,6 +25,10 @@ public class ValidationError {
         return ValidationError.builder().message(template).build();
     }
 
+    public static ValidationError ofTemplate(String template, Map<String, Object> params) {
+        return new ValidationError(template, params);
+    }
+
     public static ValidationError ofTemplate(String template, String key, int value) {
         return ValidationError.builder().message(template)
                 .params(ImmutableMap.of(key, value))

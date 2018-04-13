@@ -7,8 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.user.UserLink;
 
+import java.util.List;
 import java.util.Optional;
 
 @Getter
@@ -20,7 +22,6 @@ import java.util.Optional;
 public class TournamentResultEntry {
     private UserLink user;
     private BidState state;
-    private int punkts;
-    private CumulativeScore score;
+    private List<Optional<Reason>> reasonChain;
     private Optional<Integer> playOffStep;
 }

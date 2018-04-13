@@ -8,7 +8,7 @@ import com.google.common.collect.Multimap;
 import org.dan.ping.pong.app.sport.tennis.TennisMatchRules;
 
 public class TennisMatchRuleValidator {
-    private static final String MATCH_RULE = "match-rule";
+    public static final String MATCH_RULE = "match-rule";
     public static final String SUPER_TIEBREAK_GAMES = MATCH_RULE + ".super-tie-break-games";
     private static final String SET_TO_WIN = ".set-to-win";
     private static final String MIN_POSSIBLE_GAMES = ".min-possible-games";

@@ -7,10 +7,12 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.dan.ping.pong.sys.hash.HashAggregator;
+import org.dan.ping.pong.sys.hash.Hashable;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class Mid implements Comparable<Mid> {
+public class Mid implements Comparable<Mid>, Hashable {
     @Getter(onMethod = @__(@JsonValue))
     private final int id;
 
@@ -35,5 +37,10 @@ public class Mid implements Comparable<Mid> {
 
     public Mid negate() {
         return new Mid(-id);
+    }
+
+    @Override
+    public void hashTo(HashAggregator sink) {
+        sink.hash(id);
     }
 }

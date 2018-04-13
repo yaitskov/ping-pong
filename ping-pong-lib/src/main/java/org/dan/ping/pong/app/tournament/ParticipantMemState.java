@@ -1,7 +1,10 @@
 package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.app.bid.BidState.Lost;
+import static org.dan.ping.pong.app.tournament.TournamentMemState.TID;
+import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +12,7 @@ import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.app.user.UserLinkIf;
+import org.dan.ping.pong.sys.error.PiPoEx;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -18,6 +22,7 @@ import java.util.Optional;
 @Builder
 public class ParticipantMemState implements UserLinkIf {
     public static final Uid FILLER_LOSER_UID = new Uid(1);
+    public static final String UID = "UID";
 
     private final Tid tid;
     private final Uid uid;
@@ -30,6 +35,12 @@ public class ParticipantMemState implements UserLinkIf {
 
     public static class ParticipantMemStateBuilder {
         Optional<Integer> gid = Optional.empty();
+    }
+
+    public int gid() {
+        return gid.orElseThrow(() -> internalError(
+                "Participant is not in a group",
+                ImmutableMap.of(TID, tid, UID, uid)));
     }
 
     public String toString() {

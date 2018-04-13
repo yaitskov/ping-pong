@@ -1,7 +1,9 @@
 package org.dan.ping.pong.app.group;
 
+import static java.util.Arrays.asList;
 import static org.dan.ping.pong.app.group.ConsoleTournament.NO;
-import static org.dan.ping.pong.app.group.DisambiguationPolicy.CMP_WIN_AND_LOSE;
+import static org.dan.ping.pong.app.match.rule.rules.common.CountDirectOutcomeRule.COUNT_DIRECT_OUTCOME_RULE;
+import static org.dan.ping.pong.app.match.rule.rules.common.PickRandomlyRule.PICK_RANDOMLY_RULE;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,7 +12,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Wither;
+import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
+import org.dan.ping.pong.app.match.rule.rules.common.BallsBalanceRule;
+import org.dan.ping.pong.app.match.rule.rules.common.CountWonMatchesRule;
+import org.dan.ping.pong.app.match.rule.rules.common.LostBallsRule;
+import org.dan.ping.pong.app.match.rule.rules.common.LostSetsRule;
+import org.dan.ping.pong.app.match.rule.rules.common.SetsBalanceRule;
+import org.dan.ping.pong.app.match.rule.rules.common.WonBallsRule;
+import org.dan.ping.pong.app.match.rule.rules.common.WonSetsRule;
 
+import java.util.List;
 import java.util.Optional;
 
 @Getter
@@ -20,10 +31,29 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class GroupRules {
+    public static final List<GroupOrderRule> BALANCE_BASED_ORDER_RULES =
+            asList(new CountWonMatchesRule(),
+                    COUNT_DIRECT_OUTCOME_RULE,
+                    new SetsBalanceRule(),
+                    COUNT_DIRECT_OUTCOME_RULE,
+                    new BallsBalanceRule(),
+                    PICK_RANDOMLY_RULE);
+
+    public static final List<GroupOrderRule> WON_LOST_BASED_ORDER_RULES =
+            asList(new CountWonMatchesRule(),
+                    COUNT_DIRECT_OUTCOME_RULE,
+                    new WonSetsRule(),
+                    new LostSetsRule(),
+                    COUNT_DIRECT_OUTCOME_RULE,
+                    new WonBallsRule(),
+                    new LostBallsRule(),
+                    PICK_RANDOMLY_RULE);
+
     private int quits;
     private int groupSize;
-    private DisambiguationPolicy disambiguation = CMP_WIN_AND_LOSE;
     private ConsoleTournament console = NO;
+    private Optional<DisambiguateMatchRules> disambiguationMatch = Optional.empty();
+    private List<GroupOrderRule> orderRules = BALANCE_BASED_ORDER_RULES;
 
     /**
      * Default means {@link GroupSchedule#DEFAULT_SCHEDULE}
@@ -31,8 +61,9 @@ public class GroupRules {
     private Optional<GroupSchedule> schedule = Optional.empty();
 
     public static class GroupRulesBuilder {
-        DisambiguationPolicy disambiguation = CMP_WIN_AND_LOSE;
         Optional<GroupSchedule> schedule = Optional.empty();
         ConsoleTournament console = NO;
+        Optional<DisambiguateMatchRules> disambiguationMatch = Optional.empty();
+        List<GroupOrderRule> orderRules = BALANCE_BASED_ORDER_RULES;
     }
 }

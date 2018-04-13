@@ -49,10 +49,12 @@ import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
+import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.playoff.PlayOffMatches;
+import org.dan.ping.pong.app.playoff.PlayOffResultEntries;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.user.UserDao;
@@ -67,12 +69,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -448,36 +450,44 @@ public class TournamentService {
     private GroupService groupService;
 
     public List<TournamentResultEntry> tournamentResult(TournamentMemState tournament, int cid) {
-        final List<TournamentResultEntry> groupOrdered = groupService.resultOfAllGroupsInCategory(tournament, cid);
-        final List<TournamentResultEntry> playOffResult = playOffService.playOffResult(tournament, cid, groupOrdered);
+        final List<TournamentResultEntry> groupOrdered = groupService
+                .resultOfAllGroupsInCategory(tournament, cid);
+        final PlayOffResultEntries playOffResult = playOffService.playOffResult(tournament, cid);
 
-        if (playOffResult.isEmpty()) {
+        if (playOffResult.getEntries().isEmpty()) {
             if (groupOrdered.isEmpty()) {
-                return tournament.getParticipants().values().stream()
-                        .filter(bid -> bid.getState() == Win1 && bid.getCid() == cid)
-                        .map(bid -> TournamentResultEntry.builder()
-                                .user(bid.toLink())
-                                .playOffStep(Optional.empty())
-                                .state(Win1)
-                                .punkts(0)
-                                .score(null)
-                                .build())
-                        .collect(toList());
+                return tournamentOfSingle(tournament, cid);
             }
-            return enumerate(tournament, groupOrdered);
+            return groupOrdered;
         } else {
-            playOffResult.addAll(groupOrdered);
-            return enumerate(tournament, playOffResult);
+            final Map<Uid, List<Optional<Reason>>> reasonChains = new HashMap<>();
+            final List<TournamentResultEntry> leftInGroup = groupOrdered.stream()
+                    .filter(e -> {
+                        if (playOffResult.getPlayOffUids()
+                                .contains(e.getUser().getUid())) {
+                            reasonChains.put(e.getUser().getUid(), e.getReasonChain());
+                            return false;
+                        }
+                        return true;
+                    })
+                    .collect(toList());
+
+            playOffResult.getEntries().forEach(
+                    e -> e.getReasonChain().addAll(reasonChains.get(e.getUser().getUid())));
+            playOffResult.getEntries().addAll(leftInGroup);
+            return playOffResult.getEntries();
         }
     }
 
-    private List<TournamentResultEntry> enumerate(
-            TournamentMemState tournament,
-            List<TournamentResultEntry> playOffResult) {
-        final RewardRules reward = tournament.rewards();
-        IntStream.range(0, playOffResult.size()).forEach(
-                i -> playOffResult.get(i).setPunkts(reward.getBestScore() - reward.getNextScoreStep() * i));
-        return playOffResult;
+    private List<TournamentResultEntry> tournamentOfSingle(TournamentMemState tournament, int cid) {
+        return tournament.getParticipants().values().stream()
+                .filter(bid -> bid.getState() == Win1 && bid.getCid() == cid)
+                .map(bid -> TournamentResultEntry.builder()
+                        .user(bid.toLink())
+                        .playOffStep(Optional.empty())
+                        .state(Win1)
+                        .build())
+                .collect(toList());
     }
 
     public TournamentComplete completeInfo(TournamentMemState tournament) {
@@ -548,7 +558,7 @@ public class TournamentService {
     private TournamentTerminator tournamentTerminator;
 
     public PlayOffMatches playOffMatches(TournamentMemState tournament, int cid) {
-        return playOffService.playOffMatches(tournament, cid, null);
+        return playOffService.playOffMatches(tournament, cid, Optional.empty());
     }
 
     @Inject
@@ -618,7 +628,7 @@ public class TournamentService {
 
         matchesByGroup.forEach((gid, groupMatches) -> {
             final int quitsGroup = masterTournament.getRule().getGroup().get().getQuits();
-            final List<Uid> orderedGroupUids = groupService.orderUidsInGroup(masterTournament, groupMatches);
+            final List<Uid> orderedGroupUids = groupService.orderUidsInGroup(gid, masterTournament, groupMatches);
             final int consoleCid = categoryService.findCidOrCreate(masterTournament, gid, consoleTournament, batch);
 
             orderedGroupUids.stream().skip(quitsGroup)

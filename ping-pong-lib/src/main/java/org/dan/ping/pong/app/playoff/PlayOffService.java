@@ -1,13 +1,10 @@
 package org.dan.ping.pong.app.playoff;
 
 import static java.util.Collections.emptyMap;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.MID0;
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.ConsoleLayered;
 import static org.dan.ping.pong.app.match.MatchState.Over;
-import static org.dan.ping.pong.app.tournament.CumulativeScore.createComparator;
+import static org.dan.ping.pong.app.playoff.PlayOffBidStat.PLAY_OFF_BID_STAT_COMPARATOR;
 import static org.dan.ping.pong.app.tournament.GroupMaxMap.findMaxes;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 
@@ -18,28 +15,27 @@ import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.match.Mid;
+import org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleService;
+import org.dan.ping.pong.app.sport.Sport;
 import org.dan.ping.pong.app.sport.Sports;
-import org.dan.ping.pong.app.tournament.CumulativeScore;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
 @Slf4j
 public class PlayOffService {
-    public List<MatchInfo> findBaseMatches(TournamentMemState tournament, int cid, MatchTag tag) {
+    public List<MatchInfo> findBaseMatches(TournamentMemState tournament,
+            int cid, Optional<MatchTag> tag) {
         return findBaseMatches(findPlayOffMatches(tournament, cid, tag));
     }
 
@@ -55,21 +51,10 @@ public class PlayOffService {
                 .collect(toList());
     }
 
-    public Collection<MatchInfo> findNextMatches(Map<Mid, MatchInfo> matches,
-            Collection<MatchInfo> baseMatches) {
-        return baseMatches.stream()
-                .flatMap(m -> Stream.of(
-                        ofNullable(matches.get(m.getWinnerMid().orElse(MID0))),
-                        ofNullable(matches.get(m.getLoserMid().orElse(MID0))))
-                        .filter(Optional::isPresent)
-                        .map(Optional::get))
-                .collect(toMap(MatchInfo::getMid, o -> o, (a, b) -> a))
-                .values();
-    }
-
-    public List<MatchInfo> findPlayOffMatches(TournamentMemState tournament, int cid, MatchTag tag) {
+    public List<MatchInfo> findPlayOffMatches(
+            TournamentMemState tournament, int cid, Optional<MatchTag> tag) {
         return tournament.getMatches().values().stream()
-                .filter(matchInfo -> tag == null || tag.equals(matchInfo.getTag()))
+                .filter(matchInfo -> tag.map(t -> tag.equals(matchInfo.getTag())).orElse(true))
                 .filter(minfo -> minfo.getCid() == cid)
                 .filter(minfo -> !minfo.getGid().isPresent())
                 .sorted(Comparator.comparing(MatchInfo::getMid))
@@ -82,73 +67,84 @@ public class PlayOffService {
     @Inject
     private CategoryService categoryService;
 
-    public List<TournamentResultEntry> playOffResult(TournamentMemState tournament, int cid,
-            List<TournamentResultEntry> groupOrdered) {
-        final List<MatchInfo> cidMatches = categoryService.findMatchesInCategory(tournament, cid);
-        final Map<Uid, Integer> highestLevelReached = new HashMap<>();
-        final List<MatchInfo> cidPlayOffMatches = cidMatches
-                .stream()
-                .filter(minfo -> !minfo.getGid().isPresent())
-                .peek(minfo -> minfo.getParticipantIdScore().keySet()
-                        .forEach(uid -> highestLevelReached.merge(uid,
-                                minfo.getLevel(), Math::max)))
-                .sorted(Comparator.comparing(MatchInfo::getMid))
-                .collect(toList());
+    @Inject
+    private BallsBalanceRuleService ballsBalanceRuleService;
 
-        final Set<Uid> playOffUids = participantsOf(cidPlayOffMatches);
-        final Map<Uid, Integer> quitUid2Position = extractQuittingUids(playOffUids, groupOrdered);
+    public PlayOffResultEntries playOffResult(TournamentMemState tournament, int cid) {
+        final Map<Uid, PlayOffBidStat> uidStat = new HashMap<>();
+        final Sport sport = sports.get(tournament.getRule().getMatch().sport());
+        final PowerRange powerRange = tournament.getPowerRange();
+        final int maxSetDiff = sport.maxUpLimitSetsDiff(tournament.getRule().getMatch());
+        final int maxBallsDiff = sport.maxUpLimitBallsDiff(tournament.getRule().getMatch());
+        categoryService.findMatchesInCategoryStream(tournament, cid)
+                .filter(m -> !m.getGid().isPresent())
+                .forEach(m -> {
+                    if (m.getUids().size() < 2) {
+                        m.getUids().forEach(uid -> {
+                            uidStat.compute(uid, (u, stat) -> {
+                                if (stat == null) {
+                                    stat = new PlayOffBidStat(u);
+                                }
+                                stat.maxLevel(m.getLevel());
+                                return stat;
+                            });
+                        });
+                        return;
+                    }
+                    final Uid[] uids = m.uidsArray();
+                    final Map<Uid, Integer> ballsBalance = ballsBalanceRuleService
+                            .uid2BallsBalance(Stream.of(m));
+                    final Map<Uid, Integer> sets = sports.calcWonSets(tournament, m);
+                    final int setBalance = sets.get(uids[0]) - sets.get(uids[1]);
+                    final long setPower = powerRange.value(maxSetDiff, m.getLevel());
+                    final long ballPower = powerRange.value(maxBallsDiff, m.getLevel());
+                    uidStat.compute(uids[0], (u, stat) -> {
+                        if (stat == null) {
+                            stat = new PlayOffBidStat(u);
+                        }
+                        stat.addSetsBalance(setBalance * setPower);
+                        stat.addBallsBalance(ballsBalance.get(u) * ballPower);
+                        stat.maxLevel(m.getLevel());
+                        if (m.getWinnerId().isPresent() && !m.getWinnerId().get().equals(u)) {
+                            stat.incLost();
+                        }
+                        return stat;
+                    });
+                    uidStat.compute(uids[1], (u, stat) -> {
+                        if (stat == null) {
+                            stat = new PlayOffBidStat(u);
+                        }
+                        stat.addSetsBalance(-setBalance * setPower);
+                        stat.addBallsBalance(ballsBalance.get(u) * ballPower);
+                        stat.maxLevel(m.getLevel());
+                        if (m.getWinnerId().isPresent() && !m.getWinnerId().get().equals(u)) {
+                            stat.incLost();
+                        }
+                        return stat;
+                    });
+                });
 
-        int level = quitUid2Position.values().stream()
-                .map(n -> (int) Math.round(Math.ceil(Math.log10(n + 1))))
-                .max(Integer::compare)
-                .orElse(0);
-        final Map<Uid, CumulativeScore> uidLevel = new HashMap<>();
-        Collection<MatchInfo> baseMatches = findBaseMatches(cidPlayOffMatches);
-        while (true) {
-            groupService.ranksLevelMatches(tournament, level++, uidLevel, baseMatches);
-            final Collection<MatchInfo> nextLevel = findNextMatches(tournament.getMatches(), baseMatches);
-            if (nextLevel.isEmpty()) {
-                break;
-            }
-            baseMatches = nextLevel;
-        }
-        quitUid2Position.forEach((uid, positionInGroup)
-                -> uidLevel.get(uid).getWeighted().lostBalls(positionInGroup));
-        uidLevel.remove(FILLER_LOSER_UID);
-        return uidLevel.values().stream()
-                .sorted(createComparator(tournament.disambiguationPolicy().getComparator()))
-                .map(cuScore -> {
-                    final ParticipantMemState participant = tournament.getParticipant(
-                            cuScore.getRating().getUid());
-                    return TournamentResultEntry.builder()
-                            .user(participant.toLink())
-                            .playOffStep(ofNullable(highestLevelReached.get(participant.getUid())))
-                            .state(participant.getState())
-                            .punkts(cuScore.getRating().getPunkts())
-                            .score(cuScore)
-                            .build();
-                })
-                .collect(toList());
+        uidStat.remove(FILLER_LOSER_UID);
+        return PlayOffResultEntries.builder()
+                .entries(
+                        uidStat.values().stream()
+                                .sorted(PLAY_OFF_BID_STAT_COMPARATOR)
+                                .map(stat -> statToResultEntry(stat, tournament))
+                                .collect(toList()))
+                .playOffUids(uidStat.keySet())
+                .build();
     }
 
-    public Map<Uid, Integer> extractQuittingUids(Set<Uid> playOffUids, List<TournamentResultEntry> groupOrdered) {
-        final Map<Uid, Integer> result = new HashMap<>();
-        for (int i = groupOrdered.size() - 1; i >= 0; --i) {
-            TournamentResultEntry entry = groupOrdered.get(i);
-            if (playOffUids.contains(entry.getUser().getUid())) {
-                result.put(entry.getUser().getUid(),  i);
-                groupOrdered.remove(i);
-            }
-        }
-        return result;
-    }
-
-    public Set<Uid> participantsOf(List<MatchInfo> matches) {
-        final Set<Uid> result = matches.stream()
-                .flatMap(MatchInfo::participants)
-                .collect(Collectors.toSet());
-        result.remove(FILLER_LOSER_UID);
-        return result;
+    private TournamentResultEntry statToResultEntry(PlayOffBidStat stat,
+            TournamentMemState tournament) {
+        final ParticipantMemState participant = tournament.getParticipant(
+                stat.getUid());
+        return TournamentResultEntry.builder()
+                .user(participant.toLink())
+                .playOffStep(Optional.of(stat.getHighestLevel()))
+                .state(participant.getState())
+                .reasonChain(stat.toReasonChain())
+                .build();
     }
 
     @Inject
@@ -156,15 +152,16 @@ public class PlayOffService {
 
     private Map<MatchTag, MatchInfo> findRootMatches(TournamentMemState tournament) {
         if (tournament.getRule().getCasting().getSplitPolicy() == ConsoleLayered) {
-            return findMaxes(MatchInfo::getTag,
+            return findMaxes(m -> m.getTag().get(),
                     Comparator.comparing(MatchInfo::getLevel),
                     tournament.getMatches().values().stream()
-                            .filter(matchInfo -> matchInfo.getTag() != null));
+                            .filter(matchInfo -> matchInfo.getTag().isPresent()));
         }
         return emptyMap();
     }
 
-    public PlayOffMatches playOffMatches(TournamentMemState tournament, int cid, MatchTag tag) {
+    public PlayOffMatches playOffMatches(TournamentMemState tournament,
+            int cid, Optional<MatchTag> tag) {
         final List<MatchLink> transitions = new ArrayList<>();
         final List<PlayOffMatch> matches = new ArrayList<>();
         final Map<Uid, String> participants = new HashMap<>();
@@ -214,7 +211,8 @@ public class PlayOffService {
                 .build();
     }
 
-    private boolean isWalkOver(TournamentMemState tournament, MatchInfo m, Map<Uid, Integer> score) {
+    private boolean isWalkOver(TournamentMemState tournament, MatchInfo m,
+            Map<Uid, Integer> score) {
         if (m.getState() != Over) {
             return false;
         }
@@ -222,7 +220,8 @@ public class PlayOffService {
         return !calculatedWinner.equals(m.getWinnerId());
     }
 
-    public Stream<MatchInfo> findMatchesByLevelAndCid(int level, int cid, Stream<MatchInfo> stream) {
+    public Stream<MatchInfo> findMatchesByLevelAndCid(
+            int level, int cid, Stream<MatchInfo> stream) {
         return stream.filter(m -> m.getCid() == cid && m.getLevel() == level);
     }
 }

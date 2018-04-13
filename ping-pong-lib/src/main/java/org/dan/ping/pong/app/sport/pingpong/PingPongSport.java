@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.sport.pingpong;
 
+import static java.lang.Math.max;
 import static java.util.Arrays.asList;
 import static org.dan.ping.pong.app.sport.SportType.PingPong;
 import static org.dan.ping.pong.app.sport.tennis.TennisSport.SET_LENGTH_MISMATCH;
@@ -62,7 +63,7 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
     }
 
     private int validate(PingPongMatchRules rules, int iSet, int aGames, int bGames) {
-        final int maxGames = Math.max(aGames, bGames);
+        final int maxGames = max(aGames, bGames);
         final int minGames = Math.min(aGames, bGames);
         if (minGames < rules.getMinPossibleGames()) {
             throw badRequest("Games cannot be less than",
@@ -155,5 +156,16 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
                 .uid(scores.getScores().get(loserIdx).getUid())
                 .score(score)
                 .build();
+    }
+
+    @Override
+    public int maxUpLimitSetsDiff(PingPongMatchRules rules) {
+        return rules.getSetsToWin();
+    }
+
+    @Override
+    public int maxUpLimitBallsDiff(PingPongMatchRules rules) {
+        return max(rules.getMinGamesToWin(), rules.getMinAdvanceInGames())
+                * (2 * rules.getSetsToWin() - 1);
     }
 }

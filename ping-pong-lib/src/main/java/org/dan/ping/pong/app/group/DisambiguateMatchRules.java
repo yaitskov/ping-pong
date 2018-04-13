@@ -1,4 +1,4 @@
-package org.dan.ping.pong.app.match;
+package org.dan.ping.pong.app.group;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -6,18 +6,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import org.dan.ping.pong.app.user.UserLink;
-
-import java.util.List;
+import lombok.experimental.Wither;
+import org.dan.ping.pong.app.sport.MatchRules;
 
 @Getter
 @Setter
+@Wither
 @Builder
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class EffectedMatch {
-    private Mid mid;
-    private List<UserLink> participants;
+public class DisambiguateMatchRules {
+    private boolean onlyForQuitPosition;
+    private MatchRules matchRules;
 }

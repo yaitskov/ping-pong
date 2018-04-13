@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.match;
 
+import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q2_M;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S1A2G11;
-import static org.dan.ping.pong.app.group.DisambiguationPolicy.CMP_WIN_MINUS_LOSE;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.GLOBAL;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S1A2G11;
 import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
@@ -12,7 +12,6 @@ import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.mock.simulator.Simulator;
@@ -29,16 +28,10 @@ import javax.inject.Inject;
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = JerseyWithSimulator.class)
 public class DisambiguateGroupScoreJerseyTest extends AbstractSpringJerseyTest {
-    public static final GroupRules G8Q2_MINUS = GroupRules.builder()
-            .groupSize(8)
-            .quits(2)
-            .disambiguation(CMP_WIN_MINUS_LOSE)
-            .build();
-
     public static final TournamentRules RULES_G8Q2_S1A2G11_M = TournamentRules
             .builder()
             .match(S1A2G11)
-            .group(Optional.of(G8Q2_MINUS))
+            .group(Optional.of(G8Q2_M))
             .casting(INCREASE_SIGNUP_CASTING)
             .playOff(Optional.empty())
             .place(Optional.of(GLOBAL))

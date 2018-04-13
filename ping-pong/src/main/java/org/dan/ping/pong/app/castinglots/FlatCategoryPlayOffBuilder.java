@@ -23,6 +23,7 @@ import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -41,14 +42,14 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
         validateBidsNumberInACategory(bids);
         final List<ParticipantMemState> orderedBids = rankingService.sort(bids,
                 tournament.getRule().getCasting(), tournament);
-        build(tournament, cid, orderedBids, batch, null);
+        build(tournament, cid, orderedBids, batch, Optional.empty());
     }
 
     @Inject
     private BidService bidService;
 
     private boolean oneParticipantInCategory(TournamentMemState tournament, Integer cid,
-            List<ParticipantMemState> bids, DbUpdater batch, MatchTag tag) {
+            List<ParticipantMemState> bids, DbUpdater batch, Optional<MatchTag> tag) {
         if (bids.size() > 1) {
             return false;
         }
@@ -59,7 +60,7 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
     }
 
     public void build(TournamentMemState tournament, Integer cid,
-            List<ParticipantMemState> orderedBids, DbUpdater batch, MatchTag tag) {
+            List<ParticipantMemState> orderedBids, DbUpdater batch, Optional<MatchTag> tag) {
         validateBidsNumberInACategory(orderedBids);
         if (oneParticipantInCategory(tournament, cid, orderedBids, batch, tag)) {
             return;
@@ -83,7 +84,7 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
 
     protected void assignBidsToBaseMatches(Integer cid, int basePositions,
             List<ParticipantMemState> orderedBids,
-            TournamentMemState tournament, DbUpdater batch, MatchTag tag) {
+            TournamentMemState tournament, DbUpdater batch, Optional<MatchTag> tag) {
         final List<Integer> seeds = ofNullable(PLAY_OFF_SEEDS.get(basePositions))
                 .orElseThrow(() -> internalError("No seeding for "
                         + orderedBids.size() + " participants"));

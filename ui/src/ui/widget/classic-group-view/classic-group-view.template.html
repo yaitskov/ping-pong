@@ -91,24 +91,12 @@
                   class="text-success">
                 {{participant.setsAndBalls.wonSets}}
             </span>
-            <span ng-show="$ctrl.disambiguationPolicy == 'CMP_WIN_MINUS_LOSE'">
-                -
-            </span>
-            <span ng-show="$ctrl.disambiguationPolicy == 'CMP_WIN_AND_LOSE'">
-                &nbsp;
-            </span>
             <span ng-show="participant.setsAndBalls"
                   title="lost sets in matches with participants having the same number of points"
                   class="text-danger">
                 {{participant.setsAndBalls.lostSets}}
             </span>
             <hr class="half-cell"/>
-            <span ng-show="participant.setsAndBalls && $ctrl.disambiguationPolicy == 'CMP_WIN_MINUS_LOSE'"
-                  title="sets balance in matches with participants having the same number of points">
-                <strong>
-                    {{participant.setsAndBalls.wonSets - participant.setsAndBalls.lostSets}}
-                </strong>
-            </span>
         </td>
         <td ng-show="$ctrl.showBalance" class="text-center">
             <span ng-show="participant.setsAndBalls"
@@ -116,23 +104,10 @@
                   class="text-success">
                 {{participant.setsAndBalls.winBalls}}
             </span>
-            <span ng-show="$ctrl.disambiguationPolicy == 'CMP_WIN_MINUS_LOSE'">
-                -
-            </span>
-            <span ng-show="$ctrl.disambiguationPolicy == 'CMP_WIN_AND_LOSE'">
-                &nbsp;
-            </span>
             <span ng-show="participant.setsAndBalls"
                   title="lost balls in matches with participants having the same number of points"
                   class="text-danger">
                 {{participant.setsAndBalls.lostBalls}}
-            </span>
-            <hr class="half-cell"/>
-            <span ng-show="participant.setsAndBalls && $ctrl.disambiguationPolicy == 'CMP_WIN_MINUS_LOSE'"
-                  title="ball balance in matches with participants having the same number of points">
-                <strong>
-                    {{participant.setsAndBalls.winBalls - participant.setsAndBalls.lostBalls}}
-                </strong>
             </span>
         </td>
         <td class="text-center">

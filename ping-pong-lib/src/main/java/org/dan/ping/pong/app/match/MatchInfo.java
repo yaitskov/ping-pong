@@ -3,7 +3,10 @@ package org.dan.ping.pong.app.match;
 import static java.time.Duration.between;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toMap;
+import static org.dan.ping.pong.app.match.MatchTag.DISAMBIGUATION;
+import static org.dan.ping.pong.app.match.dispute.MatchSets.ofSets;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.UID;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
@@ -16,6 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.match.dispute.MatchSets;
 import org.dan.ping.pong.app.playoff.RootTaggedMatch;
 import org.dan.ping.pong.app.tournament.Tid;
 
@@ -38,12 +42,13 @@ import java.util.stream.Stream;
 public class MatchInfo {
     public static final String USER = "user";
     public static final String MATCH = "match";
+    public static final String MID = "mid";
 
     private Mid mid;
     private Tid tid;
     private int cid;
     private MatchType type;
-    private MatchTag tag;
+    private Optional<MatchTag> tag;
     private Optional<Integer> gid;
     private MatchState state;
     private Optional<Mid> loserMid;
@@ -60,6 +65,10 @@ public class MatchInfo {
      * from every branch resigns or gets expelled.
      * */
     private boolean losersMeet;
+
+    public Uid winnerId() {
+        return winnerId.orElseThrow(() -> internalError("no winner in match", MID, mid));
+    }
 
     public int getPlayedSets() {
         for (List<Integer> l : participantIdScore.values()) {
@@ -102,12 +111,10 @@ public class MatchInfo {
         return false;
     }
 
-    public void loadParticipants(Map<Uid, List<Integer>> scores) {
-        if (scores.size() != 2) {
-            throw internalError("Participants must be loaded in pairs");
-        }
+    public void loadParticipants(MatchSets scores) {
+        scores.validateNumberParticipants();
         losersMeet = false;
-        participantIdScore = scores;
+        participantIdScore = scores.getSets();
     }
 
     public List<Integer> getParticipantScore(Uid uid) {
@@ -136,10 +143,10 @@ public class MatchInfo {
         return getParticipantIdScore().keySet().stream();
     }
 
-    public Map<Uid, List<Integer>> sliceFirstSets(int setNumber) {
-        return participantIdScore.entrySet().stream()
+    public MatchSets sliceFirstSets(int setNumber) {
+        return ofSets(participantIdScore.entrySet().stream()
                 .collect(toMap(Map.Entry::getKey,
-                        e -> e.getValue().subList(0, setNumber)));
+                        e -> e.getValue().subList(0, setNumber))));
     }
 
     public RootTaggedMatch toRootTaggedMatch() {
@@ -148,6 +155,18 @@ public class MatchInfo {
                 .tag(tag)
                 .level(level)
                 .build();
+    }
+
+    public boolean disambiguationP() {
+        return tag.map(t -> t.getPrefix().equals(DISAMBIGUATION)).orElse(false);
+    }
+
+    public boolean inGroup() {
+        return gid.isPresent();
+    }
+
+    public int groupId() {
+        return gid.orElseThrow(() -> internalError("Match is not in a group", MID, mid));
     }
 
     public static class MatchInfoBuilder {
@@ -178,8 +197,19 @@ public class MatchInfo {
         return participantIdScore.keySet();
     }
 
+    public Uid[] uidsArray() {
+        return getUids().toArray(new Uid[2]);
+    }
+
     public Optional<Uid> leftUid() {
         return participantIdScore.keySet().stream().findAny();
+    }
+
+    public Uid opponentUid(Uid uid) {
+        return getOpponentUid(uid)
+                .orElseThrow(() -> internalError(
+                        "Uid is not participant of match",
+                        ImmutableMap.of(UID, uid, MID, mid)));
     }
 
     public Optional<Uid> getOpponentUid(Uid uid) {
@@ -218,5 +248,9 @@ public class MatchInfo {
                         .stream().collect(toMap(Map.Entry::getKey,
                                 e -> new ArrayList<>(e.getValue()))))
                 .build();
+    }
+
+    boolean continues() {
+        return !winnerId.isPresent();
     }
 }

@@ -8,7 +8,9 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.match.rule.reason.Reason;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,7 +27,7 @@ public class GroupParticipantResult {
     private int punkts;
     private int seedPosition;
     private int finishPosition;
-    private Optional<SetsAndBalls> setsAndBalls;
+    private List<Optional<Reason>> reasonChain;
     private boolean dice;
     private BidState state;
 }

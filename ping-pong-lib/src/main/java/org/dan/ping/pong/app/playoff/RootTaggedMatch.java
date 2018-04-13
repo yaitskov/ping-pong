@@ -10,6 +10,8 @@ import lombok.ToString;
 import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.match.Mid;
 
+import java.util.Optional;
+
 @Getter
 @Setter
 @Builder
@@ -19,5 +21,5 @@ import org.dan.ping.pong.app.match.Mid;
 public class RootTaggedMatch {
     private Mid mid;
     private int level;
-    private MatchTag tag;
+    private Optional<MatchTag> tag = Optional.empty();
 }

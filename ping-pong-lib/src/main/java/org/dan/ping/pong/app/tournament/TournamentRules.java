@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BalancedMix;
 import static org.dan.ping.pong.app.group.ConsoleTournament.NO;
+import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -47,5 +48,9 @@ public class TournamentRules {
 
     public boolean consoleP() {
         return group.map(GroupRules::getConsole).orElse(NO) != NO;
+    }
+
+    public GroupRules group() {
+        return group.orElseThrow(() -> internalError("tournament without groups"));
     }
 }

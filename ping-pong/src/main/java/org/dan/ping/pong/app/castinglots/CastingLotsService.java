@@ -168,12 +168,14 @@ public class CastingLotsService {
             tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
                     .ordNumber(groupIdx).label(groupLabel).build());
             orderedBids.forEach(bid -> bid.setGid(Optional.of(gid)));
-            castingLotsDao.generateGroupMatches(tournament, gid, orderedBids, groupIdx);
+            castingLotsDao.generateGroupMatches(tournament, gid, orderedBids,
+                    groupIdx, Optional.empty());
             bidDao.setGroupForUids(gid, tid, orderedBids);
         });
     }
 
-    private boolean oneParticipantInCategory(TournamentMemState tournament, Integer cid, List<ParticipantMemState> bids, DbUpdater batch) {
+    private boolean oneParticipantInCategory(TournamentMemState tournament,
+            Integer cid, List<ParticipantMemState> bids, DbUpdater batch) {
         if (bids.size() > 1) {
             return false;
         }
@@ -207,7 +209,8 @@ public class CastingLotsService {
                 }
                 groupBids.forEach(bid -> bid.setGid(Optional.of(gid)));
                 basePlayOffPriority = Math.max(
-                        castingLotsDao.generateGroupMatches(tournament, gid, groupBids, 0),
+                        castingLotsDao.generateGroupMatches(tournament, gid, groupBids,
+                                0, Optional.empty()),
                         basePlayOffPriority);
                 bidDao.setGroupForUids(gid, tid, groupBids);
             }
@@ -273,7 +276,8 @@ public class CastingLotsService {
                                             : Place,
                                     isDeadParticipant
                                             ? Optional.of(uid)
-                                            : Optional.empty());
+                                            : Optional.empty(),
+                                    Optional.empty());
                         });
         scheduleService.afterMatchComplete(tournament, batch,  clocker.get());
     }

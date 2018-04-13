@@ -42,10 +42,6 @@ public class CategoryService {
         return tournament.getMatches().values().stream().filter(m -> m.getCid() == cid);
     }
 
-    public List<MatchInfo> findMatchesInCategory(TournamentMemState tournament, int cid) {
-        return findMatchesInCategoryStream(tournament, cid).collect(toList());
-    }
-
     public CategoryInfo categoryInfo(TournamentMemState tournament,
             int cid, Optional<Uid> ouid) {
         tournament.checkCategory(cid);

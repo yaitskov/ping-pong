@@ -68,4 +68,8 @@ public interface Sport<T extends MatchRules> {
     default List<SetScoreReq> expandScoreSet(T rules, SetScoreReq score) {
         throw PiPoEx.badRequest("Sport does not support countOnlySets feature");
     }
+
+    int maxUpLimitSetsDiff(T rules);
+
+    int maxUpLimitBallsDiff(T rules);
 }

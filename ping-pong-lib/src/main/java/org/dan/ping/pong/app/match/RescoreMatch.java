@@ -12,6 +12,7 @@ import org.dan.ping.pong.app.tournament.Tid;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -22,6 +23,10 @@ import java.util.Map;
 public class RescoreMatch {
     private Tid tid;
     private Mid mid;
-    private String effectHash = "";
+    private Optional<String> effectHash = Optional.empty();
     private Map<Uid, List<Integer>> sets;
+
+    public static class RescoreMatchBuilder {
+        Optional<String> effectHash = Optional.empty();
+    }
 }

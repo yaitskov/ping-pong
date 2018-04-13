@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.castinglots;
 
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.castinglots.FlatCategoryPlayOffBuilder.validateBidsNumberInACategory;
+import static org.dan.ping.pong.app.match.MatchTag.CONSOLE_LEVEL;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -13,13 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupService;
-import org.dan.ping.pong.app.group.OrderUidsInGroupCmd;
 import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.RelatedTids;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
-import org.dan.ping.pong.jooq.tables.Bid;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.util.Comparator;
@@ -63,8 +62,8 @@ public class LayeredCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
         final ArrayListMultimap<Integer, Uid> bidsByFinalGroupPosition = ArrayListMultimap.create();
 
         orderedGroups.forEach(groupInfo -> {
-            final List<Uid> orderedUids = new OrderUidsInGroupCmd(masterTournament,
-                    groupInfo.getGid(), groupService).getFinalUidsOrder();
+            final List<Uid> orderedUids = groupService.orderUidsInGroup(groupInfo.getGid(), masterTournament,
+                    groupService.findAllMatchesInGroup(tournament, groupInfo.getGid()));
             for (int i = 0; i < orderedUids.size(); ++i) {
                 bidsByFinalGroupPosition.put(i, orderedUids.get(i));
             }
@@ -82,7 +81,7 @@ public class LayeredCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
                     .collect(toList());
             flatCategoryPlayOffBuilder.build(tournament, cid,
                     bidsInTag, batch,
-                    MatchTag.builder().prefix("L").number(i).build());
+                    MatchTag.builder().prefix(CONSOLE_LEVEL).number(i).build());
         }
     }
 }

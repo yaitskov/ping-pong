@@ -17,6 +17,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor(access = PRIVATE)
 public class MatchTag {
+    public static final String CONSOLE_LEVEL = "L";
+    public static final String DISAMBIGUATION = "DG";
+
     private String prefix;
     private int number;
 

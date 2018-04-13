@@ -1,8 +1,8 @@
 package org.dan.ping.pong.app.castinglots;
 
 import static java.util.Arrays.asList;
-import static org.dan.ping.pong.app.group.DisambiguationPolicy.CMP_WIN_AND_LOSE;
-import static org.dan.ping.pong.app.group.DisambiguationPolicy.CMP_WIN_MINUS_LOSE;
+import static org.dan.ping.pong.app.group.GroupRules.BALANCE_BASED_ORDER_RULES;
+import static org.dan.ping.pong.app.group.GroupRules.WON_LOST_BASED_ORDER_RULES;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.GLOBAL;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
 import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
@@ -18,8 +18,8 @@ import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.group.GroupSchedule;
-import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
+import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.mock.simulator.Player;
@@ -43,25 +43,15 @@ public class MatchScheduleInGroupJerseyTest extends AbstractSpringJerseyTest {
     public static final GroupRules G8Q1 = GroupRules.builder()
             .groupSize(8)
             .quits(1)
-            .disambiguation(CMP_WIN_AND_LOSE)
+            .orderRules(WON_LOST_BASED_ORDER_RULES)
             .build();
 
-    public static final GroupRules G8Q2 = GroupRules.builder()
-            .groupSize(8)
-            .quits(2)
-            .disambiguation(CMP_WIN_AND_LOSE)
-            .build();
-
+    public static final GroupRules G8Q2 = G8Q1.withQuits(2);
     public static final GroupRules G3Q2 = G8Q2.withGroupSize(3);
     public static final GroupRules G3Q1 = G3Q2.withQuits(1);
+    public static final GroupRules G2Q1 =  G3Q1.withGroupSize(2);
 
-    public static final GroupRules G2Q1 = GroupRules.builder()
-            .groupSize(2)
-            .quits(1)
-            .disambiguation(CMP_WIN_AND_LOSE)
-            .build();
-
-    public static final GroupRules G8Q2_M = G8Q2.withDisambiguation(CMP_WIN_MINUS_LOSE);
+    public static final GroupRules G8Q2_M = G8Q2.withOrderRules(BALANCE_BASED_ORDER_RULES);
 
     public static final PingPongMatchRules S1A2G11 = PingPongMatchRules.builder()
             .setsToWin(1)

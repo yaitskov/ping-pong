@@ -28,7 +28,6 @@ angular.
                              }
                              self.tournamentId = tournament.tid;
                              self.quitsGroup = tournament.quitsGroup;
-                             self.disambiguationPolicy = tournament.disambiguationPolicy;
                              self.participants.sort(sorters[self.rowOrder]);
                          };
                          self.setRowOrder = function (order) {

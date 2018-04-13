@@ -7,6 +7,10 @@ public class CounterInt {
         ++v;
     }
 
+    public int postInc() {
+        return v++;
+    }
+
     public int toInt() {
         return v;
     }

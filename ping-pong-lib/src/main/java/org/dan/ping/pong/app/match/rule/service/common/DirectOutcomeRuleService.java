@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class CountDirectOutcomeRuleService implements GroupOrderRuleService {
+public class DirectOutcomeRuleService implements GroupOrderRuleService {
     @Override
     public OrderRuleName getName() {
         return F2F;

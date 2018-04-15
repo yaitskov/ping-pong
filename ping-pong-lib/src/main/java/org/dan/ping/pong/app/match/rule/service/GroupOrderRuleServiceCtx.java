@@ -5,8 +5,8 @@ import static java.util.stream.Collectors.toMap;
 import org.dan.ping.pong.app.match.rule.GroupParticipantOrderService;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleService;
-import org.dan.ping.pong.app.match.rule.service.common.CountDirectOutcomeRuleService;
-import org.dan.ping.pong.app.match.rule.service.common.CountWonMatchesRuleService;
+import org.dan.ping.pong.app.match.rule.service.common.DirectOutcomeRuleService;
+import org.dan.ping.pong.app.match.rule.service.common.WonMatchesRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.LostBallsRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.LostSetsRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.PickRandomlyRuleService;
@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Import;
 import java.util.List;
 import java.util.Map;
 
-@Import({CountWonMatchesRuleService.class,
+@Import({WonMatchesRuleService.class,
         PickRandomlyRuleService.class,
         CountJustPunktsRuleService.class,
         SetsBalanceRuleService.class,
@@ -31,7 +31,7 @@ import java.util.Map;
         BallsBalanceRuleService.class,
         WonBallsRuleService.class,
         LostBallsRuleService.class,
-        CountDirectOutcomeRuleService.class,
+        DirectOutcomeRuleService.class,
         CountDisambiguationMatchesRuleService.class,
         DisambiguationPreviewRuleService.class,
         GroupParticipantOrderService.class

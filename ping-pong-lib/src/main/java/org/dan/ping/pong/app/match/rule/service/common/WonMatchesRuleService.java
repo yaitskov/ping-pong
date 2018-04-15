@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class CountWonMatchesRuleService implements GroupOrderRuleService {
+public class WonMatchesRuleService implements GroupOrderRuleService {
     public static final java.util.function.BiFunction<Integer, Integer, Integer> SUM_INT = (a, b) -> a + b;
 
     @Override

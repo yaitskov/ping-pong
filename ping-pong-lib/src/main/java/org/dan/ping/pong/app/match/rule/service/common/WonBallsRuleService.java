@@ -30,7 +30,7 @@ public class WonBallsRuleService implements GroupOrderRuleService {
     public Optional<Stream<? extends Reason>> score(
             Supplier<Stream<MatchInfo>> matches,
             UidsProvider _uids,
-            GroupOrderRule rule, GroupRuleParams params) {
+            GroupOrderRule _rule, GroupRuleParams _params) {
         final Map<Uid, Integer> uid2WonBalls = new HashMap<>();
         matches.get().forEach(m -> {
             final Uid[] uids = m.uidsArray();

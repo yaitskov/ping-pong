@@ -36,7 +36,7 @@ public class DirectOutcomeRuleService implements GroupOrderRuleService {
         final List<MatchInfo> match = matches.get()
                 .limit(2).collect(Collectors.toList());
         if (match.size() < 1) {
-            return Optional.empty();
+            return Optional.empty(); // could be different groups
         }
         if (match.size() > 1) {
             throw internalError("To much matches");
@@ -45,6 +45,8 @@ public class DirectOutcomeRuleService implements GroupOrderRuleService {
         return m.getWinnerId()
                 .map(wid -> {
                     final Uid opponentUid = m.opponentUid(wid);
+                    checkMatchUid(uids, m, wid);
+                    checkMatchUid(uids, m, opponentUid);
                     return Stream.of(
                             F2fReason.builder()
                                     .uid(wid)
@@ -56,5 +58,12 @@ public class DirectOutcomeRuleService implements GroupOrderRuleService {
                                     .opponentUid(wid)
                                     .build());
                 });
+    }
+
+    private void checkMatchUid(UidsProvider uids, MatchInfo m, Uid wid) {
+        if (!uids.uids().contains(wid)) {
+            throw internalError("F2f rule uids mismatch "
+                    + wid + " in mid " + m.getMid());
+        }
     }
 }

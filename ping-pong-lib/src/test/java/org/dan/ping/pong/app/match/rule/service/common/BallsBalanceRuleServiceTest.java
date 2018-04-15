@@ -3,6 +3,8 @@ package org.dan.ping.pong.app.match.rule.service.common;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.group.GroupServiceTest.UID2;
+import static org.dan.ping.pong.app.match.MatchState.Break;
+import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID3;
 import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID4;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.BallsBalance;
@@ -18,22 +20,29 @@ import org.dan.ping.pong.app.match.rule.UidsProvider;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class BallsBalanceRuleServiceTest {
     public static final List<MatchInfo> MATCHES_UIDS_2_3_4 = asList(
             MatchInfo.builder()
+                    .winnerId(Optional.of(UID3))
+                    .state(Over)
                     .participantIdScore(
                             ImmutableMap.of(UID2, asList(0, 0),
                                     UID3, asList(6, 6)))
                     .build(),
             MatchInfo.builder()
+                    .state(Break)
+                    .winnerId(Optional.of(UID4))
                     .participantIdScore(
                             ImmutableMap.of(UID2, asList(0, 0),
-                                    UID4, asList(6, 6)))
+                                    UID4, asList(6, 5)))
                     .build(),
             MatchInfo.builder()
+                    .winnerId(Optional.of(UID3))
+                    .state(Over)
                     .participantIdScore(
                             ImmutableMap.of(UID4, asList(3, 2),
                                     UID3, asList(6, 6)))
@@ -52,7 +61,7 @@ public class BallsBalanceRuleServiceTest {
                 sut.score(MATCHES_UIDS_2_3_4_S, UIDS_2_3_4, null, null)
                         .get().collect(toList()),
                 is(asList(ofIntD(UID3, 19, BallsBalance),
-                        ofIntD(UID4, 5,BallsBalance),
-                        ofIntD(UID2, -24, BallsBalance))));
+                        ofIntD(UID4, 4,BallsBalance),
+                        ofIntD(UID2, -23, BallsBalance))));
     }
 }

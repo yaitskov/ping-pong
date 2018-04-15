@@ -18,12 +18,12 @@ public class WonBallsRuleServiceTest {
     private WonBallsRuleService sut = new WonBallsRuleService();
 
     @Test
-    public void ballBalanceBoth() {
+    public void wonBalls() {
         assertThat(
                 sut.score(MATCHES_UIDS_2_3_4_S, UIDS_2_3_4, null, null)
                         .get().collect(toList()),
                 is(asList(ofIntD(UID3, 24, WonBalls),
-                        ofIntD(UID4, 17, WonBalls),
+                        ofIntD(UID4, 16, WonBalls),
                         ofIntD(UID2, 0, WonBalls))));
     }
 }

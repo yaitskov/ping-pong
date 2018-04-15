@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.group;
 
 import static java.util.Collections.singletonList;
+import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchTag.DISAMBIGUATION;
 
 import com.google.common.collect.ImmutableMap;
@@ -40,6 +41,7 @@ public class MatchListBuilder {
         return MatchInfo.builder()
                 .gid(ogid)
                 .tag(tag)
+                .state(Over)
                 .participantIdScore(ImmutableMap.of(
                         uid1, singletonList(g1),
                         uid2, singletonList(g2)))

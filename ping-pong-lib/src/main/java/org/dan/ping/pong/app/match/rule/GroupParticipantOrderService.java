@@ -11,6 +11,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.filter.FilterMarker;
+import org.dan.ping.pong.app.match.rule.reason.InfoReason;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.match.rule.service.GroupOrderRuleService;
@@ -122,6 +123,7 @@ public class GroupParticipantOrderService {
                     .map(s -> filterOutPairUids(s, rule, ambiPos));
             if (!score.isPresent()) {
                 order.getPositions().put(ambiPosI, ambiPos);
+                ambiPos.setReason(Optional.of(new InfoReason(rule.name())));
                 order.getAmbiguousPositions().add(ambiPosI);
                 continue;
             }

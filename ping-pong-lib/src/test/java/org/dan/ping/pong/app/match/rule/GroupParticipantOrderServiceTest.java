@@ -39,8 +39,7 @@ public class GroupParticipantOrderServiceTest {
     public static final Uid UID4 = new Uid(4);
     public static final Uid UID5 = new Uid(5);
     public static final int GID2 = 2;
-
-    private static final Uid UID6 = new Uid(6);
+    public static final Uid UID6 = new Uid(6);
 
     private static final PingPongMatchRules S1A2G11 = PingPongMatchRules.builder()
             .setsToWin(1)
@@ -104,7 +103,7 @@ public class GroupParticipantOrderServiceTest {
 
     @Test
     public void orderUidsInGroupRandomlyDisambiguates3Participants2OfThemHaveEqualStat() {
-        checkOrder(asList(UID6, UID2, UID4, UID5, UID3),
+        checkOrder(asList(UID6, UID4, UID5, UID2, UID3),
                 sut.findOrder(params(GID, tournamentForOrder(),
                         MatchListBuilder.matches().ogid(21)
                                 .m(UID2, 11, UID4, 2)

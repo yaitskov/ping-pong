@@ -1,6 +1,6 @@
 package org.dan.ping.pong.app.match.rule.service.meta;
 
-import static org.dan.ping.pong.app.match.rule.OrderRuleName.CountDisambiguationMatches;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 import static org.dan.ping.pong.app.match.rule.filter.DisambiguationScope.DISAMBIGUATION_MATCHES;
 
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -15,11 +15,11 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class CountDisambiguationMatchesRuleService
+public class UseDisambiguationMatchesDirectiveService
         implements GroupOrderRuleService {
     @Override
     public OrderRuleName getName() {
-        return CountDisambiguationMatches;
+        return UseDisambiguationMatches;
     }
 
     public static int matchesInGroup(int participants) {
@@ -29,7 +29,7 @@ public class CountDisambiguationMatchesRuleService
     @Override
     public Optional<Stream<? extends Reason>> score(
             Supplier<Stream<MatchInfo>> disamMatchesSupplier,
-            UidsProvider uids, GroupOrderRule rule,
+            UidsProvider uids, GroupOrderRule _rule,
             GroupRuleParams params) {
         params.setDisambiguationMode(DISAMBIGUATION_MATCHES);
         final int expectedMatches = matchesInGroup(uids.size());

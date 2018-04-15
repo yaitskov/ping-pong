@@ -2,7 +2,7 @@ package org.dan.ping.pong.app.match.rule;
 
 public enum OrderRuleName {
     Punkts,
-    CountDisambiguationMatches,
+    UseDisambiguationMatches,
     _DisambiguationPreview,
 
     F2F,

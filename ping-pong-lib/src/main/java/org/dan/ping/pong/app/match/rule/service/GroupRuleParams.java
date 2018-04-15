@@ -28,6 +28,10 @@ public class GroupRuleParams {
     private boolean countIncompleteMatches;
     private List<GroupOrderRule> orderRules;
 
+    public static class GroupRuleParamsBuilder {
+        DisambiguationScope disambiguationMode = ORIGIN_MATCHES;
+    }
+
     public static GroupRuleParams ofParams(int gid,
             TournamentMemState tournament, List<MatchInfo> groupMatches,
             List<GroupOrderRule> orderRules) {
@@ -35,7 +39,6 @@ public class GroupRuleParams {
                 .builder()
                 .uids(emptySet())
                 .gid(gid)
-                .disambiguationMode(ORIGIN_MATCHES)
                 .tournament(tournament)
                 .groupMatches(groupMatches)
                 .orderRules(orderRules)

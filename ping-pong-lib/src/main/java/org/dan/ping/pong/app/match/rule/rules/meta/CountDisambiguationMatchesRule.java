@@ -1,6 +1,6 @@
 package org.dan.ping.pong.app.match.rule.rules.meta;
 
-import static org.dan.ping.pong.app.match.rule.OrderRuleName.CountDisambiguationMatches;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 import static org.dan.ping.pong.app.match.rule.filter.MatchOutcomeScope.ALL_MATCHES;
 import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.AT_LEAST_ONE;
 
@@ -20,7 +20,7 @@ public class CountDisambiguationMatchesRule implements GroupOrderRule {
 
     @Override
     public OrderRuleName name() {
-        return CountDisambiguationMatches;
+        return UseDisambiguationMatches;
     }
 
     @Override

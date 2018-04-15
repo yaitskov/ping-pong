@@ -13,7 +13,7 @@ import org.dan.ping.pong.app.match.rule.service.common.PickRandomlyRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.SetsBalanceRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.WonBallsRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.WonSetsRuleService;
-import org.dan.ping.pong.app.match.rule.service.meta.CountDisambiguationMatchesRuleService;
+import org.dan.ping.pong.app.match.rule.service.meta.UseDisambiguationMatchesDirectiveService;
 import org.dan.ping.pong.app.match.rule.service.meta.DisambiguationPreviewRuleService;
 import org.dan.ping.pong.app.match.rule.service.ping.CountJustPunktsRuleService;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +32,7 @@ import java.util.Map;
         WonBallsRuleService.class,
         LostBallsRuleService.class,
         DirectOutcomeRuleService.class,
-        CountDisambiguationMatchesRuleService.class,
+        UseDisambiguationMatchesDirectiveService.class,
         DisambiguationPreviewRuleService.class,
         GroupParticipantOrderService.class
 })

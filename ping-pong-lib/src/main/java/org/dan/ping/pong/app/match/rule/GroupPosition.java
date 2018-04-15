@@ -5,7 +5,7 @@ import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.match.rule.filter.DisambiguationScope.ORIGIN_MATCHES;
 import static org.dan.ping.pong.app.match.rule.filter.MatchOutcomeScope.JUST_NORMALLY_COMPLETE;
 import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.AT_LEAST_ONE;
-import static org.dan.ping.pong.app.match.rule.service.meta.CountDisambiguationMatchesRuleService.matchesInGroup;
+import static org.dan.ping.pong.app.match.rule.service.meta.UseDisambiguationMatchesDirectiveService.matchesInGroup;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.Builder;

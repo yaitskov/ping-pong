@@ -2,7 +2,7 @@ package org.dan.ping.pong.app.tournament.rules;
 
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.BallsBalance;
-import static org.dan.ping.pong.app.match.rule.OrderRuleName.CountDisambiguationMatches;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.F2F;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.LostBalls;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.LostSets;
@@ -41,7 +41,7 @@ public class GroupRuleValidator {
 
     private static final Set<OrderRuleName> GROUP_RULE_NAMES = ImmutableSet.of(
             Punkts,
-            CountDisambiguationMatches,
+            UseDisambiguationMatches,
             F2F,
             Random,
             SetsBalance,

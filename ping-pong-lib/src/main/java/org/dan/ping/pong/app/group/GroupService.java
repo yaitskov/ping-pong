@@ -14,7 +14,7 @@ import static org.dan.ping.pong.app.group.ParticipantMatchState.Run;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.WalkOver;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.WalkWiner;
 import static org.dan.ping.pong.app.match.MatchState.Over;
-import static org.dan.ping.pong.app.match.rule.OrderRuleName.CountDisambiguationMatches;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 import static org.dan.ping.pong.app.match.rule.service.GroupRuleParams.ofParams;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -277,7 +277,7 @@ public class GroupService {
         final GroupParticipantOrder order = groupParticipantOrderService.findOrder(
                 ofParams(0, tournament, allGroupMatches,
                         tournament.orderRules().stream()
-                                .map(r -> r.name() == CountDisambiguationMatches
+                                .map(r -> r.name() == UseDisambiguationMatches
                                         ? new PreviewDisambiguationRule()
                                         : r)
                                 .collect(toList())));

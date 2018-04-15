@@ -2,12 +2,12 @@ package org.dan.ping.pong.app.match.rule.service.ping;
 
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.Punkts;
+import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.ofEntry;
 
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.UidsProvider;
-import org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.match.rule.service.GroupOrderRuleService;
@@ -44,7 +44,7 @@ public class CountJustPunktsRuleService implements GroupOrderRuleService {
             }
         }));
         return Optional.of(uid2Points.entrySet().stream()
-                .map((e) -> DecreasingIntScalarReason.ofEntry(e, WonBalls))
-                .sorted(Reason::compareDiff));
+                .map((e) -> ofEntry(e, getName()))
+                .sorted());
     }
 }

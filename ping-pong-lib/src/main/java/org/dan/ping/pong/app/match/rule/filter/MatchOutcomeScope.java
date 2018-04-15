@@ -7,7 +7,7 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import java.util.stream.Stream;
 
 public enum MatchOutcomeScope implements FilterMarker {
-    ALL {
+    ALL_MATCHES {
         @Override
         public boolean isSuper(MatchOutcomeScope outcomeScope) {
             return true;
@@ -17,6 +17,7 @@ public enum MatchOutcomeScope implements FilterMarker {
             return s;
         }
     },
+
     JUST_NORMALLY_COMPLETE {
         @Override
         public boolean isSuper(MatchOutcomeScope outcomeScope) {

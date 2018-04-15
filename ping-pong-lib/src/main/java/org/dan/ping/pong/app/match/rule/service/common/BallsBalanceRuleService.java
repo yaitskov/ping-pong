@@ -32,7 +32,7 @@ public class BallsBalanceRuleService implements GroupOrderRuleService {
             GroupOrderRule _rule, GroupRuleParams _params) {
         return Optional.of(uid2BallsBalance(matches.get()).entrySet()
                 .stream()
-                .map((e) -> ofEntry(e, BallsBalance))
+                .map((e) -> ofEntry(e, getName()))
                 .sorted());
     }
 

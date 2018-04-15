@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.match.rule.reason;
 
+import static java.lang.String.format;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.F2F;
 
 import lombok.AllArgsConstructor;
@@ -23,6 +24,15 @@ public class F2fReason implements Reason {
 
     @Override
     public int compareTo(Reason r) {
-        return 1 - ((F2fReason) r).won;
+        return ((F2fReason) r).won - won;
+    }
+
+    private static final String[] WON_PATTERNS = new String[] {
+            "F2F: %d > %d",
+            "F2F: %d < %d"
+    };
+
+    public String toString() {
+        return format(WON_PATTERNS[won], uid.getId(), opponentUid.getId());
     }
 }

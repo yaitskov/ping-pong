@@ -4,6 +4,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.match.rule.GroupParticipantOrder.orderOf;
 import static org.dan.ping.pong.app.match.rule.filter.GroupMatchFilter.applyFilters;
+import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.AT_LEAST_ONE;
 import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.BOTH;
 import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.GROUP_ORDER_SERVICES_BY_RULE_NAME;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -96,7 +98,7 @@ public class GroupParticipantOrderService {
 
     private static class GroupSplitLoop {
         Reason lastWonLost;
-        Set<Uid> uids;
+        Set<Uid> uids = new HashSet<>();
     }
 
     private void orderStep(GroupOrderRule rule,
@@ -115,14 +117,11 @@ public class GroupParticipantOrderService {
             setScopes(ambiPos, rule, params);
             order.getAmbiguousPositions().remove(ambiPosI);
             final Supplier<Stream<MatchInfo>> matchesSupplier = matches(params, ambiPos);
+            final UidsProvider uidsProvider = new UidsProvider(
+                    ambiPos.getCompetingUids(), matchesSupplier);
             final Optional<Stream<? extends Reason>> score = service.score(
-                    matchesSupplier,
-                    new UidsProvider(ambiPos.getCompetingUids(), matchesSupplier),
-                    rule, params)
-                    .map(s -> (rule.getMatchParticipantScope() == BOTH
-                            || ambiPos.getCompetingUids().isEmpty())
-                            ? s
-                            : s.filter(wl -> ambiPos.getCompetingUids().contains(wl.getUid())));
+                    matchesSupplier, uidsProvider, rule, params)
+                    .map(s -> filterOutPairUids(s, rule, ambiPos));
             if (!score.isPresent()) {
                 order.getPositions().put(ambiPosI, ambiPos);
                 order.getAmbiguousPositions().add(ambiPosI);
@@ -132,46 +131,67 @@ public class GroupParticipantOrderService {
         }
     }
 
+    private Stream<? extends Reason> filterOutPairUids(Stream<? extends Reason> s,
+            GroupOrderRule rule, GroupPosition ambiPos) {
+        if (rule.getMatchParticipantScope() == AT_LEAST_ONE
+                && !ambiPos.getCompetingUids().isEmpty()) {
+            return s.filter(wl -> ambiPos.getCompetingUids()
+                    .contains(wl.getUid()));
+        }
+        return s;
+    }
+
     private void splitUidsIntoCompetingGroups(GroupParticipantOrder order,
             GroupPositionIdx ambiPosI, GroupPosition ambiPos,
             Optional<Stream<? extends Reason>> score) {
         final GroupSplitLoop loop = new GroupSplitLoop();
         final CounterInt counterInt = new CounterInt();
+        final GroupPositionIdx[] newGroupPosIdx = new GroupPositionIdx[] { ambiPosI };
         score.get().forEachOrdered(wl -> {
             if (loop.lastWonLost != null
                     && wl.compareTo(loop.lastWonLost) != 0) {
-                flush(order, ambiPosI, ambiPos, loop, counterInt);
+                flush(order, newGroupPosIdx[0], ambiPos, loop);
+                newGroupPosIdx[0] = ambiPosI.plus(counterInt.toInt());
                 loop.uids.clear();
-                loop.uids.add(wl.getUid());
             }
+            loop.uids.add(wl.getUid());
             counterInt.inc();
             loop.lastWonLost = wl;
         });
         if (loop.uids.isEmpty()) {
-            return ;
+            return;
         }
-        flush(order, ambiPosI, ambiPos, loop, counterInt);
+        flush(order, newGroupPosIdx[0], ambiPos, loop);
     }
 
     private void setScopes(GroupPosition ambiPos,
             GroupOrderRule rule, GroupRuleParams params) {
+        ambiPos.setRule(Optional.of(rule));
         ambiPos.setOutcomeScope(rule.getMatchOutcomeScope());
         ambiPos.setParticipantScope(rule.getMatchParticipantScope());
         ambiPos.setDisambiguationScope(params.getDisambiguationMode());
     }
 
     private void flush(GroupParticipantOrder order, GroupPositionIdx ambiPosI,
-            GroupPosition ambiPos, GroupSplitLoop loop, CounterInt counterInt) {
-        final GroupPositionIdx newGroupPosIdx = ambiPosI.plus(counterInt.toInt());
+            GroupPosition ambiPos, GroupSplitLoop loop) {
         final Set<Uid> competingUids = new HashSet<>(loop.uids);
-        order.getPositions().put(newGroupPosIdx,
-                GroupPosition.builder()
-                        .competingUids(competingUids)
-                        .previous(ambiPos)
-                        .reason(Optional.of(loop.lastWonLost))
-                        .build());
+        final GroupPosition gp = GroupPosition.builder()
+                .competingUids(competingUids)
+                .previous(ambiPos.getPrevious())
+                .matches(ambiPos.getMatches())
+                .reason(Optional.of(loop.lastWonLost))
+                .rule(ambiPos.getRule())
+                .outcomeScope(ambiPos.getOutcomeScope())
+                .participantScope(ambiPos.getParticipantScope())
+                .disambiguationScope(ambiPos.getDisambiguationScope())
+                .build();
+        final GroupPosition lostGp = order.getPositions().put(ambiPosI, gp);
+        if (lostGp != null) {
+            throw internalError("Group position [" + lostGp
+                    + "] is overridden by [" + gp + "] at idx = " + ambiPosI);
+        }
         if (loop.uids.size() > 1) {
-            order.getAmbiguousPositions().add(newGroupPosIdx);
+            order.getAmbiguousPositions().add(ambiPosI);
         }
     }
 }

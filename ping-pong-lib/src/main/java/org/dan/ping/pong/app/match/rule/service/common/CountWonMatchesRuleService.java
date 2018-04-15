@@ -43,7 +43,7 @@ public class CountWonMatchesRuleService implements GroupOrderRuleService {
         });
         return Optional.of(wons.entrySet()
                 .stream()
-                .map((e) -> ofEntry(e, WonMatches))
+                .map((e) -> ofEntry(e, getName()))
                 .sorted());
     }
 }

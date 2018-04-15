@@ -24,7 +24,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.CastingLotsDaoIf;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
@@ -49,7 +48,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -82,18 +80,6 @@ public class GroupService {
         return Optional.of(matches);
     }
 
-    public Map<Uid, BidSuccessInGroup> emptyMatchesState(
-            Function<Uid, BidState> participantState,
-            Collection<MatchInfo> allMatchesInGroup) {
-        return allMatchesInGroup.stream()
-                .map(MatchInfo::getParticipantIdScore)
-                .map(Map::keySet)
-                .flatMap(Collection::stream)
-                .collect(toMap(uid -> uid,
-                        uid -> new BidSuccessInGroup(uid, participantState.apply(uid)),
-                        (a, b) -> a));
-    }
-
     public Map<Integer, List<MatchInfo>> groupMatchesByGroup(TournamentMemState tournament) {
         return tournament.getMatches().values().stream()
                 .filter(minfo -> minfo.getGid().isPresent())
@@ -121,38 +107,6 @@ public class GroupService {
 
     @Inject
     private Sports sports;
-
-    public void aggMatch(TournamentMemState tournament, Map<Uid, BidSuccessInGroup> uid2Stat,
-            MatchInfo minfo) {
-        if (!minfo.getWinnerId().isPresent()) {
-            log.error("Match {} is not complete", minfo.getMid());
-            return;
-        }
-        final Uid winUid = minfo.getWinnerId().get();
-        final BidSuccessInGroup winner = uid2Stat.get(winUid);
-        final Uid lostUid = minfo.getOpponentUid(winUid).get();
-        final BidSuccessInGroup loser = uid2Stat.get(lostUid);
-
-        minfo.getParticipantScore(winUid)
-                .forEach(winner::winBalls);
-        minfo.getParticipantScore(winUid)
-                .forEach(loser::lostBalls);
-        minfo.getParticipantScore(lostUid)
-                .forEach(loser::winBalls);
-        minfo.getParticipantScore(lostUid)
-                .forEach(winner::lostBalls);
-
-        final Map<Uid, Integer> uid2Sets = sports.calcWonSets(tournament, minfo);
-
-        loser.wonSets(uid2Sets.get(lostUid));
-        loser.lostSets(uid2Sets.get(winUid));
-        winner.wonSets(uid2Sets.get(winUid));
-        winner.lostSets(uid2Sets.get(lostUid));
-
-        winner.win();
-        sports.findWinnerId(tournament, uid2Sets)
-                .ifPresent(uid -> loser.lost()); // walkover = 0
-    }
 
     public GroupPopulations populations(TournamentMemState tournament, int cid) {
         final List<GroupLink> groupLinks = tournament.getGroupsByCategory(cid).stream()

@@ -1,5 +1,7 @@
 package org.dan.ping.pong.app.match.rule;
 
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.match.rule.filter.DisambiguationScope.ORIGIN_MATCHES;
 import static org.dan.ping.pong.app.match.rule.filter.MatchOutcomeScope.JUST_NORMALLY_COMPLETE;
 import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.AT_LEAST_ONE;
@@ -16,6 +18,7 @@ import org.dan.ping.pong.app.match.rule.filter.FilterMarker;
 import org.dan.ping.pong.app.match.rule.filter.MatchOutcomeScope;
 import org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
+import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.match.rule.service.GroupRuleParams;
 
 import java.util.ArrayList;
@@ -29,12 +32,21 @@ import java.util.Set;
 @Builder
 public class GroupPosition {
     private Set<Uid> competingUids;
-    private List<MatchInfo> matches;
+    private Optional<Reason> reason = Optional.empty();
+    private Optional<GroupOrderRule> rule = Optional.empty();
     private MatchParticipantScope participantScope = AT_LEAST_ONE;
     private DisambiguationScope disambiguationScope = ORIGIN_MATCHES;
-    private MatchOutcomeScope outcomeScope = MatchOutcomeScope.ALL;
+    private MatchOutcomeScope outcomeScope = MatchOutcomeScope.ALL_MATCHES;
+    private List<MatchInfo> matches;
     private GroupPosition previous;
-    private Optional<Reason> reason = Optional.empty();
+
+    public static class GroupPositionBuilder {
+        MatchParticipantScope participantScope = AT_LEAST_ONE;
+        DisambiguationScope disambiguationScope = ORIGIN_MATCHES;
+        MatchOutcomeScope outcomeScope = MatchOutcomeScope.ALL_MATCHES;
+        Optional<Reason> reason = Optional.empty();
+        Optional<GroupOrderRule> rule = Optional.empty();
+    }
 
     public List<Optional<Reason>> reasonChain() {
         if (previous == null) {
@@ -95,5 +107,12 @@ public class GroupPosition {
                 throw internalError("unknown participant scope "
                         + participantScope);
         }
+    }
+
+    public String toString() {
+        return format("rule: %s; matches: %s;", rule,
+                ofNullable(matches).map(List::size)
+                        .map(String::valueOf)
+                        .orElse("null"));
     }
 }

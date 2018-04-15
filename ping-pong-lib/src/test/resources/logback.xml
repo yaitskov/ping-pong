@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="logback/defaults.xml" />
+    <include resource="logback/console-appender.xml" />
+    <logger name="org.dan" additivity="false" level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </logger>
+    <logger name="org.quartz" additivity="false" level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </logger>
+    <root level="WARN">
+        <appender-ref ref="CONSOLE" />
+    </root>
+    <logger name="com.zaxxer.hikari" additivity="false" level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </logger>
+</configuration>

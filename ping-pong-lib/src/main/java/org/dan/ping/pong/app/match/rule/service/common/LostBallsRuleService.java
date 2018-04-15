@@ -16,7 +16,7 @@ public class LostBallsRuleService extends WonBallsRuleService {
     }
 
     protected Function<Map.Entry<Uid, Integer>, Reason> reasonFactory() {
-        return (e) -> ofEntry(e, LostBalls);
+        return (e) -> ofEntry(e, getName());
     }
 
     protected int index(int i) {

@@ -47,7 +47,7 @@ public class WonBallsRuleService implements GroupOrderRuleService {
     }
 
     protected Function<Map.Entry<Uid, Integer>, Reason> reasonFactory() {
-        return (e) -> ofEntry(e, WonBalls);
+        return (e) -> ofEntry(e, getName());
     }
 
     protected int index(int i) {

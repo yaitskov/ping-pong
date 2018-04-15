@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.match.rule.service;
 
 import static java.util.stream.Collectors.toMap;
 
+import org.dan.ping.pong.app.match.rule.GroupParticipantOrderService;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.CountDirectOutcomeRuleService;
@@ -32,7 +33,8 @@ import java.util.Map;
         LostBallsRuleService.class,
         CountDirectOutcomeRuleService.class,
         CountDisambiguationMatchesRuleService.class,
-        DisambiguationPreviewRuleService.class
+        DisambiguationPreviewRuleService.class,
+        GroupParticipantOrderService.class
 })
 public class GroupOrderRuleServiceCtx {
     public static final String COUNT_WON_MATCHES = "countWonMatches";

@@ -1,13 +1,13 @@
 package org.dan.ping.pong.app.match.rule.service.common;
 
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.WonSets;
+import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.ofEntry;
 import static org.dan.ping.pong.app.match.rule.service.common.CountWonMatchesRuleService.SUM_INT;
 
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.UidsProvider;
-import org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.match.rule.service.GroupOrderRuleService;
@@ -56,7 +56,7 @@ public class WonSetsRuleService implements GroupOrderRuleService {
     }
 
     protected Function<Map.Entry<Uid, Integer>, Reason> reasonFactory() {
-        return (e) -> DecreasingIntScalarReason.ofEntry(e, WonBalls);
+        return (e) -> ofEntry(e, getName());
     }
 
     protected int index(int i) {

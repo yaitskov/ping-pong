@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.match.rule.rules.meta;
 
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.CountDisambiguationMatches;
-import static org.dan.ping.pong.app.match.rule.filter.MatchOutcomeScope.ALL;
+import static org.dan.ping.pong.app.match.rule.filter.MatchOutcomeScope.ALL_MATCHES;
 import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.AT_LEAST_ONE;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,7 +26,7 @@ public class CountDisambiguationMatchesRule implements GroupOrderRule {
     @Override
     @JsonIgnore
     public MatchOutcomeScope getMatchOutcomeScope() {
-        return ALL;
+        return ALL_MATCHES;
     }
 
     @Override
@@ -43,5 +43,9 @@ public class CountDisambiguationMatchesRule implements GroupOrderRule {
     @Override
     public void setMatchParticipantScope(MatchParticipantScope scope) {
         // skip
+    }
+
+    public String toString() {
+        return this.getClass().getSimpleName();
     }
 }

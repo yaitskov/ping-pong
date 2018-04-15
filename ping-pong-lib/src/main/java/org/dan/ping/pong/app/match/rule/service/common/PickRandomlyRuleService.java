@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.match.rule.service.common;
 
+import static java.lang.Integer.MAX_VALUE;
 import static java.util.Comparator.comparing;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -42,18 +43,21 @@ public class PickRandomlyRuleService implements GroupOrderRuleService {
         if (allUidsInOneGroup(gid)) {
             return of(uids.uids().stream()
                     .sorted(comparing(uid -> hash(gid, uid)))
-                    .map(uid -> ofIntD(uid, c.postInc(), Random)));
+                    .map(uid -> ofIntD(uid, c.postInc(), getName())));
         }
         final Map<Uid, Integer> uidGid = uids.uids().stream()
                 .collect(toMap(o -> o,
                         uid -> params.getTournament().getParticipant(uid).gid()));
         return of(uids.uids().stream()
                 .sorted(comparing(uid -> hash(uidGid.get(uid), uid)))
-                .map(uid -> ofIntD(uid, c.postInc(), Random)));
+                .map(uid -> ofIntD(uid, c.postInc(), getName())));
     }
 
-    private int hash(int gid, Uid uid) {
-        return (uid.getId() * (gid + 11) % 251 << 24) + uid.getId();
+    int hash(int gid, Uid uid) {
+        if ((gid & 1) == 1) {
+            return ((0x7F & (uid.getId() * gid) << 24) + uid.getId());
+        }
+        return -((0x7F & (uid.getId() * gid) << 24) + uid.getId());
     }
 
     private boolean allUidsInOneGroup(int gid) {

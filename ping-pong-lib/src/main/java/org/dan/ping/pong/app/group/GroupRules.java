@@ -37,6 +37,7 @@ public class GroupRules {
                     new SetsBalanceRule(),
                     COUNT_DIRECT_OUTCOME_RULE,
                     new BallsBalanceRule(),
+                    COUNT_DIRECT_OUTCOME_RULE,
                     PICK_RANDOMLY_RULE);
 
     public static final List<GroupOrderRule> WON_LOST_BASED_ORDER_RULES =
@@ -47,6 +48,7 @@ public class GroupRules {
                     COUNT_DIRECT_OUTCOME_RULE,
                     new WonBallsRule(),
                     new LostBallsRule(),
+                    COUNT_DIRECT_OUTCOME_RULE,
                     PICK_RANDOMLY_RULE);
 
     private int quits;

@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match.rule.rules.common;
 
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.F2F;
+import static org.dan.ping.pong.app.match.rule.filter.MatchOutcomeScope.ALL_MATCHES;
 import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.BOTH;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,7 +18,7 @@ public class CountDirectOutcomeRule implements GroupOrderRule {
     public static final CountDirectOutcomeRule COUNT_DIRECT_OUTCOME_RULE
             = new CountDirectOutcomeRule();
 
-    private MatchOutcomeScope matchOutcomeScope;
+    private MatchOutcomeScope matchOutcomeScope = ALL_MATCHES;
 
     @Override
     public OrderRuleName name() {
@@ -33,5 +34,9 @@ public class CountDirectOutcomeRule implements GroupOrderRule {
     @Override
     public void setMatchParticipantScope(MatchParticipantScope scope) {
         // drop
+    }
+
+    public String toString() {
+        return getClass().getSimpleName() + "(" + matchOutcomeScope + ")";
     }
 }

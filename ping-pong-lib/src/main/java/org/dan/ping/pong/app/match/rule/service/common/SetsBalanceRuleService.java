@@ -50,7 +50,7 @@ public class SetsBalanceRuleService implements GroupOrderRuleService {
         });
         return Optional.of(uid2SetsBalance.entrySet()
                 .stream()
-                .map((e) -> ofEntry(e, SetsBalance))
+                .map((e) -> ofEntry(e, getName()))
                 .sorted());
     }
 }

@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match.rule.reason;
 
 import static java.lang.Integer.compare;
+import static java.lang.String.format;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
@@ -36,5 +37,9 @@ public class DecreasingIntScalarReason implements Reason {
     @Override
     public int compareTo(Reason r) {
         return -compare(value, ((DecreasingIntScalarReason) r).value);
+    }
+
+    public String toString() {
+        return format("%s: %d", rule.name(), value);
     }
 }

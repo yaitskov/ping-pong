@@ -25,7 +25,7 @@ public class BallsBalanceRuleServiceTest {
     public static final List<MatchInfo> MATCHES_UIDS_2_3_4 = asList(
             MatchInfo.builder()
                     .participantIdScore(
-                            ImmutableMap.of(UID2, asList(0, 1),
+                            ImmutableMap.of(UID2, asList(0, 0),
                                     UID3, asList(6, 6)))
                     .build(),
             MatchInfo.builder()
@@ -51,8 +51,8 @@ public class BallsBalanceRuleServiceTest {
         assertThat(
                 sut.score(MATCHES_UIDS_2_3_4_S, UIDS_2_3_4, null, null)
                         .get().collect(toList()),
-                is(asList(ofIntD(UID3, 18, BallsBalance),
+                is(asList(ofIntD(UID3, 19, BallsBalance),
                         ofIntD(UID4, 5,BallsBalance),
-                        ofIntD(UID2, -23, BallsBalance))));
+                        ofIntD(UID2, -24, BallsBalance))));
     }
 }

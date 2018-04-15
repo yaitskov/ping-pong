@@ -22,7 +22,7 @@ public class LostBallsRuleServiceTest {
         assertThat(
                 sut.score(MATCHES_UIDS_2_3_4_S, UIDS_2_3_4, null, null)
                         .get().collect(toList()),
-                is(asList(ofIntD(UID3, 6, LostBalls),
+                is(asList(ofIntD(UID3, 5, LostBalls),
                         ofIntD(UID4, 12, LostBalls),
                         ofIntD(UID2, 24, LostBalls))));
     }

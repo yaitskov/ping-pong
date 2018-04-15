@@ -4,6 +4,7 @@ import static org.dan.ping.pong.app.match.rule.OrderRuleName.SetsBalance;
 import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.ofEntry;
 import static org.dan.ping.pong.app.match.rule.service.common.WonMatchesRuleService.SUM_INT;
 
+import lombok.Setter;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
@@ -23,6 +24,7 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
+@Setter
 public class SetsBalanceRuleService implements GroupOrderRuleService {
     @Inject
     private Sports sports;

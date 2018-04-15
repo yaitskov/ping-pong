@@ -24,6 +24,6 @@ public class WonBallsRuleServiceTest {
                         .get().collect(toList()),
                 is(asList(ofIntD(UID3, 24, WonBalls),
                         ofIntD(UID4, 17, WonBalls),
-                        ofIntD(UID2, 1, WonBalls))));
+                        ofIntD(UID2, 0, WonBalls))));
     }
 }

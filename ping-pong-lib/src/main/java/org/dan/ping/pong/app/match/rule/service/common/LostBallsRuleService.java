@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.match.rule.service.common;
 
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.LostBalls;
-import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.ofEntry;
+import static org.dan.ping.pong.app.match.rule.reason.IncreasingIntScalarReason.ofEntry;
 
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;

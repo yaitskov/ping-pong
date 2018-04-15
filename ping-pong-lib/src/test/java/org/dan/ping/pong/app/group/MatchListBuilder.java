@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.group;
 
 import static java.util.Collections.singletonList;
+import static org.dan.ping.pong.app.match.MatchTag.DISAMBIGUATION;
 
 import com.google.common.collect.ImmutableMap;
 import org.dan.ping.pong.app.bid.Uid;
@@ -24,8 +25,14 @@ public class MatchListBuilder {
         return this;
     }
 
-    public MatchListBuilder m(Uid u1, Integer g1, Uid u2, Integer g2) {
+    public MatchListBuilder om(Uid u1, Integer g1, Uid u2, Integer g2) {
         result.add(match(u1, g1, u2, g2, Optional.empty()));
+        return this;
+    }
+
+    public MatchListBuilder dm(Uid u1, Integer g1, Uid u2, Integer g2) {
+        result.add(match(u1, g1, u2, g2,
+                Optional.of(MatchTag.builder().prefix(DISAMBIGUATION).build())));
         return this;
     }
 

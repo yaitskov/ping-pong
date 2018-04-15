@@ -2,7 +2,7 @@ package org.dan.ping.pong.app.group;
 
 import static java.util.Arrays.asList;
 import static org.dan.ping.pong.app.group.ConsoleTournament.NO;
-import static org.dan.ping.pong.app.match.rule.rules.common.CountDirectOutcomeRule.COUNT_DIRECT_OUTCOME_RULE;
+import static org.dan.ping.pong.app.match.rule.rules.common.DirectOutcomeRule.DIRECT_OUTCOME_RULE;
 import static org.dan.ping.pong.app.match.rule.rules.common.PickRandomlyRule.PICK_RANDOMLY_RULE;
 
 import lombok.AccessLevel;
@@ -33,22 +33,22 @@ import java.util.Optional;
 public class GroupRules {
     public static final List<GroupOrderRule> BALANCE_BASED_ORDER_RULES =
             asList(new CountWonMatchesRule(),
-                    COUNT_DIRECT_OUTCOME_RULE,
+                    DIRECT_OUTCOME_RULE,
                     new SetsBalanceRule(),
-                    COUNT_DIRECT_OUTCOME_RULE,
+                    DIRECT_OUTCOME_RULE,
                     new BallsBalanceRule(),
-                    COUNT_DIRECT_OUTCOME_RULE,
+                    DIRECT_OUTCOME_RULE,
                     PICK_RANDOMLY_RULE);
 
     public static final List<GroupOrderRule> WON_LOST_BASED_ORDER_RULES =
             asList(new CountWonMatchesRule(),
-                    COUNT_DIRECT_OUTCOME_RULE,
+                    DIRECT_OUTCOME_RULE,
                     new WonSetsRule(),
                     new LostSetsRule(),
-                    COUNT_DIRECT_OUTCOME_RULE,
+                    DIRECT_OUTCOME_RULE,
                     new WonBallsRule(),
                     new LostBallsRule(),
-                    COUNT_DIRECT_OUTCOME_RULE,
+                    DIRECT_OUTCOME_RULE,
                     PICK_RANDOMLY_RULE);
 
     private int quits;

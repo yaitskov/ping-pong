@@ -4,7 +4,7 @@ import static org.dan.ping.pong.app.match.rule.OrderRuleName._DisambiguationPrev
 
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 
-public class PreviewDisambiguationRule extends CountDisambiguationMatchesRule {
+public class PreviewDisambiguationDirective extends UseDisambiguationMatchesDirective {
     @Override
     public OrderRuleName name() {
         return _DisambiguationPreview;

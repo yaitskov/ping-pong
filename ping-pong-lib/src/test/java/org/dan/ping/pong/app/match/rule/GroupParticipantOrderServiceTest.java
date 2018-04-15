@@ -6,6 +6,7 @@ import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.group.GroupServiceTest.GID;
 import static org.dan.ping.pong.app.group.GroupServiceTest.UID2;
+import static org.dan.ping.pong.app.match.rule.rules.common.DirectOutcomeRule.DIRECT_OUTCOME_RULE;
 import static org.dan.ping.pong.app.sport.SportType.PingPong;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -15,6 +16,12 @@ import static org.junit.Assert.assertThat;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.group.MatchListBuilder;
+import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
+import org.dan.ping.pong.app.match.rule.rules.common.BallsBalanceRule;
+import org.dan.ping.pong.app.match.rule.rules.common.CountWonMatchesRule;
+import org.dan.ping.pong.app.match.rule.rules.common.PickRandomlyRule;
+import org.dan.ping.pong.app.match.rule.rules.common.SetsBalanceRule;
+import org.dan.ping.pong.app.match.rule.rules.meta.UseDisambiguationMatchesDirective;
 import org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx;
 import org.dan.ping.pong.app.match.rule.service.GroupRuleParams;
 import org.dan.ping.pong.app.sport.SportCtx;
@@ -35,6 +42,22 @@ import javax.inject.Inject;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {GroupOrderRuleServiceCtx.class, SportCtx.class})
 public class GroupParticipantOrderServiceTest {
+    public static final List<GroupOrderRule> BALANCE_BASED_DM_ORDER_RULES =
+            asList(new CountWonMatchesRule(),
+                    DIRECT_OUTCOME_RULE,
+                    new SetsBalanceRule(),
+                    DIRECT_OUTCOME_RULE,
+                    new BallsBalanceRule(),
+                    DIRECT_OUTCOME_RULE,
+                    new UseDisambiguationMatchesDirective(),
+                    new CountWonMatchesRule(),
+                    DIRECT_OUTCOME_RULE,
+                    new SetsBalanceRule(),
+                    DIRECT_OUTCOME_RULE,
+                    new BallsBalanceRule(),
+                    DIRECT_OUTCOME_RULE,
+                    new PickRandomlyRule());
+
     public static final Uid UID3 = new Uid(3);
     public static final Uid UID4 = new Uid(4);
     public static final Uid UID5 = new Uid(5);
@@ -80,14 +103,31 @@ public class GroupParticipantOrderServiceTest {
         checkOrder(asList(UID2, UID5, UID4, UID3),
                 sut.findOrder(params(GID, tournamentForOrder(),
                         MatchListBuilder.matches()
-                                .m(UID2, 11, UID4, 1)
-                                .m(UID2, 11, UID5, 1)
+                                .om(UID2, 11, UID4, 1)
+                                .om(UID2, 11, UID5, 1)
 
-                                .m(UID2, 1, UID3, 11)
-                                .m(UID4, 11, UID3, 1)
+                                .om(UID2, 1, UID3, 11)
+                                .om(UID4, 11, UID3, 1)
 
-                                .m(UID5,  11, UID3, 1)
-                                .m(UID5,  11, UID4, 1))));
+                                .om(UID5,  11, UID3, 1)
+                                .om(UID5,  11, UID4, 1))));
+    }
+
+    @Test
+    public void orderUidsWithDisambiguateMatches() {
+        final TournamentMemState tournament = tournamentForOrder();
+        tournament.getRule().getGroup().get()
+                .setOrderRules(BALANCE_BASED_DM_ORDER_RULES);
+        checkOrder(asList(UID2, UID4, UID3),
+                sut.findOrder(params(GID, tournament,
+                        MatchListBuilder.matches()
+                                .om(UID2, 11, UID4, 1)
+                                .om(UID2, 1, UID3, 11)
+                                .om(UID4, 11, UID3, 1)
+
+                                .dm(UID2, 11, UID4, 1)
+                                .dm(UID2, 11, UID3, 9)
+                                .dm(UID4, 11, UID3, 1))));
     }
 
     @Test
@@ -96,9 +136,9 @@ public class GroupParticipantOrderServiceTest {
                 sut.findOrder(params(GID, tournamentForOrder(),
                         MatchListBuilder.matches()
                                 .ogid(GID)
-                                .m(UID2, 11, UID4, 1)
-                                .m(UID2, 2, UID3, 11)
-                                .m(UID4, 11, UID3, 3))));
+                                .om(UID2, 11, UID4, 1)
+                                .om(UID2, 2, UID3, 11)
+                                .om(UID4, 11, UID3, 3))));
     }
 
     @Test
@@ -106,20 +146,20 @@ public class GroupParticipantOrderServiceTest {
         checkOrder(asList(UID6, UID4, UID5, UID2, UID3),
                 sut.findOrder(params(GID, tournamentForOrder(),
                         MatchListBuilder.matches().ogid(21)
-                                .m(UID2, 11, UID4, 2)
-                                .m(UID2, 11, UID5, 1)
+                                .om(UID2, 11, UID4, 2)
+                                .om(UID2, 11, UID5, 1)
 
-                                .m(UID3, 11, UID2, 2)
-                                .m(UID3, 11, UID4, 1)
+                                .om(UID3, 11, UID2, 2)
+                                .om(UID3, 11, UID4, 1)
 
-                                .m(UID4, 11, UID6, 2)
-                                .m(UID4, 11, UID5, 1)
+                                .om(UID4, 11, UID6, 2)
+                                .om(UID4, 11, UID5, 1)
 
-                                .m(UID5, 11, UID3, 1)
-                                .m(UID5, 11, UID6, 1)
+                                .om(UID5, 11, UID3, 1)
+                                .om(UID5, 11, UID6, 1)
 
-                                .m(UID6, 11, UID2, 1)
-                                .m(UID6, 11, UID3, 1))));
+                                .om(UID6, 11, UID2, 1)
+                                .om(UID6, 11, UID3, 1))));
     }
 
     @Test
@@ -135,8 +175,8 @@ public class GroupParticipantOrderServiceTest {
     private GroupParticipantOrder randomOrder(TournamentMemState tournament, int gid) {
         return sut.findOrder(params(gid, tournament,
                 MatchListBuilder.matches().ogid(gid)
-                        .m(UID2, 11, UID4, 0)
-                        .m(UID2, 0, UID3, 11)
-                        .m(UID4, 11, UID3, 0)));
+                        .om(UID2, 11, UID4, 0)
+                        .om(UID2, 0, UID3, 11)
+                        .om(UID4, 11, UID3, 0)));
     }
 }

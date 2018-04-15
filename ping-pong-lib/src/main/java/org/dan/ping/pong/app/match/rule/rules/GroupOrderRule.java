@@ -14,12 +14,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.rules.attrs.CompletenessScoped;
 import org.dan.ping.pong.app.match.rule.rules.attrs.ParticipantScoped;
-import org.dan.ping.pong.app.match.rule.rules.common.CountDirectOutcomeRule;
+import org.dan.ping.pong.app.match.rule.rules.common.DirectOutcomeRule;
 import org.dan.ping.pong.app.match.rule.rules.common.CountWonMatchesRule;
 import org.dan.ping.pong.app.match.rule.rules.common.PickRandomlyRule;
 import org.dan.ping.pong.app.match.rule.rules.common.BallsBalanceRule;
 import org.dan.ping.pong.app.match.rule.rules.common.SetsBalanceRule;
-import org.dan.ping.pong.app.match.rule.rules.meta.CountDisambiguationMatchesRule;
+import org.dan.ping.pong.app.match.rule.rules.meta.UseDisambiguationMatchesDirective;
 import org.dan.ping.pong.app.match.rule.rules.ping.CountJustPunktsRule;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -28,9 +28,9 @@ import org.dan.ping.pong.app.match.rule.rules.ping.CountJustPunktsRule;
         include = JsonTypeInfo.As.PROPERTY)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = PickRandomlyRule.class, name = RANDOM),
-        @JsonSubTypes.Type(value = CountDirectOutcomeRule.class, name = F2F),
+        @JsonSubTypes.Type(value = DirectOutcomeRule.class, name = F2F),
         @JsonSubTypes.Type(value = CountJustPunktsRule.class, name = COUNT_JUST_PUNKTS),
-        @JsonSubTypes.Type(value = CountDisambiguationMatchesRule.class, name = COUNT_DM_MATCHES),
+        @JsonSubTypes.Type(value = UseDisambiguationMatchesDirective.class, name = COUNT_DM_MATCHES),
         @JsonSubTypes.Type(value = SetsBalanceRule.class, name = USE_SETS),
         @JsonSubTypes.Type(value = BallsBalanceRule.class, name = USE_BALLS),
         @JsonSubTypes.Type(value = CountWonMatchesRule.class, name = COUNT_WON_MATCHES)

@@ -15,7 +15,7 @@ import org.dan.ping.pong.app.sport.MatchRules;
 
 @Getter
 @Setter
-public class CountDisambiguationMatchesRule implements GroupOrderRule {
+public class UseDisambiguationMatchesDirective implements GroupOrderRule {
     private MatchRules matchRules;
 
     @Override

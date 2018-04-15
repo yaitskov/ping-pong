@@ -34,7 +34,7 @@ import org.dan.ping.pong.app.match.NoDisambiguateMatchesException;
 import org.dan.ping.pong.app.match.rule.GroupParticipantOrder;
 import org.dan.ping.pong.app.match.rule.GroupParticipantOrderService;
 import org.dan.ping.pong.app.match.rule.GroupPosition;
-import org.dan.ping.pong.app.match.rule.rules.meta.PreviewDisambiguationRule;
+import org.dan.ping.pong.app.match.rule.rules.meta.PreviewDisambiguationDirective;
 import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -278,7 +278,7 @@ public class GroupService {
                 ofParams(0, tournament, allGroupMatches,
                         tournament.orderRules().stream()
                                 .map(r -> r.name() == UseDisambiguationMatches
-                                        ? new PreviewDisambiguationRule()
+                                        ? new PreviewDisambiguationDirective()
                                         : r)
                                 .collect(toList())));
 

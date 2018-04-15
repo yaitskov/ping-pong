@@ -14,9 +14,8 @@ import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 
 @Getter
 @Setter
-public class CountDirectOutcomeRule implements GroupOrderRule {
-    public static final CountDirectOutcomeRule COUNT_DIRECT_OUTCOME_RULE
-            = new CountDirectOutcomeRule();
+public class DirectOutcomeRule implements GroupOrderRule {
+    public static final DirectOutcomeRule DIRECT_OUTCOME_RULE = new DirectOutcomeRule();
 
     private MatchOutcomeScope matchOutcomeScope = ALL_MATCHES;
 

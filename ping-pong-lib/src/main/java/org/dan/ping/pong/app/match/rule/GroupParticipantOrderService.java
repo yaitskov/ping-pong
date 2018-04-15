@@ -5,7 +5,6 @@ import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.match.rule.GroupParticipantOrder.orderOf;
 import static org.dan.ping.pong.app.match.rule.filter.GroupMatchFilter.applyFilters;
 import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.AT_LEAST_ONE;
-import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.BOTH;
 import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.GROUP_ORDER_SERVICES_BY_RULE_NAME;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
@@ -23,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

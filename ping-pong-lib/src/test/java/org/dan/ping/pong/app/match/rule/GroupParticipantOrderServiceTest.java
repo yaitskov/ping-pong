@@ -32,6 +32,8 @@ import org.dan.ping.pong.app.group.MatchListBuilder;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.match.rule.rules.common.BallsBalanceRule;
+import org.dan.ping.pong.app.match.rule.rules.common.CountWonMatchesRule;
+import org.dan.ping.pong.app.match.rule.rules.common.DirectOutcomeRule;
 import org.dan.ping.pong.app.match.rule.rules.common.PickRandomlyRule;
 import org.dan.ping.pong.app.match.rule.rules.common.SetsBalanceRule;
 import org.dan.ping.pong.app.match.rule.rules.meta.UseDisambiguationMatchesDirective;
@@ -243,6 +245,28 @@ public class GroupParticipantOrderServiceTest {
                         UID4, singletonList(WonMatches),
                         UID3, singletonList(WonMatches),
                         UID2, singletonList(WonMatches)),
+                emptySet());
+    }
+
+    @Test
+    public void allMatchesToNormallyComplete() {
+        final TournamentMemState tournament = tournamentForOrder();
+        List<GroupOrderRule> rules = asList(new CountWonMatchesRule(),
+                new CountWonMatchesRule(), new DirectOutcomeRule());
+        rules.get(1).setMatchOutcomeScope(JUST_NORMALLY_COMPLETE);
+        tournament.getRule().getGroup().get().setOrderRules(rules);
+
+        checkOrder(uidSets(UID4, UID3, UID2),
+                sut.findOrder(params(GID, tournament,
+                        MatchListBuilder.matches()
+                                .ogid(GID)
+                                .brokenMatch(UID2, 10, UID4, 1)
+                                .om(UID2, 1, UID3, 11)
+                                .om(UID4, 11, UID3, 1), UIDS_2_3_4)),
+                ImmutableMap.of(
+                        UID4, asList(WonMatches, WonMatches, F2F),
+                        UID3, asList(WonMatches, WonMatches, F2F),
+                        UID2, asList(WonMatches, WonMatches)),
                 emptySet());
     }
 

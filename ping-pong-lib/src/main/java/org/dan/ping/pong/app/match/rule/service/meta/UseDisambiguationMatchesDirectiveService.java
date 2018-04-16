@@ -2,15 +2,16 @@ package org.dan.ping.pong.app.match.rule.service.meta;
 
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
-import org.dan.ping.pong.app.match.rule.UidsProvider;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.match.rule.service.GroupOrderRuleService;
 import org.dan.ping.pong.app.match.rule.service.GroupRuleParams;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -28,7 +29,7 @@ public class UseDisambiguationMatchesDirectiveService
     @Override
     public Optional<Stream<? extends Reason>> score(
             Supplier<Stream<MatchInfo>> disamMatchesSupplier,
-            UidsProvider uids, GroupOrderRule _rule,
+            Set<Uid> uids, GroupOrderRule _rule,
             GroupRuleParams params) {
         final int expectedMatches = matchesInGroup(uids.size());
         final long actualMatches = disamMatchesSupplier.get().count();

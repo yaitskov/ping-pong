@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
-import org.dan.ping.pong.app.match.rule.UidsProvider;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.match.rule.service.GroupOrderRuleService;
@@ -19,6 +18,7 @@ import org.dan.ping.pong.app.tournament.TournamentMemState;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -37,7 +37,7 @@ public class SetsBalanceRuleService implements GroupOrderRuleService {
     @Override
     public Optional<Stream<? extends Reason>> score(
             Supplier<Stream<MatchInfo>> matches,
-            UidsProvider _uids,
+            Set<Uid> _uids,
             GroupOrderRule rule, GroupRuleParams params) {
 
         final Map<Uid, Integer> uid2SetsBalance = new HashMap<>();

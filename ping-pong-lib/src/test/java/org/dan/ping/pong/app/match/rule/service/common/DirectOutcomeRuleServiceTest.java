@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.match.rule.UidsProvider;
 import org.dan.ping.pong.app.match.rule.reason.F2fReason;
 import org.dan.ping.pong.sys.error.PiPoEx;
 import org.junit.Test;
@@ -28,7 +27,7 @@ public class DirectOutcomeRuleServiceTest {
     public void skipGroupWithMoreThat2Uids() {
         assertThat(
                 sut.score(FAILING_SUPPLIER,
-                        new UidsProvider(ImmutableSet.of(UID2, UID3, UID4), FAILING_SUPPLIER),
+                        ImmutableSet.of(UID2, UID3, UID4),
                         null, null),
                 is(Optional.empty()));
     }
@@ -36,7 +35,7 @@ public class DirectOutcomeRuleServiceTest {
     @Test(expected = PiPoEx.class)
     public void errorIfMoreThat1Match() {
         sut.score(() -> Stream.of(new MatchInfo(), new MatchInfo()),
-                new UidsProvider(ImmutableSet.of(UID2, UID3), FAILING_SUPPLIER),
+                ImmutableSet.of(UID2, UID3),
                 null, null);
     }
 
@@ -46,8 +45,7 @@ public class DirectOutcomeRuleServiceTest {
                 sut.score(() -> Stream.of(MatchInfo.builder()
                                 .winnerId(Optional.empty())
                                 .build()),
-                        new UidsProvider(ImmutableSet.of(UID2, UID3),
-                                FAILING_SUPPLIER),
+                        ImmutableSet.of(UID2, UID3),
                         null, null),
                 is(Optional.empty()));
     }
@@ -61,8 +59,7 @@ public class DirectOutcomeRuleServiceTest {
                                         UID2, emptyList(),
                                         UID3, emptyList()))
                                 .build()),
-                        new UidsProvider(ImmutableSet.of(UID2, UID3),
-                                FAILING_SUPPLIER),
+                        ImmutableSet.of(UID2, UID3),
                         null, null).get().collect(toList()),
                 is(asList(F2fReason.builder()
                                 .won(1)

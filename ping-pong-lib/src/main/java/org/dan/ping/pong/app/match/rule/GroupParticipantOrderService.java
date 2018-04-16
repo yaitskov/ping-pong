@@ -116,10 +116,8 @@ public class GroupParticipantOrderService {
             setScopes(ambiPos, rule, params);
             order.getAmbiguousPositions().remove(ambiPosI);
             final Supplier<Stream<MatchInfo>> matchesSupplier = matches(params, ambiPos);
-            final UidsProvider uidsProvider = new UidsProvider(
-                    ambiPos.getCompetingUids(), matchesSupplier);
             final Optional<Stream<? extends Reason>> score = service.score(
-                    matchesSupplier, uidsProvider, rule, params)
+                    matchesSupplier, ambiPos.getCompetingUids(), rule, params)
                     .map(s -> filterOutPairUids(s, rule, ambiPos));
             if (!score.isPresent()) {
                 order.getPositions().put(ambiPosI, ambiPos);

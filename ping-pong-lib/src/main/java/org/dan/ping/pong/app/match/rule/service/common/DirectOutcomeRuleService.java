@@ -6,7 +6,6 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
-import org.dan.ping.pong.app.match.rule.UidsProvider;
 import org.dan.ping.pong.app.match.rule.reason.F2fReason;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
@@ -15,6 +14,7 @@ import org.dan.ping.pong.app.match.rule.service.GroupRuleParams;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,7 +28,7 @@ public class DirectOutcomeRuleService implements GroupOrderRuleService {
     @Override
     public Optional<Stream<? extends Reason>> score(
             Supplier<Stream<MatchInfo>> matches,
-            UidsProvider uids,
+            Set<Uid> uids,
             GroupOrderRule rule, GroupRuleParams params) {
         if (uids.size() != 2) {
             return Optional.empty();
@@ -60,8 +60,8 @@ public class DirectOutcomeRuleService implements GroupOrderRuleService {
                 });
     }
 
-    private void checkMatchUid(UidsProvider uids, MatchInfo m, Uid wid) {
-        if (!uids.uids().contains(wid)) {
+    private void checkMatchUid(Set<Uid> uids, MatchInfo m, Uid wid) {
+        if (!uids.contains(wid)) {
             throw internalError("F2f rule uids mismatch "
                     + wid + " in mid " + m.getMid());
         }

@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.match.rule.service.common;
 
+import static java.util.Collections.*;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -17,7 +18,6 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.match.rule.UidsProvider;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.match.rule.rules.common.PickRandomlyRule;
 import org.dan.ping.pong.app.match.rule.service.GroupRuleParams;
@@ -25,6 +25,7 @@ import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,7 +45,7 @@ public class PickRandomlyRuleServiceTest {
 
     @Test
     public void returnIfDisambuationMatchesCreated() {
-        final GroupRuleParams params = GroupRuleParams.ofParams(1, null, null, null);
+        final GroupRuleParams params = GroupRuleParams.ofParams(1, null, null, null, singleton(null));
         params.setDisambiguationMatchesWillBeCreated(true);
         assertThat(sut.score(FAILING_SUPPLIER, null,
                 new PickRandomlyRule(), params),
@@ -53,7 +54,7 @@ public class PickRandomlyRuleServiceTest {
 
     @Test
     public void shuffleOneGroup() {
-        final UidsProvider uidsProvider = uids(ImmutableSet.of(UID3, UID4, UID5));
+        final Set<Uid> uidsProvider = ImmutableSet.of(UID3, UID4, UID5);
         List<Uid> uids = shuffle(uidsProvider, 3);
         assertThat(uids, is(shuffle(uidsProvider, 3)));
         assertThat(uids, not(is(shuffle(uidsProvider, 2))));
@@ -61,7 +62,7 @@ public class PickRandomlyRuleServiceTest {
 
     @Test
     public void keepOrderWithInGroupWhenShuffleManyGroups() {
-        final UidsProvider uidsProvider = uids(ImmutableSet.of(UID3, UID4, UID5, UID6, UID7, UID8));
+        final Set<Uid> uidsProvider = ImmutableSet.of(UID3, UID4, UID5, UID6, UID7, UID8);
         final TournamentMemState tournament = tournamentWithParticipants(uidsProvider);
         final List<Uid> g1Uids = shuffleOneGroup(tournament, 1);
         final List<Uid> g2Uids = shuffleOneGroup(tournament, 2);
@@ -74,7 +75,7 @@ public class PickRandomlyRuleServiceTest {
 
     @Test
     public void mixUidsFromDifferentGroups() {
-        final UidsProvider uidsProvider = uids(ImmutableSet.of(UID3, UID4, UID5, UID6, UID7, UID8));
+        final Set<Uid> uidsProvider = ImmutableSet.of(UID3, UID4, UID5, UID6, UID7, UID8);
         final TournamentMemState tournament = tournamentWithParticipants(uidsProvider);
         final Map<Integer, Integer> gidUids = shuffle(uidsProvider, 0, tournament)
                 .stream()
@@ -87,9 +88,9 @@ public class PickRandomlyRuleServiceTest {
         assertThat(gidUids.get(1), allOf(greaterThan(0), lessThan(3)));
     }
 
-    private TournamentMemState tournamentWithParticipants(UidsProvider uidsProvider) {
+    private TournamentMemState tournamentWithParticipants(Set<Uid> uidsProvider) {
         return TournamentMemState.builder()
-                .participants(uidsProvider.uids().stream()
+                .participants(uidsProvider.stream()
                         .collect(toMap(o -> o, o -> ParticipantMemState
                                 .builder()
                                 .uid(o)
@@ -109,24 +110,21 @@ public class PickRandomlyRuleServiceTest {
     }
 
     private List<Uid> shuffleOneGroup(TournamentMemState tournament, int gid) {
-        return shuffle(uids(tournament.getParticipants().values()
+        return shuffle(tournament.getParticipants().values()
                 .stream().filter(p -> p.getGid().get().equals(gid))
                 .map(ParticipantMemState::getUid)
-                .collect(toSet())), gid);
+                .collect(toSet()), gid);
     }
 
-    private UidsProvider uids(Set<Uid> of) {
-        return new UidsProvider(of, FAILING_SUPPLIER);
-    }
-
-    private List<Uid> shuffle(UidsProvider uidsProvider, int gid) {
+    private List<Uid> shuffle(Set<Uid> uidsProvider, int gid) {
         return shuffle(uidsProvider, gid, null);
     }
 
-    private List<Uid> shuffle(UidsProvider uidsProvider, int gid,
+    private List<Uid> shuffle(Set<Uid> uidsProvider, int gid,
             TournamentMemState tournament) {
         return sut.score(FAILING_SUPPLIER, uidsProvider,
-                new PickRandomlyRule(), GroupRuleParams.ofParams(gid, tournament, null, null))
+                new PickRandomlyRule(),
+                GroupRuleParams.ofParams(gid, tournament, null, null, uidsProvider))
                 .get()
                 .map(Reason::getUid)
                 .collect(toList());

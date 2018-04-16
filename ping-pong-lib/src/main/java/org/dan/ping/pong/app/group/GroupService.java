@@ -98,7 +98,8 @@ public class GroupService {
     public List<Uid> orderUidsInGroup(int gid, TournamentMemState tournament,
             List<MatchInfo> groupMatches) {
         final GroupParticipantOrder orderedUids = groupParticipantOrderService
-                .findOrder(ofParams(gid, tournament, groupMatches, tournament.orderRules()));
+                .findOrder(ofParams(gid, tournament, groupMatches, tournament.orderRules(),
+                        tournament.uidsInGroup(gid)));
         if (orderedUids.unambiguous()) {
             return orderedUids.determinedUids();
         }
@@ -160,7 +161,8 @@ public class GroupService {
 
         final List<MatchInfo> groupMatches = findAllMatchesInGroup(tournament, gid);
         final GroupParticipantOrder order = groupParticipantOrderService.findOrder(
-                ofParams(gid, tournament, groupMatches, tournament.orderRules()));
+                ofParams(gid, tournament, groupMatches, tournament.orderRules(),
+                        tournament.uidsInGroup(gid)));
 
         final List<ParticipantMemState> seedBidsOrder = rankingService
                 .sort(groupBids(tournament, gid), rules.getCasting(), tournament);
@@ -280,7 +282,8 @@ public class GroupService {
                                 .map(r -> r.name() == UseDisambiguationMatches
                                         ? new PreviewDisambiguationDirective()
                                         : r)
-                                .collect(toList())));
+                                .collect(toList()),
+                        tournament.uidsInCategory(cid)));
 
         return order.getPositions().values()
                 .stream()

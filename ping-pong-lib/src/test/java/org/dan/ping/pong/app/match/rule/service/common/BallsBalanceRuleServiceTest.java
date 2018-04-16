@@ -9,18 +9,18 @@ import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.
 import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID4;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.BallsBalance;
 import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.ofIntD;
-import static org.dan.ping.pong.app.match.rule.service.common.PickRandomlyRuleServiceTest.FAILING_SUPPLIER;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.match.rule.UidsProvider;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -50,8 +50,7 @@ public class BallsBalanceRuleServiceTest {
 
     public static final Supplier<Stream<MatchInfo>> MATCHES_UIDS_2_3_4_S = MATCHES_UIDS_2_3_4::stream;
 
-    public static final UidsProvider UIDS_2_3_4 = new UidsProvider(
-            ImmutableSet.of(UID2, UID3, UID4), FAILING_SUPPLIER);
+    public static final Set<Uid> UIDS_2_3_4 = ImmutableSet.of(UID2, UID3, UID4);
 
     private BallsBalanceRuleService sut = new BallsBalanceRuleService();
 

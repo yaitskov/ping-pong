@@ -15,6 +15,7 @@ import static org.dan.ping.pong.app.match.rule.OrderRuleName.Punkts;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.SetsBalance;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 import static org.dan.ping.pong.app.match.rule.rules.common.DirectOutcomeRule.DIRECT_OUTCOME_RULE;
+import static org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleServiceTest.UIDS_2_3_4;
 import static org.dan.ping.pong.app.sport.SportType.PingPong;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -46,6 +47,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -77,6 +79,9 @@ public class GroupParticipantOrderServiceTest {
     public static final Uid UID5 = new Uid(5);
     public static final int GID2 = 2;
     public static final Uid UID6 = new Uid(6);
+
+    private static final Set<Uid> UIDS_2_3_4_5 = ImmutableSet.of(UID2, UID3, UID4, UID5);
+    private static final Set<Uid> UIDS_2_3_4_5_6 = ImmutableSet.of(UID2, UID3, UID4, UID5, UID6);
 
     private static final PingPongMatchRules S1A2G11 = PingPongMatchRules.builder()
             .setsToWin(1)
@@ -131,9 +136,9 @@ public class GroupParticipantOrderServiceTest {
     }
 
     private GroupRuleParams params(int gid, TournamentMemState tournament,
-            MatchListBuilder matchListBuilder) {
+            MatchListBuilder matchListBuilder, Set<Uid> uids) {
         return GroupRuleParams.ofParams(gid, tournament,
-                matchListBuilder.build(), tournament.orderRules());
+                matchListBuilder.build(), tournament.orderRules(), new HashSet<>(uids));
     }
 
     @Test
@@ -148,7 +153,7 @@ public class GroupParticipantOrderServiceTest {
                                 .om(UID4, 11, UID3, 1)
 
                                 .om(UID5,  11, UID3, 1)
-                                .om(UID5,  11, UID4, 1))));
+                                .om(UID5,  11, UID4, 1), UIDS_2_3_4_5)));
     }
 
     @Test
@@ -165,7 +170,7 @@ public class GroupParticipantOrderServiceTest {
 
                                 .dm(UID2, 11, UID4, 1)
                                 .dm(UID2, 11, UID3, 9)
-                                .dm(UID4, 11, UID3, 1))),
+                                .dm(UID4, 11, UID3, 1), UIDS_2_3_4)),
                 ImmutableMap.of(
                         UID2, asList(Punkts, F2F, SetsBalance, F2F, BallsBalance,
                                 F2F, UseDisambiguationMatches, Punkts),
@@ -189,7 +194,7 @@ public class GroupParticipantOrderServiceTest {
                         MatchListBuilder.matches()
                                 .om(UID2, 11, UID4, 1)
                                 .om(UID2, 1, UID3, 11)
-                                .om(UID4, 11, UID3, 1))),
+                                .om(UID4, 11, UID3, 1), UIDS_2_3_4)),
                 singleton(new GroupPositionIdx(0)));
     }
 
@@ -201,7 +206,7 @@ public class GroupParticipantOrderServiceTest {
                                 .ogid(GID)
                                 .om(UID2, 11, UID4, 1)
                                 .om(UID2, 2, UID3, 11)
-                                .om(UID4, 11, UID3, 3))));
+                                .om(UID4, 11, UID3, 3), UIDS_2_3_4)));
     }
 
     @Test
@@ -222,7 +227,7 @@ public class GroupParticipantOrderServiceTest {
                                 .om(UID5, 11, UID6, 1)
 
                                 .om(UID6, 11, UID2, 1)
-                                .om(UID6, 11, UID3, 1))));
+                                .om(UID6, 11, UID3, 1), UIDS_2_3_4_5_6)));
     }
 
     @Test
@@ -240,6 +245,6 @@ public class GroupParticipantOrderServiceTest {
                 MatchListBuilder.matches().ogid(gid)
                         .om(UID2, 11, UID4, 0)
                         .om(UID2, 0, UID3, 11)
-                        .om(UID4, 11, UID3, 0)));
+                        .om(UID4, 11, UID3, 0), UIDS_2_3_4));
     }
 }

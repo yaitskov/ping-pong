@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.tournament;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
@@ -204,5 +205,18 @@ public class TournamentMemState {
     public List<MatchInfo> findGroupMatchesByCategory(int cid) {
         return matches.values().stream().filter(m -> m.getCid() == cid)
                 .collect(toList());
+    }
+
+    public Set<Uid> uidsInGroup(int gid) {
+        final Optional<Integer> ogid = Optional.of(gid);
+        return participants.values().stream().filter(p -> p.getGid().equals(ogid))
+                .map(ParticipantMemState::getUid)
+                .collect(toSet());
+    }
+
+    public Set<Uid> uidsInCategory(int cid) {
+        return participants.values().stream().filter(p -> p.getCid() == cid)
+                .map(ParticipantMemState::getUid)
+                .collect(toSet());
     }
 }

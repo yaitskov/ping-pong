@@ -260,12 +260,15 @@ public class AffectedMatchesService {
             List<MatchInfo> allNewGroupMatches,
             boolean noNewIncompleteMatches) {
         final int gid = allGroupMatches.get(0).groupId();
+        final Set<Uid> groupUids = tournament.uidsInGroup(gid);
         final GroupParticipantOrder order = groupParticipantOrderService
                 .findOrder(ofParams(gid, tournament, allGroupMatches,
-                        tournament.orderRules()));
+                        tournament.orderRules(),
+                        groupUids));
         final GroupParticipantOrder newOrder = groupParticipantOrderService
                 .findOrder(ofParams(gid, tournament, allNewGroupMatches,
-                        tournament.orderRules()));
+                        tournament.orderRules(),
+                        groupUids));
 
         validate(tournament, allNewGroupMatches,
                 noNewIncompleteMatches, newOrder);
@@ -308,9 +311,11 @@ public class AffectedMatchesService {
 
     private AffectedMatches findPossibleDisambiguationMatchesToGenerate(
             TournamentMemState tournament, List<MatchInfo> originMatches) {
+        final int gid = originMatches.get(0).groupId();
         final GroupParticipantOrder order = groupParticipantOrderService
-                .findOrder(ofParams(originMatches.get(0).groupId(),
-                        tournament, originMatches, tournament.orderRules()));
+                .findOrder(ofParams(gid,
+                        tournament, originMatches, tournament.orderRules(),
+                        tournament.uidsInGroup(gid)));
 
         if (order.unambiguous()) {
             return NO_AFFECTED_MATCHES;

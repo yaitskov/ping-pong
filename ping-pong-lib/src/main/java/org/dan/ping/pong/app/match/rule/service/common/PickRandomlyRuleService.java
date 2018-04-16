@@ -10,7 +10,6 @@ import com.google.common.collect.Multimap;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
-import org.dan.ping.pong.app.match.rule.UidsProvider;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.match.rule.service.GroupOrderRuleService;
@@ -25,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -44,7 +44,7 @@ public class PickRandomlyRuleService implements GroupOrderRuleService {
     @Override
     public Optional<Stream<? extends Reason>> score(
             Supplier<Stream<MatchInfo>> _matches,
-            UidsProvider uids,
+            Set<Uid> uids,
             GroupOrderRule rule,
             GroupRuleParams params) {
         if (params.isDisambiguationMatchesWillBeCreated()) {
@@ -53,11 +53,11 @@ public class PickRandomlyRuleService implements GroupOrderRuleService {
         final CounterInt c = new CounterInt();
         final int gid = params.getGid();
         if (allUidsInOneGroup(gid)) {
-            return of(shufflePredicted(uids.uids(), gid).stream()
+            return of(shufflePredicted(uids, gid).stream()
                     .map(uid -> ofIntD(uid, c.postInc(), getName())));
         }
         final Multimap<Integer, Uid> gidUids = HashMultimap.create();
-        uids.uids().forEach(uid -> gidUids.put(
+        uids.forEach(uid -> gidUids.put(
                 params.getTournament().getParticipant(uid).gid(), uid));
         final List<Integer> gids = new ArrayList<>(gidUids.keySet());
         Collections.sort(gids);

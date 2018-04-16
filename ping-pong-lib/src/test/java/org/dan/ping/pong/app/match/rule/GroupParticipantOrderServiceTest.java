@@ -271,6 +271,27 @@ public class GroupParticipantOrderServiceTest {
     }
 
     @Test
+    public void normallyCompleteToAllMatches() {
+        final TournamentMemState tournament = tournamentForOrder();
+        List<GroupOrderRule> rules = asList(new CountWonMatchesRule(), new CountWonMatchesRule());
+        rules.get(0).setMatchOutcomeScope(JUST_NORMALLY_COMPLETE);
+        tournament.getRule().getGroup().get().setOrderRules(rules);
+
+        checkOrder(uidSets(UID4, UID3, UID2),
+                sut.findOrder(params(GID, tournament,
+                        MatchListBuilder.matches()
+                                .ogid(GID)
+                                .brokenMatch(UID2, 0, UID4, 10)
+                                .om(UID2, 1, UID3, 11)
+                                .om(UID4, 11, UID3, 1), UIDS_2_3_4)),
+                ImmutableMap.of(
+                        UID4, asList(WonMatches, WonMatches),
+                        UID3, asList(WonMatches, WonMatches),
+                        UID2, asList(WonMatches)),
+                emptySet());
+    }
+
+    @Test
     public void orderUidsInGroupDisambiguates3ParticipantsAllDifferentStat() {
         checkOrder(uidSets(UID3, UID2, UID4),
                 sut.findOrder(params(GID, tournamentForOrder(),

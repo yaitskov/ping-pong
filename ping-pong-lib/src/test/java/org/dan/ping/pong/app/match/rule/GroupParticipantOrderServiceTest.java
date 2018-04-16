@@ -224,6 +224,29 @@ public class GroupParticipantOrderServiceTest {
     }
 
     @Test
+    public void keepUidsTopRuleFilteredMatches() {
+        final TournamentMemState tournament = tournamentForOrder();
+        tournament.getRule().getGroup().get().getOrderRules().stream()
+                .filter(rule -> rule.name() == WonMatches)
+                .findFirst()
+                .get()
+                .setMatchOutcomeScope(JUST_NORMALLY_COMPLETE);
+
+        checkOrder(uidSets(UID4, UID3, UID2),
+                sut.findOrder(params(GID, tournament,
+                        MatchListBuilder.matches()
+                                .ogid(GID)
+                                .brokenMatch(UID2, 10, UID4, 1)
+                                .brokenMatch(UID2, 2, UID3, 10)
+                                .om(UID4, 11, UID3, 1), UIDS_2_3_4)),
+                ImmutableMap.of(
+                        UID4, singletonList(WonMatches),
+                        UID3, singletonList(WonMatches),
+                        UID2, singletonList(WonMatches)),
+                emptySet());
+    }
+
+    @Test
     public void orderUidsInGroupDisambiguates3ParticipantsAllDifferentStat() {
         checkOrder(uidSets(UID3, UID2, UID4),
                 sut.findOrder(params(GID, tournamentForOrder(),

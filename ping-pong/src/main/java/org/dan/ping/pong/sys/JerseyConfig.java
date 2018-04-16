@@ -22,11 +22,14 @@ import org.dan.ping.pong.app.tournament.TournamentResource;
 import org.dan.ping.pong.app.user.UserResource;
 import org.dan.ping.pong.sys.ctx.jackson.ObjectMapperContextResolver;
 import org.dan.ping.pong.sys.error.DefaultExceptionMapper;
+import org.dan.ping.pong.sys.error.InvalidTypeIdExceptionMapper;
 import org.dan.ping.pong.sys.error.JerseyExceptionMapper;
 import org.dan.ping.pong.sys.error.JerseyValidationExceptionMapper;
 import org.dan.ping.pong.sys.error.JooqExceptionMapper;
+import org.dan.ping.pong.sys.error.JsonMappingExceptionMapper;
 import org.dan.ping.pong.sys.error.PiPoExMapper;
 import org.dan.ping.pong.sys.error.UncheckedExecutionExceptionMapper;
+import org.dan.ping.pong.sys.error.UndeclaredThrowableExecutionExceptionMapper;
 import org.dan.ping.pong.sys.error.UnrecognizedPropertyExceptionMapper;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -46,7 +49,10 @@ public class JerseyConfig extends ResourceConfig {
         register(new DefaultExceptionMapper());
         register(UnrecognizedPropertyExceptionMapper.class);
         register(JooqExceptionMapper.class);
+        register(JsonMappingExceptionMapper.class);
+        register(InvalidTypeIdExceptionMapper.class);
         register(UncheckedExecutionExceptionMapper.class);
+        register(UndeclaredThrowableExecutionExceptionMapper.class);
         packages(false,
                 asList(UserResource.class, SysAdminSignInResource.class,
                         PlaceResource.class, TournamentResource.class,

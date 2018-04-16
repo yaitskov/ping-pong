@@ -81,17 +81,14 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
         isf.resume(scenario).run(c -> c.checkPlayOffLevels(result, 1, 1, -1));
 
         TournamentResultEntry p1Result = result.get(0);
-        assertEquals(100, p1Result.getPunkts());
         assertEquals(scenario.getPlayersSessions().get(p1).getUid(),
                 p1Result.getUser().getUid());
 
         TournamentResultEntry p2Result = result.get(1);
-        assertEquals(97, p2Result.getPunkts());
         assertEquals(scenario.getPlayersSessions().get(p2).getUid(),
                 p2Result.getUser().getUid());
 
         TournamentResultEntry p3Result = result.get(2);
-        assertEquals(94, p3Result.getPunkts());
         assertEquals(scenario.getPlayersSessions().get(p3).getUid(),
                 p3Result.getUser().getUid());
     }

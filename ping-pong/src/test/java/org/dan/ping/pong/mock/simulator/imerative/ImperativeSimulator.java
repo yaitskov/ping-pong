@@ -341,7 +341,7 @@ public class ImperativeSimulator {
         myRest.voidPost(RESCORE_MATCH, scenario.getTestAdmin(),
                 RescoreMatch.builder()
                         .tid(scenario.getTid())
-                        .effectHash(DONT_CHECK_HASH)
+                        .effectHash(Optional.of(DONT_CHECK_HASH))
                         .mid(resolveMid(p1, p2))
                         .sets(ImmutableMap.of(
                                 scenario.player2Uid(p1),

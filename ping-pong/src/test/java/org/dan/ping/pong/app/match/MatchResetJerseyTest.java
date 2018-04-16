@@ -55,10 +55,6 @@ public class MatchResetJerseyTest extends AbstractSpringJerseyTest {
                 new GenericType<List<TournamentResultEntry>>() {});
 
         assertEquals(result.get(0).getUser().getUid(), scenario.getPlayersSessions().get(p1).getUid());
-        assertEquals(result.get(0).getScore().getRating().getLostSets(), 0);
-        assertEquals(result.get(0).getScore().getRating().getWinSets(), 3);
         assertEquals(result.get(1).getUser().getUid(), scenario.getPlayersSessions().get(p2).getUid());
-        assertEquals(result.get(1).getScore().getRating().getLostSets(), 3);
-        assertEquals(result.get(1).getScore().getRating().getWinSets(), 0);
     }
 }

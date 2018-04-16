@@ -24,6 +24,7 @@ import org.dan.ping.pong.sys.db.DbUpdater;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -81,7 +82,7 @@ public class LayeredCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
                     .collect(toList());
             flatCategoryPlayOffBuilder.build(tournament, cid,
                     bidsInTag, batch,
-                    MatchTag.builder().prefix(CONSOLE_LEVEL).number(i).build());
+                    Optional.of(MatchTag.builder().prefix(CONSOLE_LEVEL).number(i).build()));
         }
     }
 }

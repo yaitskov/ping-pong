@@ -248,7 +248,7 @@ public class Simulator {
                     scenario.getTestAdmin(),
                     RescoreMatch.builder().tid(scenario.getTid())
                             .mid(mid)
-                            .effectHash(checkHash)
+                            .effectHash(Optional.of(checkHash))
                             .sets(newScore.entrySet().stream()
                                     .collect(toMap(e -> (Uid) scenario.player2Uid(e.getKey()),
                                             Map.Entry::getValue)))

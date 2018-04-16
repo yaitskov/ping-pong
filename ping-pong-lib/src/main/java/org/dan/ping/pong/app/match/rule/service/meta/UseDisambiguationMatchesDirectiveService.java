@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.match.rule.service.meta;
 
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
-import static org.dan.ping.pong.app.match.rule.filter.DisambiguationScope.DISAMBIGUATION_MATCHES;
 
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
@@ -31,7 +30,6 @@ public class UseDisambiguationMatchesDirectiveService
             Supplier<Stream<MatchInfo>> disamMatchesSupplier,
             UidsProvider uids, GroupOrderRule _rule,
             GroupRuleParams params) {
-        params.setDisambiguationMode(DISAMBIGUATION_MATCHES);
         final int expectedMatches = matchesInGroup(uids.size());
         final long actualMatches = disamMatchesSupplier.get().count();
         params.setDisambiguationMatchesWillBeCreated(actualMatches < expectedMatches);

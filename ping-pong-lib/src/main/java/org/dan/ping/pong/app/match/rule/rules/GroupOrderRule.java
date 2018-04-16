@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
+import org.dan.ping.pong.app.match.rule.filter.DisambiguationScope;
 import org.dan.ping.pong.app.match.rule.rules.attrs.CompletenessScoped;
 import org.dan.ping.pong.app.match.rule.rules.attrs.ParticipantScoped;
 import org.dan.ping.pong.app.match.rule.rules.common.DirectOutcomeRule;
@@ -21,6 +22,8 @@ import org.dan.ping.pong.app.match.rule.rules.common.BallsBalanceRule;
 import org.dan.ping.pong.app.match.rule.rules.common.SetsBalanceRule;
 import org.dan.ping.pong.app.match.rule.rules.meta.UseDisambiguationMatchesDirective;
 import org.dan.ping.pong.app.match.rule.rules.ping.CountJustPunktsRule;
+
+import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(
@@ -37,4 +40,8 @@ import org.dan.ping.pong.app.match.rule.rules.ping.CountJustPunktsRule;
 })
 public interface GroupOrderRule extends CompletenessScoped, ParticipantScoped {
     OrderRuleName name();
+
+    default Optional<DisambiguationScope> disambiguationScope() {
+        return Optional.empty();
+    }
 }

@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match.rule.rules.meta;
 
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
+import static org.dan.ping.pong.app.match.rule.filter.DisambiguationScope.DISAMBIGUATION_MATCHES;
 import static org.dan.ping.pong.app.match.rule.filter.MatchOutcomeScope.ALL_MATCHES;
 import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.AT_LEAST_ONE;
 
@@ -8,10 +9,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
+import org.dan.ping.pong.app.match.rule.filter.DisambiguationScope;
 import org.dan.ping.pong.app.match.rule.filter.MatchOutcomeScope;
 import org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.sport.MatchRules;
+
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -21,6 +25,10 @@ public class UseDisambiguationMatchesDirective implements GroupOrderRule {
     @Override
     public OrderRuleName name() {
         return UseDisambiguationMatches;
+    }
+
+    public Optional<DisambiguationScope> disambiguationScope() {
+        return Optional.of(DISAMBIGUATION_MATCHES);
     }
 
     @Override

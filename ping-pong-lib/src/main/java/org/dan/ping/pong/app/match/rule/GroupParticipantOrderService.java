@@ -154,14 +154,26 @@ public class GroupParticipantOrderService {
                 newGroupPosIdx[0] = ambiPosI.plus(counterInt.toInt());
                 loop.uids.clear();
             }
+            ambiPos.getCompetingUids().remove(wl.getUid());
             loop.uids.add(wl.getUid());
             counterInt.inc();
             loop.lastWonLost = wl;
         });
-        if (loop.uids.isEmpty()) {
+        if (!loop.uids.isEmpty()) {
+            flush(order, newGroupPosIdx[0], ambiPos, loop);
+        }
+        ensureUidsWithoutMatchesFlushed(order, ambiPosI, ambiPos, loop, counterInt);
+    }
+
+    private void ensureUidsWithoutMatchesFlushed(GroupParticipantOrder order,
+            GroupPositionIdx ambiPosI, GroupPosition ambiPos, GroupSplitLoop loop,
+            CounterInt counterInt) {
+        if (ambiPos.getCompetingUids().isEmpty()) {
             return;
         }
-        flush(order, newGroupPosIdx[0], ambiPos, loop);
+        loop.lastWonLost = new InfoReason(ambiPos.getRule().get().name());
+        loop.uids = ambiPos.getCompetingUids();
+        flush(order, ambiPosI.plus(counterInt.toInt()), ambiPos, loop);
     }
 
     private void setScopes(GroupPosition ambiPos,
@@ -169,6 +181,7 @@ public class GroupParticipantOrderService {
         ambiPos.setRule(Optional.of(rule));
         ambiPos.setOutcomeScope(rule.getMatchOutcomeScope());
         ambiPos.setParticipantScope(rule.getMatchParticipantScope());
+        rule.disambiguationScope().ifPresent(params::setDisambiguationMode);
         ambiPos.setDisambiguationScope(params.getDisambiguationMode());
     }
 

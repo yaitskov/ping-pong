@@ -4,6 +4,8 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.group.GroupServiceTest.GID;
 import static org.dan.ping.pong.app.group.GroupServiceTest.UID2;
@@ -20,6 +22,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.group.MatchListBuilder;
@@ -41,10 +44,12 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -93,17 +98,21 @@ public class GroupParticipantOrderServiceTest {
     @Inject
     private GroupParticipantOrderService sut;
 
-    private void checkOrder(List<Uid> expectedOrder, GroupParticipantOrder got) {
-        checkOrder(expectedOrder, got, emptyMap());
+    private void checkOrder(List<Set<Uid>> expectedOrder, GroupParticipantOrder got) {
+        checkOrder(expectedOrder, got, emptyMap(), emptySet());
     }
 
-    private void checkOrder(List<Uid> expectedOrder, GroupParticipantOrder got,
-            Map<Uid, List<OrderRuleName>> reasonChains) {
-        assertThat(got.getAmbiguousPositions(), is(emptySet()));
+    private void checkOrder(List<Set<Uid>> expectedOrder, GroupParticipantOrder got,
+            Set<Object> ambitionsPositions) {
+        checkOrder(expectedOrder, got, emptyMap(), ambitionsPositions);
+    }
+
+    private void checkOrder(List<Set<Uid>> expectedOrder, GroupParticipantOrder got,
+            Map<Uid, List<OrderRuleName>> reasonChains, Set<Object> ambitionsPositions) {
+        assertThat(got.getAmbiguousPositions(), is(ambitionsPositions));
         assertThat(got.getPositions().values().stream()
                         .map(GroupPosition::getCompetingUids).collect(toList()),
-                is(expectedOrder.stream().map(Collections::singleton)
-                        .collect(toList())));
+                is(expectedOrder));
         got.getPositions().values()
                 .forEach(gp -> {
                     final List<OrderRuleName> reasonChain = gp.reasonChain().stream()
@@ -129,7 +138,7 @@ public class GroupParticipantOrderServiceTest {
 
     @Test
     public void orderUidsInGroupDisambiguates2Participants() {
-        checkOrder(asList(UID2, UID5, UID4, UID3),
+        checkOrder(uidSets(UID2, UID5, UID4, UID3),
                 sut.findOrder(params(GID, tournamentForOrder(),
                         MatchListBuilder.matches()
                                 .om(UID2, 11, UID4, 1)
@@ -147,7 +156,7 @@ public class GroupParticipantOrderServiceTest {
         final TournamentMemState tournament = tournamentForOrder();
         tournament.getRule().getGroup().get()
                 .setOrderRules(BALANCE_BASED_DM_ORDER_RULES);
-        checkOrder(asList(UID2, UID4, UID3),
+        checkOrder(uidSets(UID2, UID4, UID3),
                 sut.findOrder(params(GID, tournament,
                         MatchListBuilder.matches()
                                 .om(UID2, 11, UID4, 1)
@@ -163,12 +172,30 @@ public class GroupParticipantOrderServiceTest {
                         UID3, asList(Punkts, F2F, SetsBalance, F2F, BallsBalance,
                                 F2F, UseDisambiguationMatches, Punkts),
                         UID4, asList(Punkts, F2F, SetsBalance, F2F, BallsBalance,
-                                F2F, UseDisambiguationMatches, Punkts)));
+                                F2F, UseDisambiguationMatches, Punkts)), emptySet());
+    }
+
+    private List<Set<Uid>> uidSets(Uid... uids) {
+        return Arrays.stream(uids).map(Collections::singleton).collect(toList());
+    }
+
+    @Test
+    public void orderUidsWithNoDisambiguateMatches() {
+        final TournamentMemState tournament = tournamentForOrder();
+        tournament.getRule().getGroup().get()
+                .setOrderRules(BALANCE_BASED_DM_ORDER_RULES);
+        checkOrder(singletonList(ImmutableSet.of(UID2, UID4, UID3)),
+                sut.findOrder(params(GID, tournament,
+                        MatchListBuilder.matches()
+                                .om(UID2, 11, UID4, 1)
+                                .om(UID2, 1, UID3, 11)
+                                .om(UID4, 11, UID3, 1))),
+                singleton(new GroupPositionIdx(0)));
     }
 
     @Test
     public void orderUidsInGroupDisambiguates3ParticipantsAllDifferentStat() {
-        checkOrder(asList(UID3, UID2, UID4),
+        checkOrder(uidSets(UID3, UID2, UID4),
                 sut.findOrder(params(GID, tournamentForOrder(),
                         MatchListBuilder.matches()
                                 .ogid(GID)
@@ -179,7 +206,7 @@ public class GroupParticipantOrderServiceTest {
 
     @Test
     public void orderUidsInGroupRandomlyDisambiguates3Participants2OfThemHaveEqualStat() {
-        checkOrder(asList(UID6, UID4, UID5, UID2, UID3),
+        checkOrder(uidSets(UID6, UID4, UID5, UID2, UID3),
                 sut.findOrder(params(GID, tournamentForOrder(),
                         MatchListBuilder.matches().ogid(21)
                                 .om(UID2, 11, UID4, 2)

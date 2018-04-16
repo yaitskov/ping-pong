@@ -16,6 +16,7 @@ import static org.dan.ping.pong.app.match.rule.OrderRuleName.SetsBalance;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.WonMatches;
 import static org.dan.ping.pong.app.match.rule.filter.MatchOutcomeScope.JUST_NORMALLY_COMPLETE;
+import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.BOTH;
 import static org.dan.ping.pong.app.match.rule.rules.common.DirectOutcomeRule.DIRECT_OUTCOME_RULE;
 import static org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleServiceTest.UIDS_2_3_4;
 import static org.dan.ping.pong.app.sport.SportType.PingPong;
@@ -287,7 +288,39 @@ public class GroupParticipantOrderServiceTest {
                 ImmutableMap.of(
                         UID4, asList(WonMatches, WonMatches),
                         UID3, asList(WonMatches, WonMatches),
-                        UID2, asList(WonMatches)),
+                        UID2, singletonList(WonMatches)),
+                emptySet());
+    }
+
+    @Test
+    public void bothToAtLeastOne() {
+        final TournamentMemState tournament = tournamentForOrder();
+        final List<GroupOrderRule> rules = asList(new CountWonMatchesRule(),
+                new CountWonMatchesRule(), new BallsBalanceRule());
+        rules.get(1).setMatchParticipantScope(BOTH);
+        tournament.getRule().getGroup().get().setOrderRules(rules);
+
+        checkOrder(uidSets(UID2, UID5, UID4, UID3),
+                sut.findOrder(params(GID, tournament,
+                        MatchListBuilder.matches()
+                                .ogid(GID)
+                                .om(UID4, 11, UID2, 9) // 2
+                                .om(UID4, 11, UID3, 1)
+
+                                .om(UID2, 11, UID3, 3)
+                                .om(UID2, 11, UID5, 9) // 2
+
+                                .om(UID5, 11, UID3, 9)
+                                .om(UID5, 11, UID4, 4), // 2
+                        // uid5 balls balance 7 ; 5
+                        // uid2 balls balance 8  ; 0
+                        // uid4 balls balance 5  ; -
+                        UIDS_2_3_4_5)),
+                ImmutableMap.of(
+                        UID5, asList(WonMatches, WonMatches, BallsBalance),
+                        UID4, asList(WonMatches, WonMatches, BallsBalance),
+                        UID2, asList(WonMatches, WonMatches, BallsBalance),
+                        UID3, singletonList(WonMatches)),
                 emptySet());
     }
 

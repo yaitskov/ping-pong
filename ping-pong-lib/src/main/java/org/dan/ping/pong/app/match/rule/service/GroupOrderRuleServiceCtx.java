@@ -37,11 +37,11 @@ import java.util.Map;
         GroupParticipantOrderService.class
 })
 public class GroupOrderRuleServiceCtx {
-    public static final String COUNT_WON_MATCHES = "countWonMatches";
-    public static final String USE_BALLS = "useBalls";
-    public static final String USE_SETS = "useSets";
-    public static final String COUNT_DM_MATCHES = "countDmMatches";
-    public static final String COUNT_JUST_PUNKTS = "countJustPunkts";
+    public static final String WON_MATCHES = "WM";
+    public static final String BALLS_BALANCE = "BB";
+    public static final String SETS_BALANCE = "SB";
+    public static final String DM_MATCHES = "DM";
+    public static final String PUNKTS = "Punkts";
     public static final String F2F = "f2f";
     public static final String RANDOM = "rnd";
 

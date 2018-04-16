@@ -1,12 +1,12 @@
 package org.dan.ping.pong.app.match.rule.rules;
 
-import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.COUNT_DM_MATCHES;
-import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.COUNT_JUST_PUNKTS;
-import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.COUNT_WON_MATCHES;
+import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.DM_MATCHES;
+import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.PUNKTS;
+import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.WON_MATCHES;
 import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.F2F;
 import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.RANDOM;
-import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.USE_BALLS;
-import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.USE_SETS;
+import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.BALLS_BALANCE;
+import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.SETS_BALANCE;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -17,9 +17,13 @@ import org.dan.ping.pong.app.match.rule.rules.attrs.CompletenessScoped;
 import org.dan.ping.pong.app.match.rule.rules.attrs.ParticipantScoped;
 import org.dan.ping.pong.app.match.rule.rules.common.DirectOutcomeRule;
 import org.dan.ping.pong.app.match.rule.rules.common.CountWonMatchesRule;
+import org.dan.ping.pong.app.match.rule.rules.common.LostBallsRule;
+import org.dan.ping.pong.app.match.rule.rules.common.LostSetsRule;
 import org.dan.ping.pong.app.match.rule.rules.common.PickRandomlyRule;
 import org.dan.ping.pong.app.match.rule.rules.common.BallsBalanceRule;
 import org.dan.ping.pong.app.match.rule.rules.common.SetsBalanceRule;
+import org.dan.ping.pong.app.match.rule.rules.common.WonBallsRule;
+import org.dan.ping.pong.app.match.rule.rules.common.WonSetsRule;
 import org.dan.ping.pong.app.match.rule.rules.meta.UseDisambiguationMatchesDirective;
 import org.dan.ping.pong.app.match.rule.rules.ping.CountJustPunktsRule;
 
@@ -30,13 +34,19 @@ import java.util.Optional;
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = PickRandomlyRule.class, name = RANDOM),
+        @JsonSubTypes.Type(value = BallsBalanceRule.class, name = BALLS_BALANCE),
+        @JsonSubTypes.Type(value = CountWonMatchesRule.class, name = WON_MATCHES),
         @JsonSubTypes.Type(value = DirectOutcomeRule.class, name = F2F),
-        @JsonSubTypes.Type(value = CountJustPunktsRule.class, name = COUNT_JUST_PUNKTS),
-        @JsonSubTypes.Type(value = UseDisambiguationMatchesDirective.class, name = COUNT_DM_MATCHES),
-        @JsonSubTypes.Type(value = SetsBalanceRule.class, name = USE_SETS),
-        @JsonSubTypes.Type(value = BallsBalanceRule.class, name = USE_BALLS),
-        @JsonSubTypes.Type(value = CountWonMatchesRule.class, name = COUNT_WON_MATCHES)
+        @JsonSubTypes.Type(value = LostBallsRule.class, name = "LB"),
+        @JsonSubTypes.Type(value = LostSetsRule.class, name = "LS"),
+        @JsonSubTypes.Type(value = PickRandomlyRule.class, name = RANDOM),
+        @JsonSubTypes.Type(value = SetsBalanceRule.class, name = SETS_BALANCE),
+        @JsonSubTypes.Type(value = WonBallsRule.class, name = "WB"),
+        @JsonSubTypes.Type(value = WonSetsRule.class, name = "WS"),
+
+        @JsonSubTypes.Type(value = UseDisambiguationMatchesDirective.class, name = DM_MATCHES),
+
+        @JsonSubTypes.Type(value = CountJustPunktsRule.class, name = PUNKTS)
 })
 public interface GroupOrderRule extends CompletenessScoped, ParticipantScoped {
     OrderRuleName name();

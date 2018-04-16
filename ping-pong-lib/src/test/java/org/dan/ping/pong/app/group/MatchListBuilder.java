@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.group;
 
 import static java.util.Collections.singletonList;
+import static org.dan.ping.pong.app.match.MatchState.Break;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchTag.DISAMBIGUATION;
 
@@ -28,6 +29,13 @@ public class MatchListBuilder {
 
     public MatchListBuilder om(Uid u1, Integer g1, Uid u2, Integer g2) {
         result.add(match(u1, g1, u2, g2, Optional.empty()));
+        return this;
+    }
+
+    public MatchListBuilder brokenMatch(Uid u1, Integer g1, Uid u2, Integer g2) {
+        final MatchInfo match = match(u1, g1, u2, g2, Optional.empty());
+        match.setState(Break);
+        result.add(match);
         return this;
     }
 

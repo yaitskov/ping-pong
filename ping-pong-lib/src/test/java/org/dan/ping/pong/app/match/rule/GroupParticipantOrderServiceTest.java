@@ -14,6 +14,8 @@ import static org.dan.ping.pong.app.match.rule.OrderRuleName.F2F;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.Punkts;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.SetsBalance;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.WonMatches;
+import static org.dan.ping.pong.app.match.rule.filter.MatchOutcomeScope.JUST_NORMALLY_COMPLETE;
 import static org.dan.ping.pong.app.match.rule.rules.common.DirectOutcomeRule.DIRECT_OUTCOME_RULE;
 import static org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleServiceTest.UIDS_2_3_4;
 import static org.dan.ping.pong.app.sport.SportType.PingPong;
@@ -196,6 +198,29 @@ public class GroupParticipantOrderServiceTest {
                                 .om(UID2, 1, UID3, 11)
                                 .om(UID4, 11, UID3, 1), UIDS_2_3_4)),
                 singleton(new GroupPositionIdx(0)));
+    }
+
+    @Test
+    public void filterBrokenMatch() {
+        final TournamentMemState tournament = tournamentForOrder();
+        tournament.getRule().getGroup().get().getOrderRules().stream()
+                .filter(rule -> rule.name() == WonMatches)
+                .findFirst()
+                .get()
+                .setMatchOutcomeScope(JUST_NORMALLY_COMPLETE);
+
+        checkOrder(uidSets(UID2, UID4, UID3),
+                sut.findOrder(params(GID, tournament,
+                        MatchListBuilder.matches()
+                                .ogid(GID)
+                                .om(UID2, 11, UID4, 1)
+                                .brokenMatch(UID2, 2, UID3, 10)
+                                .om(UID4, 11, UID3, 1), UIDS_2_3_4)),
+                ImmutableMap.of(
+                        UID2, asList(WonMatches, F2F),
+                        UID4, asList(WonMatches, F2F),
+                        UID3, singletonList(WonMatches)),
+                emptySet());
     }
 
     @Test

@@ -22,7 +22,6 @@ public class F2fReason implements Reason {
     private int won;
     private Uid uid;
     private Uid opponentUid;
-    private OrderRuleName rule = F2F;
 
     @Override
     public int compareTo(Reason r) {
@@ -36,5 +35,15 @@ public class F2fReason implements Reason {
 
     public String toString() {
         return format(WON_PATTERNS[won], uid.getId(), opponentUid.getId());
+    }
+
+    @Override
+    public OrderRuleName getRule() {
+        return F2F;
+    }
+
+    @Override
+    public void setRule(OrderRuleName rule) {
+        // skip
     }
 }

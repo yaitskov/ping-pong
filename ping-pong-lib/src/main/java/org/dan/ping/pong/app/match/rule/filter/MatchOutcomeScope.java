@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.match.rule.filter;
 
+import static org.dan.ping.pong.app.match.MatchState.Break;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -25,7 +26,7 @@ public enum MatchOutcomeScope implements FilterMarker {
         }
 
         public Stream<MatchInfo> filterMatches(Stream<MatchInfo> s) {
-            return s.filter(m -> m.getState() == Over);
+            return s.filter(m -> m.getState() != Break);
         }
     };
 

@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.match.rule.reason;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +27,9 @@ public class InfoReason implements Reason {
 
     @Override
     public int compareTo(Reason o) {
+        if (o instanceof InfoReason) {
+            return 0;
+        }
         throw new IllegalStateException();
     }
 

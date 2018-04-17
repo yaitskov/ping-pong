@@ -452,7 +452,7 @@ public class TournamentService {
     public List<TournamentResultEntry> tournamentResult(TournamentMemState tournament, int cid) {
         final List<TournamentResultEntry> groupOrdered = groupService
                 .resultOfAllGroupsInCategory(tournament, cid);
-        final PlayOffResultEntries playOffResult = playOffService.playOffResult(tournament, cid);
+        final PlayOffResultEntries playOffResult = playOffService.playOffResult(tournament, cid, groupOrdered);
 
         if (playOffResult.getEntries().isEmpty()) {
             if (groupOrdered.isEmpty()) {

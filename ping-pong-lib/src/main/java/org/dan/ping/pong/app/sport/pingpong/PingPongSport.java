@@ -160,12 +160,12 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
 
     @Override
     public int maxUpLimitSetsDiff(PingPongMatchRules rules) {
-        return rules.getSetsToWin();
+        return max(2, rules.getSetsToWin());
     }
 
     @Override
     public int maxUpLimitBallsDiff(PingPongMatchRules rules) {
-        return max(rules.getMinGamesToWin(), rules.getMinAdvanceInGames())
-                * (2 * rules.getSetsToWin() - 1);
+        return max(2, max(rules.getMinGamesToWin(), rules.getMinAdvanceInGames())
+                * (2 * rules.getSetsToWin() - 1));
     }
 }

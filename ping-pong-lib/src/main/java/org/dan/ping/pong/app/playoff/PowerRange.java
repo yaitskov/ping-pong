@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.playoff;
 
 import static java.util.Arrays.copyOf;
+import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,9 @@ public class PowerRange {
     private final Map<Integer, long[]> base2Range = new HashMap<>();
 
     public long value(int base, int power) {
+        if (base < 2) {
+            throw internalError("base is less than 2: " + base);
+        }
         return base2Range.compute(base, (b, range) -> {
             if (range == null) {
                 return powerOf(base, 1, new long[power + 1]);

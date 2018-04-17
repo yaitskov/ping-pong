@@ -165,13 +165,13 @@ public class TennisSport implements Sport<TennisMatchRules> {
 
     @Override
     public int maxUpLimitSetsDiff(TennisMatchRules rules) {
-        return rules.getSetsToWin();
+        return max(2, rules.getSetsToWin());
     }
 
     @Override
     public int maxUpLimitBallsDiff(TennisMatchRules rules) {
-        return rules.getSuperTieBreakGames()
+        return max(2, rules.getSuperTieBreakGames()
                 + max(rules.getMinGamesToWin(), rules.getMinAdvanceInGames())
-                * (2 * rules.getSetsToWin() - 1);
+                * (2 * rules.getSetsToWin() - 1));
     }
 }

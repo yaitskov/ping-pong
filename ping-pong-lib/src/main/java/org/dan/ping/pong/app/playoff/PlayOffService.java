@@ -70,7 +70,8 @@ public class PlayOffService {
     @Inject
     private BallsBalanceRuleService ballsBalanceRuleService;
 
-    public PlayOffResultEntries playOffResult(TournamentMemState tournament, int cid) {
+    public PlayOffResultEntries playOffResult(TournamentMemState tournament, int cid,
+            List<TournamentResultEntry> groupOrdered) {
         final Map<Uid, PlayOffBidStat> uidStat = new HashMap<>();
         final Sport sport = sports.get(tournament.getRule().getMatch().sport());
         final PowerRange powerRange = tournament.getPowerRange();
@@ -103,7 +104,7 @@ public class PlayOffService {
                             stat = new PlayOffBidStat(u);
                         }
                         stat.addSetsBalance(setBalance * setPower);
-                        stat.addBallsBalance(ballsBalance.get(u) * ballPower);
+                        stat.addBallsBalance(ballsBalance.getOrDefault(u, 0) * ballPower);
                         stat.maxLevel(m.getLevel());
                         if (m.getWinnerId().isPresent() && !m.getWinnerId().get().equals(u)) {
                             stat.incLost();
@@ -115,7 +116,7 @@ public class PlayOffService {
                             stat = new PlayOffBidStat(u);
                         }
                         stat.addSetsBalance(-setBalance * setPower);
-                        stat.addBallsBalance(ballsBalance.get(u) * ballPower);
+                        stat.addBallsBalance(ballsBalance.getOrDefault(u, 0) * ballPower);
                         stat.maxLevel(m.getLevel());
                         if (m.getWinnerId().isPresent() && !m.getWinnerId().get().equals(u)) {
                             stat.incLost();
@@ -128,7 +129,7 @@ public class PlayOffService {
         return PlayOffResultEntries.builder()
                 .entries(
                         uidStat.values().stream()
-                                .sorted(PLAY_OFF_BID_STAT_COMPARATOR)
+                                .sorted(new PlayOffBidComparator(PLAY_OFF_BID_STAT_COMPARATOR, groupOrdered))
                                 .map(stat -> statToResultEntry(stat, tournament))
                                 .collect(toList()))
                 .playOffUids(uidStat.keySet())

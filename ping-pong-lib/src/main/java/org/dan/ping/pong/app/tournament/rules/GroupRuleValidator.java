@@ -74,7 +74,7 @@ public class GroupRuleValidator {
         } else if (group.getOrderRules().get(group.getOrderRules().size() - 1).name() != Random) {
             errors.put(GROUP_RULE + ORDER_RULES,
                     ofTemplate("last-group-order-rule-is-not-random"));
-        } else if (group.getOrderRules().size() > 11) {
+        } else if (group.getOrderRules().size() > 21) {
             errors.put(GROUP_RULE + ORDER_RULES, ofTemplate("to-many-values"));
         } else {
             final Map<OrderRuleName, Integer> ruleCounter = group.getOrderRules()
@@ -84,7 +84,7 @@ public class GroupRuleValidator {
                 errors.put(GROUP_RULE + ORDER_RULES, ofTemplate("one-random-rule-is-allowed"));
             }
             ruleCounter.forEach((ruleName, count) -> {
-                if (count > 2) {
+                if (count > 6) {
                     errors.put(GROUP_RULE + ORDER_RULES,
                             ofTemplate("to-many-rules-of",
                                     ImmutableMap.of("rule", ruleName)));

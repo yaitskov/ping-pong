@@ -15,7 +15,7 @@ import org.dan.ping.pong.app.match.rule.OrderRuleName;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor = @__(@JsonIgnore))
 public class DecreasingLongScalarReason implements Reason {
     @JsonIgnore
     @Getter(onMethod = @__(@JsonIgnore))

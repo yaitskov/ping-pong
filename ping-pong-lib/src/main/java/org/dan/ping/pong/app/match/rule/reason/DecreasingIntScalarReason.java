@@ -18,7 +18,7 @@ import java.util.Map;
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor = @__(@JsonIgnore))
 public class DecreasingIntScalarReason implements Reason {
     @JsonIgnore
     @Getter(onMethod = @__(@JsonIgnore))

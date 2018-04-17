@@ -3,6 +3,8 @@ package org.dan.ping.pong.app.match.rule.reason;
 import static java.lang.String.format;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.F2F;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -17,7 +19,7 @@ import org.dan.ping.pong.app.match.rule.OrderRuleName;
 @Builder
 @EqualsAndHashCode
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor = @__(@JsonIgnore))
 public class F2fReason implements Reason {
     private int won;
     private Uid uid;

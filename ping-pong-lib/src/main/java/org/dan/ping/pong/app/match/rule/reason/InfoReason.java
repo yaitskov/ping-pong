@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match.rule.reason;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,9 +12,13 @@ import org.dan.ping.pong.app.match.rule.OrderRuleName;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor = @__(@JsonIgnore))
 public class InfoReason implements Reason {
     private OrderRuleName rule;
+
+    public static InfoReason notApplicableRule(OrderRuleName rule) {
+        return new InfoReason(rule);
+    }
 
     @Override
     @JsonIgnore

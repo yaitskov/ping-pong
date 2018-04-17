@@ -5,13 +5,13 @@ import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.match.rule.GroupParticipantOrder.orderOf;
 import static org.dan.ping.pong.app.match.rule.filter.GroupMatchFilter.applyFilters;
 import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.AT_LEAST_ONE;
+import static org.dan.ping.pong.app.match.rule.reason.InfoReason.notApplicableRule;
 import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.GROUP_ORDER_SERVICES_BY_RULE_NAME;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.filter.FilterMarker;
-import org.dan.ping.pong.app.match.rule.reason.InfoReason;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.match.rule.service.GroupOrderRuleService;
@@ -121,7 +121,7 @@ public class GroupParticipantOrderService {
                     .map(s -> filterOutPairUids(s, rule, ambiPos));
             if (!score.isPresent()) {
                 order.getPositions().put(ambiPosI, ambiPos);
-                ambiPos.setReason(Optional.of(new InfoReason(rule.name())));
+                ambiPos.setReason(Optional.of(notApplicableRule(rule.name())));
                 order.getAmbiguousPositions().add(ambiPosI);
                 continue;
             }
@@ -169,7 +169,7 @@ public class GroupParticipantOrderService {
         if (ambiPos.getCompetingUids().isEmpty()) {
             return;
         }
-        loop.lastWonLost = new InfoReason(ambiPos.getRule().get().name());
+        loop.lastWonLost = notApplicableRule(ambiPos.getRule().get().name());
         loop.uids = ambiPos.getCompetingUids();
         flush(order, ambiPosI.plus(counterInt.toInt()), ambiPos, loop);
     }

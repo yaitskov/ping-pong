@@ -15,8 +15,9 @@ import org.dan.ping.pong.app.match.rule.OrderRuleName;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = F2fReason.class, name = F2F),
         @JsonSubTypes.Type(value = InfoReason.class, name = "INF"),
-        @JsonSubTypes.Type(value = IncreasingIntScalarReason.class, name = "INC"),
-        @JsonSubTypes.Type(value = DecreasingIntScalarReason.class, name = "DEC")})
+        @JsonSubTypes.Type(value = DecreasingLongScalarReason.class, name = "DL"),
+        @JsonSubTypes.Type(value = IncreasingIntScalarReason.class, name = "II"),
+        @JsonSubTypes.Type(value = DecreasingIntScalarReason.class, name = "DI")})
 public interface Reason extends Comparable<Reason> {
     Uid getUid();
 

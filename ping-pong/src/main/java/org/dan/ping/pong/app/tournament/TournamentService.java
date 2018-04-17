@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.tournament;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
@@ -450,9 +451,11 @@ public class TournamentService {
     private GroupService groupService;
 
     public List<TournamentResultEntry> tournamentResult(TournamentMemState tournament, int cid) {
-        final List<TournamentResultEntry> groupOrdered = groupService
-                .resultOfAllGroupsInCategory(tournament, cid);
-        final PlayOffResultEntries playOffResult = playOffService.playOffResult(tournament, cid, groupOrdered);
+        final List<TournamentResultEntry> groupOrdered = tournament.getRule().getGroup()
+                .map(gr -> groupService.resultOfAllGroupsInCategory(tournament, cid))
+                .orElse(emptyList());
+        final PlayOffResultEntries playOffResult = playOffService
+                .playOffResult(tournament, cid, groupOrdered);
 
         if (playOffResult.getEntries().isEmpty()) {
             if (groupOrdered.isEmpty()) {
@@ -460,23 +463,32 @@ public class TournamentService {
             }
             return groupOrdered;
         } else {
-            final Map<Uid, List<Optional<Reason>>> reasonChains = new HashMap<>();
-            final List<TournamentResultEntry> leftInGroup = groupOrdered.stream()
-                    .filter(e -> {
-                        if (playOffResult.getPlayOffUids()
-                                .contains(e.getUser().getUid())) {
-                            reasonChains.put(e.getUser().getUid(), e.getReasonChain());
-                            return false;
-                        }
-                        return true;
-                    })
-                    .collect(toList());
-
-            playOffResult.getEntries().forEach(
-                    e -> e.getReasonChain().addAll(reasonChains.get(e.getUser().getUid())));
-            playOffResult.getEntries().addAll(leftInGroup);
+            combineGroupAndPlayOffEntries(groupOrdered, playOffResult);
             return playOffResult.getEntries();
         }
+    }
+
+    private void combineGroupAndPlayOffEntries(
+            List<TournamentResultEntry> groupOrdered,
+            PlayOffResultEntries playOffResult) {
+        if (groupOrdered.isEmpty()) {
+            return;
+        }
+        final Map<Uid, List<Optional<Reason>>> reasonChains = new HashMap<>();
+        final List<TournamentResultEntry> leftInGroup = groupOrdered.stream()
+                .filter(e -> {
+                    if (playOffResult.getPlayOffUids()
+                            .contains(e.getUser().getUid())) {
+                        reasonChains.put(e.getUser().getUid(), e.getReasonChain());
+                        return false;
+                    }
+                    return true;
+                })
+                .collect(toList());
+
+        playOffResult.getEntries().forEach(
+                e -> e.getReasonChain().addAll(reasonChains.get(e.getUser().getUid())));
+        playOffResult.getEntries().addAll(leftInGroup);
     }
 
     private List<TournamentResultEntry> tournamentOfSingle(TournamentMemState tournament, int cid) {

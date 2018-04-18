@@ -64,7 +64,7 @@ public class LayeredCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
 
         orderedGroups.forEach(groupInfo -> {
             final List<Uid> orderedUids = groupService.orderUidsInGroup(groupInfo.getGid(), masterTournament,
-                    groupService.findAllMatchesInGroup(tournament, groupInfo.getGid()));
+                    groupService.findAllMatchesInGroup(masterTournament, groupInfo.getGid()));
             for (int i = 0; i < orderedUids.size(); ++i) {
                 bidsByFinalGroupPosition.put(i, orderedUids.get(i));
             }

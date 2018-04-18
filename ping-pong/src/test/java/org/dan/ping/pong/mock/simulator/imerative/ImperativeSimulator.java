@@ -286,7 +286,7 @@ public class ImperativeSimulator {
                             .map(tr -> uid2Player(tr.getUser().getUid())).collect(toList()),
                     is(asList(p)));
         } catch (AssertionError e) {
-            log.info("results {}", tournamentResult);
+            log.error("failed tournament results {}", tournamentResult);
             throw e;
         }
         return this;

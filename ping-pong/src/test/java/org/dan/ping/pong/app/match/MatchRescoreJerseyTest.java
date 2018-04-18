@@ -234,7 +234,7 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .checkResult(p1, p3, p2)
                         .checkTournamentComplete(restState(Lost).bid(p1, Win1))
                         .rescoreMatch(p1, p3, 3, 11)
-                        .checkResult(p1, p3, p2)
+                        .checkResult(p3, p1, p2)
                         .checkTournament(Open, restState(Play).bid(p2, Wait)));
     }
 

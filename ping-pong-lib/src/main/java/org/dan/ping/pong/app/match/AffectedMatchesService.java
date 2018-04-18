@@ -264,7 +264,7 @@ public class AffectedMatchesService {
         final GroupParticipantOrder order = groupParticipantOrderService
                 .findOrder(ofParams(gid, tournament, allGroupMatches,
                         tournament.orderRules(),
-                        groupUids));
+                        new HashSet<>(groupUids)));
         final GroupParticipantOrder newOrder = groupParticipantOrderService
                 .findOrder(ofParams(gid, tournament, allNewGroupMatches,
                         tournament.orderRules(),
@@ -284,6 +284,9 @@ public class AffectedMatchesService {
             if (i >= newDeterminedUids.size() || !u.equals(newDeterminedUids.get(i))) {
                 affectedUids.add(u);
             }
+        }
+        if (affectedUids.isEmpty()) {
+            return emptyList();
         }
         return playOffMatchesAffectedByUids(tournament, affectedUids);
     }

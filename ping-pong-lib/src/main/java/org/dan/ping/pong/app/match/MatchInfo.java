@@ -233,6 +233,7 @@ public class MatchInfo {
     public MatchInfo clone() {
         return MatchInfo.builder()
                 .tid(tid)
+                .tag(tag)
                 .mid(mid)
                 .level(level)
                 .endedAt(endedAt)

@@ -2,6 +2,9 @@ package org.dan.ping.pong.app.tournament;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import static org.dan.ping.pong.app.bid.BidState.Expl;
+import static org.dan.ping.pong.app.bid.BidState.Lost;
+import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_LIST;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_RESULT;
 import static org.dan.ping.pong.app.match.DisambiguateGroupScoreJerseyTest.RULES_G8Q2_S1A2G11_M;
@@ -11,6 +14,7 @@ import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
 import static org.dan.ping.pong.app.tournament.TournamentResource.RESULT_CATEGORY;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
+import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -21,6 +25,7 @@ import static org.dan.ping.pong.mock.simulator.Player.p6;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c2;
 import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
+import static org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc.restState;
 import static org.junit.Assert.assertEquals;
 
 import org.dan.ping.pong.JerseySpringTest;
@@ -29,6 +34,7 @@ import org.dan.ping.pong.app.group.GroupParticipants;
 import org.dan.ping.pong.app.group.TournamentGroups;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
+import org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulator;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
@@ -182,8 +188,9 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
                 .rules(RULES_JP_S1A2G11)
                 .category(c1, p1, p2, p3);
         final ImperativeSimulator simulator = isf.create(tournament);
-        simulator.run(c -> c.beginTournament()
-                .checkResult(p1, p2, p3));
+        simulator.run(c -> c.beginTournament().checkResult(
+                asList(p1, p2, p3),
+                asList(p1, p3, p2)));
     }
 
     @Test
@@ -194,7 +201,11 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
                 .run(c -> c.beginTournament()
                         .scoreSet(p1, 11, p3, 3)
                         .expelPlayer(p3)
-                        .getTournamentResult());
+                        .checkResult(p1, p2, p3)
+                        .checkTournament(Open, restState(Lost)
+                                .bid(p1, Play)
+                                .bid(p2, Play)
+                                .bid(p3, Expl)));
     }
 
     @Test

@@ -196,14 +196,9 @@ public class TournamentMemState {
         return rule.group().getOrderRules();
     }
 
-    public List<ParticipantMemState> findBidsByCategory(int cid) {
-        return participants.values().stream()
-                .filter(bid -> bid.getCid() == cid)
-                .collect(toList());
-    }
-
     public List<MatchInfo> findGroupMatchesByCategory(int cid) {
-        return matches.values().stream().filter(m -> m.getCid() == cid)
+        return matches.values().stream()
+                .filter(m -> m.getCid() == cid && m.getGid().isPresent())
                 .collect(toList());
     }
 

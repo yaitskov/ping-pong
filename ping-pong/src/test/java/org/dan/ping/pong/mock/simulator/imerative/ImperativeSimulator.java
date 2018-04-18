@@ -2,7 +2,7 @@ package org.dan.ping.pong.mock.simulator.imerative;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
-import static java.util.Arrays.parallelSetAll;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -24,6 +24,7 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RES
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
@@ -34,11 +35,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.ParticipantState;
@@ -67,8 +70,10 @@ import org.dan.ping.pong.mock.simulator.Player;
 import org.dan.ping.pong.mock.simulator.PlayerCategory;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
+import org.hamcrest.Matchers;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +98,8 @@ public class ImperativeSimulator {
     private final MyRest myRest;
     private final Map<Set<Player>, Mid> matchMap = new HashMap<>();
     private boolean matchMapAutoReload;
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public ImperativeSimulator autoReload() {
         matchMapAutoReload = true;
@@ -271,23 +278,31 @@ public class ImperativeSimulator {
     }
 
     public ImperativeSimulator checkResult(Player... p) {
-        return checkResult(getOnlyCid(), p);
+        return checkResult(getOnlyCid(), singletonList(asList(p)));
     }
 
-    public ImperativeSimulator checkResult(PlayerCategory category, Player... p) {
+    public ImperativeSimulator checkResult(List<Player>... p) {
+        return checkResult(getOnlyCid(), asList(p));
+    }
+
+    public ImperativeSimulator checkResult(PlayerCategory category, List<List<Player>> p) {
         return checkResult(ofNullable(getScenario().getCategoryDbId()
                 .get(category)).orElseThrow(() -> new RuntimeException("no category " + category)), p);
     }
 
-    public ImperativeSimulator checkResult(int categoryId, Player... p) {
+    @SneakyThrows
+    public ImperativeSimulator checkResult(int categoryId, List<List<Player>> p) {
         final List<TournamentResultEntry> tournamentResult = getTournamentResult(categoryId);
         try {
             assertThat(tournamentResult.stream()
                             .map(tr -> uid2Player(tr.getUser().getUid())).collect(toList()),
-                    is(asList(p)));
+                    anyOf(p.stream().map(Matchers::is).collect(toList())));
         } catch (AssertionError e) {
-            log.error("failed tournament results {}", tournamentResult);
-            throw e;
+            log.error("failed tournament results: {}", tournamentResult);
+            throw new AssertionError(
+                    objectMapper.writeValueAsString(
+                            asList("failed tournament results: ", tournamentResult)),
+                    e);
         }
         return this;
     }

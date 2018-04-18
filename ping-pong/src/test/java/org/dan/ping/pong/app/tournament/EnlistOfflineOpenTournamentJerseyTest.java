@@ -222,7 +222,7 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                     .scoreSet(p4, 11, p5, 9)
                     //
                     .scoreSet(p1, 11, p3, 4)
-                    .checkResult(p1, p3, p4, p5, p2)
+                    .checkResult(p1, p3, p4, p2, p5)
                     .checkTournamentComplete(BidStatesDesc
                             .restState(Lost).bid(p3, Win2).bid(p1, Win1));
         });
@@ -230,7 +230,8 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
 
     @Test
     public void enlistToGroupWithResignedParticipant() {
-        TournamentScenario scenario = TournamentScenario.begin().name("enlistToGroupWithExpelledPart")
+        TournamentScenario scenario = TournamentScenario.begin()
+                .name("enlistToGroupWithExpelledPart")
                 .rules(RULES_G8Q1_S1A2G11)
                 .category(c1, p1, p2, p3);
         isf.create(scenario)
@@ -247,7 +248,7 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                     c.scoreSet(p2, 11, p3, 3)
                             .scoreSet(p2, 11, p4, 4)
                             .scoreSet(p3, 11, p4, 4)
-                            .checkResult(p2, p3, p4, p1)
+                            .checkResult(p2, p1, p3, p4)
                             .checkTournamentComplete(BidStatesDesc
                                     .restState(Lost).bid(p1, Expl).bid(p2, Win1));
                 });

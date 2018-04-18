@@ -5,8 +5,11 @@ import static org.dan.ping.pong.app.match.rule.service.GroupOrderRuleServiceCtx.
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
+
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(
@@ -19,6 +22,8 @@ import org.dan.ping.pong.app.match.rule.OrderRuleName;
         @JsonSubTypes.Type(value = IncreasingIntScalarReason.class, name = "II"),
         @JsonSubTypes.Type(value = DecreasingIntScalarReason.class, name = "DI")})
 public interface Reason extends Comparable<Reason> {
+    TypeReference<List<Reason>> REASON_CHAIN_TYPE = new TypeReference<List<Reason>>() {};
+
     Uid getUid();
 
     OrderRuleName getRule();

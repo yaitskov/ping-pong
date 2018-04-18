@@ -4,7 +4,6 @@ import static java.lang.String.format;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.F2F;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

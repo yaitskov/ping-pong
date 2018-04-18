@@ -15,6 +15,7 @@ import static org.dan.ping.pong.app.match.MatchResource.MATCH_RESULT;
 import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
 import static org.dan.ping.pong.app.match.MatchResource.RESCORE_MATCH;
 import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
+import static org.dan.ping.pong.app.match.rule.reason.Reason.REASON_CHAIN_TYPE;
 import static org.dan.ping.pong.app.tournament.SetScoreResultName.MatchContinues;
 import static org.dan.ping.pong.app.tournament.TournamentResource.MY_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.RESULT_CATEGORY;
@@ -57,6 +58,7 @@ import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
 import org.dan.ping.pong.app.match.RescoreMatch;
 import org.dan.ping.pong.app.match.SetScoreReq;
 import org.dan.ping.pong.app.match.SetScoreResult;
+import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.tournament.CopyTournament;
 import org.dan.ping.pong.app.tournament.ExpelParticipant;
 import org.dan.ping.pong.app.tournament.MyTournamentInfo;
@@ -70,6 +72,7 @@ import org.dan.ping.pong.mock.simulator.Player;
 import org.dan.ping.pong.mock.simulator.PlayerCategory;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
+import org.dan.ping.pong.sys.ctx.jackson.ObjectMapperProvider;
 import org.hamcrest.Matchers;
 
 import java.time.Instant;
@@ -99,7 +102,7 @@ public class ImperativeSimulator {
     private final Map<Set<Player>, Mid> matchMap = new HashMap<>();
     private boolean matchMapAutoReload;
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = ObjectMapperProvider.get();;
 
     public ImperativeSimulator autoReload() {
         matchMapAutoReload = true;
@@ -300,8 +303,9 @@ public class ImperativeSimulator {
         } catch (AssertionError e) {
             log.error("failed tournament results: {}", tournamentResult);
             throw new AssertionError(
-                    objectMapper.writeValueAsString(
-                            asList("failed tournament results: ", tournamentResult)),
+                    "failed tournament results: "
+                            + objectMapper.writerFor(REASON_CHAIN_TYPE)
+                            .writeValueAsString(tournamentResult),
                     e);
         }
         return this;

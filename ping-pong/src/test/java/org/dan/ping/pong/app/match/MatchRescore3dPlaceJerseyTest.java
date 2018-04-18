@@ -295,7 +295,7 @@ public class MatchRescore3dPlaceJerseyTest extends AbstractSpringJerseyTest {
                         .rescoreMatch3(p1, p4, 9, 11)
                         .checkMatchStatus(p1, p4, Over)
                         .checkMatchStatus(p1 /*as p4*/, p2, Over)
-                        .checkResult(p2, p3, p4, p1)
+                        .checkResult(p2, p4, p3, p1)
                         .checkTournamentComplete(restState(Expl)
                                 .bid(p2, Win1).bid(p3, Win3)));
     }
@@ -325,7 +325,7 @@ public class MatchRescore3dPlaceJerseyTest extends AbstractSpringJerseyTest {
                         .rescoreMatch3(p1, p4, 11, 9)
                         .checkMatchStatus(p1, p4, Over)
                         .checkMatchStatus(p1, p2, Over)
-                        .checkResult(p1, p3, p4, p2)
+                        .checkResult(p1, p2, p3, p4)
                         .checkTournamentComplete(restState(Lost)
                                 .bid(p3, Win3).bid(p2, Expl).bid(p1, Win1)));
     }
@@ -355,7 +355,7 @@ public class MatchRescore3dPlaceJerseyTest extends AbstractSpringJerseyTest {
                         .rescoreMatch3(p1, p4, 11, 9)
                         .checkMatchStatus(p1, p4, Over)
                         .checkMatchStatus(p1, p2, Over)
-                        .checkResult(p1, p3, p4, p2)
+                        .checkResult(p1, p2, p3, p4)
                         .checkTournamentComplete(restState(Lost)
                                 .bid(p3, Win3).bid(p2, Expl).bid(p1, Win1)));
     }
@@ -389,7 +389,7 @@ public class MatchRescore3dPlaceJerseyTest extends AbstractSpringJerseyTest {
                         .checkMatchStatus(p1, p4, Over)
                         .checkMatchStatus(p1, p2, Over)
                         .checkMatchStatus(p3, p4, Over)
-                        .checkResult(p2, p4, p3, p1)
+                        .checkResult(p2, p1, p4, p3)
                         .checkTournamentComplete(restState(Lost)
                                 .bid(p4, Win3).bid(p1, Expl).bid(p2, Win1)));
     }

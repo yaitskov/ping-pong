@@ -27,7 +27,7 @@ public class DecreasingLongScalarReason implements Reason {
     private OrderRuleName rule;
 
     public static DecreasingLongScalarReason ofLongD(long n, OrderRuleName rule) {
-        return ofLongD(n, rule);
+        return ofLongD(null, n, rule);
     }
 
     public static DecreasingLongScalarReason ofLongD(Uid uid, long n, OrderRuleName rule) {

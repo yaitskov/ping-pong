@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match.rule.rules.common;
 
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.LostBalls;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.LostSets;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,6 @@ public class LostSetsRule extends AbstractGroupOrderRule {
 
     @Override
     public OrderRuleName name() {
-        return LostBalls;
+        return LostSets;
     }
 }

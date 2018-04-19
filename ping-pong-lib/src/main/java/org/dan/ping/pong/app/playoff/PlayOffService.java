@@ -1,6 +1,5 @@
 package org.dan.ping.pong.app.playoff;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
@@ -23,6 +22,7 @@ import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.match.Mid;
+import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleService;
 import org.dan.ping.pong.app.sport.Sport;
 import org.dan.ping.pong.app.sport.Sports;
@@ -157,11 +157,14 @@ public class PlayOffService {
                         .user(bid.toLink())
                         .playOffStep(Optional.of(1))
                         .state(Win1)
-                        .reasonChain(asList(
-                                Optional.of(ofIntI(1, Level)),
-                                Optional.of(ofIntI(0, LostMatches)),
-                                Optional.of(ofIntD(0, CumDiffSets)),
-                                Optional.of(ofIntD(0, CumDiffBalls))))
+                        .reasonChain(Stream
+                                .<Reason>of(
+                                        ofIntI(1, Level),
+                                        ofIntI(0, LostMatches),
+                                        ofIntD(0, CumDiffSets),
+                                        ofIntD(0, CumDiffBalls))
+                                .map(Optional::of)
+                                .collect(toList()))
                         .build())
                 .collect(toList());
         return PlayOffResultEntries

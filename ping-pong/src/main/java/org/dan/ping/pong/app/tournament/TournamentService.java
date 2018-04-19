@@ -12,7 +12,6 @@ import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.TERMINAL_STATE;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
-import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.MasterOutcome;
 import static org.dan.ping.pong.app.group.ConsoleTournament.INDEPENDENT_RULES;
@@ -89,6 +88,7 @@ public class TournamentService {
     public static final String TID = "tid";
     public static final String PLACE_IS_BUSY = "place-is-busy";
     private static final List<BidState> VALID_ENLIST_BID_STATES = asList(Want, Paid, Here);
+    public static final PlayOffResultEntries EMPTY_PLAYOFF = PlayOffResultEntries.builder().entries(emptyList()).build();
 
     @Inject
     private TournamentDaoMySql tournamentDao;
@@ -454,8 +454,9 @@ public class TournamentService {
         final List<TournamentResultEntry> groupOrdered = tournament.getRule().getGroup()
                 .map(gr -> groupService.resultOfAllGroupsInCategory(tournament, cid))
                 .orElse(emptyList());
-        final PlayOffResultEntries playOffResult = playOffService
-                .playOffResult(tournament, cid, groupOrdered);
+        final PlayOffResultEntries playOffResult = tournament.getRule().getPlayOff()
+                .map(po -> playOffService.playOffResult(tournament, cid, groupOrdered))
+                .orElse(EMPTY_PLAYOFF);
 
         if (playOffResult.getEntries().isEmpty()) {
             return groupOrdered;

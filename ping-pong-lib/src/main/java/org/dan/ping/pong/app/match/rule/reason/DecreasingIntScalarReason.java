@@ -46,6 +46,10 @@ public class DecreasingIntScalarReason implements Reason {
     }
 
     public String toString() {
-        return format("%s: %d", rule.name(), value);
+        return format(pattern(), rule.name(), value);
+    }
+
+    protected String pattern() {
+        return "%s: -%d";
     }
 }

@@ -3,7 +3,7 @@ package org.dan.ping.pong.app.match.rule.service.common;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.Random;
-import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.ofIntD;
+import static org.dan.ping.pong.app.match.rule.reason.IncreasingIntScalarReason.ofIntI;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -50,11 +50,11 @@ public class PickRandomlyRuleService implements GroupOrderRuleService {
         if (params.isDisambiguationMatchesWillBeCreated()) {
             return empty();
         }
-        final CounterInt c = new CounterInt();
         final int gid = params.getGid();
         if (allUidsInOneGroup(gid)) {
+            final CounterInt c = new CounterInt();
             return of(shufflePredicted(uids, gid).stream()
-                    .map(uid -> ofIntD(uid, c.postInc(), getName())));
+                    .map(uid -> ofIntI(uid, c.postInc(), getName())));
         }
         final Multimap<Integer, Uid> gidUids = HashMultimap.create();
         uids.forEach(uid -> gidUids.put(
@@ -82,8 +82,9 @@ public class PickRandomlyRuleService implements GroupOrderRuleService {
             }
             toBeRemoved.clear();
         }
+        final CounterInt c = new CounterInt();
         return of(allUids.stream()
-                .map(uid -> ofIntD(uid, c.postInc(), getName())));
+                .map(uid -> ofIntI(uid, c.postInc(), getName())));
     }
 
     private boolean allUidsInOneGroup(int gid) {

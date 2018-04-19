@@ -36,4 +36,15 @@ public class InfoReason implements Reason {
     public String toString() {
         return "skip " + rule.name();
     }
+
+    public boolean equals(Object o) {
+        if (o instanceof InfoReason) {
+            return rule == ((InfoReason) o).rule;
+        }
+        return false;
+    }
+
+    public int hashCode() {
+        return rule.hashCode();
+    }
 }

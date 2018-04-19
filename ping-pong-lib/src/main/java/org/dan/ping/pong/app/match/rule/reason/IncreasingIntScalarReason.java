@@ -28,4 +28,8 @@ public class IncreasingIntScalarReason extends DecreasingIntScalarReason {
     public int compareTo(Reason r) {
         return -super.compareTo(r);
     }
+
+    protected String pattern() {
+        return "%s: +%d";
+    }
 }

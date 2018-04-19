@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -178,7 +179,10 @@ public class GroupService {
                 .stream()
                 .collect(toMap(
                         e -> e.getReason().get().getUid(),
-                        e -> groupPosToResult(tournament, e)));
+                        e -> groupPosToResult(tournament, e,
+                                groupMatches.stream()
+                                        .filter(m -> m.hasParticipant(
+                                                e.getReason().get().getUid())))));
 
         range(0, finalPositions.size()).forEach(
                 i -> result.get(finalPositions.get(i)).setFinishPosition(i));
@@ -195,7 +199,7 @@ public class GroupService {
     }
 
     private GroupParticipantResult groupPosToResult(
-            TournamentMemState tournament, GroupPosition gp) {
+            TournamentMemState tournament, GroupPosition gp, Stream<MatchInfo> matches) {
         final ParticipantMemState bid = tournament.getParticipant(
                 gp.getReason().get().getUid());
         return GroupParticipantResult.builder()
@@ -203,8 +207,7 @@ public class GroupService {
                 .uid(bid.getUid())
                 .state(bid.getState())
                 .reasonChain(gp.reasonChain())
-                .matches(gp.getMatches().stream()
-                        .filter(m -> m.hasParticipant(bid.getUid()))
+                .matches(matches
                         .collect(toMap(
                                 m -> m.getOpponentUid(bid.getUid()).get(),
                                 m -> matchResult(bid.getUid(), tournament, m))))

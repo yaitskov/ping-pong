@@ -24,10 +24,8 @@ public class GroupParticipantResult {
     private Uid uid;
     private String name;
     private Map<Uid, GroupMatchResult> matches;
-    private int punkts;
     private int seedPosition;
     private int finishPosition;
     private List<Optional<Reason>> reasonChain;
-    private boolean dice;
     private BidState state;
 }

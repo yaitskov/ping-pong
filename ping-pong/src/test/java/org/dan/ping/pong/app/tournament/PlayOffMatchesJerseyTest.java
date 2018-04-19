@@ -276,7 +276,11 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
                                     allOf(
                                             hasProperty("level", is(1)),
                                             hasProperty("mid", is(console.resolveMid(p2, p4))),
-                                            hasProperty("tag", is(MatchTag.builder().prefix("L").number(1).build())))));
+                                            hasProperty("tag", is(Optional.of(
+                                                    MatchTag.builder()
+                                                            .prefix("L")
+                                                            .number(1)
+                                                            .build()))))));
                     assertThat(matches.getMatches(),
                             hasItem(hasProperty("id", is(console.resolveMid(p2, p4)))));
                     assertThat(matches.getTransitions(),

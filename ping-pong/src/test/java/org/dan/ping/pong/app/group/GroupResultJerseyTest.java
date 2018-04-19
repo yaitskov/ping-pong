@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.group;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.*;
 import static java.util.Collections.singletonList;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
@@ -49,7 +48,6 @@ import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 
 import javax.inject.Inject;

@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.group;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -9,6 +10,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
+import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.Pending;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.Run;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.WalkOver;
@@ -275,7 +277,9 @@ public class GroupService {
     public List<TournamentResultEntry> resultOfAllGroupsInCategory(
             TournamentMemState tournament, int cid) {
         final List<MatchInfo> allGroupMatches = tournament.findGroupMatchesByCategory(cid);
-
+        if (allGroupMatches.isEmpty()) {
+            return tournamentOfSingle(tournament, cid);
+        }
         final GroupParticipantOrder order = groupParticipantOrderService.findOrder(
                 ofParams(0, tournament, allGroupMatches,
                         tournament.orderRules().stream()
@@ -297,6 +301,18 @@ public class GroupService {
                             .reasonChain(gp.reasonChain())
                             .build();
                 })
+                .collect(toList());
+    }
+
+    private List<TournamentResultEntry> tournamentOfSingle(TournamentMemState tournament, int cid) {
+        return tournament.getParticipants().values().stream()
+                .filter(bid -> bid.getState() == Win1 && bid.getCid() == cid)
+                .map(bid -> TournamentResultEntry.builder()
+                        .user(bid.toLink())
+                        .playOffStep(Optional.empty())
+                        .state(Win1)
+                        .reasonChain(emptyList())
+                        .build())
                 .collect(toList());
     }
 

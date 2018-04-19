@@ -27,6 +27,10 @@ public class DecreasingIntScalarReason implements Reason {
     private int value;
     private OrderRuleName rule;
 
+    public static DecreasingIntScalarReason ofIntD(int n, OrderRuleName rule) {
+        return ofIntD(null, n, rule);
+    }
+
     public static DecreasingIntScalarReason ofIntD(Uid uid, int n, OrderRuleName rule) {
         return new DecreasingIntScalarReason(uid, n, rule);
     }

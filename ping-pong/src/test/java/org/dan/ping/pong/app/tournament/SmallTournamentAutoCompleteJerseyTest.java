@@ -1,5 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11_NP;
@@ -36,7 +38,7 @@ public class SmallTournamentAutoCompleteJerseyTest extends AbstractSpringJerseyT
 
         isf.create(scenario)
                 .run(c -> c.beginTournament()
-                        .checkResult()
+                        .checkResult(emptyList())
                         .checkTournamentComplete(BidStatesDesc.restState(Quit)));
     }
 
@@ -61,8 +63,8 @@ public class SmallTournamentAutoCompleteJerseyTest extends AbstractSpringJerseyT
 
         isf.create(scenario)
                 .run(c -> c.beginTournament()
-                        .checkResult(c1, p1)
-                        .checkResult(c2, p2)
+                        .checkResult(c1, singletonList(singletonList(p1)))
+                        .checkResult(c2, singletonList(singletonList(p2)))
                         .checkTournamentComplete(BidStatesDesc.restState(Win1)
                                 .bid(p1, Win1).bid(p2, Win1)));
     }

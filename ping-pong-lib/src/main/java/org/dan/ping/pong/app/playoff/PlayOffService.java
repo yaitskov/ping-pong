@@ -1,9 +1,17 @@
 package org.dan.ping.pong.app.playoff;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
+import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.ConsoleLayered;
 import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.CumDiffBalls;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.CumDiffSets;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.Level;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.LostMatches;
+import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.ofIntD;
+import static org.dan.ping.pong.app.match.rule.reason.IncreasingIntScalarReason.ofIntI;
 import static org.dan.ping.pong.app.playoff.PlayOffBidStat.PLAY_OFF_BID_STAT_COMPARATOR;
 import static org.dan.ping.pong.app.tournament.GroupMaxMap.findMaxes;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
@@ -28,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -125,6 +134,9 @@ public class PlayOffService {
                     });
                 });
 
+        if (uidStat.isEmpty()) {
+            return tournamentOfSingle(tournament, cid);
+        }
         uidStat.remove(FILLER_LOSER_UID);
         return PlayOffResultEntries.builder()
                 .entries(
@@ -133,6 +145,31 @@ public class PlayOffService {
                                 .map(stat -> statToResultEntry(stat, tournament))
                                 .collect(toList()))
                 .playOffUids(uidStat.keySet())
+                .build();
+    }
+
+    private PlayOffResultEntries tournamentOfSingle(TournamentMemState tournament, int cid) {
+        final List<TournamentResultEntry> entries = tournament.getParticipants()
+                .values()
+                .stream()
+                .filter(bid -> bid.getState() == Win1 && bid.getCid() == cid)
+                .map(bid -> TournamentResultEntry.builder()
+                        .user(bid.toLink())
+                        .playOffStep(Optional.of(1))
+                        .state(Win1)
+                        .reasonChain(asList(
+                                Optional.of(ofIntI(1, Level)),
+                                Optional.of(ofIntI(0, LostMatches)),
+                                Optional.of(ofIntD(0, CumDiffSets)),
+                                Optional.of(ofIntD(0, CumDiffBalls))))
+                        .build())
+                .collect(toList());
+        return PlayOffResultEntries
+                .builder()
+                .playOffUids(entries.stream()
+                        .map(e -> e.getUser().getUid())
+                        .collect(Collectors.toSet()))
+                .entries(entries)
                 .build();
     }
 

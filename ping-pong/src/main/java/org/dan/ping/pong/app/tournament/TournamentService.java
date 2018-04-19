@@ -458,9 +458,6 @@ public class TournamentService {
                 .playOffResult(tournament, cid, groupOrdered);
 
         if (playOffResult.getEntries().isEmpty()) {
-            if (groupOrdered.isEmpty()) {
-                return tournamentOfSingle(tournament, cid);
-            }
             return groupOrdered;
         } else {
             combineGroupAndPlayOffEntries(groupOrdered, playOffResult);
@@ -489,17 +486,6 @@ public class TournamentService {
         playOffResult.getEntries().forEach(
                 e -> e.getReasonChain().addAll(reasonChains.get(e.getUser().getUid())));
         playOffResult.getEntries().addAll(leftInGroup);
-    }
-
-    private List<TournamentResultEntry> tournamentOfSingle(TournamentMemState tournament, int cid) {
-        return tournament.getParticipants().values().stream()
-                .filter(bid -> bid.getState() == Win1 && bid.getCid() == cid)
-                .map(bid -> TournamentResultEntry.builder()
-                        .user(bid.toLink())
-                        .playOffStep(Optional.empty())
-                        .state(Win1)
-                        .build())
-                .collect(toList());
     }
 
     public TournamentComplete completeInfo(TournamentMemState tournament) {

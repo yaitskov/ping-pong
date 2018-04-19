@@ -1,12 +1,12 @@
 package org.dan.ping.pong.app.match.rule.service.meta;
 
 import static org.dan.ping.pong.app.match.rule.filter.DisambiguationScope.DISAMBIGUATION_MATCHES;
-import static org.dan.ping.pong.app.match.rule.filter.DisambiguationScope.ORIGIN_MATCHES;
 import static org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleServiceTest.UIDS_2_3_4;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.rule.rules.meta.UseDisambiguationMatchesDirective;
 import org.dan.ping.pong.app.match.rule.service.GroupRuleParams;
 import org.junit.Test;
 
@@ -18,12 +18,8 @@ public class UseDisambiguationMatchesDirectiveServiceTest {
 
     @Test
     public void setDisambigautionFlag() {
-        final GroupRuleParams params = GroupRuleParams.builder().build();
-        assertThat(params.getDisambiguationMode(), is(ORIGIN_MATCHES));
-        assertThat(sut.score(() -> Stream.of(new MatchInfo()),
-                UIDS_2_3_4, null, params),
-                is(Optional.empty()));
-        assertThat(params.getDisambiguationMode(), is(DISAMBIGUATION_MATCHES));
+        assertThat(new UseDisambiguationMatchesDirective().disambiguationScope().get(),
+                is(DISAMBIGUATION_MATCHES));
     }
 
     @Test

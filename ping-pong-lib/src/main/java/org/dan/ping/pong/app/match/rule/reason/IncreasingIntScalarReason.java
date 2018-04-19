@@ -12,6 +12,10 @@ public class IncreasingIntScalarReason extends DecreasingIntScalarReason {
         super(uid, n, rule);
     }
 
+    public static IncreasingIntScalarReason ofIntI(int n, OrderRuleName rule) {
+        return ofIntI(null, n, rule);
+    }
+
     public static IncreasingIntScalarReason ofIntI(Uid uid, int n, OrderRuleName rule) {
         return new IncreasingIntScalarReason(uid, n, rule);
     }

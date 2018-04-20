@@ -5,6 +5,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
@@ -49,6 +50,7 @@ import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
@@ -186,12 +188,25 @@ public class TournamentService {
         enlist(tournament, uid, enlistment.getProvidedRank(), batch, Optional.empty());
     }
 
+    public void deleteByMids(TournamentMemState tournament, DbUpdater batch, Set<Mid> mids) {
+        matchDao.deleteByIds(mids, batch);
+        tournament.getMatches().keySet().removeAll(mids);
+    }
+
     private void enlist(TournamentMemState tournament, Uid uid,
             Optional<Integer> providedRank, DbUpdater batch, Optional<Integer> oGid) {
         bidDao.enlist(tournament.getParticipant(uid), providedRank, batch);
         if (tournament.getState() == Open) {
-            oGid.ifPresent(gid ->
-                    castingLotsService.addParticipant(uid, tournament, batch));
+            oGid.ifPresent(gid -> {
+                if (!tournament.disambiguationMatchNotPossible()) {
+                    deleteByMids(tournament, batch, tournament.getMatches()
+                            .values().stream()
+                            .filter(m -> m.getGid().equals(oGid) && m.getTag().isPresent())
+                            .map(MatchInfo::getMid)
+                            .collect(toSet()));
+                }
+                castingLotsService.addParticipant(uid, tournament, batch);
+            });
         }
     }
 

@@ -238,16 +238,11 @@ public class MatchEditorService {
                         tournament, batch,
                         tournament.getMatchById(aMatch.getMid()),
                         aMatch.getUid()));
-        deleteByMids(tournament, batch, affectedMatches.getToBeRemoved());
+        tournamentService.deleteByMids(tournament, batch, affectedMatches.getToBeRemoved());
 
         affectedMatches.getToBeCreated().forEach(
                 mp -> groupService.createDisambiguateMatches(tournament,
                         tournament.getParticipant(mp.getUidLess()).gid(), mp));
-    }
-
-    private void deleteByMids(TournamentMemState tournament, DbUpdater batch, Set<Mid> mids) {
-        matchDao.deleteByIds(mids, batch);
-        tournament.getMatches().keySet().removeAll(mids);
     }
 
     private void removeParticipant(TournamentMemState tournament,

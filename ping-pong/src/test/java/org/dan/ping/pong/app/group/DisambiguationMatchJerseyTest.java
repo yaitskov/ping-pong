@@ -4,18 +4,24 @@ import static java.util.Arrays.asList;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
+import static org.dan.ping.pong.app.group.GroupResource.CID;
+import static org.dan.ping.pong.app.group.GroupResource.GROUP_POPULATIONS;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S2A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.rule.rules.common.DirectOutcomeRule.DIRECT_OUTCOME_RULE;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST_OFFLINE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
+import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc.restState;
 
 import org.dan.ping.pong.JerseySpringTest;
+import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.match.rule.rules.common.BallsBalanceRule;
@@ -24,10 +30,12 @@ import org.dan.ping.pong.app.match.rule.rules.common.OrderByUidRule;
 import org.dan.ping.pong.app.match.rule.rules.common.PickRandomlyRule;
 import org.dan.ping.pong.app.match.rule.rules.meta.UseDisambiguationMatchesDirective;
 import org.dan.ping.pong.app.match.rule.rules.ping.CountJustPunktsRule;
+import org.dan.ping.pong.app.tournament.EnlistOffline;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.mock.simulator.Player;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
+import org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulator;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
@@ -38,6 +46,7 @@ import org.springframework.test.context.ContextConfiguration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -312,7 +321,48 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void addParticipantToCompleteGroupWithDm() {
+        final TournamentScenario scenario = ambigousScenario("addPlayerCompleteDm");
+        final ImperativeSimulator simulator = isf.create(scenario);
+        simulator.run(c -> {
+            c.and(this::makeGroupAmbigous)
+                    .reloadMatchMap()
+                    .scoreSet(p1, 11, p2, 0)
+                    .scoreSet(p3, 11, p2, 0);
+
+            final int cid = scenario.getCategoryDbId().get(c1);
+
+            final GroupPopulations populations = myRest()
+                    .get(GROUP_POPULATIONS + scenario.getTid().getTid() + CID + cid,
+                            GroupPopulations.class);
+
+            final Uid joinedUid = enlistParticipant(scenario, cid, populations, "p4");
+            scenario.addPlayer(joinedUid, p4);
+            c.reloadMatchMap()
+                    // dm disappeared .scoreSet(p3, 11, p1, 0)
+                    .scoreSet(p1, 9, p4, 11)
+                    .scoreSet(p2, 3, p4, 11)
+                    .scoreSet(p3, 11, p4, 6)
+                    .checkResult(p3, p4, p1, p2)
+                    .checkTournamentComplete(BidStatesDesc
+                            .restState(Lost).bid(p3, Win1));
+        });
     }
+
+    private Uid enlistParticipant(TournamentScenario scenario, int cid, GroupPopulations populations, String p5) {
+        return enlistParticipant(scenario, cid, Optional.of(populations.getLinks().get(0).getGid()), p5);
+    }
+
+    private Uid enlistParticipant(TournamentScenario scenario, int cid, Optional<Integer> gid, String p5) {
+        return myRest().post(TOURNAMENT_ENLIST_OFFLINE, scenario,
+                EnlistOffline.builder()
+                        .groupId(gid)
+                        .tid(scenario.getTid())
+                        .cid(cid)
+                        .bidState(BidState.Wait)
+                        .name(p5)
+                        .build()).readEntity(Uid.class);
+    }
+
 
     @Test
     public void expelParticipantWithDmMatches() {
@@ -328,5 +378,10 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void moveParticipantWithDmMatchToAnotherGroup() {
+    }
+
+    @Test
+    public void participantWithDmGetToConsoleTournament() {
+
     }
 }

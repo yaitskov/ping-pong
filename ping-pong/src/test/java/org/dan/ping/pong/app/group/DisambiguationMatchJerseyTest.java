@@ -142,6 +142,12 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                 .scoreSet2(p3, 11, p1, 0);
     }
 
+    private ImperativeSimulator makeGroupUnambigous(ImperativeSimulator c) {
+        return c.scoreSet(p1, 11, p2, 0)
+                .scoreSet(p3, 11, p2, 0)
+                .scoreSet(p3, 11, p1, 0);
+    }
+
     private TournamentScenario ambigousScenario(String name) {
         return ambigousScenario(name, DM_ORDER_RULES_PUNKTS);
     }
@@ -186,6 +192,20 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void rescoreOriginMatchRemovingAmbiguatyKeepOver() {
+        final TournamentScenario scenario = ambigousScenario(
+                "rescoreOriginKeepOver", DM_ORDER_RULES_BALLS);
+        final ImperativeSimulator simulator = isf.create(scenario);
+        final Map<Set<Player>, Mid> originMatchMap = new HashMap<>();
+        final Map<Set<Player>, Mid> dmMatchMap = new HashMap<>();
+        simulator.run(c -> makeGroupAmbigous(c)
+                .storeMatchMap(originMatchMap)
+                .reloadMatchMap()
+                .storeMatchMap(dmMatchMap)
+                .and(this::makeGroupUnambigous)
+                .restoreMatchMap(originMatchMap)
+                .rescoreMatch(p1, p3, 11, 9)
+                .checkResult(p1, p2, p3)
+                .checkTournamentComplete(restState(Lost).bid(p1, Win1)));
     }
 
     @Test

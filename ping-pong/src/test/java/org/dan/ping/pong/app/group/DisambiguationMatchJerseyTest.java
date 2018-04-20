@@ -6,7 +6,6 @@ import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S2A2G11_NP;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S3A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.rule.rules.common.DirectOutcomeRule.DIRECT_OUTCOME_RULE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
@@ -23,7 +22,6 @@ import org.dan.ping.pong.app.match.rule.rules.common.BallsBalanceRule;
 import org.dan.ping.pong.app.match.rule.rules.common.LostBallsRule;
 import org.dan.ping.pong.app.match.rule.rules.common.OrderByUidRule;
 import org.dan.ping.pong.app.match.rule.rules.common.PickRandomlyRule;
-import org.dan.ping.pong.app.match.rule.rules.common.WonBallsRule;
 import org.dan.ping.pong.app.match.rule.rules.meta.UseDisambiguationMatchesDirective;
 import org.dan.ping.pong.app.match.rule.rules.ping.CountJustPunktsRule;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
@@ -258,6 +256,19 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void rescoreOpenDmMatchKeep() {
+        final TournamentScenario scenario = ambigousScenario(
+                "rescoreOpenDmMatchKeep", RULES_G_S2A2G11_NP);
+        final ImperativeSimulator simulator = isf.create(scenario);
+        simulator.run(c -> makeGroupAmbigous2(c)
+                .reloadMatchMap()
+                .scoreSet(p1, 11, p2, 0)
+                .scoreSet2(p3, 11, p2, 0)
+                .scoreSet2(p3, 11, p1, 0)
+                .rescoreMatch(p1, p2, 9, 11)
+                .scoreSet(1, p1, 11, p2, 0)
+                .scoreSet(2, p1, 9, p2, 11)
+                .checkResult(p3, p2, p1)
+                .checkTournamentComplete(restState(Lost).bid(p3, Win1)));
     }
 
     @Test

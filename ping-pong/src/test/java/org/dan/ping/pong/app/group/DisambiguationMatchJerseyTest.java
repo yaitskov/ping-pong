@@ -273,6 +273,17 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void rescoreOpenDmMatchComplete() {
+        final TournamentScenario scenario = ambigousScenario(
+                "rescoreOpenDmMatchComplete", RULES_G_S2A2G11_NP);
+        final ImperativeSimulator simulator = isf.create(scenario);
+        simulator.run(c -> makeGroupAmbigous2(c)
+                .reloadMatchMap()
+                .scoreSet(p1, 11, p2, 0)
+                .scoreSet2(p3, 11, p2, 0)
+                .scoreSet2(p3, 11, p1, 0)
+                .rescoreMatch(p1, p2, 9, 11, 8, 11)
+                .checkResult(p3, p2, p1)
+                .checkTournamentComplete(restState(Lost).bid(p3, Win1)));
     }
 
     @Test

@@ -13,6 +13,7 @@ import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q1;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q2;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S1A2G11;
+import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S2A2G11;
 import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S3A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_WATCH_LIST_OPEN;
 import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
@@ -108,6 +109,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
 
     public static final TournamentRules RULES_G_S3A2G11 = RULES_G8Q1_S3A2G11.withPlayOff(Optional.empty());
     public static final TournamentRules RULES_G_S3A2G11_NP = RULES_G_S3A2G11.withPlace(Optional.empty());
+    public static final TournamentRules RULES_G_S2A2G11_NP = RULES_G_S3A2G11_NP.withMatch(S2A2G11);
 
     public static final TournamentRules RULES_G8Q1_S1A2G11 = TournamentRules
             .builder()

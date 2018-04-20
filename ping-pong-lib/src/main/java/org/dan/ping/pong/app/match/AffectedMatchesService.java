@@ -194,7 +194,7 @@ public class AffectedMatchesService {
     private AffectedMatches findAffectedByOriginMatch(TournamentMemState tournament,
             MatchInfo ogmi, MatchInfo gmiNewScore, List<MatchInfo> allGroupMatches) {
         final List<MatchInfo> originMatches = allGroupMatches.stream()
-                .filter(m -> m.getTag().isPresent()).collect(toList());
+                .filter(m -> !m.getTag().isPresent()).collect(toList());
         final int incompleteOriginMatches = countIncompleteMatches(originMatches);
         final List<MatchInfo> newOriginMatches = replaceMatch(gmiNewScore, originMatches);
         final int newIncompleteOriginMatches = countIncompleteMatches(newOriginMatches);
@@ -331,7 +331,7 @@ public class AffectedMatchesService {
                      gPosition.getCompetingUids());
              for (int i = 0; i < competingUids.size(); ++i) {
                  final Uid uid1 = competingUids.get(i);
-                 for (int j = i + i; j < competingUids.size(); ++j) {
+                 for (int j = i + 1; j < competingUids.size(); ++j) {
                      disambiguationMatches.add(
                              new MatchParticipants(uid1, competingUids.get(j)));
                  }

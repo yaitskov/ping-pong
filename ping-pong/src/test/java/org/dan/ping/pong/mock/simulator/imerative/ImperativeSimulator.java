@@ -83,6 +83,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import javax.ws.rs.core.GenericType;
@@ -373,6 +374,15 @@ public class ImperativeSimulator {
 
     public ImperativeSimulator scoreSet(Player p1, int games1, Player p2, int games2) {
         return scoreSet(0, p1, games1, p2, games2);
+    }
+
+    public ImperativeSimulator scoreSet2(Player p1, int games1, Player p2, int games2) {
+        return scoreSet(0, p1, games1, p2, games2)
+                .scoreSet(1, p1, games1, p2, games2);
+    }
+
+    public ImperativeSimulator and(Function<ImperativeSimulator, ImperativeSimulator> f) {
+        return f.apply(this);
     }
 
     public ImperativeSimulator storeMatchMap(Map<Set<Player>, Mid> memory) {

@@ -69,6 +69,8 @@ public class MatchScheduleInGroupJerseyTest extends AbstractSpringJerseyTest {
             .minGamesToWin(11)
             .build();
 
+    public static final PingPongMatchRules S2A2G11 = S3A2G11.withSetsToWin(2);
+
     public static final PingPongMatchRules S3A2G11_COS = S3A2G11.withCountOnlySets(true);
 
     public static final PingPongMatchRules S3 = S3A2G11.withCountOnlySets(true);

@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Collections.emptyList;
+import static org.dan.ping.pong.app.group.GroupService.MATCH_TAG_DISAMBIGUATION;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.collect.ImmutableMap;
@@ -24,12 +25,15 @@ public class MatchParticipants implements Comparable<MatchParticipants>, Hashabl
     private final Uid uidMore;
 
     public MatchParticipants(Uid uidLess, Uid uidMore) {
-        if (uidLess.compareTo(uidMore) <= 0) {
+        if (uidLess.equals(uidMore)) {
+            throw internalError("match uids equal " + uidLess);
+        }
+        if (uidLess.compareTo(uidMore) < 0) {
             this.uidLess = uidLess;
             this.uidMore = uidMore;
         } else {
-            this.uidLess = uidLess;
-            this.uidMore = uidMore;
+            this.uidLess = uidMore;
+            this.uidMore = uidLess;
         }
     }
 
@@ -53,6 +57,7 @@ public class MatchParticipants implements Comparable<MatchParticipants>, Hashabl
 
     public MatchInfo toFakeMatch() {
         return MatchInfo.builder().mid(Mid.of(-1))
+                .tag(MATCH_TAG_DISAMBIGUATION)
                 .participantIdScore(
                         ImmutableMap.of(
                                 uidLess, emptyList(),

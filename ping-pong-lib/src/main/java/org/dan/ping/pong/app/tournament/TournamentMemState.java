@@ -5,6 +5,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName._DisambiguationPreview;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.createLoserBid;
 import static org.dan.ping.pong.app.user.UserRole.Admin;
@@ -15,6 +17,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +28,7 @@ import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.dispute.DisputeMemState;
+import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.playoff.PowerRange;
@@ -186,10 +190,19 @@ public class TournamentMemState {
                 .orElseThrow(() -> internalError("Tournament " + tid + " has no group " + gid));
     }
 
+    private static final Set<OrderRuleName> DIS_MOD_RULES = ImmutableSet.of(
+            UseDisambiguationMatches, _DisambiguationPreview);
+
     public boolean disambiguationMatchNotPossible() {
         return !rule.getGroup()
-                .orElseThrow(() -> internalError("Tournament has no groups", TID, tid))
-                .getDisambiguationMatch().isPresent();
+                .map(g -> g.getOrderRules()
+                        .stream()
+                        .map(GroupOrderRule::name)
+                        .filter(DIS_MOD_RULES::contains)
+                        .findAny()
+                        .map(x -> true)
+                        .orElse(false))
+                .orElse(false);
     }
 
     public List<GroupOrderRule> orderRules() {

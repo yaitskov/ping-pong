@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.group;
 
 import static java.util.Arrays.asList;
+import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
@@ -320,7 +321,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
     }
 
     @Test
-    public void addParticipantToCompleteGroupWithDm() {
+    public void addParticipantToAlmostCompleteGroupWithDm() {
         final TournamentScenario scenario = ambigousScenario("addPlayerCompleteDm");
         final ImperativeSimulator simulator = isf.create(scenario);
         simulator.run(c -> {
@@ -363,9 +364,19 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                         .build()).readEntity(Uid.class);
     }
 
-
     @Test
     public void expelParticipantWithDmMatches() {
+        final TournamentScenario scenario = ambigousScenario("expelParticipantWithDmMatches");
+        final ImperativeSimulator simulator = isf.create(scenario);
+        simulator.run(c -> makeGroupAmbigous(c)
+                .reloadMatchMap()
+                .scoreSet(p1, 11, p2, 0)
+                .scoreSet(p3, 11, p2, 0)
+                .expelPlayer(p1)
+                .checkResult(p3, p1, p2)
+                .checkTournamentComplete(restState(Lost)
+                        .bid(p1, Expl)
+                        .bid(p3, Win1)));
     }
 
     @Test

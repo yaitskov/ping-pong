@@ -381,6 +381,18 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void expelParticipantFromDmGroup() {
+        final TournamentScenario scenario = ambigousScenario(
+                "expelParticipantFromDmGroup", DM_ORDER_RULES_NO_F2F);
+        final ImperativeSimulator simulator = isf.create(scenario);
+        simulator.run(c -> c.beginTournament()
+                .scoreSet(p1, 11, p2, 4)
+                .scoreSet(p2, 11, p3, 5)
+                .scoreSet(p3, 11, p1, 4)
+                .reloadMatchMap()
+                .expelPlayer(p2)
+                .scoreSet(p3, 11, p1, 5) // dm match
+                .checkResult(p3, p1, p2)
+                .checkTournamentComplete(restState(Lost).bid(p2, Expl).bid(p3, Win1)));
     }
 
     @Test

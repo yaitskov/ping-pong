@@ -238,6 +238,25 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
     }
 
     @Test
+    public void rescoreOriginMatchChangingAmbiguatyShrink() {
+        final TournamentScenario scenario = ambigousScenario(
+                "rescoreOriginChangeAmbigShrink", DM_ORDER_RULES_NO_F2F);
+        final ImperativeSimulator simulator = isf.create(scenario);
+        final Map<Set<Player>, Mid> originMatchMap = new HashMap<>();
+        simulator.run(c -> c.beginTournament()
+                .scoreSet(p1, 11, p2, 4)
+                .scoreSet(p2, 11, p3, 4)
+                .scoreSet(p3, 11, p1, 4)
+                .storeMatchMap(originMatchMap)
+                .reloadMatchMap()
+                .scoreSet(p1, 11, p3, 2) // disambiguate match
+                .restoreMatchMap(originMatchMap)
+                .rescoreMatch(p2, p3, 11, 5)
+                .checkResult(p1, p3, p2)
+                .checkTournamentComplete(restState(Lost).bid(p1, Win1)));
+    }
+
+    @Test
     public void rescoreOpenDmMatchKeep() {
     }
 

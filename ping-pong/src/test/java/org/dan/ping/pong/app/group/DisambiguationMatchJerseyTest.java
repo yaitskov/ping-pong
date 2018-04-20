@@ -83,10 +83,29 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                     .storeMatchMap(dmMatchMap)
                     .scoreSet(p1, 11, p2, 0)
                     .restoreMatchMap(originMatchMap)
-                    .rescoreMatch(p1, p3, 1, 11)
+                    .rescoreMatch(p1, p3, 9, 11)
                     .restoreMatchMap(dmMatchMap)
                     .scoreSet(p3, 11, p2, 0)
                     .scoreSet(p3, 11, p1, 0)
+                    .checkResult(p3, p1, p2)
+                    .checkTournamentComplete(restState(Lost).bid(p3, Win1));
+        });
+    }
+
+    @Test
+    public void rescoreOriginCompleteMatchKeepingAmbiguatyComplete() {
+        final TournamentScenario scenario = ambigousScenario("rescoreOriginKeepComplete");
+        final ImperativeSimulator simulator = isf.create(scenario);
+        final Map<Set<Player>, Mid> originMatchMap = new HashMap<>();
+        simulator.run(c -> {
+            makeGroupAmbigous(c)
+                    .storeMatchMap(originMatchMap)
+                    .reloadMatchMap()
+                    .scoreSet(p1, 11, p2, 0)
+                    .scoreSet(p3, 11, p2, 0)
+                    .scoreSet(p3, 11, p1, 0)
+                    .restoreMatchMap(originMatchMap)
+                    .rescoreMatch(p1, p3, 9, 11)
                     .checkResult(p3, p1, p2)
                     .checkTournamentComplete(restState(Lost).bid(p3, Win1));
         });

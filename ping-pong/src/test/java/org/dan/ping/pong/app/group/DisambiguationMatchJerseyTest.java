@@ -20,7 +20,10 @@ import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.match.rule.rules.common.BallsBalanceRule;
+import org.dan.ping.pong.app.match.rule.rules.common.LostBallsRule;
+import org.dan.ping.pong.app.match.rule.rules.common.OrderByUidRule;
 import org.dan.ping.pong.app.match.rule.rules.common.PickRandomlyRule;
+import org.dan.ping.pong.app.match.rule.rules.common.WonBallsRule;
 import org.dan.ping.pong.app.match.rule.rules.meta.UseDisambiguationMatchesDirective;
 import org.dan.ping.pong.app.match.rule.rules.ping.CountJustPunktsRule;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
@@ -63,6 +66,12 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                     new BallsBalanceRule(),
                     DIRECT_OUTCOME_RULE,
                     new PickRandomlyRule());
+
+    private static final List<GroupOrderRule> DM_ORDER_RULES_NO_F2F =
+            asList(new LostBallsRule(),
+                    new UseDisambiguationMatchesDirective(),
+                    new BallsBalanceRule(),
+                    new OrderByUidRule());
 
     @Inject
     private ImperativeSimulatorFactory isf;
@@ -113,9 +122,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
         simulator.run(c -> makeGroupAmbigous(c)
                 .storeMatchMap(originMatchMap)
                 .reloadMatchMap()
-                .scoreSet(p1, 11, p2, 0)
-                .scoreSet(p3, 11, p2, 0)
-                .scoreSet(p3, 11, p1, 0)
+                .and(this::makeGroupUnambigous)
                 .restoreMatchMap(originMatchMap)
                 .rescoreMatch(p1, p3, 9, 11)
                 .checkResult(p3, p1, p2)
@@ -209,7 +216,25 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
     }
 
     @Test
-    public void rescoreOriginMatchChangingAmbiguaty() {
+    public void rescoreOriginMatchChangingAmbiguatyExpand() {
+        final TournamentScenario scenario = ambigousScenario(
+                "rescoreOriginChangeAmbig", DM_ORDER_RULES_NO_F2F);
+        final ImperativeSimulator simulator = isf.create(scenario);
+        final Map<Set<Player>, Mid> originMatchMap = new HashMap<>();
+        simulator.run(c -> c.beginTournament()
+                .scoreSet(p1, 11, p2, 4)
+                .scoreSet(p2, 11, p3, 5)
+                .scoreSet(p3, 11, p1, 4)
+                .storeMatchMap(originMatchMap)
+                .reloadMatchMap()
+                .scoreSet(p1, 11, p3, 2) // disambiguate match
+                .restoreMatchMap(originMatchMap)
+                .rescoreMatch(p2, p3, 11, 4)
+                .reloadMatchMap()
+                .scoreSet(p2, 11, p1, 3) // new dis ma
+                .scoreSet(p3, 11, p2, 1) // new dis ma
+                .checkResult(p1, p3, p2)
+                .checkTournamentComplete(restState(Lost).bid(p1, Win1)));
     }
 
     @Test

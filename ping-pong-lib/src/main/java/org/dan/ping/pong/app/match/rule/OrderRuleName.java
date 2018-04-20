@@ -7,6 +7,7 @@ public enum OrderRuleName {
 
     F2F,
     Random,
+    UidOrder,
 
     SetsBalance,
     BallsBalance,

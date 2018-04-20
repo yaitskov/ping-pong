@@ -231,7 +231,8 @@ public class AffectedMatchesService {
                 .getToBeCreated();
         final Set<MatchParticipants> uidsOfPresentDmMatches = uidsOfMatches(presentDmMatches);
         final Set<Mid> midsToBeRemoved = presentDmMatches.stream()
-                .filter(m2 -> !newDmMatchesToGenerate.containsAll(m2.getUids()))
+                .filter(m2 -> newDmMatchesToGenerate.stream()
+                        .noneMatch(dm -> dm.hasAll(m2.getUids())))
                 .map(MatchInfo::getMid)
                 .collect(toSet());
         final SetView<MatchParticipants> toBeCreated = difference(

@@ -32,6 +32,7 @@ import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.playoff.PowerRange;
+import org.dan.ping.pong.app.sport.MatchRules;
 import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.sys.error.PiPoEx;
@@ -226,5 +227,14 @@ public class TournamentMemState {
         return participants.values().stream().filter(p -> p.getCid() == cid)
                 .map(ParticipantMemState::getUid)
                 .collect(toSet());
+    }
+
+    public MatchRules selectMatchRule(MatchInfo match) {
+        if (match.getGid().isPresent()) {
+            return rule.getMatch();
+        }
+        return rule.getPlayOff().map(po -> po.getMatch().orElse(rule.getMatch()))
+                .orElseThrow(() -> internalError("match " + match.getMid()
+                        + " without group in tid  " + tid));
     }
 }

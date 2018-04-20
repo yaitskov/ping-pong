@@ -1,5 +1,7 @@
 import TennisScoresStrategy from './TennisScoresStrategy.js';
 
+const rulesSTB1 = {minGamesToWin: 6, minAdvanceInGames: 2,
+                   superTieBreakGames: 10, setsToWin: 1};
 const rulesSTB2 = {minGamesToWin: 6, minAdvanceInGames: 2,
                    superTieBreakGames: 10, setsToWin: 2};
 const rulesSTB3 = Object.assign({}, rulesSTB2, {setsToWin: 3});
@@ -9,19 +11,25 @@ describe('tennis scores strategy', () => {
     const tennisStrategy = new TennisScoresStrategy();
 
     describe('_isSuperTieBreak', () => {
+        it('up to 1 win sets', () => {
+            expect(tennisStrategy._isSuperTieBreak(rulesSTB1, 0)).toBeFalse();
+        });
         it('up to 2 win sets', () => {
             expect(tennisStrategy._isSuperTieBreak(rulesSTB2, 2)).toBeTrue();
             expect(tennisStrategy._isSuperTieBreak(rulesSTB2, 1)).toBeFalse();
+            expect(tennisStrategy._isSuperTieBreak(rulesSTB1, 0)).toBeFalse();
         });
         it('up to 3 win sets', () => {
             expect(tennisStrategy._isSuperTieBreak(rulesSTB3, 4)).toBeTrue();
             expect(tennisStrategy._isSuperTieBreak(rulesSTB3, 3)).toBeFalse();
             expect(tennisStrategy._isSuperTieBreak(rulesSTB3, 2)).toBeFalse();
+            expect(tennisStrategy._isSuperTieBreak(rulesSTB1, 0)).toBeFalse();
         });
         it('up to 4 win sets', () => {
             expect(tennisStrategy._isSuperTieBreak(rulesSTB4, 6)).toBeTrue();
             expect(tennisStrategy._isSuperTieBreak(rulesSTB4, 5)).toBeFalse();
             expect(tennisStrategy._isSuperTieBreak(rulesSTB4, 4)).toBeFalse();
+            expect(tennisStrategy._isSuperTieBreak(rulesSTB1, 0)).toBeFalse();
         });
     });
 

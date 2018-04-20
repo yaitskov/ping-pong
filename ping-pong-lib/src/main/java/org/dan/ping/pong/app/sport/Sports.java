@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.sport;
 
 import static java.util.Optional.ofNullable;
-import static org.dan.ping.pong.app.match.dispute.MatchSets.ofSets;
 import static org.dan.ping.pong.app.tournament.rules.TennisMatchRuleValidator.MATCH_RULE;
 import static org.dan.ping.pong.app.tournament.rules.ValidationError.ofTemplate;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -39,35 +38,30 @@ public class Sports {
     }
 
     public void validateMatch(TournamentMemState tournament, MatchInfo match) {
-        get(tournament.getSport()).validate(tournament.getRule().getMatch(), match);
+        get(tournament.getSport()).validate(tournament.selectMatchRule(match), match);
     }
 
-    public Map<Uid, Integer> calcWonSets(TournamentMemState tournament,MatchInfo matchInfo) {
+    public Map<Uid, Integer> calcWonSets(TournamentMemState tournament, MatchInfo matchInfo) {
         return get(tournament.getSport()).calcWonSets(matchInfo.getParticipantIdScore());
     }
 
-    public Optional<Uid> findWinnerId(TournamentMemState tournament, Map<Uid, Integer> wonSets) {
-        return get(tournament.getSport()).findWinnerId(tournament.getRule().getMatch(), wonSets);
+    public Optional<Uid> findWinnerId(MatchRules rules, Map<Uid, Integer> wonSets) {
+        return get(rules.sport()).findWinnerId(rules, wonSets);
     }
 
     public Optional<Uid> findWinner(TournamentMemState tournament, MatchInfo matchInfo) {
-        return findWinnerByScores(tournament, ofSets(matchInfo.getParticipantIdScore()));
+        return findWinnerByScores(tournament.selectMatchRule(matchInfo),
+                matchInfo.getParticipantIdScore());
     }
 
-    public Optional<Uid> findWinnerByScores(TournamentMemState tournament, MatchSets sets) {
-        final Sport sport = get(tournament.getSport());
-        return sport.findWinnerId(tournament.getRule().getMatch(),
-                sport.calcWonSets(sets.getSets()));
+    public Optional<Uid> findWinnerByScores(MatchRules rules, Map<Uid, List<Integer>> sets) {
+        final Sport sport = get(rules.sport());
+        return sport.findWinnerId(rules, sport.calcWonSets(sets));
     }
 
-    public Optional<Uid> findStronger(TournamentMemState tournament, MatchInfo mInfo) {
-        final Sport sport = get(tournament.getSport());
-        return sport.findStronger(sport.calcWonSets(mInfo.getParticipantIdScore()));
-    }
-
-    public void checkWonSets(TournamentMemState tournament, Map<Uid, Integer> uidWonSets) {
-        final Sport sport = get(tournament.getSport());
-        sport.checkWonSets(tournament.getRule().getMatch(), uidWonSets);
+    public void checkWonSets(MatchRules rules, Map<Uid, Integer> uidWonSets) {
+        final Sport sport = get(rules.sport());
+        sport.checkWonSets(rules, uidWonSets);
     }
 
     public List<SetScoreReq> expandScoreSet(TournamentMemState tournament, SetScoreReq score) {
@@ -76,20 +70,22 @@ public class Sports {
     }
 
     public Optional<Uid> findNewWinnerUid(TournamentMemState tournament,
-            MatchSets newSets, MatchInfo minfo) {
-        if (minfo.getWinnerId().isPresent()) {
-            final Optional<Uid> actualPracticalWinnerUid = findWinner(tournament, minfo);
+            MatchSets newSets, MatchInfo mInfo) {
+        if (mInfo.getWinnerId().isPresent()) {
+            final Optional<Uid> actualPracticalWinnerUid = findWinner(tournament, mInfo);
             // actual uid always = formal uid if actual one is presented,
             // because walkover can happen if match has no scored sets
             // or presented sets are not enough to find out winner
             if (actualPracticalWinnerUid.isPresent()) {
                 // match complete normally (by score)
-                return findWinnerByScores(tournament, newSets);
+                return findWinnerByScores(
+                        tournament.selectMatchRule(mInfo), newSets.getSets());
             } else {
-                return minfo.getWinnerId(); // walkover, quit or expel
+                return mInfo.getWinnerId(); // walkover, quit or expel
             }
         } else {
-            return findWinnerByScores(tournament, newSets);
+            return findWinnerByScores(tournament.selectMatchRule(mInfo),
+                    newSets.getSets());
         }
     }
 
@@ -102,7 +98,7 @@ public class Sports {
     public MatchInfo alternativeSets(TournamentMemState tournament,
             MatchInfo mInfo, MatchSets newSets) {
         final MatchInfo clone = alternativeSetsWithoutWinner(mInfo, newSets);
-        findWinnerByScores(tournament, newSets)
+        findWinnerByScores(tournament.selectMatchRule(mInfo), newSets.getSets())
                 .ifPresent(wUid -> clone.setWinnerId(Optional.of(wUid)));
         return clone;
     }

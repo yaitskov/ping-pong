@@ -5,14 +5,22 @@ import static org.dan.ping.pong.app.tournament.rules.GroupRuleValidator.VALUE_NU
 import static org.dan.ping.pong.app.tournament.rules.ValidationError.ofTemplate;
 
 import com.google.common.collect.Multimap;
+import org.dan.ping.pong.app.sport.Sports;
+import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.rules.ValidationError;
+
+import javax.inject.Inject;
 
 public class PlayOffRuleValidator {
     private static final String THIRD_PLACE = "third-place";
     private static final String PLAYOFF_RULE = "playoff-rule";
     private static final String LOSINGS = ".losings";
 
-    public void validate(Multimap<String, ValidationError> errors, PlayOffRule playOff) {
+    @Inject
+    private Sports sports;
+
+    public void validate(Multimap<String, ValidationError> errors,
+            PlayOffRule playOff, TournamentRules rules) {
         if (playOff == null) {
             errors.put(PLAYOFF_RULE, ofTemplate(VALUE_NULL));
             return;
@@ -23,5 +31,12 @@ public class PlayOffRuleValidator {
         if (playOff.getThirdPlaceMatch() < 0 || playOff.getThirdPlaceMatch() > 1) {
             errors.put(THIRD_PLACE, ofTemplate(OUT_OF_RANGE));
         }
+
+        playOff.getMatch().ifPresent(m -> {
+            sports.validateMatch(m.sport(), errors, m);
+            if (rules.getMatch().sport() != m.sport()) {
+                errors.put(PLAYOFF_RULE + ".match", ofTemplate("sport mismatch"));
+            }
+        });
     }
 }

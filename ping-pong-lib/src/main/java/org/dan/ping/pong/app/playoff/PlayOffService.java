@@ -257,7 +257,8 @@ public class PlayOffService {
         if (m.getState() != Over) {
             return false;
         }
-        final Optional<Uid> calculatedWinner = sports.findWinnerId(tournament, score);
+        final Optional<Uid> calculatedWinner = sports.findWinnerId(
+                tournament.selectMatchRule(m), score);
         return !calculatedWinner.equals(m.getWinnerId());
     }
 

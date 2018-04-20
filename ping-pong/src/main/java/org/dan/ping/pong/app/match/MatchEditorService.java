@@ -201,7 +201,8 @@ public class MatchEditorService {
 
         final MatchInfo mInfoExpectedAfter = sports.alternativeSetsWithoutWinner(mInfo, newSets);
         sports.validateMatch(tournament, mInfoExpectedAfter);
-        sports.checkWonSets(tournament, sports.calcWonSets(tournament, mInfoExpectedAfter));
+        sports.checkWonSets(tournament.selectMatchRule(mInfo),
+                sports.calcWonSets(tournament, mInfoExpectedAfter));
     }
 
     public void resetMatchScore(TournamentMemState tournament, ResetSetScore reset, DbUpdater batch) {

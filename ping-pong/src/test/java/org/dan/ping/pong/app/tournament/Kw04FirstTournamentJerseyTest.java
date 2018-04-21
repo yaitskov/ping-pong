@@ -1,8 +1,8 @@
 package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.app.castinglots.CastingLotsResource.ORDER_BIDS_MANUALLY;
-import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q1;
-import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S1A2G11;
+import static org.dan.ping.pong.app.group.GroupRulesConst.G8Q1;
+import static org.dan.ping.pong.app.match.MatchRulesConst.S1A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_WATCH_LIST_OPEN;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_EXPEL;

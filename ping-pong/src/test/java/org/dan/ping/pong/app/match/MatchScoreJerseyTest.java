@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Arrays.asList;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_FIND_BY_PARTICIPANTS;
 import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;

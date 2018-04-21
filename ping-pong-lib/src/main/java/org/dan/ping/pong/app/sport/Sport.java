@@ -47,22 +47,6 @@ public interface Sport<T extends MatchRules> {
 
     Optional<Uid> findWinnerId(T rules, Map<Uid, Integer> wonSets);
 
-    default Optional<Uid> findStronger(Map<Uid, Integer> wonSets) {
-        if (wonSets.size() == 1) {
-            return wonSets.keySet().stream().findFirst();
-        }
-        final List<Uid> uids = new ArrayList<>(wonSets.keySet());
-        final int scoreA = wonSets.get(uids.get(0));
-        final int scoreB = wonSets.get(uids.get(1));
-        if (scoreA < scoreB) {
-            return Optional.of(uids.get(1));
-        } else if (scoreA > scoreB) {
-            return Optional.of(uids.get(0));
-        } else {
-            return Optional.empty();
-        }
-    }
-
     void checkWonSets(T rules, Map<Uid, Integer> uidWonSets);
 
     default List<SetScoreReq> expandScoreSet(T rules, SetScoreReq score) {

@@ -6,7 +6,9 @@ import static org.dan.ping.pong.app.match.rule.filter.MatchOutcomeScope.ALL_MATC
 import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.AT_LEAST_ONE;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.filter.DisambiguationScope;
@@ -19,8 +21,10 @@ import java.util.Optional;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor(onConstructor = @__(@JsonIgnore))
 public class UseDisambiguationMatchesDirective implements GroupOrderRule {
-    private MatchRules matchRules;
+    private Optional<MatchRules> matchRules = Optional.empty();
 
     @Override
     public OrderRuleName name() {

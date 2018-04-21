@@ -1,6 +1,6 @@
 package org.dan.ping.pong.app.match;
 
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_FIND_BY_PARTICIPANTS;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_FOR_JUDGE;
 import static org.dan.ping.pong.app.match.MatchType.POff;

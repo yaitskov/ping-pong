@@ -1,6 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S1A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q2_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.CANCEL_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Skip;

@@ -61,8 +61,8 @@ import javax.inject.Inject;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupService {
-    public static final Optional<MatchTag> MATCH_TAG_DISAMBIGUATION = Optional.of(
-            MatchTag.builder().prefix(MatchTag.DISAMBIGUATION).build());
+    public static final MatchTag DM_TAG = MatchTag.builder().prefix(MatchTag.DISAMBIGUATION).build();
+    public static final Optional<MatchTag> MATCH_TAG_DISAMBIGUATION = Optional.of(DM_TAG);
 
     public Optional<List<MatchInfo>> checkGroupComplete(
             TournamentMemState tournament, int gid) {

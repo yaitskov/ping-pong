@@ -1,6 +1,6 @@
 package org.dan.ping.pong.simulate;
 
-import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S3A2G11;
+import static org.dan.ping.pong.app.match.MatchRulesConst.S3A2G11;
 import static org.dan.ping.pong.app.tournament.Kw04FirstTournamentJerseyTest.RULES_G8Q1_S1A2G11_NP;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;

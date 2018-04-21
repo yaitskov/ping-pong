@@ -5,6 +5,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
+import static org.dan.ping.pong.app.group.GroupService.DM_TAG;
+import static org.dan.ping.pong.app.group.GroupService.MATCH_TAG_DISAMBIGUATION;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName._DisambiguationPreview;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
@@ -26,10 +28,12 @@ import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.dispute.DisputeMemState;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
+import org.dan.ping.pong.app.match.rule.rules.meta.UseDisambiguationMatchesDirective;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.playoff.PowerRange;
 import org.dan.ping.pong.app.sport.MatchRules;
@@ -194,6 +198,16 @@ public class TournamentMemState {
     private static final Set<OrderRuleName> DIS_MOD_RULES = ImmutableSet.of(
             UseDisambiguationMatches, _DisambiguationPreview);
 
+    public Optional<MatchRules> disambiguationMatchRules() {
+        return rule.getGroup()
+                .flatMap(g -> g.getOrderRules()
+                        .stream()
+                        .filter(gor -> UseDisambiguationMatches.equals(gor.name()))
+                        .findAny()
+                        .map(UseDisambiguationMatchesDirective.class::cast)
+                        .flatMap(UseDisambiguationMatchesDirective::getMatchRules));
+    }
+
     public boolean disambiguationMatchNotPossible() {
         return !rule.getGroup()
                 .map(g -> g.getOrderRules()
@@ -231,10 +245,23 @@ public class TournamentMemState {
 
     public MatchRules selectMatchRule(MatchInfo match) {
         if (match.getGid().isPresent()) {
-            return rule.getMatch();
+            return match
+                    .getTag()
+                    .filter(DM_TAG::equals)
+                    .map(dmTag -> disambiguationMatchRules()
+                            .orElseGet(rule::getMatch))
+                    .orElseGet(rule::getMatch);
         }
+        return playOffMatchRules(match.getMid());
+    }
+
+    public MatchRules playOffMatchRules() {
+        return playOffMatchRules(null);
+    }
+
+    private MatchRules playOffMatchRules(Mid mid) {
         return rule.getPlayOff().map(po -> po.getMatch().orElse(rule.getMatch()))
-                .orElseThrow(() -> internalError("match " + match.getMid()
+                .orElseThrow(() -> internalError("match " + mid
                         + " without group in tid  " + tid));
     }
 }

@@ -1,6 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.MY_RECENT_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.MY_RECENT_TOURNAMENT_JUDGEMENT;
 import static org.dan.ping.pong.mock.simulator.Player.p1;

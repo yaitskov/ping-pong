@@ -1,10 +1,10 @@
 package org.dan.ping.pong.app.match;
 
-import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.G8Q2_M;
-import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S1A2G11;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.GLOBAL;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S1A2G11;
-import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
+import static org.dan.ping.pong.app.group.GroupRulesConst.G8Q2_M;
+import static org.dan.ping.pong.app.match.MatchRulesConst.S1A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.GLOBAL;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q2_S1A2G11;
+import static org.dan.ping.pong.app.tournament.CastingLotsRulesConst.INCREASE_SIGNUP_CASTING;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -27,7 +27,7 @@ import javax.inject.Inject;
 
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = JerseyWithSimulator.class)
-public class DisambiguateGroupScoreJerseyTest extends AbstractSpringJerseyTest {
+public class GroupScoreJerseyTest extends AbstractSpringJerseyTest {
     public static final TournamentRules RULES_G8Q2_S1A2G11_M = TournamentRules
             .builder()
             .match(S1A2G11)

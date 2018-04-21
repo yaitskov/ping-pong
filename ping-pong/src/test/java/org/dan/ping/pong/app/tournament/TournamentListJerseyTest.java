@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S1A2G11_NP;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S1A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11_NP;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q2_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.CANCEL_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.EDITABLE_TOURNAMENTS;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;

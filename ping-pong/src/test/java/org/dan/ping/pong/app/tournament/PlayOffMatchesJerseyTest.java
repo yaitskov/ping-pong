@@ -1,9 +1,9 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.util.Collections.emptyList;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G2Q1_S1A2G11_NP;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_LC_S1A2G11_NP;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S1A2G11_NP;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_LC_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;

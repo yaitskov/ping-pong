@@ -1,16 +1,14 @@
 package org.dan.ping.pong.app.group;
 
-import static java.util.Arrays.asList;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.group.GroupResource.CID;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_POPULATIONS;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S1A2G11_NP;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G_S2A2G11_NP;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S1A2G11_NP;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S2A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchState.Over;
-import static org.dan.ping.pong.app.match.rule.rules.common.DirectOutcomeRule.DIRECT_OUTCOME_RULE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST_OFFLINE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
@@ -25,12 +23,6 @@ import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
-import org.dan.ping.pong.app.match.rule.rules.common.BallsBalanceRule;
-import org.dan.ping.pong.app.match.rule.rules.common.LostBallsRule;
-import org.dan.ping.pong.app.match.rule.rules.common.OrderByUidRule;
-import org.dan.ping.pong.app.match.rule.rules.common.PickRandomlyRule;
-import org.dan.ping.pong.app.match.rule.rules.meta.UseDisambiguationMatchesDirective;
-import org.dan.ping.pong.app.match.rule.rules.ping.CountJustPunktsRule;
 import org.dan.ping.pong.app.tournament.EnlistOffline;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.tournament.TournamentRules;
@@ -55,31 +47,6 @@ import javax.inject.Inject;
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = JerseyWithSimulator.class)
 public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
-    private static final List<GroupOrderRule> DM_ORDER_RULES_PUNKTS =
-            asList(new CountJustPunktsRule(),
-                    DIRECT_OUTCOME_RULE,
-                    new UseDisambiguationMatchesDirective(),
-                    new CountJustPunktsRule(),
-                    DIRECT_OUTCOME_RULE,
-                    new PickRandomlyRule());
-
-    private static final List<GroupOrderRule> DM_ORDER_RULES_BALLS =
-            asList(new CountJustPunktsRule(),
-                    DIRECT_OUTCOME_RULE,
-                    new BallsBalanceRule(),
-                    DIRECT_OUTCOME_RULE,
-                    new UseDisambiguationMatchesDirective(),
-                    new CountJustPunktsRule(),
-                    DIRECT_OUTCOME_RULE,
-                    new BallsBalanceRule(),
-                    DIRECT_OUTCOME_RULE,
-                    new PickRandomlyRule());
-
-    private static final List<GroupOrderRule> DM_ORDER_RULES_NO_F2F =
-            asList(new LostBallsRule(),
-                    new UseDisambiguationMatchesDirective(),
-                    new BallsBalanceRule(),
-                    new OrderByUidRule());
 
     @Inject
     private ImperativeSimulatorFactory isf;
@@ -90,14 +57,10 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
 
         final ImperativeSimulator simulator = isf.create(scenario);
         simulator.run(c -> makeGroupAmbigous(c)
-                .checkMatchStatus(p1, p2, Over)
-                .checkMatchStatus(p1, p3, Over)
-                .checkMatchStatus(p3, p2, Over)
+                .and(this::checkMatchesP1P2P3Over)
                 .checkTournament(Open, restState(Play))
                 .reloadMatchMap()
-                .scoreSet(p1, 11, p2, 0)
-                .scoreSet(p3, 11, p2, 0)
-                .scoreSet(p3, 11, p1, 0)
+                .and(this::makeGroupUnambigous)
                 .checkResult(p3, p1, p2)
                 .checkTournamentComplete(restState(Lost).bid(p3, Win1)));
     }
@@ -164,7 +127,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
     }
 
     private TournamentScenario ambigousScenario(String name) {
-        return ambigousScenario(name, DM_ORDER_RULES_PUNKTS);
+        return ambigousScenario(name, GroupRulesConst.DM_ORDER_RULES_PUNKTS);
     }
 
     private TournamentScenario ambigousScenario(String name, List<GroupOrderRule> rules) {
@@ -181,7 +144,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                 .name(name)
                 .rules(rules.withGroup(
                         rules.getGroup()
-                                .map(g -> g.withOrderRules(DM_ORDER_RULES_PUNKTS))))
+                                .map(g -> g.withOrderRules(GroupRulesConst.DM_ORDER_RULES_PUNKTS))))
                 .category(c1, p1, p2, p3);
     }
 
@@ -208,7 +171,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void rescoreOriginMatchRemovingAmbiguatyKeepOver() {
         final TournamentScenario scenario = ambigousScenario(
-                "rescoreOriginKeepOver", DM_ORDER_RULES_BALLS);
+                "rescoreOriginKeepOver", GroupRulesConst.DM_ORDER_RULES_BALLS);
         final ImperativeSimulator simulator = isf.create(scenario);
         final Map<Set<Player>, Mid> originMatchMap = new HashMap<>();
         final Map<Set<Player>, Mid> dmMatchMap = new HashMap<>();
@@ -226,7 +189,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void rescoreOriginMatchChangingAmbiguatyExpand() {
         final TournamentScenario scenario = ambigousScenario(
-                "rescoreOriginChangeAmbig", DM_ORDER_RULES_NO_F2F);
+                "rescoreOriginChangeAmbig", GroupRulesConst.DM_ORDER_RULES_NO_F2F);
         final ImperativeSimulator simulator = isf.create(scenario);
         final Map<Set<Player>, Mid> originMatchMap = new HashMap<>();
         simulator.run(c -> c.beginTournament()
@@ -248,7 +211,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void rescoreOriginMatchChangingAmbiguatyShrink() {
         final TournamentScenario scenario = ambigousScenario(
-                "rescoreOriginChangeAmbigShrink", DM_ORDER_RULES_NO_F2F);
+                "rescoreOriginChangeAmbigShrink", GroupRulesConst.DM_ORDER_RULES_NO_F2F);
         final ImperativeSimulator simulator = isf.create(scenario);
         final Map<Set<Player>, Mid> originMatchMap = new HashMap<>();
         simulator.run(c -> c.beginTournament()
@@ -382,7 +345,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void expelParticipantFromDmGroup() {
         final TournamentScenario scenario = ambigousScenario(
-                "expelParticipantFromDmGroup", DM_ORDER_RULES_NO_F2F);
+                "expelParticipantFromDmGroup", GroupRulesConst.DM_ORDER_RULES_NO_F2F);
         final ImperativeSimulator simulator = isf.create(scenario);
         simulator.run(c -> c.beginTournament()
                 .scoreSet(p1, 11, p2, 4)
@@ -393,6 +356,27 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                 .scoreSet(p3, 11, p1, 5) // dm match
                 .checkResult(p3, p1, p2)
                 .checkTournamentComplete(restState(Lost).bid(p2, Expl).bid(p3, Win1)));
+    }
+
+    private ImperativeSimulator checkMatchesP1P2P3Over(ImperativeSimulator c) {
+        return c.checkMatchStatus(p1, p2, Over)
+                .checkMatchStatus(p1, p3, Over)
+                .checkMatchStatus(p3, p2, Over);
+    }
+
+    @Test
+    public void customRulesForDmMatches() {
+        final TournamentScenario scenario = ambigousScenario("customRulesForDmMatches",
+                GroupRulesConst.DM_ORDER_RULES_S2A2G11);
+
+        final ImperativeSimulator simulator = isf.create(scenario);
+        simulator.run(c -> makeGroupAmbigous(c)
+                .and(this::checkMatchesP1P2P3Over)
+                .checkTournament(Open, restState(Play))
+                .reloadMatchMap()
+                .and(this::makeGroupUnambigous2)
+                .checkResult(p3, p1, p2)
+                .checkTournamentComplete(restState(Lost).bid(p3, Win1)));
     }
 
     @Test

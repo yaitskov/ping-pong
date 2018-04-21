@@ -55,6 +55,7 @@ import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.sched.TablesDiscovery;
+import org.dan.ping.pong.app.sport.MatchRules;
 import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
@@ -140,10 +141,13 @@ public class MatchService {
                     matchInfo);
         }
 
-        final List<SetScoreReq> scoredSets = expandScoreSet(tournament, score);
+        final List<SetScoreReq> scoredSets = expandScoreSet(
+                score, tournament.selectMatchRule(matchInfo));
         Optional<Uid> winUidO = empty();
         for (SetScoreReq atomicSetScore : scoredSets) {
-            winUidO.ifPresent((winUid) -> { throw internalError("preliminary match winner", UID, winUid); });
+            winUidO.ifPresent((winUid) -> {
+                throw internalError("preliminary match winner", UID, winUid);
+            });
             winUidO = applyAtomicSetScore(tournament, atomicSetScore, now, batch, matchInfo);
         }
         return setScoreResult(tournament,
@@ -152,9 +156,9 @@ public class MatchService {
                 matchInfo);
     }
 
-    private List<SetScoreReq> expandScoreSet(TournamentMemState tournament, SetScoreReq score) {
-        if (tournament.getRule().getMatch().countOnlySets()) {
-            return sports.expandScoreSet(tournament, score);
+    private List<SetScoreReq> expandScoreSet(SetScoreReq score, MatchRules matchRules) {
+        if (matchRules.countOnlySets()) {
+            return sports.expandScoreSet(matchRules, score);
         } else {
             return singletonList(score);
         }
@@ -603,7 +607,7 @@ public class MatchService {
         if (playedSets < score.getSetOrdNumber()) {
             throw badRequest("Set " + playedSets + " needs to be scored first");
         }
-        if (tournament.getRule().getMatch().countOnlySets()) {
+        if (tournament.selectMatchRule(matchInfo).countOnlySets()) {
             if (playedSets > 0)  {
                 throw badRequest("match with countOnlySets has scored sets");
             }

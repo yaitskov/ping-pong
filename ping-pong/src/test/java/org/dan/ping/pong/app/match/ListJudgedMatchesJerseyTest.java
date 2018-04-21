@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.match;
 
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q1_S3A2G11;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP_S1A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S3A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_FIND_BY_PARTICIPANTS;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_LIST_JUDGED;
 import static org.dan.ping.pong.app.match.MatchState.Over;

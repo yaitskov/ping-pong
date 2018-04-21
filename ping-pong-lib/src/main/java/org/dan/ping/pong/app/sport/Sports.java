@@ -64,9 +64,9 @@ public class Sports {
         sport.checkWonSets(rules, uidWonSets);
     }
 
-    public List<SetScoreReq> expandScoreSet(TournamentMemState tournament, SetScoreReq score) {
-        final Sport sport = get(tournament.getSport());
-        return sport.expandScoreSet(tournament.getRule().getMatch(), score);
+    public List<SetScoreReq> expandScoreSet(MatchRules matchRules, SetScoreReq score) {
+        final Sport sport = get(matchRules.sport());
+        return sport.expandScoreSet(matchRules, score);
     }
 
     public Optional<Uid> findNewWinnerUid(TournamentMemState tournament,

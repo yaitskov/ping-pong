@@ -3,7 +3,7 @@ package org.dan.ping.pong.app.match;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_JP2_S3A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP2_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.mock.simulator.Player.p1;

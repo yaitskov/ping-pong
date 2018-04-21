@@ -1,25 +1,16 @@
 package org.dan.ping.pong.mock;
 
-import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BalancedMix;
-import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BestToBest;
-import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.ConsoleLayered;
-import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.Manual;
-import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.MasterOutcome;
-import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.ProvidedRating;
-import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.SignUp;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.GLOBAL;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.GLOBAL;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.mock.Generators.genStr;
 
 import lombok.RequiredArgsConstructor;
-import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
-import org.dan.ping.pong.app.castinglots.rank.OrderDirection;
-import org.dan.ping.pong.app.castinglots.rank.ProvidedRankOptions;
 import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.dan.ping.pong.app.place.Pid;
+import org.dan.ping.pong.app.tournament.CastingLotsRulesConst;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
@@ -29,53 +20,6 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 public class DaoEntityGeneratorWithAdmin {
-    public static final CastingLotsRule CONSOLE_CASTING
-            = CastingLotsRule.builder()
-            .policy(MasterOutcome)
-            .direction(OrderDirection.Increase)
-            .splitPolicy(BalancedMix)
-            .build();
-
-    public static final CastingLotsRule LAYERED_CONSOLE_CASTING
-            = CastingLotsRule.builder()
-            .policy(MasterOutcome)
-            .direction(OrderDirection.Increase)
-            .splitPolicy(ConsoleLayered)
-            .build();
-
-    public static final CastingLotsRule INCREASE_SIGNUP_CASTING
-            = CastingLotsRule.builder()
-            .policy(SignUp)
-            .direction(OrderDirection.Increase)
-            .splitPolicy(BestToBest)
-            .build();
-
-    public static final CastingLotsRule INCREASE_SIGNUP_MIX
-            = CastingLotsRule.builder()
-            .policy(SignUp)
-            .direction(OrderDirection.Increase)
-            .splitPolicy(BalancedMix)
-            .build();
-
-    public static final CastingLotsRule BALANCED_MANUAL
-            = CastingLotsRule.builder()
-            .policy(Manual)
-            .direction(OrderDirection.Increase)
-            .splitPolicy(BalancedMix)
-            .build();
-
-    public static final CastingLotsRule INCREASE_PROVIDED_RANKING
-            = CastingLotsRule.builder()
-            .policy(ProvidedRating)
-            .direction(OrderDirection.Increase)
-            .splitPolicy(BestToBest)
-            .providedRankOptions(Optional.of(ProvidedRankOptions
-                    .builder()
-                    .label("TEST")
-                    .minValue(1)
-                    .maxValue(10)
-                    .build()))
-            .build();
 
     private final TestAdmin testAdmin;
     private final DaoEntityGenerator daoEntityGenerator;
@@ -113,7 +57,7 @@ public class DaoEntityGeneratorWithAdmin {
                         .build()))
                 .place(Optional.of(GLOBAL))
                 .playOff(Optional.of(Losing1))
-                .casting(INCREASE_SIGNUP_CASTING)
+                .casting(CastingLotsRulesConst.INCREASE_SIGNUP_CASTING)
                 .build();
     }
 

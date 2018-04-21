@@ -24,6 +24,7 @@ import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleService;
+import org.dan.ping.pong.app.sport.MatchRules;
 import org.dan.ping.pong.app.sport.Sport;
 import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -82,10 +83,11 @@ public class PlayOffService {
     public PlayOffResultEntries playOffResult(TournamentMemState tournament, int cid,
             List<TournamentResultEntry> groupOrdered) {
         final Map<Uid, PlayOffBidStat> uidStat = new HashMap<>();
-        final Sport sport = sports.get(tournament.getRule().getMatch().sport());
+        final MatchRules matchRules = tournament.playOffMatchRules();
+        final Sport sport = sports.get(matchRules.sport());
         final PowerRange powerRange = tournament.getPowerRange();
-        final int maxSetDiff = sport.maxUpLimitSetsDiff(tournament.getRule().getMatch());
-        final int maxBallsDiff = sport.maxUpLimitBallsDiff(tournament.getRule().getMatch());
+        final int maxSetDiff = sport.maxUpLimitSetsDiff(matchRules);
+        final int maxBallsDiff = sport.maxUpLimitBallsDiff(matchRules);
         categoryService.findMatchesInCategoryStream(tournament, cid)
                 .filter(m -> !m.getGid().isPresent())
                 .forEach(m -> {

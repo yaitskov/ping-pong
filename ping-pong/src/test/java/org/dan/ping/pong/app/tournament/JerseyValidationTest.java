@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.RULES_G8Q2_S1A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q2_S1A2G11;
 import static org.dan.ping.pong.app.tournament.Tid.TOURNAMENT_ID_SHOULD_BE_A_POSITIVE_NUMBER;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_INVALIDATE_CACHE;
 import static org.dan.ping.pong.sys.validation.TidBodyRequired.REQUEST_BODY_MUST_BE_A_TOURNAMENT_ID;

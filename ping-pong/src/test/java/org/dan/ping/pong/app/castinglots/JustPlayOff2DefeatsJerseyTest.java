@@ -1,10 +1,10 @@
 package org.dan.ping.pong.app.castinglots;
 
 import static org.dan.ping.pong.app.bid.BidState.Win1;
-import static org.dan.ping.pong.app.castinglots.MatchScheduleInGroupJerseyTest.S1A2G11;
-import static org.dan.ping.pong.app.match.MatchJerseyTest.GLOBAL;
+import static org.dan.ping.pong.app.match.MatchRulesConst.S1A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.GLOBAL;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing2;
-import static org.dan.ping.pong.mock.DaoEntityGeneratorWithAdmin.INCREASE_SIGNUP_CASTING;
+import static org.dan.ping.pong.app.tournament.CastingLotsRulesConst.INCREASE_SIGNUP_CASTING;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p17;

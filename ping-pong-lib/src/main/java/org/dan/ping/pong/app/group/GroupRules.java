@@ -54,7 +54,6 @@ public class GroupRules {
     private int quits;
     private int groupSize;
     private ConsoleTournament console = NO;
-    private Optional<DisambiguateMatchRules> disambiguationMatch = Optional.empty();
     private List<GroupOrderRule> orderRules = BALANCE_BASED_ORDER_RULES;
 
     /**
@@ -65,7 +64,6 @@ public class GroupRules {
     public static class GroupRulesBuilder {
         Optional<GroupSchedule> schedule = Optional.empty();
         ConsoleTournament console = NO;
-        Optional<DisambiguateMatchRules> disambiguationMatch = Optional.empty();
         List<GroupOrderRule> orderRules = BALANCE_BASED_ORDER_RULES;
     }
 }

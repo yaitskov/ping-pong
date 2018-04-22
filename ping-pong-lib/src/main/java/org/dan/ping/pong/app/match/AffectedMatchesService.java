@@ -12,12 +12,10 @@ import static org.dan.ping.pong.app.match.AffectedMatches.ofResets;
 import static org.dan.ping.pong.app.match.MatchInfo.MID;
 import static org.dan.ping.pong.app.match.MatchState.Auto;
 import static org.dan.ping.pong.app.match.rule.service.GroupRuleParams.ofParams;
-import static org.dan.ping.pong.app.tournament.TournamentMemState.TID;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.hash.HashAggregator.createHashAggregator;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets.SetView;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Uid;
@@ -145,8 +143,7 @@ public class AffectedMatchesService {
                 .toBeCreated(emptySet())
                 .toBeRemoved(emptySet())
                 .toBeReset(playOffMatchesAffectedByGroupWithPossibleDm(tournament,
-                        allGroupMatches,
-                        newAllGroupMatches, true))
+                        allGroupMatches, newAllGroupMatches))
                 .build();
     }
 
@@ -250,16 +247,14 @@ public class AffectedMatchesService {
                                 newDmMatchesToGenerate.stream()
                                         .filter(m2 -> !presentDmMatches.contains(m2))
                                         .map(MatchParticipants::toFakeMatch))
-                                .collect(toList()),
-                        toBeCreated.isEmpty()))
+                                .collect(toList())))
                 .build();
     }
 
     private List<MatchUid> playOffMatchesAffectedByGroupWithPossibleDm(
             TournamentMemState tournament,
             List<MatchInfo> allGroupMatches,
-            List<MatchInfo> allNewGroupMatches,
-            boolean noNewIncompleteMatches) {
+            List<MatchInfo> allNewGroupMatches) {
         final int gid = allGroupMatches.get(0).groupId();
         final Set<Uid> groupUids = tournament.uidsInGroup(gid);
         final GroupParticipantOrder order = groupParticipantOrderService
@@ -270,9 +265,6 @@ public class AffectedMatchesService {
                 .findOrder(ofParams(gid, tournament, allNewGroupMatches,
                         tournament.orderRules(),
                         groupUids));
-
-        validate(tournament, allNewGroupMatches,
-                noNewIncompleteMatches, newOrder);
 
         final List<Uid> wasDeterminedUids = order.determinedUids();
         final List<Uid> newDeterminedUids = newOrder.determinedUids();
@@ -290,24 +282,6 @@ public class AffectedMatchesService {
             return emptyList();
         }
         return playOffMatchesAffectedByUids(tournament, affectedUids);
-    }
-
-    private void validate(TournamentMemState tournament,
-            List<MatchInfo> allNewCompleteGroupMatches, boolean noNewIncompleteMatches,
-            GroupParticipantOrder newOrder) {
-        tournament.getRule().getGroup().ifPresent(groupRules -> {
-            if (!groupRules.getDisambiguationMatch().isPresent()) {
-                 if (noNewIncompleteMatches && allNewCompleteGroupMatches
-                         .stream().allMatch(m -> m.getWinnerMid().isPresent())) {
-                     if (!newOrder.unambiguous()) {
-                         throw internalError(
-                                 "Tournament has a complete group with ambiguous score",
-                                 ImmutableMap.of(TID, tournament.getTid(),
-                                         GID, allNewCompleteGroupMatches.get(0).getGid()));
-                     }
-                 }
-            }
-        });
     }
 
     @Inject

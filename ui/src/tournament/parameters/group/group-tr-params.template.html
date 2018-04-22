@@ -11,20 +11,6 @@
            bs-toggle/>
 </div>
 <div id="group-parameters" class="toggle-panel" ng-show="$ctrl.useGroups">
-    <div class="form-group">
-        <label translate="disambiguation-group-lbl"/>
-        <div id="disambiguate-strategy">
-            <a class="btn btn-default" translate="CMP_WIN_MINUS_LOSE"
-               ng-click="$ctrl.rules.group.disambiguation = 'CMP_WIN_MINUS_LOSE'"
-               ng-class="{'btn-primary': $ctrl.rules.group.disambiguation == 'CMP_WIN_MINUS_LOSE'}"/>
-            <a class="btn btn-default" translate="CMP_WIN_AND_LOSE"
-               ng-click="$ctrl.rules.group.disambiguation = 'CMP_WIN_AND_LOSE'"
-               ng-class="{'btn-primary': $ctrl.rules.group.disambiguation == 'CMP_WIN_AND_LOSE'}"/>
-        </div>
-        <p class="help-block">
-            {{ ($ctrl.rules.match['@type'] + '-disambiguation-group-help') | translate }}
-        </p>
-    </div>
     <div class="form-group" id="how-much-quits-group" ng-show="$ctrl.rules.playOff">
         <label translate="Quits from a group"/>
         <div>

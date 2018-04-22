@@ -30,14 +30,6 @@ describe('group-tr-params', () => {
         ctx.checked('#group-parameters-toggler input');
     });
 
-    it('disambiguate strategy toggles', () => {
-        ctx.broadcast('event.tournament.rules.set', newTournamentWithGroup());
-        ctx.btnToggles('#disambiguate-strategy',
-                       () => ctx.ctrl.rules.group.disambiguation,
-                       {default: {value: 'CMP_WIN_MINUS_LOSE', clazz: 'btn-primary'},
-                        other: {value: 'CMP_WIN_AND_LOSE', clazz: 'btn-primary'}});
-    });
-
     it('how much quits group and its size are visible if tournament has play off', () => {
         ctx.broadcast('event.tournament.rules.set', newTournamentWithGroup());
         ctx.visible('#how-much-quits-group');

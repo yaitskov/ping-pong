@@ -1,21 +1,4 @@
 module.exports = {
-    'disambiguation-group-lbl': 'On same # of matches win',
-    'CMP_WIN_AND_LOSE': 'Compare won and defeat',
-    'CMP_WIN_MINUS_LOSE': 'Compare won minus defeat',
-    'Tennis-disambiguation-group-help': 'Decides how to order participants in a group'
-        + ' having the same number of won matches. In case of won and defeat '
-        + ' sum of gained games across all matches are compared.'
-        + ' If they are also the same'
-        + ' then sums of lost games across all matches are compared.'
-        + ' In case of win minus defeat sum lost games is subtracted from the sum of gained games'
-        + ' and then results are compared.',
-    'PingPong-disambiguation-group-help': 'Decides how to order participants in a group'
-        + ' having the same number of won matches. In case of won and defeat '
-        + ' sum of gained balls across all matches are compared.'
-        + ' If they are also the same'
-        + ' then sums of lost balls across all matches are compared.'
-        + ' In case of win minus defeat sum lost balls is subtracted from the sum of gained balls'
-        + ' and then results are compared.',
     'thank-tournament-created-info': 'Thanks, tournament <a href="{{url}}">{{name}}</a>'
         + ' has been created and announced. Add categories to the tournament and begin drafting.',
     'Add categories btn': 'Add categories',

@@ -1,19 +1,4 @@
 module.exports = {
-    'disambiguation-group-lbl': 'Gdy ilość wygranych meczy podobna',
-    'CMP_WIN_AND_LOSE': 'Porównywać wygrane i przegrane',
-    'CMP_WIN_MINUS_LOSE': 'Porównywać wygrane minus przegrane',
-    'Tennis-disambiguation-group-help': 'Decyduje jak wybierać uczestników'
-        + ' gdy ilość wygranych meczy taka sama. W razie "wygrane i przegrane" '
-        + ' liczy się suma wygranych piłek we wszystkich meczach.'
-        + ' Jeśli oni są też podobny wtedy liczy się suma przegranych piłek.'
-        + ' A w razie "wygrane minus przegrane" liczy się suma wygranych piłek z'
-        + ' odejmowaniem sumy przeganych piłek.',
-    'PingPong-disambiguation-group-help': 'Decyduje jak wybierać uczestników'
-        + ' gdy ilość wygranych meczy taka sama. W razie "wygrane i przegrane" '
-        + ' liczy się suma wygranych gemów we wszystkich meczach.'
-        + ' Jeśli oni są też podobny wtedy liczy się suma przegranych gemów.'
-        + ' A w razie "wygrane minus przegrane" liczy się suma wygranych gemów z'
-        + ' odejmowaniem sumy przeganych gemów.',
     'thank-tournament-created-info': 'Dzieńkuje, turniej <a href="{{url}}">{{name}}</a>'
         + ' został stworzony i ogłoszony. Dodaj kategorie do turnieju i zaczinaj rekrutacje.',
     'Add categories btn': 'Dodać kategorie',

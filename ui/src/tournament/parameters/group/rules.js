@@ -3,7 +3,6 @@ import MatchOutcomeScope from './MatchOutcomeScope.js';
 import MatchParticipantScope from './MatchParticipantScope.js';
 
 const ruleId = arrayEnum('BB', 'WM', 'f2f', 'LB', 'LS', 'rnd', 'SB', 'WB', 'WS', 'Punkts', 'DM');
-export ruleId;
 
 export function createGroupRule(type, options) {
     return Object.assign({'@type': type}, options || {});
@@ -38,4 +37,4 @@ const customRules = [
 const ruleType2Factory = matchBasedRules.concat(customRules).map(
     ruleFactory => [ruleFactory()['@type'], ruleFactory]);
 
-export ruleType2Factory;
+export { ruleId, ruleType2Factory };

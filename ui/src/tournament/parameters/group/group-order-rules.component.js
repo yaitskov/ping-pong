@@ -4,6 +4,6 @@ import GroupOrderRulesCtrl from './GroupOrderRulesCtrl.js';
 
 angular.
     module('tournament').
-    component('group-order-rules', {
+    component('groupOrderRules', {
         templateUrl: template,
         controller: GroupOrderRulesCtrl});

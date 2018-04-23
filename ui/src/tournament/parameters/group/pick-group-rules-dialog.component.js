@@ -4,6 +4,6 @@ import PickGroupRulesDialog from './PickGroupRulesDialog.js';
 
 angular.
     module('tournament').
-    component('pick-group-rules-dialog', {
+    component('pickGroupRulesDialog', {
         templateUrl: template,
         controller: PickGroupRulesDialog});

@@ -4,6 +4,6 @@ import GroupRuleParametersDialog from './GroupRuleParametersDialog.js';
 
 angular.
     module('tournament').
-    component('group-rule-parameters-dialog', {
+    component('groupRuleParametersDialog', {
         templateUrl: template,
         controller: GroupRuleParametersDialog});

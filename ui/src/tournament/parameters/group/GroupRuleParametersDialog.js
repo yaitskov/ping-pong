@@ -2,7 +2,7 @@ import backedUpValue from 'core/backedUpValue.js';
 import SimpleDialog from 'core/angular/SimpleDialog.js';
 import MatchOutcomeScope from './MatchOutcomeScope.js';
 import MatchParticipantScope from './MatchParticipantScope.js';
-import HeadlessDmMatchParams from './HeadlessDmMatchParams.js';
+import HeadlessDmMatchParams from './HeadlessDmMatchParamsCtrl.js';
 
 export default class GroupRuleParametersDialog extends SimpleDialog {
     static get TopicLoad() {

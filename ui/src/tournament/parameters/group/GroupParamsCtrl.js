@@ -1,5 +1,6 @@
 import BaseTrParamsCtrl from 'tournament/parameters/BaseTrParamsCtrl.js';
 import backedUpValue from 'core/backedUpValue.js';
+import GroupOrderRulesCtrl from './GroupOrderRulesCtrl.js';
 
 function defaultGroupRules() {
     return {
@@ -15,7 +16,7 @@ function defaultGroupRules() {
 
 export default class GroupParamsCtrl extends BaseTrParamsCtrl {
     static get $inject() {
-        return ['requestStatus', 'groupSchedule'].concat(super.$inject);
+        return ['MessageBus', 'requestStatus', 'groupSchedule'].concat(super.$inject);
     }
 
     get isValid() {
@@ -71,6 +72,8 @@ export default class GroupParamsCtrl extends BaseTrParamsCtrl {
 
     onTournamentSet(tournament) {
         super.onTournamentSet(tournament);
+        this.MessageBus.broadcast(
+            GroupOrderRulesCtrl.TopicTournamentRulesAvailable, tournament.rules);
         this.watchForUseGroups();
         const group = this.rules.group;
         this.useGroups = !!group;

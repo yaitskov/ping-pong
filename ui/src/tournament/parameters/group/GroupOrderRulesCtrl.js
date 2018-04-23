@@ -4,12 +4,12 @@ import GroupRuleParametersDialog from './GroupRuleParametersDialog.js';
 import GroupRules from './rules.js';
 
 export default class GroupOrderRulesCtrl extends SimpleController {
-    static get TopicTournamentRulesAvaiblable() {
+    static get TopicTournamentRulesAvailable() {
         return 'tournament-rules-available';
     }
 
     $onInit() {
-        this.subscribe(GroupOrderRulesCtrl.TopicTournamentRulesAvaiblable,
+        this.subscribe(this.constructor.TopicTournamentRulesAvailable,
                        (e) => this.setRules(e));
         this.subscribe(PickGroupRulesDialog.TopicRuleSelected,
                        (ruleId) => this.onRuleSelected(ruleId));
@@ -27,6 +27,7 @@ export default class GroupOrderRulesCtrl extends SimpleController {
     setRules(tournamentRules) {
         this.rules = tournamentRules.group.orderRules;
         this.sport = tournamentRules.match['@type'];
+        this.commonMatchRules = tournamentRules.match;
     }
 
     showMenu(index) {
@@ -34,7 +35,9 @@ export default class GroupOrderRulesCtrl extends SimpleController {
     }
 
     configureRule(groupOrderRule) {
-        this.send(GroupRuleParametersDialog.TopicLoad, groupOrderRule);
+        this.send(GroupRuleParametersDialog.TopicLoad,
+                  groupOrderRule,
+                  this.commonMatchRules);
     }
 
     moveItem(index, shift) {

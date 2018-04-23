@@ -1,17 +1,17 @@
 import SimpleDialog from 'core/angular/SimpleDialog.js';
 import ruleIdsBySport from './ruleIdsBySport.js';
 
-export class PickGroupRulesDialog extends SimpleDialog {
+export default class PickGroupRulesDialog extends SimpleDialog {
     static get TopicShowAvailableRules() {
         return 'pick-group-rule-dialog-show-available-rules';
     }
 
     static get TopicRuleSelected() {
-        return 'pick-group-rule-dialog-rule-selecte';
+        return 'pick-group-rule-dialog-rule-selected';
     }
 
     $onInit() {
-        this.subscribe(PickGroupRulesDialog.TopicShowAvailableRules,
+        this.subscribe(this.constructor.TopicShowAvailableRules,
                        (sport)  => this.showOptionsFor(sport));
     }
 
@@ -21,6 +21,6 @@ export class PickGroupRulesDialog extends SimpleDialog {
     }
 
     pickThis(ruleId) {
-        this.send(PickGroupRulesDialog.TopicRuleSelected, ruleId);
+        this.send(this.constructor.TopicRuleSelected, ruleId);
     }
 }

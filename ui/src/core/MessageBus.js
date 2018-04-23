@@ -50,6 +50,10 @@ export default class MessageBus {
         return topic.subscribe(consumer);
     }
 
+    subscribeIn($scope, topicName, consumer) {
+        $scope.$on('$destroy', this.subscribe(topicName, consumer));
+    }
+
     _removeTopic(topicName) {
         delete this.topicsByName[topicName];
     }

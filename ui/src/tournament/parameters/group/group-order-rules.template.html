@@ -1,0 +1,32 @@
+<div class="form-group" ng-repeat="gor in $ctrl.rules">
+  <div>
+    <a ng-click="$ctrl.showMenu(gor)"
+       class="btn btn-default"
+       translate="group-order-rule-label-{{gor['@type']}}"/>
+  </div>
+  <div class="form-group" ng-show="$ctrl.indexRuleWithMenu == $index">
+    <div class="btn-group">
+      <a class="btn btn-primary"
+         ng-show="$ctrl.hasParameters(gor)"
+         ng-click="$ctrl.configureRule(gor)">
+        <span class="glyphicon glyphicon-cog"/>
+      </a>
+      <a class="btn btn-primary"
+         ng-show="$index > 0"
+         ng-click="$ctrl.moveItem($index, -1)">
+        <span class="glyphicon glyphicon-triangle-top"/>
+      </a>
+      <a class="btn btn-success"
+         ng-click="$ctrl.addRule($index)">
+        <span class="glyphicon glyphicon-plus"/>
+      </a>
+      <a class="btn btn-danger"
+         ng-show="$index < $ctrl.rules.length - 1"
+         ng-click="$ctrl.removeRule($index)">
+        <span class="glyphicon glyphicon-trash"/>
+      </a>
+    </div>
+  </div>
+</div>
+<pick-group-rules-dialog/>
+<group-rule-parameters-dialog/>

@@ -1,0 +1,20 @@
+<div id="rulesDialog" class="modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" translate="Select Group Order Rule"/>
+            </div>
+            <div class="modal-body">
+              <div class="btn-group">
+                <a ng-click="$ctrl.pickThis(ruleId)" ng-repeat="ruleId in $ctrl.ruleIds"
+                   class="btn btn-primary" data-dismiss="modal">
+                  {{ ('group-rule-label-' + ruleId) | translate}}
+                </a>
+              </div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>

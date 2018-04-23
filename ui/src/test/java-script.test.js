@@ -60,6 +60,20 @@ describe('java script', () => {
         });
     });
     describe('classes', () => {
+        describe('getter', () => {
+            it('static override from base', () => {
+                class Base {
+                    static get s() { return 'base'; }
+                    readS() {
+                        return this.constructor.s;
+                    }
+                }
+                class Next extends Base {
+                    static get s() { return 'next'; }
+                }
+                expect(new Next().readS()).toBe('next');
+            });
+        });
         describe('method', () => {
             class Base {
                 static get s() { return [1]; }

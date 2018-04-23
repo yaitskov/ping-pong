@@ -1,0 +1,54 @@
+<div id="group-rule-parameters" class="modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                  {{ 'group-rule-parameters-title' | translate }}
+                  {{ ('group-rule-label-' + $ctrl['@type']) | translate}}
+                </h4>
+            </div>
+            <div class="modal-body">
+              <many-button-toggler ng-model="$ctrl.rule.matchOutcomeScope"
+                                   domain="Object.keys($ctrl.MatchOutcomeScope)"
+                                   selected-class="['btn-primary', 'btn-success']"
+                                   ng-show="$ctrl.rule.matchOutcomeScope"
+                                   label="match-outcome-scope"/>
+              <many-button-toggler ng-model="$ctrl.rule.matchParticipantScope"
+                                   domain="Object.keys($ctrl.MatchParticipantScope)"
+                                   selected-class="['btn-primary', 'btn-success']"
+                                   ng-show="$ctrl.rule.matchParticipantScope"
+                                   label="match-participant-scope"/>
+
+              <div class="form-group toggle-btn"
+                   id="custom-dm-match-rules-toggler"
+                   ng-show="$ctrl.rule['@type'] == 'DM'">
+                <label translate="custom-dm-match-rules-lbl"/>
+                <input type="checkbox"
+                       data-size="small"
+                       bs-toggler-anchor="custom-dm-match-rules-toggler"
+                       ng-model="$ctrl.useCustomDmMatchRules"
+                       bs-toggle-on="{{ 'yes-lbl' | translate }}"
+                       bs-toggle-off="{{ 'no-lbl' | translate }}"
+                       bs-toggle-target="#custom-dm-match-rules-panel"
+                       bs-toggle/>
+              </div>
+              <div id="custom-dm-match-rules-panel"
+                   class="toggle-panel"
+                   ng-show="$ctrl.rule['@type'] == 'DM' && $ctrl.useCustomDmMatchRules">
+                <headless-dm-match-params/>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger"
+                        data-dismiss="modal"
+                        translate="Cancel btn"/>
+
+              <button type="button" class="btn btn-primary"
+                        ng-click="$ctrl.saveChanges()"
+                        data-dismiss="modal"
+                        translate="save-lbl"/>
+            </div>
+        </div>
+    </div>
+</div>

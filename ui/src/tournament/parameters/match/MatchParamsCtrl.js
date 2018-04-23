@@ -1,10 +1,18 @@
 import BaseTrParamsCtrl from 'tournament/parameters/BaseTrParamsCtrl.js';
+import HeadLessCommonMatchParamsCtrl from './HeadLessCommonMatchParamsCtrl.js';
 
 export default class MatchParamsCtrl extends BaseTrParamsCtrl {
+    static get $inject() {
+        return ['MessageBus'].concat(super.$inject);
+    }
+
     constructor() {
         super(...arguments);
-        this.advance = {min: 1, max: 1000};
-        this.score = {min: 1, max: 1000};
-        this.sets = {min: 1, max: 1000};
+    }
+
+    onTournamentSet(tournament) {
+        super.onTournamentSet(tournament);
+        this.MessageBus.broadcast(
+            HeadLessCommonMatchParamsCtrl.TopicLoad, tournament.rules);
     }
 }

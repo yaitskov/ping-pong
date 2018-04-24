@@ -11,6 +11,7 @@ Custom keys:
   --fan         - use phantom js runner
   --chrom       - use chrome js runner
   --debugfan    - launch phantom js
+  --ll=         - log level
 `);
     process.exit(1);
 }
@@ -54,7 +55,11 @@ module.exports = (config) => {
         //     'ng-html2js',
         //     'karma-jasmine-matchers'
         // ],
-
+        browserConsoleLogOptions: {
+            level: config.ll ? config.ll : 'error',
+            format: '%b %T: %m',
+            terminal: true
+        },
         files: [
             'dist/bundle.js',
             'node_modules/angular-mocks/angular-mocks.js',

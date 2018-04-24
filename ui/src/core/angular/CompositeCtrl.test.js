@@ -3,6 +3,7 @@ import CompositeCtrl from './CompositeCtrl.js';
 import ComposableCtrl from './ComposableCtrl.js';
 import eventBinder from './eventBinder.js';
 import EventBarrierFactory from './EventBarrierFactory.js';
+import MessageBus from 'core/MessageBus.js';
 
 class MyComposableCtrl1 extends ComposableCtrl {
 }
@@ -21,6 +22,7 @@ describe('CompositeCtrl', () => {
     angular.module(ajModule, []);
     angular.module(ajModule).
         service('eBarier', EventBarrierFactory).
+        service('MessageBus', MessageBus).
         factory('binder', () => eventBinder).
         component('testComposable1', {
             template: '<p>child1</p>',

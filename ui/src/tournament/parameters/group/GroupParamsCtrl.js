@@ -1,16 +1,17 @@
 import BaseTrParamsCtrl from 'tournament/parameters/BaseTrParamsCtrl.js';
 import backedUpValue from 'core/backedUpValue.js';
 import GroupOrderRulesCtrl from './GroupOrderRulesCtrl.js';
+import sportDefaultGroupRules from './sportDefaultGroupRules.js';
 
-function defaultGroupRules() {
+function defaultGroupRules(sport) {
     return {
         quits: 1,
         groupSize: 9,
-        disambiguation: 'CMP_WIN_MINUS_LOSE',
         console: 'NO',
         schedule: {
             size2Schedule: {2: [0, 1]}
-        }
+        },
+        orderRules: sportDefaultGroupRules(sport)
     };
 }
 
@@ -72,6 +73,7 @@ export default class GroupParamsCtrl extends BaseTrParamsCtrl {
 
     onTournamentSet(tournament) {
         super.onTournamentSet(tournament);
+        console.log(`send rules to group order rules ${JSON.stringify(tournament.rules)}`);
         this.MessageBus.broadcast(
             GroupOrderRulesCtrl.TopicTournamentRulesAvailable, tournament.rules);
         this.watchForUseGroups();
@@ -81,7 +83,7 @@ export default class GroupParamsCtrl extends BaseTrParamsCtrl {
             return;
         }
         if (!group.schedule || !group.schedule.size2Schedule) {
-            group.schedule = defaultGroupRules().schedule;
+            group.schedule = defaultGroupRules(this.rules.match['@type']).schedule;
         }
         this.generateGroupSchedule();
     }
@@ -89,7 +91,9 @@ export default class GroupParamsCtrl extends BaseTrParamsCtrl {
     constructor() {
         super(...arguments);
         this.maxGroupSize = {min: 2, max: 20};
-        this.groupRuleBackup = backedUpValue(defaultGroupRules, () => this.rules.group);
+        this.groupRuleBackup = backedUpValue(
+            () => defaultGroupRules(this.rules.match['@type']),
+            () => this.rules.group);
         this.useGroups = false;
         this.groupScheduleErrors = [];
         this.formatScheduleError = this.groupSchedule.formatScheduleError;

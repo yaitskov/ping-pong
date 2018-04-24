@@ -1,5 +1,9 @@
 describe('java script', () => {
     describe('api', () => {
+        describe('Map', () => {
+            const m = new Map([1,2,3,4].map(i => ["key " + i, "value " + i]));
+            it('find value', () => expect(m.get('key 3')).toBe('value 3'));
+        });
         class X {
             static get myName() {
                 return this.name;

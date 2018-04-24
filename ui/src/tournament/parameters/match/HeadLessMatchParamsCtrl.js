@@ -5,6 +5,13 @@ export default class HeadLessMatchParamsCtrl extends SimpleController {
         return 'head-less-match-params-load';
     }
 
+    // constructor(...params) {
+    //     super(...params);
+    //     this.advance = {min: 1, max: 1000};
+    //     this.score = {min: 1, max: 1000};
+    //     this.sets = {min: 1, max: 1000};
+    // }
+
     $onInit() {
         this.advance = {min: 1, max: 1000};
         this.score = {min: 1, max: 1000};

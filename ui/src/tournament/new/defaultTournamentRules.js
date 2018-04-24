@@ -1,4 +1,5 @@
 import defaultMatchRules from './defaultMatchRules.js';
+import sportDefaultGroupRules from 'tournament/parameters/group/sportDefaultGroupRules.js';
 
 export default function defaultTournamentRules(sport) {
     return {
@@ -15,7 +16,6 @@ export default function defaultTournamentRules(sport) {
             }
         },
         group: {
-            disambiguation: 'CMP_WIN_MINUS_LOSE',
             quits: 2,
             console: 'NO',
             groupSize: 8,
@@ -24,7 +24,8 @@ export default function defaultTournamentRules(sport) {
                     2: [0, 1],
                     3: [0, 2, 0, 1, 1, 2]
                 }
-            }
+            },
+            orderRules: sportDefaultGroupRules(sport)
         },
         playOff: {
             losings: 1,

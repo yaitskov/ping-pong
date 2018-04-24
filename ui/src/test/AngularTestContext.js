@@ -4,6 +4,12 @@ export default class AngularTestContext {
         this.scope = null;
         this.element = null;
         this.ctrl = null;
+        this.MessageBus = null;
+    }
+
+    send(...args) {
+        this.MessageBus.broadcast(...args);
+        this.sync();
     }
 
     broadcast() {

@@ -2,7 +2,7 @@ import JsHttpBackend from './JsHttpBackend.js';
 import AngularTestContext from './AngularTestContext.js';
 
 export function defineAppModule(moduleName) {
-    angular.module(moduleName, ['cloudSport', 'ngMock', 'cloudSportE2e.templates']);
+    angular.module(moduleName, ['cloudSport', 'ngMock', 'cloudSportE2e.templates', 'core.util']);
     angular.module(moduleName).service('jsHttpBackend', JsHttpBackend);
     return moduleName;
 }
@@ -22,6 +22,7 @@ export function setupAngularJs(ctrlElementId, extra) {
     beforeEach(() => angular.mock.inject(function($rootScope, $compile, $injector) {
         ctx.$rootScope = $rootScope;
         ctx.scope = $rootScope.$new();
+        ctx.MessageBus = $injector.get('MessageBus');
         if (extra.onInit) {
             const args = [ctx.scope];
             if (extra.onInit.length > 1) {
@@ -54,4 +55,8 @@ export function setupAngularJs(ctrlElementId, extra) {
 
 export function ij(name, f) {
     it(name, angular.mock.inject(f));
+}
+
+export function templateRequiredFromTest(p) {
+    return p.replace("/tmp/_karma_webpack_/", "");
 }

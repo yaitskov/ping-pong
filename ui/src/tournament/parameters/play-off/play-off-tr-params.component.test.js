@@ -4,7 +4,7 @@ import { newTournamentWithPlayOff, newTournamentWithoutPlayOff } from 'test/defa
 
 describe('play-off-tr-params', () => {
     var initEventFired = false;
-
+    const sport = 'PingPong';
     const ctx = setupAngularJs(
         'play-off-tr-params',
         {onInit: s => s.$on(PlayOffParamsCtrl.readyEvent, e => initEventFired = true),
@@ -15,27 +15,27 @@ describe('play-off-tr-params', () => {
     });
 
     it('play off panel is visible if tournament has play off', () => {
-        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff());
+        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff(sport));
         expect(ctx.ctrl.usePlayOff).toBeTrue();
         ctx.visible('#play-off-parameters');
         ctx.checked('#play-off-parameters-toggler input');
     });
 
     it('play off panel is hidden if tournament without play off', () => {
-        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff());
+        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff(sport));
         expect(ctx.ctrl.usePlayOff).toBeTrue();
         ctx.visible('#play-off-parameters');
         ctx.checked('#play-off-parameters-toggler input');
     });
 
     it('enable play off panel', () => {
-        ctx.broadcast('event.tournament.rules.set', newTournamentWithoutPlayOff());
+        ctx.broadcast('event.tournament.rules.set', newTournamentWithoutPlayOff(sport));
         ctx.toggleOn('#play-off-parameters-toggler input');
         expect(ctx.ctrl.rules.playOff.losings).toBe(1);
     });
 
     it('disable / enable play off panel', () => {
-        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff());
+        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff(sport));
         ctx.toggleOff('#play-off-parameters-toggler input');
         expect(ctx.ctrl.rules.playOff).toBeUndefined();
         ctx.toggleOn('#play-off-parameters-toggler input');
@@ -43,7 +43,7 @@ describe('play-off-tr-params', () => {
     });
 
     it('max losses in play off toggles', () => {
-        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff());
+        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff(sport));
         ctx.btnTogglesDiffClasses('#max-losses-in-play-off',
                                   () => ctx.ctrl.rules.playOff.losings,
                                   {default: {clazz: 'btn-primary', value: 1},
@@ -51,7 +51,7 @@ describe('play-off-tr-params', () => {
     });
 
     it('3rd place match toggles', () => {
-        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff());
+        ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff(sport));
         ctx.btnTogglesDiffClasses('#third-place-match',
                                   () => ctx.ctrl.rules.playOff.thirdPlaceMatch,
                                   {default: {clazz: 'btn-primary', value: 1},

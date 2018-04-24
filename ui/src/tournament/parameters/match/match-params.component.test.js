@@ -65,13 +65,4 @@ describe('match-params', () => {
                                   {default: {clazz: 'btn-primary', value: false},
                                    other: {clazz: 'btn-success', value: true}});
     });
-
-    it('min game advance not increase limit', () => {
-        expect(ctx.ctrl.advance.max).toBe(1000);
-        const tournament = pingPongTournament();
-        tournament.rules.match.minAdvanceInGames = 1000;
-        ctx.broadcast('event.tournament.rules.set', tournament);
-        checkTouchSpinNotIncrease(ctx, '#min-game-advance',
-                                  () => ctx.ctrl.rules.match.minAdvanceInGames);
-    });
 });

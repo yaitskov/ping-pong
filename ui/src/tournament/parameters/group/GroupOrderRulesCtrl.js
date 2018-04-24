@@ -1,7 +1,7 @@
 import SimpleController from 'core/angular/SimpleController.js';
 import PickGroupRulesDialog from './PickGroupRulesDialog.js';
 import GroupRuleParametersDialog from './GroupRuleParametersDialog.js';
-import GroupRules from './rules.js';
+import * as GroupRules from './rules.js';
 
 export default class GroupOrderRulesCtrl extends SimpleController {
     static get TopicTournamentRulesAvailable() {
@@ -21,11 +21,13 @@ export default class GroupOrderRulesCtrl extends SimpleController {
     }
 
     onRuleSelected(ruleId) {
-        this.rules.splice(this.indexRuleWithMenu, 0, GroupRules.ruleType2Factory(ruleId)());
+        this.rules.splice(this.indexRuleWithMenu, 0, GroupRules.ruleType2Factory.get(ruleId)());
     }
 
     setRules(tournamentRules) {
-        this.rules = tournamentRules.group.orderRules;
+        console.log(`set rules ${JSON.stringify(tournamentRules.group)}`);
+        this.rules = tournamentRules.group ? tournamentRules.group.orderRules : [];
+        console.log(`set rules 2 ${JSON.stringify(this.rules)}`);
         this.sport = tournamentRules.match['@type'];
         this.commonMatchRules = tournamentRules.match;
     }

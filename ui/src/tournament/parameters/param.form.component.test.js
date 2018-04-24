@@ -3,6 +3,7 @@ import { existingTournament, newTournament } from 'test/defaultTournaments.js';
 
 describe('tournament-parameters-form', () => {
     var initEventFired = false;
+    const sport = 'PingPong';
     const ctx = setupAngularJs(
         'tournament-parameters-form',
         {onInit: (scope) => {
@@ -41,15 +42,15 @@ describe('tournament-parameters-form', () => {
 
     describe('existing tournament', () => {
         it('update button is not visible', () => {
-            ctx.broadcast('event.tournament.rules.set', existingTournament());
+            ctx.broadcast('event.tournament.rules.set', existingTournament(sport));
             ctx.visible('#update-tournament-rules');
         });
         it('create button is visible', () => {
-            ctx.broadcast('event.tournament.rules.set', existingTournament());
+            ctx.broadcast('event.tournament.rules.set', existingTournament(sport));
             ctx.hidden('#create-tournament');
         });
         it('back button is visible', () => {
-            ctx.broadcast('event.tournament.rules.set', existingTournament());
+            ctx.broadcast('event.tournament.rules.set', existingTournament(sport));
             ctx.hidden('#back-to-tournament-properties');
         });
     });

@@ -2,6 +2,7 @@ import angular from 'angular';
 import angularTranslate from 'angular-translate';
 import manyButtonToggler from './manyButtonToggler.js';
 import { setupAngularJs } from 'test/angularjs-test-setup.js';
+import MessageBus from 'core/MessageBus.js';
 
 describe('manyButtonToggler', () => {
     angular.module('test-many-button-toggler', ['pascalprecht.translate']).
@@ -12,6 +13,7 @@ describe('manyButtonToggler', () => {
                        'input-label-B': 'B label'});
             $translateProvider.preferredLanguage('en');
         }]).
+        service('MessageBus', MessageBus).
         directive('manyButtonToggler', manyButtonToggler);
 
     describe('one selected class', () => {

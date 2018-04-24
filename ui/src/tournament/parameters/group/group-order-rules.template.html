@@ -1,7 +1,7 @@
 <div class="form-group" ng-repeat="gor in $ctrl.rules">
   <div>
     <a ng-click="$ctrl.showMenu(gor)"
-       class="btn btn-default"
+       class="btn btn-default group-rule-label"
        translate="group-order-rule-label-{{gor['@type']}}"/>
   </div>
   <div class="form-group" ng-show="$ctrl.indexRuleWithMenu == $index">

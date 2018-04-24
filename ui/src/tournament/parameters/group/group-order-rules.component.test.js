@@ -28,5 +28,15 @@ describe('group-order-rules', () => {
         ctx.visible('.group-rule-menu:eq(1)');
         ctx.hidden('.group-rule-menu:eq(0)');
     });
-});
 
+    it('config button is hidden for rnd rule', () => {
+        setRules();
+        ctx.hidden('.group-order-rule-config:last');
+    });
+
+    it('config button is visible for punkts and f2f', () => {
+        setRules();
+        ctx.visible('.group-order-rule-config:first');
+        //ctx.visible('.group-order-rule-config:eq(1)');
+    });
+});

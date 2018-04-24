@@ -21,5 +21,12 @@ describe('group-order-rules', () => {
         setRules();
         ctx.hidden('.group-rule:eq(1) .group-rule-menu');
     });
+
+    it('click rule label toggles menu', () => {
+        setRules();
+        ctx.click('.group-rule-label:eq(1)');
+        ctx.visible('.group-rule-menu:eq(1)');
+        ctx.hidden('.group-rule-menu:eq(0)');
+    });
 });
 

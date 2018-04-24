@@ -1,6 +1,6 @@
 <div class="form-group group-rule" ng-repeat="gor in $ctrl.rules">
   <div>
-    <a ng-click="$ctrl.showMenu(gor)"
+    <a ng-click="$ctrl.showMenu($index)"
        class="btn btn-default group-rule-label"
        translate="group-order-rule-label-{{gor['@type']}}"/>
   </div>

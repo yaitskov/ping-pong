@@ -1,6 +1,7 @@
 import { setupAngularJs } from 'test/angularjs-test-setup.js';
 import GroupOrderRulesCtrl from './GroupOrderRulesCtrl.js';
 import { newTournament } from 'test/defaultTournaments.js';
+import { ruleId } from './rules.js';
 
 describe('group-order-rules', () => {
     const ctx = setupAngularJs('group-order-rules');
@@ -49,5 +50,18 @@ describe('group-order-rules', () => {
         setRules();
         ctx.visible('.group-order-rule-remove:first');
         ctx.visible('.group-order-rule-remove:eq(-2)');
+    });
+
+    it('click on remove button removes rule', () => {
+        setRules();
+        expect(ctx.ctrl.rules[0]['@type']).toBe(ruleId.Punkts);
+        ctx.click('.group-order-rule-remove:first');
+        expect(ctx.ctrl.rules[0]['@type']).toBe(ruleId.f2f);
+    });
+
+    it('rule remove keeps index of rule with visible menud', () => {
+        setRules();
+        ctx.click('.group-order-rule-remove:first');
+        expect(ctx.ctrl.indexRuleWithMenu).toBe(0);
     });
 });

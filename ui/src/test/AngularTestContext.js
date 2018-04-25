@@ -10,6 +10,7 @@ export default class AngularTestContext {
     send(...args) {
         this.MessageBus.broadcast(...args);
         this.sync();
+        return args[0];
     }
 
     broadcast() {

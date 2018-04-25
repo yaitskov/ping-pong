@@ -12,8 +12,8 @@
          ng-click="$ctrl.configureRule(gor)">
         <span class="glyphicon glyphicon-cog"/>
       </a>
-      <a class="btn btn-primary"
-         ng-show="$index > 0"
+      <a class="btn btn-primary group-order-rule-up"
+         ng-show="$index > 0 && $index < $ctrl.rules.length - 1"
          ng-click="$ctrl.moveItem($index, -1)">
         <span class="glyphicon glyphicon-triangle-top"/>
       </a>

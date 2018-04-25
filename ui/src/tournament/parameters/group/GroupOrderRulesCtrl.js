@@ -44,7 +44,7 @@ export default class GroupOrderRulesCtrl extends SimpleController {
 
     moveItem(index, shift) {
         const gor = this.rules.splice(index, 1);
-        this.rules.splice(index + shift, gor);
+        this.rules.splice(index + shift, 0, ...gor);
         this.indexRuleWithMenu += shift;
     }
 

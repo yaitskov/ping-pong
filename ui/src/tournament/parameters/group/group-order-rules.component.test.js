@@ -64,4 +64,27 @@ describe('group-order-rules', () => {
         ctx.click('.group-order-rule-remove:first');
         expect(ctx.ctrl.indexRuleWithMenu).toBe(0);
     });
+
+    describe('move up button', () => {
+        it('hidden in first rule', () => {
+            setRules();
+            ctx.hidden('.group-order-rule-up:first');
+        });
+        it('hidden in last rule', () => {
+            setRules();
+            ctx.hidden('.group-order-rule-up:last');
+        });
+        it('visible in second rule', () => {
+            setRules();
+            ctx.visible('.group-order-rule-up:eq(1)');
+        });
+        it('clicking moves rule up with menu', () => {
+            setRules();
+            ctx.ctrl.indexRuleWithMenu = 1;
+            ctx.click('.group-order-rule-up:eq(1)');
+            expect(ctx.ctrl.rules[0]['@type']).toBe(ruleId.f2f);
+            expect(ctx.ctrl.rules[1]['@type']).toBe(ruleId.Punkts);
+            expect(ctx.ctrl.indexRuleWithMenu).toBe(0);
+        });
+    });
 });

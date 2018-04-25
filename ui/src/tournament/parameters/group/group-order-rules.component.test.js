@@ -37,6 +37,17 @@ describe('group-order-rules', () => {
     it('config button is visible for punkts and f2f', () => {
         setRules();
         ctx.visible('.group-order-rule-config:first');
-        //ctx.visible('.group-order-rule-config:eq(1)');
+        ctx.visible('.group-order-rule-config:eq(1)');
+    });
+
+    it('remove button is hidden for last rule', () => {
+        setRules();
+        ctx.hidden('.group-order-rule-remove:last');
+    });
+
+    it('remove button is visible for first and before last rule', () => {
+        setRules();
+        ctx.visible('.group-order-rule-remove:first');
+        ctx.visible('.group-order-rule-remove:eq(-2)');
     });
 });

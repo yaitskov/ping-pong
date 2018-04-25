@@ -17,7 +17,7 @@ export default class GroupOrderRulesCtrl extends SimpleController {
     }
 
     hasParameters(rule) {
-        return Object.keys(rule).filter(x => x.match(/^[^$@]/)).length > 0;
+        return Object.keys(rule).filter(key => key.match(/^[^$@]/)).length > 0;
     }
 
     onRuleSelected(ruleId) {

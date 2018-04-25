@@ -17,6 +17,11 @@
          ng-click="$ctrl.moveItem($index, -1)">
         <span class="glyphicon glyphicon-triangle-top"/>
       </a>
+      <a class="btn btn-primary group-order-rule-down"
+         ng-show="$index < $ctrl.rules.length - 2"
+         ng-click="$ctrl.moveItem($index, +1)">
+        <span class="glyphicon glyphicon-triangle-bottom"/>
+      </a>
       <a class="btn btn-success"
          ng-click="$ctrl.addRule($index)">
         <span class="glyphicon glyphicon-plus"/>

@@ -25,9 +25,8 @@ export default class GroupOrderRulesCtrl extends SimpleController {
     }
 
     setRules(tournamentRules) {
-        console.log(`set rules ${JSON.stringify(tournamentRules.group)}`);
+        this.indexRuleWithMenu = 0;
         this.rules = tournamentRules.group ? tournamentRules.group.orderRules : [];
-        console.log(`set rules 2 ${JSON.stringify(this.rules)}`);
         this.sport = tournamentRules.match['@type'];
         this.commonMatchRules = tournamentRules.match;
     }

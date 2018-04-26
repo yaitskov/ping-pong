@@ -27,6 +27,15 @@ describe('group-order-rules', () => {
         });
     });
 
+    describe('add rule button above the current one', () => {
+        it('click emits show available rules with sport', () => {
+            ctx.recordEvents(PickGroupRulesDialog.TopicShowAvailableRules, (events) => {
+                ctx.click('.group-order-rule-add:first');
+                expect(events[0][0]).toBe('PingPong');
+            });
+        });
+    });
+
     describe('config button', () => {
         describe('visibility', () => {
             it('hidden for rnd rule', () => ctx.hidden('.group-order-rule-config:last'));
@@ -36,7 +45,6 @@ describe('group-order-rules', () => {
         it('click emits topic load and show dialog', () => {
             ctx.recordEvents(GroupRuleParametersDialog.TopicLoad, (events) => {
                 ctx.click('.group-order-rule-config:first');
-                ctx.sync();
                 expect(events[0][0]['@type']).toBe(ruleId.Punkts);
                 expect(events[0][1]['@type']).toBe('PingPong');
             });

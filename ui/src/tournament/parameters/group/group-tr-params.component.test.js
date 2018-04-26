@@ -138,4 +138,9 @@ describe('group-tr-params', () => {
         ctx.broadcast('event.tournament.rules.set', existingLayeredConsoleTournament(sport));
         ctx.hidden('#group-parameters-toggler');
     });
+
+    it('match schedule in group is hidden for tournament with schedule', () => {
+        ctx.broadcast('event.tournament.rules.set', newTournamentWithGroup(sport));
+        ctx.hidden('.ns-match-schedule-in-group');
+    });
 });

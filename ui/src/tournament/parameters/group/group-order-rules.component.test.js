@@ -33,6 +33,14 @@ describe('group-order-rules', () => {
             it('visible for punkts', () => ctx.visible('.group-order-rule-config:first'));
             it('visible for f2f', () => ctx.visible('.group-order-rule-config:eq(1)'));
         });
+        it('click emits topic load and show dialog', () => {
+            ctx.recordEvents(GroupRuleParametersDialog.TopicLoad, (events) => {
+                ctx.click('.group-order-rule-config:first');
+                ctx.sync();
+                expect(events[0][0]['@type']).toBe(ruleId.Punkts);
+                expect(events[0][1]['@type']).toBe('PingPong');
+            });
+        });
     });
 
     describe('remove button', () => {

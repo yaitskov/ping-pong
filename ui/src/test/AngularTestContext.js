@@ -7,6 +7,19 @@ export default class AngularTestContext {
         this.MessageBus = null;
     }
 
+    recordEvents(topicName, bc) {
+        const events = [];
+        const cleaner = this.MessageBus.subscribe(topicName, (...params) => {
+            // console.log(`record event ${params[0]} in topic ${topicName}`);
+            events.push(params);
+        });
+        try {
+            bc(events);
+        } finally {
+            cleaner();
+        }
+    }
+
     send(...args) {
         this.MessageBus.broadcast(...args);
         this.sync();

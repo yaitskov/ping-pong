@@ -8,7 +8,7 @@ function createGroupRule(type, options) {
     return Object.assign({'@type': type}, options || {});
 }
 
-function createMatchBasedRule(type, options) {
+export function createMatchBasedRule(type, options) {
     return createGroupRule(
         type,
         Object.assign(
@@ -20,16 +20,20 @@ function createMatchBasedRule(type, options) {
         ));
 }
 
+export function createF2fRule(options) {
+    return createGroupRule(
+        ruleId.f2f,
+        Object.assign(
+            {matchOutcomeScope: MatchOutcomeScope.ALL_MATCHES},
+            options || {}));
+}
+
 const matchBasedRules = [ruleId.BB, ruleId.WM, ruleId.LB, ruleId.LS,
                          ruleId.SB, ruleId.WB, ruleId.WS, ruleId.Punkts].map(
                              rlId => (o) => createMatchBasedRule(rlId, o));
 
 const customRules = [
-    (o) => createGroupRule(
-        ruleId.f2f,
-        Object.assign(
-            {matchOutcomeScope: MatchOutcomeScope.ALL_MATCHES},
-            o)),
+    (o) => createF2fRule(o),
     (o) => createGroupRule(ruleId.rnd, o),
     (o) => createGroupRule(ruleId.DM, o)
 ];
@@ -37,4 +41,3 @@ const customRules = [
 // const _ruleId2Factory =
 export const ruleType2Factory = new Map(matchBasedRules.concat(customRules).map(
     ruleFactory => [ruleFactory()['@type'], ruleFactory]));
-

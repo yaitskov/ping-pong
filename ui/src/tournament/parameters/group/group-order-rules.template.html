@@ -11,6 +11,7 @@
     <div>
       <a ng-click="$ctrl.showMenu($index)"
          class="btn btn-default group-rule-label pull-left btn-block"
+         ng-class="{'btn-primary': $index == $ctrl.indexRuleWithMenu}"
          translate="group-order-rule-label-{{gor['@type']}}"/>
     </div>
     <hr class="spacer"/>

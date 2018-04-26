@@ -27,6 +27,14 @@ describe('group-order-rules', () => {
         });
     });
 
+    it('current rule button is outlined', () => {
+        ctx.hasClass('.group-rule-label:first', 'btn-primary');
+        ctx.hasNoClass('.group-rule-label:eq(1)', 'btn-primary');
+        ctx.click('.group-rule-label:eq(1)');
+        ctx.hasNoClass('.group-rule-label:first', 'btn-primary');
+        ctx.hasClass('.group-rule-label:eq(1)', 'btn-primary');
+    });
+
     describe('add rule button above the current one', () => {
         it('click emits show available rules with sport', () => {
             ctx.recordEvents(PickGroupRulesDialog.TopicShowAvailableRules, (events) => {

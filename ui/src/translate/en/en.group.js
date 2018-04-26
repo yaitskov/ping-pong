@@ -16,5 +16,6 @@ module.exports = {
     'group-order-rule-label-Punkts': 'Score Sum',
     'group-order-rule-label-DM': 'Play extra matches',
 
-    'group-rule-parameters-title': 'Parameters for '
+    'group-rule-parameters-title': 'Parameters for ',
+    'group-order-rule-list-lbl': 'List of order rules'
 };

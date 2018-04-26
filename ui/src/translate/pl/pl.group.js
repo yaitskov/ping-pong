@@ -17,5 +17,6 @@ module.exports = {
     'group-order-rule-label-Punkts': 'Suma Punktów',
     'group-order-rule-label-DM': 'Dodatkowe meczi',
 
-    'group-rule-parameters-title': 'Ustawenia dla: '
+    'group-rule-parameters-title': 'Ustawenia dla: ',
+    'group-order-rule-list-lbl': 'Lista regul uporządkowania'
 };

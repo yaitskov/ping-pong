@@ -1,36 +1,47 @@
-<div class="form-group group-rule" ng-repeat="gor in $ctrl.rules">
-  <div>
-    <a ng-click="$ctrl.showMenu($index)"
-       class="btn btn-default group-rule-label"
-       translate="group-order-rule-label-{{gor['@type']}}"/>
-  </div>
-  <div class="form-group group-rule-menu"
-       ng-show="$ctrl.indexRuleWithMenu == $index">
-    <div class="btn-group">
-      <a class="btn btn-primary group-order-rule-config"
-         ng-show="$ctrl.hasParameters(gor)"
-         ng-click="$ctrl.configureRule(gor)">
-        <span class="glyphicon glyphicon-cog"/>
-      </a>
-      <a class="btn btn-primary group-order-rule-up"
-         ng-show="$index > 0 && $index < $ctrl.rules.length - 1"
-         ng-click="$ctrl.moveItem($index, -1)">
-        <span class="glyphicon glyphicon-triangle-top"/>
-      </a>
-      <a class="btn btn-primary group-order-rule-down"
-         ng-show="$index < $ctrl.rules.length - 2"
-         ng-click="$ctrl.moveItem($index, +1)">
-        <span class="glyphicon glyphicon-triangle-bottom"/>
-      </a>
-      <a class="btn btn-success group-order-rule-add"
-         ng-click="$ctrl.addRule($index)">
-        <span class="glyphicon glyphicon-plus"/>
-      </a>
-      <a class="btn btn-danger group-order-rule-remove"
-         ng-show="$index < $ctrl.rules.length - 1"
-         ng-click="$ctrl.removeRule($index)">
-        <span class="glyphicon glyphicon-trash"/>
-      </a>
+<div class="form-group toggle-btn">
+    <label translate="group-order-rule-list-lbl"/>
+    <a class="pull-right arrow"
+       simple-toggler="#group-order-rule-list">
+        <span class="glyphicon glyphicon-menu-down"/>
+        <span class="glyphicon glyphicon-menu-up"/>
+    </a>
+</div>
+<div class="toggle-panel in" id="group-order-rule-list">
+  <div class="form-group group-rule clearfix" ng-repeat="gor in $ctrl.rules">
+    <div>
+      <a ng-click="$ctrl.showMenu($index)"
+         class="btn btn-default group-rule-label pull-left btn-block"
+         translate="group-order-rule-label-{{gor['@type']}}"/>
+    </div>
+    <hr class="spacer"/>
+    <div class="group-rule-menu"
+         ng-show="$ctrl.indexRuleWithMenu == $index">
+      <div class="btn-group">
+        <a class="btn btn-primary group-order-rule-config"
+           ng-show="$ctrl.hasParameters(gor)"
+           ng-click="$ctrl.configureRule(gor)">
+          <span class="glyphicon glyphicon-cog"/>
+        </a>
+        <a class="btn btn-primary group-order-rule-up"
+           ng-show="$index > 0 && $index < $ctrl.rules.length - 1"
+           ng-click="$ctrl.moveItem($index, -1)">
+          <span class="glyphicon glyphicon-triangle-top"/>
+        </a>
+        <a class="btn btn-primary group-order-rule-down"
+           ng-show="$index < $ctrl.rules.length - 2"
+           ng-click="$ctrl.moveItem($index, +1)">
+          <span class="glyphicon glyphicon-triangle-bottom"/>
+        </a>
+        <a class="btn btn-success group-order-rule-add"
+           ng-click="$ctrl.addRule($index)">
+          <span class="glyphicon glyphicon-plus"/>
+        </a>
+        <a class="btn btn-danger group-order-rule-remove"
+           ng-show="$index < $ctrl.rules.length - 1"
+           ng-click="$ctrl.removeRule($index)">
+          <span class="glyphicon glyphicon-trash"/>
+        </a>
+      </div>
     </div>
   </div>
 </div>

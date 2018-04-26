@@ -10,14 +10,16 @@
             </div>
             <div class="modal-body">
               <many-button-toggler ng-model="$ctrl.rule.matchOutcomeScope"
-                                   domain="Object.keys($ctrl.MatchOutcomeScope)"
+                                   domain="$ctrl.matchOutcomeScopeKeys"
                                    selected-class="['btn-primary', 'btn-success']"
                                    ng-show="$ctrl.rule.matchOutcomeScope"
+                                   id="match-outcome-scope"
                                    label="match-outcome-scope"/>
               <many-button-toggler ng-model="$ctrl.rule.matchParticipantScope"
                                    domain="Object.keys($ctrl.MatchParticipantScope)"
                                    selected-class="['btn-primary', 'btn-success']"
                                    ng-show="$ctrl.rule.matchParticipantScope"
+                                   id="match-participant-scope"
                                    label="match-participant-scope"/>
 
               <div class="form-group toggle-btn"

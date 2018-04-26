@@ -20,8 +20,8 @@ export default class GroupRuleParametersDialog extends SimpleDialog {
         this.useCustomDmMatchRules = false;
         this.subscribe(GroupRuleParametersDialog.TopicLoad,
                        (gor, defaultMatchRules) => this.showDialogFor(gor, defaultMatchRules));
-        this.MatchOutcomeScope = MatchOutcomeScope;
-        this.MatchParticipantScope = MatchParticipantScope;
+        this.matchOutcomeScopeKeys = Object.keys(MatchOutcomeScope);
+        this.matchParticipantScopeKeys = Object.keys(MatchParticipantScope);
     }
 
     watchForUseDmMatchRules() {

@@ -23,6 +23,7 @@ describe('group-rule-parameters-dialog', () => {
 
         it('custom dm matches hidden', () => ctx.hidden('#custom-dm-match-rules-toggler'));
 
+
         it('match participant scope visible', () => ctx.visible('#match-participant-scope'));
         it('match outcome scope visible', () => ctx.visible('#match-outcome-scope'));
         it('match outcome scope keys',
@@ -31,5 +32,10 @@ describe('group-rule-parameters-dialog', () => {
         it('match participant scope keys',
            () => expect(ctx.ctrl.matchParticipantScopeKeys.sort()).
            toEqual(['AT_LEAST_ONE', 'BOTH']));
+        it('translate match outcome scope', () =>
+           ctx.transAs('#match-outcome-scope label:first', 'Count broken matches'));
+        it('translate participant scope', () =>
+           ctx.transAs('#match-participant-scope label:first',
+                       'Count only matches among competing players'));
     });
 });

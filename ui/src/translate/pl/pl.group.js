@@ -18,5 +18,12 @@ module.exports = {
     'group-order-rule-label-DM': 'Dodatkowe meczi',
 
     'group-rule-parameters-title': 'Ustawenia dla: ',
-    'group-order-rule-list-lbl': 'Lista regul uporządkowania'
+    'group-order-rule-list-lbl': 'Lista regul uporządkowania',
+
+    'match-outcome-scope-lbl': 'Liczyć przerwanę meczi',
+    'match-outcome-scope-lbl-ALL_MATCHES': 'Tak',
+    'match-outcome-scope-lbl-JUST_NORMALLY_COMPLETE': 'Nie',
+    'match-participant-scope-lbl': 'Liczyć meczi tylko mędzę spórnymi graczami',
+    'match-participant-scope-lbl-BOTH': 'Tak',
+    'match-participant-scope-lbl-AT_LEAST_ONE': 'Nie'
 };

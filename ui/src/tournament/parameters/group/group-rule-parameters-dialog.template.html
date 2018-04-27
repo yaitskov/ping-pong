@@ -14,13 +14,13 @@
                                    selected-class="['btn-primary', 'btn-success']"
                                    ng-show="$ctrl.rule.matchOutcomeScope"
                                    id="match-outcome-scope"
-                                   label="match-outcome-scope"/>
+                                   label="match-outcome-scope-lbl"/>
               <many-button-toggler ng-model="$ctrl.rule.matchParticipantScope"
-                                   domain="Object.keys($ctrl.MatchParticipantScope)"
+                                   domain="$ctrl.matchParticipantScopeKeys"
                                    selected-class="['btn-primary', 'btn-success']"
                                    ng-show="$ctrl.rule.matchParticipantScope"
                                    id="match-participant-scope"
-                                   label="match-participant-scope"/>
+                                   label="match-participant-scope-lbl"/>
 
               <div class="form-group toggle-btn"
                    id="custom-dm-match-rules-toggler"

@@ -75,6 +75,10 @@ export default class AngularTestContext {
        expect(this.element.find(jqueryPrefix).hasClass(cssClass)).toBeFalse();
     }
 
+    transAs(jqueryPrefix, text) {
+       expect(this.element.find(jqueryPrefix).text()).toBe(text);
+    }
+
     btnToggles(jqueryPrefix, valueF, options) {
         this.btnTogglesDiffClasses(jqueryPrefix, valueF, options);
     }

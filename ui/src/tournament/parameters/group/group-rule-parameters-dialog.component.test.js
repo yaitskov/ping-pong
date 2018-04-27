@@ -2,6 +2,7 @@ import { setupAngularJs } from 'test/angularjs-test-setup.js';
 import GroupOrderRulesCtrl from './GroupOrderRulesCtrl.js';
 import { ruleId, createMatchBasedRule, createF2fRule, createDmRule } from './rules.js';
 import GroupRuleParametersDialog from './GroupRuleParametersDialog.js';
+import defaultMatchRules from 'tournament/new/defaultMatchRules.js';
 
 
 describe('group-rule-parameters-dialog', () => {
@@ -53,7 +54,7 @@ describe('group-rule-parameters-dialog', () => {
 
     describe('with DM rule', () => {
         const setRules = () => ctx.send(GroupRuleParametersDialog.TopicLoad,
-                                        createDmRule());
+                                        createDmRule(), defaultMatchRules('PingPong'));
 
         beforeEach(() => setRules());
 
@@ -61,5 +62,11 @@ describe('group-rule-parameters-dialog', () => {
         it('custom dm matches panel hidden', () => ctx.hidden('#custom-dm-match-rules-panel'));
         it('match participant scope hidden', () => ctx.hidden('#match-participant-scope'));
         it('match outcome scope hidden', () => ctx.hidden('#match-outcome-scope'));
+
+        it('toggle on custom dm rules', () => {
+            ctx.toggleOn('#custom-dm-match-rules-toggler input');
+            ctx.visible('#custom-dm-match-rules-panel');
+            expect(ctx.ctrl.rule.match.setsToWin).toBe(3);
+        });
     });
 });

@@ -13,6 +13,8 @@ export default class GroupOrderRulesCtrl extends SimpleController {
                        (e) => this.setRules(e));
         this.subscribe(PickGroupRulesDialog.TopicRuleSelected,
                        (ruleId) => this.onRuleSelected(ruleId));
+        this.subscribe(GroupRuleParametersDialog.TopicSave,
+                       (newRule, oldRule) => this.rules[this.rules.indexOf(oldRule)] = newRule);
         this.indexRuleWithMenu = 0;
     }
 

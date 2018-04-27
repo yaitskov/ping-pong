@@ -60,6 +60,12 @@ describe('group-order-rules', () => {
         });
     });
 
+    it('save event from group order rule params dialog updates rule', () => {
+        const ruleCopy = Object.assign({}, ctx.ctrl.rules[0], {keyFromUpdate: 1});
+        ctx.send(GroupRuleParametersDialog.TopicSave, ruleCopy, ctx.ctrl.rules[0]);
+        expect(ctx.ctrl.rules[0].keyFromUpdate).toBe(1);
+    });
+
     describe('remove button', () => {
         it('hidden for last rule',  () => ctx.hidden('.group-order-rule-remove:last'));
         it('visible in first rule', () => ctx.visible('.group-order-rule-remove:first'));

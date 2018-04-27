@@ -28,6 +28,13 @@ export function createF2fRule(options) {
             options || {}));
 }
 
+export function createDmRule(options) {
+    return createGroupRule(
+        ruleId.DM,
+        Object.assign({}, options || {}));
+}
+
+
 const matchBasedRules = [ruleId.BB, ruleId.WM, ruleId.LB, ruleId.LS,
                          ruleId.SB, ruleId.WB, ruleId.WS, ruleId.Punkts].map(
                              rlId => (o) => createMatchBasedRule(rlId, o));

@@ -1,6 +1,6 @@
 import { setupAngularJs } from 'test/angularjs-test-setup.js';
 import GroupOrderRulesCtrl from './GroupOrderRulesCtrl.js';
-import { ruleId, createMatchBasedRule, createF2fRule } from './rules.js';
+import { ruleId, createMatchBasedRule, createF2fRule, createDmRule } from './rules.js';
 import GroupRuleParametersDialog from './GroupRuleParametersDialog.js';
 
 
@@ -49,5 +49,17 @@ describe('group-rule-parameters-dialog', () => {
         it('custom dm matches hidden', () => ctx.hidden('#custom-dm-match-rules-toggler'));
         it('match participant scope hidden', () => ctx.hidden('#match-participant-scope'));
         it('match outcome scope visible', () => ctx.visible('#match-outcome-scope'));
+    });
+
+    describe('with DM rule', () => {
+        const setRules = () => ctx.send(GroupRuleParametersDialog.TopicLoad,
+                                        createDmRule());
+
+        beforeEach(() => setRules());
+
+        it('custom dm matches toggler visible', () => ctx.visible('#custom-dm-match-rules-toggler'));
+        it('custom dm matches panel hidden', () => ctx.hidden('#custom-dm-match-rules-panel'));
+        it('match participant scope hidden', () => ctx.hidden('#match-participant-scope'));
+        it('match outcome scope hidden', () => ctx.hidden('#match-outcome-scope'));
     });
 });

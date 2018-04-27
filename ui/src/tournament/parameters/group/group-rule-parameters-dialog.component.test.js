@@ -22,8 +22,6 @@ describe('group-rule-parameters-dialog', () => {
                'Parameters for Score Sum'));
 
         it('custom dm matches hidden', () => ctx.hidden('#custom-dm-match-rules-toggler'));
-
-
         it('match participant scope visible', () => ctx.visible('#match-participant-scope'));
         it('match outcome scope visible', () => ctx.visible('#match-outcome-scope'));
         it('match outcome scope keys',
@@ -37,5 +35,19 @@ describe('group-rule-parameters-dialog', () => {
         it('translate participant scope', () =>
            ctx.transAs('#match-participant-scope label:first',
                        'Count only matches among competing players'));
+    });
+
+    describe('with f2f rule', () => {
+        const setRules = () => ctx.send(GroupRuleParametersDialog.TopicLoad,
+                                        createF2fRule());
+
+        beforeEach(() => setRules());
+
+        it('translate title',
+           () => expect(ctx.find('h4.modal-title:first').text()).toBe(
+               'Parameters for Face-to-Face'));
+        it('custom dm matches hidden', () => ctx.hidden('#custom-dm-match-rules-toggler'));
+        it('match participant scope hidden', () => ctx.hidden('#match-participant-scope'));
+        it('match outcome scope visible', () => ctx.visible('#match-outcome-scope'));
     });
 });

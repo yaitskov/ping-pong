@@ -32,7 +32,8 @@
                        ng-model="$ctrl.useCustomDmMatchRules"
                        bs-toggle-on="{{ 'yes-lbl' | translate }}"
                        bs-toggle-off="{{ 'no-lbl' | translate }}"
-                       bs-toggle-target="#custom-dm-match-rules-panel"
+                       bs-toggle-tar
+                       get="#custom-dm-match-rules-panel"
                        bs-toggle/>
               </div>
               <div id="custom-dm-match-rules-panel"
@@ -43,13 +44,14 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-danger"
-                        data-dismiss="modal"
-                        translate="Cancel btn"/>
+                      data-dismiss="modal"
+                      translate="Cancel btn"/>
 
               <button type="button" class="btn btn-primary"
-                        ng-click="$ctrl.saveChanges()"
-                        data-dismiss="modal"
-                        translate="save-lbl"/>
+                      id="save-group-rule-params-button"
+                      ng-click="$ctrl.saveChanges()"
+                      data-dismiss="modal"
+                      translate="save-lbl"/>
             </div>
         </div>
     </div>

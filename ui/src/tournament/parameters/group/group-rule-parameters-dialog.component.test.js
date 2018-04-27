@@ -68,5 +68,22 @@ describe('group-rule-parameters-dialog', () => {
             ctx.visible('#custom-dm-match-rules-panel');
             expect(ctx.ctrl.rule.match.setsToWin).toBe(3);
         });
+
+
+        it('toggle off custom dm rules', () => {
+            ctx.toggleOn('#custom-dm-match-rules-toggler input');
+            ctx.toggleOff('#custom-dm-match-rules-toggler input');
+            ctx.hidden('#custom-dm-match-rules-panel');
+            expect(ctx.ctrl.rule.match).toBeUndefined();
+        });
+
+        it('save button emits updated rule', () => {
+            ctx.toggleOn('#custom-dm-match-rules-toggler input');
+            ctx.recordEvents(GroupRuleParametersDialog.TopicSave, (events) => {
+                ctx.click('#save-group-rule-params-button');
+                it('dialog hidden', () => ctx.hidden('#group-rule-parameters'));
+                expect(events[0][0].match.setsToWin).toBe(3);
+            });
+        });
     });
 });

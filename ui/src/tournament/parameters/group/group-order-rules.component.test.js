@@ -48,6 +48,7 @@ describe('group-order-rules', () => {
         describe('visibility', () => {
             it('hidden for rnd rule', () => ctx.hidden('.group-order-rule-config:last'));
             it('visible for punkts', () => ctx.visible('.group-order-rule-config:first'));
+            it('visible for dm', () => ctx.visible('.group-order-rule-config:eq(6)'));
             it('visible for f2f', () => ctx.visible('.group-order-rule-config:eq(1)'));
         });
         it('click emits topic load and show dialog', () => {

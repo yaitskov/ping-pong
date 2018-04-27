@@ -24,5 +24,7 @@ module.exports = {
     'match-outcome-scope-lbl-JUST_NORMALLY_COMPLETE': 'No',
     'match-participant-scope-lbl': 'Count only matches among competing players',
     'match-participant-scope-lbl-BOTH': 'Yes',
-    'match-participant-scope-lbl-AT_LEAST_ONE': 'No'
+    'match-participant-scope-lbl-AT_LEAST_ONE': 'No',
+
+    'custom-dm-match-rules-lbl': 'Custom rules for extra matches'
 };

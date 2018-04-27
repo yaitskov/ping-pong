@@ -25,5 +25,7 @@ module.exports = {
     'match-outcome-scope-lbl-JUST_NORMALLY_COMPLETE': 'Nie',
     'match-participant-scope-lbl': 'Liczyć meczi tylko mędzę spórnymi graczami',
     'match-participant-scope-lbl-BOTH': 'Tak',
-    'match-participant-scope-lbl-AT_LEAST_ONE': 'Nie'
+    'match-participant-scope-lbl-AT_LEAST_ONE': 'Nie',
+
+    'custom-dm-match-rules-lbl': 'Niezależyne reguly dodatkowych meczów'
 };

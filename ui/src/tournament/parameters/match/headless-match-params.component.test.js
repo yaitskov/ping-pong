@@ -27,5 +27,16 @@ describe('head-less-match-params', () => {
         checkTouchSpinID(ctx, '#min-game-advance',
                          () => ctx.ctrl.rules.match.minAdvanceInGames);
     });
-});
 
+    describe('count only sets', () => {
+        beforeEach(() => {
+            const tournamentRules = newTournament('PingPong').rules;
+            tournamentRules.match.countOnlySets = true;
+            ctx.send(HeadLessMatchParamsCtrl.TopicLoad, tournamentRules);
+        });
+
+        it('sets input visible', () => ctx.visible('#sets-to-win-match'));
+        it('min-games-to-win hidden', () => ctx.hidden('#min-games-to-win'));
+        it('min-game-advance hidden', () => ctx.hidden('#min-game-advance'));
+    });
+});

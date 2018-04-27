@@ -41,6 +41,10 @@ export default class AngularTestContext {
         this.sync();
     }
 
+    toggleOutOfManyButtons(jqueryPrefix, btnClazz) {
+        this.click(`${jqueryPrefix} .${btnClazz}`);
+    }
+
     btnTogglesDiffClasses(jqueryPrefix, valueF, options) {
         expect(valueF()).toBe(options.default.value);
         this.click(`${jqueryPrefix} .${options.default.clazz}`);

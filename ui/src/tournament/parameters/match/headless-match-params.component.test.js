@@ -38,5 +38,11 @@ describe('head-less-match-params', () => {
         it('sets input visible', () => ctx.visible('#sets-to-win-match'));
         it('min-games-to-win hidden', () => ctx.hidden('#min-games-to-win'));
         it('min-game-advance hidden', () => ctx.hidden('#min-game-advance'));
+        it('visible for ping pong', () => ctx.visible('#count-only-sets'));
+    });
+
+    it('count only sets hidden for tennis', () => {
+        ctx.send(HeadLessMatchParamsCtrl.TopicLoad, newTournament('Tennis').rules);
+        ctx.hidden('#count-only-sets');
     });
 });

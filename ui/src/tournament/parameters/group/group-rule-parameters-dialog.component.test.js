@@ -77,6 +77,15 @@ describe('group-rule-parameters-dialog', () => {
             expect(ctx.ctrl.rule.match).toBeUndefined();
         });
 
+        it('retoggle keeps changed dm rules', () => {
+            ctx.toggleOn('#custom-dm-match-rules-toggler input');
+            expect(ctx.ctrl.rule.match.setsToWin).toBe(3);
+            ctx.ctrl.rule.match.setsToWin = 9;
+            ctx.toggleOff('#custom-dm-match-rules-toggler input');
+            ctx.toggleOn('#custom-dm-match-rules-toggler input');
+            expect(ctx.ctrl.rule.match.setsToWin).toBe(9);
+        });
+
         it('save button emits updated rule', () => {
             ctx.toggleOn('#custom-dm-match-rules-toggler input');
             ctx.recordEvents(GroupRuleParametersDialog.TopicSave, (events) => {

@@ -62,6 +62,10 @@ tr.bottom-line td {
         width: 45px;
         display: inline-block;
     }
+
+    .btn-space {
+        margin: 10px;
+    }
 }
 
 @include mobile-media {
@@ -77,6 +81,10 @@ tr.bottom-line td {
         padding: 8px 10px;
         width: 40px;
         display: inline-block;
+    }
+
+    .btn-space {
+        margin: 2px;
     }
 }
 

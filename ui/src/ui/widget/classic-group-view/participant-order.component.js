@@ -1,22 +1,22 @@
 import 'angular';
 import template from './participant-order.template.html';
+import ClassicGroupViewCtrl from 'ui/widget/classic-group-view/ClassicGroupViewCtrl.js';
 
 angular.
     module('widget').
     component('participantOrder', {
         templateUrl: template,
-        controller: ['$scope', '$rootScope', 'binder',
-                     function ($scope, $rootScope, binder) {
+        controller: ['$scope', '$rootScope', 'binder', 'MessageBus',
+                     function ($scope, $rootScope, binder, MessageBus) {
                          var self = this;
                          self.sortBy = 'seed';
                          self.changeSortBy = (order) => {
-                             $rootScope.$broadcast('event.classic.group.view.row.order', order);
+                             MessageBus.broadcast(ClassicGroupViewCtrl.TopicSetRowOrder, order);
                          };
-                         binder($scope, {
-                             'event.classic.group.view.row.order': function (e, order) {
-                                  self.sortBy = order;
-                             }
-                         })
+                         MessageBus.subscribeIn(
+                             $scope,
+                             ClassicGroupViewCtrl.TopicSetRowOrder,
+                             (order) => self.sortBy = order);
                          $rootScope.$broadcast('event.participant.order.ready');
                      }]
     });

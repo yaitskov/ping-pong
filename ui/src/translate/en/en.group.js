@@ -26,5 +26,30 @@ module.exports = {
     'match-participant-scope-lbl-BOTH': 'Yes',
     'match-participant-scope-lbl-AT_LEAST_ONE': 'No',
 
-    'custom-dm-match-rules-lbl': 'Custom rules for extra matches'
+    'custom-dm-match-rules-lbl': 'Custom rules for extra matches',
+
+    'rule-column-header-Tennis-BB': '⚫-⚪',
+    'rule-column-header-Tennis-WM': '∑🏆',
+    'rule-column-header-Tennis-f2f': '☺☻',
+    'rule-column-header-Tennis-LB': '⚪',
+    'rule-column-header-Tennis-LS': '♺🎾',
+    'rule-column-header-Tennis-rnd': '⚄⚂',
+    'rule-column-header-Tennis-SB': 'Δ🎾',
+    'rule-column-header-Tennis-WB': '⚫',
+    'rule-column-header-Tennis-WS': '🎾',
+    'rule-column-header-Tennis-Punkts': '∑',
+    'rule-column-header-Tennis-DM': 'DM', // not used
+
+
+    'rule-column-header-PingPong-BB': '⚫-⚪',
+    'rule-column-header-PingPong-WM': '∑🏆',
+    'rule-column-header-PingPong-f2f': '☺☻',
+    'rule-column-header-PingPong-LB': '⚪',
+    'rule-column-header-PingPong-LS': '♺🏓',
+    'rule-column-header-PingPong-rnd': '⚄⚂',
+    'rule-column-header-PingPong-SB': 'Δ🏓',
+    'rule-column-header-PingPong-WB': '⚫',
+    'rule-column-header-PingPong-WS': '🏓',
+    'rule-column-header-PingPong-Punkts': '∑',
+    'rule-column-header-PingPong-DM': 'DM' // not used
 };

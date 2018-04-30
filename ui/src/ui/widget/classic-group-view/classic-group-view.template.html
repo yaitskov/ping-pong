@@ -1,127 +1,108 @@
 <table class="table classic-group-view">
-    <thead>
+  <thead>
     <tr>
-        <td title="position">
-            #
-        </td>
-        <td translate="Participant lbl" />
-        <td ng-repeat="participant in $ctrl.participants" class="text-center">
-            <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}"
-               title="{{participant.name}}"
-               class="text-black">
-                {{ $index + 1 }} {{participant.name | initials}}
-            </a>
-        </td>
-        <td ng-show="$ctrl.showBalance" title="set balance" class="text-center cloud-sport-font">
-            <span>⚖</span>
-            <span>⚔</span>
-        </td>
-        <td ng-show="$ctrl.showBalance" title="ball balance" class="text-center cloud-sport-font">
-            <span>⚖</span>
-            <span>⚪/⚫</span>
-        </td>
-        <td title="punkts" class="text-center" translate="Punkts lbl" />
+      <td title="position">
+        #
+      </td>
+      <td translate="Participant lbl" />
+      <td ng-repeat="participant in $ctrl.participants" class="text-center">
+        <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}"
+           title="{{participant.name}}"
+           class="text-black">
+          {{ $index + 1 }} {{participant.name | initials}}
+        </a>
+      </td>
+      <td ng-repeat="gorId in $ctrl.usedGroupOrderRules track by $index"
+          class="text-center cloud-sport-font"
+          translate="rule-column-header-{{$ctrl.sportType}}-{{gorId}}"/>
     </tr>
-    </thead>
-    <tbody>
+  </thead>
+  <tbody>
     <tr ng-repeat="participant in $ctrl.participants">
-        <td>{{$index + 1}}</td>
-        <td>
-            <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}"
-               ng-class="{'text-success': participant.finishPosition < $ctrl.quitsGroup, 'text-danger': participant.state == 'Expl'}">
-                <span ng-show="participant.state == 'Expl'"  class="cloud-sport-font">
-                    ☠
+      <td>{{$index + 1}}</td>
+      <td>
+        <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}"
+           ng-class="{'text-success': participant.finishPosition < $ctrl.quitsGroup, 'text-danger': participant.state == 'Expl'}">
+          <span ng-show="participant.state == 'Expl'"  class="cloud-sport-font">
+            ☠
+          </span>
+          {{participant.name}}
+        </a>
+      </td>
+      <td ng-repeat="p2 in $ctrl.participants" class="text-center">
+        <span ng-show="participant.uid == p2.uid">
+          <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}"
+             title="{{participant.name}}"
+             class="text-muted">
+            {{participant.name | initials}}
+          </a>
+        </span>
+        <span ng-show="participant.uid != p2.uid">
+          <a ng-show="participant.matches[p2.uid]"
+             href="#!/match/management/{{$ctrl.tournamentId}}/{{participant.matches[p2.uid].mid}}">
+            <span ng-show="participant.matches[p2.uid].state == 'Pending'" class="text-muted">
+              <span class="pending">𝄞</span>
+            </span>
+            <span ng-show="participant.matches[p2.uid].state == 'Run'">
+              <span ng-repeat="set in participant.matches[p2.uid].games" class="small">
+                {{set.his}}&nbsp;:&nbsp;{{set.enemy}}
+                <span ng-show="$index + 1 != participant.matches[p2.uid].games.length">,</span>
+              </span>
+              <sup>
+                <span class="glyphicon glyphicon-refresh spinning-slow tiny"/>
+              </sup>
+            </span>
+            <span ng-show="participant.matches[p2.uid].state == 'Over'"
+                  ng-class="{'text-danger': $ctrl.isLost(participant, p2), 'text-success': $ctrl.isWon(participant, p2)}">
+              <span ng-switch="$ctrl.scoreShowMode">
+                <span ng-switch-when="sets">
+                  {{participant.matches[p2.uid].sets.his}}&nbsp;:&nbsp;{{participant.matches[p2.uid].sets.enemy}}
                 </span>
-                {{participant.name}}
-            </a>
-        </td>
-        <td ng-repeat="p2 in $ctrl.participants" class="text-center">
-            <span ng-show="participant.uid == p2.uid">
-                <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}"
-                   title="{{participant.name}}"
-                   class="text-muted">
-                    {{participant.name | initials}}
-                </a>
+                <span ng-switch-when="games">
+                  <span ng-repeat="set in participant.matches[p2.uid].games" class="small">
+                    {{set.his}}&nbsp;:&nbsp;{{set.enemy}}
+                    <span ng-show="$index + 1 != participant.matches[p2.uid].games.length">,</span>
+                  </span>
+                </span>
+                <span ng-switch-default>
+                  unsupported mode {{$ctrl.scoreShowMode}}
+                </span>
+              </span>
             </span>
-            <span ng-show="participant.uid != p2.uid">
-                <a href="#!/match/management/{{$ctrl.tournamentId}}/{{participant.matches[p2.uid].mid}}">
-                    <span ng-show="participant.matches[p2.uid].state == 'Pending'" class="text-muted">
-                        <span class="pending">𝄞</span>
-                    </span>
-                    <span ng-show="participant.matches[p2.uid].state == 'Run'">
-                        <span ng-repeat="set in participant.matches[p2.uid].games" class="small">
-                            {{set.his}}&nbsp;:&nbsp;{{set.enemy}}
-                            <span ng-show="$index + 1 != participant.matches[p2.uid].games.length">,</span>
-                        </span>
-                        <sup>
-                            <span class="glyphicon glyphicon-refresh spinning-slow tiny"/>
-                        </sup>
-                    </span>
-                    <span ng-show="participant.matches[p2.uid].state == 'Over'"
-                          ng-class="{'text-danger': $ctrl.isLost(participant, p2), 'text-success': $ctrl.isWon(participant, p2)}">
-                        <span ng-switch="$ctrl.scoreShowMode">
-                            <span ng-switch-when="sets">
-                                {{participant.matches[p2.uid].sets.his}}&nbsp;:&nbsp;{{participant.matches[p2.uid].sets.enemy}}
-                            </span>
-                            <span ng-switch-when="games">
-                                <span ng-repeat="set in participant.matches[p2.uid].games" class="small">
-                                    {{set.his}}&nbsp;:&nbsp;{{set.enemy}}
-                                    <span ng-show="$index + 1 != participant.matches[p2.uid].games.length">,</span>
-                                </span>
-                            </span>
-                            <span ng-switch-default>
-                                unsupported mode {{$ctrl.scoreShowMode}}
-                            </span>
-                        </span>
-                    </span>
-                    <span ng-show="participant.matches[p2.uid].state == 'WalkOver'" class="text-danger"
-                          title="participant walked over the match">
-                        <span class="walk-over cloud-sport-font">⚐</span>
-                    </span>
-                    <span ng-show="participant.matches[p2.uid].state == 'WalkWiner'" class="text-success"
-                          title="enemy walked over the match">
-                        <span class="win-over cloud-sport-font">☺</span>
-                    </span>
-                </a>
+            <span ng-show="participant.matches[p2.uid].state == 'WalkOver'" class="text-danger"
+                  title="participant walked over the match">
+              <span class="walk-over cloud-sport-font">⚐</span>
             </span>
-        </td>
-        <td ng-show="$ctrl.showBalance" class="text-center">
-            <span ng-show="participant.setsAndBalls"
-                  title="won sets in matches with participants having the same number of points"
-                  class="text-success">
-                {{participant.setsAndBalls.wonSets}}
+            <span ng-show="participant.matches[p2.uid].state == 'WalkWiner'" class="text-success"
+                  title="enemy walked over the match">
+              <span class="win-over cloud-sport-font">☺</span>
             </span>
-            <span ng-show="participant.setsAndBalls"
-                  title="lost sets in matches with participants having the same number of points"
-                  class="text-danger">
-                {{participant.setsAndBalls.lostSets}}
-            </span>
-            <hr class="half-cell"/>
-        </td>
-        <td ng-show="$ctrl.showBalance" class="text-center">
-            <span ng-show="participant.setsAndBalls"
-                  title="won balls in matches with participants having the same number of points"
-                  class="text-success">
-                {{participant.setsAndBalls.winBalls}}
-            </span>
-            <span ng-show="participant.setsAndBalls"
-                  title="lost balls in matches with participants having the same number of points"
-                  class="text-danger">
-                {{participant.setsAndBalls.lostBalls}}
-            </span>
-        </td>
-        <td class="text-center">
-            {{participant.punkts}}
-            <div class="dice-set text-warning cloud-sport-font" ng-show="participant.dice"
-                 title="{{ 'dice-comment' | translate }}">
-                <div class="dice">
-                    ⚂
-                </div>
-                <div class="dice">
-                    ⚄
-                </div>
-            </div>
-        </td>
+          </a>
+        </span>
+      </td>
+      <td ng-repeat="reason in participant.reasonChain"
+          class="text-center"
+          ng-show="$ctrl.rowSpan[$parent.$index][$index] > 0"
+          rowspan="{{$ctrl.rowSpan[$parent.$index][$index]}}"
+          ng-switch="reason['@type']">
+        <span ng-switch-when="INF"
+              title="not applicable"/>
+        <span ng-switch-when="f2f"
+              ng-class="{'glyphicon-thumbs-up': reason.won, 'glyphicon-thumbs-down': !reason.won}"
+              class="glyphicon"/>
+        <span ng-switch-when="DL" class="text-success">
+          {{reason.value}}
+        </span>
+        <span ng-switch-when="DI" class="text-success">
+          {{reason.value}}
+        </span>
+        <span ng-switch-when="II" class="text-danger">
+          {{reason.value}}
+        </span>
+        <span ng-switch-default>
+          bad reason type
+        </span>
+      </td>
     </tr>
-    </tbody>
+  </tbody>
 </table>

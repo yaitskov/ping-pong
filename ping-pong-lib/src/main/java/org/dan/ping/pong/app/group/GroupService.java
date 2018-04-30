@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.group;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -16,8 +17,11 @@ import static org.dan.ping.pong.app.group.ParticipantMatchState.Run;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.WalkOver;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.WalkWiner;
 import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.match.MatchTag.DISAMBIGUATION;
+import static org.dan.ping.pong.app.match.MatchTag.ORIGIN;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 import static org.dan.ping.pong.app.match.rule.service.GroupRuleParams.ofParams;
+import static org.dan.ping.pong.app.match.rule.service.meta.UseDisambiguationMatchesDirectiveService.matchesInGroup;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
@@ -46,12 +50,12 @@ import org.dan.ping.pong.app.tournament.TournamentRules;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -61,7 +65,8 @@ import javax.inject.Inject;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupService {
-    public static final MatchTag DM_TAG = MatchTag.builder().prefix(MatchTag.DISAMBIGUATION).build();
+    public static final MatchTag DM_TAG = MatchTag.builder().prefix(DISAMBIGUATION).build();
+    public static final MatchTag OM_TAG = MatchTag.builder().prefix(ORIGIN).build();
     public static final Optional<MatchTag> MATCH_TAG_DISAMBIGUATION = Optional.of(DM_TAG);
 
     public Optional<List<MatchInfo>> checkGroupComplete(
@@ -174,15 +179,16 @@ public class GroupService {
                 .stream()
                 .map(e -> e.getReason().get().getUid())
                 .collect(toList());
+        final boolean possibleDm = matchesInGroup(finalPositions.size()) < groupMatches.size();
         final Map<Uid, GroupParticipantResult> result = order.getPositions()
                 .values()
                 .stream()
                 .collect(toMap(
                         e -> e.getReason().get().getUid(),
-                        e -> groupPosToResult(tournament, e,
-                                groupMatches.stream()
-                                        .filter(m -> m.hasParticipant(
-                                                e.getReason().get().getUid())))));
+                        e -> groupPosToResult(tournament, e, possibleDm)));
+
+
+        arrangeMatchesByUids(tournament, groupMatches, result);
 
         range(0, finalPositions.size()).forEach(
                 i -> result.get(finalPositions.get(i)).setFinishPosition(i));
@@ -195,11 +201,29 @@ public class GroupService {
                 .tid(tournament.getTid())
                 .participants(result.values())
                 .quitsGroup(groupRules.getQuits())
+                .sportType(tournament.getSport())
                 .build();
     }
 
+    private void arrangeMatchesByUids(TournamentMemState tournament,
+            List<MatchInfo> groupMatches,
+            Map<Uid, GroupParticipantResult> result) {
+        groupMatches.forEach(m -> {
+            if (m.getTag().isPresent()) {
+                m.participants().forEach(uid -> result.get(uid)
+                        .getDmMatches()
+                        .put(m.opponentUid(uid), matchResult(uid, tournament, m)));
+            } else {
+                m.participants().forEach(uid -> result.get(uid)
+                        .getOriginMatches()
+                        .put(m.opponentUid(uid), matchResult(uid, tournament, m)));
+            }
+        });
+    }
+
     private GroupParticipantResult groupPosToResult(
-            TournamentMemState tournament, GroupPosition gp, Stream<MatchInfo> matches) {
+            TournamentMemState tournament, GroupPosition gp,
+            boolean possibleDm) {
         final ParticipantMemState bid = tournament.getParticipant(
                 gp.getReason().get().getUid());
         return GroupParticipantResult.builder()
@@ -207,10 +231,8 @@ public class GroupService {
                 .uid(bid.getUid())
                 .state(bid.getState())
                 .reasonChain(gp.reasonChain())
-                .matches(matches
-                        .collect(toMap(
-                                m -> m.getOpponentUid(bid.getUid()).get(),
-                                m -> matchResult(bid.getUid(), tournament, m))))
+                .dmMatches(possibleDm ? new HashMap<>() : emptyMap())
+                .originMatches(new HashMap<>())
                 .build();
     }
 

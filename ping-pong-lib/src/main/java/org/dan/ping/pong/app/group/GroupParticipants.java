@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.tournament.Tid;
 
 import java.util.Collection;
@@ -20,4 +21,5 @@ public class GroupParticipants {
     private Collection<GroupParticipantResult> participants;
     private Tid tid;
     private int quitsGroup;
+    private SportType sportType;
 }

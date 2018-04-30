@@ -1,14 +1,15 @@
 import angular from 'angular';
 import template from './tr-group-result.template.html';
+import ClassicGroupViewCtrl from 'ui/widget/classic-group-view/ClassicGroupViewCtrl.js';
 
 angular.
     module('tournament').
     component('tournamentGroupResult', {
         templateUrl: template,
         controller: ['Tournament', 'Group', 'mainMenu', '$routeParams', 'eBarier',
-                     'requestStatus', 'binder', '$scope', '$rootScope',
+                     'requestStatus', 'binder', '$scope', '$rootScope', 'MessageBus',
                      function (Tournament, Group, mainMenu, $routeParams, eBarier,
-                               requestStatus, binder, $scope, $rootScope) {
+                               requestStatus, binder, $scope, $rootScope, MessageBus) {
                          var self = this;
                          self.matches = null;
                          self.winners = null;
@@ -32,7 +33,7 @@ angular.
                                      requestStatus.failed);
                          };
 
-                         var barWidgetsReady = eBarier.create(['view', 'group', 'category', 'status'], (e) => {
+                         var barWidgetsReady = eBarier.create(['group', 'category', 'status'], (e) => {
                              self.loadGroups();
                          });
 
@@ -52,7 +53,7 @@ angular.
                                      {tournamentId: $routeParams.tournamentId, groupId: gid},
                                      function (tournament) {
                                          requestStatus.complete();
-                                         $rootScope.$broadcast('event.classic.group.view.data', tournament);
+                                         MessageBus.broadcast(ClassicGroupViewCtrl.TopicLoad, tournament);
                                      },
                                      requestStatus.failed);
                          };
@@ -68,16 +69,16 @@ angular.
                          };
 
                          self.pickShowMode = function (mode) {
-                             $rootScope.$broadcast('event.classic.group.view.score.show.mode', mode);
+                             MessageBus.broadcast(ClassicGroupViewCtrl.TopicSetShowMode, mode);
                          };
 
+                         MessageBus.subscribeIn(
+                             $scope,
+                             ClassicGroupViewCtrl.TopicSetShowMode,
+                             (mode) => self.scoreShowMode = mode);
                          binder($scope, {
-                             'event.classic.group.view.score.show.mode': function (e, mode) {
-                                   self.scoreShowMode = mode;
-                             },
                              'event.main.menu.ready': function (e) { mainMenu.setTitle('Results in groups'); },
                              'event.request.status.ready': function (event) { barWidgetsReady.got('status'); },
-                             'event.classic.group.view.ready': function (e) { barWidgetsReady.got('view'); },
                              'event.category.switch.ready': function (e) { barWidgetsReady.got('category'); },
                              'event.group.switch.ready': function (e) { barWidgetsReady.got('group'); },
                              'event.group.switch.current': function (e, gid) { self.pickGroup(gid); },

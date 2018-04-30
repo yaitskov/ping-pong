@@ -23,7 +23,8 @@ import java.util.Optional;
 public class GroupParticipantResult {
     private Uid uid;
     private String name;
-    private Map<Uid, GroupMatchResult> matches;
+    private Map<Uid, GroupMatchResult> originMatches;
+    private Map<Uid, GroupMatchResult> dmMatches;
     private int seedPosition;
     private int finishPosition;
     private List<Optional<Reason>> reasonChain;

@@ -21,6 +21,7 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.MY_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.RESULT_CATEGORY;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_COPY;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_EXPEL;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_INVALIDATE_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
@@ -133,6 +134,11 @@ public class ImperativeSimulator {
         assertNull(consoleScenario);
         scenario.consoleTid(restGenerator.createConsoleTournament(scenario, scenario.getTid()));
         consoleScenario = scenario.createConsoleTournament();
+        return this;
+    }
+
+    public ImperativeSimulator invalidateTournamentCache() {
+        myRest.voidPost(TOURNAMENT_INVALIDATE_CACHE, scenario, scenario.getTid());
         return this;
     }
 

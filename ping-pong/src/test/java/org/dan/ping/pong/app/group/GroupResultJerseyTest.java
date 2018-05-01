@@ -6,8 +6,6 @@ import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_LIST;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_RESULT;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S3A2G11;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.F2F;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.LostBalls;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.LostSets;
@@ -19,7 +17,8 @@ import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.
 import static org.dan.ping.pong.app.match.rule.reason.IncreasingIntScalarReason.ofIntI;
 import static org.dan.ping.pong.app.match.rule.reason.InfoReason.notApplicableRule;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST_OFFLINE;
-import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_INVALIDATE_CACHE;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S3A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -206,8 +205,7 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
 
         enlistParticipant(scenario,
                 scenario.getCategoryDbId().get(c1), Optional.of(gid), "p3");
-
-        myRest().voidPost(TOURNAMENT_INVALIDATE_CACHE, scenario, scenario.getTid());
+        simulator.invalidateTournamentCache();
 
         final GroupParticipants r = groupResult(tid, gid);
 

@@ -53,7 +53,7 @@ describe('match-params', () => {
         ctx.visible('#min-game-advance');
         tournament.rules.match.countOnlySets = true;
         ctx.broadcast('event.tournament.rules.set', tournament);
-        ctx.hidden('#sets-to-win-match');
+        ctx.visible('#sets-to-win-match');
         ctx.hidden('#min-games-to-win');
         ctx.hidden('#min-game-advance');
     });

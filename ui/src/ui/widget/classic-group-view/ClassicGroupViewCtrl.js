@@ -68,10 +68,16 @@ export default class ClassicGroupViewCtrl extends SimpleController {
 
     setRowOrder(order) {
         this.rowOrder = order;
-        this.participants.sort(this.sorters[this.rowOrder]);
-        const reasonChainList = this.participants.map((p) => p.reasonChain);
-        this.rowSpan = findRowSpan(reasonChainList, (reason) => reason['@type'] == 'INF');
-        this.usedGroupOrderRules =  findUsedGroupOrderRules(reasonChainList);
+        this._update();
+    }
+
+    _update() {
+        if (this.participants) {
+            this.participants.sort(this.sorters[this.rowOrder]);
+            const reasonChainList = this.participants.map((p) => p.reasonChain);
+            this.rowSpan = findRowSpan(reasonChainList, (reason) => reason['@type'] == 'INF');
+            this.usedGroupOrderRules =  findUsedGroupOrderRules(reasonChainList);
+        }
     }
 
     setScoreShowMode(mode) {

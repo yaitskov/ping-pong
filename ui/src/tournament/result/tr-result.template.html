@@ -47,9 +47,6 @@
       <tr>
         <td class="text-center">#</td>
         <td>{{ 'Participant' | translate }}</td>
-        <td title="{{ 'cumulative score across all matches' | translate }}">
-          {{ 'Score' | translate }}
-        </td>
       </tr>
       </thead>
       <tbody>
@@ -69,12 +66,9 @@
             {{participant.user.name}}
           </a>
         </td>
-        <td>
-          {{participant.punkts}}
-        </td>
       </tr>
       <tr ng-show="$ctrl.playOffParticipants && $ctrl.inGroupParticipants">
-        <td colspan="3" class="text-center text-muted" translate="group-play-off-border"/>
+        <td colspan="2" class="text-center text-muted" translate="group-play-off-border"/>
       </tr>
       <tr ng-repeat="participant in $ctrl.inGroupParticipants" class="even-row">
         <td ng-switch="participant.state" class="text-center">
@@ -89,9 +83,6 @@
           <a href="#!/participant/result/{{$ctrl.tournament.tid}}/{{participant.user.uid}}">
             {{participant.user.name}}
           </a>
-        </td>
-        <td>
-          {{participant.punkts}}
         </td>
       </tr>
       </tbody>

@@ -15,7 +15,7 @@ import javax.validation.constraints.Min;
 
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
 public class Uid implements Comparable<Uid>, Hashable {
     public static final String USER_ID_MUST_BE_GREATER_THAN_2 = "user id must be greater than 2";
 

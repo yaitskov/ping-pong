@@ -1,7 +1,7 @@
 import findRowSpan from './findRowSpan.js';
 
 function sut(reasonChainList) {
-    return findRowSpan(reasonChainList, (a, b) => a == b);
+    return findRowSpan(reasonChainList, (a) => a < 0, (a, b) => a == b);
 }
 
 describe('findRowSpan', () => {
@@ -25,4 +25,8 @@ describe('findRowSpan', () => {
     it('4 x 2 t merge',
        () => expect(sut([[1], [2, 3], [4, 3], [1]])).toEqual(
            {0: {0: 1}, 1: {0: 1, 1: 2}, 2: {0: 1}, 3: {0: 1}}));
+
+    it('3 x 3 void',
+       () => expect(sut([[-1, -2, 1], [-1, -2, 2], [-1, -2, 3]])).toEqual(
+           {0: {2: 1}, 1: {2: 1}, 2: {2: 1}}));
 });

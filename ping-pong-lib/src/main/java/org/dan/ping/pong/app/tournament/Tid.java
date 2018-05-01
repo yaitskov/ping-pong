@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import javax.validation.constraints.Min;
 
 @EqualsAndHashCode
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
 public class Tid implements Comparable<Tid> {
     public static final String TOURNAMENT_ID_SHOULD_BE_A_POSITIVE_NUMBER = "tournament id should be a positive number";
 

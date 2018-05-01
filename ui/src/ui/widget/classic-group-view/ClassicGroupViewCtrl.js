@@ -70,7 +70,7 @@ export default class ClassicGroupViewCtrl extends SimpleController {
         this.rowOrder = order;
         this.participants.sort(this.sorters[this.rowOrder]);
         const reasonChainList = this.participants.map((p) => p.reasonChain);
-        this.rowSpan = findRowSpan(reasonChainList);
+        this.rowSpan = findRowSpan(reasonChainList, (reason) => reason['@type'] == 'INF');
         this.usedGroupOrderRules =  findUsedGroupOrderRules(reasonChainList);
     }
 

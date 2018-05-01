@@ -1,6 +1,6 @@
 import defaultReasonEq from './reasonEq.js';
 
-export default function (reasonChainList, reasonEq = defaultReasonEq) {
+export default function (reasonChainList, voidP, reasonEq = defaultReasonEq) {
     const rowSpan = {};
     let previousReasonChain = null;
     let prevSpan = null;
@@ -10,7 +10,9 @@ export default function (reasonChainList, reasonEq = defaultReasonEq) {
         for (let iCol = 0; iCol < reasonChain.length; ++iCol) {
             const maxPrevCol = previousReasonChain === null ? -1 : previousReasonChain.length;
             if (maxPrevCol < iCol || !reasonEq(reasonChain[iCol], previousReasonChain[iCol])) {
-                span[iCol] = 1;
+                if (!voidP(reasonChain[iCol])) {
+                    span[iCol] = 1;
+                }
             } else if (prevSpan[iCol]) {
                 prevSpan[iCol] += 1;
             }

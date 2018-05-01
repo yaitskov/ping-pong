@@ -11,7 +11,7 @@ import org.dan.ping.pong.sys.hash.HashAggregator;
 import org.dan.ping.pong.sys.hash.Hashable;
 
 @EqualsAndHashCode
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
 public class Mid implements Comparable<Mid>, Hashable {
     @Getter(onMethod = @__(@JsonValue))
     private final int id;

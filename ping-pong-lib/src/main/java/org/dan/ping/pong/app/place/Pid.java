@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @EqualsAndHashCode
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
 public class Pid {
     @Getter(onMethod = @__(@JsonValue))
     private final int pid;

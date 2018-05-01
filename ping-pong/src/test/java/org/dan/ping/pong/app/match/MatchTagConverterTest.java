@@ -1,6 +1,5 @@
 package org.dan.ping.pong.app.match;
 
-import static org.dan.ping.pong.app.match.MatchTagConverter.MASTER_TOURNAMENT_TAG;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -13,7 +12,7 @@ public class MatchTagConverterTest {
 
     @Test
     public void deserializeNullValueAsDefault() {
-        assertThat(sut.from(null), is(MASTER_TOURNAMENT_TAG));
+        assertThat(sut.from(null), is(nullValue()));
     }
 
     @Test
@@ -23,7 +22,7 @@ public class MatchTagConverterTest {
 
     @Test
     public void serializeDefaultToNull() {
-        assertThat(sut.to(MASTER_TOURNAMENT_TAG), nullValue());
+        assertThat(sut.to(null), nullValue());
     }
 
     @Test

@@ -29,28 +29,25 @@ module.exports = {
 
     'custom-dm-match-rules-lbl': 'Niezależyne reguly dodatkowych meczów',
 
-    'rule-column-header-Tennis-BB': '⚫-⚪',
-    'rule-column-header-Tennis-WM': '∑🏆',
-    'rule-column-header-Tennis-f2f': '☺☻',
-    'rule-column-header-Tennis-LB': '⚪',
-    'rule-column-header-Tennis-LS': '♺🎾',
-    'rule-column-header-Tennis-rnd': '⚄⚂',
-    'rule-column-header-Tennis-SB': 'Δ🎾',
-    'rule-column-header-Tennis-WB': '⚫',
-    'rule-column-header-Tennis-WS': '🎾',
+    'rule-column-header-Tennis-BallsBalance': '⚫-⚪',
+    'rule-column-header-Tennis-WonMatches': '∑🏆',
+    'rule-column-header-Tennis-F2F': '☺☻',
+    'rule-column-header-Tennis-LostBalls': '⚪',
+    'rule-column-header-Tennis-LostSets': '♺🎾',
+    'rule-column-header-Tennis-Random': '⚄⚂',
+    'rule-column-header-Tennis-SetsBalance': 'Δ🎾',
+    'rule-column-header-Tennis-WonBalls': '⚫',
+    'rule-column-header-Tennis-WonSets': '🎾',
     'rule-column-header-Tennis-Punkts': '∑',
-    'rule-column-header-Tennis-DM': 'DM', // not used
 
-
-    'rule-column-header-PingPong-BB': '⚫-⚪',
-    'rule-column-header-PingPong-WM': '∑🏆',
-    'rule-column-header-PingPong-f2f': '☺☻',
-    'rule-column-header-PingPong-LB': '⚪',
-    'rule-column-header-PingPong-LS': '♺🏓',
-    'rule-column-header-PingPong-rnd': '⚄⚂',
-    'rule-column-header-PingPong-SB': 'Δ🏓',
-    'rule-column-header-PingPong-WB': '⚫',
-    'rule-column-header-PingPong-WS': '🏓',
-    'rule-column-header-PingPong-Punkts': '∑',
-    'rule-column-header-PingPong-DM': 'DM' // not used
+    'rule-column-header-PingPong-BallsBalance': '⚫-⚪',
+    'rule-column-header-PingPong-WonMatches': '∑🏆',
+    'rule-column-header-PingPong-F2F': '☺☻',
+    'rule-column-header-PingPong-LostBalls': '⚪',
+    'rule-column-header-PingPong-LostSets': '♺🏓',
+    'rule-column-header-PingPong-Random': '⚄⚂',
+    'rule-column-header-PingPong-SetsBalance': 'Δ🏓',
+    'rule-column-header-PingPong-WonBalls': '⚫',
+    'rule-column-header-PingPong-WonSets': '🏓',
+    'rule-column-header-PingPong-Punkts': '∑'
 };

@@ -53,8 +53,8 @@ describe('classic-group-view', () => {
                () => expect(ctx.element.find('table tbody tr').length).toBe(3));
         });
         describe('number of table columns', () => {
-            //it('ctx.element is not null', () => expect(ctx.element.find).not.toBe(null));
-            //expect(ctx.element.find('table tbody tr:first td').length).toBe(2 + 3 + 3);
+            it('ctx.element is not null',
+               () => expect(ctx.element.find('table tbody tr:first td').length).toBe(2 + 3 + 3));
         });
     });
 });

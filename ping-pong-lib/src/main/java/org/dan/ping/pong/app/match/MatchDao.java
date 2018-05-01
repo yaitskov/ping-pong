@@ -13,7 +13,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface MatchDao {
-    Mid createGroupMatch(Tid tid, int gid, int cid, int priorityGroup, Uid uid1, Uid uid2);
+    Mid createGroupMatch(Tid tid, int gid, int cid, int priorityGroup,
+            Uid uid1, Uid uid2, Optional<MatchTag> tag);
 
     Mid createPlayOffMatch(Tid tid, Integer cid,
             Optional<Mid> winMid, Optional<Mid> loseMid,

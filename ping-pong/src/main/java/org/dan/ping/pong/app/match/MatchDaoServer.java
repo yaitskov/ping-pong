@@ -53,13 +53,15 @@ public class MatchDaoServer implements MatchDao {
     private DSLContext jooq;
 
     @Override
-    public Mid createGroupMatch(Tid tid, int gid, int cid, int priorityGroup, Uid uid1, Uid uid2) {
+    public Mid createGroupMatch(Tid tid, int gid, int cid, int priorityGroup,
+            Uid uid1, Uid uid2, Optional<MatchTag> tag) {
         log.info("Create a match in group {} of tournament {}", gid, tid);
         return jooq.insertInto(MATCHES, MATCHES.TID,
                 MATCHES.GID, MATCHES.CID,
                 MATCHES.STATE, MATCHES.PRIORITY, MATCHES.TYPE,
-                MATCHES.UID_LESS, MATCHES.UID_MORE)
-                .values(tid, Optional.of(gid), cid, Place, priorityGroup, Grup, uid1, uid2)
+                MATCHES.UID_LESS, MATCHES.UID_MORE, MATCHES.TAG)
+                .values(tid, Optional.of(gid), cid, Place, priorityGroup,
+                        Grup, uid1, uid2, tag.orElse(null))
                 .returning()
                 .fetchOne()
                 .getMid();

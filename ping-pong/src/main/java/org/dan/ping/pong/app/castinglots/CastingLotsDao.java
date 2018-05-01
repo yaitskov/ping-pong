@@ -85,7 +85,7 @@ public class CastingLotsDao implements CastingLotsDaoIf {
             MatchState state, Optional<Uid> winnerId, Optional<MatchTag> tag) {
         final Mid mid = matchDao.createGroupMatch(bid1.getTid(),
                 bid1.getGid().get(), bid1.getCid(), ++priorityGroup,
-                bid1.getUid(), bid2.getUid());
+                bid1.getUid(), bid2.getUid(), tag);
         tournament.getMatches().put(mid, MatchInfo.builder()
                 .tid(bid1.getTid())
                 .mid(mid)

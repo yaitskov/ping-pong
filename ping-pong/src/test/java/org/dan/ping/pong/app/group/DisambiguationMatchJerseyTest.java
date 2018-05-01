@@ -126,11 +126,11 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                 .scoreSet(p3, 11, p1, 0);
     }
 
-    private TournamentScenario ambigousScenario(String name) {
+    public static TournamentScenario ambigousScenario(String name) {
         return ambigousScenario(name, GroupRulesConst.DM_ORDER_RULES_PUNKTS);
     }
 
-    private TournamentScenario ambigousScenario(String name, List<GroupOrderRule> rules) {
+    private static TournamentScenario ambigousScenario(String name, List<GroupOrderRule> rules) {
         return TournamentScenario.begin()
                 .name(name)
                 .rules(RULES_G_S1A2G11_NP.withGroup(

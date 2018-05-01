@@ -15,3 +15,10 @@
    ng-class="{'btn-primary': $ctrl.sortBy == 'name'}">
     <span class="glyphicon glyphicon-sort-by-alphabet"></span>
 </a>
+<a class="btn btn-default"
+   ng-show="$ctrl.groupHashExtraMatches"
+   ng-click="$ctrl.toggleShowExtraMatches()"
+   title="Show extra matches"
+   ng-class="{'btn-primary': $ctrl.showExtraMatches}">
+    <span class="glyphicon glyphicon-plus"></span>
+</a>

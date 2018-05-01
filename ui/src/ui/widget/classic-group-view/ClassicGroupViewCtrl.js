@@ -19,6 +19,14 @@ export default class ClassicGroupViewCtrl extends SimpleController {
         return 'classic-group-view-set-tag-filter';
     }
 
+    static get Dm() {
+        return 'dm';
+    }
+
+    static get Origin() {
+        return 'origin';
+    }
+
     $onInit() {
         this.subscribe(this.constructor.TopicLoad, (gr) => this.loadData(gr));
         this.subscribe(this.constructor.TopicSetRowOrder, (order) => this.setRowOrder(order));
@@ -32,7 +40,7 @@ export default class ClassicGroupViewCtrl extends SimpleController {
         };
         this.scoreShowMode = 'sets';
         this.rowOrder = 'final'; // final | abc
-        this.matchTagFilter = 'origin'; // origin | dm
+        this.matchTagFilter = this.constructor.Origin; // origin | dm
         this.usedGroupOrderRules = [];
         this.rowSpan = {};
     }
@@ -49,10 +57,10 @@ export default class ClassicGroupViewCtrl extends SimpleController {
     _selectMatchesByTag() {
         for (let participant of this.participants) {
             switch (this.matchTagFilter) {
-            case 'origin':
+            case this.constructor.Origin:
                 this.matches = this.originMatches;
                 break;
-            case 'dm':
+            case this.constructor.Dm:
                 this.matches = this.dmMatches || {};
                 break;
             default:

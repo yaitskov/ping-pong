@@ -15,6 +15,13 @@ export default function (reasonChainList, voidP, reasonEq = defaultReasonEq) {
                 }
             } else if (prevSpan[iCol]) {
                 prevSpan[iCol] += 1;
+            } else {
+                for (let r = iRow - 1; r >= 0; --r) {
+                    if (rowSpan[r][iCol]) {
+                        rowSpan[r][iCol] += 1;
+                        break;
+                    }
+                }
             }
         }
         previousReasonChain = reasonChain;

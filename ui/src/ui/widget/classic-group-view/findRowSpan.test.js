@@ -29,4 +29,9 @@ describe('findRowSpan', () => {
     it('3 x 3 void',
        () => expect(sut([[-1, -2, 1], [-1, -2, 2], [-1, -2, 3]])).toEqual(
            {0: {2: 1}, 1: {2: 1}, 2: {2: 1}}));
+
+    it('3 x 3 merge all rows in first column',
+       () => expect(sut([[1, -2, 1], [1, -2, 2], [1, -2, 3]])).toEqual(
+           {0: {0: 3, 2: 1}, 1: {2: 1}, 2: {2: 1}}));
+
 });

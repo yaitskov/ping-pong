@@ -1,6 +1,14 @@
 @import "core-const";
 @import "mixin";
 
+.v-center {
+    vertical-align: middle !important;
+}
+
+.bg-light {
+    background-color: $active-background-color;
+}
+
 /* begin of no side space */
 .view-container .container-fluid {
     padding-left: 0px;

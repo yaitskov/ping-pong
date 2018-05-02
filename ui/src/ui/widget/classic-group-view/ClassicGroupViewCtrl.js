@@ -30,8 +30,8 @@ export default class ClassicGroupViewCtrl extends SimpleController {
     $onInit() {
         this.subscribe(this.constructor.TopicLoad, (gr) => this.loadData(gr));
         this.subscribe(this.constructor.TopicSetRowOrder, (order) => this.setRowOrder(order));
-        this.subscribe(this.constructor.TopicSetShowMode, (mode) => self.setScoreShowMode(mode));
-        this.subscribe(this.constructor.TopicSetTagFilter, (tag) => self.setTagFilter(tag));
+        this.subscribe(this.constructor.TopicSetShowMode, (mode) => this.setScoreShowMode(mode));
+        this.subscribe(this.constructor.TopicSetTagFilter, (tag) => this.setTagFilter(tag));
 
         this.sorters = {
             'seed':  (a, b) => a.seedPosition - b.seedPosition,
@@ -58,10 +58,10 @@ export default class ClassicGroupViewCtrl extends SimpleController {
         for (let participant of this.participants) {
             switch (this.matchTagFilter) {
             case this.constructor.Origin:
-                this.matches = this.originMatches;
+                participant.matches = participant.originMatches;
                 break;
             case this.constructor.Dm:
-                this.matches = this.dmMatches || {};
+                participant.matches = participant.dmMatches || {};
                 break;
             default:
                 throw new Error(`unknown matchTagFilter "${this.matchTagFilter}"`);

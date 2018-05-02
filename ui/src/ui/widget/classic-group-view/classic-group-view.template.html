@@ -82,6 +82,7 @@
       </td>
       <td ng-repeat="reason in participant.reasonChain"
           class="text-center"
+          ng-class="{'v-center bg-light': $ctrl.rowSpan[$parent.$index][$index] > 1}"
           ng-show="$ctrl.rowSpan[$parent.$index][$index] > 0"
           rowspan="{{$ctrl.rowSpan[$parent.$index][$index]}}"
           ng-switch="reason['@type']">

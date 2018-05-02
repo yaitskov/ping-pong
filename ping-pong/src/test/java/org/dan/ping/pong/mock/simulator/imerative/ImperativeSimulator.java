@@ -10,6 +10,8 @@ import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidResource.ENLISTED_BIDS;
 import static org.dan.ping.pong.app.category.CategoryResource.CATEGORIES_BY_TID;
 import static org.dan.ping.pong.app.category.CategoryResource.CATEGORY_MEMBERS;
+import static org.dan.ping.pong.app.group.GroupResource.GROUP_LIST;
+import static org.dan.ping.pong.app.group.GroupResource.GROUP_RESULT;
 import static org.dan.ping.pong.app.match.AffectedMatchesService.DONT_CHECK_HASH;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_RESULT;
 import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
@@ -50,6 +52,9 @@ import org.dan.ping.pong.app.bid.ParticipantState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.category.CategoryLink;
+import org.dan.ping.pong.app.group.GroupInfo;
+import org.dan.ping.pong.app.group.GroupParticipants;
+import org.dan.ping.pong.app.group.TournamentGroups;
 import org.dan.ping.pong.app.match.IdentifiedScore;
 import org.dan.ping.pong.app.match.MatchResult;
 import org.dan.ping.pong.app.match.MatchState;
@@ -246,6 +251,10 @@ public class ImperativeSimulator {
         return scenario.getTid().getTid();
     }
 
+    public TournamentGroups tournamentGroups() {
+        return myRest.get(GROUP_LIST + tid(), TournamentGroups.class);
+    }
+
     private Player uid2Player(Uid uid) {
         return ofNullable(scenario.getUidPlayer().get(uid))
                 .orElseThrow(
@@ -334,6 +343,23 @@ public class ImperativeSimulator {
         assertEquals(expectedLevels, tournamentResult.stream()
                 .map(TournamentResultEntry::getPlayOffStep).collect(toList()));
         return this;
+    }
+
+    public GroupParticipants getGroupResult(int gid) {
+        return myRest.get(GROUP_RESULT + tid() + "/" + gid,
+                GroupParticipants.class);
+    }
+
+    public int gidOf(int cid, int groupIndex) {
+        final TournamentGroups tGroups = tournamentGroups();
+        return tGroups.getGroups().stream()
+                .filter(g -> g.getCid() == cid)
+                .skip(groupIndex)
+                .map(GroupInfo::getGid)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(
+                        "num of groups is less than "
+                        + groupIndex));
     }
 
     public List<TournamentResultEntry> getTournamentResult(Integer onlyCid) {

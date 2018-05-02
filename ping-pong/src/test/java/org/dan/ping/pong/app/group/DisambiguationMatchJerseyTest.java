@@ -1,15 +1,18 @@
 package org.dan.ping.pong.app.group;
 
+import static com.spotify.hamcrest.optional.OptionalMatchers.optionalWithValue;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.group.GroupResource.CID;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_POPULATIONS;
+import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.F2F;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST_OFFLINE;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S2A2G11_NP;
-import static org.dan.ping.pong.app.match.MatchState.Over;
-import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST_OFFLINE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -17,12 +20,24 @@ import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc.restState;
+import static org.hamcrest.Matchers.aMapWithSize;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.core.AllOf.allOf;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.Mid;
+import org.dan.ping.pong.app.match.rule.OrderRuleName;
+import org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason;
+import org.dan.ping.pong.app.match.rule.reason.InfoReason;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
+import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.tournament.EnlistOffline;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.tournament.TournamentRules;
@@ -47,7 +62,6 @@ import javax.inject.Inject;
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = JerseyWithSimulator.class)
 public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
-
     @Inject
     private ImperativeSimulatorFactory isf;
 
@@ -62,7 +76,88 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                 .reloadMatchMap()
                 .and(this::makeGroupUnambigous)
                 .checkResult(p3, p1, p2)
-                .checkTournamentComplete(restState(Lost).bid(p3, Win1)));
+                .checkTournamentComplete(restState(Lost).bid(p3, Win1))
+                .and(this::validateGroupResult)
+                .invalidateTournamentCache()
+                .and(this::validateGroupResult));
+    }
+
+    private ImperativeSimulator validateGroupResult(ImperativeSimulator c) {
+        final TournamentScenario s = c.getScenario();
+        final GroupParticipants gp = c.getGroupResult(
+                c.gidOf(s.getCategoryDbId().get(c1), 0));
+
+        assertThat(gp, allOf(hasProperty("participants", contains(
+                allOf(
+                        hasProperty("uid", is(s.player2Uid(p1))),
+                        hasProperty("seedPosition", is(0)),
+                        hasProperty("finishPosition", is(1)),
+                        hasProperty("dmMatches", aMapWithSize(is(2))),
+                        hasProperty("originMatches", aMapWithSize(is(2))),
+                        hasProperty("reasonChain", contains(
+                                optionalWithValue(allOf(
+                                        instanceOf(DecreasingIntScalarReason.class),
+                                        hasProperty("rule", is(OrderRuleName.Punkts)),
+                                        hasProperty("value", is(3)))),
+                                optionalWithValue(allOf(
+                                        instanceOf(InfoReason.class),
+                                        hasProperty("rule", is(F2F)))),
+                                optionalWithValue(allOf(
+                                        instanceOf(InfoReason.class),
+                                        hasProperty("rule", is(UseDisambiguationMatches)))),
+                                optionalWithValue(allOf(
+                                        instanceOf(DecreasingIntScalarReason.class),
+                                        hasProperty("rule", is(OrderRuleName.Punkts)),
+                                        hasProperty("value", is(3)))))),
+                        hasProperty("name", containsString("p1"))),
+                allOf(
+                        hasProperty("uid", is(s.player2Uid(p2))),
+                        hasProperty("seedPosition", is(1)),
+                        hasProperty("finishPosition", is(2)),
+                        hasProperty("dmMatches", aMapWithSize(is(2))),
+                        hasProperty("originMatches", aMapWithSize(is(2))),
+                        hasProperty("reasonChain", contains(
+                                optionalWithValue(allOf(
+                                        instanceOf(DecreasingIntScalarReason.class),
+                                        hasProperty("rule", is(OrderRuleName.Punkts)),
+                                        hasProperty("value", is(3)))),
+                                optionalWithValue(allOf(
+                                        instanceOf(InfoReason.class),
+                                        hasProperty("rule", is(F2F)))),
+                                optionalWithValue(allOf(
+                                        instanceOf(InfoReason.class),
+                                        hasProperty("rule", is(UseDisambiguationMatches)))),
+                                optionalWithValue(allOf(
+                                        instanceOf(DecreasingIntScalarReason.class),
+                                        hasProperty("rule", is(OrderRuleName.Punkts)),
+                                        hasProperty("value", is(2)))))),
+                        hasProperty("name", containsString("p2"))),
+                allOf(
+                        hasProperty("uid", is(s.player2Uid(p3))),
+                        hasProperty("seedPosition", is(2)),
+                        hasProperty("finishPosition", is(0)),
+                        hasProperty("dmMatches", aMapWithSize(is(2))),
+                        hasProperty("originMatches", aMapWithSize(is(2))),
+                        hasProperty("reasonChain", contains(
+                                optionalWithValue(allOf(
+                                        instanceOf(DecreasingIntScalarReason.class),
+                                        hasProperty("rule", is(OrderRuleName.Punkts)),
+                                        hasProperty("value", is(3)))),
+                                optionalWithValue(allOf(
+                                        instanceOf(InfoReason.class),
+                                        hasProperty("rule", is(F2F)))),
+                                optionalWithValue(allOf(
+                                        instanceOf(InfoReason.class),
+                                        hasProperty("rule", is(UseDisambiguationMatches)))),
+                                optionalWithValue(allOf(
+                                        instanceOf(DecreasingIntScalarReason.class),
+                                        hasProperty("rule", is(OrderRuleName.Punkts)),
+                                        hasProperty("value", is(4)))))),
+                        hasProperty("name", containsString("p3"))))),
+                hasProperty("quitsGroup", is(1)),
+                hasProperty("sportType", is(SportType.PingPong)),
+                hasProperty("tid", is(s.getTid()))));
+        return c;
     }
 
     @Test

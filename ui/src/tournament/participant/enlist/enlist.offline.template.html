@@ -60,41 +60,17 @@
   <form novalidate name="$ctrl.form" ng-show="$ctrl.categoryId" ng-submit="$ctrl.enlist('Here')">
     <div class="form-group"
          ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.firstName.$dirty) && $ctrl.form.firstName.$invalid}">
-      <label for="firstName">{{ 'First name' | translate }}</label>
-      <input type="text" class="form-control"
-             ng-model="$ctrl.firstName"
-             ng-maxlength="20"
-             ng-minlength="2"
-             required
-             name="firstName"
-             id="firstName"
-             placeholder="{{ 'First name' | translate }}"/>
+      <label for="fullName">{{ 'Full name' | translate }}</label>
+      <person-name-field name="fullName" id="fullName"
+                         ng-maxlength="40" required
+                         ng-minlength="5" ng-model="$ctrl.fullName"/>
       <p class="help-block"
-         ng-show="$ctrl.form.firstName.$error.required">
-        {{ 'FirstName is required' | translate }}
+         ng-show="$ctrl.form.fullName.$error.required">
+        {{ 'FullName is required' | translate }}
       </p>
       <p class="help-block"
-         ng-show="$ctrl.form.firstName.$error.minlength || $ctrl.form.firstName.$error.maxlength">
-        {{ 'first-name-length-range' | translate : '{min: 2, max: 20}' }}
-      </p>
-    </div>
-    <div class="form-group"
-         ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.lastName.$dirty) && $ctrl.form.lastName.$invalid}">
-      <label for="lastName">{{ 'Last name' | translate }}</label>
-      <input type="text" class="form-control"
-             name="lastName"
-             ng-maxlength="20"
-             ng-minlength="2"
-             required
-             ng-model="$ctrl.lastName"
-             id="lastName" placeholder="{{ 'Last name' | translate }}"/>
-      <p class="help-block"
-         ng-show="$ctrl.form.lastName.$error.required">
-        {{ 'LastName is required' | translate }}
-      </p>
-      <p class="help-block"
-         ng-show="$ctrl.form.lastName.$error.minlength || $ctrl.form.lastName.$error.maxlength">
-        {{ 'last-name-length-range' | translate : '{min: 2, max: 20}' }}
+         ng-show="$ctrl.form.fullName.$error.minlength || $ctrl.form.fullName.$error.maxlength">
+        {{ 'full-name-length-range' | translate : '{min: 5, max: 40}' }}
       </p>
     </div>
     <div class="form-group" default-button-type

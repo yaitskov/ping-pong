@@ -1,8 +1,11 @@
 module.exports = {
         // sign up page
     'First name': 'First name',
+    'Full name': 'Full name',
+    'FullName is required': 'Full name is required',
     'FirstName is required': 'First name is required',
     'LastName is required': 'Last name is required',
+    'full-name-length-range': 'Full name length must be in range {{min}} and {{max}}',
     'first-name-length-range': 'Name length must be in range {{min}} and {{max}}',
     'last-name-length-range': 'Name length must be in range {{min}} and {{max}}',
     'Last name': 'Last name',

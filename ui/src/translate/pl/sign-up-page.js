@@ -1,8 +1,11 @@
 module.exports = {
         // sign-up-page
     'First name': 'Imię',
+    'Full name': 'Godność',
+    'FullName is required': 'Imię jest wymagane',
     'FirstName is required': 'Imię jest wymagane',
     'LastName is required': 'Nazwisko jest wymagane',
+    'full-name-length-range': 'Długość imieni musi być między {{min}} i {{max}} literami',
     'first-name-length-range': 'Długość imieni musi być między {{min}} i {{max}} literami',
     'last-name-length-range': 'Długość nazwiska musi być między {{min}} i {{max}} literami',
     'Last name': 'Nazwisko',

@@ -105,11 +105,10 @@ angular.
                                  requestStatus.validationFailed("CategoryNotChosen");
                                  return;
                              }
-                             var name = self.firstName + ' ' + self.lastName;
                              var req = {tid: self.tournamentId,
                                         cid: self.categoryId,
                                         bidState: bidState,
-                                        name: name
+                                        name: self.fullName
                                        };
                              if (self.rules.casting.providedRankOptions) {
                                  req.providedRank = self.rank;
@@ -123,11 +122,11 @@ angular.
                                  then(
                                      function (resp) {
                                          requestStatus.complete();
-                                         self.firstName = '';
-                                         self.lastName = '';
-                                         self.enlisted.unshift({uid: resp.data, name: name});
+                                         self.enlisted.unshift({uid: resp.data,
+                                                                name: self.fullName});
+                                         self.participantFullName = '';
                                          self.form.$setPristine(true);
-                                         jQuery(self.form.firstName.$$element).focus();
+                                         jQuery(self.form.fullName.$$element).focus();
                                          if (self.groupId === 0) {
                                               self.loadGroupPopulations($routeParams.tournamentId, self.categoryId);
                                          } else {

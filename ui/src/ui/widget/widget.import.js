@@ -5,3 +5,4 @@ import './classic-group-view/participant-order.component.js';
 import './classic-group-view/classic-group-view.component.js';
 import './vis-ladder/vis-ladder.component.js';
 import './group-switch/group-switch.component.js';
+import './person-name-field/person-name-field.directive.js';

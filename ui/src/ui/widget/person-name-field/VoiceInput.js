@@ -28,16 +28,12 @@ export default class VoiceInput extends AngularBean {
     }
 
     static get $inject() {
-        return ['MessageBus', 'ProtocolSwitcher', 'InfoPopup'];
-    }
-
-    static get isSupported() {
-        return webkitSpeechRecognition;
+        return ['$window', 'MessageBus', 'ProtocolSwitcher', 'InfoPopup'];
     }
 
     _createSpeechRecognition() {
-        if (webkitSpeechRecognition) {
-            return new webkitSpeechRecognition();
+        if (this.$window.webkitSpeechRecognition) {
+            return new this.$window.webkitSpeechRecognition();
         }
         return new FakeSpeechRecognition(this.InfoPopup);
     }

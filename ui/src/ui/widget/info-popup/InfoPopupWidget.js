@@ -39,6 +39,10 @@ export default class InfoPopupWidget extends SimpleController {
     _showMessage(msg) {
         msg.level = msg.level || 'error';
         msg.id = this.freeId++;
+        const wasIndex = this.messages.findIndex((m) => m.text == msg.text);
+        if (wasIndex >= 0) {
+           this.messages.splice(wasIndex, 1);
+        }
         this.messages.unshift(msg);
         if (this.messages.length > 10) {
            this.messages.splice(10);

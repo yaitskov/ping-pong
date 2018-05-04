@@ -25,6 +25,11 @@ export default class VoiceInputDialog extends SimpleDialog {
         this.microphoneWorking = false;
         this.transcripts = null;
         this.lang = AppLang.getLanguage();
+        if (this.lang == 'en') {
+            this.lang += '-US';
+        } else {
+            this.lang += "-" + this.lang.toUpperCase();
+        }
     }
 
     _stop() {

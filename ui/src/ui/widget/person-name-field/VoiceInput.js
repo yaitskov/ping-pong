@@ -20,7 +20,11 @@ export default class VoiceInput extends AngularBean {
     }
 
     static get TopicStop() {
-        return 'voice-input-stop';
+            return 'voice-input-stop';
+    }
+
+    static get TopicOnStop() {
+        return 'voice-input-on-stop';
     }
 
     static get TopicError() {
@@ -50,7 +54,7 @@ export default class VoiceInput extends AngularBean {
                 this.InfoPopup.transInfo('voice-recognition-no-speech');
             }
             this.working = false;
-            this.MessageBus.broadcast(this.constructor.TopicStop);
+            this.MessageBus.broadcast(this.constructor.TopicOnStop);
         };
         this.speechRecognition.onerror = (e) => {
             this.working = false;
@@ -78,6 +82,15 @@ export default class VoiceInput extends AngularBean {
                 this.MessageBus.broadcast(this.constructor.TopicTranscripted, e.results);
             }
         };
+        this.MessageBus.subscribe(this.constructor.TopicStop,
+                                  () => this.stopListening());
+    }
+
+    stopListening() {
+        if (this.working) {
+           this.onResultCalled = true;
+           this.speechRecognition.stop();
+        }
     }
 
     normalizeLang(lang) {

@@ -15,12 +15,16 @@ export default class VoiceInputDialog extends SimpleDialog {
         return 'voice-input-dialog-pick';
     }
 
+    get tagId() {
+        return 'voice-input-dialog';
+    }
+
     $onInit() {
         console.log("voice input dialog init")
         this.subscribe(this.constructor.TopicShow, () => this._show());
         this.subscribe(VoiceInput.TopicTranscripted,
                        (results) => this.onTranscripted(results));
-        this.subscribe(VoiceInput.TopicStop,
+        this.subscribe(VoiceInput.TopicOnStop,
                        () => this._stop());
         this.microphoneWorking = false;
         this.transcripts = null;
@@ -31,6 +35,7 @@ export default class VoiceInputDialog extends SimpleDialog {
                 this.pageCtx.put('voice-recognition-language', newv);
             }
         });
+        this.onHide(() => this.send(VoiceInput.TopicStop));
     }
 
     _stop() {
@@ -53,7 +58,7 @@ export default class VoiceInputDialog extends SimpleDialog {
     _show() {
         this.turnOnMic();
         //this.transcripts = ['HEllo world'];
-        this.showDialog('voice-input-dialog');
+        this.showDialog();
     }
 
     turnOnMic() {
@@ -62,7 +67,7 @@ export default class VoiceInputDialog extends SimpleDialog {
     }
 
     hide() {
-        this.hideDialog('voice-input-dialog');
+        this.hideDialog();
     }
 
     chooseIt(variant) {

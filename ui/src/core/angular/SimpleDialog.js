@@ -6,10 +6,18 @@ export default class SimpleDialog extends SimpleController {
     }
 
     showDialog(tagId) {
-        this.$element.find('#' + tagId).modal('show');
+        this.$element.find('#' + (tagId || this.tagId)).modal('show');
     }
 
     hideDialog(tagId) {
-        this.$element.find('#' + tagId).modal('hide');
+        this.$element.find('#' + (tagId || this.tagId)).modal('hide');
+    }
+
+    onHide(cb, tagId) {
+        this.$element.find('#' + (tagId || this.tagId)).on('hidden.bs.modal', cb);
+    }
+
+    get tagId() {
+        return null;
     }
 }

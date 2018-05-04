@@ -18,11 +18,10 @@
                          ng-show="$ctrl.microphoneWorking"/>
                     <div class="alert alert-warn"
                          translate="nothing-caputred-repeat"
-                         ng-show="!$ctrl.microphoneWorking && $ctrl.transcripts.length"/>
+                         ng-show="!$ctrl.microphoneWorking && $ctrl.transcripts.length == 0"/>
                 </div>
                 <div class="form-group" ng-repeat="transcript in $ctrl.transcripts">
                     <a class="btn btn-default"
-                       data-dismiss="modal"
                        ng-click="$ctrl.chooseIt(transcript)">
                         {{transcript}}
                     </a>
@@ -30,8 +29,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger"
-                        data-dismiss="modal"
-                        translate="Cancel btn"/>
+                        ng-click="$ctrl.hide()" translate="Cancel btn"/>
             </div>
         </div>
     </div>

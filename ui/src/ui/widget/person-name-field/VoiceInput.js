@@ -56,6 +56,18 @@ export default class VoiceInput extends AngularBean {
         this.speechRecognition.onerror = (e) => {
             this.working = false;
             console.error("Voice error [" + e.error + "]");
+
+            switch (e.error) {
+               case 'no-speech':
+                  this.InfoPopup.transInfo('voice-recognition-no-speech');
+                  break;
+               case 'not-allowed':
+                  this.InfoPopup.transError('voice-recognition-not-allowed');
+                  break;
+               default:
+                  this.InfoPopup.transInfo('voice-recognition-unknown', {error: e.error});
+                  break;
+            }
             this.MessageBus.broadcast(this.constructor.TopicError, e.error);
         };
         this.speechRecognition.onaudiostart = (e) => {
@@ -69,7 +81,7 @@ export default class VoiceInput extends AngularBean {
     }
 
     transcriptFrom(lang) {
-        this.ProtocolSwitcher.ifHttps(() => this._transcriptFrom(lang));
+        this.ProtocolSwitcher.ifHttpsOrLocal(() => this._transcriptFrom(lang));
     }
 
     _transcriptFrom(lang) {

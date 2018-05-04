@@ -5,16 +5,17 @@ export default class ProtocolSwitcher extends AngularBean {
         return ['$window', 'InfoPopup'];
     }
 
-    isHttps() {
-        return this.$window.location.protocol.indexOf('https') == 0;
+    isHttpsOrLocal() {
+        return this.$window.location.protocol.indexOf('https') == 0 ||
+               this.$window.location.href.indexOf('://127.0.0.1/') > 0  ;
     }
 
     httpsUrl() {
         return this.$window.location.href.replace('http:', 'https:');
     }
 
-    ifHttps(cb, errorMessage = 'feature-requires-https-protocol') {
-        if (this.isHttps()) {
+    ifHttpsOrLocal(cb, errorMessage = 'feature-requires-https-protocol') {
+        if (this.isHttpsOrLocal()) {
             cb();
         } else {
             this.InfoPopup.transWarn(errorMessage, {'url': this.httpsUrl()});

@@ -36,7 +36,7 @@ export default class PersonNameField extends AngularBean {
     link(scope, element, attrs, ctrls) {
         this.MessageBus.subscribeIn(
             scope, VoiceInputDialog.TopicPick,
-            (results) => this.nameSelected(name, ctrls[1]));
+            (name) => this.nameSelected(name, ctrls[1]));
         scope.showDialog = () => this.showDialog();
     }
 }

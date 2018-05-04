@@ -3,5 +3,8 @@ module.exports = {
     'Turn on microphone': 'Turn on microphone',
     'i-am-listening-to-you': 'I am listening to You...'
         + ' <br/>Say what you need and click the best option.',
-    'nothing-caputred-repeat': 'Nothing captured. Please try again.'
+    'nothing-caputred-repeat': 'Nothing captured. Please try again.',
+    'voice-recognition-no-speech': 'Nothing captured',
+    'voice-recognition-not-allowed': 'Audio source is not available. Check permissions.',
+    'voice-recognition-unknown': 'Voice recogition error: "{{error}}"'
 };

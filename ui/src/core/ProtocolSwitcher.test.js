@@ -8,11 +8,11 @@ describe('ProtocolSwitcher', () => {
     sutHttp.$window = {location: {href: 'http://localhost/#!bla', protocol: 'http:'}};
 
     it('isHttps returns true', () => {
-        expect(sutHttps.isHttps()).toBeTrue();
+        expect(sutHttps.isHttpsOrLocal()).toBeTrue();
     });
 
     it('isHttps returns false', () => {
-        expect(sutHttp.isHttps()).toBeFalse();
+        expect(sutHttp.isHttpsOrLocal()).toBeFalse();
     });
 
     it('httpsUrl replaces protocol', () => {

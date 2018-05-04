@@ -3,7 +3,7 @@ import SimpleController from 'core/angular/SimpleController.js';
 
 export default class InfoPopupWidget extends SimpleController {
     static get $inject() {
-        return ['syncTranslate'].concat(super.$inject);
+        return ['$timeout', 'syncTranslate'].concat(super.$inject);
     }
 
     static get TopicShow() {
@@ -43,6 +43,7 @@ export default class InfoPopupWidget extends SimpleController {
         if (this.messages.length > 10) {
            this.messages.splice(10);
         }
+        this.$timeout(() => this.$scope.$digest());
     }
 
     removeMessageById(msgId) {

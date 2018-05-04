@@ -42,7 +42,8 @@ export default class VoiceInput extends AngularBean {
         return new FakeSpeechRecognition(this.InfoPopup);
     }
 
-    $onInit() {
+    constructor(...args) {
+        super(...args);
         this.working = false;
         this.speechRecognition = this._createSpeechRecognition();
         this.speechRecognition.continuous = false;

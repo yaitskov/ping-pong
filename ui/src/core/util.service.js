@@ -3,6 +3,7 @@ import EventBarrierFactory from './angular/EventBarrierFactory.js';
 import eventBinder from './angular/eventBinder.js';
 import MessageBus from './MessageBus.js';
 import ProtocolSwitcher from './ProtocolSwitcher.js';
+import VoiceInput from 'ui/widget/person-name-field/VoiceInput.js';
 
 var humanizeDuration = require('humanize-duration');
 
@@ -99,6 +100,7 @@ angular.
         };
     }]).
     service('ProtocolSwitcher', ProtocolSwitcher).
+    service('VoiceInput', VoiceInput).
     service('MessageBus', MessageBus).
     service('eBarier', EventBarrierFactory).
     factory('longDateTime', ['$filter', function ($filter) {

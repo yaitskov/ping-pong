@@ -74,6 +74,10 @@ tr.bottom-line td {
     .btn-space {
         margin: 10px;
     }
+
+    .text-above-btn {
+        padding-bottom: 8px;
+    }
 }
 
 @include mobile-media {
@@ -93,6 +97,10 @@ tr.bottom-line td {
 
     .btn-space {
         margin: 2px;
+    }
+
+    .text-above-btn {
+        padding-bottom: 8px;
     }
 }
 

@@ -46,6 +46,9 @@ export default class VoiceInput extends AngularBean {
         this.speechRecognition.interim = false;
         this.speechRecognition.interimResults = false;
         this.speechRecognition.onend = (e) => {
+            if (this.working && !this.onResultCalled) {
+                this.InfoPopup.transInfo('voice-recognition-no-speech');
+            }
             this.working = false;
             this.MessageBus.broadcast(this.constructor.TopicStop);
         };
@@ -70,6 +73,7 @@ export default class VoiceInput extends AngularBean {
             this.working = true;
         };
         this.speechRecognition.onresult = (e) => {
+            this.onResultCalled = e;
             if (e.results.length) {
                 this.MessageBus.broadcast(this.constructor.TopicTranscripted, e.results);
             }
@@ -89,6 +93,7 @@ export default class VoiceInput extends AngularBean {
     }
 
     _transcriptFrom(lang) {
+        this.onResultCalled = null;
         this.speechRecognition.lang = this.normalizeLang(lang || AppLang.getLanguage());
         if (this.working) {
             this.speechRecognition.stop();

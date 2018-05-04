@@ -1,5 +1,6 @@
 import AngularBean from 'core/angular/AngularBean.js';
 import InfoPopupWidget from './InfoPopupWidget.js';
+import ScopedInfoPopup from './ScopedInfoPopup.js';
 
 export default class InfoPopupService extends AngularBean {
     static get $inject() {
@@ -25,5 +26,9 @@ export default class InfoPopupService extends AngularBean {
 
     transSuccess(msg, params = {}) {
         return this.showMessage({format: 'translate', level: 'success', text: msg, params: params});
+    }
+
+    createScope() {
+        return new ScopedInfoPopup(this);
     }
 }

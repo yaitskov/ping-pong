@@ -4,6 +4,7 @@ module.exports = merge.apply(
     null,
     [{},
      require('./pl.participant.result.js'),
+     require('./pl.voice.js'),
      require('./pl.errors.js'),
      require('./pl.rank.manual.js'),
      require('./pl.common.js'),

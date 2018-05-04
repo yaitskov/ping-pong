@@ -1,0 +1,15 @@
+<div class="info-popup" ng-show="$ctrl.messages.length">
+    <div class="alert alert-{{message.level}}"
+         ng-click="$ctrl.removeMessageByIndex($index)"
+         ng-repeat="message in $ctrl.messages">
+        <span ng-switch="message.format">
+            <span ng-switch-when="translate" ng-bind-html="message.translated"/>
+            <span ng-switch-when="verb">
+                 <pre ng-bind-html="message.text"></pre>
+            </span>
+            <span ng-switch-default>
+                {{ 'Message format is not supported' | translate : {format: message.format} }}
+            </span>
+        </span>
+    </div>
+</div>

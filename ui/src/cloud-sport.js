@@ -14,6 +14,7 @@ import 'flatpickr';
 import 'angular';
 import 'angular-route';
 import 'angular-resource';
+import 'angular-sanitize';
 import 'angular-moment/angular-moment.js';
 import 'angular-touchspin';
 import 'angular-ui-sortable/src/sortable.js';

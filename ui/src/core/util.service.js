@@ -2,6 +2,7 @@ import angular from 'angular';
 import EventBarrierFactory from './angular/EventBarrierFactory.js';
 import eventBinder from './angular/eventBinder.js';
 import MessageBus from './MessageBus.js';
+import ProtocolSwitcher from './ProtocolSwitcher.js';
 
 var humanizeDuration = require('humanize-duration');
 
@@ -97,6 +98,7 @@ angular.
             return $filter('date')(dt, 'MMM d EEE h:mm a Z').replace(/:00 /, ' ');
         };
     }]).
+    service('ProtocolSwitcher', ProtocolSwitcher).
     service('MessageBus', MessageBus).
     service('eBarier', EventBarrierFactory).
     factory('longDateTime', ['$filter', function ($filter) {

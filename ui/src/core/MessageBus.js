@@ -21,7 +21,7 @@ class Topic {
             return false;
         }
         this.subscribers.splice(idx, 1);
-        if (!this.subscribers.lenght) {
+        if (!this.subscribers.length) {
             this.bus._removeTopic(this.name);
         }
         return true;

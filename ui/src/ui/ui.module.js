@@ -1,3 +1,3 @@
 import angular from 'angular';
 
-angular.module('ui', ['ngRoute', 'mainMenu', 'widget']);
+angular.module('ui', ['ngRoute', 'ngSanitize', 'mainMenu', 'widget']);

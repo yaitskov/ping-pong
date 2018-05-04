@@ -1,8 +1,9 @@
 import angular from 'angular';
-import personNameField from './personNameField.js';
+import PersonNameField from './PersonNameField.js';
 
 angular.module('widget').
     /**
        <person-name-field ng-model="$ctrl.participantName"/>
     */
-    directive('personNameField', personNameField);
+    directive('personNameField',
+              ['MessageBus', (MessageBus) => new PersonNameField(MessageBus)]);

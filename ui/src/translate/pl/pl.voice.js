@@ -6,5 +6,11 @@ module.exports = {
     'nothing-caputred-repeat': 'Nic nie złapałem. Spróbuj ponownie.',
     'voice-recognition-no-speech': 'Nic nie poweidziane',
     'voice-recognition-not-allowed': 'Żródło dzięku nie dostępne. Sprawdź ustawenia.',
-    'voice-recognition-unknown': 'Błąd rozposnowania dzięku: "{{error}}"'
+    'voice-recognition-unknown': 'Błąd rozposnowania dzięku: "{{error}}"',
+
+    'en': 'Angielski',
+    'pl': 'Poliski',
+    'ru': 'Rosyjski',
+    'de': 'Niemiecki',
+    'fr': 'Francuski'
 };

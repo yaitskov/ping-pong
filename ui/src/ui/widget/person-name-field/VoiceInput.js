@@ -76,12 +76,20 @@ export default class VoiceInput extends AngularBean {
         };
     }
 
+    normalizeLang(lang) {
+        if (lang == 'en') {
+            return lang + '-US';
+        } else {
+            return lang + "-" + lang.toUpperCase();
+        }
+    }
+
     transcriptFrom(lang) {
         this.ProtocolSwitcher.ifHttpsOrLocal(() => this._transcriptFrom(lang));
     }
 
     _transcriptFrom(lang) {
-        this.speechRecognition.lang = lang || AppLang.getLanguage();
+        this.speechRecognition.lang = this.normalizeLang(lang || AppLang.getLanguage());
         if (this.working) {
             this.speechRecognition.stop();
         }

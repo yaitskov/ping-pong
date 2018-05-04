@@ -7,11 +7,12 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <div>
-                        <a ng-show="!$ctrl.microphoneWorking"
-                           ng-click="$ctrl.turnOnMic()"
+                    <div ng-show="!$ctrl.microphoneWorking">
+                        <a ng-click="$ctrl.turnOnMic()"
                            translate="Turn on microphone"
                            class="btn btn-primary"/>
+                        <translating-drop-down ng-model="$ctrl.lang"
+                                               domain="['pl', 'ru', 'fr', 'en', 'de']"/>
                     </div>
                     <div class="alert alert-info"
                          ng-show="$ctrl.microphoneWorking">

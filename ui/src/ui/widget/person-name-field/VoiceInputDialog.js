@@ -24,12 +24,13 @@ export default class VoiceInputDialog extends SimpleDialog {
                        () => this._stop());
         this.microphoneWorking = false;
         this.transcripts = null;
-        this.lang = AppLang.getLanguage();
-        if (this.lang == 'en') {
-            this.lang += '-US';
-        } else {
-            this.lang += "-" + this.lang.toUpperCase();
-        }
+        this.lang = this.pageCtx.get('voice-recognition-language') || AppLang.getLanguage();
+        this.$scope.$watch('$ctrl.lang', (newv, oldv) => {
+            console.log("chose lang " + newv + " in favor " + oldv);
+            if (newv) {
+                this.pageCtx.put('voice-recognition-language', newv);
+            }
+        });
     }
 
     _stop() {

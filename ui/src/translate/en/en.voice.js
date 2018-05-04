@@ -6,5 +6,11 @@ module.exports = {
     'nothing-caputred-repeat': 'Nothing captured. Please try again.',
     'voice-recognition-no-speech': 'Nothing captured',
     'voice-recognition-not-allowed': 'Audio source is not available. Check permissions.',
-    'voice-recognition-unknown': 'Voice recogition error: "{{error}}"'
+    'voice-recognition-unknown': 'Voice recogition error: "{{error}}"',
+
+    'en': 'English',
+    'pl': 'Polish',
+    'ru': 'Russian',
+    'de': 'German',
+    'fr': 'French'
 };

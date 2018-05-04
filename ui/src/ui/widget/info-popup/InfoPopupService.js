@@ -8,25 +8,22 @@ export default class InfoPopupService extends AngularBean {
 
     showMessage(msg) {
         this.MessageBus.broadcast(InfoPopupWidget.TopicShow, msg);
+        return msg;
     }
 
     transError(msg, params = {}) {
-        this.showMessage({format: 'translate', level: 'danger', text: msg, params: params});
-        return msg;
+        return this.showMessage({format: 'translate', level: 'danger', text: msg, params: params});
     }
 
     transInfo(msg, params = {}) {
-        this.showMessage({format: 'translate', level: 'info', text: msg, params: params});
-        return msg;
+        return this.showMessage({format: 'translate', level: 'info', text: msg, params: params});
     }
 
     transWarn(msg, params = {}) {
-        this.showMessage({format: 'translate', level: 'warning', text: msg, params: params});
-        return msg;
+        return this.showMessage({format: 'translate', level: 'warning', text: msg, params: params});
     }
 
     transSuccess(msg, params = {}) {
-        this.showMessage({format: 'translate', level: 'success', text: msg, params: params});
-        return msg;
+        return this.showMessage({format: 'translate', level: 'success', text: msg, params: params});
     }
 }

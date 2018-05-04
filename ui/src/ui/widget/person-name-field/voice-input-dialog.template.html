@@ -15,6 +15,7 @@
                                                domain="['pl', 'ru', 'fr', 'en', 'de']"/>
                     </div>
                     <div class="alert alert-info"
+                         ng-click="$ctrl.stopRecognition()"
                          ng-show="$ctrl.microphoneWorking">
                         <span class="glyphicon glyphicon-record blinking text-danger"/>
                         <span translate="i-am-listening-to-you"/>

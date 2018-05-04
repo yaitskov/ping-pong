@@ -35,7 +35,7 @@ export default class VoiceInputDialog extends SimpleDialog {
                 this.pageCtx.put('voice-recognition-language', newv);
             }
         });
-        this.onHide(() => this.send(VoiceInput.TopicStop));
+        this.onHide(() => this.stopRecognition());
     }
 
     _stop() {
@@ -53,6 +53,10 @@ export default class VoiceInputDialog extends SimpleDialog {
         }
         this.transcripts.splice(10);
         this.$timeout(() => this.$scope.$digest());
+    }
+
+    stopRecognition() {
+        this.send(VoiceInput.TopicStop);
     }
 
     _show() {

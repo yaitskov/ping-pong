@@ -1,5 +1,6 @@
 import AngularBean from 'core/angular/AngularBean.js';
 import AppLang from 'ui/lang.js';
+import InfoPopupWidget from 'ui/widget/info-popup/InfoPopupWidget.js';
 
 class FakeSpeechRecognition {
     constructor(InfoPopup) {
@@ -20,7 +21,7 @@ export default class VoiceInput extends AngularBean {
     }
 
     static get TopicStop() {
-            return 'voice-input-stop';
+        return 'voice-input-stop';
     }
 
     static get TopicOnStop() {
@@ -42,16 +43,21 @@ export default class VoiceInput extends AngularBean {
         return new FakeSpeechRecognition(this.InfoPopup);
     }
 
+    noSpeechInfo() {
+        this.noSpeechInfoMsg = this.InfoPopup.transInfo('voice-recognition-no-speech');
+    }
+
     constructor(...args) {
         super(...args);
         this.working = false;
+        this.noSpeechInfoMsg = {};
         this.speechRecognition = this._createSpeechRecognition();
         this.speechRecognition.continuous = false;
         this.speechRecognition.interim = false;
         this.speechRecognition.interimResults = false;
         this.speechRecognition.onend = (e) => {
             if (this.working && !this.onResultCalled) {
-                this.InfoPopup.transInfo('voice-recognition-no-speech');
+                this.noSpeechInfo();
             }
             this.working = false;
             this.MessageBus.broadcast(this.constructor.TopicOnStop);
@@ -62,7 +68,7 @@ export default class VoiceInput extends AngularBean {
 
             switch (e.error) {
                case 'no-speech':
-                  this.InfoPopup.transInfo('voice-recognition-no-speech');
+                  this.noSpeechInfo();
                   break;
                case 'not-allowed':
                   this.InfoPopup.transError('voice-recognition-not-allowed');
@@ -106,6 +112,10 @@ export default class VoiceInput extends AngularBean {
     }
 
     _transcriptFrom(lang) {
+        if (this.noSpeechInfoMsg.id) {
+            this.MessageBus.broadcast(InfoPopupWidget.TopicInvalidate, this.noSpeechInfoMsg.id);
+            this.noSpeechInfoMsg.id = null;
+        }
         this.onResultCalled = null;
         this.speechRecognition.lang = this.normalizeLang(lang || AppLang.getLanguage());
         if (this.working) {

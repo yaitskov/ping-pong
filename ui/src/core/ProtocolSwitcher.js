@@ -14,11 +14,11 @@ export default class ProtocolSwitcher extends AngularBean {
         return this.$window.location.href.replace('http:', 'https:');
     }
 
-    ifHttpsOrLocal(cb, errorMessage = 'feature-requires-https-protocol') {
+    ifHttpsOrLocal(cb, InfoPopup = null, errorMessage = 'feature-requires-https-protocol') {
         if (this.isHttpsOrLocal()) {
             cb();
         } else {
-            this.InfoPopup.transWarn(errorMessage, {'url': this.httpsUrl()});
+            (InfoPopup || this.InfoPopup).transWarn(errorMessage, {'url': this.httpsUrl()});
         }
     }
 }

@@ -23,6 +23,10 @@ export default class VoiceInput extends AngularBean {
         return 'voice-input-stop';
     }
 
+    static get TopicClearNotifications() {
+        return 'voice-input-clear-notifications';
+    }
+
     static get TopicOnStop() {
         return 'voice-input-on-stop';
     }
@@ -44,6 +48,11 @@ export default class VoiceInput extends AngularBean {
 
     noSpeechInfo() {
         this.popupMsgScope.transInfo('voice-recognition-no-speech');
+    }
+
+    clearNotifications() {
+        console.log('clear notifications')
+        this.popupMsgScope.clearAll();
     }
 
     constructor(...args) {
@@ -89,6 +98,8 @@ export default class VoiceInput extends AngularBean {
         };
         this.MessageBus.subscribe(this.constructor.TopicStop,
                                   () => this.stopListening());
+        this.MessageBus.subscribe(this.constructor.TopicClearNotifications,
+                                  () => this.clearNotifications());
     }
 
     stopListening() {
@@ -107,11 +118,13 @@ export default class VoiceInput extends AngularBean {
     }
 
     transcriptFrom(lang) {
-        this.ProtocolSwitcher.ifHttpsOrLocal(() => this._transcriptFrom(lang));
+        this.ProtocolSwitcher.ifHttpsOrLocal(
+            () => this._transcriptFrom(lang),
+            this.popupMsgScope);
     }
 
     _transcriptFrom(lang) {
-        this.popupMsgScope.clearAll();
+        this.clearNotifications();
         this.onResultCalled = null;
         this.speechRecognition.lang = this.normalizeLang(lang || AppLang.getLanguage());
         if (this.working) {

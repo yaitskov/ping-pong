@@ -6,6 +6,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const OfflinePlugin = require('offline-plugin');
 const WebpackSourceMapSupport = require("webpack-source-map-support");
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
 module.exports = {
     cache: true,
@@ -74,6 +75,24 @@ module.exports = {
         //     sourceMap: true
         // }),
         // new CleanWebpackPlugin(['dist']),
+        new FaviconsWebpackPlugin({
+            logo: 'logo.png',
+            persistentCache: true,
+            inject: true,
+            title: 'Cloud-Sport',
+            icons: {
+                android: false,
+                appleIcon: false,
+                appleStartup: false,
+                coast: false,
+                favicons: true,
+                firefox: true,
+                opengraph: false,
+                twitter: false,
+                yandex: false,
+                windows: false
+            }
+        }),
         new HtmlWebpackPlugin({
             template: 'src/index-template.ejs'
         }),

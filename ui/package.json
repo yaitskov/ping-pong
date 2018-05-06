@@ -26,6 +26,7 @@
     "core-js": "2.5.3",
     "flatpickr": "3.0.6",
     "hard-source-webpack-plugin": "^0.6.4",
+    "html2canvas": "^1.0.0-alpha.12",
     "humanize-duration": "3.10.1",
     "jquery": "^3.2.1",
     "jquery-ui-dist": "1.12.1",

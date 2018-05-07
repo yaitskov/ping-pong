@@ -83,6 +83,9 @@ describe('java script', () => {
                 static get s() { return [1]; }
                 get g() { return 'A'; }
                 f() { return 'A'; }
+                static className() {
+                    return this.name;
+                }
             }
 
             class Next extends Base {
@@ -90,6 +93,11 @@ describe('java script', () => {
                 get g() { return 'N' + super.g; }
                 f() { return 'B' + super.f(); }
             }
+
+            it('static class name method', () => {
+                expect(Base.className()).toBe('Base');
+                expect(Next.className()).toBe('Next');
+            })
 
             it('call overridden', () => {
                 expect(new Next().f()).toBe('BA');

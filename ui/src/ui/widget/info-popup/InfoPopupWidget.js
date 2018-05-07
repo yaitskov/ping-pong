@@ -47,7 +47,7 @@ export default class InfoPopupWidget extends SimpleController {
         if (this.messages.length > 10) {
            this.messages.splice(10);
         }
-        this.$timeout(() => this.$scope.$digest());
+        //this.$timeout(() => this.$scope.$digest());
     }
 
     removeMessageById(msgId) {

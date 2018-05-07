@@ -1,3 +1,5 @@
+import AngularBean from './angular/AngularBean.js';
+
 class Topic {
     constructor(bus, name) {
         this.bus = bus;
@@ -6,8 +8,9 @@ class Topic {
         this.lastEvent = undefined;
     }
 
-    subscribe(consumer) {
-        this.subscribers.push(consumer);
+    subscribe(consumer, scope) {
+        this.subscribers.push({consumer: consumer,
+                               scope: scope});
         if (this.lastEvent != undefined) {
             consumer(...this.lastEvent);
         }
@@ -28,13 +31,23 @@ class Topic {
     }
 
     broadcast(params) {
-        this.subscribers.forEach(s => s(...params));
+        this.subscribers.forEach(s => {
+            s.consumer(...params);
+            if (s.scope) {
+                this.bus.$timeout(() => s.scope.$digest());
+            }
+        });
         this.lastEvent = params;
     }
 }
 
-export default class MessageBus {
-    constructor() {
+export default class MessageBus extends AngularBean {
+    static get $inject() {
+        return ['$timeout'];
+    }
+
+    constructor(...args) {
+        super(...args);
         this.topicsByName = {};
     }
 
@@ -42,16 +55,16 @@ export default class MessageBus {
         return this.topicsByName[name] = new Topic(this, name);
     }
 
-    subscribe(topicName, consumer) {
+    subscribe(topicName, consumer, scope) {
         let topic = this.topicsByName[topicName];
         if (!topic) {
             topic = this._newTopic(topicName);
         }
-        return topic.subscribe(consumer);
+        return topic.subscribe(consumer, scope);
     }
 
     subscribeIn($scope, topicName, consumer) {
-        $scope.$on('$destroy', this.subscribe(topicName, consumer));
+        $scope.$on('$destroy', this.subscribe(topicName, consumer, $scope));
     }
 
     _removeTopic(topicName) {

@@ -40,7 +40,7 @@ export default class VoiceInputDialog extends SimpleDialog {
 
     _stop() {
         this.microphoneWorking = false;
-        this.$timeout(() => this.$scope.$digest());
+        // this.$timeout(() => this.$scope.$digest());
     }
 
     onTranscripted(results) {
@@ -52,13 +52,13 @@ export default class VoiceInputDialog extends SimpleDialog {
             }
         }
         this.transcripts.splice(10);
-        this.$timeout(() => this.$scope.$digest());
+        // this.$timeout(() => this.$scope.$digest());
     }
 
     _onHide() {
         this.stopRecognition();
         this.send(VoiceInput.TopicClearNotifications);
-        this.$timeout(() => this.$scope.$digest());
+        // this.$timeout(() => this.$scope.$digest());
     }
 
     stopRecognition() {

@@ -1,0 +1,27 @@
+<div id="screen-sharer-dialog" class="modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" translate="Downloading lbl"/>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label translate="preview lbl"/>
+                    <br/>
+                    <img src="{{$ctrl.screenshotData}}"
+                         alt="preview" class="img-responsive"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger"
+                        ng-click="$ctrl.hideDialog()" translate="Cancel btn"/>
+                <a class="btn btn-primary"
+                   ng-show="$ctrl.screenshotData"
+                   href="{{$ctrl.screenshotData}}"
+                   download="{{$ctrl.suggestedFileName}}"
+                   translate="Download btn"/>
+            </div>
+        </div>
+    </div>
+</div>

@@ -4,5 +4,8 @@ module.exports = {
     'group-lbl': 'Group',
     'match-lbl': 'Match',
     'play-off-lbl': 'Play Off',
-    'saving': 'Saving'
+    'saving': 'Saving',
+    'Download btn': 'Download',
+    'Downloading lbl': 'Downloading',
+    'preview lbl': 'Preview'
 };

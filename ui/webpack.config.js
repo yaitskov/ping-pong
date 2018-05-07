@@ -75,24 +75,24 @@ module.exports = {
         //     sourceMap: true
         // }),
         // new CleanWebpackPlugin(['dist']),
-        new FaviconsWebpackPlugin({
-            logo: 'logo.png',
-            persistentCache: true,
-            inject: true,
-            title: 'Cloud-Sport',
-            icons: {
-                android: false,
-                appleIcon: false,
-                appleStartup: false,
-                coast: false,
-                favicons: true,
-                firefox: true,
-                opengraph: false,
-                twitter: false,
-                yandex: false,
-                windows: false
-            }
-        }),
+        // new FaviconsWebpackPlugin({
+        //     logo: 'logo.png',
+        //     persistentCache: true,
+        //     inject: true,
+        //     title: 'Cloud-Sport',
+        //     icons: {
+        //         android: false,
+        //         appleIcon: false,
+        //         appleStartup: false,
+        //         coast: false,
+        //         favicons: true,
+        //         firefox: true,
+        //         opengraph: false,
+        //         twitter: false,
+        //         yandex: false,
+        //         windows: false
+        //     }
+        // }),
         new HtmlWebpackPlugin({
             template: 'src/index-template.ejs'
         }),

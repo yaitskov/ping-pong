@@ -19,6 +19,10 @@ export default class VoiceInput extends AngularBean {
         return 'voice-input-transcripted';
     }
 
+    static get TopicStarted() {
+        return 'voice-input-started';
+    }
+
     static get TopicStop() {
         return 'voice-input-stop';
     }
@@ -89,6 +93,7 @@ export default class VoiceInput extends AngularBean {
         };
         this.speechRecognition.onaudiostart = (e) => {
             this.working = true;
+            this.MessageBus.broadcast(this.constructor.TopicStarted);
         };
         this.speechRecognition.onresult = (e) => {
             this.onResultCalled = e;

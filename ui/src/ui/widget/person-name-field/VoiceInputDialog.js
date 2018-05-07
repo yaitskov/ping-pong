@@ -21,6 +21,8 @@ export default class VoiceInputDialog extends SimpleDialog {
 
     $onInit() {
         console.log("voice input dialog init")
+        this.subscribe(VoiceInput.TopicStarted,
+                       () => this.microphoneWorking = true);
         this.subscribe(this.constructor.TopicShow, () => this._show());
         this.subscribe(VoiceInput.TopicTranscripted,
                        (results) => this.onTranscripted(results));
@@ -72,7 +74,6 @@ export default class VoiceInputDialog extends SimpleDialog {
     }
 
     turnOnMic() {
-        this.microphoneWorking = true;
         this.VoiceInput.transcriptFrom(this.lang);
     }
 

@@ -6,7 +6,8 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const OfflinePlugin = require('offline-plugin');
 const WebpackSourceMapSupport = require("webpack-source-map-support");
-const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
+//const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     cache: true,
@@ -93,6 +94,7 @@ module.exports = {
         //         windows: false
         //     }
         // }),
+        new CopyWebpackPlugin(['src/logo.png']),
         new HtmlWebpackPlugin({
             template: 'src/index-template.ejs'
         }),

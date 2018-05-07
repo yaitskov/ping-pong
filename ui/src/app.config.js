@@ -5,6 +5,11 @@ import AppLang from './ui/lang.js';
 var translateTables = require('./translate/translate.js');
 
 angular.module('cloudSport').
+    config(['$compileProvider', ($compileProvider) => {
+        const pattern = /^\s*(https|http|data):/;
+        $compileProvider.aHrefSanitizationWhitelist(pattern);
+        $compileProvider.imgSrcSanitizationWhitelist(pattern);
+    }]).
     config(['$httpProvider', function($httpProvider) {
         if (!$httpProvider.defaults.headers.get) {
             $httpProvider.defaults.headers.get = {};

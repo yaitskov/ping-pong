@@ -12,6 +12,26 @@
   <!-- application cache hack -->
 </head>
 <body id="body">
+  <script>
+       window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '242796933136161',
+                xfbml      : true,
+                version    : 'v3.0',
+                status:      true
+            });
+            FB.AppEvents.logPageView();
+       };
+
+      (function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) {return;}
+          js = d.createElement(s); js.id = id;
+          js.src = "https://connect.facebook.net/en_US/sdk.js";
+          fjs.parentNode.insertBefore(js, fjs);
+      })(document, 'script', 'facebook-jssdk');
+
+  </script>
   <screen-sharer-dialog></screen-sharer-dialog>
   <voice-input-dialog></voice-input-dialog>
 

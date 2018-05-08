@@ -33,5 +33,6 @@ import './user/user.import.js';
 import './ui/ui.import.js';
 import './place/place.import.js';
 import './tournament/tournament.import.js';
+import './integration/integration.import.js';
 
 require('offline-plugin/runtime').install();

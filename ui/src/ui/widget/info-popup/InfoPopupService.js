@@ -28,6 +28,10 @@ export default class InfoPopupService extends AngularBean {
         return this.showMessage({format: 'translate', level: 'success', text: msg, params: params});
     }
 
+    verbError(msg) {
+        return this.showMessage({format: 'verb', level: 'danger', text: msg});
+    }
+
     createScope() {
         return new ScopedInfoPopup(this);
     }

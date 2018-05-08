@@ -7,6 +7,11 @@
       <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
+      <li>
+        <a ng-click="$ctrl.loginFb()">
+          FB
+        </a>
+      </li>
       <li ng-show="$ctrl.lastTournament">
         <a href="#!/my/matches/judgement/{{$ctrl.lastTournament.tid}}"
            ng-show="$ctrl.lastTournament.role == 'Admin' && $ctrl.lastTournament.state == 'Open'">

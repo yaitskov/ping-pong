@@ -1,27 +1,56 @@
 <div id="screen-sharer-dialog" class="modal" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" translate="Downloading lbl"/>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label translate="preview lbl"/>
-                    <br/>
-                    <img src="{{$ctrl.screenshotData}}"
-                         alt="preview" class="img-responsive"/>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger"
-                        ng-click="$ctrl.hideDialog()" translate="Cancel btn"/>
-                <a class="btn btn-primary"
-                   ng-show="$ctrl.screenshotData"
-                   href="{{$ctrl.screenshotData}}"
-                   download="{{$ctrl.suggestedFileName}}"
-                   translate="Download btn"/>
-            </div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" translate="Downloading lbl"/>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <div class="btn-group">
+            <a ng-click="$ctrl.useSink('file')"
+               class="btn"
+               ng-class="{'btn-primary': $ctrl.sink == 'file'}"
+               title="save to local file">
+              <span class="glyphicon glyphicon-floppy-save"/>
+            </a>
+            <a ng-click="$ctrl.useFbSink()"
+               class="btn"
+               ng-class="{'btn-success': $ctrl.sink == 'facebook'}"
+               title="publish on facebook">
+              <span class="fa-facebook">f</span>
+            </a>
+          </div>
         </div>
+        <div class="form-group" ng-show="$ctrl.sink == 'facebook'">
+          <label translate="target fb page"/>
+          <select class="form-control" ng-model="$ctrl.fbTargetPageId">
+            <option value="me" translate="your-photos"/>
+            <option ng-repeat="page in $ctrl.facebookPages | orderBy : 'name'" value="{{page.id}}">
+              {{page.name}}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label translate="preview lbl"/>
+          <br/>
+          <img src="{{$ctrl.screenshotData}}"
+               alt="preview" class="img-responsive"/>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger"
+                ng-click="$ctrl.hideDialog()" translate="Cancel btn"/>
+        <a class="btn btn-primary"
+           ng-show="$ctrl.screenshotData && $ctrl.sink == 'file'"
+           href="{{$ctrl.screenshotData}}"
+           download="{{$ctrl.suggestedFileName}}"
+           translate="Download btn"/>
+        <a class="btn btn-primary"
+           ng-show="$ctrl.screenshotData && $ctrl.sink == 'facebook' && $ctrl.fbTargetPageId"
+           ng-click="$ctrl.publish()"
+           translate="Publish btn"/>
+      </div>
     </div>
+  </div>
 </div>

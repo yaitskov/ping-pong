@@ -18,7 +18,7 @@ class Topic {
     }
 
     unsubscribe(consumer) {
-        const idx = this.subscribers.indexOf(consumer);
+        const idx = this.subscribers.findIndex(e => e.consumer == consumer);
         if (idx < 0) {
             console.warn(`Attempt to unsubscribe unknown consumer ${consumer} from topic ${this.name}`);
             return false;

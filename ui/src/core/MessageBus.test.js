@@ -1,8 +1,12 @@
 import MessageBus from './MessageBus.js';
 
+function createMessageBus() {
+    return new MessageBus((cb) => cb());
+}
+
 describe('MessageBus', () => {
     it('subscribe, broadcast', () => {
-        const bus = new MessageBus();
+        const bus = createMessageBus();
         let summator = 0;
         bus.subscribe('t1', (n) => summator += n);
         bus.broadcast('t1', 3);
@@ -10,7 +14,7 @@ describe('MessageBus', () => {
     });
 
     it('broadcast, subscribe', () => {
-        const bus = new MessageBus();
+        const bus = createMessageBus();
         let summator = 0;
         bus.broadcast('t1', 3);
         bus.subscribe('t1', (n) => summator += n);
@@ -18,7 +22,7 @@ describe('MessageBus', () => {
     });
 
     it('subscribe, unsubscribe, broadcast', () => {
-        const bus = new MessageBus();
+        const bus = createMessageBus();
         let summator = 0;
         const disposer = bus.subscribe('t1', (n) => summator += n);
         disposer();
@@ -27,7 +31,7 @@ describe('MessageBus', () => {
     });
 
     it('broadcast, subscribe, unsubscribe, subscribe', () => {
-        const bus = new MessageBus();
+        const bus = createMessageBus();
         let summator = 0;
         bus.broadcast('t1', 3);
         bus.subscribe('t1', (n) => summator += n)();

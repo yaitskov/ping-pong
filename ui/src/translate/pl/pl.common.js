@@ -15,5 +15,7 @@ module.exports = {
 
     'facebook-unknown-error': 'Facebook zwrócił nieprzewidywany błąd "{{message}}"',
     'not enough permission': 'Dla wykonania operacji Facebook wymaga zgody od Ciebię ({{perm}})',
-    'permission-still-missing': 'Facebook permisja "{{perm}}" nadał nie wydana Cloud-Sportowi'
+    'permission-still-missing': 'Facebook permisja "{{perm}}" nadał nie wydana Cloud-Sportowi',
+
+    'privacy-policy': 'Polityka prywantości'
 };

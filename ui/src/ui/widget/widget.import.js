@@ -11,3 +11,4 @@ import './person-name-field/voice-input-dialog.component.js';
 import './person-name-field/person-name-field.directive.js';
 import './screenshot-sharer/screen-sharer-dialog.component.js';
 import './screenshot-sharer/screenshot-button.directive.js';
+import './footer/footer-widget.component.js';

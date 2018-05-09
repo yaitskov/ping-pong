@@ -11,5 +11,9 @@ module.exports = {
     'preview lbl': 'Zapowiedź',
     'screenshot posted': 'Screenshot has been posted',
     'your-photos': 'Strona domowa',
-    'target fb page': 'Wybieź FB stronę dla publikacji'
+    'target fb page': 'Wybieź FB stronę dla publikacji',
+
+    'facebook-unknown-error': 'Facebook zwrócił nieprzewidywany błąd "{{message}}"',
+    'not enough permission': 'Dla wykonania operacji Facebook wymaga zgody od Ciebię ({{perm}})',
+    'permission-still-missing': 'Facebook permisja "{{perm}}" nadał nie wydana Cloud-Sportowi'
 };

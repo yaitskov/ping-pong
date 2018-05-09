@@ -50,11 +50,11 @@ export default class ScreenSharerDialog extends SimpleDialog {
         });
     }
 
-    publish() {
-        this.Facebook.ensureLogin((ar) => this._publish(ar.accessToken));
+    publish(attempt) {
+        this.Facebook.ensureLogin((ar) => this._publish(ar.accessToken, attempt || new Set()));
     }
 
-    _publish(accessToken) {
+    _publish(accessToken, attempt) {
         const blob = this.dataURItoBlob(this.screenshotData, 'image/png');
         const payload = new FormData();
         payload.append('access_token', accessToken);
@@ -78,6 +78,32 @@ export default class ScreenSharerDialog extends SimpleDialog {
                 }).
             catch((e) => {
                 console.log(`failed ${JSON.stringify(e)}`);
+                if (e.data.error.code == 200) {
+                    const sizeWas = attempt.size;
+                    const msg = e.data.error.message;
+                    const extraPermission = msg.substr(1 + msg.lastIndexOf(' '));
+                    attempt.add(extraPermission);
+                    if (attempt.size == sizeWas) {
+                       this.InfoPopup.transError(
+                           "permission-still-missing", {perm: extraPermission});
+                       console.log("permission " + extraPermission + " is not granted");
+                       return;
+                    }
+                    this.InfoPopup.transInfo('not enough permission', {perm: extraPermission});
+                    this.Facebook.login((ar) => {
+                        this._publish(ar.authResponse.accessToken, attempt);
+                    }, extraPermission);
+                // Error validating access token:
+                // The session is invalid because the user logged out.",
+                // "type":"OAuthException","code":190,"error_subcode":467
+                } else if (e.data.error.code == 190) {
+                    this.InfoPopup.transInfo('facebook-token-expired', e.data.error);
+                    this.Facebook.login((ar) => {
+                                            this._publish(ar.authResponse.accessToken, new Set());
+                                        });
+                } else {
+                    this.InfoPopup.transError('facebook-unknown-error', e.data.error);
+                }
             });
     }
 

@@ -29,7 +29,7 @@ export default class Facebook extends AngularBean {
                             'CS not get access to your fb account', r.error);
                     }
                 },
-                {scope: scope || 'manage_pages publish_pages'}));
+                {scope: scope || 'manage_pages publish_pages publish_actions'}));
     }
 
     listPages(cb) {

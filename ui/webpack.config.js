@@ -14,7 +14,7 @@ module.exports = {
     cache: true,
     entry: ['core-js', './src/cloud-sport.js'],
     output: {
-        filename: 'bundle-[git-revision-hash].js',
+        filename: 'bundle-[hash]-[git-revision-hash].js',
         path: path.resolve(__dirname, 'dist')
     },
     target: 'web',
@@ -100,7 +100,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: 'src/index-template.ejs'
         }),
-        new ExtractTextPlugin("styles-[git-revision-hash].css"),
+        new ExtractTextPlugin("styles-[hash]-[git-revision-hash].css"),
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery',

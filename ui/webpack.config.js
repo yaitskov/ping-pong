@@ -1,4 +1,5 @@
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+const GitRevisionPlugin = require('git-revision-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -13,7 +14,7 @@ module.exports = {
     cache: true,
     entry: ['core-js', './src/cloud-sport.js'],
     output: {
-        filename: 'bundle.js',
+        filename: 'bundle-[git-revision-hash].js',
         path: path.resolve(__dirname, 'dist')
     },
     target: 'web',
@@ -64,6 +65,7 @@ module.exports = {
     },
     devtool: 'source-map',
     plugins:[
+        new GitRevisionPlugin(),
         new HardSourceWebpackPlugin(),
         //new WebpackSourceMapSupport(),
         // new webpack.DefinePlugin({
@@ -98,7 +100,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: 'src/index-template.ejs'
         }),
-        new ExtractTextPlugin("styles.css"),
+        new ExtractTextPlugin("styles-[git-revision-hash].css"),
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery',

@@ -21,6 +21,7 @@ const path = require('path');
 const gitHash = new GitRevisionPlugin().commithash();
 const jsCssInFix = gitHash + "-" + Date.now();
 const distPath = path.resolve(__dirname, 'dist');
+const glob = require("glob");
 
 if (!fs.existsSync(distPath)) {
     console.log(`Create ${distPath}`);
@@ -54,9 +55,22 @@ module.exports = function(grunt) {
             remove_cache: 'sed -i "/^CACHE:/d" dist/appcache/manifest.appcache'
         }
     });
-    grunt.registerTask('all', ['install-dependencies',
-                               'webpack',
-                               'karma:unit:start',
-                               'exec']);
+    grunt.task.registerTask(
+        'clean-assets', 'remove css and js with dynamic names',
+        (arg) => {
+            console.log(`First Arg is ${arg}`);
+            for (let prefix of ['styles-*', 'bundle-*']) {
+                for (let ext of ['.css', '.css.map', '.js', '.js.map']) {
+                    const files = glob.sync(`${distPath}/${prefix}${ext}`);
+                    for (let file of files) {
+                        console.log(`Remove file ${file}`);
+                        fs.unlinkSync(file);
+                    }
+                }
+            }
+
+        });
+    grunt.registerTask('fwp', ['clean-assets', 'webpack']);
+    grunt.registerTask('all', ['install-dependencies', 'fwp', 'karma:unit:start', 'exec']);
     grunt.registerTask('default', ['all']);
 };

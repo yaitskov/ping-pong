@@ -1,4 +1,7 @@
 const path = require('path');
+const fs = require('fs');
+
+const jsCssInFix = fs.readFileSync(path.resolve(__dirname, 'dist/jsCssInFix'));
 
 function showHelp() {
     console.log(`
@@ -61,7 +64,7 @@ module.exports = (config) => {
             terminal: true
         },
         files: [
-            'dist/bundle.js',
+            `dist/bundle-${jsCssInFix}.js`,
             'node_modules/angular-mocks/angular-mocks.js',
             //'node_modules/jasmine-expect/dist/jasmine-matchers.js',
             'dist/*.html',

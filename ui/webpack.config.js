@@ -1,5 +1,5 @@
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
-const GitRevisionPlugin = require('git-revision-webpack-plugin');
+const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -10,11 +10,13 @@ const WebpackSourceMapSupport = require("webpack-source-map-support");
 //const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
+const jsCssInFix = fs.readFileSync(path.resolve(__dirname, 'dist/jsCssInFix'));
+
 module.exports = {
     cache: true,
     entry: ['core-js', './src/cloud-sport.js'],
     output: {
-        filename: 'bundle-[hash]-[git-revision-hash].js',
+        filename: `bundle-${jsCssInFix}.js`,
         path: path.resolve(__dirname, 'dist')
     },
     target: 'web',
@@ -65,7 +67,6 @@ module.exports = {
     },
     devtool: 'source-map',
     plugins:[
-        new GitRevisionPlugin(),
         new HardSourceWebpackPlugin(),
         //new WebpackSourceMapSupport(),
         // new webpack.DefinePlugin({
@@ -100,7 +101,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: 'src/index-template.ejs'
         }),
-        new ExtractTextPlugin("styles-[hash]-[git-revision-hash].css"),
+        new ExtractTextPlugin(`styles-${jsCssInFix}.css`),
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery',

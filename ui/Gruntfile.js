@@ -13,6 +13,22 @@
 // npm install offline-plugin --save-dev
 // npm install grunt-exec --save-dev
 
+
+const GitRevisionPlugin = require('git-revision-webpack-plugin');
+const fs = require('fs');
+const path = require('path');
+
+const gitHash = new GitRevisionPlugin().commithash();
+const jsCssInFix = gitHash + "-" + Date.now();
+const distPath = path.resolve(__dirname, 'dist');
+
+if (!fs.existsSync(distPath)) {
+    console.log(`Create ${distPath}`);
+    fs.mkdirSync(distPath);
+}
+
+fs.writeFileSync(path.resolve(distPath, 'jsCssInFix'), jsCssInFix);
+
 const webpackConfig = require('./webpack.config.js');
 
 module.exports = function(grunt) {
@@ -35,13 +51,12 @@ module.exports = function(grunt) {
             dev: Object.assign({ watch: false }, webpackConfig)
         },
         exec: {
-            build_label: 'date >> dist/version.txt',
-            version_label: 'grep version package.json >> dist/version.txt',
-            git_label: 'git rev-list HEAD | head -1 >> dist/version.txt',
             remove_cache: 'sed -i "/^CACHE:/d" dist/appcache/manifest.appcache'
         }
     });
-    grunt.registerTask('all', ['install-dependencies', 'webpack',
-                               'karma:unit:start', 'exec']);
+    grunt.registerTask('all', ['install-dependencies',
+                               'webpack',
+                               'karma:unit:start',
+                               'exec']);
     grunt.registerTask('default', ['all']);
 };

@@ -17,5 +17,7 @@ module.exports = {
     'not enough permission': 'Facebook requires a consent from You to execute the operation ({{perm}})',
     'permission-still-missing': 'Facebook permission "{{perm}}" still has not been granted to Cloud-Sport',
 
-    'privacy-policy': 'Privacy Policy'
+    'privacy-policy': 'Privacy Policy',
+
+    'app-version-lbl': 'Version'
 };

@@ -1,8 +1,3 @@
-const path = require('path');
-const fs = require('fs');
-
-const jsCssInFix = fs.readFileSync(path.resolve(__dirname, 'dist/jsCssInFix'));
-
 function showHelp() {
     console.log(`
 Custom keys:
@@ -64,7 +59,7 @@ module.exports = (config) => {
             terminal: true
         },
         files: [
-            `dist/bundle-${jsCssInFix}.js`,
+            `dist/bundle.js`,
             'node_modules/angular-mocks/angular-mocks.js',
             //'node_modules/jasmine-expect/dist/jasmine-matchers.js',
             'dist/*.html',
@@ -100,7 +95,7 @@ module.exports = (config) => {
             cacheIdFromPath: function(filepath) {
                 // console.log("cacheIdFromPath " + filepath);
                 return filepath.substr(filepath.lastIndexOf('/') + 1);
-            },
+            }
         },
         customLaunchers: {
             'PhantomJS_debug': {
@@ -108,5 +103,5 @@ module.exports = (config) => {
                 debug: true
             }
         }
-    })
-}
+    });
+};

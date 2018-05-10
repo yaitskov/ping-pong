@@ -17,5 +17,7 @@ module.exports = {
     'not enough permission': 'Dla wykonania operacji Facebook wymaga zgody od Ciebię ({{perm}})',
     'permission-still-missing': 'Facebook permisja "{{perm}}" nadał nie wydana Cloud-Sportowi',
 
-    'privacy-policy': 'Polityka prywantości'
+    'privacy-policy': 'Polityka prywantości',
+
+    'app-version-lbl': 'Wersja'
 };

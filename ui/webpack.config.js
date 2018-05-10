@@ -1,5 +1,5 @@
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
-const fs = require('fs');
+const GitRevisionPlugin = require('git-revision-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -10,13 +10,12 @@ const WebpackSourceMapSupport = require("webpack-source-map-support");
 //const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const jsCssInFix = fs.readFileSync(path.resolve(__dirname, 'dist/jsCssInFix'));
 
 module.exports = {
     cache: true,
     entry: ['core-js', './src/cloud-sport.js'],
     output: {
-        filename: `bundle-${jsCssInFix}.js`,
+        filename: `bundle.js`,
         path: path.resolve(__dirname, 'dist')
     },
     target: 'web',
@@ -31,17 +30,10 @@ module.exports = {
                 loader: ExtractTextPlugin.extract({
                     fallback: "style-loader",
                     use: [
-                        {
-                            loader: 'css-loader',
-                        },
-                        {
-                            loader: 'sass-loader',
-                            // options: {
-                            //     includePaths: ["absolute/path/a", "absolute/path/b"]
-                            // }
-                        }
+                        {loader: 'css-loader'},
+                        {loader: 'sass-loader'}
                     ]
-                }),
+                })
             },
             {
                 test: /\.(png|woff|woff2|eot|ttf|svg)$/,
@@ -51,12 +43,25 @@ module.exports = {
                 loader: 'file-loader'
             },
             {
+                test: /AppBuildInfo.js/,
+                exclude: /node_modules/,
+                loader: 'string-replace-loader',
+                options: {
+                    multiple: [
+                        {search: '$$lastCommitHash$$',
+                         replace: new GitRevisionPlugin().commithash()},
+                        {search: '$$buildTime$$',
+                         replace: '' + new Date().getTime()}
+                    ]
+                }
+            },
+            {
                 test: /\.js$/,
-                exclude: /(node_modules)/,
+                exclude: /node_modules/,
                 loader: 'babel-loader',
                 query: {
-                    presets: ["es2015", "es2016", 'es2017'],
-                    plugins: [ 'source-map-support' //'transform-runtime'
+                    presets: ['es2015', 'es2016', 'es2017'],
+                    plugins: ['source-map-support' //'transform-runtime'
                         //"transform-es2015-for-of",
                         //"transform-es2015-block-scoping", "transform-strict-mode",
                                ,"transform-object-rest-spread"
@@ -101,7 +106,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: 'src/index-template.ejs'
         }),
-        new ExtractTextPlugin(`styles-${jsCssInFix}.css`),
+        new ExtractTextPlugin(`styles.css`),
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery',

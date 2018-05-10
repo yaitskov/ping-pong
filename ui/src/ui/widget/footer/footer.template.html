@@ -3,4 +3,10 @@
         <a href="/privacy.html" target="_blank"
            translate="privacy-policy"/>
     </div>
+    <div class="col-md-4">
+        <a href="https://github.com/yaitskov/ping-pong/tree/{{$ctrl.buildInfo.lastCommitHash}}"
+           ng-show="$ctrl.buildInfo.lastCommitHash"
+           title="Build at {{ $ctrl.buildInfo.buildTime | longDateTime }}"
+           translate="app-version-lbl"/>
+    </div>
 </div>

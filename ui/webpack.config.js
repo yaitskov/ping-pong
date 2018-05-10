@@ -111,9 +111,6 @@ module.exports = {
         new OfflinePlugin({
             ServiceWorker: false,
             //AppCache: false,
-            externals: [
-                'version.txt'
-            ]
         })
     ]
 };

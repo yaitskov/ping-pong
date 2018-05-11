@@ -19,6 +19,7 @@ const GitRevisionPlugin = require('git-revision-webpack-plugin');
 const webpackConfig = require('./webpack.config.js');
 const distDir = path.resolve(__dirname, 'dist');
 const webpack = require('webpack');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 function generateBuildInfo() {
     const gitHash = new GitRevisionPlugin().commithash();
@@ -37,7 +38,10 @@ const wpProd = Object.assign(
     webpackConfig,
     {
         plugins: [...webpackConfig.plugins.slice(0, -1),
-                  new webpack.optimize.UglifyJsPlugin({output: {comments: false}}),
+                  new UglifyJsPlugin({
+                      parallel: 4,
+                      sourceMap: true
+                  }),
                   ...webpackConfig.plugins.slice(-1)]
         //[
                //new webpack.optimize.UglifyJsPlugin({output: {comments: false}}),

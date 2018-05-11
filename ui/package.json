@@ -91,6 +91,7 @@
     "sass-loader": "^6.0.6",
     "source-map-support": "^0.5.0",
     "style-loader": "^0.18.2",
+    "uglifyjs-webpack-plugin": "^1.2.5",
     "url-loader": "^0.5.9",
     "webpack": "^3.10.0",
     "webpack-source-map-support": "^2.0.1"

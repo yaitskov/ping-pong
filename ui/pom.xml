@@ -28,6 +28,21 @@
                 <version>${exec.maven.plugin.version}</version>
                 <executions>
                     <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <executable>bash</executable>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <arguments>
+                                <argument>-c</argument>
+                                <argument>npm install</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>run-grunt</id>
                         <goals>
                             <goal>exec</goal>
@@ -38,7 +53,7 @@
                             <workingDirectory>${project.basedir}</workingDirectory>
                             <arguments>
                                 <argument>-c</argument>
-                                <argument>grunt all</argument>
+                                <argument>grunt</argument>
                             </arguments>
                         </configuration>
                     </execution>

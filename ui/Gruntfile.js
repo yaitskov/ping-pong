@@ -18,6 +18,7 @@ const fs = require('fs');
 const GitRevisionPlugin = require('git-revision-webpack-plugin');
 const webpackConfig = require('./webpack.config.js');
 const distDir = path.resolve(__dirname, 'dist');
+const webpack = require('webpack');
 
 function generateBuildInfo() {
     const gitHash = new GitRevisionPlugin().commithash();
@@ -30,6 +31,20 @@ function generateBuildInfo() {
              }
         }`);
 }
+
+const wpProd = Object.assign(
+    {},
+    webpackConfig,
+    {
+        plugins: [...webpackConfig.plugins.slice(0, -1),
+                  new webpack.optimize.UglifyJsPlugin({output: {comments: false}}),
+                  ...webpackConfig.plugins.slice(-1)]
+        //[
+               //new webpack.optimize.UglifyJsPlugin({output: {comments: false}}),
+//               webpackConfig.plugins.slice(-1)
+//           ])
+    }
+);
 
 module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-install-dependencies');
@@ -47,7 +62,7 @@ module.exports = function(grunt) {
             options: {
                 stats: !process.env.NODE_ENV || process.env.NODE_ENV === 'development'
             },
-            prod: webpackConfig,
+            prod: wpProd,
             dev: Object.assign({ watch: false }, webpackConfig)
         },
         exec: {
@@ -59,9 +74,11 @@ module.exports = function(grunt) {
 
     grunt.task.registerTask('build-info', 'generates AppBuildInfo.js',
                             generateBuildInfo);
-    grunt.registerTask('wbuild', ['build-info', 'webpack', 'exec:fixAppCacheManifest']);
-    grunt.registerTask('rerelease', ['wbuild', 'exec:karman']);
+    grunt.registerTask('wdbuild', ['build-info', 'webpack:dev', 'exec:fixAppCacheManifest']);
+    grunt.registerTask('wrbuild', ['build-info', 'webpack:prod', 'exec:fixAppCacheManifest']);
+
+    grunt.registerTask('rerelease', ['wrbuild', 'exec:karman']);
     grunt.registerTask('release', ['exec:clean', 'install-dependencies',
-                                    'wbuild', 'exec:karman']);
+                                    'wrbuild', 'exec:karman']);
     grunt.registerTask('default', ['release']);
 };

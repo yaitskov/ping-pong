@@ -19,5 +19,6 @@ module.exports = {
 
     'privacy-policy': 'Polityka prywantości',
 
-    'app-version-lbl': 'Wersja'
+    'app-version-lbl': 'Wersja',
+    'support-lbl': 'Wsparcie'
 };

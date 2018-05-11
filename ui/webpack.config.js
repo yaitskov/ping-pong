@@ -1,5 +1,4 @@
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
-const GitRevisionPlugin = require('git-revision-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -41,19 +40,6 @@ module.exports = {
             },
             {   test: /\.html$/,
                 loader: 'file-loader'
-            },
-            {
-                test: /AppBuildInfo.js/,
-                exclude: /node_modules/,
-                loader: 'string-replace-loader',
-                options: {
-                    multiple: [
-                        {search: '$$lastCommitHash$$',
-                         replace: new GitRevisionPlugin().commithash()},
-                        {search: '$$buildTime$$',
-                         replace: '' + new Date().getTime()}
-                    ]
-                }
             },
             {
                 test: /\.js$/,

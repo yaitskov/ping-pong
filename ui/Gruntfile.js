@@ -13,7 +13,23 @@
 // npm install offline-plugin --save-dev
 // npm install grunt-exec --save-dev
 
+const path = require('path');
+const fs = require('fs');
+const GitRevisionPlugin = require('git-revision-webpack-plugin');
 const webpackConfig = require('./webpack.config.js');
+const distDir = path.resolve(__dirname, 'dist');
+
+function generateBuildInfo() {
+    const gitHash = new GitRevisionPlugin().commithash();
+    fs.writeFileSync(
+        `${__dirname}/src/AppBuildInfo.js`,
+        `export default class AppBuildInfo {
+             constructor() {
+                 this.lastCommitHash = '${gitHash}';
+                 this.buildTime = new Date(${new Date().getTime()});
+             }
+        }`);
+}
 
 module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-install-dependencies');
@@ -35,9 +51,17 @@ module.exports = function(grunt) {
             dev: Object.assign({ watch: false }, webpackConfig)
         },
         exec: {
-            remove_cache: 'sed -i "/^CACHE:/d" dist/appcache/manifest.appcache'
+            clean: `rm -rf ${__dirname}/dist ${__dirname}/node_modules/.cache/hard-source && mkdir ${__dirname}/dist`,
+            karman: 'karma start',
+            fixAppCacheManifest: `sed -i "/^CACHE:/d" ${__dirname}/dist/appcache/manifest.appcache`
         }
     });
-    grunt.registerTask('all', ['install-dependencies', 'webpack', 'karma:unit:start', 'exec']);
-    grunt.registerTask('default', ['all']);
+
+    grunt.task.registerTask('build-info', 'generates AppBuildInfo.js',
+                            generateBuildInfo);
+    grunt.registerTask('wbuild', ['build-info', 'webpack', 'exec:fixAppCacheManifest']);
+    grunt.registerTask('rerelease', ['wbuild', 'exec:karman']);
+    grunt.registerTask('release', ['exec:clean', 'install-dependencies',
+                                    'wbuild', 'exec:karman']);
+    grunt.registerTask('default', ['release']);
 };

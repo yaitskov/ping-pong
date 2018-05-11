@@ -1,5 +1,6 @@
 ui/node_modules
 ui/dist
+ui/src/AppBuildInfo.js
 ui/package-lock.json
 ui/.tmp
 ui/coverage

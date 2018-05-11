@@ -19,5 +19,6 @@ module.exports = {
 
     'privacy-policy': 'Privacy Policy',
 
-    'app-version-lbl': 'Version'
+    'app-version-lbl': 'Version',
+    'support-lbl': 'Support'
 };

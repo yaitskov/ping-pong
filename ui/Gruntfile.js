@@ -89,6 +89,8 @@ module.exports = function(grunt) {
 
     grunt.registerTask('rerelease', ['wrbuild', 'exec:karman']);
     grunt.registerTask('release', ['exec:clean', 'install-dependencies',
-                                    'wrbuild', 'exec:karman']);
+                                   'wrbuild', 'exec:karman']);
+    grunt.registerTask('drelease', ['exec:clean', 'install-dependencies',
+                                    'wdbuild', 'exec:karman']);
     grunt.registerTask('default', ['release']);
 };

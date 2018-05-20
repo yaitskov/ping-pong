@@ -18,6 +18,7 @@ module.exports = {
     'permission-still-missing': 'Facebook permission "{{perm}}" still has not been granted to Cloud-Sport',
 
     'privacy-policy': 'Privacy Policy',
+    'terms-of-service': 'Terms of Service',
 
     'app-version-lbl': 'Version',
     'support-lbl': 'Support'

@@ -89,7 +89,7 @@ module.exports = {
         //         windows: false
         //     }
         // }),
-        new CopyWebpackPlugin(['src/logo.png', 'src/privacy.html']),
+        new CopyWebpackPlugin(['src/logo.png', 'src/privacy.html', 'src/terms.html']),
         new HtmlWebpackPlugin({
             template: 'src/index-template.ejs'
         }),

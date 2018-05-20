@@ -8,6 +8,7 @@ const OfflinePlugin = require('offline-plugin');
 const WebpackSourceMapSupport = require("webpack-source-map-support");
 //const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 
 module.exports = {
@@ -99,8 +100,9 @@ module.exports = {
             FlatpickrInstance: 'flatpickr',
             "window.jQuery": "jquery"
         }),
+        // new BundleAnalyzerPlugin({generateStatsFile: true}),
         new OfflinePlugin({
-            ServiceWorker: false,
+            ServiceWorker: false
             //AppCache: false,
         })
     ]

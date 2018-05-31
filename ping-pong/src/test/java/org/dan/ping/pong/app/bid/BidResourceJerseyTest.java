@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.bid;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidResource.BID_CHANGE_GROUP;
 import static org.dan.ping.pong.app.bid.BidResource.FIND_BIDS_BY_STATE;
@@ -26,6 +27,7 @@ import static org.dan.ping.pong.mock.simulator.Player.p5;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.core.AllOf.allOf;
@@ -232,6 +234,28 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
                     assertThat(users,
                             hasItems(hasProperty("uid", Matchers.is(scenario.player2Uid(p1))),
                                     hasProperty("uid", Matchers.is(scenario.player2Uid(p2)))));
+                });
+    }
+
+    @Test
+    public void rename() {
+        final TournamentScenario scenario = begin().name("renameOfflineBid")
+                .rules(RULES_G2Q1_S1A2G11_NP)
+                .category(c1, p1, p2);
+        isf.create(scenario)
+                .run(c -> {
+                    c.beginTournament().renameBid(p2, "p2 renamed");
+                    final List<UserLink> users = myRest().post(FIND_BIDS_BY_STATE,
+                            FindByState.builder()
+                                    .tid(scenario.getTid())
+                                    .states(singletonList(Play))
+                                    .build())
+                            .readEntity(new GenericType<List<UserLink>>() {});
+                    assertThat(users,
+                            hasItem(
+                                    allOf(
+                                            hasProperty("name", Matchers.is("p2 renamed")),
+                                            hasProperty("uid", Matchers.is(scenario.player2Uid(p2))))));
                 });
     }
 }

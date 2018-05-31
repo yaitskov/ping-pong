@@ -7,6 +7,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.dan.ping.pong.app.bid.BidResource.BID_RENAME;
 import static org.dan.ping.pong.app.bid.BidResource.ENLISTED_BIDS;
 import static org.dan.ping.pong.app.category.CategoryResource.CATEGORIES_BY_TID;
 import static org.dan.ping.pong.app.category.CategoryResource.CATEGORY_MEMBERS;
@@ -47,6 +48,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.BidRename;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.ParticipantState;
 import org.dan.ping.pong.app.bid.Uid;
@@ -504,5 +506,18 @@ public class ImperativeSimulator {
                         .originTid(scenario.getTid())
                         .build())
                 .readEntity(Tid.class);
+    }
+
+    public ImperativeSimulator renameBid(Player p, String newName) {
+        final Uid uid = scenario.player2Uid(p);
+        myRest.post(BID_RENAME, scenario.getTestAdmin(),
+                BidRename
+                        .builder()
+                        .expectedName(scenario.getPlayersSessions().get(p).getName())
+                        .tid(scenario.getTid())
+                        .newName(newName)
+                        .uid(uid)
+                        .build());
+        return this;
     }
 }

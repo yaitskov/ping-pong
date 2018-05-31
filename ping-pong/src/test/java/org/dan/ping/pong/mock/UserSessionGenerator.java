@@ -37,6 +37,7 @@ public class UserSessionGenerator {
         return TestUserSession.builder()
                 .uid(userInfo.getUid())
                 .email(userInfo.getEmail().get())
+                .name(name)
                 .session(daoEntityGenerator.genUserSession(userInfo.getUid()))
                 .build();
     }

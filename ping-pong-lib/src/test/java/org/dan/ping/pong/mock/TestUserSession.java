@@ -12,4 +12,5 @@ public class TestUserSession implements SessionAware {
     private String session;
     private Uid uid;
     private String email;
+    private String name;
 }

@@ -45,4 +45,6 @@ public interface BidDao {
     void resetStateByTid(Tid tid, Instant now, DbUpdater batch);
 
     Map<Uid, ParticipantMemState> loadParticipants(Tid tid);
+
+    void renameParticipant(Uid uid, String newName, DbUpdater batch);
 }

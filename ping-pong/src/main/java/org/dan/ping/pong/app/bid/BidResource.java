@@ -13,6 +13,7 @@ import org.dan.ping.pong.app.bid.result.BidResultService;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
+import org.dan.ping.pong.jooq.tables.Bid;
 
 import java.util.List;
 
@@ -42,6 +43,7 @@ public class BidResource {
     public static final String TID_SLASH_UID = "/";
     public static final String ENLISTED_BIDS = "/bid/enlisted-to-be-checked/";
     public static final String BID_CHANGE_GROUP = "/bid/change-group";
+    public static final String BID_RENAME = "/bid/rename";
 
     @Inject
     private AuthService authService;
@@ -64,6 +66,22 @@ public class BidResource {
         tournamentAccessor.update(bidId.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
             bidService.paid(tournament, bidId.getUid(), batch);
+        });
+    }
+
+    @POST
+    @Path(BID_RENAME)
+    @Consumes(APPLICATION_JSON)
+    public void rename(
+            @Suspended AsyncResponse response,
+            @HeaderParam(SESSION) String session,
+            BidRename bidRename) {
+        final Uid adminUid = authService.userInfoBySession(session).getUid();
+        log.info("Admin {} renames bid {} as [{}]",
+                adminUid, bidRename.getUid(), bidRename.getNewName());
+        tournamentAccessor.update(bidRename.getTid(), response, (tournament, batch) -> {
+            tournament.checkAdmin(adminUid);
+            bidService.rename(tournament, batch, bidRename);
         });
     }
 

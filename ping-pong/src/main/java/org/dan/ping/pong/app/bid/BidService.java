@@ -23,6 +23,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
@@ -226,5 +227,17 @@ public class BidService {
                 .collect(toMap(MatchInfo::getMid, m -> m)));
 
         matchDao.deleteByIds(midsForRemoval, batch);
+    }
+
+    public void rename(TournamentMemState tournament, DbUpdater batch, BidRename bidRename) {
+        final ParticipantMemState bid = tournament.getParticipant(bidRename.getUid());
+        if (!bid.getName().equals(bidRename.getExpectedName())) {
+            throw badRequest("user name mismatch",
+                    ImmutableMap.of(
+                            "expected", bidRename.getExpectedName(),
+                            "was", bid.getName()));
+        }
+        bidDao.renameParticipant(bidRename.getUid(), bidRename.getNewName(), batch);
+        bid.setName(bidRename.getNewName());
     }
 }

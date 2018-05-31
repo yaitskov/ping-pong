@@ -227,4 +227,13 @@ public class BidDaoServer implements BidDao {
                                 .bidState(r.get(BID.STATE))
                                 .build()));
     }
+
+    @Override
+    public void renameParticipant(Uid uid, String newName, DbUpdater batch) {
+        batch.exec(DbUpdateSql.builder()
+                .query(jooq.update(USERS)
+                        .set(USERS.NAME, newName)
+                        .where(USERS.UID.eq(uid)))
+                .build());
+    }
 }

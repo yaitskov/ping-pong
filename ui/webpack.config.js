@@ -14,6 +14,13 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
     cache: true,
     entry: ['core-js', './src/cloud-sport.js'],
+    stats: {
+        children: false
+    },
+    node: {
+        fs: 'empty',
+        module: 'empty'
+    },
     output: {
         filename: `bundle.js`,
         path: path.resolve(__dirname, 'dist')

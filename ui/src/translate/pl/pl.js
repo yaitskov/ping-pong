@@ -17,7 +17,7 @@ module.exports = merge.apply(
      require('./sign-in-page.js'),
      require('./do-authentication-page.js'),
      require('./edit-account-page.js'),
-     require('./account.js'),
+     require('./pl.account.js'),
      require('./pl.rules.js'),
      require('./pl.match.js'),
      require('./pl.arena.js'),

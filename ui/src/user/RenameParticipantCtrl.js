@@ -2,7 +2,7 @@ import SimpleController from 'core/angular/SimpleController.js';
 
 export default class RenameParticipantCtrl extends SimpleController {
     static get $inject() {
-        return ['$routeParams', 'Participant', 'AjaxInfo'];
+        return ['$routeParams', 'Participant', 'AjaxInfo', 'mainMenu'];
     }
 
     rename() {
@@ -17,6 +17,7 @@ export default class RenameParticipantCtrl extends SimpleController {
     }
 
     $onInit() {
+        this.mainMenu.setTitle('Rename participant');
         this.AjaxInfo.doAjax(
             'Loading participant',
             this.Participant.state,

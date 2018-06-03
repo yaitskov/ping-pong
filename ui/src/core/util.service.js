@@ -176,6 +176,9 @@ angular.
                             } else {
                                 console.log("Reject obsolete translation: " + msg);
                             }
+                        }).catch((msg) => {
+                            console.error(`Failed translation of [${msg}]`);
+                            nextCallback(msg);
                         });
                     };
                     this.transTitleAndMenu = function (originTitle, originMenu, callback) {

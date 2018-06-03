@@ -1,6 +1,7 @@
 import angular from 'angular';
 import EventBarrierFactory from './angular/EventBarrierFactory.js';
 import eventBinder from './angular/eventBinder.js';
+import AjaxInfo from './angular/AjaxInfo.js';
 import MessageBus from './MessageBus.js';
 import ProtocolSwitcher from './ProtocolSwitcher.js';
 import VoiceInput from 'ui/widget/person-name-field/VoiceInput.js';
@@ -103,6 +104,7 @@ angular.
     service('VoiceInput', VoiceInput).
     service('MessageBus', MessageBus).
     service('eBarier', EventBarrierFactory).
+    service('AjaxInfo', AjaxInfo).
     factory('longDateTime', ['$filter', function ($filter) {
         return function (dt) {
             if (!dt) {

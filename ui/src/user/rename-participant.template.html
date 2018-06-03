@@ -1,0 +1,24 @@
+<main-menu></main-menu>
+<div class="container">
+    <form novalidate name="$ctrl.form" ng-submit="$ctrl.rename()">
+        <div class="form-group"
+             ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.firstName.$dirty) && $ctrl.form.firstName.$invalid}">
+            <label for="fullName">{{ 'Full name' | translate }}</label>
+            <person-name-field name="fullName" id="fullName"
+                               ng-maxlength="40" required
+                               ng-minlength="5" ng-model="$ctrl.fullName"/>
+            <p class="help-block"
+               ng-show="$ctrl.form.fullName.$error.required">
+                {{ 'FullName is required' | translate }}
+            </p>
+            <p class="help-block"
+               ng-show="$ctrl.form.fullName.$error.minlength || $ctrl.form.fullName.$error.maxlength">
+                {{ 'full-name-length-range' | translate : '{min: 5, max: 40}' }}
+            </p>
+        </div>
+        <div class="form-group">
+          <a back-button class="btn btn-default" translate="Back btn"/>
+          <button type="submit" class="btn btn-primary" translate="Update btn"/>
+        </div>
+    </form>
+</div>

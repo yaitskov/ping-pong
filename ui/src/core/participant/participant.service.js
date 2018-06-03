@@ -24,6 +24,13 @@ angular.
                                             session: 1
                                         }
                                     },
+                                    rename: {
+                                        url: '/api/bid/rename',
+                                        method: 'POST',
+                                        headers: {
+                                            session: 1
+                                        }
+                                    },
                                     changeGroup: {
                                         url: '/api/bid/change-group',
                                         method: 'POST',

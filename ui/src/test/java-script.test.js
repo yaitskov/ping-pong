@@ -97,7 +97,7 @@ describe('java script', () => {
             it('static class name method', () => {
                 expect(Base.className()).toBe('Base');
                 expect(Next.className()).toBe('Next');
-            })
+            });
 
             it('call overridden', () => {
                 expect(new Next().f()).toBe('BA');
@@ -115,7 +115,20 @@ describe('java script', () => {
                 function sum(a, b) { return a + b; }
                 const a = [1, 2];
                 expect(sum(...a)).toBe(3);
-            }) ;
+            });
+            it('call method by ref', () => {
+                class C {
+                    constructor() {
+                        this.a = 3;
+                    }
+                    methodF(n) {
+                        return this.a + n;
+                    }
+                }
+                const c = new C();
+                const methodPointer = c.methodF.bind(c);
+                expect(methodPointer(1)).toBe(4);
+            });
         });
         describe('constructor', () => {
             it('inherit', () => {

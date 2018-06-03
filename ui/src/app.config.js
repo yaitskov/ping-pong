@@ -74,6 +74,9 @@ angular.module('cloudSport').
                     when('/tournament/rules/:tournamentId', {
                         template: '<tournament-rules/>'
                     }).
+                    when('/participant/rename/:tournamentId/:participantId', {
+                        template: '<rename-participant/>'
+                    }).
                     when('/tournament/played-matches/:tournamentId', {
                         template: '<participant-played-matches/>'
                     }).

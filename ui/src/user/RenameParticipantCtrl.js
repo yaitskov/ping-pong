@@ -9,7 +9,7 @@ export default class RenameParticipantCtrl extends SimpleController {
         this.AjaxInfo.doAjax('saving',
                              this.Participant.rename,
                              {tid: this.$routeParams.tournamentId,
-                              bid: this.$routeParams.participantId,
+                              uid: this.$routeParams.participantId,
                               expectedName: this.expectedName,
                               newName: this.fullName
                              },

@@ -6,6 +6,10 @@ export default class RenameParticipantCtrl extends SimpleController {
     }
 
     rename() {
+        this.form.$setSubmitted();
+        if (!this.form.$valid) {
+            return;
+        }
         this.AjaxInfo.doAjax('saving',
                              this.Participant.rename,
                              {tid: this.$routeParams.tournamentId,

@@ -13,6 +13,10 @@ module.exports = {
     'your-photos': 'Strona domowa',
     'target fb page': 'Wybieź FB stronę dla publikacji',
 
+    'doing fb call...': 'doing fb call...',
+    'publishing image on fb': 'publishing image on fb...',
+    'authenticating on fb...': 'authenticating on fb...',
+    'listing fb pages...': 'listing fb pages...',
     'facebook-unknown-error': 'Facebook zwrócił nieprzewidywany błąd "{{message}}"',
     'facebook-token-expired':  'Facebook token wygasł',
     'screenshot posted': '<a class="text-decoration: underline;" target="_blank" href="{{url}}">Screenshot</a> został opulikowany',

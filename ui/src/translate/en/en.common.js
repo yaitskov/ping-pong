@@ -13,6 +13,10 @@ module.exports = {
     'your-photos': 'Your homepage',
     'target fb page': 'Choose a target FB page for posting',
 
+    'doing fb call...': 'doing fb call...',
+    'publishing image on fb': 'publishing image on fb...',
+    'authenticating on fb...': 'authenticating on fb...',
+    'listing fb pages...': 'listing fb pages...',
     'facebook-unknown-error': 'Facebook returned unexpected error "{{message}}"',
     'facebook-token-expired':  'Facebook token expired',
     'screenshot posted': '<a class="text-decoration: underline;" target="_blank" href="{{url}}">Screenshot</a> has been posted',

@@ -67,19 +67,25 @@ export default class Facebook extends AngularBean {
         }
     }
 
-    api(path, fbCallCtx = null) {
+    api(path, fbCallCtx) {
+        const doingMsg = this.InfoPopup.transInfo(fbCallCtx.name || 'doing fb call...');
+        const nextAttempt = fbCallCtx.retry();
         this.$window.FB.api(
             path,
-            (r) => this.handleError(
-                r,
-                () => this.api(path, fbCallCtx.retry()),
-                FbCallCtx.ofNullable(fbCallCtx)));
+            (r) => {
+                this.InfoPopup.removeMessage(doingMsg);
+                this.handleError(
+                    r,
+                    () => this.api(path, nextAttempt),
+                    fbCallCtx);
+            });
     }
 
     publishImage(targetId, blob, fbCallCtx) {
+        const nextAttempt = fbCallCtx.retry();
         this.ensureLogin(
             (ar) => this._publish(ar.accessToken, targetId, blob,
-                                  () => this.publishImage(targetId, blob, fbCallCtx.retry()),
+                                  () => this.publishImage(targetId, blob, nextAttempt),
                                   fbCallCtx));
     }
 
@@ -87,7 +93,7 @@ export default class Facebook extends AngularBean {
         const payload = new FormData();
         payload.append('access_token', accessToken);
         payload.append('source', blob);
-
+        const doingMsg = this.InfoPopup.transInfo('publishing image on fb...');
         this.$http({
             url: `https://graph.facebook.com/${targetPageId}/photos`,
             method: 'POST',
@@ -100,6 +106,7 @@ export default class Facebook extends AngularBean {
         }).
             then(
                 (r) => {
+                    this.InfoPopup.removeMessage(doingMsg);
                     this.handleError(r, retryCb,
                                      fbCallCtx.wrapOkCb((data, forwardCb) => {
                                          console.log(`image posted ${JSON.stringify(r)}`);
@@ -112,6 +119,7 @@ export default class Facebook extends AngularBean {
                                      }));
                 }).
             catch((e) => {
+                this.InfoPopup.removeMessage(doingMsg);
                 console.log(`Failed ${JSON.stringify(e)}`);
                 this.handleError(e.data || {error: {code: 777}},
                                  retryCb, fbCallCtx);
@@ -120,23 +128,27 @@ export default class Facebook extends AngularBean {
 
     login(cb, scope) {
         this.ProtocolSwitcher.ifHttps(
-            () => this.$window.FB.login(
-                (r) => {
-                    if (r.status == 'connected') {
-                        this.authErrScope.clearAll();
-                        cb(r);
-                    } else {
-                        console.log("login error response "
-                                    + JSON.stringify(r));
-                        this.authErrScope.transError(
-                            'CS not get access to your fb account', r.error);
-                    }
-                },
-                {scope: scope || this.defaultFbScope}));
+            () => {
+                const doingMsg = this.InfoPopup.transInfo('authenticating on fb...');
+                this.$window.FB.login(
+                    (r) => {
+                        this.InfoPopup.removeMessage(doingMsg);
+                        if (r.status == 'connected') {
+                            this.authErrScope.clearAll();
+                            cb(r);
+                        } else {
+                            console.log("login error response "
+                                        + JSON.stringify(r));
+                            this.authErrScope.transError(
+                                'CS not get access to your fb account', r.error);
+                        }
+                    },
+                    {scope: scope || this.defaultFbScope});
+            });
     }
 
     listPages(fbCallCtx) {
-        this.ensureLogin((ar) => this._listPages(ar.userID, fbCallCtx));
+        this.ensureLogin((ar) => this._listPages(ar.userID, fbCallCtx.named('listing fb pages...')));
     }
 
     _listPages(userId, fbCallCtx) {

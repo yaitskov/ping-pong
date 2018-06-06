@@ -7,6 +7,11 @@ export default class FbCallCtx {
         this.name = 'Remote call';
     }
 
+    named(name) {
+        this.name = name;
+        return this;
+    }
+
     static ofOk(okCb) {
         return new FbCallCtx(okCb);
     }
@@ -15,11 +20,11 @@ export default class FbCallCtx {
         return fbCallCtx ? fbCallCtx : new FbCallCtx();
     }
 
-    chainOkCb(nextOkCb) {
+    preChainOkCb(preOkCb) {
         const originCb = this.okCb;
         this.okCb = (data) => {
+            preOkCb(data);
             originCb(data);
-            nextOkCb(data);
         };
         return this;
     }
@@ -33,8 +38,9 @@ export default class FbCallCtx {
     }
 
     retry() {
-        this.recoverableRetries -= 1;
-        return this;
+        const copy = {...this};
+        copy.recoverableRetries -= 1;
+        return copy;
     }
 
     isExhausted() {

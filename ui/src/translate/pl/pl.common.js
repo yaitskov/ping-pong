@@ -15,7 +15,7 @@ module.exports = {
 
     'facebook-unknown-error': 'Facebook zwrócił nieprzewidywany błąd "{{message}}"',
     'facebook-token-expired':  'Facebook token wygasł',
-    'screenshot posted': '<a class="text-decoration: underline;" href="{{url}}">Screenshot</a> został opulikowany',
+    'screenshot posted': '<a class="text-decoration: underline;" target="_blank" href="{{url}}">Screenshot</a> został opulikowany',
     'facebook-authentication-required': 'Facebook potrzebuje żeby był zalowany',
     'Facebook did not give user Id': 'Facebook nie podał ID użytkownika',
 

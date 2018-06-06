@@ -38,14 +38,9 @@ export default class ScreenSharerDialog extends SimpleDialog {
             return;
         }
         this.Facebook.listPages((pageList) => {
-            const fbPageId = this.pageCtx.get('last-facebook-page-to-publish');
+            this.fbTargetPageId = this.pageCtx.get('last-facebook-page-to-publish') || 'me';
             this.sink = 'facebook';
             this.facebookPages = pageList;
-            if (pageList.findIndex((pl) => pl.id == fbPageId) >= 0) {
-                this.fbTagetPageId = fbPageId;
-            } else {
-                this.fbTagetPageId = null;
-            }
             this.$timeout(() => this.$scope.$digest());
         });
     }

@@ -25,8 +25,12 @@
         <div class="form-group" ng-show="$ctrl.sink == 'facebook'">
           <label translate="target fb page"/>
           <select class="form-control" ng-model="$ctrl.fbTargetPageId">
-            <option value="me" translate="your-photos"/>
-            <option ng-repeat="page in $ctrl.facebookPages | orderBy : 'name'" value="{{page.id}}">
+            <option value="me"
+                    translate="your-photos"
+                    ng-selected="$ctrl.fbTargetPageId == 'me'"/>
+            <option ng-repeat="page in $ctrl.facebookPages | orderBy : 'name'"
+                    ng-selected="$ctrl.fbTargetPageId == page.id"
+                    value="{{page.id}}">
               {{page.name}}
             </option>
           </select>

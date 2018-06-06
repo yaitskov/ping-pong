@@ -51,8 +51,11 @@ export default class Facebook extends AngularBean {
                     this.InfoPopup.verbError('Facebook did not give user Id');
                 }
             } else {
-                this.InfoPopup.transInfo('facebook-authentication-required');
-                this.login((ar) => cb(ar.authResponse));
+                const authRequiredMsg = this.InfoPopup.transInfo('facebook-authentication-required');
+                this.login((ar) => {
+                    this.InfoPopup.removeMessage(authRequiredMsg);
+                    cb(ar.authResponse);
+                });
             }
         });
     }

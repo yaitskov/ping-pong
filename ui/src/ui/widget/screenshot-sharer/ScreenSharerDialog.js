@@ -69,7 +69,7 @@ export default class ScreenSharerDialog extends SimpleDialog {
                 (rok) => {
                     console.log(`image posted ${JSON.stringify(rok)}`);
                     this.pageCtx.put('last-facebook-page-to-publish', this.fbTargetPageId);
-                    this.InfoPopup.transInfo('screenshort posted');
+                    this.InfoPopup.transInfo('screenshot posted');
                 }).
             catch((e) => {
                 console.log(`failed ${JSON.stringify(e)}`);

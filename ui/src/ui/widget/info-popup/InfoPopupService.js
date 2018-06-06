@@ -35,4 +35,8 @@ export default class InfoPopupService extends AngularBean {
     createScope() {
         return new ScopedInfoPopup(this);
     }
+
+    removeMessage(msg) {
+        this.MessageBus.broadcast(InfoPopupWidget.TopicInvalidate, msg.id);
+    }
 }

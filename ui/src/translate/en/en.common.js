@@ -14,6 +14,11 @@ module.exports = {
     'target fb page': 'Choose a target FB page for posting',
 
     'facebook-unknown-error': 'Facebook returned unexpected error "{{message}}"',
+    'facebook-token-expired':  'Facebook token expired',
+    'screenshot posted': 'Screenshot has been posted',
+    'facebook-authentication-required': 'Facebook requires authentication to continue',
+    'Facebook did not give user Id': 'Facebook did not give user ID',
+
     'not enough permission': 'Facebook requires a consent from You to execute the operation ({{perm}})',
     'permission-still-missing': 'Facebook permission "{{perm}}" still has not been granted to Cloud-Sport',
 

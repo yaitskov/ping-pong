@@ -14,6 +14,11 @@ module.exports = {
     'target fb page': 'Wybieź FB stronę dla publikacji',
 
     'facebook-unknown-error': 'Facebook zwrócił nieprzewidywany błąd "{{message}}"',
+    'facebook-token-expired':  'Facebook token wygasł',
+    'screenshot posted': 'Screenshot został opulikowany',
+    'facebook-authentication-required': 'Facebook potrzebuje żeby był zalowany',
+    'Facebook did not give user Id': 'Facebook nie podał ID użytkownika',
+
     'not enough permission': 'Dla wykonania operacji Facebook wymaga zgody od Ciebię ({{perm}})',
     'permission-still-missing': 'Facebook permisja "{{perm}}" nadał nie wydana Cloud-Sportowi',
 

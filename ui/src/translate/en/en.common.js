@@ -15,7 +15,7 @@ module.exports = {
 
     'facebook-unknown-error': 'Facebook returned unexpected error "{{message}}"',
     'facebook-token-expired':  'Facebook token expired',
-    'screenshot posted': 'Screenshot has been posted',
+    'screenshot posted': '<a class="text-decoration: underline;" href="{{url}}">Screenshot</a> has been posted',
     'facebook-authentication-required': 'Facebook requires authentication to continue',
     'Facebook did not give user Id': 'Facebook did not give user ID',
 

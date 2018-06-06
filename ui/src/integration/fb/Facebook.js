@@ -52,7 +52,7 @@ export default class Facebook extends AngularBean {
                 }
             } else {
                 this.InfoPopup.transInfo('facebook-authentication-required');
-                this.login((ar) => cb(ar.authResponse.userID));
+                this.login((ar) => cb(ar.authResponse));
             }
         });
     }

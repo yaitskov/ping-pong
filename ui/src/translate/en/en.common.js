@@ -13,6 +13,10 @@ module.exports = {
     'your-photos': 'Your homepage',
     'target fb page': 'Choose a target FB page for posting',
 
+    'fb-comment-max-length': 'Comment must be shorter than {{max}}',
+    'fb-comment-min-length': 'Comment must be longer than {{min}}',
+    'fb-comment-lbl': 'Comment',
+    'fb-comment-required': 'Comment is required',
     'resolving photo FB url...': 'Resolving photo FB URL ...',
     'doing fb call...': 'doing fb call ...',
     'publishing image on fb...': 'publishing image on FB ...',

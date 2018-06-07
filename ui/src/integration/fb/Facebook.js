@@ -81,18 +81,21 @@ export default class Facebook extends AngularBean {
             });
     }
 
-    publishImage(targetId, blob, fbCallCtx) {
+    publishImage(targetId, blob, caption, fbCallCtx) {
         const nextAttempt = fbCallCtx.retry();
         this.ensureLogin(
             (ar) => this._publish(ar.accessToken, targetId, blob,
-                                  () => this.publishImage(targetId, blob, nextAttempt),
-                                  fbCallCtx));
+                                  () => this.publishImage(targetId, blob, caption, nextAttempt),
+                                  fbCallCtx, caption));
     }
 
-    _publish(accessToken, targetPageId, blob, retryCb, fbCallCtx) {
+    _publish(accessToken, targetPageId, blob, retryCb, fbCallCtx, caption) {
         const payload = new FormData();
         payload.append('access_token', accessToken);
         payload.append('source', blob);
+        if (caption) {
+            payload.append('caption', caption);
+        }
         const doingMsg = this.InfoPopup.transInfo('publishing image on fb...');
         this.$http({
             url: `https://graph.facebook.com/${targetPageId}/photos`,

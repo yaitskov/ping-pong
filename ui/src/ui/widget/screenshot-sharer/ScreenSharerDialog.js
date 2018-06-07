@@ -46,13 +46,20 @@ export default class ScreenSharerDialog extends SimpleDialog {
     }
 
     publish() {
+        if (!this.form.$valid) {
+            this.form.$setSubmitted();
+            return;
+        }
         const blob = this.dataURItoBlob(this.screenshotData, 'image/png');
         this.Facebook.publishImage(
             this.fbTargetPageId,
             blob,
+            this.fbComment,
             FbCallCtx.ofOk((data) => {
                  this.pageCtx.put('last-facebook-page-to-publish',
                                   this.fbTargetPageId);
+                 this.fbComment = null;
+                 this.form.$setPristine(true);
                  this.hideDialog();
             }));
     }

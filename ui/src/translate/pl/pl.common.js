@@ -13,8 +13,12 @@ module.exports = {
     'your-photos': 'Strona domowa',
     'target fb page': 'Wybieź FB stronę dla publikacji',
 
+    'fb-comment-max-length': 'Komentarz musi być krócej niż {{max}}',
+    'fb-comment-min-length': 'Komentarz musi być dłużej niż {{min}}',
+    'fb-comment-lbl': 'Komentarz',
+    'fb-comment-required': 'Komentarz jest wymagany',
     'resolving photo FB url...': 'Sciąganie odnośnika do zdjęcia na Fejsie ...',
-    'doing fb call...': 'Kommunikacja z Fejsem ...',
+    'doing fb call...': 'Komunikacja z Fejsem ...',
     'publishing image on fb...': 'Publikacja na Fejsie ...',
     'authenticating on fb...': 'Autentykacja na Fejsie ...',
     'listing fb pages...': 'Sciąganie dostępny stron na Fejsie ...',

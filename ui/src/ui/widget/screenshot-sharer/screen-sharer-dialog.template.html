@@ -6,45 +6,71 @@
         <h4 class="modal-title" translate="Downloading lbl"/>
       </div>
       <div class="modal-body">
-        <div class="form-group">
-          <div class="btn-group">
-            <a ng-click="$ctrl.useSink('file')"
-               class="btn btn-default"
-               ng-class="{'btn-primary': $ctrl.sink == 'file'}"
-               title="save to local file">
-              <span class="glyphicon glyphicon-floppy-save"/>
-            </a>
-            <a ng-click="$ctrl.useFbSink()"
-               class="btn btn-default fa-facebook"
-               ng-class="{'btn-success': $ctrl.sink == 'facebook'}"
-               title="publish on facebook">
-              f
-            </a>
+        <form novalidate name="$ctrl.form">
+          <div class="form-group">
+            <div class="btn-group">
+              <a ng-click="$ctrl.useSink('file')"
+                 class="btn btn-default"
+                 ng-class="{'btn-primary': $ctrl.sink == 'file'}"
+                 title="save to local file">
+                <span class="glyphicon glyphicon-floppy-save"/>
+              </a>
+              <a ng-click="$ctrl.useFbSink()"
+                 class="btn btn-default fa-facebook"
+                 ng-class="{'btn-success': $ctrl.sink == 'facebook'}"
+                 title="publish on facebook">
+                f
+              </a>
+            </div>
           </div>
-        </div>
-        <div class="form-group" ng-show="$ctrl.sink == 'facebook'">
-          <label translate="target fb page"/>
-          <select class="form-control" ng-model="$ctrl.fbTargetPageId">
-            <option value="me"
-                    translate="your-photos"
-                    ng-selected="$ctrl.fbTargetPageId == 'me'"/>
-            <option ng-repeat="page in $ctrl.facebookPages | orderBy : 'name'"
-                    ng-selected="$ctrl.fbTargetPageId == page.id"
-                    value="{{page.id}}">
-              {{page.name}}
-            </option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label translate="preview lbl"/>
-          <br/>
-          <img src="{{$ctrl.screenshotData}}"
-               alt="preview" class="img-responsive"/>
-        </div>
+          <div class="form-group" ng-show="$ctrl.sink == 'facebook'">
+            <label translate="target fb page"/>
+            <select class="form-control" ng-model="$ctrl.fbTargetPageId">
+              <option value="me"
+                      translate="your-photos"
+                      ng-selected="$ctrl.fbTargetPageId == 'me'"/>
+              <option ng-repeat="page in $ctrl.facebookPages | orderBy : 'name'"
+                      ng-selected="$ctrl.fbTargetPageId == page.id"
+                      value="{{page.id}}">
+                {{page.name}}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label translate="preview lbl"/>
+            <br/>
+            <img src="{{$ctrl.screenshotData}}"
+                 alt="preview" class="img-responsive"/>
+          </div>
+          <div class="form-group"
+               ng-class="{'has-error': $ctrl.form.fbComment.$invalid}"
+               ng-show="$ctrl.sink == 'facebook'">
+            <label translate="fb-comment-lbl"/>
+            <input type="text" class="form-control"
+                   ng-required="$ctrl.sink == 'facebook'"
+                   ng-model="$ctrl.fbComment"
+                   ng-maxlength="100"
+                   ng-minlength="10"
+                   name="fbComment"
+                   id="fbComment"
+                   placeholder="{{ 'fb-comment-required' | translate }}"/>
+            <p class="help-block"
+               translate="fb-comment-required"
+               ng-show="$ctrl.form.fbComment.$error.required"/>
+            <p class="help-block"
+               ng-show="$ctrl.form.fbComment.$error.maxlength">
+              {{ 'fb-comment-max-length' | translate : '{max: 100}' }}
+            </p>
+            <p class="help-block"
+               ng-show="$ctrl.form.fbComment.$error.minlength">
+              {{ 'fb-comment-min-length' | translate : '{min: 10}' }}
+            </p>
+          </div>
+        </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger"
-                ng-click="$ctrl.hideDialog()" translate="Cancel btn"/>
+        <a class="btn btn-danger"
+           ng-click="$ctrl.hideDialog()" translate="Cancel btn"/>
         <a class="btn btn-primary"
            ng-show="$ctrl.screenshotData && $ctrl.sink == 'file'"
            href="{{$ctrl.screenshotData}}"

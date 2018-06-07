@@ -35,4 +35,7 @@ import './place/place.import.js';
 import './tournament/tournament.import.js';
 import './integration/integration.import.js';
 
+// for in browser debugging (ajaxes etc.)
+window['$'] = window['jQuery'] = require('jquery');
+
 require('offline-plugin/runtime').install();

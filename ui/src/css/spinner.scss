@@ -9,6 +9,11 @@ example
     -webkit-animation: spin2 20s infinite linear;
 }
 
+.glyphicon.spinning-fast {
+    animation: spin 3s infinite linear;
+    -webkit-animation: spin2 3s infinite linear;
+}
+
 @keyframes spin {
     from { transform: scale(1) rotate(0deg); }
     to { transform: scale(1) rotate(360deg); }

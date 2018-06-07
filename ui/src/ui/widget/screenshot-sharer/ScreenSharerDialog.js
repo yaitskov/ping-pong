@@ -54,11 +54,11 @@ export default class ScreenSharerDialog extends SimpleDialog {
         this.Facebook.publishImage(
             this.fbTargetPageId,
             blob,
-            this.fbComment,
+            this.caption,
             FbCallCtx.ofOk((data) => {
                  this.pageCtx.put('last-facebook-page-to-publish',
                                   this.fbTargetPageId);
-                 this.fbComment = null;
+                 this.caption = null;
                  this.form.$setPristine(true);
                  this.hideDialog();
             }));

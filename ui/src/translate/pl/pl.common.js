@@ -13,6 +13,7 @@ module.exports = {
     'your-photos': 'Strona domowa',
     'target fb page': 'Wybieź FB stronę dla publikacji',
 
+    'resolving photo FB url...': 'Resolving photo FB url...',
     'doing fb call...': 'doing fb call <span class="glyphicon glyphicon-refresh spinning-fast"/>',
     'publishing image on fb...': 'publishing image on fb <span class="glyphicon glyphicon-refresh spinning-fast"/>',
     'authenticating on fb...': 'authenticating on fb <span class="glyphicon glyphicon-refresh spinning-fast"/>',

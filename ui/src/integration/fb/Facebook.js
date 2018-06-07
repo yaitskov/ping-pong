@@ -63,7 +63,7 @@ export default class Facebook extends AngularBean {
                 this.unknownError(r.error);
             }
         } else {
-            fbCallCtx.okCb(r.data);
+            fbCallCtx.okCb(r.data || r);
         }
     }
 
@@ -111,10 +111,12 @@ export default class Facebook extends AngularBean {
                                      fbCallCtx.wrapOkCb((data, forwardCb) => {
                                          console.log(`image posted ${JSON.stringify(r)}`);
                                          this.authErrScope.clearAll();
-                                         const ids = data.post_id.split('_');
-                                         this.InfoPopup.transInfo(
-                                             'screenshot posted',
-                                             {url: `https://facebook.com/${ids[0]}/photos/${ids[1]}`});
+                                         this.getLink(data.post_id,
+                                                      FbCallCtx.ofOk((link) => {
+                                                          this.InfoPopup.transInfo(
+                                                              'screenshot posted',
+                                                              {url: link.link});
+                                                      }));
                                          forwardCb(data);
                                      }));
                 }).
@@ -182,6 +184,11 @@ export default class Facebook extends AngularBean {
                 console.log("login status " + JSON.stringify(r));
                 cb(r);
             });
+    }
+
+    getLink(postId, fbCallCtx) {
+        this.api(`/${postId}/?fields=link`,
+                 fbCallCtx.named('resolving photo FB url...'));
     }
 
     checkPermissions(userId, cb) {

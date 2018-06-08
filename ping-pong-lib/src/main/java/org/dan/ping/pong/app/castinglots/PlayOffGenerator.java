@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.castinglots;
 
 import static com.google.common.primitives.Ints.asList;
 import static org.dan.ping.pong.app.group.GroupSchedule.oneBased;
+import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchType.Brnz;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
 import static org.dan.ping.pong.app.match.MatchType.POff;
@@ -98,7 +99,8 @@ public class PlayOffGenerator {
     private Optional<Mid> createMatch(Optional<Mid> winMid, Optional<Mid> loserMid,
             int priority, int level, MatchType type) {
         final Mid mid = matchDao.createPlayOffMatch(
-                tournament.getTid(), cid, winMid, loserMid, priority, level, type, tag);
+                tournament.getTid(), cid, winMid, loserMid,
+                priority, level, type, tag, Draft);
         final Optional<Mid> omid = Optional.of(mid);
         tournament.getMatches().put(mid, MatchInfo.builder()
                 .tid(tournament.getTid())

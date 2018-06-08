@@ -83,18 +83,7 @@ public class TournamentResource {
     public Tid create(
             @HeaderParam(SESSION) String session,
             CreateTournament newTournament) {
-        if (newTournament.getRules() == null) {
-            throw badRequest("No rules");
-        }
-        if (newTournament.getSport() != newTournament.getRules().getMatch().sport()) {
-            throw badRequest("sport type mismatch");
-        }
-        if (newTournament.getType() != TournamentType.Classic) {
-            throw badRequest("Tournament type is not Classic but " + newTournament.getType());
-        }
-        if (newTournament.getState() != TournamentState.Hidden) {
-            throw badRequest("Tournament state is not Hidden");
-        }
+        newTournament.validateNew();
         rulesValidator.validate(newTournament.getRules());
         return tournamentService.create(
                 authService.userInfoBySession(session).getUid(),

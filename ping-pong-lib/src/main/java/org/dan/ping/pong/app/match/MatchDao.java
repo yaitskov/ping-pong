@@ -13,12 +13,14 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface MatchDao {
+    Mid createMatch(MatchInfo matchInfo);
+
     Mid createGroupMatch(Tid tid, int gid, int cid, int priorityGroup,
-            Uid uid1, Uid uid2, Optional<MatchTag> tag);
+            Uid uid1, Uid uid2, Optional<MatchTag> tag, MatchState place);
 
     Mid createPlayOffMatch(Tid tid, Integer cid,
             Optional<Mid> winMid, Optional<Mid> loseMid,
-            int priority, int level, MatchType type, Optional<MatchTag> tag);
+            int priority, int level, MatchType type, Optional<MatchTag> tag, MatchState draft);
 
     void changeStatus(Mid mid, MatchState state, DbUpdater batch);
 

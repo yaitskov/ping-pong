@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.match;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.jooq.Tables.BID;
 import static org.dan.ping.pong.jooq.Tables.SET_SCORE;
 import static org.dan.ping.pong.jooq.Tables.TOURNAMENT;
@@ -11,7 +12,6 @@ import static org.dan.ping.pong.jooq.tables.Matches.MATCHES;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
-import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
@@ -52,15 +52,55 @@ public class MatchDaoServer implements MatchDao {
     @Inject
     private DSLContext jooq;
 
+    public Mid createMatch(MatchInfo matchInfo) {
+        final List<Uid> participantUids = matchInfo
+                .participants().collect(toList());
+        return jooq.insertInto(
+                MATCHES,
+                MATCHES.TID,
+                MATCHES.GID,
+                MATCHES.CID,
+                MATCHES.STATE,
+                MATCHES.PRIORITY,
+                MATCHES.LEVEL,
+                MATCHES.TYPE,
+                MATCHES.UID_LESS,
+                MATCHES.UID_MORE,
+                MATCHES.TAG,
+                MATCHES.WIN_MID,
+                MATCHES.LOSE_MID,
+                MATCHES.UID_WIN,
+                MATCHES.STARTED,
+                MATCHES.ENDED)
+                .values(matchInfo.getTid(),
+                        matchInfo.getGid(),
+                        matchInfo.getCid(),
+                        matchInfo.getState(),
+                        matchInfo.getPriority(),
+                        matchInfo.getLevel(),
+                        matchInfo.getType(),
+                        participantUids.size() > 0 ? participantUids.get(0) : null,
+                        participantUids.size() > 1 ? participantUids.get(1) : null,
+                        matchInfo.getTag().orElse(null),
+                        matchInfo.getWinnerMid(),
+                        matchInfo.getLoserMid(),
+                        matchInfo.getWinnerId().orElse(null),
+                        matchInfo.getStartedAt(),
+                        matchInfo.getEndedAt())
+                .returning()
+                .fetchOne()
+                .getMid();
+    }
+
     @Override
     public Mid createGroupMatch(Tid tid, int gid, int cid, int priorityGroup,
-            Uid uid1, Uid uid2, Optional<MatchTag> tag) {
+            Uid uid1, Uid uid2, Optional<MatchTag> tag, MatchState place) {
         log.info("Create a match in group {} of tournament {}", gid, tid);
         return jooq.insertInto(MATCHES, MATCHES.TID,
                 MATCHES.GID, MATCHES.CID,
                 MATCHES.STATE, MATCHES.PRIORITY, MATCHES.TYPE,
                 MATCHES.UID_LESS, MATCHES.UID_MORE, MATCHES.TAG)
-                .values(tid, Optional.of(gid), cid, Place, priorityGroup,
+                .values(tid, Optional.of(gid), cid, place, priorityGroup,
                         Grup, uid1, uid2, tag.orElse(null))
                 .returning()
                 .fetchOne()
@@ -71,11 +111,12 @@ public class MatchDaoServer implements MatchDao {
     @Transactional(TRANSACTION_MANAGER)
     public Mid createPlayOffMatch(Tid tid, Integer cid,
             Optional<Mid> winMid, Optional<Mid> loseMid,
-            int priority, int level, MatchType type, Optional<MatchTag> tag) {
+            int priority, int level, MatchType type,
+            Optional<MatchTag> tag, MatchState draft) {
         return jooq.insertInto(MATCHES, MATCHES.TID, MATCHES.CID,
                 MATCHES.PRIORITY, MATCHES.STATE,
                 MATCHES.WIN_MID, MATCHES.LOSE_MID, MATCHES.LEVEL, MATCHES.TYPE, MATCHES.TAG)
-                .values(tid, cid, priority, Draft, winMid, loseMid, level, type, tag.orElse(null))
+                .values(tid, cid, priority, draft, winMid, loseMid, level, type, tag.orElse(null))
                 .returning()
                 .fetchOne()
                 .getMid();

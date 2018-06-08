@@ -22,6 +22,7 @@ import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.dispute.MatchSets;
 import org.dan.ping.pong.app.playoff.RootTaggedMatch;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.marshaling.StrictUniMap;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -167,6 +169,18 @@ public class MatchInfo {
 
     public int groupId() {
         return gid.orElseThrow(() -> internalError("Match is not in a group", MID, mid));
+    }
+
+    public void getParticipantUids(StrictUniMap<Uid> users) {
+        final List<Uid> oldUids = participantIdScore.keySet()
+                .stream().collect(Collectors.toList());
+
+        oldUids.forEach(uid -> {
+            if (FILLER_LOSER_UID.equals(uid)) {
+                return;
+            }
+            participantIdScore.put(users.apply(uid), participantIdScore.remove(uid));
+        });
     }
 
     public static class MatchInfoBuilder {

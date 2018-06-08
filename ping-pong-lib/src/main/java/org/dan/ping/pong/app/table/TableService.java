@@ -143,7 +143,7 @@ public class TableService {
             final MatchInfo match = matches.get(i);
             tableDao.locateMatch(freeTables.get(i), match.getMid(), batch);
             markAsSchedule(match, now, batch);
-            bidDao.markParticipantsBusy(tournament, match.getUids(), now, batch);
+            bidDao.markParticipantsBusy(tournament, match.uids(), now, batch);
         }
         if (freeTables.isEmpty()
                 && !matches.isEmpty()

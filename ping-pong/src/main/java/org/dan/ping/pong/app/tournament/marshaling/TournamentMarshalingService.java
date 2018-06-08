@@ -1,5 +1,8 @@
 package org.dan.ping.pong.app.tournament.marshaling;
 
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.db.DbStrictUpdater.DB_STRICT_UPDATER;
@@ -34,7 +37,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -104,12 +106,11 @@ public class TournamentMarshalingService {
 
     private Map<Boolean, List<MatchInfo>> resolvableMatches(
             Stream<MatchInfo> s, Predicate<Mid> resolvableP) {
-        return s.collect(Collectors.groupingBy(
+        return s.collect(groupingBy(
                 mi -> Stream.of((Supplier<Optional<Mid>>) mi::getWinnerMid, mi::getLoserMid)
-                        .anyMatch(me -> me.get()
-                                .filter(resolvableP)
-                                .map(o -> true)
-                                .orElse(false))));
+                        .allMatch(me -> me.get()
+                                .map(resolvableP::test)
+                                .orElse(true))));
     }
 
     @Inject
@@ -124,11 +125,12 @@ public class TournamentMarshalingService {
         final StrictUniMap<Mid> matches = StrictUniMap.of("matches", matchIds);
         Stream<MatchInfo> matchStream = expTournament.getMatches().values().stream();
         for (;;) {
-            final Map<Boolean, List<MatchInfo>> resolvableMatches = resolvableMatches(
+            final Map<Boolean, List<MatchInfo>> resGroupsOfMatches = resolvableMatches(
                     matchStream, matchIds::containsKey);
-
+            final List<MatchInfo> resMatches = ofNullable(resGroupsOfMatches.get(true))
+                    .orElse(emptyList());
             matchIds.putAll(
-                    resolvableMatches.get(true)
+                    resMatches
                             .stream()
                             .peek(mi -> {
                                 mi.setTid(expTournament.getTid());
@@ -140,15 +142,17 @@ public class TournamentMarshalingService {
                                 mi.getParticipantUids(users);
                             })
                             .collect(toMap(MatchInfo::getMid, matchDao::createMatch)));
+            final List<MatchInfo> nonResMatches = ofNullable(resGroupsOfMatches.get(false))
+                    .orElse(emptyList());
             log.info("Left matches {} / {}",
-                    matchIds.size(), resolvableMatches.get(false).size());
-            if (resolvableMatches.get(false).isEmpty()) {
+                    matchIds.size(), nonResMatches.size());
+            if (nonResMatches.isEmpty()) {
                 break;
             }
-            if (resolvableMatches.get(true).isEmpty()) {
+            if (resMatches.isEmpty()) {
                 throw internalError("Import of matches loops");
             }
-            matchStream = resolvableMatches.get(false).stream();
+            matchStream = nonResMatches.stream();
         }
     }
 

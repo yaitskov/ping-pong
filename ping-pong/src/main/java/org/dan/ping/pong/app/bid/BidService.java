@@ -92,14 +92,14 @@ public class BidService {
 
     public void setBidState(ParticipantMemState bid, BidState target,
             Collection<BidState> expected, DbUpdater batch) {
-        if (FILLER_LOSER_UID.equals(bid.getUid()) || bid.getState() == target) {
+        if (FILLER_LOSER_UID.equals(bid.getUid()) || bid.state() == target) {
             return;
         }
         log.info("Set bid {} state {}", bid.getUid(), target);
-        if (!expected.contains(bid.getState())) {
+        if (!expected.contains(bid.state())) {
             throw internalError(
                     "Bid " + bid.getUid() + " state "
-                            + bid.getState() + " but expected " + expected);
+                            + bid.state() + " but expected " + expected);
         }
         bid.setBidState(target);
         bidDao.setBidState(bid.getTid(), bid.getUid(),
@@ -122,7 +122,7 @@ public class BidService {
     public Stream<UserLink> findByStateNonRecursive(TournamentMemState tournament,
             List<BidState> states) {
         return tournament.getParticipants().values().stream()
-                .filter(p -> states.contains(p.getState()))
+                .filter(p -> states.contains(p.state()))
                 .filter(p -> tournament.participantMatches(p.getUid())
                         .anyMatch(m -> INCOMPLETE_MATCH_STATES.contains(m.getState())))
                 .map(ParticipantMemState::toLink);
@@ -132,7 +132,7 @@ public class BidService {
         return tournament.getParticipants().values().stream()
                 .filter(p -> tournament.participantMatches(p.getUid())
                         .anyMatch(m -> m.getState() == Over
-                                || m.getPlayedSets() > 0))
+                                || m.playedSets() > 0))
                 .map(ParticipantMemState::toLink)
                 .sorted(Comparator.comparing(UserLink::getName))
                 .collect(toList());

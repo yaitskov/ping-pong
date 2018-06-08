@@ -181,7 +181,7 @@ public class CastingLotsService {
         }
         log.info("Autocomplete category {} in tid {} due it has 1 participant",
                 cid, tournament.getTid());
-        bidService.setBidState(bids.get(0), Win1, singleton(bids.get(0).getState()), batch);
+        bidService.setBidState(bids.get(0), Win1, singleton(bids.get(0).state()), batch);
         return true;
     }
 
@@ -234,7 +234,7 @@ public class CastingLotsService {
 
     public void checkAllThatAllHere(List<ParticipantMemState> readyBids) {
         final List<UserLink> notHere = readyBids.stream()
-                .filter(bid -> WANT_PAID.contains(bid.getState()))
+                .filter(bid -> WANT_PAID.contains(bid.state()))
                 .map(ParticipantMemState::toLink)
                 .collect(toList());
         if (notHere.isEmpty()) {
@@ -268,7 +268,7 @@ public class CastingLotsService {
                 .sorted(Comparator.comparingInt(p -> p.getUid().getId()))
                 .forEach(
                         p -> {
-                            final boolean isDeadParticipant = QUIT_EXPELLED.contains(p.getState());
+                            final boolean isDeadParticipant = QUIT_EXPELLED.contains(p.state());
                             priority[0] = castingLotsDao.addGroupMatch(
                                     tournament, priority[0], participant, p,
                                     isDeadParticipant

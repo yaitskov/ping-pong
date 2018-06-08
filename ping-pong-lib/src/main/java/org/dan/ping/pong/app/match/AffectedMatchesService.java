@@ -229,7 +229,7 @@ public class AffectedMatchesService {
         final Set<MatchParticipants> uidsOfPresentDmMatches = uidsOfMatches(presentDmMatches);
         final Set<Mid> midsToBeRemoved = presentDmMatches.stream()
                 .filter(m2 -> newDmMatchesToGenerate.stream()
-                        .noneMatch(dm -> dm.hasAll(m2.getUids())))
+                        .noneMatch(dm -> dm.hasAll(m2.uids())))
                 .map(MatchInfo::getMid)
                 .collect(toSet());
         final SetView<MatchParticipants> toBeCreated = difference(
@@ -243,7 +243,7 @@ public class AffectedMatchesService {
                                 concat(newOriginMatches.stream(),
                                         presentDmMatches.stream()
                                         .filter(m2 -> newDmMatchesToGenerate
-                                                .containsAll(m2.getUids()))),
+                                                .containsAll(m2.uids()))),
                                 newDmMatchesToGenerate.stream()
                                         .filter(m2 -> !presentDmMatches.contains(m2))
                                         .map(MatchParticipants::toFakeMatch))

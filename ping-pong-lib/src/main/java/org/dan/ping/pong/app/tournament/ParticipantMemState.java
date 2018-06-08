@@ -4,7 +4,9 @@ import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.tournament.TournamentMemState.TID;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableMap;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +24,7 @@ import java.util.Optional;
 @Setter
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ParticipantMemState implements UserLinkIf {
     public static final Uid FILLER_LOSER_UID = new Uid(1);
     public static final String UID = "UID";
@@ -50,7 +52,7 @@ public class ParticipantMemState implements UserLinkIf {
         return "bid(" + uid + ", " + tid + ", " + cid + ")";
     }
 
-    public BidState getState() {
+    public BidState state() {
         return bidState;
     }
 

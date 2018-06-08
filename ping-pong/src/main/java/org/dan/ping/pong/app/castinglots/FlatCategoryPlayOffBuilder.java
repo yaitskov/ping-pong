@@ -55,7 +55,7 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
         }
         log.info("Autocomplete category {} with tag {} in tid {} due it has 1 participant",
                 cid, tag, tournament.getTid());
-        bidService.setBidState(bids.get(0), Win1, singleton(bids.get(0).getState()), batch);
+        bidService.setBidState(bids.get(0), Win1, singleton(bids.get(0).state()), batch);
         return true;
     }
 

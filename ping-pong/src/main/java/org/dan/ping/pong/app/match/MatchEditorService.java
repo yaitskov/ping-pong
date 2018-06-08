@@ -158,7 +158,7 @@ public class MatchEditorService {
         mInfo.participants()
                 .map(tournament::getBidOrQuit)
                 .forEach(bid -> {
-                    if (bid.getState() != Play) {
+                    if (bid.state() != Play) {
                         resetBidStateTo(batch, bid, Play);
                     }
                 });
@@ -191,7 +191,7 @@ public class MatchEditorService {
         if (!openOrClose.contains(tournament.getState())) {
             throw badRequest("tournament is not open nor closed");
         }
-        if (mInfo.getPlayedSets() == 0) {
+        if (mInfo.playedSets() == 0) {
             throw badRequest("match should have a scored set");
         }
         newSets.validateParticipants(mInfo.getParticipantIdScore().keySet());
@@ -207,7 +207,7 @@ public class MatchEditorService {
 
     public void resetMatchScore(TournamentMemState tournament, ResetSetScore reset, DbUpdater batch) {
         final MatchInfo mInfo = tournament.getMatchById(reset.getMid());
-        final int numberOfSets = mInfo.getPlayedSets();
+        final int numberOfSets = mInfo.playedSets();
         if (numberOfSets < reset.getSetNumber()) {
             throw badRequest("Match has just " + numberOfSets + " sets");
         }
@@ -248,7 +248,7 @@ public class MatchEditorService {
 
     private void removeParticipant(TournamentMemState tournament,
             DbUpdater batch, MatchInfo mInfo, Uid uid) {
-        final int played = mInfo.getPlayedSets();
+        final int played = mInfo.playedSets();
         if (!mInfo.removeParticipant(uid)) {
             log.warn("No uid {} is not in mid {}", uid, mInfo.getMid());
             return;
@@ -263,7 +263,7 @@ public class MatchEditorService {
             log.warn("Remove first uid {} from mid {}", uid, mInfo.getMid());
             final Uid opUid = mInfo.leftUid().get();
             final ParticipantMemState opponent = tournament.getBidOrQuit(opUid);
-            final BidState opoState = opponent.getState();
+            final BidState opoState = opponent.state();
             switch (opoState) {
                 case Expl:
                 case Quit:
@@ -290,7 +290,7 @@ public class MatchEditorService {
 
     private void resetBidStateTo(DbUpdater batch, ParticipantMemState opponent,
             BidState targetState) {
-        if (TERMINAL_RECOVERABLE_STATES.contains(opponent.getState())) {
+        if (TERMINAL_RECOVERABLE_STATES.contains(opponent.state())) {
             bidService.setBidState(opponent, targetState,
                     TERMINAL_RECOVERABLE_STATES, batch);
         }

@@ -91,8 +91,8 @@ public class PlayOffService {
         categoryService.findMatchesInCategoryStream(tournament, cid)
                 .filter(m -> !m.getGid().isPresent())
                 .forEach(m -> {
-                    if (m.getUids().size() < 2) {
-                        m.getUids().forEach(uid -> {
+                    if (m.uids().size() < 2) {
+                        m.uids().forEach(uid -> {
                             uidStat.compute(uid, (u, stat) -> {
                                 if (stat == null) {
                                     stat = new PlayOffBidStat(u);
@@ -154,7 +154,7 @@ public class PlayOffService {
         final List<TournamentResultEntry> entries = tournament.getParticipants()
                 .values()
                 .stream()
-                .filter(bid -> bid.getState() == Win1 && bid.getCid() == cid)
+                .filter(bid -> bid.state() == Win1 && bid.getCid() == cid)
                 .map(bid -> TournamentResultEntry.builder()
                         .user(bid.toLink())
                         .playOffStep(Optional.of(1))
@@ -185,7 +185,7 @@ public class PlayOffService {
         return TournamentResultEntry.builder()
                 .user(participant.toLink())
                 .playOffStep(Optional.of(stat.getHighestLevel()))
-                .state(participant.getState())
+                .state(participant.state())
                 .reasonChain(stat.toReasonChain())
                 .build();
     }

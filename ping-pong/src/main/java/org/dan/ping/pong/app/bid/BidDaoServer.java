@@ -66,7 +66,7 @@ public class BidDaoServer implements BidDao {
             Collection<Uid> uids, Instant now, DbUpdater batch) {
         final List<Uid> finalUids = uids.stream()
                 .map(tournament::getBid)
-                .filter(bid -> bid.getState() == Wait)
+                .filter(bid -> bid.state() == Wait)
                 .peek(bid -> bid.setBidState(Play))
                 .map(ParticipantMemState::getUid)
                 .collect(toList());

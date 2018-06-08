@@ -337,7 +337,7 @@ public class MatchDaoServer implements MatchDao {
 
     @Override
     public void deleteSets(DbUpdater batch, MatchInfo mInfo, int setNumber) {
-        final int limit = mInfo.getPlayedSets() - setNumber;
+        final int limit = mInfo.playedSets() - setNumber;
         mInfo.participants().forEach(uid -> {
             final List<Integer> participantScore = mInfo.getParticipantScore(uid);
             if (participantScore.isEmpty()) {

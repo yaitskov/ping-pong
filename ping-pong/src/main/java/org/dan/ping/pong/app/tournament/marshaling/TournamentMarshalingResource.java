@@ -4,6 +4,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.app.match.MatchResource.TID_JP;
 import static org.dan.ping.pong.app.tournament.CreateTournament.ofImport;
+import static org.dan.ping.pong.app.tournament.TournamentService.TID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
@@ -20,6 +21,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
@@ -42,6 +44,7 @@ public class TournamentMarshalingResource {
     public void exportState(
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
+            @PathParam(TID)
             @TidBodyRequired @Valid Tid tid) {
         tournamentAccessor.read(tid, response, marshalingService::exportState);
     }

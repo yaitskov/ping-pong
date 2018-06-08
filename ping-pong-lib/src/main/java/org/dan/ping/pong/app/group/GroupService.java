@@ -229,7 +229,7 @@ public class GroupService {
         return GroupParticipantResult.builder()
                 .name(bid.getName())
                 .uid(bid.getUid())
-                .state(bid.getState())
+                .state(bid.state())
                 .reasonChain(gp.reasonChain())
                 .dmMatches(possibleDm ? new HashMap<>() : emptyMap())
                 .originMatches(new HashMap<>())
@@ -323,7 +323,7 @@ public class GroupService {
                     return TournamentResultEntry.builder()
                             .user(participant.toLink())
                             .playOffStep(empty())
-                            .state(participant.getState())
+                            .state(participant.state())
                             .reasonChain(gp.reasonChain())
                             .build();
                 })
@@ -332,7 +332,7 @@ public class GroupService {
 
     private List<TournamentResultEntry> tournamentOfSingle(TournamentMemState tournament, int cid) {
         return tournament.getParticipants().values().stream()
-                .filter(bid -> bid.getState() == Win1 && bid.getCid() == cid)
+                .filter(bid -> bid.state() == Win1 && bid.getCid() == cid)
                 .map(bid -> TournamentResultEntry.builder()
                         .user(bid.toLink())
                         .playOffStep(Optional.empty())
@@ -343,7 +343,7 @@ public class GroupService {
     }
 
     public boolean notExpelledInGroup(TournamentMemState tournament, ParticipantMemState b) {
-        return b.getState() != Expl || tournament.participantMatches(b.getUid())
+        return b.state() != Expl || tournament.participantMatches(b.getUid())
                 .anyMatch(m -> !m.getGid().isPresent());
     }
 

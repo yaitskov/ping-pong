@@ -13,7 +13,6 @@ import org.dan.ping.pong.app.bid.result.BidResultService;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
-import org.dan.ping.pong.jooq.tables.Bid;
 
 import java.util.List;
 
@@ -100,7 +99,7 @@ public class BidResource {
                     .category(tournament.getCategory(participant.getCid()))
                     .group(participant.getGid()
                             .map(gid -> tournament.getGroups().get(gid).toLink()))
-                    .state(participant.getState())
+                    .state(participant.state())
                     .enlistedAt(participant.getEnlistedAt())
                     .build();
         });

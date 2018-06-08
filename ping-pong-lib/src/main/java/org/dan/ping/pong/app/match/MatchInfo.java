@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.match;
 
 import static java.time.Duration.between;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.match.MatchTag.DISAMBIGUATION;
 import static org.dan.ping.pong.app.match.dispute.MatchSets.ofSets;
@@ -12,6 +13,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.collect.ImmutableMap;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,7 +42,7 @@ import java.util.stream.Stream;
 @Setter
 @Builder
 @NoArgsConstructor(onConstructor = @__(@JsonCreator))
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MatchInfo {
     public static final String USER = "user";
     public static final String MATCH = "match";
@@ -50,15 +52,15 @@ public class MatchInfo {
     private Tid tid;
     private int cid;
     private MatchType type;
-    private Optional<MatchTag> tag;
-    private Optional<Integer> gid;
+    private Optional<MatchTag> tag = Optional.empty();
+    private Optional<Integer> gid = Optional.empty();
     private MatchState state;
-    private Optional<Mid> loserMid;
-    private Optional<Mid> winnerMid;
-    private Optional<Uid> winnerId;
-    private Map<Uid, List<Integer>> participantIdScore;
-    private Optional<Instant> startedAt;
-    private Optional<Instant> endedAt;
+    private Optional<Mid> loserMid = Optional.empty();
+    private Optional<Mid> winnerMid = Optional.empty();
+    private Optional<Uid> winnerId = Optional.empty();
+    private Map<Uid, List<Integer>> participantIdScore = emptyMap();
+    private Optional<Instant> startedAt = Optional.empty();
+    private Optional<Instant> endedAt = Optional.empty();
     private int priority;
     private int level;
     /**
@@ -72,7 +74,7 @@ public class MatchInfo {
         return winnerId.orElseThrow(() -> internalError("no winner in match", MID, mid));
     }
 
-    public int getPlayedSets() {
+    public int playedSets() {
         for (List<Integer> l : participantIdScore.values()) {
             return l.size();
         }
@@ -207,12 +209,12 @@ public class MatchInfo {
         scores.forEach(score -> participantIdScore.get(score.getUid()).add(score.getScore()));
     }
 
-    public Set<Uid> getUids() {
+    public Set<Uid> uids() {
         return participantIdScore.keySet();
     }
 
     public Uid[] uidsArray() {
-        return getUids().toArray(new Uid[2]);
+        return uids().toArray(new Uid[2]);
     }
 
     public Optional<Uid> leftUid() {

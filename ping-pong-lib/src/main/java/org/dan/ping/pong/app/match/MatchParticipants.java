@@ -39,10 +39,10 @@ public class MatchParticipants implements Comparable<MatchParticipants>, Hashabl
     }
 
     public static MatchParticipants create(MatchInfo match) {
-        if (match.getUids().size() != 2) {
+        if (match.uids().size() != 2) {
             throw internalError("group match doesn't have enough participants");
         }
-        final Iterator<Uid> a = match.getUids().iterator();
+        final Iterator<Uid> a = match.uids().iterator();
         return new MatchParticipants(a.next(), a.next());
     }
 

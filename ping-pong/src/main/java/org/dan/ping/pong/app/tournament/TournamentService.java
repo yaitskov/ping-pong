@@ -451,7 +451,7 @@ public class TournamentService {
         scheduleService.cancelTournament(tournament, batch, now);
         matchDao.deleteAllByTid(tournament, batch, tournament.getMatches().size());
         tournament.getParticipants().values().stream()
-                .filter(bid -> bid.getState() != Quit)
+                .filter(bid -> bid.state() != Quit)
                 .forEach(bid -> bid.setBidState(Want));
         bidDao.resetStateByTid(tid, now, batch);
         groupDao.deleteAllByTid(tournament.getTid(), batch, tournament.getGroups().size());

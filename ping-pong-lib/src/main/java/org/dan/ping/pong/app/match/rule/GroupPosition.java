@@ -104,9 +104,9 @@ public class GroupPosition {
         switch (participantScope) {
             case AT_LEAST_ONE:
                 return s -> s.filter(
-                        m -> m.getUids().stream().anyMatch(competingUids::contains));
+                        m -> m.uids().stream().anyMatch(competingUids::contains));
             case BOTH:
-                return s -> s.filter(m -> competingUids.containsAll(m.getUids()));
+                return s -> s.filter(m -> competingUids.containsAll(m.uids()));
             default:
                 throw internalError("unknown participant scope "
                         + participantScope);

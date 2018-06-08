@@ -37,7 +37,7 @@ public class WonMatchesRuleService implements GroupOrderRuleService {
                 wons.merge(m.getWinnerId().get(), 1, SUM_INT);
                 wons.merge(m.opponentUid(m.getWinnerId().get()), 0, SUM_INT);
             } else {
-                m.getUids().forEach(uid ->
+                m.uids().forEach(uid ->
                         wons.merge(uid, 0, (a, b) -> a + b));
             }
         });

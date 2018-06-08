@@ -192,7 +192,7 @@ public class MatchService {
             case MatchContinues:
                 return SetScoreResult.builder()
                         .scoreOutcome(name)
-                        .nextSetNumberToScore(Optional.of(matchInfo.getPlayedSets()))
+                        .nextSetNumberToScore(Optional.of(matchInfo.playedSets()))
                         .build();
             default:
                 throw internalError("Unknown state " + name);
@@ -315,7 +315,7 @@ public class MatchService {
         final Set<Uid> matchUids = matchInfo.getParticipantIdScore().keySet();
         matchUids.stream()
                 .map(tournament::getBidOrQuit)
-                .filter(b -> expected.contains(b.getState()))
+                .filter(b -> expected.contains(b.state()))
                 .forEach(b -> bidService.setBidState(b,
                         completeGroupMatchBidState(tournament, b),
                         expected, batch));
@@ -458,7 +458,7 @@ public class MatchService {
 
     public static boolean isPyrrhic(ParticipantMemState bid) {
         return bid.getUid().equals(FILLER_LOSER_UID)
-                || quitOrExpl.contains(bid.getState());
+                || quitOrExpl.contains(bid.state());
     }
 
     private void nextMatch(MatchInfo mInfo, TournamentMemState tournament, DbUpdater batch, Uid uid) {
@@ -517,11 +517,11 @@ public class MatchService {
                     final ParticipantMemState bid = tournament.getBidOrQuit(uid);
                     if (isPyrrhic(bid)) {
                         walkOver(tournament, uid, mInfo, batch);
-                    } else if (bid.getState() == Wait) {
+                    } else if (bid.state() == Wait) {
                         changeStatus(batch, mInfo, Place);
                     } else {
                         throw internalError("unexpected bid "
-                                + uid + " state " + bid.getState());
+                                + uid + " state " + bid.state());
                     }
                     break;
                 case Auto:
@@ -603,7 +603,7 @@ public class MatchService {
         }
         final Map<Uid, Integer> newSetScore = score.getScores().stream()
                 .collect(toMap(IdentifiedScore::getUid, IdentifiedScore::getScore));
-        final int playedSets = matchInfo.getPlayedSets();
+        final int playedSets = matchInfo.playedSets();
         if (playedSets < score.getSetOrdNumber()) {
             throw badRequest("Set " + playedSets + " needs to be scored first");
         }
@@ -698,7 +698,7 @@ public class MatchService {
                                 .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
                                 .type(m.getType())
                                 .participants(
-                                        m.getUids().stream()
+                                        m.uids().stream()
                                                 .map(tournament::getParticipant)
                                                 .map(ParticipantMemState::toLink)
                                                 .collect(toList()))
@@ -745,7 +745,7 @@ public class MatchService {
                                         .mid(m.getMid())
                                         .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
                                         .state(m.getState())
-                                        .playedSets(m.getPlayedSets())
+                                        .playedSets(m.playedSets())
                                         .tid(tournament.getTid())
                                         .matchType(m.getType())
                                         .sport(tournament.selectMatchRule(m).toMyPendingMatchSport())
@@ -759,7 +759,7 @@ public class MatchService {
                         .showTables(tournament.getRule().getPlace().map(PlaceRules::getArenaDistribution)
                                 .orElse(NO) != NO)
                         .progress(tournamentProgress(tournament, uid))
-                        .bidState(tournament.getParticipant(uid).getState())
+                        .bidState(tournament.getParticipant(uid).state())
                         .build());
     }
 
@@ -815,7 +815,7 @@ public class MatchService {
 
     public PlayedMatchList findPlayedMatchesByBid(TournamentMemState tournament, Uid uid) {
         final List<MatchInfo> completeMatches = tournament.participantMatches(uid)
-                .filter(m -> m.getState() == Over || m.getPlayedSets() > 0)
+                .filter(m -> m.getState() == Over || m.playedSets() > 0)
                 .sorted(Comparator.comparing(m -> m.getEndedAt().orElse(Instant.MIN)))
                 .collect(toList());
         return PlayedMatchList.builder()
@@ -857,7 +857,7 @@ public class MatchService {
                 .group(m.getGid().map(gid -> tournament.getGroups().get(gid).toLink()))
                 .category(tournament.getCategory(m.getCid()))
                 .tid(tournament.getTid())
-                .playedSets(m.getPlayedSets())
+                .playedSets(m.playedSets())
                 .sport(tournament.selectMatchRule(m).toMyPendingMatchSport())
                 .build();
     }
@@ -886,7 +886,7 @@ public class MatchService {
                 .mid(m.getMid())
                 .tid(tournament.getTid())
                 .sport(tournament.selectMatchRule(m).toMyPendingMatchSport())
-                .playedSets(m.getPlayedSets())
+                .playedSets(m.playedSets())
                 .started(m.getStartedAt())
                 .matchType(m.getType())
                 .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))

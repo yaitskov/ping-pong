@@ -12,7 +12,6 @@ import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.app.user.UserLinkIf;
-import org.dan.ping.pong.sys.error.PiPoEx;
 
 import java.time.Instant;
 import java.util.Optional;

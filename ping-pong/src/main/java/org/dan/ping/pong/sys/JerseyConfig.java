@@ -19,6 +19,7 @@ import org.dan.ping.pong.app.match.dispute.MatchDisputeResource;
 import org.dan.ping.pong.app.place.PlaceResource;
 import org.dan.ping.pong.app.table.TableResource;
 import org.dan.ping.pong.app.tournament.TournamentResource;
+import org.dan.ping.pong.app.tournament.marshaling.TournamentMarshalingResource;
 import org.dan.ping.pong.app.user.UserResource;
 import org.dan.ping.pong.sys.ctx.jackson.ObjectMapperContextResolver;
 import org.dan.ping.pong.sys.error.DefaultExceptionMapper;
@@ -56,6 +57,7 @@ public class JerseyConfig extends ResourceConfig {
         packages(false,
                 asList(UserResource.class, SysAdminSignInResource.class,
                         PlaceResource.class, TournamentResource.class,
+                        TournamentMarshalingResource.class,
                         GroupResource.class, MatchDisputeResource.class,
                         BidResource.class, CategoryResource.class,
                         MatchResource.class, AuthResource.class,

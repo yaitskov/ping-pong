@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.tournament;
 import org.dan.ping.pong.app.tournament.console.ConsoleCtx;
 import org.dan.ping.pong.app.tournament.console.TournamentRelationCacheFactory;
 import org.dan.ping.pong.app.tournament.console.TournamentRelationCacheLoader;
+import org.dan.ping.pong.app.tournament.marshaling.TournamentMarshalingCtx;
 import org.dan.ping.pong.app.tournament.rules.GroupRuleValidator;
 import org.dan.ping.pong.app.tournament.rules.PingPongMatchRuleValidator;
 import org.dan.ping.pong.app.tournament.rules.TournamentRulesValidator;
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.Import;
         PingPongMatchRuleValidator.class,
         TournamentTerminator.class,
         ChildTournamentProvider.class,
+        TournamentMarshalingCtx.class,
         TournamentService.class})
 public class TournamentCtx {
 }

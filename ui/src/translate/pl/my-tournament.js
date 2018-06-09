@@ -7,8 +7,11 @@ module.exports = {
     'Edit tournament': 'Prawić turniej',
     'Configure tournament parameters': 'Skonfigurować parametry turnieju',
     'Stop and cancel tournament': 'Zatrzymać i anulować turniej',
+    'cancel-tournament-lbl': 'Anulować turniej',
     'Announce and Open Draft': 'Ogłosić i Otworzyć Rekrutację',
     'Restart canceled tournament from scratch': 'Zrestartować anulowany turniej',
+    'restart-tournament-lbl': 'Zrestartować turniej',
+    'complete-matches-lbl': 'Zakończone meczi',
     'Add offline participant, who does not have internet and a good phone': 'Dodać offline uczestinka, który nie ma internetu oraz komórki',
     'tournament-with-uncheched-participants-warn': 'Turniej ma {{users}} zapisanych, ale nie sprawdzionych uczestników'
         + ' i, żeby zacząć turniej trzeba ich wydalić lub oznaczyć jako obecnych.',
@@ -24,5 +27,6 @@ module.exports = {
     'Starting the tournament': 'Rozpoczęczie turnieju',
     "Reseting": "Zresetowanie",
     'Cancelation of the tournament': 'Anulowanie turnieju',
-    'copy-tournament-hint': 'Zaplanować kolejny turniej na postawie obecnego'
+    'copy-tournament-hint': 'Zaplanować kolejny turniej na postawie obecnego',
+    'copy-tournament-lbl': 'Zkopiować turniej'
 };

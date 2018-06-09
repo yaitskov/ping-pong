@@ -7,8 +7,11 @@ module.exports = {
     'Edit tournament': 'Edit tournament',
     'Configure tournament parameters': 'Configure tournament parameters',
     'Stop and cancel tournament': 'Stop and cancel tournament',
+    'cancel-tournament-lbl': 'Cancel tournament',
     'Announce and Open Draft': 'Announce and Open Draft',
     'Restart canceled tournament from scratch': 'Restart canceled tournament from scratch',
+    'restart-tournament-lbl': 'Restart tournament',
+    'complete-matches-lbl': 'Complete matches',
     'Add offline participant, who does not have internet and a good phone': 'Add offline participant, who does not have internet and a good phone',
     'tournament-with-uncheched-participants-warn': 'Tournament has {{users}} enlisted, but not checked participants.'
         + ' To begin the tournament you need to expel all of them or mark as participanting.',
@@ -24,5 +27,6 @@ module.exports = {
     'Starting the tournament': 'Starting the tournament',
     "Reseting": "Resetting",
     'Cancelation of the tournament': 'Cancellation of the tournament',
-    'copy-tournament-hint': 'Schedule next tournament as a copy this one'
+    'copy-tournament-hint': 'Copy tournament without participants',
+    'copy-tournament-lbl': 'Copy tournament'
 };

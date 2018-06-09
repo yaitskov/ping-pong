@@ -3,100 +3,121 @@
 <div class="container my-tournament-admin">
   <div class="form-group">
     <div class="btn-group">
-      <a class="btn btn-default" title="back" back-button>
-        <span class="glyphicon glyphicon-circle-arrow-left"></span>
+      <a class="btn navbar-btn btn-primary dropdown-toggle"
+         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="glyphicon glyphicon-list"></span>
+        <span class="caret"></span>
       </a>
-      <a class="btn btn-default"
-         ng-show="$ctrl.tournament.masterTid"
-         href="#!/my/tournament/{{$ctrl.tournament.masterTid}}"
-         title="{{ 'master-tournament-hint' | translate }}">
-        <span class="glyphicon cloud-sport-font">√</span>
-      </a>
-      <a class="btn btn-success"
-         ng-click="$ctrl.open()"
-         ng-show="$ctrl.isDrafting()"
-         title="{{ 'Split participants into groups and open tournament' | translate }}">
-        <span class="glyphicon glyphicon-play-circle"></span>
-      </a>
-      <a class="btn btn-primary"
-         href="#!/my/matches/judgement/{{$ctrl.tournament.tid}}"
-         ng-show="$ctrl.tournament.state == 'Open'"
-         title="{{ 'Judge and score open matches in the tournament' | translate }}">
-        <img ng-src="{{$ctrl.whistle}}" class="icon-image"/>
-      </a>
-      <a class="btn btn-primary"
-         href="#!/tournament/result/{{$ctrl.tournament.tid}}"
-         ng-show="$ctrl.tournament.state == 'Close' || $ctrl.tournament.state == 'Open'"
-         title="{{ 'Browser tournament results' | translate }}">
-        <span class="glyphicon glyphicon-eye-open"></span>
-      </a>
-      <a class="btn btn-default"
-         title="{{ 'Previous Tournament in the seria' | translate }}"
-         href="#!/my/tournament/{{$ctrl.tournament.previousTid}}"
-         ng-show="$ctrl.tournament.previousTid">
-        <span class="glyphicon glyphicon-step-backward"></span>
-      </a>
-      <a class="btn btn-default"
-         title="{{ 'Edit tournament' | translate }}"
-         ng-show="$ctrl.canEdit()"
-         href="#!/my/tournament/edit/{{$ctrl.tournament.tid}}">
-        <span class="glyphicon glyphicon-edit"></span>
-      </a>
-      <a class="btn btn-default"
-         title="{{ 'Configure tournament parameters' | translate }}"
-         ng-show="$ctrl.canConfigureParams()"
-         href="#!/my/tournament/parameters/{{$ctrl.tournament.tid}}">
-        <span class="glyphicon glyphicon-cog"></span>
-      </a>
-      <a class="btn btn-danger"
-         ng-click="$ctrl.cancel()"
-         ng-show="$ctrl.isNotCanceled()"
-         title="{{ 'Stop and cancel tournament' | translate }}">
-        <span class="glyphicon glyphicon-stop"></span>
-      </a>
-      <a class="btn btn-primary"
-         title="{{ 'Announce and Open Draft' | translate }}"
-         ng-click="$ctrl.beginDrafting()"
-         ng-show="$ctrl.canBeginDrafting()">
-        <span class="glyphicon glyphicon-globe"></span>
-      </a>
-      <a class="btn btn-primary"
-         title="{{ 'Restart canceled tournament from scratch' | translate }}"
-         ng-click="$ctrl.restart()"
-         ng-show="$ctrl.tournament.state == 'Canceled'">
-        <span class="glyphicon glyphicon-repeat"></span>
-      </a>
-      <a class="btn btn-default"
-         title="list of complete matches"
-         href="#!/tournament/judged-matches/{{$ctrl.tournament.tid}}"
-         ng-show="$ctrl.tournament.state == 'Close' || $ctrl.tournament.state == 'Open'">
-        <span class="glyphicon glyphicon-book"></span>
-      </a>
-      <a class="btn btn-primary"
-         title="{{ 'Add offline participant, who does not have internet and a good phone' | translate }}"
-         href="#!/tournament/enlist/offline/{{$ctrl.tournament.tid}}"
-         ng-show="$ctrl.tournament.state == 'Draft' || $ctrl.tournament.state == 'Open'">
-        <span class="glyphicon glyphicon-plus-sign"></span>
-      </a>
-      <a class="btn btn-primary"
-         href="#!/tournament/copy/{{$ctrl.tournament.tid}}"
-         ng-show="!$ctrl.tournament.masterTid"
-         title="{{ 'copy-tournament-hint' | translate }}">
-        <span class="glyphicon glyphicon-duplicate"></span>
-      </a>
-      <a class="btn btn-default"
-         ng-show="$ctrl.tournament.consoleTid"
-         href="#!/my/tournament/{{$ctrl.tournament.consoleTid}}"
-         title="{{ 'console-tournament-hint' | translate }}">
-        <span class="glyphicon cloud-sport-font">😭</span>
-      </a>
-      <a class="btn btn-default"
-         title="{{ 'List of consequent tournaments in the seria' | translate }}"
-         href="#!/subsequent/tournaments/{{$ctrl.tournament.tid}}"
-         ng-show="$ctrl.haveFollowingTournaments()">
-        <span class="glyphicon glyphicon-step-forward"></span>
-      </a>
+      <ul class="dropdown-menu">
+        <li ng-show="!$ctrl.tournament.masterTid">
+          <a href="#!/tournament/copy/{{$ctrl.tournament.tid}}"
+             title="{{ 'copy-tournament-hint' | translate }}">
+            <span class="btn btn-primary">
+              <span class="glyphicon glyphicon-duplicate"/>
+            </span>
+            <span translate="copy-tournament-lbl"/>
+          </a>
+        </li>
+        <li ng-show="$ctrl.tournament.state == 'Close' || $ctrl.tournament.state == 'Open'">
+          <a title="list of complete matches"
+             href="#!/tournament/judged-matches/{{$ctrl.tournament.tid}}">
+            <span class="btn btn-default">
+              <span class="glyphicon glyphicon-book"/>
+            </span>
+            <span translate="complete-matches-lbl"/>
+          </a>
+        </li>
+        <li role="separator" class="divider"
+            ng-show="$ctrl.tournament.state == 'Canceled' || $ctrl.isNotCanceled()"/>
+        <li ng-show="$ctrl.isNotCanceled()">
+          <a ng-click="$ctrl.cancel()"
+             title="{{ 'Stop and cancel tournament' | translate }}">
+          <span class="btn btn-danger">
+            <span class="glyphicon glyphicon-stop"/>
+          </span>
+            <span translate="cancel-tournament-lbl"/>
+          </a>
+        </li>
+        <li ng-show="$ctrl.tournament.state == 'Canceled'">
+          <a title="{{ 'Restart canceled tournament from scratch' | translate }}"
+             ng-click="$ctrl.restart()">
+            <span class="btn btn-primary">
+              <span class="glyphicon glyphicon-repeat"/>
+            </span>
+            <span translate="restart-tournament-lbl"/>
+          </a>
+        </li>
+      </ul>
     </div>
+    <a class="btn btn-default" title="back" back-button>
+      <span class="glyphicon glyphicon-circle-arrow-left"></span>
+    </a>
+    <a class="btn btn-default"
+       ng-show="$ctrl.tournament.masterTid"
+       href="#!/my/tournament/{{$ctrl.tournament.masterTid}}"
+       title="{{ 'master-tournament-hint' | translate }}">
+      <span class="glyphicon cloud-sport-font">√</span>
+    </a>
+    <a class="btn btn-success"
+       ng-click="$ctrl.open()"
+       ng-show="$ctrl.isDrafting()"
+       title="{{ 'Split participants into groups and open tournament' | translate }}">
+      <span class="glyphicon glyphicon-play-circle"></span>
+    </a>
+    <a class="btn btn-primary"
+       href="#!/my/matches/judgement/{{$ctrl.tournament.tid}}"
+       ng-show="$ctrl.tournament.state == 'Open'"
+       title="{{ 'Judge and score open matches in the tournament' | translate }}">
+      <img ng-src="{{$ctrl.whistle}}" class="icon-image"/>
+    </a>
+    <a class="btn btn-primary"
+       href="#!/tournament/result/{{$ctrl.tournament.tid}}"
+       ng-show="$ctrl.tournament.state == 'Close' || $ctrl.tournament.state == 'Open'"
+       title="{{ 'Browser tournament results' | translate }}">
+      <span class="glyphicon glyphicon-eye-open"></span>
+    </a>
+    <a class="btn btn-default"
+       title="{{ 'Previous Tournament in the seria' | translate }}"
+       href="#!/my/tournament/{{$ctrl.tournament.previousTid}}"
+       ng-show="$ctrl.tournament.previousTid">
+      <span class="glyphicon glyphicon-step-backward"></span>
+    </a>
+    <a class="btn btn-default"
+       title="{{ 'Edit tournament' | translate }}"
+       ng-show="$ctrl.canEdit()"
+       href="#!/my/tournament/edit/{{$ctrl.tournament.tid}}">
+      <span class="glyphicon glyphicon-edit"></span>
+    </a>
+    <a class="btn btn-default"
+       title="{{ 'Configure tournament parameters' | translate }}"
+       ng-show="$ctrl.canConfigureParams()"
+       href="#!/my/tournament/parameters/{{$ctrl.tournament.tid}}">
+      <span class="glyphicon glyphicon-cog"></span>
+    </a>
+    <a class="btn btn-primary"
+       title="{{ 'Announce and Open Draft' | translate }}"
+       ng-click="$ctrl.beginDrafting()"
+       ng-show="$ctrl.canBeginDrafting()">
+      <span class="glyphicon glyphicon-globe"></span>
+    </a>
+    <a class="btn btn-primary"
+       title="{{ 'Add offline participant, who does not have internet and a good phone' | translate }}"
+       href="#!/tournament/enlist/offline/{{$ctrl.tournament.tid}}"
+       ng-show="$ctrl.tournament.state == 'Draft' || $ctrl.tournament.state == 'Open'">
+      <span class="glyphicon glyphicon-plus-sign"></span>
+    </a>
+    <a class="btn btn-default"
+       ng-show="$ctrl.tournament.consoleTid"
+       href="#!/my/tournament/{{$ctrl.tournament.consoleTid}}"
+       title="{{ 'console-tournament-hint' | translate }}">
+      <span class="glyphicon cloud-sport-font">😭</span>
+    </a>
+    <a class="btn btn-default"
+       title="{{ 'List of consequent tournaments in the seria' | translate }}"
+       href="#!/subsequent/tournaments/{{$ctrl.tournament.tid}}"
+       ng-show="$ctrl.haveFollowingTournaments()">
+      <span class="glyphicon glyphicon-step-forward"></span>
+    </a>
   </div>
   <div ng-show="$ctrl.errorHasUncheckedUsers.length > 0">
     <div class="form-group">

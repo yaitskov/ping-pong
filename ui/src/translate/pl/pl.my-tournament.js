@@ -28,5 +28,7 @@ module.exports = {
     "Reseting": "Zresetowanie",
     'Cancelation of the tournament': 'Anulowanie turnieju',
     'copy-tournament-hint': 'Zaplanować kolejny turniej na postawie obecnego',
-    'copy-tournament-lbl': 'Zkopiować turniej'
+    'copy-tournament-lbl': 'Zkopiować turniej',
+    'export-tournament-lbl': 'Exportować turniej',
+    'export-tournament-hint': 'Exportować cały turniej do pliku dla kopii zaposowej'
 };

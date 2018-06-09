@@ -9,6 +9,15 @@
         <span class="caret"></span>
       </a>
       <ul class="dropdown-menu">
+        <li>
+          <a href="/api/tournament/export/state/{{$ctrl.tournament.tid}}"
+             title="{{ 'export-tournament-hint' | translate }}">
+            <span class="btn btn-primary">
+              <span class="glyphicon glyphicon-cloud-download"/>
+            </span>
+            <span translate="export-tournament-lbl"/>
+          </a>
+        </li>
         <li ng-show="!$ctrl.tournament.masterTid">
           <a href="#!/tournament/copy/{{$ctrl.tournament.tid}}"
              title="{{ 'copy-tournament-hint' | translate }}">

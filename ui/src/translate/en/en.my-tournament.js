@@ -28,5 +28,7 @@ module.exports = {
     "Reseting": "Resetting",
     'Cancelation of the tournament': 'Cancellation of the tournament',
     'copy-tournament-hint': 'Copy tournament without participants',
-    'copy-tournament-lbl': 'Copy tournament'
+    'copy-tournament-lbl': 'Copy tournament',
+    'export-tournament-lbl': 'Export tournament',
+    'export-tournament-hint': 'Export the whole tournament into a file for backup purpose'
 };

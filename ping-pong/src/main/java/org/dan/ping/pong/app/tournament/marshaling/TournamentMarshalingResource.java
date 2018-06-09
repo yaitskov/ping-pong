@@ -1,10 +1,12 @@
 package org.dan.ping.pong.app.tournament.marshaling;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.Response.ok;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.app.match.MatchResource.TID_JP;
 import static org.dan.ping.pong.app.tournament.CreateTournament.ofImport;
 import static org.dan.ping.pong.app.tournament.TournamentService.TID;
+import static org.dan.ping.pong.app.tournament.marshaling.ContentDisposition.headerBody;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
@@ -46,7 +48,14 @@ public class TournamentMarshalingResource {
             @HeaderParam(SESSION) String session,
             @PathParam(TID)
             @TidBodyRequired @Valid Tid tid) {
-        tournamentAccessor.read(tid, response, marshalingService::exportState);
+        tournamentAccessor.read(tid, response,
+                (tournament) ->
+                    ok(marshalingService.exportState(tournament))
+                            .header("Content-Description", "File Transfer")
+                            .header("Content-Type", "application/json")
+                            .header("Content-Disposition",
+                                    headerBody(tournament.getName() + ".cloud-sport.json"))
+                            .build());
     }
 
     @Inject

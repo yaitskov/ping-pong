@@ -39,7 +39,7 @@ module.exports = merge.apply(
      require('./pl.new-tournament-parameters.js'),
      require('./new-place.js'),
      require('./my-tournament-list.js'),
-     require('./my-tournament.js'),
+     require('./pl.my-tournament.js'),
      require('./my-tournament-participant.js'),
      require('./my-tournament-parameters.js'),
      require('./my-tournament-offline-enlist.js'),

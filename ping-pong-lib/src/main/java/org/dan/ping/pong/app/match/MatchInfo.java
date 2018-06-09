@@ -12,6 +12,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -58,6 +59,7 @@ public class MatchInfo {
     private Optional<Mid> loserMid = Optional.empty();
     private Optional<Mid> winnerMid = Optional.empty();
     private Optional<Uid> winnerId = Optional.empty();
+    @JsonInclude // export to json removes all keys
     private Map<Uid, List<Integer>> participantIdScore = emptyMap();
     private Optional<Instant> startedAt = Optional.empty();
     private Optional<Instant> endedAt = Optional.empty();

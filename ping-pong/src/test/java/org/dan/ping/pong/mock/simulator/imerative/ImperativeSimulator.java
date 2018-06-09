@@ -66,7 +66,6 @@ import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
 import org.dan.ping.pong.app.match.RescoreMatch;
 import org.dan.ping.pong.app.match.SetScoreReq;
 import org.dan.ping.pong.app.match.SetScoreResult;
-import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.tournament.CopyTournament;
 import org.dan.ping.pong.app.tournament.ExpelParticipant;
 import org.dan.ping.pong.app.tournament.MyTournamentInfo;
@@ -84,7 +83,6 @@ import org.dan.ping.pong.sys.ctx.jackson.ObjectMapperProvider;
 import org.hamcrest.Matchers;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -313,7 +311,7 @@ public class ImperativeSimulator {
 
     @SneakyThrows
     public ImperativeSimulator checkResult(int categoryId, List<List<Player>> p) {
-        final List<TournamentResultEntry> tournamentResult = getTournamentResult(categoryId);
+        final List<TournamentResultEntry> tournamentResult = getTournamentResult(categoryId, tid());
         try {
             assertThat(tournamentResult.stream()
                             .map(tr -> uid2Player(tr.getUser().getUid())).collect(toList()),
@@ -330,7 +328,7 @@ public class ImperativeSimulator {
     }
 
     public List<TournamentResultEntry> getTournamentResult() {
-        return getTournamentResult(getOnlyCid());
+        return getTournamentResult(getOnlyCid(), tid());
     }
 
     public ImperativeSimulator checkPlayOffLevels(int... levels) {
@@ -364,8 +362,8 @@ public class ImperativeSimulator {
                         + groupIndex));
     }
 
-    public List<TournamentResultEntry> getTournamentResult(Integer onlyCid) {
-        return myRest.get(TOURNAMENT_RESULT + tid()
+    public List<TournamentResultEntry> getTournamentResult(Integer onlyCid, int tid) {
+        return myRest.get(TOURNAMENT_RESULT + tid
                         + RESULT_CATEGORY + onlyCid,
                 new GenericType<List<TournamentResultEntry>>() {});
 

@@ -97,6 +97,7 @@ public class TournamentMarshalingService {
             ExportedTournament expTournament) {
         expTournament.getParticipants().values()
                 .forEach(pa -> {
+                    pa.setTid(expTournament.getTid());
                     pa.setUid(users.apply(pa.getUid()));
                     pa.setCid(categories.apply(pa.getCid()));
                     pa.setGid(pa.getGid().map(groups));

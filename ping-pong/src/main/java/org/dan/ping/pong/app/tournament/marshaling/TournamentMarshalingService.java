@@ -83,8 +83,15 @@ public class TournamentMarshalingService {
         final StrictUniMap<Integer> groups = createGroups(categories, expTournament);
         final StrictUniMap<Uid> users = createUsers(expTournament);
         enlistUsers(categories, groups, users, expTournament);
-        createMatches(categories, groups, users, expTournament);
+        final StrictUniMap<Mid> matches = createMatches(categories, groups, users, expTournament);
+        fillSets(matches, expTournament);
         return tid;
+    }
+
+    private void fillSets(StrictUniMap<Mid> matches, ExportedTournament expTournament) {
+        expTournament.getMatches().values().stream()
+                .peek(m -> m.setMid(matches.apply(m.getMid())))
+                .forEach(m -> matchDao.insertScores(m, DB_STRICT_UPDATER));
     }
 
     @Inject
@@ -117,7 +124,7 @@ public class TournamentMarshalingService {
     @Inject
     private MatchDao matchDao;
 
-    private void createMatches(
+    private StrictUniMap<Mid> createMatches(
             StrictUniMap<Integer> categories,
             StrictUniMap<Integer> groups,
             StrictUniMap<Uid> users,
@@ -140,7 +147,7 @@ public class TournamentMarshalingService {
                                 mi.setCid(categories.apply(mi.getCid()));
                                 mi.setGid(mi.getGid().map(groups));
                                 mi.setWinnerId(mi.getWinnerId().map(users));
-                                mi.getParticipantUids(users);
+                                mi.replaceParticipantUids(users);
                             })
                             .collect(toMap(MatchInfo::getMid, matchDao::createMatch)));
             final List<MatchInfo> nonResMatches = ofNullable(resGroupsOfMatches.get(false))
@@ -148,7 +155,7 @@ public class TournamentMarshalingService {
             log.info("Left matches {} / {}",
                     matchIds.size(), nonResMatches.size());
             if (nonResMatches.isEmpty()) {
-                break;
+                return StrictUniMap.of("matches", matchIds);
             }
             if (resMatches.isEmpty()) {
                 throw internalError("Import of matches loops");

@@ -55,8 +55,8 @@ public class TournamentMarshalingJerseyTest extends AbstractSpringJerseyTest {
         final ImperativeSimulator is = isf.create(scenario);
         is.run(c -> c.beginTournament()
                 .scoreSet(p1, 11, p3, 0)
-                .scoreSet(p1, 11, p2, 0)
-                .scoreSet(p3, 11, p2, 0));
+                .scoreSet(p2, 11, p1, 1)
+                .scoreSet(p3, 11, p2, 2));
 
         final TournamentEnvelope expTournament = exportTour(scenario);
 

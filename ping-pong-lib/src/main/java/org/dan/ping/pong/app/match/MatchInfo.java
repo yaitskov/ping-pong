@@ -175,7 +175,7 @@ public class MatchInfo {
         return gid.orElseThrow(() -> internalError("Match is not in a group", MID, mid));
     }
 
-    public void getParticipantUids(StrictUniMap<Uid> users) {
+    public void replaceParticipantUids(StrictUniMap<Uid> users) {
         final List<Uid> oldUids = participantIdScore.keySet()
                 .stream().collect(Collectors.toList());
 

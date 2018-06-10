@@ -18,6 +18,7 @@ export default class MainMenuService extends AngularBean {
         if (menu) {
             this.setContextMenu(menu);
         }
+
         this.stranslate.trans(originTitle || 'Loading', (title) => {
             this.title = title;
             //this.$rootScope.$broadcast('title.set', title);

@@ -30,7 +30,7 @@ module.exports = merge.apply(
      require('./tournament result.js'),
      require('./play in tournament list.js'),
      require('./place picker.js'),
-     require('./place detail.js'),
+     require('./en.place-detail.js'),
      require('./participant presence.js'),
      require('./open tournament list.js'),
      require('./open tournament page.js'),

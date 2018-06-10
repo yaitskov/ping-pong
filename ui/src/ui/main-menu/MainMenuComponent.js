@@ -10,7 +10,7 @@ export default class MainMenuComponent extends AngularBean {
         this.accountName = this.auth.myName();
         this.title = this.mainMenu.getTitle();
         this.lastTournament = this.pageCtx.get('last-tournament');
-        this.contextMenu = this.mainMenu.getContextMenu();
+        this.setMenu(this.mainMenu.getContextMenu());
 
         this.binder(this.$scope, {
             'event.mm.last.tournament': (event, tournament) => {

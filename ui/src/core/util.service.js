@@ -5,6 +5,7 @@ import AjaxInfo from './angular/AjaxInfo.js';
 import MessageBus from './MessageBus.js';
 import ProtocolSwitcher from './ProtocolSwitcher.js';
 import VoiceInput from 'ui/widget/person-name-field/VoiceInput.js';
+import SyncTranslateFactory from './SyncTranslateFactory.js';
 
 var humanizeDuration = require('humanize-duration');
 
@@ -135,77 +136,7 @@ angular.
                    '..' + nameParts[1].substr(nameParts[1].length - 1, 1);
         };
     }).
-    factory('syncTranslate', ['$translate', '$q', function ($translate, $q) {
-        return new function () {
-            this.create = function () {
-                return new function () {
-                    var self = this;
-                    this.lastCallId = new Object();
-                    this.callTranslate = function (originMessage) {
-                        if (typeof originMessage == "string") {
-                            return $translate(originMessage);
-                        } else {
-                            return $translate(originMessage[0], originMessage[1]);
-                        }
-                    };
-                    this.transMenu = function (map, nextCallback) {
-                        var callId = new Object();
-                        self.lastCallId = callId;
-                        var keys = Object.keys(map);
-                        var origins = [];
-                        for (var i = 0; i < keys.length; ++i) {
-                            origins.push(map[keys[i]]);
-                        }
-                        $translate(origins).then(function (translations) {
-                            if (self.lastCallId == callId) {
-                                for (var i = 0; i < keys.length; ++i) {
-                                    map[keys[i]] = translations[map[keys[i]]];
-                                }
-                                nextCallback(map);
-                            } else {
-                                console.log("Reject obsolete translations");
-                            }
-                        });
-                    };
-                    this.trans = function (originMessage, nextCallback) {
-                        var callId = new Object();
-                        self.lastCallId = callId;
-                        self.callTranslate(originMessage).then(function (msg) {
-                            if (self.lastCallId == callId) {
-                                nextCallback(msg);
-                            } else {
-                                console.log("Reject obsolete translation: " + msg);
-                            }
-                        }).catch((msg) => {
-                            console.error(`Failed translation of [${msg}]`);
-                            nextCallback(msg);
-                        });
-                    };
-                    this.transTitleAndMenu = function (originTitle, originMenu, callback) {
-                        var callId = new Object();
-                        self.lastCallId = callId;
-                        var keys = Object.keys(originMenu);
-                        var origins = [];
-                        for (var i = 0; i < keys.length; ++i) {
-                            origins.push(originMenu[keys[i]]);
-                        }
-                        $q.all([self.callTranslate(originTitle).$promise, $translate(origins).$promise]).then(
-                            function (responses) {
-                                translations = responses[1];
-                                if (self.lastCallId == callId) {
-                                    for (var i = 0; i < keys.length; ++i) {
-                                        originMenu[keys[i]] = translations[originMenu[keys[i]]];
-                                    }
-                                    nextCallback(responses[0], originMenu);
-                                } else {
-                                    console.log("Reject obsolete translations");
-                                }
-                            });
-                    };
-                };
-            };
-        };
-    }]).
+    service('syncTranslate', SyncTranslateFactory).
     factory('lateEvent', ['$timeout', function ($timeout) {
         return function (callback) {
             $timeout(callback, 0);

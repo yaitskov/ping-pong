@@ -1,5 +1,4 @@
 module.exports = {
-        // place detail
     'place name': 'Name',
     'place city': 'City',
     'Postal Address': 'Postal Address',
@@ -7,5 +6,6 @@ module.exports = {
     'Contact Email': 'Contact Email',
     'PlaceTitle': 'Place',
     'PlaceWithName': 'Place {{name}}',
-    'AddTournament': 'Add Tournament'
+    'AddTournament': 'Add Tournament',
+    'import-tournament-from-cs-backup': 'Import tournament'
 };

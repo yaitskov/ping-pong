@@ -88,7 +88,8 @@
       <li role="separator" class="divider" ng-hide="$ctrl.contextMenu | isEmpty"></li>
       <li ng-repeat="(path, label) in $ctrl.contextMenu">
         <a ng-attr-href="{{path}}">
-          {{label}}
+          <span ng-show="label.glyph" class="glyphicon glyphicon-{{label.glyph}}"/>
+          {{label.text}}
         </a>
       </li>
     </ul>

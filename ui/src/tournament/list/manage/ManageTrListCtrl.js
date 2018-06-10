@@ -29,7 +29,7 @@ export default class ManageTrListCtrl extends SimpleController {
                         this.requestStatus.complete();
                         this.tournaments = tournaments;
                     },
-                    this.requestStatus.failed);
+                    (...a) => this.requestStatus.failed(...a));
             }
         });
     }

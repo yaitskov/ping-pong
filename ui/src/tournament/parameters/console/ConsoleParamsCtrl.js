@@ -18,7 +18,7 @@ export default class ConsoleParamsCtrl extends BaseTrParamsCtrl {
                     }
                     this.requestStatus.complete();
                 },
-                this.requestStatus.failed);
+                (...a) => this.requestStatus.failed(...a));
     }
 
     watchForPlayConsoleTournament() {

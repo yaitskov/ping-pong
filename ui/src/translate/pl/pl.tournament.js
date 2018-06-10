@@ -16,5 +16,10 @@ module.exports = {
     'Following Tournaments': 'Kolejnyje Turnei',
     'no-following-tournaments': 'Nie ma kolejnych turnei',
     'configure-console-tournament': 'Skonfigurować turniej pocieszenia',
-    'creating-console-tournament': 'Tworzenie turnieju pocieszenia'
+    'creating-console-tournament': 'Tworzenie turnieju pocieszenia',
+    'import-btn': 'Importować',
+    'file-lbl': 'Plik',
+    'Backup file is required': 'Backup plik jest wymagany',
+    'Tournament import': 'Tournament import',
+    'Tournament imported': 'Tournament {{name}} imported'
 };

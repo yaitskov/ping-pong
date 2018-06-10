@@ -29,7 +29,7 @@ export default class JudgeMatchListCtrl extends AngularBean {
                 this.matches = matches.matches;
                 this.progress = matches.progress;
             },
-            this.requestStatus.failed);
+            (...a) => this.requestStatus.failed(...a));
     }
 
     loadRunningMatches() {
@@ -43,7 +43,7 @@ export default class JudgeMatchListCtrl extends AngularBean {
                 this.progress = matches.progress;
                 this.tournamentNotOpen = !matches.length;
             },
-            this.requestStatus.failed);
+            (...a) => this.requestStatus.failed(...a));
     }
 
     loadParticipantsWithIncompletMatches() {
@@ -62,7 +62,7 @@ export default class JudgeMatchListCtrl extends AngularBean {
                     this.bidChange();
                 }
             },
-            this.requestStatus.failed);
+            (...a) => this.requestStatus.failed(...a));
     }
 
     onFormReady() {
@@ -76,7 +76,7 @@ export default class JudgeMatchListCtrl extends AngularBean {
                     this.loadParticipantsWithIncompletMatches();
                 }
             },
-            this.requestStatus.failed);
+            (...a) => this.requestStatus.failed(...a));
     }
 
     bind() {

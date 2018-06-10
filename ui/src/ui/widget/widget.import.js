@@ -9,6 +9,7 @@ import './info-popup/info-popup.component.js';
 import './translating-drop-down/translating-drop-down.directive.js';
 import './person-name-field/voice-input-dialog.component.js';
 import './person-name-field/person-name-field.directive.js';
+import './file-reader-field/file-reader-field.directive.js';
 import './screenshot-sharer/screen-sharer-dialog.component.js';
 import './screenshot-sharer/screenshot-button.directive.js';
 import './footer/footer-widget.component.js';

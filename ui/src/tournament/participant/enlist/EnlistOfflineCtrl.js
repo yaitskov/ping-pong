@@ -55,7 +55,7 @@ export default class EnlistOfflineCtrl extends SimpleController {
                                 this.loadGroupPopulations(this.$routeParams.tournamentId, this.categoryId);
                             }
                         },
-                        this.requestStatus.failed);
+                        (...a) => this.requestStatus.failed(...a));
             }
         });
     }
@@ -78,7 +78,7 @@ export default class EnlistOfflineCtrl extends SimpleController {
                 }
                 this.requestStatus.complete();
             },
-            this.requestStatus.failed);
+            (...a) => this.requestStatus.failed(...a));
     }
 
     activate(cid) {
@@ -133,6 +133,6 @@ export default class EnlistOfflineCtrl extends SimpleController {
                             this.categoryGroups.links.findIndex((link) => link.gid == this.groupId)] += 1;
                     }
                 },
-                this.requestStatus.failed);
+                (...a) => this.requestStatus.failed(...a));
     }
 }

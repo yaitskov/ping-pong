@@ -149,6 +149,9 @@ angular.module('cloudSport').
                     when('/tournament/new', {
                         template: '<new-tournament/>'
                     }).
+                    when('/tournament/import', {
+                        template: '<import-tournament/>'
+                    }).
                     when('/tournament/copy/:tournamentId', {
                         template: '<copy-tournament/>'
                     }).

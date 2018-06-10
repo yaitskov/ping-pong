@@ -32,7 +32,7 @@ export default class ManageOneCtrl extends SimpleController {
                         this.requestStatus.complete();
                         this.participant = state;
                     },
-                    this.requestStatus.failed);
+                    (...a) => this.requestStatus.failed(...a));
             }
         });
     }

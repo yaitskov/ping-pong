@@ -12,9 +12,7 @@ export default class RequestStatusComponent extends AngularBean {
     }
 
     scrollToError() {
-        this.$timeout(function () {
-            this.$anchorScroll('errorOutput');
-        }, 1);
+        this.$timeout(() => this.$anchorScroll('errorOutput'), 1);
     }
 
     strToErr(msg) {

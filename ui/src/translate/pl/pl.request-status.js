@@ -1,6 +1,6 @@
 module.exports = {
     // request status
-    'Loading': 'Ładowanie',
+    'Loading': 'Ładowanie ...',
     'Server is not available': 'Serwer jest nie dostępny',
     'connectivity-hint': 'Sprawdź połączenie z internet',
     'application-error': 'Wystąpił błąd aplikacji',

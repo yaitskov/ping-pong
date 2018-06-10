@@ -16,5 +16,10 @@ module.exports = {
     'Following Tournaments': 'Following Tournaments',
     'no-following-tournaments': 'No following tournaments',
     'configure-console-tournament': 'Configure console tournament',
-    'creating-console-tournament': 'Creating console tournament'
+    'creating-console-tournament': 'Creating console tournament',
+    'import-btn': 'Import',
+    'file-lbl': 'File',
+    'Backup file is required': 'Backup file is required',
+    'Tournament import': 'Tournament import',
+    'Tournament imported': 'Tournament {{name}} imported'
 };

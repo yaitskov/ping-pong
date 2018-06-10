@@ -14,7 +14,7 @@ export default class ImportTournamentCtrl extends SimpleController {
         this.place = this.placePicker.getChosenPlace() || {};
         this.tournamentBackup = this.pageCtx.get('tournamentBackup');
 
-        this.$scope.$watch('$ctrl.tournamentBackup', (oldValue, newValue) => {
+        this.$scope.$watch('$ctrl.tournamentBackup', (newValue) => {
             if (newValue) {
                 try {
                     this.tournamentBackupJson = JSON.parse(newValue);
@@ -22,6 +22,7 @@ export default class ImportTournamentCtrl extends SimpleController {
                     console.error(JSON.stringify(e));
                     this.info.transError('Backup file is not in JSON format');
                     this.tournamentBackup = null;
+                    this.tournamentBackupJson = null;
                 }
             }
         });

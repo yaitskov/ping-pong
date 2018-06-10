@@ -24,7 +24,7 @@ export default class NewTournamentCtrl extends SimpleController {
             this.tournament.placeName = this.place.name;
             this.pageCtx.put('newTournament', this.tournament);
         }
-        this.$scope.$watch('$ctrl.tournament.startTime', (oldValue, newValue) => {
+        this.$scope.$watch('$ctrl.tournament.startTime', (newValue, oldValue) => {
             // space hack
             if (this.tournament.startTime) {
                 this.tournament.startTime = this.tournament.startTime.replace(/([^ ])(AM|PM)$/, '$1 $2');

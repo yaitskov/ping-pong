@@ -22,7 +22,7 @@ angular.
                                           dateFormat: 'Y-m-d',
                                           minDate: new Date()};
 
-                         $scope.$watch('$ctrl.tournament.startTime', function (oldValue, newValue) {
+                         $scope.$watch('$ctrl.tournament.startTime', function (newValue, oldValue) {
                              // space hack
                              if (self.tournament.startTime) {
                                  self.tournament.startTime = self.tournament.startTime.replace(/([^ ])(AM|PM)$/, '$1 $2');

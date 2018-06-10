@@ -166,10 +166,17 @@ public class GroupParticipantOrderService {
     private void ensureUidsWithoutMatchesFlushed(GroupParticipantOrder order,
             GroupPositionIdx ambiPosI, GroupPosition ambiPos, GroupSplitLoop loop,
             CounterInt counterInt) {
-        if (ambiPos.getCompetingUids().isEmpty()) {
-            return;
+        switch (ambiPos.getCompetingUids().size()) {
+            case 0:
+                return;
+            case 1:
+                loop.lastWonLost = notApplicableRule(
+                        ambiPos.getCompetingUids().stream().findAny().get(),
+                        ambiPos.getRule().get().name());
+                break;
+            default:
+                loop.lastWonLost = notApplicableRule(ambiPos.getRule().get().name());
         }
-        loop.lastWonLost = notApplicableRule(ambiPos.getRule().get().name());
         loop.uids = ambiPos.getCompetingUids();
         flush(order, ambiPosI.plus(counterInt.toInt()), ambiPos, loop);
     }

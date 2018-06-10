@@ -13,16 +13,21 @@ import org.dan.ping.pong.app.match.rule.OrderRuleName;
 @NoArgsConstructor
 @AllArgsConstructor(onConstructor = @__(@JsonIgnore))
 public class InfoReason implements Reason {
+    @Getter(onMethod = @__(@JsonIgnore))
+    private Uid uid;
     private OrderRuleName rule;
 
-    public static InfoReason notApplicableRule(OrderRuleName rule) {
-        return new InfoReason(rule);
+    @JsonIgnore
+    public InfoReason(OrderRuleName rule) {
+        this.rule = rule;
     }
 
-    @Override
-    @JsonIgnore
-    public Uid getUid() {
-        return null;
+    public static InfoReason notApplicableRule(OrderRuleName rule) {
+        return notApplicableRule(null, rule);
+    }
+
+    public static InfoReason notApplicableRule(Uid uid, OrderRuleName rule) {
+        return new InfoReason(uid, rule);
     }
 
     @Override

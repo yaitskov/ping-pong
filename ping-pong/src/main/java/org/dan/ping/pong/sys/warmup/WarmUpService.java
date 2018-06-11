@@ -27,7 +27,7 @@ public class WarmUpService {
         }
     }
 
-    public void logDuration(int warmUpId) {
-        warmUpDao.logDuration(warmUpId, clocker.get());
+    public int logDuration(int warmUpId) {
+        return warmUpDao.logDuration(warmUpId, clocker.get());
     }
 }

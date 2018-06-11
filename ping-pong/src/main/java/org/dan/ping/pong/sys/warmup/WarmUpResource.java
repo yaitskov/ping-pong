@@ -8,6 +8,8 @@ import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.user.UserInfo;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -17,15 +19,19 @@ import javax.ws.rs.Produces;
 @Path("/")
 @Produces(APPLICATION_JSON)
 public class WarmUpResource {
+    public static final String WARM_UP = "/warm/up";
+
     @Inject
     private WarmUpService warmUpService;
     @Inject
     private AuthService authService;
 
     @POST
+    @Path(WARM_UP)
+    @Consumes(APPLICATION_JSON)
     public int warmUp(
             @HeaderParam(SESSION) String session,
-            WarmUpRequest request) {
+            @Valid WarmUpRequest request) {
         final UserInfo user = authService.userInfoBySession(session);
         return warmUpService.warmUp(user, request);
     }

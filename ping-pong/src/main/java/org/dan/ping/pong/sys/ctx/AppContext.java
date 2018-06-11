@@ -19,6 +19,7 @@ import org.dan.ping.pong.sys.EmailService;
 import org.dan.ping.pong.sys.ctx.jackson.JacksonContext;
 import org.dan.ping.pong.sys.db.DbContext;
 import org.dan.ping.pong.sys.seqex.SeqexCtx;
+import org.dan.ping.pong.sys.warmup.WarmUpCtx;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -41,6 +42,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         TimeContext.class,
         JacksonContext.class,
         CronContext.class,
+        WarmUpCtx.class,
         EmailService.class,
         SeqexCtx.class,
         DbContext.class})

@@ -29,7 +29,7 @@ public class CleanUpWarmUpJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) {
         final Instant cutPoint = clocker.get().minus(30, ChronoUnit.DAYS);
         log.info("Cleaned {} warm-up entries older that {}",
-                cutPoint, warmUpDao.cleanOlderThan(cutPoint));
+                warmUpDao.cleanOlderThan(cutPoint), cutPoint);
     }
 
     @Getter

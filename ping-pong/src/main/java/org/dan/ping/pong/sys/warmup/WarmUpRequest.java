@@ -9,12 +9,17 @@ import lombok.Setter;
 
 import java.time.Instant;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(onConstructor = @__(@JsonIgnore))
 public class WarmUpRequest {
+    @NotBlank
     private String action;
+    @NotNull
     private Instant clientTime;
 }

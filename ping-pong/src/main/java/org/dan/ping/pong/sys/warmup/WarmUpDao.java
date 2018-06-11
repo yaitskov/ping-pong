@@ -26,8 +26,8 @@ public class WarmUpDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void logDuration(int warmUpId, Instant now) {
-        jooq.update(WARM_UP)
+    public int logDuration(int warmUpId, Instant now) {
+        return jooq.update(WARM_UP)
                 .set(WARM_UP.COMPLETE_AT, now)
                 .where(WARM_UP.WM_ID.eq(warmUpId))
                 .execute();

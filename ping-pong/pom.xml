@@ -601,13 +601,33 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>Instant</name>
+                                    <expression>.*warm_up\.complete_at</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Instant</name>
+                                    <expression>.*warm_up\.client_started</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
                                     <name>OptionalInstant</name>
                                     <expression>.*match_dispute\.resolved_at</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
                                     <name>Instant</name>
+                                    <expression>.*warm_up\.created</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Instant</name>
                                     <expression>.*match_dispute\.created</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Uid</name>
+                                    <expression>.*warm_up\.uid</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

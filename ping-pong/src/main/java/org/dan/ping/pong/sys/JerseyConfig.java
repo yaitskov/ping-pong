@@ -32,6 +32,8 @@ import org.dan.ping.pong.sys.error.PiPoExMapper;
 import org.dan.ping.pong.sys.error.UncheckedExecutionExceptionMapper;
 import org.dan.ping.pong.sys.error.UndeclaredThrowableExecutionExceptionMapper;
 import org.dan.ping.pong.sys.error.UnrecognizedPropertyExceptionMapper;
+import org.dan.ping.pong.sys.warmup.WarmUpHttpFilter;
+import org.dan.ping.pong.sys.warmup.WarmUpResource;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -42,6 +44,7 @@ public class JerseyConfig extends ResourceConfig {
     public JerseyConfig() {
         property(BV_SEND_ERROR_IN_RESPONSE, true);
         register(new LoggingFilter());
+        register(WarmUpHttpFilter.class);
         register(ObjectMapperContextResolver.class);
         register(JacksonJaxbJsonProvider.class);
         register(new PiPoExMapper());
@@ -57,6 +60,7 @@ public class JerseyConfig extends ResourceConfig {
         packages(false,
                 asList(UserResource.class, SysAdminSignInResource.class,
                         PlaceResource.class, TournamentResource.class,
+                        WarmUpResource.class,
                         TournamentMarshalingResource.class,
                         GroupResource.class, MatchDisputeResource.class,
                         BidResource.class, CategoryResource.class,

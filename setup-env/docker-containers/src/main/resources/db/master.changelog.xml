@@ -12,4 +12,5 @@
     <include relativeToChangelogFile="true" file="r1.0.008.sport.changelog.sql"/>
     <include relativeToChangelogFile="true" file="r1.0.008.tournament.type.changelog.sql"/>
     <include relativeToChangelogFile="true" file="r1.0.009.match-tag.changelog.sql"/>
+    <include relativeToChangelogFile="true" file="r1.0.010.warm-up.changelog.sql"/>
 </databaseChangeLog>

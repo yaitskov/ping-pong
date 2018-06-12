@@ -1,6 +1,7 @@
 import angular from 'angular';
 import jQuery from 'jquery';
 import AppLang from './ui/lang.js';
+import InjectingSessionInterceptor from './InjectingSessionInterceptor.js';
 
 var translateTables = require('./translate/translate.js');
 
@@ -29,21 +30,7 @@ angular.module('cloudSport').
     //         $log.warn(exception, cause);
     //     };
     // }]).
-    service('injectingSessionInterceptor', ['auth', function (auth) {
-        var ser = this;
-        ser.request = function (config) {
-            var session = auth.mySession();
-            if (session) {
-                if (config.headers.session) {
-                    config.headers.session = session;
-                }
-            } else if (config.headers.session) {
-                // prevent sending request
-                console.log("Error session is missing");
-            }
-            return config;
-        };
-    }]).
+    service('injectingSessionInterceptor', InjectingSessionInterceptor).
     config(['$locationProvider', '$routeProvider', '$translateProvider',
             function config($locationProvider, $routeProvider, $translateProvider) {
                 $translateProvider

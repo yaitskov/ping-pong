@@ -21,6 +21,7 @@ public class WarmUpService {
     public int warmUp(UserInfo user, WarmUpRequest request) {
         final String action = warmUpCache.getIfPresent(request.getAction());
         if (action == null) {
+            warmUpCache.put(request.getAction(), request.getAction());
             return warmUpDao.warmUp(user.getUid(), request, clocker.get());
         } else {
             return 0;

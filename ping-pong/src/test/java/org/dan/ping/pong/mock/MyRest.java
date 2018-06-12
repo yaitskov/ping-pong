@@ -11,6 +11,7 @@ import java.net.URI;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
@@ -40,9 +41,13 @@ public class MyRest {
         return post(path, sessionAware.getSession(), entity);
     }
 
-    public <T> Response post(String path, String session, T entity) {
+    public <T> Invocation.Builder postBuilder(String path, String session) {
         return request().path(path).request(APPLICATION_JSON)
-                .header(SESSION, session)
+                .header(SESSION, session);
+    }
+
+    public <T> Response post(String path, String session, T entity) {
+        return postBuilder(path, session)
                 .post(Entity.entity(entity, APPLICATION_JSON));
     }
 

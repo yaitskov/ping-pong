@@ -8,7 +8,7 @@ export default class WarmUp extends AngularBean {
     warmUp(action) {
         this.$http.post(
             '/api/warm/up',
-            {action: action, clientTime: new Date()},
+            {action: action, warmUpStarted: new Date()},
             {headers: {session: 1}}).then(
                 (ok) => {
                     if (ok.data) {

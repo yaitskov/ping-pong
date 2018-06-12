@@ -607,6 +607,11 @@
                                 </forcedType>
                                 <forcedType>
                                     <name>Instant</name>
+                                    <expression>.*warm_up\.warm_up_started</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Instant</name>
                                     <expression>.*warm_up\.client_started</expression>
                                     <types>.*</types>
                                 </forcedType>

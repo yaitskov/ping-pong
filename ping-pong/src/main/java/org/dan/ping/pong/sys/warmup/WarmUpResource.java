@@ -2,6 +2,7 @@ package org.dan.ping.pong.sys.warmup;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
@@ -32,7 +33,11 @@ public class WarmUpResource {
     public int warmUp(
             @HeaderParam(SESSION) String session,
             @Valid WarmUpRequest request) {
-        final UserInfo user = authService.userInfoBySession(session);
-        return warmUpService.warmUp(user, request);
+        return warmUpService.warmUp(
+                authService
+                        .userInfoBySessionQuite(session)
+                        .map(UserInfo::getUid)
+                        .orElse(FILLER_LOSER_UID),
+                request);
     }
 }

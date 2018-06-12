@@ -1,8 +1,12 @@
 package org.dan.ping.pong.sys.warmup;
 
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.dan.ping.pong.app.tournament.Kw04FirstTournamentJerseyTest.RULES_G8Q1_S1A2G11_NP;
 import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
+import static org.dan.ping.pong.sys.warmup.WarmUpHttpFilter.CS_CLIENT_STARTED;
+import static org.dan.ping.pong.sys.warmup.WarmUpHttpFilter.CS_WARM_UP_ID;
+import static org.dan.ping.pong.sys.warmup.WarmUpResource.WARM_UP;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -21,7 +25,6 @@ import org.springframework.test.context.ContextConfiguration;
 import javax.inject.Inject;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
-import javax.ws.rs.core.MediaType;
 
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = JerseyWithSimulator.class)
@@ -55,17 +58,19 @@ public class WarmUpTest extends AbstractSpringJerseyTest {
 
     private Integer doWarmUp(TournamentScenario scenario, Integer wmId, String action) {
         final Invocation.Builder builder = myRest()
-                .postBuilder(WarmUpResource.WARM_UP, scenario.getTestAdmin().getSession());
+                .postBuilder(WARM_UP, scenario.getTestAdmin().getSession());
         if (wmId != null) {
-            builder.header(WarmUpHttpFilter.CS_WARM_UP_ID, wmId);
+            builder.header(CS_WARM_UP_ID, wmId)
+                    .header(CS_CLIENT_STARTED,
+                            clocker.get().minusMillis(1).toEpochMilli());
         }
         return builder
                 .post(Entity.entity(WarmUpRequest
                                 .builder()
                                 .action(action)
-                                .clientTime(clocker.get().minusMillis(1))
+                                .warmUpStarted(clocker.get().minusMillis(1))
                                 .build(),
-                        MediaType.APPLICATION_JSON_TYPE))
+                        APPLICATION_JSON_TYPE))
                 .readEntity(Integer.class);
     }
 

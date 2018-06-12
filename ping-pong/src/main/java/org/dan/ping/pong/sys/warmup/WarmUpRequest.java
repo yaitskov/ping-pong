@@ -21,5 +21,5 @@ public class WarmUpRequest {
     @NotBlank
     private String action;
     @NotNull
-    private Instant clientTime;
+    private Instant warmUpStarted;
 }

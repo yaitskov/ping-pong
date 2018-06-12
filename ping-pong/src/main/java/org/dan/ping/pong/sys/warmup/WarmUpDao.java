@@ -23,8 +23,8 @@ public class WarmUpDao {
         return jooq
                 .insertInto(
                         WARM_UP, WARM_UP.BEFORE_ACTION, WARM_UP.UID,
-                        WARM_UP.CREATED, WARM_UP.CLIENT_STARTED)
-                .values(request.getAction(), uid, now, request.getClientTime())
+                        WARM_UP.CREATED, WARM_UP.WARM_UP_STARTED)
+                .values(request.getAction(), uid, now, request.getWarmUpStarted())
                 .returning()
                 .fetchOne()
                 .get(WARM_UP.WM_ID);
@@ -48,9 +48,10 @@ public class WarmUpDao {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public int logDuration(int warmUpId, Instant now) {
+    public int logDuration(int warmUpId, Instant now, Instant clientStarted) {
         return jooq.update(WARM_UP)
                 .set(WARM_UP.COMPLETE_AT, now)
+                .set(WARM_UP.CLIENT_STARTED, clientStarted)
                 .where(WARM_UP.WM_ID.eq(warmUpId))
                 .execute();
     }

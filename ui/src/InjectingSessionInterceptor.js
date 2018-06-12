@@ -24,6 +24,7 @@ export default class InjectingSessionInterceptors extends AngularBean {
                 delete this.action2WmId[config.url];
                 console.log(`Complete warm up ${config.url} => ${wmId}`);
                 config.headers['cs-warm-up-id'] = wmId;
+                config.headers['cs-client-started'] = new Date().getTime();
             }
             return config;
         };

@@ -21,7 +21,7 @@ angular.
                                          requestStatus.complete();
                                          self.profile = profile;
                                      },
-                                     requestStatus.failed);
+                                     (...a) => requestStatus.failed(...a));
                              }
                          });
                      }

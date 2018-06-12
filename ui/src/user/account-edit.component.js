@@ -21,7 +21,7 @@ angular.
                                     auth.updateAccount(self.data);
                                     history.back();
                                 },
-                                requestStatus.failed);
+                              (...a) => requestStatus.failed(...a));
                 };
                 binder($scope, {
                     'event.main.menu.ready': (e) => mainMenu.setTitle('Account Modification'),
@@ -33,7 +33,7 @@ angular.
                                     requestStatus.complete();
                                     self.data.phone = ok.data.phone;
                                 },
-                                requestStatus.failed);
+                                (...a) => requestStatus.failed(...a));
                     }
                 });
             }]});

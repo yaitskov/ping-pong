@@ -41,7 +41,7 @@ angular.module('participant').
                                      requestStatus.complete();
                                      participant.state = 'Paid';
                                  },
-                                 requestStatus.failed);
+                               (...a) => requestStatus.failed(...a));
                          };
                          this.participantIsHere = function (participant) {
                              requestStatus.startLoading("Marking participant presence");
@@ -54,7 +54,7 @@ angular.module('participant').
                                      requestStatus.complete();
                                      participant.state = 'Here';
                                  },
-                                 requestStatus.failed);
+                               (...a) => requestStatus.failed(...a));
                          };
                          this.resetToWant = function (participant) {
                              requestStatus.startLoading("Reseting participant");
@@ -67,7 +67,7 @@ angular.module('participant').
                                      requestStatus.complete();
                                      participant.state = 'Want';
                                  },
-                                 requestStatus.failed);
+                               (...a) => requestStatus.failed(...a));
                          };
                          binder($scope, {
                              'event.main.menu.ready': (e) => {
@@ -84,7 +84,7 @@ angular.module('participant').
                                              self.enlisted = okResp.data;
                                              requestStatus.complete();
                                          },
-                                         requestStatus.failed);
+                                         (...a) => requestStatus.failed(...a));
                              }
                          });
                      }

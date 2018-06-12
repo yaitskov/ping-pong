@@ -19,7 +19,7 @@ angular.
                                          requestStatus.complete();
                                          self.rules = rules;
                                      },
-                                     requestStatus.failed);
+                                     (...a) => requestStatus.failed(...a));
                              }
                          });
                      }]});

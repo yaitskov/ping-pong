@@ -20,7 +20,7 @@ angular.module('placePicker').
                                          requestStatus.complete();
                                          self.places = l;
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                              }
                          });
                      }

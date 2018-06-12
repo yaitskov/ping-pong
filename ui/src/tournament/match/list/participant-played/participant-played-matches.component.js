@@ -30,7 +30,7 @@ angular.
                                          inGroupBarier.got('data', matches.inGroup);
                                          playOffBarier.got('data', matches.playOff);
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                              }
                          });
                      }

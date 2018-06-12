@@ -21,7 +21,7 @@ angular.module('participant').
                                      requestStatus.complete(ok);
                                      window.history.back();
                                  },
-                                 requestStatus.failed);
+                               (...a) => requestStatus.failed(...a));
                          };
                          $scope.$watch('$ctrl.sortMode', (newVavlue, oldValue) => {
                              if (!self.rankedBids) {
@@ -56,7 +56,7 @@ angular.module('participant').
                                                  self.rankedBids = responses[1];
                                                  requestStatus.complete(responses);
                                              },
-                                             requestStatus.failed);
+                                             (...a) => requestStatus.failed(...a));
                              }
                          });
                      }

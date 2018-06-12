@@ -1,14 +1,6 @@
 import angular from 'angular';
 import template from './tr-group-switcher.template.html';
 
-//class TrGroupSwitcher {
-//
-//    $onInit() {
-//    }
-//
-//    constructor() {
-//    }
-//}
 
 angular.module('participant').
     component('trGroupMemberSwitcher', {
@@ -35,7 +27,8 @@ angular.module('participant').
                              if (targetGid !== 0) {
                                  req.targetGid = targetGid;
                              }
-                             Participant.changeGroup(req, () => history.back(), requestStatus.failed);
+                             Participant.changeGroup(req, () => history.back(),
+                                                    (...a) => requestStatus.failed(...a));
                          };
 
                          binder($scope, {
@@ -58,7 +51,7 @@ angular.module('participant').
                                          self.groups = responses[0].groups;
                                          self.bid = responses[1];
                                      },
-                                     requestStatus.failed);
+                                     (...a) => requestStatus.failed(...a));
                              }
                          });
                      }

@@ -30,7 +30,7 @@ angular.module('tournament').
                                              self.openMatch = cutil.findValByO(matches.matches, {state: 'Game'});
                                          }
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                              }
                          });
                      }

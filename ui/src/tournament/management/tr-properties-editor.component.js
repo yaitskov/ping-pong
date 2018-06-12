@@ -61,7 +61,7 @@ angular.
                                      requestStatus.complete();
                                      history.back();
                                  },
-                                 requestStatus.failed);
+                               (...a) => requestStatus.failed(...a));
                          };
                          binder($scope, {
                              'event.main.menu.ready': (e) => mainMenu.setTitle('Tournament Modification'),
@@ -76,7 +76,7 @@ angular.
                                          self.splitDate();
                                          pageCtx.put('editableTournament', self.tournament);
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                              }
                          });
                      }]});

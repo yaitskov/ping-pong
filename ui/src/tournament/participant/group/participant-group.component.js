@@ -18,7 +18,7 @@ angular.
                                            self.group = groupInfo;
                                            self.members = groupInfo.members;
                                        },
-                                       requestStatus.failed);
+                                     (...a) => requestStatus.failed(...a));
                          binder($scope, {
                              'event.main.menu.ready': (e) => mainMenu.setTitle('Group members'),
                          });

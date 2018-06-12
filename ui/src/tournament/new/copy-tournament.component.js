@@ -49,7 +49,7 @@ angular.
                                          requestStatus.complete();
                                          $location.path('/my/tournament/' + ok.data);
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                          };
                          binder($scope, {
                              'event.main.menu.ready': (e) => mainMenu.setTitle('Copy Tournament'),
@@ -61,7 +61,7 @@ angular.
                                                       self.tournament.name = tournament.name;
                                                       self.tournament.startTime = $moment(tournament.opensAt).format('hh:mm A');
                                                   },
-                                                  requestStatus.failed);
+                                                (...a) => requestStatus.failed(...a));
                              }
                          });
                      }]});

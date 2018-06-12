@@ -36,6 +36,6 @@ angular.
                                                   userName, self.email,
                                                   okResp.data.type);
                             },
-                            requestStatus.failed);
+                            (...a) => requestStatus.failed(...a));
                 };
             }]});

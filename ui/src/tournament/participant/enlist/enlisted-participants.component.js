@@ -20,7 +20,7 @@ angular.
                                                       requestStatus.complete();
                                                       self.members = catInfo.users;
                                                   },
-                                                  requestStatus.failed);
+                                                (...a) => requestStatus.failed(...a));
                              },
                              'event.category.switch.ready': (event) => {
                                  $rootScope.$broadcast('event.category.switch.data', self.categories);

@@ -22,7 +22,7 @@ angular.
                                     requestStatus.complete();
                                     history.back();
                                 },
-                                requestStatus.failed);
+                              (...a) => requestStatus.failed(...a));
                 };
                 binder($scope, {
                     'event.main.menu.ready': (e) => mainMenu.setTitle('Place Modification'),
@@ -39,7 +39,7 @@ angular.
                                          self.data.address.address = self.place.address.address;
                                          mainMenu.setTitle(['ModificationOf', {name: place.name}]);
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                     }
                 });
             }]});

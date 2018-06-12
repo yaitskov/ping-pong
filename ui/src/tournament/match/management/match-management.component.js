@@ -29,7 +29,7 @@ angular.
                                              match.state == 'Place';
                                          $rootScope.$broadcast('event.review.match.data', match);
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                               }
                          });
                          console.log('match management bound');

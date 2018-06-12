@@ -26,7 +26,7 @@ angular.module('tournamentCategory').
                                                       state: self.tournament.state});
                                          $location.path('/my/tournament/' + self.tournament.tid);
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                          };
                          this.addGroup = function () {
                              self.form.$setSubmitted();
@@ -45,7 +45,7 @@ angular.module('tournamentCategory').
                                          requestStatus.complete();
                                          self.form.$setPristine(true);
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                          };
                          this.removeCategoryByIdx = function (idx) {
                              requestStatus.startLoading('Removing category');
@@ -57,7 +57,7 @@ angular.module('tournamentCategory').
                                          requestStatus.complete();
                                          self.categories.splice(idx, 1);
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                          };
                          binder($scope, {
                              'event.main.menu.ready': (e) => {
@@ -73,7 +73,7 @@ angular.module('tournamentCategory').
                                              requestStatus.complete();
                                              self.categories = okResp.data;
                                          },
-                                         requestStatus.failed);
+                                       (...a) => requestStatus.failed(...a));
                              }
                          });
                      }

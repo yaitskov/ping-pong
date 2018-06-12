@@ -35,7 +35,7 @@ angular.
                                              mainMenu.setTitle(
                                                  ['MatchesOf', {name: self.tournament.name}]);
                                          },
-                                         requestStatus.failed);
+                                         (...a) => requestStatus.failed(...a));
                                  })
                              }
                          });

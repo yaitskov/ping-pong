@@ -27,7 +27,7 @@ angular.
                                                       resp.data.type);
                                     $location.path('/');
                                 },
-                                requestStatus.failed);
+                                (...a) => requestStatus.failed(...a));
                     }
                 });
             }]});

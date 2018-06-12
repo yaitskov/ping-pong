@@ -30,7 +30,7 @@ angular.
                             self.tables.splice(idx, 1);
                             requestStatus.complete()
                         },
-                        requestStatus.failed);
+                      (...a) => requestStatus.failed(...a));
                 };
                 this.addTables = function () {
                     self.form.$setSubmitted();
@@ -45,7 +45,7 @@ angular.
                                   self.load();
                                   self.newTables = 1;
                               },
-                              requestStatus.failed);
+                            (...a) => requestStatus.failed(...a));
                 };
                 this.load = function () {
                     requestStatus.startLoading();
@@ -54,7 +54,7 @@ angular.
                                      requestStatus.complete();
                                      self.tables = tables;
                                  },
-                                 requestStatus.failed);
+                               (...a) => requestStatus.failed(...a));
                 };
                 binder($scope, {
                     'event.main.menu.ready': (e) => mainMenu.setTitle('Place Tables'),

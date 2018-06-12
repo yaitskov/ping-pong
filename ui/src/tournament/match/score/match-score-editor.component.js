@@ -105,7 +105,7 @@ angular.
                                          self.match = match;
                                          $rootScope.$broadcast('event.review.match.data', match);
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                              }
                          });
                      }]});

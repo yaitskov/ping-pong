@@ -20,7 +20,7 @@ angular.module('tournamentCategory').
                                  function (ok) {
                                      history.back();
                                  },
-                                 requestStatus.failed);
+                               (...a) => requestStatus.failed(...a));
                          };
 
                          binder($scope, {
@@ -37,7 +37,7 @@ angular.module('tournamentCategory').
                                          requestStatus.complete();
                                          self.categories = categories;
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                              }
                          });
                      }

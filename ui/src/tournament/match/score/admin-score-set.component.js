@@ -30,7 +30,7 @@ angular.
                                              requestStatus.complete();
                                              matchReady.got('match.loaded', match);
                                          },
-                                         requestStatus.failed);
+                                       (...a) => requestStatus.failed(...a));
                                  } else {
                                      matchReady.got('match.loaded', self.match);
                                  }

@@ -22,7 +22,7 @@ angular.
                                                   pageCtx.put('place', place);
                                                   mainMenu.setTitle(['ManagementOf', {name: place.name}], extraMenu);
                                               },
-                                              requestStatus.failed);
+                                            (...a) => requestStatus.failed(...a));
                              }
                          });
                      }]});

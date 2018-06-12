@@ -30,7 +30,7 @@ angular.
 
                                          $rootScope.$broadcast('event.category.switch.data', {list: self.categories});
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                          };
 
                          var barWidgetsReady = eBarier.create(['group', 'category', 'status'], (e) => {
@@ -55,7 +55,7 @@ angular.
                                          requestStatus.complete();
                                          MessageBus.broadcast(ClassicGroupViewCtrl.TopicLoad, tournament);
                                      },
-                                     requestStatus.failed);
+                                     (...a) => requestStatus.failed(...a));
                          };
 
                          self.scoreShowMode = 'sets';

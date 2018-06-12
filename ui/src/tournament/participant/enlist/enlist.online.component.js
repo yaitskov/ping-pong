@@ -82,7 +82,7 @@ angular.
                                              self.myCategory.name = cutil.findValBy(self.tournament.categories,
                                                                                     {cid: self.myCategory.cid}).name;
                                          },
-                                         requestStatus.failed);
+                                       (...a) => requestStatus.failed(...a));
                              } else {
                                  auth.requireLogin();
                              }
@@ -96,7 +96,7 @@ angular.
                                      self.tournament.bidState = 'Quit';
                                      requestStatus.complete();
                                  },
-                                 requestStatus.failed);
+                               (...a) => requestStatus.failed(...a));
                          };
 
                          var setLastTournament = eBarier.create(

@@ -25,7 +25,7 @@ angular.module('tournamentCategory').
                                          self.members = catInfo.users;
                                          self.catInfo = catInfo;
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                              }
                          });
                      }

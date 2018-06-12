@@ -48,7 +48,7 @@ angular.
                                                       name: self.tournament.name,
                                                       state: self.tournament.state});
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                              }
                          });
                          this.haveFollowingTournaments = () => self.tournament &&
@@ -80,7 +80,7 @@ angular.
                                          self.tournament.state = 'Draft';
                                          requestStatus.complete();
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                          };
                          this.expelAndOpenTournament = function () {
                              if (!self.errorHasUncheckedUsers || !self.errorHasUncheckedUsers.length) {
@@ -97,7 +97,7 @@ angular.
                                  function (ok) {
                                      self.expelAndOpenTournament();
                                  },
-                                 requestStatus.failed);
+                               (...a) => requestStatus.failed(...a));
                          };
                          this.cancelExpelAll = function () {
                              self.errorHasUncheckedUsers = null;
@@ -138,7 +138,7 @@ angular.
                                      requestStatus.complete();
                                      self.tournament.state = 'Draft';
                                  },
-                                 requestStatus.failed);
+                               (...a) => requestStatus.failed(...a));
                          }
                          this.confirmCancel = function () {
                              this.wantRemove = false;
@@ -151,7 +151,7 @@ angular.
                                          self.tournament.state = 'Canceled';
                                          requestStatus.complete();
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                          };
                      }
                     ]

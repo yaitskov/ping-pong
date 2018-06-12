@@ -28,6 +28,6 @@ angular.
                                 self.ok = 1;
                                 requestStatus.complete(ok);
                             },
-                            requestStatus.failed);
+                            (...a) => requestStatus.failed(...a));
                 };
             }]});

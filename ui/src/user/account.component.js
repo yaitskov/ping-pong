@@ -41,7 +41,7 @@ angular.
                                 self.adminAccessRequested = 1;
                                 requestStatus.complete();
                             },
-                            requestStatus.failed);
+                          (...a) => requestStatus.failed(...a));
                 };
                 this.generateSignInLink = function () {
                     requestStatus.startLoading("Sending email");
@@ -54,7 +54,7 @@ angular.
                                 self.signInEmailSent = true;
                                 requestStatus.complete(ok);
                             },
-                            requestStatus.failed);
+                          (...a) => requestStatus.failed(...a));
                 };
                 this.logout = function () {
                     if (self.email) {
@@ -76,7 +76,7 @@ angular.
                                     requestStatus.complete();
                                     self.userData = ok.data;
                                 },
-                                requestStatus.failed);
+                                (...a) => requestStatus.failed(...a));
                     }
                 });
             }]});

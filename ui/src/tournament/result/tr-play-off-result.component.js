@@ -29,7 +29,7 @@ angular.
 
                                          $rootScope.$broadcast('event.category.switch.data', {list: self.categories});
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                          };
 
                          var barWidgetsReady = eBarier.create(['view', 'category', 'status'], (e) => {
@@ -44,7 +44,7 @@ angular.
                                     tournament.tid = $routeParams.tournamentId;
                                     $rootScope.$broadcast('event.playoff.view.data', tournament);
                                 },
-                                requestStatus.failed);
+                                (...a) => requestStatus.failed(...a));
 
                          };
 

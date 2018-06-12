@@ -68,7 +68,7 @@ angular.
                                          requestStatus.complete();
                                          self.cityForm.$setPristine(true);
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
 
                          };
                          this.createCountryAndUse = function () {
@@ -91,7 +91,7 @@ angular.
                                          self.countryForm.$setPristine(true);
                                          self.showNewCityForm();
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                          };
                          this.createPlace = function () {
                              self.form.$setSubmitted();
@@ -110,7 +110,7 @@ angular.
                                          requestStatus.complete();
                                          window.history.back();
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                          };
                          self.loadCities = function () {
                              requestStatus.startLoading('Cities');
@@ -120,7 +120,7 @@ angular.
                                      self.cities = cities;
                                      requestStatus.complete();
                                  },
-                                 requestStatus.failed);
+                               (...a) => requestStatus.failed(...a));
                          }
                          binder($scope, {
                              'event.main.menu.ready': (e) => mainMenu.setTitle('New Place'),
@@ -139,7 +139,7 @@ angular.
                                          }
                                          requestStatus.complete();
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
 
                                  if (self.countryId) {
                                      self.loadCities();

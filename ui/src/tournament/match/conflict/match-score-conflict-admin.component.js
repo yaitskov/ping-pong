@@ -82,6 +82,6 @@ angular.
                                              }
                                          });
                                  },
-                                 requestStatus.failed);
+                               (...a) => requestStatus.failed(...a));
                          }
                      }]});

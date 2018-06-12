@@ -21,7 +21,7 @@ angular.module('participant').
                         requestStatus.complete();
                         self.bid.state = expelAs;
                     },
-                    requestStatus.failed);
+                  (...a) => requestStatus.failed(...a));
             };
             self.expelUrl = (tid, uid) => `#!/my/tournament/${tid}/participant/${uid}`;
             binder($scope, {

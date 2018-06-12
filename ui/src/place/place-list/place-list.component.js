@@ -17,7 +17,7 @@ angular.module('place').
                                          requestStatus.complete();
                                          self.places = places;
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                              }
                          });
                      }

@@ -44,7 +44,7 @@ angular.
                                                                    Object.assign({}, responses[1].toJSON(),
                                                                                  {rules: responses[0].toJSON()}));
                                          },
-                                         requestStatus.failed);
+                                       (...a) => requestStatus.failed(...a));
                              }
                          });
                      }]});

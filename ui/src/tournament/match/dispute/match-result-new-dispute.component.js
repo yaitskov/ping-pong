@@ -26,7 +26,7 @@ angular.
                                                     $routeParams.tournamentId + '/' +
                                                     $routeParams.matchId);
                                  },
-                                 requestStatus.failed);
+                               (...a) => requestStatus.failed(...a));
                          };
 
                          self.acceptSetScore = function () {
@@ -79,7 +79,7 @@ angular.
                                          self.match = match;
                                          $rootScope.$broadcast('event.review.match.data', match);
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                              }
                          });
                      }]});

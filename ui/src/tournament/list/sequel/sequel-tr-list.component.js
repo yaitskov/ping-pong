@@ -19,7 +19,7 @@ angular.module('tournament').
                                          requestStatus.complete();
                                          self.tournaments = tournaments;
                                      },
-                                     requestStatus.failed);
+                                   (...a) => requestStatus.failed(...a));
                              }
                          });
                      }

@@ -1,6 +1,7 @@
 <div class="container request-status" ng-show="$ctrl.loading || $ctrl.error">
-  <div class="alert alert-info" ng-show="$ctrl.loading.message">
-    {{ $ctrl.loading.message | translate : $ctrl.loading.params }} ...
+  <div class="alert alert-info"
+       ng-bind-html="$ctrl.loading.message | translate : $ctrl.loading.params"
+       ng-show="$ctrl.loading.message">
   </div>
   <div id="errorOutput">
     <div ng-show="$ctrl.error.message">

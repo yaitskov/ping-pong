@@ -20,9 +20,10 @@ export default class EnlistOfflineCtrl extends SimpleController {
         this.enlisted = [];
         this.form = {};
 
+        this.mainMenu.setTitle('Offline enlist');
+
         const req = {tournamentId: this.$routeParams.tournamentId};
         this.binder(this.$scope, {
-            'event.main.menu.ready': (e) => this.mainMenu.setTitle('Offline enlist'),
             'event.request.status.ready': (event) => {
                 this.requestStatus.startLoading('Loading');
                 this.$q.all([
@@ -129,7 +130,7 @@ export default class EnlistOfflineCtrl extends SimpleController {
                     jQuery(this.form.fullName.$$element).focus();
                     if (this.groupId === 0) {
                         this.loadGroupPopulations(this.$routeParams.tournamentId, this.categoryId);
-                    } else {
+                    } else if (this.groupId) {
                         this.categoryGroups.populations[
                             this.categoryGroups.links.findIndex((link) => link.gid == this.groupId)] += 1;
                     }

@@ -1,10 +1,13 @@
 import { setupAngularJs, ij } from 'test/angularjs-test-setup.js';
 
 describe('sign-up', () => {
-    const ctx = setupAngularJs('sign-up');
+    const ctx = setupAngularJs(
+        'sign-up',
+        {onInit: (scope, jsHttpBackend) => jsHttpBackend.onPost(/.api.warm.up/,
+                                                                (data) => true).respondObject(0)});
     const baseFormData = {'#firstName': 'daniil', '#lastName': 'iaitskov'};
 
-    it('dom working', () => {
+    ij('dom working', () => {
         ctx.find('#firstName').val('123').triggerHandler('input');
         expect(ctx.find('#firstName').val()).toBe('123');
         expect(ctx.ctrl.firstName).toBe('123');

@@ -4,10 +4,12 @@ export default class EnlistOfflineCtrl extends SimpleController {
     static get $inject () {
         return ['$routeParams', 'Tournament', 'mainMenu', '$q', 'Group',
                 'requestStatus', 'Participant', '$http', 'auth', 'pageCtx',
-                'binder', '$scope'];
+                'binder', '$scope', 'WarmUp'];
     }
 
     $onInit() {
+        this.enlistPath = '/api/tournament/enlist-offline';
+        this.WarmUp.warmUp(this.enlistPath);
         this.groupId = null;
         this.categoryId = null;
         this.tournamentId = this.$routeParams.tournamentId;
@@ -115,9 +117,8 @@ export default class EnlistOfflineCtrl extends SimpleController {
         if (this.groupId) {
             req.groupId = this.groupId;
         }
-        this.$http.post('/api/tournament/enlist-offline',
-                   req,
-                   {headers: {session: this.auth.mySession()}}).
+        this.$http.post(this.enlistPath, req,
+                        {headers: {session: this.auth.mySession()}}).
             then(
                 (resp) => {
                     this.requestStatus.complete();

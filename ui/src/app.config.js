@@ -2,6 +2,7 @@ import angular from 'angular';
 import jQuery from 'jquery';
 import AppLang from './ui/lang.js';
 import InjectingSessionInterceptor from './InjectingSessionInterceptor.js';
+import WarmUp from 'core/warmup/WarmUp.js';
 
 var translateTables = require('./translate/translate.js');
 
@@ -31,6 +32,7 @@ angular.module('cloudSport').
     //     };
     // }]).
     service('injectingSessionInterceptor', InjectingSessionInterceptor).
+    service('WarmUp', WarmUp).
     config(['$locationProvider', '$routeProvider', '$translateProvider',
             function config($locationProvider, $routeProvider, $translateProvider) {
                 $translateProvider

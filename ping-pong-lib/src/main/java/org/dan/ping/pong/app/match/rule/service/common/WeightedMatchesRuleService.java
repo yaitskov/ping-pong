@@ -27,7 +27,6 @@ import javax.inject.Inject;
 
 public class WeightedMatchesRuleService implements GroupOrderRuleService {
     @Inject
-
     private Sports sports;
 
     @Override
@@ -40,7 +39,6 @@ public class WeightedMatchesRuleService implements GroupOrderRuleService {
             Supplier<Stream<MatchInfo>> matches,
             Set<Uid> _uids,
             GroupOrderRule rule, GroupRuleParams params) {
-
         final Map<Uid, WeightSetsReason> uid2Reason = new HashMap<>();
         final TournamentMemState tournament = params.getTournament();
 
@@ -59,7 +57,7 @@ public class WeightedMatchesRuleService implements GroupOrderRuleService {
             WeightSetsReason reason = uid2Reason.get(uids[i]);
             if (reason == null) {
                 uid2Reason.put(uids[i],
-                        new WeightSetsReason(uids[i], getName(), new TreeSet<>()));
+                        reason = new WeightSetsReason(uids[i], getName(), new TreeSet<>()));
             }
             final CmpValueCounter<HisIntPair> zeroRepeats = new CmpValueCounter<>(
                     new HisIntPair(
@@ -68,7 +66,7 @@ public class WeightedMatchesRuleService implements GroupOrderRuleService {
                     0);
             final TreeSet<CmpValueCounter<HisIntPair>> weightSets = reason.getWeightSets();
             final CmpValueCounter<HisIntPair> sameScore = weightSets.lower(zeroRepeats);
-            if (sameScore == null) {
+            if (sameScore == null || !sameScore.getValue().equals(zeroRepeats.getValue())) {
                 weightSets.add(zeroRepeats.increment());
             } else {
                 weightSets.remove(sameScore);

@@ -18,6 +18,8 @@ public enum OrderRuleName {
 
     WonMatches,
 
+    WeightedMatches,
+
     // Applicable for Play Off Only
     LostMatches,
     Level,

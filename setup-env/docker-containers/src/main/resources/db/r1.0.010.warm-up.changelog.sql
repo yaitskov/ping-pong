@@ -6,7 +6,7 @@ create table warm_up (
     before_action varchar(100) not null,
     uid int(11) not null,
     created timestamp(3) default current_timestamp(3),
-    warm_up_started timestamp(3) not null,
+    warm_up_started timestamp(3) null,
     client_started timestamp(3) null,
     complete_at timestamp(3) null,
     foreign key (uid) references users(uid));

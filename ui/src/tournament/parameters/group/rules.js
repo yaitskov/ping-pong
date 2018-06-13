@@ -2,7 +2,8 @@ import arrayEnum from 'core/collection/arrayEnum.js';
 import MatchOutcomeScope from './MatchOutcomeScope.js';
 import MatchParticipantScope from './MatchParticipantScope.js';
 
-export const ruleId = arrayEnum('BB', 'WM', 'f2f', 'LB', 'LS', 'rnd', 'SB', 'WB', 'WS', 'Punkts', 'DM');
+export const ruleId = arrayEnum('BB', 'WM', 'f2f', 'LB', 'LS', 'rnd', 'SB',
+                                'WB', 'WS', 'Punkts', 'DM', 'WtMbS');
 
 function createGroupRule(type, options) {
     return Object.assign({'@type': type}, options || {});
@@ -36,7 +37,8 @@ export function createDmRule(options) {
 
 
 const matchBasedRules = [ruleId.BB, ruleId.WM, ruleId.LB, ruleId.LS,
-                         ruleId.SB, ruleId.WB, ruleId.WS, ruleId.Punkts].map(
+                         ruleId.SB, ruleId.WB, ruleId.WS, ruleId.WtMbS,
+                         ruleId.Punkts].map(
                              rlId => (o) => createMatchBasedRule(rlId, o));
 
 const customRules = [

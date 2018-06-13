@@ -14,6 +14,7 @@ module.exports = {
     'group-order-rule-label-SB': 'Bilans Setów',
     'group-order-rule-label-WB': 'Wygranę Piłki',
     'group-order-rule-label-WS': 'Wygranę Sety',
+    'group-order-rule-label-WtMbS': 'ATP ważone meczi',
     'group-order-rule-label-Punkts': 'Suma Punktów',
     'group-order-rule-label-DM': 'Dodatkowe meczi',
 

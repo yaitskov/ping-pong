@@ -2,7 +2,7 @@ package org.dan.ping.pong.app.match.rule.service.common;
 
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.BallsBalance;
 import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.ofEntry;
-import static org.dan.ping.pong.app.match.rule.service.common.WonMatchesRuleService.SUM_INT;
+import static org.dan.ping.pong.util.FuncUtils.SUM_INT;
 
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;

@@ -1,4 +1,4 @@
 export default {
-    Tennis: ['BB', 'WM', 'f2f', 'LB', 'LS', 'rnd', 'SB', 'WB', 'WS'],
+    Tennis: ['BB', 'WM', 'f2f', 'LB', 'LS', 'rnd', 'SB', 'WB', 'WS', 'WtMbS'],
     PingPong: ['BB', 'f2f', 'LB', 'LS', 'rnd', 'SB', 'WB', 'WS', 'Punkts', 'DM']
 };

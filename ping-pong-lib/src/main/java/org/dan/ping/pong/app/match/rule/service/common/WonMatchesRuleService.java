@@ -10,6 +10,7 @@ import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.match.rule.service.GroupOrderRuleService;
 import org.dan.ping.pong.app.match.rule.service.GroupRuleParams;
+import org.dan.ping.pong.util.FuncUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,8 +20,6 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class WonMatchesRuleService implements GroupOrderRuleService {
-    public static final java.util.function.BiFunction<Integer, Integer, Integer> SUM_INT = (a, b) -> a + b;
-
     @Override
     public OrderRuleName getName() {
         return WonMatches;
@@ -34,8 +33,8 @@ public class WonMatchesRuleService implements GroupOrderRuleService {
         final Map<Uid, Integer> wons = new HashMap<>();
         matches.get().forEach(m -> {
             if (m.getWinnerId().isPresent()) {
-                wons.merge(m.getWinnerId().get(), 1, SUM_INT);
-                wons.merge(m.opponentUid(m.getWinnerId().get()), 0, SUM_INT);
+                wons.merge(m.getWinnerId().get(), 1, FuncUtils.SUM_INT);
+                wons.merge(m.opponentUid(m.getWinnerId().get()), 0, FuncUtils.SUM_INT);
             } else {
                 m.uids().forEach(uid ->
                         wons.merge(uid, 0, (a, b) -> a + b));

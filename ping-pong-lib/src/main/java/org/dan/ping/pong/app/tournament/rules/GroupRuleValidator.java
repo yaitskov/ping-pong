@@ -10,6 +10,7 @@ import static org.dan.ping.pong.app.match.rule.OrderRuleName.LostSets;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.Punkts;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.Random;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.SetsBalance;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.WeightedMatches;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.WonBalls;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.WonMatches;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.WonSets;
@@ -43,6 +44,7 @@ public class GroupRuleValidator {
     private static final Set<OrderRuleName> GROUP_RULE_NAMES = ImmutableSet.of(
             Punkts,
             UseDisambiguationMatches,
+            WeightedMatches,
             F2F,
             Random,
             UidOrder,

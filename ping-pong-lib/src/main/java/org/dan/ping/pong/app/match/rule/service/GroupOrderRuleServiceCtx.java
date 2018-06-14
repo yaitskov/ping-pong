@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toMap;
 
 import org.dan.ping.pong.app.match.rule.GroupParticipantOrderService;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
+import org.dan.ping.pong.app.match.rule.service.common.AtpWeightedMatchesRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.DirectOutcomeRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.OrderUidRuleService;
@@ -26,6 +27,7 @@ import java.util.Map;
 
 @Import({WonMatchesRuleService.class,
         WeightedMatchesRuleService.class,
+        AtpWeightedMatchesRuleService.class,
         PickRandomlyRuleService.class,
         OrderUidRuleService.class,
         CountJustPunktsRuleService.class,

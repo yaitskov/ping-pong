@@ -19,6 +19,7 @@ public enum OrderRuleName {
     WonMatches,
 
     WeightedMatches,
+    AtpWeightedMatches,
 
     // Applicable for Play Off Only
     LostMatches,

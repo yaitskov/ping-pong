@@ -5,7 +5,7 @@ import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.group.GroupServiceTest.UID2;
 import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID3;
 import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID4;
-import static org.dan.ping.pong.app.match.rule.OrderRuleName.WeightedMatches;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpWeightedMatches;
 import static org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleServiceTest.UIDS_2_3_4;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -29,26 +29,26 @@ import java.util.List;
 import javax.inject.Inject;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {WeightedMatchesRuleService.class, SportCtx.class})
-public class WeightedMatchesRuleServiceTest {
+@ContextConfiguration(classes = {AtpWeightedMatchesRuleService.class, SportCtx.class})
+public class AtpWeightedMatchesRuleServiceTest {
     @Inject
-    private WeightedMatchesRuleService sut;
+    private AtpWeightedMatchesRuleService sut;
 
     public static final List<MatchInfo> MATCHES_UIDS_2_3_4_NO_SAME = asList(
             MatchInfo.builder()
                     .participantIdScore(
-                            ImmutableMap.of(UID2, asList(3, 2, 1),
-                                    UID3, asList(6, 6, 6)))
+                            ImmutableMap.of(UID2, asList(3, 2),
+                                    UID3, asList(6, 6)))
                     .build(),
             MatchInfo.builder()
                     .participantIdScore(
-                            ImmutableMap.of(UID3, asList(1, 6, 0, 1),
-                                    UID4, asList(6, 1, 6, 6)))
+                            ImmutableMap.of(UID3, asList(1, 6, 0),
+                                    UID4, asList(6, 1, 6)))
                     .build(),
             MatchInfo.builder()
                     .participantIdScore(
-                            ImmutableMap.of(UID4, asList(2, 6, 1, 6, 0),
-                                    UID2, asList(6, 5, 6, 3, 6)))
+                            ImmutableMap.of(UID4, asList(2),
+                                    UID2, asList(6)))
                     .build());
 
     @Test
@@ -64,23 +64,24 @@ public class WeightedMatchesRuleServiceTest {
                 .map(WeightSetsReason.class::cast)
                 .collect(toList());
         assertThat(result.stream().map(WeightSetsReason::getUid).collect(toList()),
-                is(asList(UID3, UID4, UID2)));
+                is(asList(UID4, UID3, UID2)));
         assertThat(result.stream().map(WeightSetsReason::getRule).collect(toList()),
-                is(asList(WeightedMatches, WeightedMatches, WeightedMatches)));
+                is(asList(AtpWeightedMatches, AtpWeightedMatches, AtpWeightedMatches)));
 
         assertThat(result.get(0).getWeightSets().stream().collect(toList()),
                 is(asList(
-                        new CmpValueCounter<>(new HisIntPair(3, 0), 1),
-                        new CmpValueCounter<>(new HisIntPair(1, 3), 1))));
+                        new CmpValueCounter<>(new HisIntPair(2, 1), 1),
+                        new CmpValueCounter<>(new HisIntPair(0, 1), 1))));
 
         assertThat(result.get(1).getWeightSets().stream().collect(toList()),
                 is(asList(
-                        new CmpValueCounter<>(new HisIntPair(3, 1), 1),
-                        new CmpValueCounter<>(new HisIntPair(2, 3), 1))));
+                        new CmpValueCounter<>(new HisIntPair(2, 0), 1),
+                        new CmpValueCounter<>(new HisIntPair(1, 2), 1))));
 
         assertThat(result.get(2).getWeightSets().stream().collect(toList()),
                 is(asList(
-                        new CmpValueCounter<>(new HisIntPair(3, 2), 1),
-                        new CmpValueCounter<>(new HisIntPair(0, 3), 1))));
+                        new CmpValueCounter<>(new HisIntPair(1, 0), 1),
+                        new CmpValueCounter<>(new HisIntPair(0, 2), 1))));
+        ;
     }
 }

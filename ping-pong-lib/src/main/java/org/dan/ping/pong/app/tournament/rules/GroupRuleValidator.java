@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.tournament.rules;
 
 import static java.util.stream.Collectors.toMap;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpWeightedMatches;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.BallsBalance;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UidOrder;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
@@ -45,6 +46,7 @@ public class GroupRuleValidator {
             Punkts,
             UseDisambiguationMatches,
             WeightedMatches,
+            AtpWeightedMatches,
             F2F,
             Random,
             UidOrder,

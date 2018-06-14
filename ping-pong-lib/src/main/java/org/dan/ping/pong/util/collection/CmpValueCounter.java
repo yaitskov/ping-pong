@@ -1,21 +1,10 @@
 package org.dan.ping.pong.util.collection;
 
-import static java.lang.Integer.compare;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class CmpValueCounter<T extends Comparable<T>> implements Comparable<CmpValueCounter<T>> {
+public class CmpValueCounter<T> {
     private T value;
     private int repeats;
-
-    @Override
-    public int compareTo(CmpValueCounter<T> o) {
-        final int cmp = value.compareTo(o.value);
-        if (cmp != 0) {
-            return cmp;
-        }
-        return compare(o.repeats, repeats);
-    }
 
     public CmpValueCounter() {
     }

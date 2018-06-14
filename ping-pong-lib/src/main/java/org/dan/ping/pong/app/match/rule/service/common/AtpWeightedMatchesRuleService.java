@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.match.rule.service.common;
 
-import static java.util.Comparator.comparing;
-import static org.dan.ping.pong.app.match.rule.OrderRuleName.WeightedMatches;
+import static java.util.Comparator.comparingInt;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpWeightedMatches;
 import static org.dan.ping.pong.util.collection.IterableComparator.LengthPolicy.LongerSmaller;
 
 import org.dan.ping.pong.app.group.HisIntPair;
@@ -11,26 +11,29 @@ import org.dan.ping.pong.util.collection.CmpValueCounter;
 import org.dan.ping.pong.util.collection.IterableComparator;
 
 import java.util.Comparator;
-import java.util.function.Function;
 
-public class WeightedMatchesRuleService extends AbstractWeightedMatchesRuleService {
-    public static final Comparator<CmpValueCounter<HisIntPair>> CMP_VALUE_COUNTER_COMPARATOR
-            = comparing(
-            (Function<CmpValueCounter<HisIntPair>, HisIntPair>)
-                    CmpValueCounter::getValue)
-            .thenComparingInt(o -> -o.getRepeats());
+public class AtpWeightedMatchesRuleService extends AbstractWeightedMatchesRuleService {
+    private static final Comparator<CmpValueCounter<HisIntPair>> COMPARATOR
+            = comparingInt(
+            (CmpValueCounter<HisIntPair> cvc) ->
+                    -cvc.getValue().getHis())
+            .thenComparingInt((CmpValueCounter<HisIntPair> cvc) ->
+                    -cvc.getValue().getEnemy())
+            .thenComparingInt((CmpValueCounter<HisIntPair> cvc) ->
+                    -cvc.getRepeats());
 
     private static final IterableComparator<CmpValueCounter<HisIntPair>> WEIGHT_SET_CMP
-            = new IterableComparator<>(CMP_VALUE_COUNTER_COMPARATOR);
+            = new IterableComparator<>(COMPARATOR);
 
     @Override
     public OrderRuleName getName() {
-        return WeightedMatches;
+        return AtpWeightedMatches;
     }
+
 
     @Override
     protected Comparator<CmpValueCounter<HisIntPair>> comparatorCmpValueCounter() {
-        return CMP_VALUE_COUNTER_COMPARATOR;
+        return COMPARATOR;
     }
 
     private static class WeightSetsReasonComparator implements Comparator<WeightSetsReason> {

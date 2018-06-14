@@ -85,7 +85,7 @@ public class GroupParticipantOrderServiceTest {
     public static final int GID2 = 2;
     public static final Uid UID6 = new Uid(6);
 
-    private static final Set<Uid> UIDS_2_3_4_5 = ImmutableSet.of(UID2, UID3, UID4, UID5);
+    public static final Set<Uid> UIDS_2_3_4_5 = ImmutableSet.of(UID2, UID3, UID4, UID5);
     private static final Set<Uid> UIDS_2_3_4_5_6 = ImmutableSet.of(UID2, UID3, UID4, UID5, UID6);
 
     private static final PingPongMatchRules S1A2G11 = PingPongMatchRules.builder()

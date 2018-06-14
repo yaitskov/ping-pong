@@ -7,18 +7,19 @@ import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.service.common.AtpWeightedMatchesRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.DirectOutcomeRuleService;
-import org.dan.ping.pong.app.match.rule.service.common.OrderUidRuleService;
-import org.dan.ping.pong.app.match.rule.service.common.WeightedMatchesRuleService;
-import org.dan.ping.pong.app.match.rule.service.common.WonMatchesRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.LostBallsRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.LostSetsRuleService;
+import org.dan.ping.pong.app.match.rule.service.common.OrderUidRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.PickRandomlyRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.SetsBalanceRuleService;
+import org.dan.ping.pong.app.match.rule.service.common.WeightedMatchesRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.WonBallsRuleService;
+import org.dan.ping.pong.app.match.rule.service.common.WonMatchesRuleService;
 import org.dan.ping.pong.app.match.rule.service.common.WonSetsRuleService;
-import org.dan.ping.pong.app.match.rule.service.meta.UseDisambiguationMatchesDirectiveService;
 import org.dan.ping.pong.app.match.rule.service.meta.DisambiguationPreviewRuleService;
+import org.dan.ping.pong.app.match.rule.service.meta.UseDisambiguationMatchesDirectiveService;
 import org.dan.ping.pong.app.match.rule.service.ping.CountJustPunktsRuleService;
+import org.dan.ping.pong.app.match.rule.service.tennis.atp.AtpDIRuleService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
@@ -28,6 +29,7 @@ import java.util.Map;
 @Import({WonMatchesRuleService.class,
         WeightedMatchesRuleService.class,
         AtpWeightedMatchesRuleService.class,
+        AtpDIRuleService.class,
         PickRandomlyRuleService.class,
         OrderUidRuleService.class,
         CountJustPunktsRuleService.class,

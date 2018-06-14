@@ -29,6 +29,7 @@ import org.dan.ping.pong.app.match.rule.rules.common.WonBallsRule;
 import org.dan.ping.pong.app.match.rule.rules.common.WonSetsRule;
 import org.dan.ping.pong.app.match.rule.rules.meta.UseDisambiguationMatchesDirective;
 import org.dan.ping.pong.app.match.rule.rules.ping.CountJustPunktsRule;
+import org.dan.ping.pong.app.match.rule.rules.tennis.atp.AtpDIRule;
 
 import java.util.Optional;
 
@@ -49,6 +50,7 @@ import java.util.Optional;
         @JsonSubTypes.Type(value = WonSetsRule.class, name = "WS"),
         @JsonSubTypes.Type(value = WeightedMatchesBySetsRule.class, name = "WtMbS"),
         @JsonSubTypes.Type(value = AtpWeightedMatchesBySetsRule.class, name = "AtpWMS"),
+        @JsonSubTypes.Type(value = AtpDIRule.class, name = "AtpDI"),
         @JsonSubTypes.Type(value = UseDisambiguationMatchesDirective.class, name = DM_MATCHES),
 
         @JsonSubTypes.Type(value = CountJustPunktsRule.class, name = PUNKTS)

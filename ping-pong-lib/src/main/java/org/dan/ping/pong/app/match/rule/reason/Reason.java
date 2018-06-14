@@ -20,6 +20,7 @@ import java.util.List;
         @JsonSubTypes.Type(value = InfoReason.class, name = "INF"),
         @JsonSubTypes.Type(value = DecreasingLongScalarReason.class, name = "DL"),
         @JsonSubTypes.Type(value = IncreasingIntScalarReason.class, name = "II"),
+        @JsonSubTypes.Type(value = WeightSetsReason.class, name = "WSR"),
         @JsonSubTypes.Type(value = DecreasingIntScalarReason.class, name = "DI")})
 public interface Reason extends Comparable<Reason> {
     TypeReference<List<Reason>> REASON_CHAIN_TYPE = new TypeReference<List<Reason>>() {};

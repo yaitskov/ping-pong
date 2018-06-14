@@ -51,14 +51,15 @@ public abstract class AbstractWeightedMatchesRuleService implements GroupOrderRu
             if (reason == null) {
                 uid2Reason.put(uids[i],
                         reason = new WeightSetsReason(
-                                uids[i], getName(), new TreeSet<>(comparatorCmpValueCounter())));
+                                uids[i], getName(),
+                                new TreeSet<>(comparatorCmpValueCounter())));
             }
             final CmpValueCounter<HisIntPair> zeroRepeats = new CmpValueCounter<>(
                     new HisIntPair(
                             uid2Sets.get(uids[i]),
                             uid2Sets.get(uids[1 - i])),
                     0);
-            final TreeSet<CmpValueCounter<HisIntPair>> weightSets = reason.getWeightSets();
+            final TreeSet<CmpValueCounter<HisIntPair>> weightSets = (TreeSet) reason.getWeightSets();
             final CmpValueCounter<HisIntPair> sameScore = weightSets.lower(zeroRepeats);
             if (sameScore == null || !sameScore.getValue().equals(zeroRepeats.getValue())) {
                 weightSets.add(zeroRepeats.increment());

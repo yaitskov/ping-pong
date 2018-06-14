@@ -11,7 +11,7 @@ import org.dan.ping.pong.app.group.HisIntPair;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.util.collection.CmpValueCounter;
 
-import java.util.TreeSet;
+import java.util.Collection;
 
 @Getter
 @Setter
@@ -19,13 +19,12 @@ import java.util.TreeSet;
 @NoArgsConstructor
 @AllArgsConstructor(onConstructor = @__(@JsonIgnore))
 public class WeightSetsReason implements Reason {
-
     @JsonIgnore
     @Getter(onMethod = @__(@JsonIgnore))
     @Setter(onMethod = @__(@JsonIgnore))
     private Uid uid;
     private OrderRuleName rule;
-    private TreeSet<CmpValueCounter<HisIntPair>> weightSets;
+    private Collection<CmpValueCounter<HisIntPair>> weightSets;
 
     @Override
     public int compareTo(Reason o) {

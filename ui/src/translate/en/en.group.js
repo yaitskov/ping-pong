@@ -13,7 +13,8 @@ module.exports = {
     'group-order-rule-label-SB': 'Sets Balance',
     'group-order-rule-label-WB': 'Won Balls',
     'group-order-rule-label-WS': 'Won Sets',
-    'group-order-rule-label-WtMbS': 'ATP weighted matches',
+    'group-order-rule-label-WtMbS': 'Weighted matches',
+    'group-order-rule-label-AtpWMS': 'ATP weighted matches',
     'group-order-rule-label-Punkts': 'Score Sum',
     'group-order-rule-label-DM': 'Play extra matches',
 

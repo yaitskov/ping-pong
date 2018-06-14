@@ -3,7 +3,8 @@ import MatchOutcomeScope from './MatchOutcomeScope.js';
 import MatchParticipantScope from './MatchParticipantScope.js';
 
 export const ruleId = arrayEnum('BB', 'WM', 'f2f', 'LB', 'LS', 'rnd', 'SB',
-                                'WB', 'WS', 'Punkts', 'DM', 'WtMbS', 'AtpWMS');
+                                'WB', 'WS', 'Punkts', 'DM', 'WtMbS', 'AtpWMS',
+                                'AtpDI');
 
 function createGroupRule(type, options) {
     return Object.assign({'@type': type}, options || {});
@@ -44,7 +45,8 @@ const matchBasedRules = [ruleId.BB, ruleId.WM, ruleId.LB, ruleId.LS,
 const customRules = [
     (o) => createF2fRule(o),
     (o) => createGroupRule(ruleId.rnd, o),
-    (o) => createGroupRule(ruleId.DM, o)
+    (o) => createGroupRule(ruleId.DM, o),
+    (o) => createGroupRule(ruleId.AtpDI, o)
 ];
 
 // const _ruleId2Factory =

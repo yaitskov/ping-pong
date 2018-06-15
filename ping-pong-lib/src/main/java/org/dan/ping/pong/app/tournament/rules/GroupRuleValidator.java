@@ -2,16 +2,17 @@ package org.dan.ping.pong.app.tournament.rules;
 
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpDI;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpDII;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpWeightedMatches;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.BallsBalance;
-import static org.dan.ping.pong.app.match.rule.OrderRuleName.UidOrder;
-import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.F2F;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.LostBalls;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.LostSets;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.Punkts;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.Random;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.SetsBalance;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.UidOrder;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.WeightedMatches;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.WonBalls;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.WonMatches;
@@ -49,6 +50,7 @@ public class GroupRuleValidator {
             WeightedMatches,
             AtpDI,
             AtpWeightedMatches,
+            AtpDII,
             F2F,
             Random,
             UidOrder,

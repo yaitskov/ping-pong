@@ -19,6 +19,7 @@ import org.dan.ping.pong.app.match.rule.service.common.WonSetsRuleService;
 import org.dan.ping.pong.app.match.rule.service.meta.DisambiguationPreviewRuleService;
 import org.dan.ping.pong.app.match.rule.service.meta.UseDisambiguationMatchesDirectiveService;
 import org.dan.ping.pong.app.match.rule.service.ping.CountJustPunktsRuleService;
+import org.dan.ping.pong.app.match.rule.service.tennis.atp.AtpDIIHighestPercentWonSetsRuleService;
 import org.dan.ping.pong.app.match.rule.service.tennis.atp.AtpDIRuleService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -30,6 +31,7 @@ import java.util.Map;
         WeightedMatchesRuleService.class,
         AtpWeightedMatchesRuleService.class,
         AtpDIRuleService.class,
+        AtpDIIHighestPercentWonSetsRuleService.class,
         PickRandomlyRuleService.class,
         OrderUidRuleService.class,
         CountJustPunktsRuleService.class,

@@ -1,8 +1,8 @@
 package org.dan.ping.pong.app.match.rule.rules.tennis.atp;
 
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpDI;
+import static org.dan.ping.pong.app.match.rule.filter.MatchOutcomeScope.ALL_MATCHES;
 import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.AT_LEAST_ONE;
-import static org.dan.ping.pong.app.match.rule.filter.MatchParticipantScope.BOTH;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -34,7 +34,7 @@ public class AtpDIRule extends AbstractGroupOrderRule {
     @Override
     @JsonIgnore
     public MatchOutcomeScope getMatchOutcomeScope() {
-        return MatchOutcomeScope.ALL_MATCHES;
+        return ALL_MATCHES;
     }
 
     @Override

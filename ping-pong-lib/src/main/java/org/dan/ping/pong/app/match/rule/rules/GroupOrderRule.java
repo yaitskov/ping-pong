@@ -15,7 +15,8 @@ import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.filter.DisambiguationScope;
 import org.dan.ping.pong.app.match.rule.rules.attrs.CompletenessScoped;
 import org.dan.ping.pong.app.match.rule.rules.attrs.ParticipantScoped;
-import org.dan.ping.pong.app.match.rule.rules.common.AtpWeightedMatchesBySetsRule;
+import org.dan.ping.pong.app.match.rule.rules.tennis.atp.AtpDIIHighestPercentWonSetsRule;
+import org.dan.ping.pong.app.match.rule.rules.tennis.atp.AtpWeightedMatchesBySetsRule;
 import org.dan.ping.pong.app.match.rule.rules.common.DirectOutcomeRule;
 import org.dan.ping.pong.app.match.rule.rules.common.CountWonMatchesRule;
 import org.dan.ping.pong.app.match.rule.rules.common.LostBallsRule;
@@ -51,6 +52,7 @@ import java.util.Optional;
         @JsonSubTypes.Type(value = WeightedMatchesBySetsRule.class, name = "WtMbS"),
         @JsonSubTypes.Type(value = AtpWeightedMatchesBySetsRule.class, name = "AtpWMS"),
         @JsonSubTypes.Type(value = AtpDIRule.class, name = "AtpDI"),
+        @JsonSubTypes.Type(value = AtpDIIHighestPercentWonSetsRule.class, name = "AtpDII"),
         @JsonSubTypes.Type(value = UseDisambiguationMatchesDirective.class, name = DM_MATCHES),
 
         @JsonSubTypes.Type(value = CountJustPunktsRule.class, name = PUNKTS)

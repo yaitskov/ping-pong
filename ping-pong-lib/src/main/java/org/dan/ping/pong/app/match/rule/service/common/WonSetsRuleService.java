@@ -39,20 +39,25 @@ public class WonSetsRuleService implements GroupOrderRuleService {
             Set<Uid> _uids,
             GroupOrderRule rule, GroupRuleParams params) {
 
+        return Optional.of(findUid2WonSets(matches.get(), params).entrySet()
+                .stream()
+                .map(reasonFactory())
+                .sorted());
+    }
+
+    public Map<Uid, Integer> findUid2WonSets(
+            Stream<MatchInfo> matches, GroupRuleParams params) {
         final Map<Uid, Integer> uid2WonSets = new HashMap<>();
         final TournamentMemState tournament = params.getTournament();
 
-        matches.get().forEach(m -> {
+        matches.forEach(m -> {
             final Map<Uid, Integer> uid2Sets = sports.calcWonSets(tournament, m);
             final Uid[] matchUids = m.uidsArray();
 
             uid2WonSets.merge(matchUids[0], uid2Sets.get(matchUids[index(0)]), SUM_INT);
             uid2WonSets.merge(matchUids[1], uid2Sets.get(matchUids[index(1)]), SUM_INT);
         });
-        return Optional.of(uid2WonSets.entrySet()
-                .stream()
-                .map(reasonFactory())
-                .sorted());
+        return uid2WonSets;
     }
 
     protected Function<Map.Entry<Uid, Integer>, Reason> reasonFactory() {

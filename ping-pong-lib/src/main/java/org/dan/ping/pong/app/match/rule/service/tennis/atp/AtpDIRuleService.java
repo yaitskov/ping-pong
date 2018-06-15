@@ -18,7 +18,6 @@ import org.dan.ping.pong.app.match.rule.service.GroupRuleParams;
 import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;

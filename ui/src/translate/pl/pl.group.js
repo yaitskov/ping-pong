@@ -17,6 +17,7 @@ module.exports = {
     'group-order-rule-label-WtMbS': 'Ważone meczi',
     'group-order-rule-label-AtpWMS': 'ATP ważone meczi',
     'group-order-rule-label-AtpDI': 'ATP part d.i',
+    'group-order-rule-label-AtpDII': 'ATP part d.ii',
     'group-order-rule-label-Punkts': 'Suma Punktów',
     'group-order-rule-label-DM': 'Dodatkowe meczi',
 

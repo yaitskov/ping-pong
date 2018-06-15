@@ -17,6 +17,7 @@ module.exports = {
     'group-order-rule-label-AtpWMS': 'ATP weighted matches',
     'group-order-rule-label-AtpDI': 'ATP part d.i',
     'group-order-rule-label-AtpDII': 'ATP part d.ii',
+    'group-order-rule-label-AtpDIII': 'ATP part d.iii',
     'group-order-rule-label-Punkts': 'Score Sum',
     'group-order-rule-label-DM': 'Play extra matches',
 

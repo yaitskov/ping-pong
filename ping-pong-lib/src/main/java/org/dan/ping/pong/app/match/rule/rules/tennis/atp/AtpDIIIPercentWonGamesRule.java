@@ -14,7 +14,7 @@ import org.dan.ping.pong.app.match.rule.rules.AbstractGroupOrderRule;
 
 @Getter
 @Setter
-public class AtpDIIIHighestPercentWonGamesRule extends AbstractGroupOrderRule {
+public class AtpDIIIPercentWonGamesRule extends AbstractGroupOrderRule {
     @Override
     public OrderRuleName name() {
         return AtpDIII;

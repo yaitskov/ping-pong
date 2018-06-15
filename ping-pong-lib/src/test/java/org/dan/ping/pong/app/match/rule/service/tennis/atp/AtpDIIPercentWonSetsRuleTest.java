@@ -38,14 +38,14 @@ import javax.inject.Inject;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
-        AtpDIIHighestPercentWonSetsRuleService.class,
+        AtpDIIPercentWonSetsRuleService.class,
         WonSetsRuleService.class, LostSetsRuleService.class,
         SportCtx.class})
-public class AtpDIIHighestPercentWonSetsRuleTest {
+public class AtpDIIPercentWonSetsRuleTest {
     @Inject
-    private AtpDIIHighestPercentWonSetsRuleService sut;
+    private AtpDIIPercentWonSetsRuleService sut;
 
-    private static final List<MatchInfo> BASE = asList(
+    static final List<MatchInfo> BASE = asList(
             MatchInfo.builder().state(Over)
                     .winnerId(Optional.of(UID3))
                     .gid(Optional.of(1))

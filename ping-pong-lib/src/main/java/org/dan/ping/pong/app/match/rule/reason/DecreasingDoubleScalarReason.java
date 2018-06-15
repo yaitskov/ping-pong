@@ -16,7 +16,6 @@ import java.util.Map;
 
 @Getter
 @Setter
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor(onConstructor = @__(@JsonIgnore))
 public class DecreasingDoubleScalarReason implements Reason {
@@ -26,6 +25,37 @@ public class DecreasingDoubleScalarReason implements Reason {
     private Uid uid;
     private double value;
     private OrderRuleName rule;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DecreasingDoubleScalarReason that = (DecreasingDoubleScalarReason) o;
+
+        if (Double.compare(that.value, value) != 0) {
+            return false;
+        }
+        if (!uid.equals(that.uid)) {
+            return false;
+        }
+        return rule == that.rule;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = uid.hashCode();
+        temp = Double.doubleToLongBits(value);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + rule.hashCode();
+        return result;
+    }
 
     public static DecreasingDoubleScalarReason ofDoubleD(
             double n, OrderRuleName rule) {

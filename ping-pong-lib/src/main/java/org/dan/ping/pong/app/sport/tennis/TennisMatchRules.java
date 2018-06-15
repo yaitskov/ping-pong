@@ -44,4 +44,8 @@ public class TennisMatchRules implements MatchRules {
     public boolean countOnlySets() {
         return false;
     }
+
+    public boolean isSuperTieBreak(int iSet) {
+        return iSet >= setsToWin;
+    }
 }

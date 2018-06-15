@@ -39,13 +39,13 @@ public class WonSetsRuleService implements GroupOrderRuleService {
             Set<Uid> _uids,
             GroupOrderRule rule, GroupRuleParams params) {
 
-        return Optional.of(findUid2WonSets(matches.get(), params).entrySet()
+        return Optional.of(findUid2Sets(matches.get(), params).entrySet()
                 .stream()
                 .map(reasonFactory())
                 .sorted());
     }
 
-    public Map<Uid, Integer> findUid2WonSets(
+    public Map<Uid, Integer> findUid2Sets(
             Stream<MatchInfo> matches, GroupRuleParams params) {
         final Map<Uid, Integer> uid2WonSets = new HashMap<>();
         final TournamentMemState tournament = params.getTournament();

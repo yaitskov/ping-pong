@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.tournament.rules;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpDI;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpDII;
+import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpDIII;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpWeightedMatches;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.BallsBalance;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.F2F;
@@ -51,6 +52,7 @@ public class GroupRuleValidator {
             AtpDI,
             AtpWeightedMatches,
             AtpDII,
+            AtpDIII,
             F2F,
             Random,
             UidOrder,

@@ -13,8 +13,9 @@
         </a>
       </td>
       <td ng-repeat="gorId in $ctrl.usedGroupOrderRules track by $index"
-          class="text-center cloud-sport-font"
-          translate="rule-column-header-{{$ctrl.sportType}}-{{gorId}}"/>
+          ng-click="$ctrl.showHelpForRule(gorId)"
+          translate="rule-column-header-{{$ctrl.sportType}}-{{gorId}}"
+          class="text-center cloud-sport-font"/>
     </tr>
   </thead>
   <tbody>
@@ -113,7 +114,7 @@
             {{reason.value}}
           </span>
         </span>
-        <span ng-switch-when="WSR" class="text-danger">
+        <span ng-switch-when="WSR">
           <table class="weighted-match-table">
             <tr ng-repeat="e in reason.weightSets">
               <td>

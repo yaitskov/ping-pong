@@ -23,6 +23,10 @@ export default class ClassicGroupViewCtrl extends SimpleController {
         return 'dm';
     }
 
+    static get $inject() {
+        return ['InfoPopup'].concat(super.$inject);
+    }
+
     static get Origin() {
         return 'origin';
     }
@@ -43,6 +47,10 @@ export default class ClassicGroupViewCtrl extends SimpleController {
         this.matchTagFilter = this.constructor.Origin; // origin | dm
         this.usedGroupOrderRules = [];
         this.rowSpan = {};
+    }
+
+    showHelpForRule(ruleId) {
+        this.InfoPopup.transInfo(`group-order-rule-${ruleId}-description`);
     }
 
     loadData(tournament) {

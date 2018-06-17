@@ -57,5 +57,20 @@ module.exports = {
     'rule-column-header-PingPong-SetsBalance': 'Δ🏓',
     'rule-column-header-PingPong-WonBalls': '⚫',
     'rule-column-header-PingPong-WonSets': '🏓',
-    'rule-column-header-PingPong-Punkts': '∑'
+    'rule-column-header-PingPong-Punkts': '∑',
+
+    'group-order-rule-WonMatches-description': 'Number of won matches',
+    'group-order-rule-F2F-description': 'Head-to-head (Face-to-Face) match result',
+    'group-order-rule-AtpDI-description':
+          'If three (3) players are tied, and'
+          + ' three (3) players each have one (1) win, a player having played less'
+          + ' than all three (3) matches is automatically eliminated and the player advancing to'
+          + ' the single elimination competition is the winner of the matchup of the two (2)'
+          + ' players tied with 1-2 records',
+    'group-order-rule-AtpDII-description': 'Highest percentage of sets won',
+    'group-order-rule-AtpDIII-description': 'Highest percentage of games won',
+    'group-order-rule-AtpWeightedMatches-description':
+          'Greatest number of matches played.('
+          + 'Comment: 2-1 won-loss record beats a 2-0 won-loss record; a 1-2 record'
+          + 'beats a 1-0 record)'
 };

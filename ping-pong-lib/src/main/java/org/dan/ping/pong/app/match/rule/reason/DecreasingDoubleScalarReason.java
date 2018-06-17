@@ -68,15 +68,16 @@ public class DecreasingDoubleScalarReason implements Reason {
         return ofDoubleD(null, n, rule);
     }
 
+    public static double nanAs0(double d) {
+        if (Double.isNaN(d)) {
+            return 0.0;
+        }
+        return d;
+    }
+
     public static DecreasingDoubleScalarReason ofDoubleD(
             Uid uid, double n, OrderRuleName rule) {
         return new DecreasingDoubleScalarReason(uid, n, rule);
-    }
-
-    public static DecreasingDoubleScalarReason ofEntry(
-            Map.Entry<Uid, Integer> e,
-            OrderRuleName rule) {
-        return ofDoubleD(e.getKey(), e.getValue(), rule);
     }
 
     @Override

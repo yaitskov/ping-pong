@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.match.rule.service.tennis.atp;
 
 import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpDIII;
+import static org.dan.ping.pong.app.match.rule.reason.DecreasingDoubleScalarReason.nanAs0;
 import static org.dan.ping.pong.app.match.rule.reason.DecreasingDoubleScalarReason.ofDoubleD;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.util.FuncUtils.SUM_INT;
@@ -67,10 +68,10 @@ public class AtpDIIIPercentWonGamesRuleService implements GroupOrderRuleService 
                 .stream()
                 .map((e) -> ofDoubleD(
                         e.getKey(),
-                        e.getValue().doubleValue() / (e.getValue()
+                        nanAs0(e.getValue().doubleValue() / (e.getValue()
                                 + ofNullable(uid2LostBalls.get(e.getKey()))
                                 .orElseThrow(() -> internalError(
-                                        "no lost " + e.getKey()))),
+                                        "no lost " + e.getKey())))),
                         getName()))
                 .sorted());
     }

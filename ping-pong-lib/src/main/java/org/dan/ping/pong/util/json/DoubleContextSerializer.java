@@ -26,9 +26,13 @@ public class DoubleContextSerializer
         if (precision == 0) {
             gen.writeNumber(value.doubleValue());
         } else {
-            BigDecimal bd = new BigDecimal(value);
-            bd = bd.setScale(precision, RoundingMode.HALF_UP);
-            gen.writeNumber(bd.doubleValue());
+            if (Double.isNaN(value)) {
+                gen.writeNumber(value);
+            } else {
+                BigDecimal bd = new BigDecimal(value);
+                bd = bd.setScale(precision, RoundingMode.HALF_UP);
+                gen.writeNumber(bd.doubleValue());
+            }
         }
 
     }

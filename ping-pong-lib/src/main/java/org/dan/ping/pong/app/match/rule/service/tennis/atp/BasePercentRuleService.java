@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.match.rule.service.tennis.atp;
 
 import static java.util.Optional.ofNullable;
+import static org.dan.ping.pong.app.match.rule.reason.DecreasingDoubleScalarReason.nanAs0;
 import static org.dan.ping.pong.app.match.rule.reason.DecreasingDoubleScalarReason.ofDoubleD;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
@@ -29,10 +30,10 @@ public abstract class BasePercentRuleService implements GroupOrderRuleService {
                 .stream()
                 .map((e) -> ofDoubleD(
                         e.getKey(),
-                        e.getValue().doubleValue() / (e.getValue()
+                        nanAs0(e.getValue().doubleValue() / (e.getValue()
                                 + ofNullable(uid2LostSets.get(e.getKey()))
                                 .orElseThrow(() -> internalError(
-                                        "no lost " + e.getKey()))),
+                                        "no lost " + e.getKey())))),
                         getName()))
                 .sorted());
     }

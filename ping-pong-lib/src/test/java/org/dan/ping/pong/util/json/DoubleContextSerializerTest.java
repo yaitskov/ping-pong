@@ -24,12 +24,21 @@ public class DoubleContextSerializerTest {
         private double f;
     }
 
+    final ObjectMapper om = ObjectMapperProvider.get();
+
     @Test
     @SneakyThrows
     public void precisionObeyed() {
-        final ObjectMapper om = ObjectMapperProvider.get();
         assertThat(
                 om.writeValueAsString(new X(0.1234567)),
                 is("{\"f\":0.12}"));
+    }
+
+    @Test
+    @SneakyThrows
+    public void nan() {
+        assertThat(
+                om.writeValueAsString(new X(Double.NaN)),
+                is("{\"f\":\"NaN\"}"));
     }
 }

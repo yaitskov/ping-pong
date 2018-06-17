@@ -9,7 +9,7 @@ export default function (reasonChainList, voidP, reasonEq = defaultReasonEq) {
         const span = rowSpan[iRow] = {};
         for (let iCol = 0; iCol < reasonChain.length; ++iCol) {
             const maxPrevCol = previousReasonChain === null ? -1 : previousReasonChain.length;
-            if (maxPrevCol < iCol || !reasonEq(reasonChain[iCol], previousReasonChain[iCol])) {
+            if (maxPrevCol <= iCol || !reasonEq(reasonChain[iCol], previousReasonChain[iCol])) {
                 if (!voidP(reasonChain[iCol])) {
                     span[iCol] = 1;
                 }

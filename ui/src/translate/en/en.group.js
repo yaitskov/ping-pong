@@ -43,6 +43,10 @@ module.exports = {
     'rule-column-header-Tennis-WonBalls': '⚫',
     'rule-column-header-Tennis-WonSets': '🎾',
     'rule-column-header-Tennis-Punkts': '∑',
+    'rule-column-header-Tennis-AtpWeightedMatches': 'ATP<sub>b</sub>',
+    'rule-column-header-Tennis-AtpDI': 'ATP<sub>d</sub><sup>1</sup>',
+    'rule-column-header-Tennis-AtpDII': 'ATP<sub>d</sub><sup>2</sup>',
+    'rule-column-header-Tennis-AtpDIII': 'ATP<sub>d</sub><sup>3</sup>',
 
     'rule-column-header-PingPong-BallsBalance': '⚫-⚪',
     'rule-column-header-PingPong-WonMatches': '∑🏆',

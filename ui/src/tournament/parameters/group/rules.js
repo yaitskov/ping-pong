@@ -47,7 +47,7 @@ const customRules = [
     (o) => createGroupRule(ruleId.rnd, o),
     (o) => createGroupRule(ruleId.DM, o),
     (o) => createGroupRule(ruleId.AtpDI, o),
-    (o) => createGroupRule(ruleId.AtpDII, o)
+    (o) => createGroupRule(ruleId.AtpDII, o),
     (o) => createGroupRule(ruleId.AtpDIII, o)
 ];
 

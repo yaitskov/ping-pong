@@ -97,11 +97,36 @@
         <span ng-switch-when="DI" class="text-success">
           {{reason.value}}
         </span>
-        <span ng-switch-when="II" class="text-danger">
-          {{reason.value}}
+        <span ng-switch="reason.rule" ng-switch-when="II">
+          <span ng-switch="reason.value" ng-switch-when="AtpDI">
+            <span ng-switch-when="1"
+                  class="cloud-sport-font text-success">
+              ☺
+            </span>
+            <span ng-switch-when="2"
+                  class="cloud-sport-font text-danger">⚐</span>
+            <span ng-switch-default>
+              bad value {{reason.value}}
+            </span>
+          </span>
+          <span ng-switch-default class="text-danger">
+            {{reason.value}}
+          </span>
+        </span>
+        <span ng-switch-when="WSR" class="text-danger">
+          <table class="weighted-match-table">
+            <tr ng-repeat="e in reason.weightSets">
+              <td>
+                {{e.repeats}} x {{e.value.his}}-{{e.value.enemy}}
+              </td>
+            </tr>
+          </table>
+        </span>
+        <span ng-switch-when="DD" class="text-danger">
+          {{(reason.value * 100.0).toFixed(2)}}%
         </span>
         <span ng-switch-default>
-          bad reason type
+          bad reason type {{reason['@type']}}
         </span>
       </td>
     </tr>

@@ -2,6 +2,18 @@
 
 @import "dice.scss";
 
+.classic-group-view {
+    .weighted-match-table {
+        margin: auto;
+        font-size: 70%;
+    }
+}
+
+.classic-group-view > thead tr:first-child td {
+    border-bottom: 1px solid #ddd;
+}
+
+
 @include desktop-media {
     .classic-group-view {
         .walk-over {

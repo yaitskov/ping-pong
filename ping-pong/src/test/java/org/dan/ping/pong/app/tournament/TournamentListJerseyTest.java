@@ -1,9 +1,9 @@
 package org.dan.ping.pong.app.tournament;
 
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11_NP;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q2_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.CANCEL_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.EDITABLE_TOURNAMENTS;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11_NP;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q2_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
 import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 import static org.hamcrest.Matchers.allOf;
@@ -30,9 +30,6 @@ import javax.inject.Inject;
 public class TournamentListJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     private Simulator simulator;
-
-    @Inject
-    private TournamentService tournamentService;
 
     @Test
     public void listCancelledAdministrableTournamentForAWhile() {

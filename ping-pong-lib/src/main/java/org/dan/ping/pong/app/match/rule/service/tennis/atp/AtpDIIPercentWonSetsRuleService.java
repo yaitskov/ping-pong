@@ -13,9 +13,11 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 public class AtpDIIPercentWonSetsRuleService extends BasePercentRuleService {
     @Inject
+    @Named("wonSetsRuleService")
     private WonSetsRuleService wonSetsRuleService;
 
     @Inject

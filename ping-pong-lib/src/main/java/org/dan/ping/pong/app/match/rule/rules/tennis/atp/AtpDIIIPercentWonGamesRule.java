@@ -15,6 +15,9 @@ import org.dan.ping.pong.app.match.rule.rules.AbstractGroupOrderRule;
 @Getter
 @Setter
 public class AtpDIIIPercentWonGamesRule extends AbstractGroupOrderRule {
+    public static final AtpDIIIPercentWonGamesRule ATP_D3
+            = new AtpDIIIPercentWonGamesRule();
+
     @Override
     public OrderRuleName name() {
         return AtpDIII;

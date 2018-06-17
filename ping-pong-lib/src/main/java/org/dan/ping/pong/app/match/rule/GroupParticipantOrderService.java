@@ -147,7 +147,7 @@ public class GroupParticipantOrderService {
         final GroupPositionIdx[] newGroupPosIdx = new GroupPositionIdx[] { ambiPosI };
         score.get().forEachOrdered(wl -> {
             if (loop.lastWonLost != null
-                    && wl.compareTo(loop.lastWonLost) != 0) {
+                    && !wl.equalsWithoutUid(loop.lastWonLost)) {
                 flush(order, newGroupPosIdx[0], ambiPos, loop);
                 newGroupPosIdx[0] = ambiPosI.plus(counterInt.toInt());
                 loop.uids.clear();

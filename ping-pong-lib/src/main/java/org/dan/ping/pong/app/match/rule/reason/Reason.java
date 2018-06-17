@@ -30,4 +30,8 @@ public interface Reason extends Comparable<Reason> {
 
     OrderRuleName getRule();
     void setRule(OrderRuleName rule);
+
+    default boolean equalsWithoutUid(Reason o) {
+        return compareTo(o) == 0;
+    }
 }

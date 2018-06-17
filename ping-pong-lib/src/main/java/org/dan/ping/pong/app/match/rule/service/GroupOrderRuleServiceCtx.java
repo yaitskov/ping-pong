@@ -38,7 +38,6 @@ import java.util.Map;
         OrderUidRuleService.class,
         CountJustPunktsRuleService.class,
         SetsBalanceRuleService.class,
-        WonSetsRuleService.class,
         LostSetsRuleService.class,
         BallsBalanceRuleService.class,
         WonBallsRuleService.class,
@@ -64,5 +63,10 @@ public class GroupOrderRuleServiceCtx {
             List<GroupOrderRuleService> services) {
         return services.stream()
                 .collect(toMap(GroupOrderRuleService::getName, s -> s));
+    }
+
+    @Bean(name = "wonSetsRuleService")
+    public WonSetsRuleService wonSetsRuleService() {
+        return new WonSetsRuleService();
     }
 }

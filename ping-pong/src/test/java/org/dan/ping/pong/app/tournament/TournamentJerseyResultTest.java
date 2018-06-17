@@ -8,12 +8,12 @@ import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_LIST;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_RESULT;
 import static org.dan.ping.pong.app.match.GroupScoreJerseyTest.RULES_G8Q2_S1A2G11_M;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G3Q2_S1A2G11;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q2_S3A2G11;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
 import static org.dan.ping.pong.app.tournament.TournamentResource.RESULT_CATEGORY;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G3Q2_S1A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q2_S3A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
@@ -53,9 +53,6 @@ import javax.ws.rs.core.GenericType;
 public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
     @Inject
     private Simulator simulator;
-
-    @Inject
-    private TournamentService tournamentService;
 
     @Inject
     private ImperativeSimulatorFactory isf;

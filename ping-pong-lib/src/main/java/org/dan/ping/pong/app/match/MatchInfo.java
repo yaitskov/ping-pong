@@ -11,8 +11,10 @@ import static org.dan.ping.pong.app.tournament.ParticipantMemState.UID;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
+import com.fasterxml.jackson.annotation.JacksonAnnotation;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

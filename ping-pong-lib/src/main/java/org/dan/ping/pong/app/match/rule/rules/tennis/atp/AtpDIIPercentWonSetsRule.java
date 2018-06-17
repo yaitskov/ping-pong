@@ -15,6 +15,9 @@ import org.dan.ping.pong.app.match.rule.rules.AbstractGroupOrderRule;
 @Getter
 @Setter
 public class AtpDIIPercentWonSetsRule extends AbstractGroupOrderRule {
+    public static final AtpDIIPercentWonSetsRule ATP_D2
+            = new AtpDIIPercentWonSetsRule();
+
     @Override
     public OrderRuleName name() {
         return AtpDII;

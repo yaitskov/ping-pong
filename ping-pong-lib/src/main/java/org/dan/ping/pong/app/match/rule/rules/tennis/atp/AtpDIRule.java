@@ -15,6 +15,8 @@ import org.dan.ping.pong.app.match.rule.rules.AbstractGroupOrderRule;
 @Getter
 @Setter
 public class AtpDIRule extends AbstractGroupOrderRule {
+    public static final AtpDIRule ATP_D1 = new AtpDIRule();
+
     @Override
     public OrderRuleName name() {
         return AtpDI;

@@ -30,4 +30,10 @@ public class WeightSetsReason implements Reason {
     public int compareTo(Reason o) {
         throw new IllegalStateException();
     }
+
+    @Override
+    public boolean equalsWithoutUid(Reason _r) {
+        final WeightSetsReason r = (WeightSetsReason) _r;
+        return rule == r.rule && weightSets.equals(r.weightSets);
+    }
 }

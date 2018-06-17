@@ -4,6 +4,7 @@ import static java.lang.Double.compare;
 import static java.lang.String.format;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
+import org.dan.ping.pong.util.json.DoubleContextSerializer;
+import org.dan.ping.pong.util.json.Precision;
 
 import java.util.Map;
 
@@ -23,6 +26,9 @@ public class DecreasingDoubleScalarReason implements Reason {
     @Getter(onMethod = @__(@JsonIgnore))
     @Setter(onMethod = @__(@JsonIgnore))
     private Uid uid;
+
+    @Precision(4)
+    @JsonSerialize(using = DoubleContextSerializer.class)
     private double value;
     private OrderRuleName rule;
 

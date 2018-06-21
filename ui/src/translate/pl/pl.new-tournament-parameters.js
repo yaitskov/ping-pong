@@ -28,7 +28,7 @@ module.exports = {
     'rank-policy-lbl': 'Sposób rankingu',
     'rank-policy-lbl-pr': 'Podany poziom',
     'rank-policy-lbl-Manual': 'Ręczne',
-    'rank-policy-lbl-SignUp': 'Kolejność rejestracji',
+    'rank-policy-lbl-su': 'Kolejność rejestracji',
     'rank-policy-lbl-MasterOutcome': 'Główny turniej',
     'max-losses': 'Ilość porażek',
     'max-losses-1': 'Do jednej',

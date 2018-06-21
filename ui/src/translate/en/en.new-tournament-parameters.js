@@ -29,7 +29,7 @@ module.exports = {
     'rank-policy-lbl': 'Rating method',
     'rank-policy-lbl-pr': 'Provided skill',
     'rank-policy-lbl-Manual': 'Manually',
-    'rank-policy-lbl-SignUp': 'Sign-up order',
+    'rank-policy-lbl-su': 'Sign-up order',
     'rank-policy-lbl-MasterOutcome': 'Master tournament',
     'max-losses': 'Max losses',
     'max-losses-1': 'up to 1',

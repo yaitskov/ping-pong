@@ -20,7 +20,7 @@ describe('seeding-tr-params', () => {
         ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff(sport));
         ctx.btnArrayToggles('#ranking-policy a',
                             () => ctx.ctrl.rules.casting.policy,
-                            ['pr', 'Manual', 'SignUp']);
+                            ['pr', 'Manual', 'su']);
     });
 
     it('rank name is visible for policy provided rank', () => {
@@ -82,7 +82,7 @@ describe('seeding-tr-params', () => {
 
     it('ranking policy is hidden if ConsoleLayered', () => {
         const tournament = existingLayeredConsoleTournament(sport);
-        tournament.rules.casting.policy = 'SignUp';
+        tournament.rules.casting.policy = 'su';
         tournament.rules.casting.splitPolicy = 'ConsoleLayered';
         ctx.broadcast('event.tournament.rules.set', tournament);
         ctx.hidden('#ranking-policy');

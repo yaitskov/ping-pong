@@ -13,8 +13,8 @@ import org.dan.ping.pong.app.sport.tennis.TennisMatchRules;
         include = JsonTypeInfo.As.PROPERTY,
         defaultImpl=PingPongMatchRules.class)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = PingPongMatchRules.class, name = "PingPong"),
-        @JsonSubTypes.Type(value = TennisMatchRules.class, name = "Tennis") })
+        @JsonSubTypes.Type(value = PingPongMatchRules.class, name = "PP"),
+        @JsonSubTypes.Type(value = TennisMatchRules.class, name = "TE") })
 public interface MatchRules {
     SportType sport();
 

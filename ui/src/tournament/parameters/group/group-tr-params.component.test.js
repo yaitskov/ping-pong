@@ -6,7 +6,7 @@ import { newTournamentWithGroup, newTournamentWithoutGroup, newTournamentWithout
 
 describe('group-tr-params', () => {
     var initEventFired = false;
-    const sport = 'PingPong';
+    const sport = 'PP';
     const ctx = setupAngularJs(
         'group-tr-params',
         {onInit: s => s.$on(GroupParamsCtrl.readyEvent, e => initEventFired = true),

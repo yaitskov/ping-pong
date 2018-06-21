@@ -14,8 +14,8 @@ describe('arena-params', () => {
         expect(initEventFired).toBeTrue();
     });
 
-    const tennisTournament = () => newTournament('Tennis');
-    const pingPongTournament = () => newTournament('PingPong');
+    const tennisTournament = () => newTournament('TE');
+    const pingPongTournament = () => newTournament('PP');
 
     it('disambiguate strategy toggles', () => {
         ctx.broadcast('event.tournament.rules.set', tennisTournament());

@@ -6,7 +6,7 @@ import { newTournament, existingTournamentWithoutGroup, existingTournamentWithou
 
 describe('console-tr-params', () => {
     var initEventFired = false;
-    const sport = 'PingPong';
+    const sport = 'PP';
     const ctx = setupAngularJs(
         'console-tr-params',
         {onInit: s => s.$on(ConsoleParamsCtrl.readyEvent, e => initEventFired = true),

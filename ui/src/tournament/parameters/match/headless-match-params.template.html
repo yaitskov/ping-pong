@@ -1,5 +1,5 @@
 <div class="form-group" id="supertie-break-games"
-     ng-show="$ctrl.rules.match['@type'] == 'Tennis'">
+     ng-show="$ctrl.rules.match['@type'] == 'TE'">
   <label translate="Super tie break games"/>
   <div touch-spin options="$ctrl.sets"
        ng-model="$ctrl.rules.match.stbg"></div>
@@ -14,18 +14,18 @@
 <div class="form-group" id="min-games-to-win"
      ng-show="!$ctrl.rules.match.cos"
      ng-class="{'has-error': $ctrl.errors['match-rule.min-games-to-win']}">
-  <label ng-show="$ctrl.rules.match['@type'] == 'Tennis'"
+  <label ng-show="$ctrl.rules.match['@type'] == 'TE'"
          translate="Min games to win a set"/>
-  <label ng-show="$ctrl.rules.match['@type'] == 'PingPong'"
+  <label ng-show="$ctrl.rules.match['@type'] == 'PP'"
          translate="Min score to win a set"/>
   <div touch-spin options="$ctrl.score"
        ng-model="$ctrl.rules.match.mgtw"/>
   <p class="help-block" ng-repeat="error in $ctrl.errors['match-rule.min-games-to-win']">
     {{ error.message | translate : error.params }}
   </p>
-  <p class="help-block" ng-show="$ctrl.rules.match['@type'] == 'PingPong'"
+  <p class="help-block" ng-show="$ctrl.rules.match['@type'] == 'PP'"
      translate="min-score-to-win-set-help"/>
-  <p class="help-block" ng-show="$ctrl.rules.match['@type'] == 'Tennis'"
+  <p class="help-block" ng-show="$ctrl.rules.match['@type'] == 'TE'"
      translate="min-games-to-win-set-help"/>
 </div>
 <div class="form-group" id="min-game-advance"
@@ -35,11 +35,11 @@
        ng-model="$ctrl.rules.match.maig"/>
   <p class="help-block"
      translate="min-score-advance-help"
-     ng-show="$ctrl.rules.match['@type'] == 'PingPong'"/>
+     ng-show="$ctrl.rules.match['@type'] == 'PP'"/>
   <p class="help-block"
      translate="min-games-advance-help"
-     ng-show="$ctrl.rules.match['@type'] == 'Tennis'"/>
+     ng-show="$ctrl.rules.match['@type'] == 'TE'"/>
 </div>
-<many-button-toggler id="count-only-sets" ng-show="$ctrl.rules.match['@type'] == 'PingPong'"
+<many-button-toggler id="count-only-sets" ng-show="$ctrl.rules.match['@type'] == 'PP'"
                      domain="[false, true]" selected-class="['btn-primary', 'btn-success']"
                      label="Count only sets lbl" ng-model="$ctrl.rules.match.cos"/>

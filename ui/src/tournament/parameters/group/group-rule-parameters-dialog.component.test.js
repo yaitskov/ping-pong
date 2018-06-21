@@ -54,7 +54,7 @@ describe('group-rule-parameters-dialog', () => {
 
     describe('with DM rule', () => {
         const setRules = () => ctx.send(GroupRuleParametersDialog.TopicLoad,
-                                        createDmRule(), defaultMatchRules('PingPong'));
+                                        createDmRule(), defaultMatchRules('PP'));
 
         beforeEach(() => setRules());
 

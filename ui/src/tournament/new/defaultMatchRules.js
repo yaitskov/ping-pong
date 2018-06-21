@@ -1,18 +1,18 @@
 export default function defaultMatchRules(sport) {
     switch (sport) {
     case undefined:
-    case 'PingPong':
+    case 'PP':
         return {
-            '@type': 'PingPong',
+            '@type': 'PP',
             mgtw: 11,
             maig: 2,
             mpg: 0,
             stw: 3,
             cos: false
         };
-    case 'Tennis':
+    case 'TE':
         return {
-            '@type': 'Tennis',
+            '@type': 'TE',
             mgtw: 6,
             maig: 2,
             mpg: 0,

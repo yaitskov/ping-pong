@@ -3,7 +3,7 @@ import { existingTournament, newTournament } from 'test/defaultTournaments.js';
 
 describe('tournament-parameters-form', () => {
     var initEventFired = false;
-    const sport = 'PingPong';
+    const sport = 'PP';
     const ctx = setupAngularJs(
         'tournament-parameters-form',
         {onInit: (scope) => {
@@ -56,13 +56,13 @@ describe('tournament-parameters-form', () => {
     });
 
     it('set event', () => {
-        const tournament = existingTournament('PingPong');
+        const tournament = existingTournament('PP');
         ctx.broadcast('event.tournament.rules.set', tournament);
         expect(ctx.ctrl.tournament.tid).toBe(tournament.tid);
     });
 
     ij('default new tr rules pass', ($rootScope) => {
-        const tournament = newTournament('PingPong');
+        const tournament = newTournament('PP');
         ctx.broadcast('event.tournament.rules.set', tournament);
 
         const spy = spyOn($rootScope, '$broadcast');
@@ -72,7 +72,7 @@ describe('tournament-parameters-form', () => {
     });
 
     ij('default update tr rules pass', ($rootScope) => {
-        const tournament = existingTournament('PingPong');
+        const tournament = existingTournament('PP');
         ctx.broadcast('event.tournament.rules.set', tournament);
         const spy = spyOn($rootScope, '$broadcast');
         ctx.element.find('#update-tournament-rules').click();
@@ -81,7 +81,7 @@ describe('tournament-parameters-form', () => {
     });
 
     ij('child component validation works', ($rootScope) => {
-        const tournament = newTournament('PingPong');
+        const tournament = newTournament('PP');
         const veryLongLabel = ''.padEnd(111, 'x');
         tournament.rules.casting.pro.label = veryLongLabel; // to long
         ctx.broadcast('event.tournament.rules.set', tournament);

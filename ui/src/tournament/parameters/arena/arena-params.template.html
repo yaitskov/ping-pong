@@ -1,6 +1,6 @@
 <div class="form-group toggle-btn">
-    <label ng-show="$ctrl.rules.match['@type'] == 'Tennis'" translate="tennis-arena-lbl"/>
-    <label ng-show="$ctrl.rules.match['@type'] == 'PingPong'" translate="ping-pong-arena-lbl"/>
+    <label ng-show="$ctrl.rules.match['@type'] == 'TE'" translate="tennis-arena-lbl"/>
+    <label ng-show="$ctrl.rules.match['@type'] == 'PP'" translate="ping-pong-arena-lbl"/>
     <a class="pull-right arrow"
        simple-toggler="#arena-parameters">
         <span class="glyphicon glyphicon-menu-down"/>
@@ -10,10 +10,10 @@
 <div id="arena-parameters" class="toggle-panel in">
     <div class="form-group">
         <label class="toggle-option"
-               ng-show="$ctrl.rules.match['@type'] == 'PingPong'"
+               ng-show="$ctrl.rules.match['@type'] == 'PP'"
                translate="Schedule tables"/>
         <label class="toggle-option"
-               ng-show="$ctrl.rules.match['@type'] == 'Tennis'"
+               ng-show="$ctrl.rules.match['@type'] == 'TE'"
                translate="Schedule courts"/>
         <a class="btn btn-default"
            translate="yes-lbl"

@@ -6,13 +6,13 @@ function makeRules(ruleIds) {
 
 function selectRuleIds(sport) {
     switch(sport) {
-    case 'Tennis':
+    case 'TE':
         return [ruleId.WM, ruleId.f2f,
                 ruleId.SB, ruleId.f2f,
                 ruleId.BB, ruleId.f2f,
                 ruleId.rnd
                ];
-    case 'PingPong':
+    case 'PP':
         return [ruleId.Punkts, ruleId.f2f,
                 ruleId.SB, ruleId.f2f,
                 ruleId.BB, ruleId.f2f,

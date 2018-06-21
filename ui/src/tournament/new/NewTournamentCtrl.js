@@ -9,7 +9,7 @@ export default class NewTournamentCtrl extends SimpleController {
     $onInit() {
         this.binder(this.$scope, {
             'event.main.menu.ready': (e) => this.mainMenu.setTitle('New Tournament')});
-        this.tournament = this.pageCtx.get('newTournament') || {ticketPrice: 30, sport: 'Tennis'};
+        this.tournament = this.pageCtx.get('newTournament') || {ticketPrice: 30, sport: 'TE'};
         if (this.tournament.tid) {
             delete this.tournament.tid;
         }

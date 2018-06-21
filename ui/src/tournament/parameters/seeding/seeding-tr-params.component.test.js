@@ -5,7 +5,7 @@ import { newTournamentWithPlayOff, existingLayeredConsoleTournament } from 'test
 
 describe('seeding-tr-params', () => {
     var initEventFired = false;
-    const sport = 'PingPong';
+    const sport = 'PP';
 
     const ctx = setupAngularJs(
         'seeding-tr-params',

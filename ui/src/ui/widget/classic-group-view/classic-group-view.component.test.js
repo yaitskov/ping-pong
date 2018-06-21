@@ -45,7 +45,7 @@ describe('classic-group-view', () => {
                          participants: generateParticipants(3),
                          tid: 1,
                          quitsGroup: 1,
-                         sportType: 'PingPong'
+                         sportType: 'PP'
                      });
         });
         describe('number of table rows equals number of participants', () => {

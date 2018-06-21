@@ -14,7 +14,7 @@ angular.
 describe('head-less-match-params', () => {
     const ctx = setupAngularJs('head-less-match-params');
     it('min game advance not increase limit', () => {
-        const tournament = newTournament('PingPong');
+        const tournament = newTournament('PP');
         tournament.rules.match.maig = 1000;
         ctx.send(HeadLessMatchParamsCtrl.TopicLoad, tournament.rules);
         checkTouchSpinNotIncrease(ctx, '#min-game-advance',
@@ -23,14 +23,14 @@ describe('head-less-match-params', () => {
 
     it('min game advance changes', () => {
         ctx.send(HeadLessMatchParamsCtrl.TopicLoad,
-                 newTournament('PingPong').rules);
+                 newTournament('PP').rules);
         checkTouchSpinID(ctx, '#min-game-advance',
                          () => ctx.ctrl.rules.match.maig);
     });
 
     describe('count only sets', () => {
         beforeEach(() => {
-            const tournamentRules = newTournament('PingPong').rules;
+            const tournamentRules = newTournament('PP').rules;
             tournamentRules.match.cos = true;
             ctx.send(HeadLessMatchParamsCtrl.TopicLoad, tournamentRules);
         });
@@ -42,7 +42,7 @@ describe('head-less-match-params', () => {
     });
 
     it('count only sets hidden for tennis', () => {
-        ctx.send(HeadLessMatchParamsCtrl.TopicLoad, newTournament('Tennis').rules);
+        ctx.send(HeadLessMatchParamsCtrl.TopicLoad, newTournament('TE').rules);
         ctx.hidden('#count-only-sets');
     });
 });

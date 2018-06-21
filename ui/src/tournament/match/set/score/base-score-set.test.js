@@ -20,7 +20,7 @@ const PingPongZeroSets = {
     playedSets: 0,
     participants: [ParticipantA, ParticipantB],
     sport: {
-        '@type': 'PingPong',
+        '@type': 'PP',
         mgtw: 11,
         maig: 2,
         cos: false

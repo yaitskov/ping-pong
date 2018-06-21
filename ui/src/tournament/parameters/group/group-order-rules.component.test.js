@@ -10,7 +10,7 @@ describe('group-order-rules', () => {
     const ctx = setupAngularJs('group-order-rules');
 
     const setRules = () => ctx.send(GroupOrderRulesCtrl.TopicTournamentRulesAvailable,
-                                    newTournament('PingPong').rules);
+                                    newTournament('PP').rules);
     beforeEach(() => setRules());
 
     describe('menu', () => {
@@ -39,7 +39,7 @@ describe('group-order-rules', () => {
         it('click emits show available rules with sport', () => {
             ctx.recordEvents(PickGroupRulesDialog.TopicShowAvailableRules, (events) => {
                 ctx.click('.group-order-rule-add:first');
-                expect(events[0][0]).toBe('PingPong');
+                expect(events[0][0]).toBe('PP');
             });
         });
     });
@@ -55,7 +55,7 @@ describe('group-order-rules', () => {
             ctx.recordEvents(GroupRuleParametersDialog.TopicLoad, (events) => {
                 ctx.click('.group-order-rule-config:first');
                 expect(events[0][0]['@type']).toBe(ruleId.Punkts);
-                expect(events[0][1]['@type']).toBe('PingPong');
+                expect(events[0][1]['@type']).toBe('PP');
             });
         });
     });

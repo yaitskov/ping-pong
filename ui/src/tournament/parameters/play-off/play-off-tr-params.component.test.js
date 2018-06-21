@@ -4,7 +4,7 @@ import { newTournamentWithPlayOff, newTournamentWithoutPlayOff } from 'test/defa
 
 describe('play-off-tr-params', () => {
     var initEventFired = false;
-    const sport = 'PingPong';
+    const sport = 'PP';
     const ctx = setupAngularJs(
         'play-off-tr-params',
         {onInit: s => s.$on(PlayOffParamsCtrl.readyEvent, e => initEventFired = true),

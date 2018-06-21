@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         include = JsonTypeInfo.As.PROPERTY,
         defaultImpl=MyPendingMatchPingPongSport.class)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = MyPendingMatchPingPongSport.class, name = "PingPong"),
-        @JsonSubTypes.Type(value = MyPendingMatchTennisSport.class, name = "Tennis") })
+        @JsonSubTypes.Type(value = MyPendingMatchPingPongSport.class, name = "PP"),
+        @JsonSubTypes.Type(value = MyPendingMatchTennisSport.class, name = "TE") })
 public interface MyPendingMatchSport {
 }

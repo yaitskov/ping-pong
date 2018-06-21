@@ -17,12 +17,12 @@ export default class PingPongScoresStrategy extends BaseScoresStrategy {
     loserOptions(rules, winnerOption) {
         if (winnerOption == rules.mgtw) {
            let result = [];
-           for (let i = 0; i <= (winnerOption - rules.minAdvanceInGames); ++i) {
+           for (let i = 0; i <= (winnerOption - rules.maig); ++i) {
                result.push(i);
            }
            return result;
         }
-        return [winnerOption - rules.minAdvanceInGames];
+        return [winnerOption - rules.maig];
     }
     defaultWinnerScore(rules, playedSets) {
         return rules.mgtw;

@@ -15,17 +15,17 @@ describe('head-less-match-params', () => {
     const ctx = setupAngularJs('head-less-match-params');
     it('min game advance not increase limit', () => {
         const tournament = newTournament('PingPong');
-        tournament.rules.match.minAdvanceInGames = 1000;
+        tournament.rules.match.maig = 1000;
         ctx.send(HeadLessMatchParamsCtrl.TopicLoad, tournament.rules);
         checkTouchSpinNotIncrease(ctx, '#min-game-advance',
-                                  () => ctx.ctrl.rules.match.minAdvanceInGames);
+                                  () => ctx.ctrl.rules.match.maig);
     });
 
     it('min game advance changes', () => {
         ctx.send(HeadLessMatchParamsCtrl.TopicLoad,
                  newTournament('PingPong').rules);
         checkTouchSpinID(ctx, '#min-game-advance',
-                         () => ctx.ctrl.rules.match.minAdvanceInGames);
+                         () => ctx.ctrl.rules.match.maig);
     });
 
     describe('count only sets', () => {

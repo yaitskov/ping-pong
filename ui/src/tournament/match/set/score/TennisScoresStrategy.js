@@ -23,13 +23,13 @@ export default class TennisScoresStrategy extends BaseScoresStrategy {
         }
         if (winnerOption == rules.mgtw) {
            let result = [];
-           for (let i = 0; i <= (winnerOption - rules.minAdvanceInGames); ++i) {
+           for (let i = 0; i <= (winnerOption - rules.maig); ++i) {
                result.push(i);
            }
            return result;
         }
         if (winnerOption == rules.mgtw + 1) {
-           let i = winnerOption - rules.minAdvanceInGames;
+           let i = winnerOption - rules.maig;
            let result = [];
            while (i < winnerOption) {
                result.push(i++);

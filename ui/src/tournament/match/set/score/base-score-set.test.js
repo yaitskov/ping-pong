@@ -22,7 +22,7 @@ const PingPongZeroSets = {
     sport: {
         '@type': 'PingPong',
         mgtw: 11,
-        minAdvanceInGames: 2,
+        maig: 2,
         countOnlySets: false
     }
 };

@@ -5,7 +5,7 @@ export default function defaultMatchRules(sport) {
         return {
             '@type': 'PingPong',
             mgtw: 11,
-            minAdvanceInGames: 2,
+            maig: 2,
             minPossibleGames: 0,
             setsToWin: 3,
             countOnlySets: false
@@ -14,7 +14,7 @@ export default function defaultMatchRules(sport) {
         return {
             '@type': 'Tennis',
             mgtw: 6,
-            minAdvanceInGames: 2,
+            maig: 2,
             minPossibleGames: 0,
             setsToWin: 2,
             superTieBreakGames: 10

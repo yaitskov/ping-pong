@@ -19,13 +19,13 @@ describe('arena-params', () => {
 
     it('disambiguate strategy toggles', () => {
         ctx.broadcast('event.tournament.rules.set', tennisTournament());
-        expect(ctx.ctrl.rules.place.arenaDistribution).toBe('NO');
+        expect(ctx.ctrl.rules.place.ar).toBe('NO');
         ctx.click('#arena-parameters .btn-danger');
-        expect(ctx.ctrl.rules.place.arenaDistribution).toBe('NO');
+        expect(ctx.ctrl.rules.place.ar).toBe('NO');
         ctx.click('#arena-parameters a:not(.btn-danger)');
-        expect(ctx.ctrl.rules.place.arenaDistribution).toBe('GLOBAL');
+        expect(ctx.ctrl.rules.place.ar).toBe('g');
         ctx.click('#arena-parameters a:not(.btn-primary)');
-        expect(ctx.ctrl.rules.place.arenaDistribution).toBe('NO');
+        expect(ctx.ctrl.rules.place.ar).toBe('NO');
     });
 
     it('tennis arena label is only visible', () => {

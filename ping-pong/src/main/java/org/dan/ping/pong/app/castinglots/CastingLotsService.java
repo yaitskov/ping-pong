@@ -165,7 +165,7 @@ public class CastingLotsService {
             orderedBids.forEach(bid -> bid.setGid(Optional.of(gid)));
             castingLotsDao.generateGroupMatches(batch, tournament, gid, orderedBids,
                     0, Optional.empty());
-            bidDao.setGroupForUids(gid, tid, orderedBids);
+            bidDao.setGroupForUids(batch, gid, tid, orderedBids);
         });
     }
 
@@ -204,7 +204,7 @@ public class CastingLotsService {
                         castingLotsDao.generateGroupMatches(batch, tournament, gid, groupBids,
                                 0, Optional.empty()),
                         basePlayOffPriority);
-                bidDao.setGroupForUids(gid, tid, groupBids);
+                bidDao.setGroupForUids(batch, gid, tid, groupBids);
             }
             castingLotsDao.generatePlayOffMatches(batch, tournament, cid,
                     roundPlayOffBase(bidsByGroups.size() * quits),

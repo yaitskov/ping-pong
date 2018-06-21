@@ -95,13 +95,8 @@ public class BidDaoServer implements BidDao {
                         groupBids.stream()
                                 .map(ParticipantMemState::getUid)
                                 .collect(toList())))
-                .mustAffectRows(of(1))
+                .mustAffectRows(of(-1))
                 .build());
-    }
-
-    @Override
-    public void setGroupForUids(int gid, Tid tid, List<ParticipantMemState> groupBids) {
-        setGid(gid, tid, groupBids).execute();
     }
 
     private UpdateConditionStep<BidRecord> setGid(int gid, Tid tid, List<ParticipantMemState> groupBids) {

@@ -90,4 +90,9 @@ public class PiPoEx extends RuntimeException {
     public static PiPoEx internalError(Error error) {
         return new PiPoEx(INTERNAL_SERVER_ERROR_500, error, null);
     }
+
+    public static PiPoEx internalError(String clientMessage, Exception e) {
+        return new PiPoEx(INTERNAL_SERVER_ERROR_500,
+                new TemplateError(clientMessage, Collections.emptyMap()), e);
+    }
 }

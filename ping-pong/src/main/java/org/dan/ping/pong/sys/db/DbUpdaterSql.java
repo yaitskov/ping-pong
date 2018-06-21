@@ -2,15 +2,11 @@ package org.dan.ping.pong.sys.db;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.primitives.Ints.asList;
-import static java.util.stream.Collectors.toList;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.jooq.DSLContext;
-import org.jooq.Query;
 
 import java.util.List;
 
@@ -18,13 +14,13 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 public class DbUpdaterSql implements DbUpdater {
-    private final DSLContext jooq;
+    private final BatchExecutor batchExecutor;
     private final List<DbUpdateSql> updates;
     private final List<Runnable> failureCallbacks;
     private boolean dirty;
 
-    public static DbUpdaterSql create(DSLContext jooq) {
-        return new DbUpdaterSql(jooq, newArrayList(), newArrayList());
+    public static DbUpdaterSql create(BatchExecutor batchExecutor) {
+        return new DbUpdaterSql(batchExecutor, newArrayList(), newArrayList());
     }
 
     public DbUpdater onFailure(Runnable r) {
@@ -49,13 +45,10 @@ public class DbUpdaterSql implements DbUpdater {
     @Override
     public void flush() {
         log.info("*** Flush db {} queries ***", updates.size());
-        final List<Query> queries = updates.stream()
-                .map(u -> {
-                    u.getLogBefore().run();
-                    return u.getQuery(); })
-                .collect(toList());
-        final List<Integer> updateRows = asList(jooq.batch(queries).execute());
-        checkArgument(updateRows.size() == queries.size());
+
+        final List<Integer> updateRows = batchExecutor.execute(updates);
+        checkArgument(updateRows.size() == updates.size(),
+                "%s <> %s", updateRows.size(), updates.size());
         for (int i = 0; i < updateRows.size(); ++i) {
             final int rowsUpdates = updateRows.get(i);
             final DbUpdateSql update = updates.get(i);

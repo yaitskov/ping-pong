@@ -22,7 +22,7 @@ import javax.inject.Named;
 import javax.sql.DataSource;
 
 @Slf4j
-@Import(DbUpdaterFactory.class)
+@Import({BatchExecutorFactory.class, DbUpdaterFactory.class})
 @EnableTransactionManagement
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class DbContext {

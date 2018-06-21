@@ -30,6 +30,7 @@ import org.dan.ping.pong.app.user.UserType;
 import org.dan.ping.pong.sys.db.DbStrictUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 import org.jooq.DSLContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -160,6 +161,7 @@ public class DaoEntityGenerator {
     @Inject
     private CategoryDao categoryDao;
 
+    @Transactional
     public void genCategory(String name, Tid tid, int cid) {
         categoryDao.create(
                 NewCategory.builder()

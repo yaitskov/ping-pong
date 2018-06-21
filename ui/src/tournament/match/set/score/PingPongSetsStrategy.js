@@ -8,18 +8,18 @@ export default class PingPongSetsStrategy {
     }
 
     winnerOptions(rules, winScore, playedSets) {
-        return [rules.setsToWin];
+        return [rules.stw];
     }
 
     loserOptions(rules, winnerOption) {
         const result = [];
-        for (let i = 0; i < rules.setsToWin; ++i)  {
+        for (let i = 0; i < rules.stw; ++i)  {
             result.push(i);
         }
         return result;
     }
 
     defaultWinnerScore(rules, playedSets) {
-        return rules.setsToWin;
+        return rules.stw;
     }
 }

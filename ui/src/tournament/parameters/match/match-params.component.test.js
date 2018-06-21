@@ -30,7 +30,7 @@ describe('match-params', () => {
 
     it('min sets to win increase/decrease', () => {
         ctx.broadcast('event.tournament.rules.set', pingPongTournament());
-        checkTouchSpinID(ctx, '#sets-to-win-match', () => ctx.ctrl.rules.match.setsToWin);
+        checkTouchSpinID(ctx, '#sets-to-win-match', () => ctx.ctrl.rules.match.stw);
     });
 
     it('super tie break games increase/decrease', () => {

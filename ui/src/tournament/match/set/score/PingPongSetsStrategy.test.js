@@ -1,6 +1,6 @@
 import PingPongSetsStrategy from './PingPongSetsStrategy.js';
 
-const rules = {setsToWin: 3};
+const rules = {stw: 3};
 
 describe('ping pong sets strategy', () => {
     const pingPongStrategy = new PingPongSetsStrategy();

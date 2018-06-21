@@ -66,7 +66,7 @@ describe('group-rule-parameters-dialog', () => {
         it('toggle on custom dm rules', () => {
             ctx.toggleOn('#custom-dm-match-rules-toggler input');
             ctx.visible('#custom-dm-match-rules-panel');
-            expect(ctx.ctrl.rule.match.setsToWin).toBe(3);
+            expect(ctx.ctrl.rule.match.stw).toBe(3);
         });
 
 
@@ -79,11 +79,11 @@ describe('group-rule-parameters-dialog', () => {
 
         it('retoggle keeps changed dm rules', () => {
             ctx.toggleOn('#custom-dm-match-rules-toggler input');
-            expect(ctx.ctrl.rule.match.setsToWin).toBe(3);
-            ctx.ctrl.rule.match.setsToWin = 9;
+            expect(ctx.ctrl.rule.match.stw).toBe(3);
+            ctx.ctrl.rule.match.stw = 9;
             ctx.toggleOff('#custom-dm-match-rules-toggler input');
             ctx.toggleOn('#custom-dm-match-rules-toggler input');
-            expect(ctx.ctrl.rule.match.setsToWin).toBe(9);
+            expect(ctx.ctrl.rule.match.stw).toBe(9);
         });
 
         it('save button emits updated rule', () => {
@@ -91,7 +91,7 @@ describe('group-rule-parameters-dialog', () => {
             ctx.recordEvents(GroupRuleParametersDialog.TopicSave, (events) => {
                 ctx.click('#save-group-rule-params-button');
                 it('dialog hidden', () => ctx.hidden('#group-rule-parameters'));
-                expect(events[0][0].match.setsToWin).toBe(3);
+                expect(events[0][0].match.stw).toBe(3);
             });
         });
     });

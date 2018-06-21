@@ -7,7 +7,7 @@ export default function defaultMatchRules(sport) {
             mgtw: 11,
             maig: 2,
             mpg: 0,
-            setsToWin: 3,
+            stw: 3,
             countOnlySets: false
         };
     case 'Tennis':
@@ -16,7 +16,7 @@ export default function defaultMatchRules(sport) {
             mgtw: 6,
             maig: 2,
             mpg: 0,
-            setsToWin: 2,
+            stw: 2,
             superTieBreakGames: 10
         };
     default:

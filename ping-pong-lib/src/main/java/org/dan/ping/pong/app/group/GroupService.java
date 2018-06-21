@@ -367,7 +367,7 @@ public class GroupService {
     public int createGroup(TournamentMemState tournament, int cid, DbUpdater batch) {
         final int gid = tournament.getNextGroup().next();
         final String label = sortToLabel(gid);
-        final int ordNumber = gid - 1;
+        final int ordNumber = (int) tournament.findGroupsByCategory(cid).count();
         groupDao.createGroup(gid, batch,
                 tournament.getTid(), cid, label,
                 tournament.getRule().getGroup().get().getQuits(), ordNumber);

@@ -155,7 +155,8 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         forTestBidDao.getState(tid, participants.get(LOSER).getUid())));
 
         assertEquals(Stream.of(Over, Close).map(Optional::of).collect(toList()),
-                asList(forTestMatchDao.getById(adminOpenMatches.get(0).getMid())
+                asList(forTestMatchDao.getById(adminOpenMatches.get(0).getTid(),
+                        adminOpenMatches.get(0).getMid())
                                 .map(MatchInfo::getState),
                         tournamentDao.getRow(tid).map(TournamentRow::getState)));
 
@@ -177,7 +178,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
         List<OpenMatchForWatch> result = rest.get(MATCH_WATCH_LIST_OPEN + scenario.getTid().getTid(),
                 new GenericType<List<OpenMatchForWatch>>() {});
         assertThat(result, hasItem(allOf(
-                hasProperty("mid", hasProperty("id", greaterThan(0))),
+                hasProperty("mid", greaterThan(Mid.of(0))),
                 hasProperty("type", is(Grup)),
                 hasProperty("score", is(asList(0, 0))),
                 hasProperty("category", allOf(

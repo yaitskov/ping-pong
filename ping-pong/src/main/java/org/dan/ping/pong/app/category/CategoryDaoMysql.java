@@ -12,6 +12,7 @@ import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -46,12 +47,15 @@ public class CategoryDaoMysql implements CategoryDao {
     }
 
     @Override
-    @Transactional(TRANSACTION_MANAGER)
     public void delete(Tid tid, int cid, DbUpdater batch) {
         log.info("Delete category {}", cid);
-        jooq.deleteFrom(CATEGORY)
-                .where(CATEGORY.TID.eq(tid), CATEGORY.CID.eq(cid))
-                .execute();
+        batch.exec(DbUpdateSql
+                .builder()
+                .query(jooq.deleteFrom(CATEGORY)
+                        .where(CATEGORY.TID.eq(tid), CATEGORY.CID.eq(cid)))
+                .mustAffectRows(Optional.of(1))
+                .logBefore(() -> log.info("Remove category {} {}", tid, cid))
+                .build());
     }
 
     @Override

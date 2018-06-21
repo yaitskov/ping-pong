@@ -28,7 +28,7 @@ public class MatchScoreDaoMysql implements MatchScoreDao {
         jooq.select(SET_SCORE.MID, SET_SCORE.UID, SET_SCORE.GAMES)
                 .from(SET_SCORE)
                 .innerJoin(MATCHES)
-                .on(SET_SCORE.MID.eq(MATCHES.MID))
+                .on(SET_SCORE.TID.eq(MATCHES.TID), SET_SCORE.MID.eq(MATCHES.MID))
                 .where(MATCHES.TID.eq(tid))
                 .orderBy(SET_SCORE.SET_ID)
                 .fetch()

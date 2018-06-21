@@ -213,6 +213,8 @@ public class BidDaoServer implements BidDao {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.deleteFrom(BID)
                         .where(BID.TID.eq(tid), BID.UID.in(uids)))
+                .mustAffectRows(Optional.of(uids.size()))
+                .logBefore(() -> log.info("Remove uids {} from tournament {}", uids, tid))
                 .build());
     }
 }

@@ -27,12 +27,12 @@ public class ForTestMatchDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<MatchInfo> getById(Mid mid) {
+    public Optional<MatchInfo> getById(Tid tid, Mid mid) {
         return ofNullable(jooq.select(MATCHES.TID, MATCHES.STATE, MATCHES.GID,
                 MATCHES.CID, MATCHES.LOSE_MID, MATCHES.WIN_MID, MATCHES.TYPE,
                 MATCHES.LEVEL, MATCHES.PRIORITY)
                 .from(MATCHES)
-                .where(MATCHES.MID.eq(mid))
+                .where(MATCHES.TID.eq(tid), MATCHES.MID.eq(mid))
                 .fetchOne()).map(r ->
                 MatchInfo.builder()
                         .gid(r.get(MATCHES.GID))

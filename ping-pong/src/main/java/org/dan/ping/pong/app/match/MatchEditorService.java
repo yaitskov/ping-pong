@@ -256,9 +256,9 @@ public class MatchEditorService {
             log.warn("No uid {} is not in mid {}", uid, mInfo.getMid());
             return;
         }
-        matchDao.removeScores(batch, mInfo.getMid(), uid, played);
+        matchDao.removeScores(batch, mInfo, uid, played);
         mInfo.leftUid().ifPresent(ouid -> {
-            matchDao.removeScores(batch, mInfo.getMid(), ouid, played);
+            matchDao.removeScores(batch, mInfo, ouid, played);
             mInfo.getParticipantScore(ouid).clear();
         });
         final int numberOfParticipants = mInfo.numberOfParticipants();
@@ -280,11 +280,11 @@ public class MatchEditorService {
             final ParticipantMemState bid = tournament.getBidOrQuit(uid);
             resetBidStateTo(batch, bid, Wait);
             removeWinnerUidIf(batch, mInfo);
-            matchDao.removeSecondParticipant(batch, mInfo.getMid(), opUid);
+            matchDao.removeSecondParticipant(batch, mInfo, opUid);
         } else if (numberOfParticipants == 0) {
             log.warn("Remove last uid {} from mid {}", uid, mInfo.getMid());
             matchService.changeStatus(batch, mInfo, Draft);
-            matchDao.removeParticipants(batch, mInfo.getMid());
+            matchDao.removeParticipants(batch, mInfo);
         } else {
             throw internalError("unexpected number or participants left "
                     + numberOfParticipants);

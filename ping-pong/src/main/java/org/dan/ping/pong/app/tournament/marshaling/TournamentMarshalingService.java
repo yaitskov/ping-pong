@@ -116,7 +116,7 @@ public class TournamentMarshalingService {
         expTournament.getGroups().values().forEach(
                 gi -> groupDao.createGroup(
                         gi.getGid(), DB_STRICT_UPDATER, expTournament.getTid(),
-                        gi.getCid(), gi.getLabel(), 1));
+                        gi.getCid(), gi.getLabel(), 1, gi.getOrdNumber()));
     }
 
     @Inject

@@ -23,12 +23,12 @@ public interface MatchDao {
             Optional<Mid> winMid, Optional<Mid> loseMid,
             int priority, int level, MatchType type, Optional<MatchTag> tag, MatchState draft);
 
-    void changeStatus(Mid mid, MatchState state, DbUpdater batch);
+    void changeStatus(MatchInfo mInfo, DbUpdater batch);
 
     void scoreSet(TournamentMemState tournament, MatchInfo matchInfo,
             DbUpdater batch, List<IdentifiedScore> scores);
 
-    void completeMatch(Mid mid, Uid winUid, Instant now, DbUpdater batch, Set<MatchState> expected);
+    void completeMatch(MatchInfo mInfo, DbUpdater batch, Set<MatchState> expected);
 
     void markAsSchedule(MatchInfo match, DbUpdater batch);
 
@@ -38,19 +38,19 @@ public interface MatchDao {
 
     void deleteAllByTid(TournamentMemState tournament, DbUpdater batch, int size);
 
-    void deleteByIds(Collection<Mid> mids, DbUpdater batch);
+    void deleteByIds(Tid tid, Collection<Mid> mids, DbUpdater batch);
 
-    void setParticipant(int n, Mid mid, Uid uid, DbUpdater batch);
+    void setParticipant(MatchInfo mInfo, Uid uid, DbUpdater batch);
 
     List<MatchInfo> load(Tid tid, MaxValue<Mid> maxMid);
 
-    void deleteSets(DbUpdater batch, MatchInfo minfo, int setNumber);
+    void deleteSets(DbUpdater batch, MatchInfo mInfo, int setNumber);
 
-    void removeSecondParticipant(DbUpdater batch, Mid mid, Uid uidKeep);
+    void removeSecondParticipant(DbUpdater batch, MatchInfo mInfo, Uid uidKeep);
 
-    void removeParticipants(DbUpdater batch, Mid mid);
+    void removeParticipants(DbUpdater batch, MatchInfo mInfo);
 
-    void removeScores(DbUpdater batch, Mid mid, Uid uid, int played);
+    void removeScores(DbUpdater batch, MatchInfo mInfo, Uid uid, int played);
 
     void setWinnerId(MatchInfo mInfo, DbUpdater batch);
 

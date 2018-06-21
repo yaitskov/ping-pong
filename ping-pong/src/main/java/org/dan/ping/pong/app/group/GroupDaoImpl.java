@@ -25,12 +25,12 @@ public class GroupDaoImpl implements GroupDao {
 
     @Override
     public void createGroup(int gid, DbUpdater batch, Tid tid, Integer cid, String label,
-            int quits) {
+            int quits, int ordNumber) {
         batch.exec(DbUpdateSql
                 .builder()
                 .query(jooq.insertInto(GROUPS, GROUPS.GID, GROUPS.TID, GROUPS.LABEL,
                         GROUPS.STATE, GROUPS.CID, GROUPS.QUITS, GROUPS.SORT)
-                        .values(gid, tid, label, Open, cid, quits, gid))
+                        .values(gid, tid, label, Open, cid, quits, ordNumber))
                 .mustAffectRows(Optional.of(1))
                 .onFailure((u) -> internalError("Failed to create a group"))
                 .build());

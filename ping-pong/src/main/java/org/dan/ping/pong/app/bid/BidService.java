@@ -226,7 +226,7 @@ public class BidService {
                 .filter(m -> !midsForRemoval.contains(m.getMid()))
                 .collect(toMap(MatchInfo::getMid, m -> m)));
 
-        matchDao.deleteByIds(midsForRemoval, batch);
+        matchDao.deleteByIds(tournament.getTid(), midsForRemoval, batch);
     }
 
     public void rename(TournamentMemState tournament, DbUpdater batch, BidRename bidRename) {

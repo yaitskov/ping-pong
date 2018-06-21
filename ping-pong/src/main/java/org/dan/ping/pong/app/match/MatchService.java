@@ -220,7 +220,7 @@ public class MatchService {
         mInfo.setWinnerId(Optional.of(winUid));
         final Instant now = clocker.get();
         mInfo.setEndedAt(Optional.of(now));
-        matchDao.completeMatch(mInfo.getMid(), winUid, now, batch, expectedMatchStates);
+        matchDao.completeMatch(mInfo, batch, expectedMatchStates);
     }
 
     private BidState playOffMatchWinnerState(PlayOffRule playOff, MatchInfo mInfo,
@@ -368,7 +368,7 @@ public class MatchService {
     private void completeMiniTournamentGroup(
             TournamentMemState tournament, GroupInfo iGru,
             List<Uid> quitUids, DbUpdater batch) {
-        if (iGru.getOrdNumber() == 0) {
+        if (tournament.findGroupsByCategory(iGru.getCid()).count() == 1) {
             log.info("Set terminal bid states in mini tid {}", tournament.getTid());
             for (int i = 0; i < quitUids.size(); ++i) {
                 bidService.setBidState(tournament.getBidOrQuit(quitUids.get(i)),
@@ -509,7 +509,7 @@ public class MatchService {
             bidRewalksLadder(tournament, mInfo, batch, uid);
             return;
         }
-        matchDao.setParticipant(mInfo.numberOfParticipants(), mInfo.getMid(), uid, batch);
+        matchDao.setParticipant(mInfo, uid, batch);
         final int numberOfParticipants = mInfo.numberOfParticipants();
         if (numberOfParticipants == 2) {
             switch (mInfo.getState()) {
@@ -583,7 +583,7 @@ public class MatchService {
             return;
         }
         mInfo.setState(state);
-        matchDao.changeStatus(mInfo.getMid(), state, batch);
+        matchDao.changeStatus(mInfo, batch);
     }
 
     private void checkPermissions(TournamentMemState tournament, Uid senderUid,

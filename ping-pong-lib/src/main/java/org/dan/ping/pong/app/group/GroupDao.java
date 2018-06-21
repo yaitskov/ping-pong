@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface GroupDao {
     void createGroup(int gid, DbUpdater batch, Tid tid, Integer cid, String label,
-            int quits);
+            int quits, int ordNumber);
 
     Map<Integer, GroupInfo> load(Tid tid, MaxValue<Integer> maxGid);
 

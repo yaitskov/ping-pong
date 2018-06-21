@@ -367,14 +367,14 @@ public class GroupService {
     public int createGroup(TournamentMemState tournament, int cid, DbUpdater batch) {
         final int gid = tournament.getNextGroup().next();
         final String label = sortToLabel(gid);
-
+        final int ordNumber = gid - 1;
         groupDao.createGroup(gid, batch,
                 tournament.getTid(), cid, label,
-                tournament.getRule().getGroup().get().getQuits());
+                tournament.getRule().getGroup().get().getQuits(), ordNumber);
         log.info("New group {}/{} is created in tid/cid {}/{}",
                 gid, label, tournament.getTid(), cid);
         tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
-                .ordNumber(gid).label(label).build());
+                .ordNumber(ordNumber).label(label).build());
         return gid;
     }
 

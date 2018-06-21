@@ -7,7 +7,6 @@ import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -17,7 +16,7 @@ public class MatchRemover {
 
     public void deleteByMids(TournamentMemState tournament,
             DbUpdater batch, Collection<Mid> mids) {
-        matchDao.deleteByIds(mids, batch);
+        matchDao.deleteByIds(tournament.getTid(), mids, batch);
         tournament.getMatches().keySet().removeAll(mids);
     }
 

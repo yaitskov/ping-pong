@@ -285,4 +285,8 @@ public class TournamentMemState {
     public Stream<ParticipantMemState> findBidsByCategory(int cid) {
         return participants().filter(p -> p.getCid() == cid);
     }
+
+    public Stream<GroupInfo> findGroupsByCategory(int cid) {
+        return groups.values().stream().filter(gi -> gi.getCid() == cid);
+    }
 }

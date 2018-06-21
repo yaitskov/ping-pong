@@ -29,7 +29,6 @@ import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.group.GroupDao;
-import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.group.PlayOffMatcherFromGroup;
 import org.dan.ping.pong.app.match.MatchDao;
@@ -315,7 +314,7 @@ public class CastingLotsService {
         final Set<Mid> midsForRemoval = matchesToBeRemoved.stream()
                 .map(MatchInfo::getMid).collect(toSet());
         filterMatches(tournament, midsForRemoval);
-        matchDao.deleteByIds(midsForRemoval, batch);
+        matchDao.deleteByIds(tournament.getTid(), midsForRemoval, batch);
         return matchesToBeRemoved.stream().map(MatchInfo::getPriority).min(Integer::compare).orElse(0);
     }
 

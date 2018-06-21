@@ -36,7 +36,6 @@ import org.jooq.DSLContext;
 import org.jooq.TableField;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -135,20 +134,22 @@ public class MatchDaoServer implements MatchDao {
     }
 
     @Override
-    public void changeStatus(Mid mid, MatchState state, DbUpdater batch) {
+    public void changeStatus(MatchInfo mInfo, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(NON_ZERO_ROWS)
-                .logBefore(() -> log.info("Put match {} into {}", mid, state))
+                .logBefore(() -> log.info("Put match {} into {}",
+                        mInfo.getMid(), mInfo.getState()))
                 .query(jooq.update(MATCHES)
-                        .set(MATCHES.STATE, state)
-                        .where(MATCHES.MID.eq(mid)))
+                        .set(MATCHES.STATE, mInfo.getState())
+                        .where(MATCHES.TID.eq(mInfo.getTid()),
+                                MATCHES.MID.eq(mInfo.getMid())))
                 .build());
     }
 
     @Override
     public void scoreSet(TournamentMemState tournament, MatchInfo matchInfo,
             DbUpdater batch, List<IdentifiedScore> scores) {
-        insertSetScore(batch, matchInfo.getMid(), scores);
+        insertSetScore(batch, tournament.getTid(), matchInfo.getMid(), scores);
     }
 
     @Override
@@ -157,32 +158,36 @@ public class MatchDaoServer implements MatchDao {
                 (uid, sets) ->
                         sets.forEach(games -> batch.exec(
                                 DbUpdateSql.builder()
-                                        .query(jooq.insertInto(SET_SCORE, SET_SCORE.MID,
-                                                SET_SCORE.UID, SET_SCORE.GAMES)
-                                                .values(mInfo.getMid(), uid, games))
+                                        .query(jooq.insertInto(SET_SCORE, SET_SCORE.TID,
+                                                SET_SCORE.MID, SET_SCORE.UID,
+                                                SET_SCORE.GAMES)
+                                                .values(mInfo.getTid(), mInfo.getMid(),
+                                                        uid, games))
                                         .build())));
     }
 
     @Override
-    public void completeMatch(Mid mid, Uid winUid, Instant now, DbUpdater batch, Set<MatchState> expected) {
+    public void completeMatch(MatchInfo mInfo, DbUpdater batch, Set<MatchState> expected) {
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(JUST_A_ROW)
-                .logBefore(() -> log.info("Match {} won uid {} if {}", mid, winUid, expected))
+                .logBefore(() -> log.info("Match {} won uid {} if {}",
+                        mInfo.getMid(), mInfo.winnerId(), expected))
                 .query(jooq.update(MATCHES)
                         .set(MATCHES.STATE, MatchState.Over)
-                        .set(MATCHES.UID_WIN, winUid)
-                        .set(MATCHES.ENDED, Optional.of(now))
-                        .where(MATCHES.MID.eq(mid),
+                        .set(MATCHES.UID_WIN, mInfo.winnerId())
+                        .set(MATCHES.ENDED, mInfo.getEndedAt())
+                        .where(MATCHES.TID.eq(mInfo.getTid()),
+                                MATCHES.MID.eq(mInfo.getMid()),
                                 MATCHES.STATE.in(expected)))
                 .build());
     }
 
-    private void insertSetScore(DbUpdater batch, Mid mid, List<IdentifiedScore> scores) {
+    private void insertSetScore(DbUpdater batch, Tid tid, Mid mid, List<IdentifiedScore> scores) {
         scores.forEach(score -> batch.exec(
                 DbUpdateSql.builder()
-                        .query(jooq.insertInto(SET_SCORE, SET_SCORE.MID,
+                        .query(jooq.insertInto(SET_SCORE, SET_SCORE.TID, SET_SCORE.MID,
                                 SET_SCORE.UID, SET_SCORE.GAMES)
-                                .values(mid, score.getUid(), score.getScore()))
+                                .values(tid, mid, score.getUid(), score.getScore()))
                         .build()));
     }
 
@@ -197,7 +202,8 @@ public class MatchDaoServer implements MatchDao {
                         .query(jooq.update(MATCHES)
                                 .set(MATCHES.STATE, match.getState())
                                 .set(MATCHES.STARTED, match.getStartedAt())
-                                .where(MATCHES.MID.eq(match.getMid()),
+                                .where(MATCHES.TID.eq(match.getTid()),
+                                        MATCHES.MID.eq(match.getMid()),
                                         MATCHES.STATE.eq(Place)))
                         .build());
     }
@@ -254,7 +260,7 @@ public class MatchDaoServer implements MatchDao {
     }
 
     @Override
-    public void deleteByIds(Collection<Mid> mids, DbUpdater batch) {
+    public void deleteByIds(Tid tid, Collection<Mid> mids, DbUpdater batch) {
         if (mids.isEmpty()) {
             return;
         }
@@ -263,12 +269,14 @@ public class MatchDaoServer implements MatchDao {
                 .exec(DbUpdateSql.builder()
                         .mustAffectRows(empty())
                         .query(jooq.deleteFrom(SET_SCORE)
-                                .where(SET_SCORE.MID.in(mids)))
+                                .where(SET_SCORE.TID.eq(tid),
+                                        SET_SCORE.MID.in(mids)))
                         .build())
                 .exec(DbUpdateSql.builder()
                         .mustAffectRows(NON_ZERO_ROWS)
                         .query(jooq.deleteFrom(MATCHES)
-                                .where(MATCHES.MID.in(mids)))
+                                .where(MATCHES.TID.eq(tid),
+                                        MATCHES.MID.in(mids)))
                         .build());
     }
 
@@ -278,7 +286,7 @@ public class MatchDaoServer implements MatchDao {
                 .exec(DbUpdateSql.builder()
                         .mustAffectRows(empty())
                         .query(jooq.deleteFrom(SET_SCORE)
-                                .where(SET_SCORE.MID.in(tournament.getMatches().keySet())))
+                                .where(SET_SCORE.TID.eq(tournament.getTid())))
                         .build())
                 .exec(DbUpdateSql.builder()
                         .mustAffectRows(Optional.of(size))
@@ -288,12 +296,13 @@ public class MatchDaoServer implements MatchDao {
     }
 
     @Override
-    public void setParticipant(int n, Mid mid, Uid uid, DbUpdater batch) {
+    public void setParticipant(MatchInfo mInfo, Uid uid, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(NON_ZERO_ROWS)
                 .query(jooq.update(MATCHES)
-                        .set(pickField(n), uid)
-                        .where(MATCHES.MID.eq(mid)))
+                        .set(pickField(mInfo.numberOfParticipants()), uid)
+                        .where(MATCHES.TID.eq(mInfo.getTid()),
+                                MATCHES.MID.eq(mInfo.getMid())))
                 .build());
     }
 
@@ -362,41 +371,47 @@ public class MatchDaoServer implements MatchDao {
                             setNumber, mInfo.getMid(), uid))
                     .query(jooq.query("delete from "
                                     + SET_SCORE.getSchema().getName() + "." + SET_SCORE.getName()
-                                    + " where " + SET_SCORE.MID.getName() + " = ? and "
+                                    + " where " + SET_SCORE.TID.getName() + " = ? and "
+                                    + SET_SCORE.MID.getName() + " = ? and "
                                     + SET_SCORE.UID.getName() + " = ? order by "
                                     + SET_SCORE.SET_ID.getName() + " desc limit ?",
-                            mInfo.getMid(), uid, limit))
+                            mInfo.getTid(), mInfo.getMid(), uid, limit))
                     .build());
         });
     }
 
     @Override
-    public void removeSecondParticipant(DbUpdater batch, Mid mid, Uid uidKeep) {
+    public void removeSecondParticipant(DbUpdater batch, MatchInfo mInfo, Uid uidKeep) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(MATCHES)
                         .set(MATCHES.UID_LESS, uidKeep)
                         .set(MATCHES.UID_MORE, (Uid) null)
-                        .where(MATCHES.MID.eq(mid)))
+                        .where(MATCHES.TID.eq(mInfo.getTid()),
+                                MATCHES.MID.eq(mInfo.getMid())))
                 .build());
     }
 
     @Override
-    public void removeParticipants(DbUpdater batch, Mid mid) {
+    public void removeParticipants(DbUpdater batch, MatchInfo mInfo) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(MATCHES)
                         .set(MATCHES.UID_LESS, (Uid) null)
                         .set(MATCHES.UID_MORE, (Uid) null)
-                        .where(MATCHES.MID.eq(mid)))
+                        .where(MATCHES.TID.eq(mInfo.getTid()),
+                                MATCHES.MID.eq(mInfo.getMid())))
                 .build());
     }
 
     @Override
-    public void removeScores(DbUpdater batch, Mid mid, Uid uid, int played) {
+    public void removeScores(DbUpdater batch, MatchInfo mInfo, Uid uid, int played) {
         batch.exec(DbUpdateSql.builder()
-                .logBefore(() -> log.info("Delete all scores for mid {} uid {}", mid, uid))
+                .logBefore(() -> log.info("Delete all scores for mid {} uid {}",
+                        mInfo.getMid(), uid))
                 .mustAffectRows(Optional.of(played))
                 .query(jooq.deleteFrom(SET_SCORE)
-                        .where(SET_SCORE.MID.eq(mid), SET_SCORE.UID.eq(uid)))
+                        .where(SET_SCORE.TID.eq(mInfo.getTid()),
+                                SET_SCORE.MID.eq(mInfo.getMid()),
+                                SET_SCORE.UID.eq(uid)))
                 .build());
     }
 

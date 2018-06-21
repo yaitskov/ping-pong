@@ -50,7 +50,7 @@ public class CategoryDaoMysql implements CategoryDao {
     public void delete(Tid tid, int cid, DbUpdater batch) {
         log.info("Delete category {}", cid);
         jooq.deleteFrom(CATEGORY)
-                .where(CATEGORY.CID.eq(cid))
+                .where(CATEGORY.TID.eq(tid), CATEGORY.CID.eq(cid))
                 .execute();
     }
 

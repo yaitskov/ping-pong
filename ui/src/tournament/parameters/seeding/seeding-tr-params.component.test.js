@@ -64,7 +64,7 @@ describe('seeding-tr-params', () => {
         ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff(sport));
         ctx.btnTogglesDiffClasses('#rank-axis-direction',
                                   () => ctx.ctrl.rules.casting.direction,
-                                  {default: {clazz: 'btn-primary', value: 'Decrease'},
+                                  {default: {clazz: 'btn-primary', value: 'd'},
                                    other: {clazz: 'btn-primary', value: 'i'}});
     });
 

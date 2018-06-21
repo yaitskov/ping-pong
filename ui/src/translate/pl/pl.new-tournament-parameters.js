@@ -23,7 +23,7 @@ module.exports = {
     'Min score advance to win a set': 'Min przewaga',
     'min-score-advance-help': 'Minimalna przewaga w punktach do zdobycia seta',
     'min-games-advance-help': 'Minimalna przewaga w gemach do zdobycia seta',
-    'rank-direction-lbl-Decrease': 'Malejąco',
+    'rank-direction-lbl-d': 'Malejąco',
     'rank-direction-lbl-i': 'Rosnąco',
     'rank-policy-lbl': 'Sposób rankingu',
     'rank-policy-lbl-pr': 'Podany poziom',

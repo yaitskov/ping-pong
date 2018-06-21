@@ -24,7 +24,7 @@ module.exports = {
     'Min score advance to win a set': 'Min advance',
     'min-score-advance-help': 'Required advance in the score to win a set',
     'min-games-advance-help': 'Required advance in the score to win a set',
-    'rank-direction-lbl-Decrease': 'Descending',
+    'rank-direction-lbl-d': 'Descending',
     'rank-direction-lbl-i': 'Ascending',
     'rank-policy-lbl': 'Rating method',
     'rank-policy-lbl-pr': 'Provided skill',

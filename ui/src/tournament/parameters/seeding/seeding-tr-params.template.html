@@ -42,7 +42,7 @@
         <div touch-spin options="$ctrl.rank"
              ng-model="$ctrl.rules.casting.providedRankOptions.maxValue"/>
     </div>
-    <many-button-toggler domain="['Decrease', 'Increase']" label="rank-direction-lbl"
+    <many-button-toggler domain="['Decrease', 'i']" label="rank-direction-lbl"
                          id="rank-axis-direction"
                          ng-show="['BestToBest', 'BalancedMix'].includes($ctrl.rules.casting.splitPolicy) &amp;&amp; ['pr', 'su'].includes($ctrl.rules.casting.policy)"
                          ng-model="$ctrl.rules.casting.direction"/>

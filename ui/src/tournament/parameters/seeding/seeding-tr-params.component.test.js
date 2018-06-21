@@ -65,7 +65,7 @@ describe('seeding-tr-params', () => {
         ctx.btnTogglesDiffClasses('#rank-axis-direction',
                                   () => ctx.ctrl.rules.casting.direction,
                                   {default: {clazz: 'btn-primary', value: 'Decrease'},
-                                   other: {clazz: 'btn-primary', value: 'Increase'}});
+                                   other: {clazz: 'btn-primary', value: 'i'}});
     });
 
     it('max rank increase/decrease', () => {

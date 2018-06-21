@@ -24,7 +24,7 @@ module.exports = {
     'min-score-advance-help': 'Minimalna przewaga w punktach do zdobycia seta',
     'min-games-advance-help': 'Minimalna przewaga w gemach do zdobycia seta',
     'rank-direction-lbl-Decrease': 'Malejąco',
-    'rank-direction-lbl-Increase': 'Rosnąco',
+    'rank-direction-lbl-i': 'Rosnąco',
     'rank-policy-lbl': 'Sposób rankingu',
     'rank-policy-lbl-pr': 'Podany poziom',
     'rank-policy-lbl-m': 'Ręczne',

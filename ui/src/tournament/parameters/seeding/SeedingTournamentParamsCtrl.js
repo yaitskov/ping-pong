@@ -9,7 +9,7 @@ export default class SeedingTournamentParamsCtrl extends BaseTrParamsCtrl {
     watchForPolicy() {
         this.$scope.$watch('$ctrl.rules.casting.policy', (rankPolicy) => {
             console.log(`rules.casting.policy: ${rankPolicy}`);
-            this.rules.casting.providedRankOptions = this.rankOptionsBackup.map(rankPolicy);
+            this.rules.casting.pro = this.rankOptionsBackup.map(rankPolicy);
         });
     }
 
@@ -26,7 +26,7 @@ export default class SeedingTournamentParamsCtrl extends BaseTrParamsCtrl {
         super(...arguments);
         this.rank = {min: 0, max: 1000000};
         this.rankOptionsBackup = backedUpValue(defaultProvidedRankOptions,
-                                               () => this.rules.casting.providedRankOptions,
+                                               () => this.rules.casting.pro,
                                                'pr');
     }
 }

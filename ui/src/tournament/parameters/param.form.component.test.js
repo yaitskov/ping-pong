@@ -83,7 +83,7 @@ describe('tournament-parameters-form', () => {
     ij('child component validation works', ($rootScope) => {
         const tournament = newTournament('PingPong');
         const veryLongLabel = ''.padEnd(111, 'x');
-        tournament.rules.casting.providedRankOptions.label = veryLongLabel; // to long
+        tournament.rules.casting.pro.label = veryLongLabel; // to long
         ctx.broadcast('event.tournament.rules.set', tournament);
 
         const spy = spyOn($rootScope, '$broadcast');

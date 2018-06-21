@@ -20,7 +20,7 @@
          ng-show="$ctrl.rules.casting.policy == 'pr'">
         <label for="rankName" class="toggle-option" translate="rank-name-lbl"/>
         <input type="text" class="form-control"
-               ng-model="$ctrl.rules.casting.providedRankOptions.label"
+               ng-model="$ctrl.rules.casting.pro.label"
                ng-maxlength="100"
                name="rankName"
                id="rankName"
@@ -34,13 +34,13 @@
          ng-show="$ctrl.rules.casting.policy == 'pr'">
         <label translate="Minimal allowed rank value"/>
         <div touch-spin options="$ctrl.rank"
-             ng-model="$ctrl.rules.casting.providedRankOptions.minValue"/>
+             ng-model="$ctrl.rules.casting.pro.minValue"/>
     </div>
     <div class="form-group" id="max-rank-value"
          ng-show="$ctrl.rules.casting.policy == 'pr'">
         <label translate="Maximum allowed rank value"/>
         <div touch-spin options="$ctrl.rank"
-             ng-model="$ctrl.rules.casting.providedRankOptions.maxValue"/>
+             ng-model="$ctrl.rules.casting.pro.maxValue"/>
     </div>
     <many-button-toggler domain="['d', 'i']" label="rank-direction-lbl"
                          id="rank-axis-direction"

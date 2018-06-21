@@ -31,12 +31,12 @@ describe('seeding-tr-params', () => {
         ctx.visible('#rank-axis-direction');
 
         expect(ctx.element.find('#rankName').val()).
-            toBe(ctx.ctrl.rules.casting.providedRankOptions.label);
+            toBe(ctx.ctrl.rules.casting.pro.label);
     });
 
     const tournamentWithManualRanking = () => {
         const tournament = newTournamentWithPlayOff(sport);
-        delete tournament.rules.casting.providedRankOptions;
+        delete tournament.rules.casting.pro;
         tournament.rules.casting.policy = 'm';
         return tournament;
     };
@@ -71,13 +71,13 @@ describe('seeding-tr-params', () => {
     it('max rank increase/decrease', () => {
         ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff(sport));
         checkTouchSpinID(ctx, '#max-rank-value',
-                         () => ctx.ctrl.rules.casting.providedRankOptions.maxValue);
+                         () => ctx.ctrl.rules.casting.pro.maxValue);
     });
 
     it('min rank increase/decrease', () => {
         ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff(sport));
         checkTouchSpinID(ctx, '#min-rank-value',
-                         () => ctx.ctrl.rules.casting.providedRankOptions.minValue);
+                         () => ctx.ctrl.rules.casting.pro.minValue);
     });
 
     it('ranking policy is hidden if ConsoleLayered', () => {

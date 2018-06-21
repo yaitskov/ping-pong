@@ -69,7 +69,7 @@ angular.
                              if (auth.isAuthenticated()) {
                                  var req = {tid: self.tournament.tid,
                                             categoryId: self.myCategory.cid};
-                                 if (self.tournament.rules.casting.providedRankOptions) {
+                                 if (self.tournament.rules.casting.pro) {
                                      req.providedRank = self.rank;
                                  }
                                  $http.post('/api/tournament/enlist',
@@ -124,8 +124,8 @@ angular.
                                          mainMenu.setTitle(['Drafting to', {name: tournament.name}]);
                                          setLastTournament.got('got.tr', tournament);
                                          self.tournament = tournament;
-                                         var rnkOptions = tournament.rules.casting.providedRankOptions;
-                                         if (tournament.rules.casting.providedRankOptions) {
+                                         var rnkOptions = tournament.rules.casting.pro;
+                                         if (tournament.rules.casting.pro) {
                                              self.rankRange = {min: rnkOptions.minValue, max: rnkOptions.maxValue};
                                              self.rank = rnkOptions.minValue;
                                          }

@@ -34,7 +34,7 @@ export default class EnlistOfflineCtrl extends SimpleController {
                             const tournament = responses[0];
                             this.tournament = tournament;
                             this.rules = responses[1];
-                            var rnkOptions = this.rules.casting.providedRankOptions;
+                            var rnkOptions = this.rules.casting.pro;
                             if (rnkOptions) {
                                 this.rankRange = {min: rnkOptions.minValue, max: rnkOptions.maxValue};
                             }
@@ -112,7 +112,7 @@ export default class EnlistOfflineCtrl extends SimpleController {
                    bidState: bidState,
                    name: this.fullName
                   };
-        if (this.rules.casting.providedRankOptions) {
+        if (this.rules.casting.pro) {
             req.providedRank = this.rank;
         }
         if (this.groupId) {

@@ -9,7 +9,7 @@ export default function defaultTournamentRules(sport) {
             policy: 'pr',
             direction: 'd',
             splitPolicy: 'BalancedMix',
-            providedRankOptions: {
+            pro: {
                 label: 'rating',
                 minValue: 0,
                 maxValue: 500000

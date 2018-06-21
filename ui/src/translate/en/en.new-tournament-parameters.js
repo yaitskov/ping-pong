@@ -38,7 +38,7 @@ module.exports = {
     'rank-name-length': 'Max length of rank name must be less than {{max}} letters',
     'split-policy-lbl': 'Number of ladders',
     'split-policy-lbl-bm': 'one',
-    'split-policy-lbl-ConsoleLayered': 'as much as levels',
+    'split-policy-lbl-cl': 'as much as levels',
     'Minimal allowed rank value': 'Min rating value',
     'Maximum allowed rank value': 'Max rating value',
     'quits-group-help': 'How many players quits from a group and continue participate'

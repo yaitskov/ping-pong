@@ -23,7 +23,7 @@ const PingPongZeroSets = {
         '@type': 'PingPong',
         mgtw: 11,
         maig: 2,
-        countOnlySets: false
+        cos: false
     }
 };
 

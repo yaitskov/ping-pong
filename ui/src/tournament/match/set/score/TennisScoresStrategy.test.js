@@ -1,9 +1,9 @@
 import TennisScoresStrategy from './TennisScoresStrategy.js';
 
 const rulesSTB1 = {mgtw: 6, maig: 2,
-                   superTieBreakGames: 10, stw: 1};
+                   stbg: 10, stw: 1};
 const rulesSTB2 = {mgtw: 6, maig: 2,
-                   superTieBreakGames: 10, stw: 2};
+                   stbg: 10, stw: 2};
 const rulesSTB3 = Object.assign({}, rulesSTB2, {stw: 3});
 const rulesSTB4 = Object.assign({}, rulesSTB2, {stw: 4});
 

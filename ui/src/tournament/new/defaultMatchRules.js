@@ -8,7 +8,7 @@ export default function defaultMatchRules(sport) {
             maig: 2,
             mpg: 0,
             stw: 3,
-            countOnlySets: false
+            cos: false
         };
     case 'Tennis':
         return {
@@ -17,7 +17,7 @@ export default function defaultMatchRules(sport) {
             maig: 2,
             mpg: 0,
             stw: 2,
-            superTieBreakGames: 10
+            stbg: 10
         };
     default:
         throw new Error(`Sport [${sport}] is not supported`);

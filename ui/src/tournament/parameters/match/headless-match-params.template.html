@@ -2,7 +2,7 @@
      ng-show="$ctrl.rules.match['@type'] == 'Tennis'">
   <label translate="Super tie break games"/>
   <div touch-spin options="$ctrl.sets"
-       ng-model="$ctrl.rules.match.superTieBreakGames"></div>
+       ng-model="$ctrl.rules.match.stbg"></div>
   <p class="help-block" translate="super-time-break-games-help"/>
 </div>
 <div class="form-group" id="sets-to-win-match">
@@ -12,7 +12,7 @@
   <p class="help-block" translate="match-score-help"/>
 </div>
 <div class="form-group" id="min-games-to-win"
-     ng-show="!$ctrl.rules.match.countOnlySets"
+     ng-show="!$ctrl.rules.match.cos"
      ng-class="{'has-error': $ctrl.errors['match-rule.min-games-to-win']}">
   <label ng-show="$ctrl.rules.match['@type'] == 'Tennis'"
          translate="Min games to win a set"/>
@@ -29,7 +29,7 @@
      translate="min-games-to-win-set-help"/>
 </div>
 <div class="form-group" id="min-game-advance"
-     ng-show="!$ctrl.rules.match.countOnlySets">
+     ng-show="!$ctrl.rules.match.cos">
   <label translate="Min score advance to win a set"/>
   <div touch-spin options="$ctrl.advance"
        ng-model="$ctrl.rules.match.maig"/>
@@ -42,4 +42,4 @@
 </div>
 <many-button-toggler id="count-only-sets" ng-show="$ctrl.rules.match['@type'] == 'PingPong'"
                      domain="[false, true]" selected-class="['btn-primary', 'btn-success']"
-                     label="Count only sets lbl" ng-model="$ctrl.rules.match.countOnlySets"/>
+                     label="Count only sets lbl" ng-model="$ctrl.rules.match.cos"/>

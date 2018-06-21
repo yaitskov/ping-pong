@@ -31,7 +31,7 @@ describe('head-less-match-params', () => {
     describe('count only sets', () => {
         beforeEach(() => {
             const tournamentRules = newTournament('PingPong').rules;
-            tournamentRules.match.countOnlySets = true;
+            tournamentRules.match.cos = true;
             ctx.send(HeadLessMatchParamsCtrl.TopicLoad, tournamentRules);
         });
 

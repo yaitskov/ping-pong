@@ -35,7 +35,7 @@ describe('match-params', () => {
 
     it('super tie break games increase/decrease', () => {
         ctx.broadcast('event.tournament.rules.set', tennisTournament());
-        checkTouchSpinID(ctx, '#supertie-break-games', () => ctx.ctrl.rules.match.superTieBreakGames);
+        checkTouchSpinID(ctx, '#supertie-break-games', () => ctx.ctrl.rules.match.stbg);
     });
 
     it('super tie break games is visible for tennis only', () => {
@@ -45,13 +45,13 @@ describe('match-params', () => {
         ctx.hidden('#supertie-break-games');
     });
 
-    it('min sets to win is not visible if countOnlySets', () => {
+    it('min sets to win is not visible if cos', () => {
         const tournament = pingPongTournament();
         ctx.broadcast('event.tournament.rules.set', tournament);
         ctx.visible('#sets-to-win-match');
         ctx.visible('#min-games-to-win');
         ctx.visible('#min-game-advance');
-        tournament.rules.match.countOnlySets = true;
+        tournament.rules.match.cos = true;
         ctx.broadcast('event.tournament.rules.set', tournament);
         ctx.visible('#sets-to-win-match');
         ctx.hidden('#min-games-to-win');
@@ -61,7 +61,7 @@ describe('match-params', () => {
     it('3rd place match toggles', () => {
         ctx.broadcast('event.tournament.rules.set', pingPongTournament());
         ctx.btnTogglesDiffClasses('#count-only-sets',
-                                  () => ctx.ctrl.rules.match.countOnlySets,
+                                  () => ctx.ctrl.rules.match.cos,
                                   {default: {clazz: 'btn-primary', value: false},
                                    other: {clazz: 'btn-success', value: true}});
     });

@@ -14,7 +14,7 @@ export default class ConsoleParamsCtrl extends BaseTrParamsCtrl {
                 (ok) => {
                     this.tournament.consoleTid = ok.data;
                     if (this.tournament.rules.group) {
-                        this.tournament.rules.group.console = 'INDEPENDENT_RULES';
+                        this.tournament.rules.group.console = 'ir';
                     }
                     this.requestStatus.complete();
                 },
@@ -29,7 +29,7 @@ export default class ConsoleParamsCtrl extends BaseTrParamsCtrl {
             if (newv) {
                 if (this.tournament.consoleTid) {
                     console.log(`console tid is alread exist. just set connsole`);
-                    this.tournament.rules.group.console = 'INDEPENDENT_RULES';
+                    this.tournament.rules.group.console = 'ir';
                 } else {
                     this.createConsoleTournament(this.tournament.tid);
                 }

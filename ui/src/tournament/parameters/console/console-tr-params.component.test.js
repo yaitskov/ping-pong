@@ -70,7 +70,7 @@ describe('console-tr-params', () => {
 
         jsHttpBackend.flush(); // response callback
 
-        expect(tour.rules.group.console).toBe('INDEPENDENT_RULES');
+        expect(tour.rules.group.console).toBe('ir');
         expect(tour.consoleTid).toEqual(consoleTid);
         expect(ctx.element.find('#console-tournament-parameters .btn-primary').
                attr('href')).toBe(`#!/my/tournament/parameters/${consoleTid}`);
@@ -86,6 +86,6 @@ describe('console-tr-params', () => {
             respondObject(2/*consoleTid*/);
         ctx.element.find('#console-tournament-toggler input').bootstrapToggle('on');
         jsHttpBackend.flush(); // response callback
-        expect(tour.rules.group.console).toBe('INDEPENDENT_RULES');
+        expect(tour.rules.group.console).toBe('ir');
     });
 });

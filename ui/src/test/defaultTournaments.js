@@ -54,7 +54,7 @@ export function existingTournamentWithoutConsole(sport) {
 
 export function existingTournamentRequiresConsole(sport) {
     const tournament = existingTournament(sport);
-    tournament.rules.group.console = 'INDEPENDENT_RULES';
+    tournament.rules.group.console = 'ir';
     return tournament;
 }
 

@@ -17,7 +17,7 @@ export default class SeedingTournamentParamsCtrl extends BaseTrParamsCtrl {
         super.onTournamentSet(...arguments);
         this.rankingPolicyDomain = ['pr', 'm', 'su'];
         if (this.tournament.masterTid) {
-            this.rankingPolicyDomain.push('MasterOutcome');
+            this.rankingPolicyDomain.push('mo');
         }
         this.watchForPolicy();
     }

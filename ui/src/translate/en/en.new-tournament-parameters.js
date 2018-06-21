@@ -30,7 +30,7 @@ module.exports = {
     'rank-policy-lbl-pr': 'Provided skill',
     'rank-policy-lbl-m': 'Manually',
     'rank-policy-lbl-su': 'Sign-up order',
-    'rank-policy-lbl-MasterOutcome': 'Master tournament',
+    'rank-policy-lbl-mo': 'Master tournament',
     'max-losses': 'Max losses',
     'max-losses-1': 'up to 1',
     'max-losses-2': 'up to 2',

@@ -1,18 +1,13 @@
 package org.dan.ping.pong.app.match.dispute;
 
-import static java.lang.Integer.compare;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.dan.ping.pong.sys.type.number.ImmutableNumber;
 
-@EqualsAndHashCode
-@RequiredArgsConstructor
-public class DisputeId implements Comparable<DisputeId> {
-    @Getter(onMethod = @__(@JsonValue))
-    private final int id;
+public class DisputeId extends ImmutableNumber {
+    @JsonCreator
+    public DisputeId(int v) {
+        super(v);
+    }
 
     // jax-rsp
     @JsonCreator
@@ -22,14 +17,5 @@ public class DisputeId implements Comparable<DisputeId> {
 
     public static DisputeId of(int id) {
         return new DisputeId(id);
-    }
-
-    public String toString() {
-        return String.valueOf(id);
-    }
-
-    @Override
-    public int compareTo(DisputeId o) {
-        return compare(id, o.id);
     }
 }

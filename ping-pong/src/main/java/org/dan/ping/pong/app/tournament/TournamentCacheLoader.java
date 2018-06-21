@@ -18,6 +18,10 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.playoff.PowerRange;
 import org.dan.ping.pong.app.score.MatchScoreDao;
+import org.dan.ping.pong.util.collection.MaxValue;
+import org.dan.ping.pong.util.counter.DidSeqGen;
+import org.dan.ping.pong.util.counter.IdSeqGen;
+import org.dan.ping.pong.util.counter.MidSeqGen;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -55,8 +59,12 @@ public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> 
         log.info("Loading tournament {}", tid);
         final TournamentRow row = tournamentDao.getRow(tid)
                 .orElseThrow(() -> notFound(TOURNAMENT_NOT_FOUND, TID, tid));
-        final Map<Mid, MatchInfo> matchMap = combineMatchesAndSets(matchDao.load(tid),
+        final MaxValue<Mid> maxMid = new MaxValue<>(Mid.of(0));
+        final Map<Mid, MatchInfo> matchMap = combineMatchesAndSets(
+                matchDao.load(tid, maxMid),
                 matchScoreDao.load(tid));
+        final MaxValue<Integer> maxCid = new MaxValue<>(0);
+        final MaxValue<Integer> maxGid = new MaxValue<>(0);
         return TournamentMemState.builder()
                 .name(row.getName())
                 .condActions(OneTimeCondActions
@@ -67,8 +75,13 @@ public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> 
                 .type(row.getType())
                 .participants(bidDao.loadParticipants(tid))
                 .categories(categoryDao.listCategoriesByTid(tid).stream()
+                        .peek(c -> maxCid.accept(c.getCid()))
                         .collect(toMap(CategoryLink::getCid, o -> o)))
-                .groups(groupDao.load(tid))
+                .groups(groupDao.load(tid, maxGid))
+                .nextCategory(new IdSeqGen(maxCid.getMax()))
+                .nextGroup(new IdSeqGen(maxGid.getMax()))
+                .nextDispute(new DidSeqGen(0)) // to be load
+                .nextMatch(new MidSeqGen(maxMid.getMax()))
                 .matches(matchMap)
                 .tid(tid)
                 .sport(row.getSport())

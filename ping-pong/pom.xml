@@ -216,17 +216,6 @@
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.ext</groupId>
-            <artifactId>jersey-bean-validation</artifactId>
-            <version>${jersey.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.glassfish.hk2.external</groupId>
-                    <artifactId>javax.inject</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.ext</groupId>
             <artifactId>jersey-spring3</artifactId>
             <version>${jersey.version}</version>
             <exclusions>
@@ -474,29 +463,44 @@
                                     <binding>org.dan.ping.pong.sys.db.converters.OptionalStringConverter</binding>
                                 </customType>
                                 <customType>
+                                    <name>OptionalUByte</name>
+                                    <type>java.util.Optional&lt;java.lang.Integer&gt;</type>
+                                    <binding>org.dan.ping.pong.sys.db.converters.num.UByteOptionalConverter</binding>
+                                </customType>
+                                <customType>
                                     <name>OptionalInteger</name>
                                     <type>java.util.Optional&lt;java.lang.Integer&gt;</type>
-                                    <binding>org.dan.ping.pong.sys.db.converters.OptionalIntegerConverter</binding>
+                                    <binding>org.dan.ping.pong.sys.db.converters.num.OptionalIntegerConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>OptionalMid</name>
                                     <type>java.util.Optional&lt;org.dan.ping.pong.app.match.Mid&gt;</type>
-                                    <binding>org.dan.ping.pong.sys.db.converters.OptionalMidConverter</binding>
+                                    <binding>org.dan.ping.pong.sys.db.converters.num.OptionalMidConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>Uid</name>
                                     <type>org.dan.ping.pong.app.bid.Uid</type>
-                                    <binding>org.dan.ping.pong.sys.db.converters.UidConverter</binding>
+                                    <binding>org.dan.ping.pong.sys.db.converters.num.UidConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>Mid</name>
                                     <type>org.dan.ping.pong.app.match.Mid</type>
-                                    <binding>org.dan.ping.pong.sys.db.converters.MidConverter</binding>
+                                    <binding>org.dan.ping.pong.sys.db.converters.num.MidConverter</binding>
+                                </customType>
+                                <customType>
+                                    <name>Cid</name>
+                                    <type>java.lang.Integer</type>
+                                    <binding>org.dan.ping.pong.sys.db.converters.num.CidConverter</binding>
+                                </customType>
+                                <customType>
+                                    <name>Gid</name>
+                                    <type>java.lang.Integer</type>
+                                    <binding>org.dan.ping.pong.sys.db.converters.num.GidConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>Pid</name>
                                     <type>org.dan.ping.pong.app.place.Pid</type>
-                                    <binding>org.dan.ping.pong.sys.db.converters.PidConverter</binding>
+                                    <binding>org.dan.ping.pong.sys.db.converters.num.PidConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>SportType</name>
@@ -511,7 +515,7 @@
                                 <customType>
                                     <name>Did</name>
                                     <type>org.dan.ping.pong.app.match.dispute.DisputeId</type>
-                                    <binding>org.dan.ping.pong.sys.db.converters.DidConverter</binding>
+                                    <binding>org.dan.ping.pong.sys.db.converters.num.DidConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>Scores</name>
@@ -521,7 +525,7 @@
                                 <customType>
                                     <name>Tid</name>
                                     <type>org.dan.ping.pong.app.tournament.Tid</type>
-                                    <binding>org.dan.ping.pong.sys.db.converters.TidConverter</binding>
+                                    <binding>org.dan.ping.pong.sys.db.converters.num.TidConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>OptionalDouble</name>
@@ -736,6 +740,11 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>Cid</name>
+                                    <expression>.*category\.(cid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
                                     <name>Instant</name>
                                     <expression>.*tournament\.(opens_at)</expression>
                                     <types>.*</types>
@@ -786,13 +795,33 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
-                                    <name>OptionalInteger</name>
+                                    <name>Gid</name>
+                                    <expression>.*groups\.(gid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Cid</name>
+                                    <expression>.*groups\.(cid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>OptionalUByte</name>
                                     <expression>.*bid\.(gid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Cid</name>
+                                    <expression>.*bid\.(cid)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
                                     <name>OptionalMid</name>
                                     <expression>.*matches\.(win_mid|lose_mid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Cid</name>
+                                    <expression>.*matches\.(cid)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
@@ -811,7 +840,7 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
-                                    <name>OptionalInteger</name>
+                                    <name>OptionalUByte</name>
                                     <expression>.*matches\.(gid)</expression>
                                     <types>.*</types>
                                 </forcedType>
@@ -903,6 +932,11 @@
                                 <forcedType>
                                     <name>Mid</name>
                                     <expression>.*set_score\.(mid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Tid</name>
+                                    <expression>.*set_score\.(tid)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

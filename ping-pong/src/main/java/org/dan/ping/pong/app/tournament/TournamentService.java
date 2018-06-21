@@ -45,12 +45,11 @@ import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryService;
-import org.dan.ping.pong.app.group.GroupDao;
+import org.dan.ping.pong.app.group.GroupRemover;
 import org.dan.ping.pong.app.group.GroupService;
-import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.match.MatchRemover;
 import org.dan.ping.pong.app.match.MatchService;
-import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
@@ -188,22 +187,19 @@ public class TournamentService {
         enlist(tournament, uid, enlistment.getProvidedRank(), batch, Optional.empty());
     }
 
-    public void deleteByMids(TournamentMemState tournament, DbUpdater batch, Set<Mid> mids) {
-        matchDao.deleteByIds(mids, batch);
-        tournament.getMatches().keySet().removeAll(mids);
-    }
-
     private void enlist(TournamentMemState tournament, Uid uid,
             Optional<Integer> providedRank, DbUpdater batch, Optional<Integer> oGid) {
         bidDao.enlist(tournament.getParticipant(uid), providedRank, batch);
         if (tournament.getState() == Open) {
             oGid.ifPresent(gid -> {
                 if (!tournament.disambiguationMatchNotPossible()) {
-                    deleteByMids(tournament, batch, tournament.getMatches()
-                            .values().stream()
-                            .filter(m -> m.getGid().equals(oGid) && m.getTag().isPresent())
-                            .map(MatchInfo::getMid)
-                            .collect(toSet()));
+                    matchRemover.deleteByMids(
+                            tournament, batch, tournament.getMatches()
+                                    .values().stream()
+                                    .filter(m -> m.getGid().equals(oGid)
+                                            && m.getTag().isPresent())
+                                    .map(MatchInfo::getMid)
+                                    .collect(toSet()));
                 }
                 castingLotsService.addParticipant(uid, tournament, batch);
             });
@@ -437,10 +433,10 @@ public class TournamentService {
     }
 
     @Inject
-    private MatchDao matchDao;
+    private MatchRemover matchRemover;
 
     @Inject
-    private GroupDao groupDao;
+    private GroupRemover groupRemover;
 
     public void cancel(TournamentMemState tournament, DbUpdater batch) {
         final Instant now = clocker.get();
@@ -449,14 +445,12 @@ public class TournamentService {
         tournamentTerminator.setTournamentState(tournament, Canceled, batch);
         tournamentTerminator.setTournamentCompleteAt(tournament, clocker.get(), batch);
         scheduleService.cancelTournament(tournament, batch, now);
-        matchDao.deleteAllByTid(tournament, batch, tournament.getMatches().size());
+        matchRemover.removeByTournament(tournament, batch);
         tournament.getParticipants().values().stream()
                 .filter(bid -> bid.state() != Quit)
                 .forEach(bid -> bid.setBidState(Want));
         bidDao.resetStateByTid(tid, now, batch);
-        groupDao.deleteAllByTid(tournament.getTid(), batch, tournament.getGroups().size());
-        tournament.getMatches().clear();
-        tournament.getGroups().clear();
+        groupRemover.removeByTournament(tournament, batch);
     }
 
     @Inject

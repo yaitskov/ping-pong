@@ -393,12 +393,13 @@ public class Simulator {
             playersSession.put(player, user);
             scenario.getUidPlayer().put(user.getUid(), player);
         }
+        int catId = 0;
         for (PlayerCategory category : scenario.getCategoryDbId().keySet()) {
-            final int catId = daoGenerator.genCategory(prefix + " " + category, tid);
+            daoGenerator.genCategory(prefix + " " + category, tid, ++catId);
             scenario.getCategoryDbId().put(category, catId);
         }
         for (PlayerCategory category : scenario.getCategoryDbId().keySet()) {
-            final int catId = scenario.getCategoryDbId().get(category);
+            catId = scenario.getCategoryDbId().get(category);
             Map<TestUserSession, EnlistMode> m = scenario.getPlayerPresence().keySet()
                     .stream().collect(Collectors.toMap(
                             player -> scenario.getPlayersSessions().get(player),

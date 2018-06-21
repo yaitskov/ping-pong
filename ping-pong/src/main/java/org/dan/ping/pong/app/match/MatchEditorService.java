@@ -232,6 +232,9 @@ public class MatchEditorService {
         scheduleService.afterMatchComplete(tournament, batch, clocker.get());
     }
 
+    @Inject
+    private MatchRemover matchRemover;
+
     private void resetMatches(TournamentMemState tournament, DbUpdater batch,
             AffectedMatches affectedMatches) {
         affectedMatches.getToBeReset().forEach(
@@ -239,10 +242,10 @@ public class MatchEditorService {
                         tournament, batch,
                         tournament.getMatchById(aMatch.getMid()),
                         aMatch.getUid()));
-        tournamentService.deleteByMids(tournament, batch, affectedMatches.getToBeRemoved());
+        matchRemover.deleteByMids(tournament, batch, affectedMatches.getToBeRemoved());
 
         affectedMatches.getToBeCreated().forEach(
-                mp -> groupService.createDisambiguateMatches(tournament,
+                mp -> groupService.createDisambiguateMatches(batch, tournament,
                         tournament.getParticipant(mp.getUidLess()).gid(), mp));
     }
 

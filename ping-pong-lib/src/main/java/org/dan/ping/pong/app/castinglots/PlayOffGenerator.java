@@ -17,6 +17,7 @@ import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.match.MatchType;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
+import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,6 +76,7 @@ public class PlayOffGenerator {
     private final boolean thirdPlaceMatch;
     private final MatchDao matchDao;
     private final Optional<MatchTag> tag;
+    private final DbUpdater batch;
 
     public Optional<Mid> generateTree(int level, Optional<Mid> parentMid,
             int priority, TypeChain types, Optional<Mid> loserMid) {
@@ -98,8 +100,10 @@ public class PlayOffGenerator {
 
     private Optional<Mid> createMatch(Optional<Mid> winMid, Optional<Mid> loserMid,
             int priority, int level, MatchType type) {
-        final Mid mid = matchDao.createPlayOffMatch(
-                tournament.getTid(), cid, winMid, loserMid,
+        final Mid mid = tournament.getNextMatch().next();
+
+        matchDao.createPlayOffMatch(
+                batch, mid, tournament.getTid(), cid, winMid, loserMid,
                 priority, level, type, tag, Draft);
         final Optional<Mid> omid = Optional.of(mid);
         tournament.getMatches().put(mid, MatchInfo.builder()

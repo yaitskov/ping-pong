@@ -5,6 +5,7 @@ import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdater;
+import org.dan.ping.pong.util.collection.MaxValue;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -13,12 +14,12 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface MatchDao {
-    Mid createMatch(MatchInfo matchInfo);
+    void createMatch(MatchInfo matchInfo, DbUpdater dbStrictUpdater);
 
-    Mid createGroupMatch(Tid tid, int gid, int cid, int priorityGroup,
+    void createGroupMatch(DbUpdater batch, Mid mid, Tid tid, int gid, int cid, int priorityGroup,
             Uid uid1, Uid uid2, Optional<MatchTag> tag, MatchState place);
 
-    Mid createPlayOffMatch(Tid tid, Integer cid,
+    void  createPlayOffMatch(DbUpdater batch, Mid mid, Tid tid, Integer cid,
             Optional<Mid> winMid, Optional<Mid> loseMid,
             int priority, int level, MatchType type, Optional<MatchTag> tag, MatchState draft);
 
@@ -41,7 +42,7 @@ public interface MatchDao {
 
     void setParticipant(int n, Mid mid, Uid uid, DbUpdater batch);
 
-    List<MatchInfo> load(Tid tid);
+    List<MatchInfo> load(Tid tid, MaxValue<Mid> maxMid);
 
     void deleteSets(DbUpdater batch, MatchInfo minfo, int setNumber);
 

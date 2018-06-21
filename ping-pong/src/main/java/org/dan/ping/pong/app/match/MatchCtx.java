@@ -7,6 +7,7 @@ import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.springframework.context.annotation.Import;
 
 @Import({MatchDaoServer.class, MatchResource.class, MatchService.class,
+        MatchRemover.class,
         MatchDisputeCtx.class, MatchEditorService.class,
         PlayOffService.class, PlayOffRuleValidator.class,
         AffectedMatchesService.class,

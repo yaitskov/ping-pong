@@ -1,20 +1,13 @@
 package org.dan.ping.pong.app.match;
 
-import static java.lang.Integer.compare;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.dan.ping.pong.sys.hash.HashAggregator;
-import org.dan.ping.pong.sys.hash.Hashable;
+import org.dan.ping.pong.sys.type.number.ImmutableNumber;
 
-@EqualsAndHashCode
-@RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
-public class Mid implements Comparable<Mid>, Hashable {
-    @Getter(onMethod = @__(@JsonValue))
-    private final int id;
+public class Mid extends ImmutableNumber {
+    @JsonCreator
+    public Mid(int id) {
+        super(id);
+    }
 
     // jax-rsp
     @JsonCreator
@@ -24,23 +17,5 @@ public class Mid implements Comparable<Mid>, Hashable {
 
     public static Mid of(int id) {
         return new Mid(id);
-    }
-
-    public String toString() {
-        return String.valueOf(id);
-    }
-
-    @Override
-    public int compareTo(Mid o) {
-        return compare(id, o.id);
-    }
-
-    public Mid negate() {
-        return new Mid(-id);
-    }
-
-    @Override
-    public void hashTo(HashAggregator sink) {
-        sink.hash(id);
     }
 }

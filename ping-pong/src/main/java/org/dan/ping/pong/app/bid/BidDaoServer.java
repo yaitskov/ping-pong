@@ -236,4 +236,12 @@ public class BidDaoServer implements BidDao {
                         .where(USERS.UID.eq(uid)))
                 .build());
     }
+
+    @Override
+    public void removeByIds(Tid tid, List<Uid> uids, DbUpdater batch) {
+        batch.exec(DbUpdateSql.builder()
+                .query(jooq.deleteFrom(BID)
+                        .where(BID.TID.eq(tid), BID.UID.in(uids)))
+                .build());
+    }
 }

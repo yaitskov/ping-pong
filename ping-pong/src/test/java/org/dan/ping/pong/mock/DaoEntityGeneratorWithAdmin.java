@@ -69,8 +69,9 @@ public class DaoEntityGeneratorWithAdmin {
         return daoEntityGenerator.genPlace(testAdmin.getUid(), tables);
     }
 
-    public int genCategory(Tid tid) {
-        return daoEntityGenerator.genCategory(UUID.randomUUID().toString(), tid);
+    public int genCategory(Tid tid, int cid) {
+        daoEntityGenerator.genCategory(UUID.randomUUID().toString(), tid, cid);
+        return cid;
     }
 
     public int genCity() {

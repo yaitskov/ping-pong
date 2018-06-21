@@ -177,7 +177,7 @@ public class ImperativeSimulator {
 
     public MatchResult matchResult(Mid mid) {
         return myRest.get(MATCH_RESULT + scenario.getTid().getTid()
-                + "/" + mid.getId(), MatchResult.class);
+                + "/" + mid.intValue(), MatchResult.class);
     }
 
     public ImperativeSimulator checkTournamentComplete(BidStatesDesc expected) {

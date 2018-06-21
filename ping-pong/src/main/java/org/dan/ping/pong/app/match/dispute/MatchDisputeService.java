@@ -29,6 +29,7 @@ public class MatchDisputeService {
                 .builder()
                 .created(now)
                 .status(CLAIMED)
+                .did(tournament.getNextDispute().next())
                 .mid(claim.getMid())
                 .plaintiff(uid)
                 .plaintiffComment(claim.getComment())
@@ -37,8 +38,7 @@ public class MatchDisputeService {
                 .proposedScore(claim.getSets())
                 .resolvedAt(Optional.empty())
                 .build();
-        batch.markDirty();
-        dispute.setDid(matchDisputeDao.create(tournament.getTid(), dispute));
+        matchDisputeDao.create(tournament.getTid(), dispute, batch);
 
         tournament.getDisputes().add(dispute);
         return dispute.getDid();

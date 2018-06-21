@@ -66,7 +66,7 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
             return;
         }
         final int basePositions = roundPlayOffBase(orderedBids.size());
-        castingLotsDao.generatePlayOffMatches(tournament, cid, basePositions, 1, tag);
+        castingLotsDao.generatePlayOffMatches(batch, tournament, cid, basePositions, 1, tag);
         assignBidsToBaseMatches(cid, basePositions, orderedBids, tournament, batch, tag);
     }
 

@@ -6,6 +6,8 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.sys.db.DbUpdateSql;
+import org.dan.ping.pong.sys.db.DbUpdater;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,15 +21,15 @@ public class CategoryDaoMysql implements CategoryDao {
     private DSLContext jooq;
 
     @Override
-    @Transactional(TRANSACTION_MANAGER)
-    public int create(NewCategory newCategory) {
-        final int cid = jooq.insertInto(CATEGORY, CATEGORY.NAME, CATEGORY.TID)
-                .values(newCategory.getName(), newCategory.getTid())
-                .returning(CATEGORY.CID)
-                .fetchOne()
-                .getCid();
-        log.info("Set id {} to category {}", cid, newCategory);
-        return cid;
+    public void create(NewCategory newCategory, DbUpdater batch) {
+        batch.exec(DbUpdateSql.builder()
+                .query(jooq.insertInto(
+                        CATEGORY, CATEGORY.NAME,
+                        CATEGORY.TID, CATEGORY.CID)
+                        .values(newCategory.getName(),
+                                newCategory.getTid(),
+                                newCategory.getCid()))
+                .build());
     }
 
     @Override
@@ -45,7 +47,7 @@ public class CategoryDaoMysql implements CategoryDao {
 
     @Override
     @Transactional(TRANSACTION_MANAGER)
-    public void delete(int cid) {
+    public void delete(Tid tid, int cid, DbUpdater batch) {
         log.info("Delete category {}", cid);
         jooq.deleteFrom(CATEGORY)
                 .where(CATEGORY.CID.eq(cid))
@@ -58,8 +60,8 @@ public class CategoryDaoMysql implements CategoryDao {
         final List<CategoryLink> categories = listCategoriesByTid(originTid);
         jooq.batch(
                 categories.stream().map(cinfo ->
-                        jooq.insertInto(CATEGORY, CATEGORY.NAME, CATEGORY.TID)
-                                .values(cinfo.getName(), tid))
+                        jooq.insertInto(CATEGORY, CATEGORY.NAME, CATEGORY.TID, CATEGORY.CID)
+                                .values(cinfo.getName(), tid, cinfo.getCid()))
                 .collect(toList()))
                 .execute();
     }

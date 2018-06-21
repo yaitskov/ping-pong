@@ -47,4 +47,6 @@ public interface BidDao {
     Map<Uid, ParticipantMemState> loadParticipants(Tid tid);
 
     void renameParticipant(Uid uid, String newName, DbUpdater batch);
+
+    void removeByIds(Tid tid, List<Uid> toBeRemoveUids, DbUpdater batch);
 }

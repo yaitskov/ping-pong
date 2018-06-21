@@ -1,4 +1,4 @@
-package org.dan.ping.pong.sys.db.converters;
+package org.dan.ping.pong.sys.db.converters.num;
 
 import org.dan.ping.pong.app.place.Pid;
 import org.jooq.Converter;

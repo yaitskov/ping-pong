@@ -4,32 +4,34 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.dan.ping.pong.app.bid.BidState.Win1;
+import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.bid.BidState.Win3;
+import static org.dan.ping.pong.app.match.MatchInfo.MID;
+import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.match.MatchState.Place;
+import static org.dan.ping.pong.app.match.MatchType.Grup;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.jooq.Tables.BID;
 import static org.dan.ping.pong.jooq.Tables.SET_SCORE;
 import static org.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static org.dan.ping.pong.jooq.Tables.USERS;
 import static org.dan.ping.pong.jooq.tables.Matches.MATCHES;
-import static org.dan.ping.pong.app.bid.BidState.Win1;
-import static org.dan.ping.pong.app.bid.BidState.Win2;
-import static org.dan.ping.pong.app.bid.BidState.Win3;
-import static org.dan.ping.pong.app.match.MatchState.Over;
-import static org.dan.ping.pong.app.match.MatchState.Place;
-import static org.dan.ping.pong.app.match.MatchType.Grup;
-import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.JUST_A_ROW;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
+import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.jooq.tables.Users;
 import org.dan.ping.pong.jooq.tables.records.MatchesRecord;
-import org.dan.ping.pong.app.tournament.TournamentMemState;
-import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.bid.Uid;
-import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdateSql;
 import org.dan.ping.pong.sys.db.DbUpdater;
+import org.dan.ping.pong.util.collection.MaxValue;
 import org.jooq.DSLContext;
 import org.jooq.TableField;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,74 +54,84 @@ public class MatchDaoServer implements MatchDao {
     @Inject
     private DSLContext jooq;
 
-    public Mid createMatch(MatchInfo matchInfo) {
+    public void createMatch(MatchInfo matchInfo, DbUpdater batch) {
         final List<Uid> participantUids = matchInfo
                 .participants().collect(toList());
-        return jooq.insertInto(
-                MATCHES,
-                MATCHES.TID,
-                MATCHES.GID,
-                MATCHES.CID,
-                MATCHES.STATE,
-                MATCHES.PRIORITY,
-                MATCHES.LEVEL,
-                MATCHES.TYPE,
-                MATCHES.UID_LESS,
-                MATCHES.UID_MORE,
-                MATCHES.TAG,
-                MATCHES.WIN_MID,
-                MATCHES.LOSE_MID,
-                MATCHES.UID_WIN,
-                MATCHES.STARTED,
-                MATCHES.ENDED)
-                .values(matchInfo.getTid(),
-                        matchInfo.getGid(),
-                        matchInfo.getCid(),
-                        matchInfo.getState(),
-                        matchInfo.getPriority(),
-                        matchInfo.getLevel(),
-                        matchInfo.getType(),
-                        participantUids.size() > 0 ? participantUids.get(0) : null,
-                        participantUids.size() > 1 ? participantUids.get(1) : null,
-                        matchInfo.getTag().orElse(null),
-                        matchInfo.getWinnerMid(),
-                        matchInfo.getLoserMid(),
-                        matchInfo.getWinnerId().orElse(null),
-                        matchInfo.getStartedAt(),
-                        matchInfo.getEndedAt())
-                .returning()
-                .fetchOne()
-                .getMid();
+        batch.exec(DbUpdateSql.builder()
+                .query(jooq.insertInto(
+                        MATCHES,
+                        MATCHES.MID,
+                        MATCHES.TID,
+                        MATCHES.GID,
+                        MATCHES.CID,
+                        MATCHES.STATE,
+                        MATCHES.PRIORITY,
+                        MATCHES.LEVEL,
+                        MATCHES.TYPE,
+                        MATCHES.UID_LESS,
+                        MATCHES.UID_MORE,
+                        MATCHES.TAG,
+                        MATCHES.WIN_MID,
+                        MATCHES.LOSE_MID,
+                        MATCHES.UID_WIN,
+                        MATCHES.STARTED,
+                        MATCHES.ENDED)
+                        .values(matchInfo.getMid(),
+                                matchInfo.getTid(),
+                                matchInfo.getGid(),
+                                matchInfo.getCid(),
+                                matchInfo.getState(),
+                                matchInfo.getPriority(),
+                                matchInfo.getLevel(),
+                                matchInfo.getType(),
+                                participantUids.size() > 0 ? participantUids.get(0) : null,
+                                participantUids.size() > 1 ? participantUids.get(1) : null,
+                                matchInfo.getTag().orElse(null),
+                                matchInfo.getWinnerMid(),
+                                matchInfo.getLoserMid(),
+                                matchInfo.getWinnerId().orElse(null),
+                                matchInfo.getStartedAt(),
+                                matchInfo.getEndedAt()))
+                .onFailure((u) -> internalError("Import match", MID, matchInfo.getMid()))
+                .mustAffectRows(Optional.of(1))
+                .logBefore(() -> log.info("Import match {} of tournament {}",
+                        matchInfo.getMid(), matchInfo.getTid()))
+                .build());
     }
 
     @Override
-    public Mid createGroupMatch(Tid tid, int gid, int cid, int priorityGroup,
+    public void createGroupMatch(DbUpdater batch, Mid mid, Tid tid, int gid, int cid, int priorityGroup,
             Uid uid1, Uid uid2, Optional<MatchTag> tag, MatchState place) {
-        log.info("Create a match in group {} of tournament {}", gid, tid);
-        return jooq.insertInto(MATCHES, MATCHES.TID,
-                MATCHES.GID, MATCHES.CID,
-                MATCHES.STATE, MATCHES.PRIORITY, MATCHES.TYPE,
-                MATCHES.UID_LESS, MATCHES.UID_MORE, MATCHES.TAG)
-                .values(tid, Optional.of(gid), cid, place, priorityGroup,
-                        Grup, uid1, uid2, tag.orElse(null))
-                .returning()
-                .fetchOne()
-                .getMid();
+        batch.exec(DbUpdateSql.builder()
+                .query(jooq.insertInto(MATCHES, MATCHES.MID, MATCHES.TID,
+                        MATCHES.GID, MATCHES.CID,
+                        MATCHES.STATE, MATCHES.PRIORITY, MATCHES.TYPE,
+                        MATCHES.UID_LESS, MATCHES.UID_MORE, MATCHES.TAG)
+                        .values(mid, tid, Optional.of(gid), cid, place, priorityGroup,
+                                Grup, uid1, uid2, tag.orElse(null)))
+                .onFailure((u) -> internalError("Create group match", MID, mid))
+                .mustAffectRows(Optional.of(1))
+                .logBefore(() -> log.info("Create match {} in group {} of tournament {}",
+                        mid, gid, tid))
+                .build());
     }
 
     @Override
-    @Transactional(TRANSACTION_MANAGER)
-    public Mid createPlayOffMatch(Tid tid, Integer cid,
+    public void createPlayOffMatch(DbUpdater batch, Mid mid, Tid tid, Integer cid,
             Optional<Mid> winMid, Optional<Mid> loseMid,
             int priority, int level, MatchType type,
             Optional<MatchTag> tag, MatchState draft) {
-        return jooq.insertInto(MATCHES, MATCHES.TID, MATCHES.CID,
-                MATCHES.PRIORITY, MATCHES.STATE,
-                MATCHES.WIN_MID, MATCHES.LOSE_MID, MATCHES.LEVEL, MATCHES.TYPE, MATCHES.TAG)
-                .values(tid, cid, priority, draft, winMid, loseMid, level, type, tag.orElse(null))
-                .returning()
-                .fetchOne()
-                .getMid();
+        batch.exec(DbUpdateSql.builder()
+                .query(jooq.insertInto(MATCHES, MATCHES.MID, MATCHES.TID, MATCHES.CID,
+                        MATCHES.PRIORITY, MATCHES.STATE, MATCHES.WIN_MID,
+                        MATCHES.LOSE_MID, MATCHES.LEVEL, MATCHES.TYPE, MATCHES.TAG)
+                        .values(mid, tid, cid, priority, draft, winMid, loseMid, level,
+                                type, tag.orElse(null)))
+                .onFailure((u) -> internalError("Create play off match", MID, mid))
+                .mustAffectRows(Optional.of(1))
+                .logBefore(() -> log.info("Create match {} in playoff of tournament {}",
+                        mid, tid))
+                .build());
     }
 
     @Override
@@ -297,7 +309,7 @@ public class MatchDaoServer implements MatchDao {
     }
 
     @Override
-    public List<MatchInfo> load(Tid tid) {
+    public List<MatchInfo> load(Tid tid, MaxValue<Mid> maxMid) {
         return jooq.select(MATCHES.MID, MATCHES.GID, MATCHES.CID,
                 MATCHES.WIN_MID, MATCHES.LOSE_MID, MATCHES.PRIORITY,
                 MATCHES.STATE, MATCHES.TYPE, MATCHES.ENDED,
@@ -315,7 +327,7 @@ public class MatchDaoServer implements MatchDao {
                             .filter(uid -> uid.getId() > 0)
                             .ifPresent(uid -> uids.put(uid, new ArrayList<>()));
                     return MatchInfo.builder()
-                            .mid(r.get(MATCHES.MID))
+                            .mid(maxMid.apply(r.get(MATCHES.MID)))
                             .cid(r.get(MATCHES.CID))
                             .gid(r.get(MATCHES.GID))
                             .tag(Optional.ofNullable(r.get(MATCHES.TAG)))

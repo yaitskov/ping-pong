@@ -171,7 +171,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                         .header(SESSION, userSession.getSession())
                         .post(Entity.entity(EnlistTournament.builder()
                                 .tid(tid)
-                                .categoryId(daoGenerator.genCategory(tid))
+                                .categoryId(daoGenerator.genCategory(tid, 1))
                                 .build(), APPLICATION_JSON))
                         .getStatus());
 
@@ -199,7 +199,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                         .phone(Optional.of(phone))
                         .build());
         final Tid tid = daoGenerator.genTournament(placeId);
-        final int cid = daoGenerator.genCategory(tid);
+        final int cid = daoGenerator.genCategory(tid, 1);
 
         final DraftingTournamentInfo adminResult = myRest().get(DRAFTING + tid.getTid(),
                 adminSession, DraftingTournamentInfo.class);
@@ -244,8 +244,8 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     public void resign() {
         final Tid tid = daoGenerator.genTournament(
                 daoGenerator.genPlace(0), Draft);
-        final int cid1 = daoGenerator.genCategory(tid);
-        final int cid2 = daoGenerator.genCategory(tid);
+        final int cid1 = daoGenerator.genCategory(tid, 1);
+        final int cid2 = daoGenerator.genCategory(tid, 2);
         myRest().voidPost(TOURNAMENT_ENLIST, userSession, EnlistTournament.builder()
                 .tid(tid)
                 .categoryId(cid1)
@@ -290,7 +290,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     public void runningTournaments() {
         final Pid placeId = daoGenerator.genPlace(1);
         final Tid tid = daoGenerator.genTournament(placeId, Draft, 1);
-        final int cid = daoGenerator.genCategory(tid);
+        final int cid = daoGenerator.genCategory(tid, 1);
 
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
         restEntityGenerator.enlistParticipants(myRest(), adminSession, tid, cid, participants);
@@ -317,7 +317,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     public void enlistOffline() {
         final Tid tid = daoGenerator.genTournament(
                 daoGenerator.genPlace(0), Draft);
-        final int cid = daoGenerator.genCategory(tid);
+        final int cid = daoGenerator.genCategory(tid, 1);
         final String name = UUID.randomUUID().toString();
         final Uid uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, adminSession.getSession(),
                 EnlistOffline.builder()

@@ -5,13 +5,13 @@ import static java.util.stream.Collectors.toSet;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.group.GroupRemover;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -61,18 +61,29 @@ public class CategoryService {
     private CategoryDao categoryDao;
 
     public int createCategory(TournamentMemState tournament, String name, DbUpdater batch) {
-        log.info("Add category [{}] to tid {}", name, tournament.getTid());
-        final int cid = categoryDao.create(
+        final int cid = tournament.getNextCategory().next();
+        log.info("Add category [{}/{}] to tid {}", cid, name, tournament.getTid());
+        categoryDao.create(
                 NewCategory.builder()
                         .name(name)
                         .tid(tournament.getTid())
-                        .build());
-        log.info("Category [{}] got id {}", name, cid);
+                        .cid(cid)
+                        .build(),
+                batch);
         tournament.getCategories().put(cid, CategoryLink.builder()
                 .name(name)
                 .cid(cid)
                 .build());
-        batch.markDirty();
         return cid;
+    }
+
+    @Inject
+    private GroupRemover gidRemover;
+
+    public void removeCategory(TournamentMemState tournament, int cid, DbUpdater batch) {
+        log.info("Remove category {}/{}", cid, tournament.getCategory(cid).getName());
+        gidRemover.removeByCategory(tournament, cid, batch);
+        categoryDao.delete(tournament.getTid(), cid, batch);
+        tournament.getCategories().remove(cid);
     }
 }

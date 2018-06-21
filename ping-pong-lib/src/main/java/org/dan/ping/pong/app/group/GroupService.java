@@ -46,6 +46,7 @@ import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 import org.dan.ping.pong.app.tournament.TournamentRules;
+import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -363,17 +364,17 @@ public class GroupService {
     @Inject
     private GroupDao groupDao;
 
-    public int createGroup(TournamentMemState tournament, int cid) {
-        final int sort = tournament.getGroups().values().stream()
-                .map(GroupInfo::getOrdNumber)
-                .max(Integer::compare).orElse(-1) + 1;
-        final String label = sortToLabel(sort);
-        final int gid = groupDao.createGroup(tournament.getTid(), cid, label,
-                tournament.getRule().getGroup().get().getQuits(), sort);
+    public int createGroup(TournamentMemState tournament, int cid, DbUpdater batch) {
+        final int gid = tournament.getNextGroup().next();
+        final String label = sortToLabel(gid);
+
+        groupDao.createGroup(gid, batch,
+                tournament.getTid(), cid, label,
+                tournament.getRule().getGroup().get().getQuits());
         log.info("New group {}/{} is created in tid/cid {}/{}",
                 gid, label, tournament.getTid(), cid);
         tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
-                .ordNumber(sort).label(label).build());
+                .ordNumber(gid).label(label).build());
         return gid;
     }
 
@@ -389,7 +390,7 @@ public class GroupService {
     private CastingLotsDaoIf castingLotsDao;
 
     public void createDisambiguateMatches(
-            NoDisambiguateMatchesException e,
+            DbUpdater batch, NoDisambiguateMatchesException e,
             TournamentMemState tournament,
             List<MatchInfo> allGroupMatches) {
         if (allGroupMatches.stream().anyMatch(m -> m.getTag().isPresent())) {
@@ -398,22 +399,23 @@ public class GroupService {
         final int gid = allGroupMatches.get(0).getGid().get();
 
         for (GroupPosition group : e.getUids().ambiguousGroups()) {
-            createDisambiguateMatches(tournament, gid, group.getCompetingUids());
+            createDisambiguateMatches(batch, tournament, gid, group.getCompetingUids());
         }
     }
 
-    public void createDisambiguateMatches(TournamentMemState tournament,
+    public void createDisambiguateMatches(
+            DbUpdater batch, TournamentMemState tournament,
             int gid, Collection<Uid> uids) {
-        castingLotsDao.generateGroupMatches(tournament, gid,
+        castingLotsDao.generateGroupMatches(batch, tournament, gid,
                 uids.stream()
                         .map(tournament::getParticipant)
                         .collect(toList()), 0,
                 MATCH_TAG_DISAMBIGUATION);
     }
 
-    public void createDisambiguateMatches(TournamentMemState tournament,
+    public void createDisambiguateMatches(DbUpdater batch, TournamentMemState tournament,
             int gid, MatchParticipants mp) {
-        createDisambiguateMatches(tournament, gid,
+        createDisambiguateMatches(batch, tournament, gid,
                 asList(mp.getUidLess(), mp.getUidMore()));
     }
 }

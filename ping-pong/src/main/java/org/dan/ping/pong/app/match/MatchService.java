@@ -334,7 +334,7 @@ public class MatchService {
                             completeGroup(gid, tournament, oMatches.get(), batch),
                             batch));
         } catch (NoDisambiguateMatchesException e) {
-            groupService.createDisambiguateMatches(e, tournament,
+            groupService.createDisambiguateMatches(batch, e, tournament,
                     oMatches.orElseThrow(() -> internalError("No matches in group")));
         }
     }

@@ -54,7 +54,7 @@ public class MatchForJudgeJerseyTest extends AbstractSpringJerseyTest {
                         + uid1.getId() + "/" + FILLER_LOSER_UID.getId(),
                 new GenericType<List<Mid>>(){}).get(0);
         OpenMatchForJudge match = myRest().get(
-                MATCH_FOR_JUDGE + tid + "/" + mid.getId(),
+                MATCH_FOR_JUDGE + tid + "/" + mid.intValue(),
                 OpenMatchForJudge.class);
 
         assertThat(match, allOf(

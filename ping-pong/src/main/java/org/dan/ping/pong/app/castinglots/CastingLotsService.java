@@ -98,7 +98,7 @@ public class CastingLotsService {
         if (!tournament.getRule().getPlayOff().isPresent()) {
             generatePlayOffRules(tournament, batch);
         }
-        final int gid = groupService.createGroup(tournament, cid);
+        final int gid = groupService.createGroup(tournament, cid, batch);
         recreatePlayOff(tournament, cid, batch);
         return gid;
     }
@@ -154,7 +154,6 @@ public class CastingLotsService {
             List<ParticipantMemState> readyBids, DbUpdater batch) {
         log.info("Seed tid {} as group", tournament.getTid());
         final Tid tid = tournament.getTid();
-        final int quits = rules.getGroup().get().getQuits();
         groupByCategories(readyBids).forEach((Integer cid, List<ParticipantMemState> bids) -> {
             validateBidsNumberInACategory(bids);
             if (oneParticipantInCategory(tournament, cid, bids, batch)) {
@@ -162,14 +161,10 @@ public class CastingLotsService {
             }
             final List<ParticipantMemState> orderedBids = rankingService.sort(
                     bids, rules.getCasting(), tournament);
-            final String groupLabel = GroupService.sortToLabel(0);
-            final int groupIdx = 0;
-            final int gid = groupDao.createGroup(tid, cid, groupLabel, quits, groupIdx);
-            tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
-                    .ordNumber(groupIdx).label(groupLabel).build());
+            final int gid = groupService.createGroup(tournament, cid, batch);
             orderedBids.forEach(bid -> bid.setGid(Optional.of(gid)));
-            castingLotsDao.generateGroupMatches(tournament, gid, orderedBids,
-                    groupIdx, Optional.empty());
+            castingLotsDao.generateGroupMatches(batch, tournament, gid, orderedBids,
+                    0, Optional.empty());
             bidDao.setGroupForUids(gid, tid, orderedBids);
         });
     }
@@ -199,22 +194,19 @@ public class CastingLotsService {
                     rankingService.sort(bids, rules.getCasting(), tournament));
             int basePlayOffPriority = 0;
             for (int gi : bidsByGroups.keySet().stream().sorted().collect(toList())) {
-                final String groupLabel = GroupService.sortToLabel(gi);
-                final int gid = groupDao.createGroup(tid, cid, groupLabel, quits, gi);
-                tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
-                        .ordNumber(gi).label(groupLabel).build());
+                final int gid = groupService.createGroup(tournament, cid, batch);
                 final List<ParticipantMemState> groupBids = bidsByGroups.get(gi);
                 if (groupBids.size() < quits) {
                     throw badRequest("Category should have more participants than quits from a group");
                 }
                 groupBids.forEach(bid -> bid.setGid(Optional.of(gid)));
                 basePlayOffPriority = Math.max(
-                        castingLotsDao.generateGroupMatches(tournament, gid, groupBids,
+                        castingLotsDao.generateGroupMatches(batch, tournament, gid, groupBids,
                                 0, Optional.empty()),
                         basePlayOffPriority);
                 bidDao.setGroupForUids(gid, tid, groupBids);
             }
-            castingLotsDao.generatePlayOffMatches(tournament, cid,
+            castingLotsDao.generatePlayOffMatches(batch, tournament, cid,
                     roundPlayOffBase(bidsByGroups.size() * quits),
                     basePlayOffPriority + 1);
         });
@@ -270,6 +262,7 @@ public class CastingLotsService {
                         p -> {
                             final boolean isDeadParticipant = QUIT_EXPELLED.contains(p.state());
                             priority[0] = castingLotsDao.addGroupMatch(
+                                    batch,
                                     tournament, priority[0], participant, p,
                                     isDeadParticipant
                                             ? Over
@@ -289,7 +282,7 @@ public class CastingLotsService {
         final int quits = tournament.getRule().getGroup().get().getQuits();
         final int quittersForRealGroups = tournament.getGroupsByCategory(cid).size() * quits;
         final int roundedQuitters = roundPlayOffBase(quittersForRealGroups);
-        castingLotsDao.generatePlayOffMatches(tournament, cid,
+        castingLotsDao.generatePlayOffMatches(batch, tournament, cid,
                 roundedQuitters, basePriority);
         if (quittersForRealGroups < roundedQuitters) {
             final List<MatchInfo> playOffMatches = playOffService.findMatchesByLevelAndCid(

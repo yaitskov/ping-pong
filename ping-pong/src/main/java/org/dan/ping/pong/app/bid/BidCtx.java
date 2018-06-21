@@ -4,6 +4,7 @@ import org.dan.ping.pong.app.bid.result.BidResultService;
 import org.springframework.context.annotation.Import;
 
 @Import({BidDaoServer.class, BidService.class,
+        BidRemover.class,
         BidResultService.class, BidResource.class})
 public class BidCtx {
 }

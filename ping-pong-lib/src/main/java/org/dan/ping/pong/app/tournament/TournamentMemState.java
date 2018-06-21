@@ -6,7 +6,6 @@ import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.group.GroupService.DM_TAG;
-import static org.dan.ping.pong.app.group.GroupService.MATCH_TAG_DISAMBIGUATION;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName._DisambiguationPreview;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
@@ -28,7 +27,6 @@ import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.dispute.DisputeMemState;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
@@ -40,6 +38,9 @@ import org.dan.ping.pong.app.sport.MatchRules;
 import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.sys.error.PiPoEx;
+import org.dan.ping.pong.util.counter.DidSeqGen;
+import org.dan.ping.pong.util.counter.IdSeqGen;
+import org.dan.ping.pong.util.counter.MidSeqGen;
 
 import java.time.Instant;
 import java.util.List;
@@ -75,6 +76,10 @@ public class TournamentMemState {
     private List<DisputeMemState> disputes;
     private OneTimeCondActions condActions;
     private PowerRange powerRange;
+    private IdSeqGen nextCategory;
+    private DidSeqGen nextDispute;
+    private IdSeqGen nextGroup;
+    private MidSeqGen nextMatch;
 
     public Optional<MatchInfo> maybeMatchById(Mid mid) {
         return ofNullable(matches.get(mid));
@@ -93,6 +98,10 @@ public class TournamentMemState {
         return ofNullable(participants.get(uid))
                 .orElseThrow(() -> notFound("User " + uid
                         + " does participate in the tournament " + tid));
+    }
+
+    public Stream<ParticipantMemState> participants() {
+        return participants.values().stream();
     }
 
     public SetScoreResultName matchScoreResult() {
@@ -159,6 +168,14 @@ public class TournamentMemState {
                 .name(name)
                 .tid(tid)
                 .build();
+    }
+
+    public Stream<MatchInfo> matches() {
+        return matches.values().stream();
+    }
+
+    public Stream<MatchInfo> findMatchesByCid(int cid) {
+        return matches().filter(m -> m.getCid() == cid);
     }
 
     public Stream<MatchInfo> participantMatches(Uid uid) {
@@ -263,5 +280,9 @@ public class TournamentMemState {
         return rule.getPlayOff().map(po -> po.getMatch().orElse(rule.getMatch()))
                 .orElseThrow(() -> internalError("match " + mid
                         + " without group in tid  " + tid));
+    }
+
+    public Stream<ParticipantMemState> findBidsByCategory(int cid) {
+        return participants().filter(p -> p.getCid() == cid);
     }
 }

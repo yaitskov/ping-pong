@@ -4,14 +4,12 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.app.match.MatchResource.TID_JP;
 import static org.dan.ping.pong.app.tournament.TournamentService.TID;
-import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
 import org.dan.ping.pong.app.user.UserInfo;
-import org.jooq.exception.DataAccessException;
 
 import java.util.List;
 
@@ -36,6 +34,7 @@ public class CategoryResource {
     public static final String CID = "cid";
     public static final String CATEGORIES_BY_TID = "/category/find/by/tid/";
     public static final String CATEGORY_CREATE = "/category/create";
+    public static final String CATEGORY_DELETE = "/category/delete";
 
     @Inject
     private CategoryDao categoryDao;
@@ -84,16 +83,18 @@ public class CategoryResource {
     }
 
     @POST
-    @Path(CATEGORY + "delete/{cid}")
+    @Path(CATEGORY_DELETE)
     @Consumes(APPLICATION_JSON)
-    public void delete(@HeaderParam(SESSION) String session,
-            @PathParam("cid") int cid) {
+    public void delete(
+            @HeaderParam(SESSION) String session,
+            @Suspended AsyncResponse response,
+            RemoveCategory rmCat) {
         final UserInfo user = authService.userInfoBySession(session);
-        // check perms
-        try {
-            categoryDao.delete(cid);
-        } catch (DataAccessException e) {
-            throw badRequest("Category with enlisted participants cannot deleted", e);
-        }
+        tournamentAccessor.update(rmCat.getTid(), response,
+                (tournament, batch) -> {
+                    tournament.checkAdmin(user.getUid());
+                    categoryService.removeCategory(tournament, rmCat.getCid(), batch);
+                });
+
     }
 }

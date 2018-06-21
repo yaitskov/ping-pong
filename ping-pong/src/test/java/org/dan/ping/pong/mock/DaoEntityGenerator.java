@@ -4,6 +4,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.mock.Generators.genPhone;
 import static org.dan.ping.pong.mock.Generators.genStr;
 import static org.dan.ping.pong.mock.Generators.genTournamentName;
+import static org.dan.ping.pong.sys.db.DbStrictUpdater.DB_STRICT_UPDATER;
 
 import org.dan.ping.pong.app.auth.AuthDao;
 import org.dan.ping.pong.app.category.CategoryDao;
@@ -22,11 +23,11 @@ import org.dan.ping.pong.app.tournament.ForTestTournamentDao;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.tournament.TournamentDaoMySql;
-import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserRegRequest;
 import org.dan.ping.pong.app.user.UserType;
+import org.dan.ping.pong.sys.db.DbStrictUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 import org.jooq.DSLContext;
 
@@ -159,10 +160,13 @@ public class DaoEntityGenerator {
     @Inject
     private CategoryDao categoryDao;
 
-    public int genCategory(String name, Tid tid) {
-        return categoryDao.create(NewCategory.builder()
-                .name(name)
-                .tid(tid)
-                .build());
+    public void genCategory(String name, Tid tid, int cid) {
+        categoryDao.create(
+                NewCategory.builder()
+                        .name(name)
+                        .tid(tid)
+                        .cid(cid)
+                        .build(),
+                DB_STRICT_UPDATER);
     }
 }

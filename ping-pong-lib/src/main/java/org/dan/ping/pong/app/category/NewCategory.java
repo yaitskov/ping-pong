@@ -18,4 +18,5 @@ import org.dan.ping.pong.app.tournament.Tid;
 public class NewCategory {
     private String name;
     private Tid tid;
+    private int cid;
 }

@@ -1,4 +1,4 @@
-package org.dan.ping.pong.sys.db.converters;
+package org.dan.ping.pong.sys.db.converters.num;
 
 import org.dan.ping.pong.app.tournament.Tid;
 import org.jooq.Converter;

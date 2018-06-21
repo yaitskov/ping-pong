@@ -124,7 +124,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 TournamentProps.builder()
                         .sport(SportType.PingPong)
                         .rules(TournamentRulesConst.RULES_G8Q1_S1A2G11).build());
-        final int cid = daoGenerator.genCategory(tid);
+        final int cid = daoGenerator.genCategory(tid, 1);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
         restGenerator.enlistParticipants(tid, cid, participants);
         assertEquals(emptyList(), restGenerator.listOpenMatches(tid).getMatches());

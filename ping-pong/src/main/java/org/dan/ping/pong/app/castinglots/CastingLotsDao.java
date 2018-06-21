@@ -32,6 +32,7 @@ import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.jooq.tables.records.BidRecord;
+import org.dan.ping.pong.sys.db.DbUpdater;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.SortField;
@@ -63,7 +64,7 @@ public class CastingLotsDao implements CastingLotsDaoIf {
     }
 
     @Override
-    public int generateGroupMatches(TournamentMemState tournament, int gid,
+    public int generateGroupMatches(DbUpdater batch, TournamentMemState tournament, int gid,
             List<ParticipantMemState> groupBids, int priorityGroup,
             Optional<MatchTag> tag) {
         final Tid tid = tournament.getTid();
@@ -74,16 +75,18 @@ public class CastingLotsDao implements CastingLotsDaoIf {
             final int bidIdxB = schedule.get(i++);
             final ParticipantMemState bid1 = groupBids.get(bidIdxA);
             final ParticipantMemState bid2 = groupBids.get(bidIdxB);
-            priorityGroup = addGroupMatch(tournament, priorityGroup, bid1, bid2,
+            priorityGroup = addGroupMatch(batch, tournament, priorityGroup, bid1, bid2,
                     Place, Optional.empty(), tag);
         }
         return priorityGroup;
     }
 
-    public int addGroupMatch(TournamentMemState tournament, int priorityGroup,
+    public int addGroupMatch(DbUpdater batch,
+            TournamentMemState tournament, int priorityGroup,
             ParticipantMemState bid1, ParticipantMemState bid2,
             MatchState state, Optional<Uid> winnerId, Optional<MatchTag> tag) {
-        final Mid mid = matchDao.createGroupMatch(bid1.getTid(),
+        final Mid mid = tournament.getNextMatch().next();
+        matchDao.createGroupMatch(batch, mid, bid1.getTid(),
                 bid1.getGid().get(), bid1.getCid(), ++priorityGroup,
                 bid1.getUid(), bid2.getUid(), tag, Place);
         tournament.getMatches().put(mid, MatchInfo.builder()
@@ -105,12 +108,12 @@ public class CastingLotsDao implements CastingLotsDaoIf {
         return priorityGroup;
     }
 
-    public Mid generatePlayOffMatches(TournamentMemState tInfo, Integer cid,
+    public Mid generatePlayOffMatches(DbUpdater batch, TournamentMemState tInfo, Integer cid,
             int playOffStartPositions, int basePlayOffPriority) {
-        return generatePlayOffMatches(tInfo, cid,playOffStartPositions, basePlayOffPriority, empty());
+        return generatePlayOffMatches(batch, tInfo, cid,playOffStartPositions, basePlayOffPriority, empty());
     }
 
-    public Mid generatePlayOffMatches(TournamentMemState tInfo, Integer cid,
+    public Mid generatePlayOffMatches(DbUpdater batch, TournamentMemState tInfo, Integer cid,
             int playOffStartPositions, int basePlayOffPriority, Optional<MatchTag> tag) {
         final Tid tid = tInfo.getTid();
         log.info("Generate play off matches for {} bids in tid {}",
@@ -131,6 +134,7 @@ public class CastingLotsDao implements CastingLotsDaoIf {
         final PlayOffGenerator generator = PlayOffGenerator.builder()
                 .tournament(tInfo)
                 .cid(cid)
+                .batch(batch)
                 .thirdPlaceMatch(playOffRule.getThirdPlaceMatch() == 1)
                 .matchDao(matchDao)
                 .tag(tag)

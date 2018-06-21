@@ -15,8 +15,8 @@ export function createMatchBasedRule(type, options) {
         type,
         Object.assign(
             {
-                matchParticipantScope: MatchParticipantScope.AT_LEAST_ONE,
-                matchOutcomeScope: MatchOutcomeScope.ALL_MATCHES
+                mps: MatchParticipantScope.AT_LEAST_ONE,
+                mos: MatchOutcomeScope.ALL_MATCHES
             },
             options || {}
         ));
@@ -26,7 +26,7 @@ export function createF2fRule(options) {
     return createGroupRule(
         ruleId.f2f,
         Object.assign(
-            {matchOutcomeScope: MatchOutcomeScope.ALL_MATCHES},
+            {mos: MatchOutcomeScope.ALL_MATCHES},
             options || {}));
 }
 

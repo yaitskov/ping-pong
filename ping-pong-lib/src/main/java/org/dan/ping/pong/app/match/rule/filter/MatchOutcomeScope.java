@@ -1,13 +1,14 @@
 package org.dan.ping.pong.app.match.rule.filter;
 
 import static org.dan.ping.pong.app.match.MatchState.Break;
-import static org.dan.ping.pong.app.match.MatchState.Over;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dan.ping.pong.app.match.MatchInfo;
 
 import java.util.stream.Stream;
 
 public enum MatchOutcomeScope implements FilterMarker {
+    @JsonProperty("am")
     ALL_MATCHES {
         @Override
         public boolean isSuper(MatchOutcomeScope outcomeScope) {
@@ -19,6 +20,7 @@ public enum MatchOutcomeScope implements FilterMarker {
         }
     },
 
+    @JsonProperty("jnc")
     JUST_NORMALLY_COMPLETE {
         @Override
         public boolean isSuper(MatchOutcomeScope outcomeScope) {

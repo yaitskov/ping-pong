@@ -21,7 +21,7 @@ const PingPongZeroSets = {
     participants: [ParticipantA, ParticipantB],
     sport: {
         '@type': 'PingPong',
-        minGamesToWin: 11,
+        mgtw: 11,
         minAdvanceInGames: 2,
         countOnlySets: false
     }

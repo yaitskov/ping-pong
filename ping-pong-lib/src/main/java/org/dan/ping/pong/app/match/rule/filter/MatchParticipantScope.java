@@ -1,6 +1,9 @@
 package org.dan.ping.pong.app.match.rule.filter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum MatchParticipantScope {
+    @JsonProperty("alo")
     AT_LEAST_ONE {
         @Override
         public boolean isSuper(MatchParticipantScope sub) {

@@ -4,7 +4,7 @@ export default function defaultMatchRules(sport) {
     case 'PingPong':
         return {
             '@type': 'PingPong',
-            minGamesToWin: 11,
+            mgtw: 11,
             minAdvanceInGames: 2,
             minPossibleGames: 0,
             setsToWin: 3,
@@ -13,7 +13,7 @@ export default function defaultMatchRules(sport) {
     case 'Tennis':
         return {
             '@type': 'Tennis',
-            minGamesToWin: 6,
+            mgtw: 6,
             minAdvanceInGames: 2,
             minPossibleGames: 0,
             setsToWin: 2,

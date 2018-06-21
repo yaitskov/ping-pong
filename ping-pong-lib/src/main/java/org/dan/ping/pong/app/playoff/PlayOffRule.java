@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.playoff;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -19,6 +20,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlayOffRule {
+    @JsonProperty("tpm")
     private int thirdPlaceMatch;
     private int losings;
     private Optional<MatchRules> match = Optional.empty();

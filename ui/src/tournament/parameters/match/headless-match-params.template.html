@@ -19,7 +19,7 @@
   <label ng-show="$ctrl.rules.match['@type'] == 'PingPong'"
          translate="Min score to win a set"/>
   <div touch-spin options="$ctrl.score"
-       ng-model="$ctrl.rules.match.minGamesToWin"/>
+       ng-model="$ctrl.rules.match.mgtw"/>
   <p class="help-block" ng-repeat="error in $ctrl.errors['match-rule.min-games-to-win']">
     {{ error.message | translate : error.params }}
   </p>

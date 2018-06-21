@@ -1,5 +1,9 @@
 package org.dan.ping.pong.app.group;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum ConsoleTournament {
-    NO, INDEPENDENT_RULES
+    NO,
+    @JsonProperty("ir")
+    INDEPENDENT_RULES
 }

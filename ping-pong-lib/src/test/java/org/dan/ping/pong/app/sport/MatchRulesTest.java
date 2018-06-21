@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.sport;
 
+import static org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules.MGTW;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
@@ -36,7 +37,7 @@ public class MatchRulesTest {
     @Test
     @SneakyThrows
     public void defaultPingPong() {
-        assertThat((PingPongMatchRules) om.readValue("{\"minGamesToWin\": 2}", MatchRules.class),
+        assertThat((PingPongMatchRules) om.readValue("{\"" + MGTW + "\": 2}", MatchRules.class),
                 allOf(
                         isA(PingPongMatchRules.class),
                         hasProperty("minGamesToWin", is(2))));

@@ -4,6 +4,7 @@ import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BalancedMi
 import static org.dan.ping.pong.app.group.ConsoleTournament.NO;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +28,7 @@ import java.util.Optional;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TournamentRules {
     public static final int FIRST_VERSION = 2;
+    @JsonProperty("v")
     private int version = FIRST_VERSION;
     private MatchRules match;
     private CastingLotsRule casting;

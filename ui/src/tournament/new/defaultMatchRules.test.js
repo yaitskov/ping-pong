@@ -2,10 +2,10 @@ import defaultMatchRules from './defaultMatchRules.js';
 
 describe('defaultMatchRules', () => {
     it('for tennis', () => {
-        expect(defaultMatchRules('Tennis').minGamesToWin).toBe(6);
+        expect(defaultMatchRules('Tennis').mgtw).toBe(6);
     });
     it('for ping-pong', () => {
-        expect(defaultMatchRules('PingPong').minGamesToWin).toBe(11);
+        expect(defaultMatchRules('PingPong').mgtw).toBe(11);
     });
     it('default sport is ping-pong', () => {
         expect(defaultMatchRules()['@type']).toBe('PingPong');

@@ -25,7 +25,7 @@ describe('match-params', () => {
 
     it('min games to win increase/decrease', () => {
         ctx.broadcast('event.tournament.rules.set', pingPongTournament());
-        checkTouchSpinID(ctx, '#min-games-to-win', () => ctx.ctrl.rules.match.minGamesToWin);
+        checkTouchSpinID(ctx, '#min-games-to-win', () => ctx.ctrl.rules.match.mgtw);
     });
 
     it('min sets to win increase/decrease', () => {

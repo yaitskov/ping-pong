@@ -1,8 +1,8 @@
 import TennisScoresStrategy from './TennisScoresStrategy.js';
 
-const rulesSTB1 = {minGamesToWin: 6, minAdvanceInGames: 2,
+const rulesSTB1 = {mgtw: 6, minAdvanceInGames: 2,
                    superTieBreakGames: 10, setsToWin: 1};
-const rulesSTB2 = {minGamesToWin: 6, minAdvanceInGames: 2,
+const rulesSTB2 = {mgtw: 6, minAdvanceInGames: 2,
                    superTieBreakGames: 10, setsToWin: 2};
 const rulesSTB3 = Object.assign({}, rulesSTB2, {setsToWin: 3});
 const rulesSTB4 = Object.assign({}, rulesSTB2, {setsToWin: 4});

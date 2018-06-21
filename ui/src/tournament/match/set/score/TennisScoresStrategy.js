@@ -11,7 +11,7 @@ export default class TennisScoresStrategy extends BaseScoresStrategy {
         if (this._isSuperTieBreak(rules, playedSets)) {
             return [rules.superTieBreakGames];
         }
-        return [rules.minGamesToWin, rules.minGamesToWin + 1];
+        return [rules.mgtw, rules.mgtw + 1];
     }
     loserOptions(rules, winnerOption, playedSets) {
         if (this._isSuperTieBreak(rules, playedSets)) {
@@ -21,14 +21,14 @@ export default class TennisScoresStrategy extends BaseScoresStrategy {
            }
            return result;
         }
-        if (winnerOption == rules.minGamesToWin) {
+        if (winnerOption == rules.mgtw) {
            let result = [];
            for (let i = 0; i <= (winnerOption - rules.minAdvanceInGames); ++i) {
                result.push(i);
            }
            return result;
         }
-        if (winnerOption == rules.minGamesToWin + 1) {
+        if (winnerOption == rules.mgtw + 1) {
            let i = winnerOption - rules.minAdvanceInGames;
            let result = [];
            while (i < winnerOption) {
@@ -42,6 +42,6 @@ export default class TennisScoresStrategy extends BaseScoresStrategy {
         if (this._isSuperTieBreak(rules, playedSets)) {
            return rules.superTieBreakGames;
         }
-        return rules.minGamesToWin;
+        return rules.mgtw;
     }
 }

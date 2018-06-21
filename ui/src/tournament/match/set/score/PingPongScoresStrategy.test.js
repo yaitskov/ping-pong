@@ -1,6 +1,6 @@
 import PingPongScoresStrategy from './PingPongScoresStrategy.js';
 
-const rules = {minGamesToWin: 11, minAdvanceInGames: 2};
+const rules = {mgtw: 11, minAdvanceInGames: 2};
 
 describe('ping pong scores strategy', () => {
     const pingPongStrategy = new PingPongScoresStrategy();

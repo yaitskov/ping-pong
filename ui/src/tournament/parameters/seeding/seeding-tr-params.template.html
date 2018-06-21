@@ -7,13 +7,13 @@
     </a>
 </div>
 <div id="seeding-parameters" class="toggle-panel in">
-    <many-button-toggler domain="['BalancedMix', 'ConsoleLayered']"
+    <many-button-toggler domain="['bm', 'ConsoleLayered']"
                          id="split-policy" label="split-policy-lbl"
                          ng-show="$ctrl.tournament.masterTid"
                          ng-model="$ctrl.rules.casting.splitPolicy"/>
     <many-button-toggler domain="$ctrl.rankingPolicyDomain"
                          id="ranking-policy" label="rank-policy-lbl"
-                         ng-show="['BestToBest', 'BalancedMix'].includes($ctrl.rules.casting.splitPolicy)"
+                         ng-show="['BestToBest', 'bm'].includes($ctrl.rules.casting.splitPolicy)"
                          ng-model="$ctrl.rules.casting.policy"/>
     <div class="form-group" id="rank-name-field"
          ng-class="{'has-error': $ctrl.showError('rankName')}"
@@ -44,6 +44,6 @@
     </div>
     <many-button-toggler domain="['d', 'i']" label="rank-direction-lbl"
                          id="rank-axis-direction"
-                         ng-show="['BestToBest', 'BalancedMix'].includes($ctrl.rules.casting.splitPolicy) &amp;&amp; ['pr', 'su'].includes($ctrl.rules.casting.policy)"
+                         ng-show="['BestToBest', 'bm'].includes($ctrl.rules.casting.splitPolicy) &amp;&amp; ['pr', 'su'].includes($ctrl.rules.casting.policy)"
                          ng-model="$ctrl.rules.casting.direction"/>
 </div>

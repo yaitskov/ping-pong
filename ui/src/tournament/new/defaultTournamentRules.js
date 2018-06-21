@@ -8,7 +8,7 @@ export default function defaultTournamentRules(sport) {
         casting: {
             policy: 'pr',
             direction: 'd',
-            splitPolicy: 'BalancedMix',
+            splitPolicy: 'bm',
             pro: {
                 label: 'rating',
                 minValue: 0,

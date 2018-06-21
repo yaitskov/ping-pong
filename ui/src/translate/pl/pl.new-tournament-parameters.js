@@ -36,7 +36,7 @@ module.exports = {
     'rank-name-lbl': 'Nazwa rankingu',
     'rank-name-length': 'Długość nazwy musi być mniej niż {{max}} liter',
     'split-policy-lbl': 'Ilość drabin',
-    'split-policy-lbl-BalancedMix': 'jedna',
+    'split-policy-lbl-bm': 'jedna',
     'split-policy-lbl-ConsoleLayered': 'tyle ile poziomów',
     'Minimal allowed rank value': 'Minimalne znaczenie rankingu',
     'Maximum allowed rank value': 'Maksimalne znaczenie rankingu',

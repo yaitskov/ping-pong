@@ -130,30 +130,6 @@ public class BidDaoServer implements BidDao {
 
     @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<ParticipantState> findEnlisted(Tid tid) {
-        return jooq.select(BID.UID, USERS.NAME, BID.STATE, CATEGORY.NAME, CATEGORY.CID)
-                .from(BID)
-                .innerJoin(USERS)
-                .on(BID.UID.eq(USERS.UID))
-                .innerJoin(CATEGORY)
-                .on(BID.TID.eq(CATEGORY.TID), BID.CID.eq(CATEGORY.CID))
-                .where(BID.TID.eq(tid))
-                .fetch()
-                .map(r -> ParticipantState.builder()
-                        .category(CategoryLink.builder()
-                                .cid(r.get(CATEGORY.CID))
-                                .name(r.get(CATEGORY.NAME))
-                                .build())
-                        .user(UserLink.builder()
-                                .name(r.get(USERS.NAME))
-                                .uid(r.get(BID.UID))
-                                .build())
-                        .state(r.get(BID.STATE))
-                        .build());
-    }
-
-    @Override
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public Optional<DatedParticipantState> getParticipantInfo(Tid tid, Uid uid) {
         return ofNullable(jooq.select(BID.UID, USERS.NAME, BID.STATE,
                 BID.CREATED, CATEGORY.NAME, CATEGORY.CID)

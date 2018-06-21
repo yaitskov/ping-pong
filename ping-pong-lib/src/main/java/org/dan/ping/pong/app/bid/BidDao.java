@@ -34,8 +34,6 @@ public interface BidDao {
 
     void enlist(ParticipantMemState bid, Optional<Integer> providedRank, DbUpdater batch);
 
-    List<ParticipantState> findEnlisted(Tid tid);
-
     Optional<DatedParticipantState> getParticipantInfo(Tid tid, Uid uid);
 
     void setCategory(SetCategory setCategory, Instant now, DbUpdater batch);

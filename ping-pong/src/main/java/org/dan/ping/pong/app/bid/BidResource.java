@@ -177,10 +177,12 @@ public class BidResource {
 
     @GET
     @Path(ENLISTED_BIDS + TID_JP)
-    public List<ParticipantState> enlistedToBeChecked(
+    public void enlistedToBeChecked(
+            @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             @PathParam(TID) Tid tid) {
-        return bidService.findEnlisted(tid);
+        tournamentAccessor.read(tid, response,
+                tournament -> bidService.findEnlisted(tournament));
     }
 
     @GET

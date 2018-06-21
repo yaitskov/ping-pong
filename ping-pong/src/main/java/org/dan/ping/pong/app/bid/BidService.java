@@ -67,8 +67,15 @@ public class BidService {
         setBidState(tournament.getParticipant(uid), Here, asList(Paid, Want), batch);
     }
 
-    public List<ParticipantState> findEnlisted(Tid tid) {
-        return bidDao.findEnlisted(tid);
+    public List<ParticipantState> findEnlisted(TournamentMemState tournament) {
+        return tournament.participants()
+                .map(p -> ParticipantState
+                        .builder()
+                        .user(p.toLink())
+                        .state(p.getBidState())
+                        .category(tournament.getCategory(p.getCid()))
+                        .build())
+                .collect(toList());
     }
 
     public DatedParticipantState getParticipantState(Tid tid, Uid uid) {

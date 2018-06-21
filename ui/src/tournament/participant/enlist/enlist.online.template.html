@@ -98,7 +98,7 @@
   </div>
 
   <div class="form-group" default-button-type
-       ng-show="$ctrl.tournament.rules.casting.policy == 'ProvidedRating'"
+       ng-show="$ctrl.tournament.rules.casting.policy == 'pr'"
        ng-class="{'has-error': ($ctrl.form.$submitted || $ctrl.form.rank.$dirty) && $ctrl.form.rank.$invalid}">
     <label>{{ $ctrl.tournament.rules.casting.providedRankOptions.label }}</label>
     <div touch-spin options="$ctrl.rankRange" ng-model="$ctrl.rank"></div>

@@ -6,7 +6,7 @@ export default function defaultTournamentRules(sport) {
         match: defaultMatchRules(sport),
         place: {ar: 'NO'},
         casting: {
-            policy: 'ProvidedRating',
+            policy: 'pr',
             direction: 'Decrease',
             splitPolicy: 'BalancedMix',
             providedRankOptions: {

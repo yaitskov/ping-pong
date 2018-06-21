@@ -26,7 +26,7 @@ module.exports = {
     'rank-direction-lbl-Decrease': 'Malejąco',
     'rank-direction-lbl-Increase': 'Rosnąco',
     'rank-policy-lbl': 'Sposób rankingu',
-    'rank-policy-lbl-ProvidedRating': 'Podany poziom',
+    'rank-policy-lbl-pr': 'Podany poziom',
     'rank-policy-lbl-Manual': 'Ręczne',
     'rank-policy-lbl-SignUp': 'Kolejność rejestracji',
     'rank-policy-lbl-MasterOutcome': 'Główny turniej',

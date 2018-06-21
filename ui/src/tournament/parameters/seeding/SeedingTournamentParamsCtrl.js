@@ -15,7 +15,7 @@ export default class SeedingTournamentParamsCtrl extends BaseTrParamsCtrl {
 
     onTournamentSet() {
         super.onTournamentSet(...arguments);
-        this.rankingPolicyDomain = ['ProvidedRating', 'Manual', 'SignUp'];
+        this.rankingPolicyDomain = ['pr', 'Manual', 'SignUp'];
         if (this.tournament.masterTid) {
             this.rankingPolicyDomain.push('MasterOutcome');
         }
@@ -27,6 +27,6 @@ export default class SeedingTournamentParamsCtrl extends BaseTrParamsCtrl {
         this.rank = {min: 0, max: 1000000};
         this.rankOptionsBackup = backedUpValue(defaultProvidedRankOptions,
                                                () => this.rules.casting.providedRankOptions,
-                                               'ProvidedRating');
+                                               'pr');
     }
 }

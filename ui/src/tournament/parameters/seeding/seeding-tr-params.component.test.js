@@ -20,7 +20,7 @@ describe('seeding-tr-params', () => {
         ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff(sport));
         ctx.btnArrayToggles('#ranking-policy a',
                             () => ctx.ctrl.rules.casting.policy,
-                            ['ProvidedRating', 'Manual', 'SignUp']);
+                            ['pr', 'Manual', 'SignUp']);
     });
 
     it('rank name is visible for policy provided rank', () => {

@@ -28,7 +28,7 @@ module.exports = {
     'rank-direction-lbl-Increase': 'Ascending',
     'rank-policy-lbl': 'Rating method',
     'rank-policy-lbl-pr': 'Provided skill',
-    'rank-policy-lbl-Manual': 'Manually',
+    'rank-policy-lbl-m': 'Manually',
     'rank-policy-lbl-su': 'Sign-up order',
     'rank-policy-lbl-MasterOutcome': 'Master tournament',
     'max-losses': 'Max losses',

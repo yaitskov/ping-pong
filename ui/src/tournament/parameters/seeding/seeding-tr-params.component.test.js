@@ -20,7 +20,7 @@ describe('seeding-tr-params', () => {
         ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff(sport));
         ctx.btnArrayToggles('#ranking-policy a',
                             () => ctx.ctrl.rules.casting.policy,
-                            ['pr', 'Manual', 'su']);
+                            ['pr', 'm', 'su']);
     });
 
     it('rank name is visible for policy provided rank', () => {
@@ -37,7 +37,7 @@ describe('seeding-tr-params', () => {
     const tournamentWithManualRanking = () => {
         const tournament = newTournamentWithPlayOff(sport);
         delete tournament.rules.casting.providedRankOptions;
-        tournament.rules.casting.policy = 'Manual';
+        tournament.rules.casting.policy = 'm';
         return tournament;
     };
 

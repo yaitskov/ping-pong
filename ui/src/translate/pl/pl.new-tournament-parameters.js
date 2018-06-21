@@ -27,7 +27,7 @@ module.exports = {
     'rank-direction-lbl-Increase': 'Rosnąco',
     'rank-policy-lbl': 'Sposób rankingu',
     'rank-policy-lbl-pr': 'Podany poziom',
-    'rank-policy-lbl-Manual': 'Ręczne',
+    'rank-policy-lbl-m': 'Ręczne',
     'rank-policy-lbl-su': 'Kolejność rejestracji',
     'rank-policy-lbl-MasterOutcome': 'Główny turniej',
     'max-losses': 'Ilość porażek',

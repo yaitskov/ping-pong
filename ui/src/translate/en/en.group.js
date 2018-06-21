@@ -25,11 +25,11 @@ module.exports = {
     'group-order-rule-list-lbl': 'List of order rules',
 
     'match-outcome-scope-lbl': 'Count broken matches',
-    'match-outcome-scope-lbl-ALL_MATCHES': 'Yes',
-    'match-outcome-scope-lbl-JUST_NORMALLY_COMPLETE': 'No',
+    'match-outcome-scope-lbl-am': 'Yes',
+    'match-outcome-scope-lbl-jnc': 'No',
     'match-participant-scope-lbl': 'Count only matches among competing players',
     'match-participant-scope-lbl-BOTH': 'Yes',
-    'match-participant-scope-lbl-AT_LEAST_ONE': 'No',
+    'match-participant-scope-lbl-alo': 'No',
 
     'custom-dm-match-rules-lbl': 'Custom rules for extra matches',
 

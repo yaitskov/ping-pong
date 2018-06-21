@@ -26,11 +26,11 @@ module.exports = {
     'group-order-rule-list-lbl': 'Lista regul uporządkowania',
 
     'match-outcome-scope-lbl': 'Liczyć przerwanę meczi',
-    'match-outcome-scope-lbl-ALL_MATCHES': 'Tak',
-    'match-outcome-scope-lbl-JUST_NORMALLY_COMPLETE': 'Nie',
+    'match-outcome-scope-lbl-am': 'Tak',
+    'match-outcome-scope-lbl-jnc': 'Nie',
     'match-participant-scope-lbl': 'Liczyć meczi tylko mędzę spórnymi graczami',
     'match-participant-scope-lbl-BOTH': 'Tak',
-    'match-participant-scope-lbl-AT_LEAST_ONE': 'Nie',
+    'match-participant-scope-lbl-alo': 'Nie',
 
     'custom-dm-match-rules-lbl': 'Niezależyne reguly dodatkowych meczów',
 

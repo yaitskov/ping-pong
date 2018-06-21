@@ -9,8 +9,8 @@ describe('group order rules', () => {
         it('creates WM', () => expect(ruleType2Factory.get(ruleId.WM)()).toEqual(
             {
                 '@type': 'WM',
-                mps: 'AT_LEAST_ONE',
-                mos: 'ALL_MATCHES'
+                mps: 'alo',
+                mos: 'am'
             }));
     });
 

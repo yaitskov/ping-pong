@@ -27,10 +27,10 @@ describe('group-rule-parameters-dialog', () => {
         it('match outcome scope visible', () => ctx.visible('#match-outcome-scope'));
         it('match outcome scope keys',
            () => expect(ctx.ctrl.matchOutcomeScopeKeys.sort()).
-           toEqual(['ALL_MATCHES', 'JUST_NORMALLY_COMPLETE']));
+           toEqual(['am', 'jnc']));
         it('match participant scope keys',
            () => expect(ctx.ctrl.matchParticipantScopeKeys.sort()).
-           toEqual(['AT_LEAST_ONE', 'BOTH']));
+           toEqual(['alo', 'BOTH']));
         it('translate match outcome scope', () =>
            ctx.transAs('#match-outcome-scope label:first', 'Count broken matches'));
         it('translate participant scope', () =>

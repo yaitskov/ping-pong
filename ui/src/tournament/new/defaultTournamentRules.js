@@ -29,7 +29,7 @@ export default function defaultTournamentRules(sport) {
         },
         playOff: {
             losings: 1,
-            thirdPlaceMatch: 1
+            tpm: 1
         }
     };
 }

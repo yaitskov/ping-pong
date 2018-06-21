@@ -39,7 +39,7 @@ describe('play-off-tr-params', () => {
         ctx.toggleOff('#play-off-parameters-toggler input');
         expect(ctx.ctrl.rules.playOff).toBeUndefined();
         ctx.toggleOn('#play-off-parameters-toggler input');
-        expect(ctx.ctrl.rules.playOff.thirdPlaceMatch).toBe(1);
+        expect(ctx.ctrl.rules.playOff.tpm).toBe(1);
     });
 
     it('max losses in play off toggles', () => {
@@ -53,7 +53,7 @@ describe('play-off-tr-params', () => {
     it('3rd place match toggles', () => {
         ctx.broadcast('event.tournament.rules.set', newTournamentWithPlayOff(sport));
         ctx.btnTogglesDiffClasses('#third-place-match',
-                                  () => ctx.ctrl.rules.playOff.thirdPlaceMatch,
+                                  () => ctx.ctrl.rules.playOff.tpm,
                                   {default: {clazz: 'btn-primary', value: 1},
                                    other: {clazz: 'btn-danger', value: 0}});
     });

@@ -2,7 +2,7 @@ import BaseTrParamsCtrl from 'tournament/parameters/BaseTrParamsCtrl.js';
 import backedUpValue from 'core/backedUpValue.js';
 
 function defaultPlayOffRules() {
-   return {thirdPlaceMatch: 0, losings: 1};
+   return {tpm: 0, losings: 1};
 }
 
 export default class PlayOffParamsCtrl extends BaseTrParamsCtrl {

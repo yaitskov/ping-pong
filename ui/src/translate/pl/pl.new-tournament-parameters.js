@@ -37,7 +37,7 @@ module.exports = {
     'rank-name-length': 'Długość nazwy musi być mniej niż {{max}} liter',
     'split-policy-lbl': 'Ilość drabin',
     'split-policy-lbl-bm': 'jedna',
-    'split-policy-lbl-ConsoleLayered': 'tyle ile poziomów',
+    'split-policy-lbl-cl': 'tyle ile poziomów',
     'Minimal allowed rank value': 'Minimalne znaczenie rankingu',
     'Maximum allowed rank value': 'Maksimalne znaczenie rankingu',
     'quits-group-help': 'Ilość uczestników wychodzących z grupy do play-off turnieju.',

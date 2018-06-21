@@ -80,10 +80,10 @@ describe('seeding-tr-params', () => {
                          () => ctx.ctrl.rules.casting.pro.minValue);
     });
 
-    it('ranking policy is hidden if ConsoleLayered', () => {
+    it('ranking policy is hidden if cl', () => {
         const tournament = existingLayeredConsoleTournament(sport);
         tournament.rules.casting.policy = 'su';
-        tournament.rules.casting.splitPolicy = 'ConsoleLayered';
+        tournament.rules.casting.splitPolicy = 'cl';
         ctx.broadcast('event.tournament.rules.set', tournament);
         ctx.hidden('#ranking-policy');
         ctx.hidden('#rank-axis-direction');

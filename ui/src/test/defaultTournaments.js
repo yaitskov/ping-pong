@@ -68,6 +68,6 @@ export function existingLayeredConsoleTournament(sport) {
     const tournament = existingTournament(sport);
     tournament.masterTid = 2;
     tournament.rules.casting.policy = 'mo';
-    tournament.rules.casting.splitPolicy = 'ConsoleLayered';
+    tournament.rules.casting.splitPolicy = 'cl';
     return tournament;
 }

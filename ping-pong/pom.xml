@@ -478,6 +478,11 @@
                                     <binding>org.dan.ping.pong.sys.db.converters.num.OptionalMidConverter</binding>
                                 </customType>
                                 <customType>
+                                    <name>Bid</name>
+                                    <type>org.dan.ping.pong.app.bid.Bid</type>
+                                    <binding>org.dan.ping.pong.sys.db.converters.num.BidConverter</binding>
+                                </customType>
+                                <customType>
                                     <name>Uid</name>
                                     <type>org.dan.ping.pong.app.bid.Uid</type>
                                     <binding>org.dan.ping.pong.sys.db.converters.num.UidConverter</binding>
@@ -641,7 +646,12 @@
                                 </forcedType>
                                 <forcedType>
                                     <name>Uid</name>
-                                    <expression>.*match_dispute\.(plaintiff|judge)</expression>
+                                    <expression>.*match_dispute\.judge</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Bid</name>
+                                    <expression>.*match_dispute\.plaintiff</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
@@ -865,6 +875,11 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>Bid</name>
+                                    <expression>.*bid\.(bid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
                                     <name>Tid</name>
                                     <expression>.*bid\.(tid)</expression>
                                     <types>.*</types>
@@ -920,8 +935,8 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
-                                    <name>Uid</name>
-                                    <expression>.*matches\.(uid_less|uid_more|uid_win)</expression>
+                                    <name>Bid</name>
+                                    <expression>.*matches\.(bid_less|bid_more|bid_win)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
@@ -945,8 +960,8 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
-                                    <name>Uid</name>
-                                    <expression>.*set_score\.(uid)</expression>
+                                    <name>Bid</name>
+                                    <expression>.*set_score\.(bid)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

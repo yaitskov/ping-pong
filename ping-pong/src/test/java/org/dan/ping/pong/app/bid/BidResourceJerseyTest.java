@@ -39,8 +39,6 @@ import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupWithMembers;
 import org.dan.ping.pong.app.group.TournamentGroups;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
-import org.dan.ping.pong.app.tournament.ParticipantMemState;
-import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc;
@@ -228,15 +226,15 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
                             .scoreSet(p1, 11, p2, 4)
                             .scoreSet(p3, 11, p4, 3)
                             .resolveCategories();
-                    final List<UserLink> users = myRest().post(FIND_BIDS_BY_STATE,
+                    final List<ParticipantLink> users = myRest().post(FIND_BIDS_BY_STATE,
                             FindByState.builder()
                                     .tid(scenario.getTid())
                                     .states(asList(Play, Wait))
                                     .build())
-                            .readEntity(new GenericType<List<UserLink>>() {});
+                            .readEntity(new GenericType<List<ParticipantLink>>() {});
                     assertThat(users,
-                            hasItems(hasProperty("uid", Matchers.is(scenario.player2Bid(p1))),
-                                    hasProperty("uid", Matchers.is(scenario.player2Bid(p2)))));
+                            hasItems(hasProperty("bid", Matchers.is(scenario.player2Bid(p1))),
+                                    hasProperty("bid", Matchers.is(scenario.player2Bid(p2)))));
                 });
     }
 
@@ -248,17 +246,17 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     c.beginTournament().renameBid(p2, "p2 renamed");
-                    final List<UserLink> users = myRest().post(FIND_BIDS_BY_STATE,
+                    final List<ParticipantLink> users = myRest().post(FIND_BIDS_BY_STATE,
                             FindByState.builder()
                                     .tid(scenario.getTid())
                                     .states(singletonList(Play))
                                     .build())
-                            .readEntity(new GenericType<List<UserLink>>() {});
+                            .readEntity(new GenericType<List<ParticipantLink>>() {});
                     assertThat(users,
                             hasItem(
                                     allOf(
                                             hasProperty("name", Matchers.is("p2 renamed")),
-                                            hasProperty("uid", Matchers.is(scenario.player2Bid(p2))))));
+                                            hasProperty("bid", Matchers.is(scenario.player2Bid(p2))))));
                 });
     }
 }

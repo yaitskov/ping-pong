@@ -69,7 +69,8 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
         loserBids.stream()
                 .map(masterTournament::getParticipant)
                 .forEach(bid ->
-                        tournamentService.enlistOnlineWithoutValidation(
+                        tournamentService.enlistToConsole(
+                                bid.getBid(),
                                 EnlistTournament.builder()
                                         .categoryId(cid)
                                         .bidState(

@@ -178,14 +178,18 @@ public class TournamentService {
             UserLinkIf user, DbUpdater batch) {
         log.info("Uid {} enlists to tid {} in cid {}",
                 user.getUid(), tournament.getTid(), enlistment.getCategoryId());
-        final Uid uid = user.getUid();
         final Bid bid = tournament.getNextBid().next();
+        return enlistToConsole(bid, enlistment, tournament, user, batch);
+    }
+
+    public Bid enlistToConsole(Bid bid, EnlistTournament enlistment,
+            TournamentMemState tournament, UserLinkIf user, DbUpdater batch) {
         final Instant now = clocker.get();
         tournament.registerParticipant(
                 ParticipantMemState.builder()
                         .bidState(enlistment.getBidState())
                         .bid(bid)
-                        .uid(uid)
+                        .uid(user.getUid())
                         .name(user.getName())
                         .updatedAt(now)
                         .enlistedAt(now)
@@ -663,7 +667,8 @@ public class TournamentService {
             orderedGroupUids.stream().skip(quitsGroup)
                     .map(masterTournament::getBidOrQuit)
                     .forEach(bid ->
-                            enlistOnlineWithoutValidation(
+                            enlistToConsole(
+                                    bid.getBid(),
                                     EnlistTournament.builder()
                                             .categoryId(consoleCid)
                                             .bidState(

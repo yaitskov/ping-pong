@@ -137,10 +137,9 @@ public class Simulator {
         for (PlayerCategory playerCategory : scenario.getChampions().keySet()) {
             final int cid = scenario.getCategoryDbId().get(playerCategory);
             assertEquals(scenario.getChampions().get(playerCategory),
-                    forTestBidDao.findByTidAndState(scenario.getTid(),
-                            cid,
-                            bidStates)
-                            .stream().map(uid -> scenario.getBidPlayer().get(uid))
+                    forTestBidDao.findByTidAndState(scenario.getTid(), cid, bidStates)
+                            .stream()
+                            .map(bid -> scenario.getBidPlayer().get(bid))
                             .collect(toList()));
             assertEquals(
                     scenario.getPlayersSessions().keySet().stream()
@@ -150,7 +149,7 @@ public class Simulator {
                                     .get(player).equals(playerCategory))
                             .collect(toSet()),
                     forTestBidDao.findByTidAndState(scenario.getTid(), cid, asList(Lost, Quit, Expl))
-                            .stream().map(uid -> scenario.getBidPlayer().get(uid))
+                            .stream().map(bid -> scenario.getBidPlayer().get(bid))
                             .collect(toSet()));
         }
         assertEquals(Optional.of(scenario.getExpectedTerminalState()),

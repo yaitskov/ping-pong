@@ -20,9 +20,9 @@ public class ConsoleStrategyDispatcher implements ConsoleStrategy {
     @Override
     public void onGroupComplete(int gid, TournamentMemState tournament,
             Set<Bid> loserBids, DbUpdater batch) {
+        noConsoleStrategy.onGroupComplete(gid, tournament, loserBids, batch);
         if (tournament.getRule().consoleP()) {
             consoleStrategy.onGroupComplete(gid, tournament, loserBids, batch);
         }
-        noConsoleStrategy.onGroupComplete(gid, tournament, loserBids, batch);
     }
 }

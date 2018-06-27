@@ -2,7 +2,7 @@ package org.dan.ping.pong.app.match.rule.service.tennis.atp;
 
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpDII;
 
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.service.GroupRuleParams;
@@ -29,12 +29,12 @@ public class AtpDIIPercentWonSetsRuleService extends BasePercentRuleService {
     }
 
     @Override
-    protected Map<Uid, Integer> findUid2LostSets(Stream<MatchInfo> matches, GroupRuleParams params) {
+    protected Map<Bid, Integer> findBid2LostSets(Stream<MatchInfo> matches, GroupRuleParams params) {
         return lostSetsRuleService.findUid2Sets(matches, params);
     }
 
     @Override
-    protected Map<Uid, Integer> findUid2WonSets(Stream<MatchInfo> matches, GroupRuleParams params) {
+    protected Map<Bid, Integer> findBid2WonSets(Stream<MatchInfo> matches, GroupRuleParams params) {
         return wonSetsRuleService.findUid2Sets(matches, params);
     }
 }

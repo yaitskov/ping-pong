@@ -8,7 +8,7 @@ import static org.dan.ping.pong.app.match.rule.reason.IncreasingIntScalarReason.
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.util.FuncUtils.SUM_INT;
 
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
@@ -39,25 +39,25 @@ public class AtpDIRuleService implements GroupOrderRuleService {
     @Override
     public Optional<Stream<? extends Reason>> score(
             Supplier<Stream<MatchInfo>> matches,
-            Set<Uid> uids,
+            Set<Bid> bids,
             GroupOrderRule _rule, GroupRuleParams params) {
-        if (uids.size() != 3) {
+        if (bids.size() != 3) {
             return Optional.empty();
         }
 
-        final Map<Uid, Integer> wons = new TreeMap<>();
-        final Map<Uid, Integer> walkOvers = new TreeMap<>();
+        final Map<Bid, Integer> wons = new TreeMap<>();
+        final Map<Bid, Integer> walkOvers = new TreeMap<>();
         final TournamentMemState tournament = params.getTournament();
 
         matches.get().forEach(m -> {
-            final Map<Uid, Integer> uid2Sets = sports.calcWonSets(tournament, m);
-            final Optional<Uid> oUid = sports.findWinnerId(
-                    tournament.selectMatchRule(m), uid2Sets);
-            oUid.filter(uids::contains)
-                    .ifPresent(uid -> wons.merge(uid, 1, SUM_INT));
-            if (m.getState() == Over && !oUid.equals(m.getWinnerId())) {
-                uid2Sets.keySet().stream()
-                        .filter(uids::contains)
+            final Map<Bid, Integer> bid2Sets = sports.calcWonSets(tournament, m);
+            final Optional<Bid> oBid = sports.findWinnerId(
+                    tournament.selectMatchRule(m), bid2Sets);
+            oBid.filter(bids::contains)
+                    .ifPresent(bid -> wons.merge(bid, 1, SUM_INT));
+            if (m.getState() == Over && !oBid.equals(m.getWinnerId())) {
+                bid2Sets.keySet().stream()
+                        .filter(bids::contains)
                         .forEach(uid -> walkOvers.merge(uid, 1, SUM_INT));
             }
         });

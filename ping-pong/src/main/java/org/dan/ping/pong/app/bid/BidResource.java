@@ -2,9 +2,8 @@ package org.dan.ping.pong.app.bid;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
+import static org.dan.ping.pong.app.match.MatchResource.BID_JP;
 import static org.dan.ping.pong.app.match.MatchResource.TID_JP;
-import static org.dan.ping.pong.app.match.MatchResource.UID;
-import static org.dan.ping.pong.app.match.MatchResource.UID_JP;
 import static org.dan.ping.pong.app.tournament.TournamentService.TID;
 
 import lombok.extern.slf4j.Slf4j;
@@ -14,9 +13,9 @@ import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
 
-import java.util.List;
-
 import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -31,18 +30,19 @@ import javax.ws.rs.container.Suspended;
 @Path("/")
 @Produces(APPLICATION_JSON)
 public class BidResource {
-    private static final String BID = "/bid/";
-    public static final String PROFILE = BID + "profile/";
-    public static final String FIND_BIDS_BY_STATE = BID + "find-by-state";
+    private static final String BID = "bid";
+    public static final String PROFILE = "/bid/profile/";
+    public static final String FIND_BIDS_BY_STATE = "/bid/find-by-state";
     public static final String FIND_BIDS_WITH_MATCH = "/bid/find-with-match/";
-    public static final String BID_PAID = BID + "paid";
-    public static final String BID_READY_TO_PLAY = BID + "ready-to-play";
-    public static final String BID_SET_STATE = BID + "set-state";
-    private static final String BID_RESULTS = BID + "results/";
+    public static final String BID_PAID = "/bid/paid";
+    public static final String BID_READY_TO_PLAY = "/bid/ready-to-play";
+    public static final String BID_SET_STATE = "/bid/set-state";
+    private static final String BID_RESULTS = "/bid/results/";
     public static final String TID_SLASH_UID = "/";
     public static final String ENLISTED_BIDS = "/bid/enlisted-to-be-checked/";
     public static final String BID_CHANGE_GROUP = "/bid/change-group";
     public static final String BID_RENAME = "/bid/rename";
+    public static final String BID_SET_CATEGORY = "/bid/set-category";
 
     @Inject
     private AuthService authService;
@@ -58,13 +58,13 @@ public class BidResource {
     @Consumes(APPLICATION_JSON)
     public void paid(
             @Suspended AsyncResponse response,
-            @HeaderParam(SESSION) String session,
-            BidId bidId) {
+            @NotNull @HeaderParam(SESSION) String session,
+            @Valid BidId bidId) {
         final Uid adminUid = authService.userInfoBySession(session).getUid();
         log.info("Admin {} took money for bid {}", adminUid, bidId);
         tournamentAccessor.update(bidId.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
-            bidService.paid(tournament, bidId.getUid(), batch);
+            bidService.paid(tournament, bidId.getBid(), batch);
         });
     }
 
@@ -77,7 +77,7 @@ public class BidResource {
             BidRename bidRename) {
         final Uid adminUid = authService.userInfoBySession(session).getUid();
         log.info("Admin {} renames bid {} as [{}]",
-                adminUid, bidRename.getUid(), bidRename.getNewName());
+                adminUid, bidRename.getBid(), bidRename.getNewName());
         tournamentAccessor.update(bidRename.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
             bidService.rename(tournament, batch, bidRename);
@@ -85,15 +85,14 @@ public class BidResource {
     }
 
     @GET
-    @Path(PROFILE + TID_JP + TID_SLASH_UID + UID_JP)
+    @Path(PROFILE + TID_JP + TID_SLASH_UID + BID_JP)
     @Consumes(APPLICATION_JSON)
     public void profile(
             @Suspended AsyncResponse response,
-            @HeaderParam(SESSION) String session,
-            @PathParam(TID) Tid tid,
-            @PathParam(UID) Uid uid) {
+            @Valid @PathParam(TID) Tid tid,
+            @Valid @PathParam(BID) Bid bid) {
         tournamentAccessor.read(tid, response, tournament -> {
-            final ParticipantMemState participant = tournament.getParticipant(uid);
+            final ParticipantMemState participant = tournament.getParticipant(bid);
             return BidProfile.builder()
                     .name(participant.getName())
                     .category(tournament.getCategory(participant.getCid()))
@@ -116,12 +115,12 @@ public class BidResource {
         log.info("Admin {} checked that bid {} arrived to tournament in good fit",
                 adminUid, bidId);
         tournamentAccessor.update(bidId.getTid(), response, (tournament, batch) -> {
-            bidService.readyToPlay(tournament, bidId.getUid(), batch);
+            bidService.readyToPlay(tournament, bidId.getBid(), batch);
         });
     }
 
     @POST
-    @Path(BID + "set-category")
+    @Path(BID_SET_CATEGORY)
     @Consumes(APPLICATION_JSON)
     public void setCategory(
             @Suspended AsyncResponse response,
@@ -166,13 +165,13 @@ public class BidResource {
     private BidResultService bidResultService;
 
     @GET
-    @Path(BID_RESULTS + TID_JP + TID_SLASH_UID + UID_JP)
+    @Path(BID_RESULTS + TID_JP + TID_SLASH_UID + BID_JP)
     public void getResults(
             @Suspended AsyncResponse response,
-            @PathParam(TID) Tid tid,
-            @PathParam(UID) Uid uid) {
+            @Valid @PathParam(TID) Tid tid,
+            @Valid @PathParam(BID) Bid bid) {
         tournamentAccessor.read(tid, response,
-                tournament -> bidResultService.getResults(tournament, uid));
+                tournament -> bidResultService.getResults(tournament, bid));
     }
 
     @GET
@@ -183,15 +182,6 @@ public class BidResource {
             @PathParam(TID) Tid tid) {
         tournamentAccessor.read(tid, response,
                 tournament -> bidService.findEnlisted(tournament));
-    }
-
-    @GET
-    @Path(BID + "state/" + TID_JP + TID_SLASH_UID + UID_JP)
-    public DatedParticipantState getParticipantState(
-            @HeaderParam(SESSION) String session,
-            @PathParam(TID) Tid tid,
-            @PathParam(UID) Uid uid) {
-        return bidService.getParticipantState(tid, uid);
     }
 
     @POST

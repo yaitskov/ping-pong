@@ -14,7 +14,7 @@ import org.dan.ping.pong.app.tournament.Tid;
 @AllArgsConstructor
 public class SetBidState {
     private Tid tid;
-    private Uid uid;
+    private Bid bid;
     private BidState expected;
     private BidState target;
 }

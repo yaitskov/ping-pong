@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 
 @Getter
@@ -14,7 +14,7 @@ import org.dan.ping.pong.app.match.rule.OrderRuleName;
 @AllArgsConstructor(onConstructor = @__(@JsonIgnore))
 public class InfoReason implements Reason {
     @Getter(onMethod = @__(@JsonIgnore))
-    private Uid uid;
+    private Bid bid;
     private OrderRuleName rule;
 
     @JsonIgnore
@@ -26,7 +26,7 @@ public class InfoReason implements Reason {
         return notApplicableRule(null, rule);
     }
 
-    public static InfoReason notApplicableRule(Uid uid, OrderRuleName rule) {
+    public static InfoReason notApplicableRule(Bid uid, OrderRuleName rule) {
         return new InfoReason(uid, rule);
     }
 

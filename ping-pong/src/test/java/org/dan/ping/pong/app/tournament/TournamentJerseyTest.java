@@ -1,15 +1,15 @@
 package org.dan.ping.pong.app.tournament;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 import static javax.ws.rs.core.Response.Status.Family.familyOf;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
-import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.category.CategoryResource.CATEGORY_MEMBERS;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S1A2G11;
 import static org.dan.ping.pong.app.place.PlaceMemState.NO_ADMIN_ACCESS_TO_PLACE;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
@@ -19,9 +19,9 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.RUNNING_TOURNA
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_CREATE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLISTED;
-import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST_OFFLINE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_STATE;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentService.UNKNOWN_PLACE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
@@ -47,7 +47,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.place.ForTestPlaceDao;
@@ -59,7 +59,8 @@ import org.dan.ping.pong.mock.RestEntityGenerator;
 import org.dan.ping.pong.mock.TestAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.UserSessionGenerator;
-import org.dan.ping.pong.sys.ctx.TestCtx;
+import org.dan.ping.pong.mock.simulator.Simulator;
+import org.dan.ping.pong.simulate.SimulationCtx;
 import org.dan.ping.pong.sys.error.TemplateError;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
 import org.hamcrest.Matchers;
@@ -80,7 +81,7 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 @Category(JerseySpringTest.class)
-@ContextConfiguration(classes = {TestCtx.class, ForTestPlaceDao.class})
+@ContextConfiguration(classes = {SimulationCtx.class, ForTestPlaceDao.class})
 public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     static class DigestList extends ArrayList<TournamentDigest> {}
 
@@ -203,8 +204,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
         final DraftingTournamentInfo adminResult = myRest().get(DRAFTING + tid.getTid(),
                 adminSession, DraftingTournamentInfo.class);
-        assertEquals(Optional.empty(), adminResult.getMyCategoryId());
-        assertEquals(Optional.empty(), adminResult.getBidState());
+        assertEquals(emptyMap(), adminResult.getCategoryState());
         assertTrue(adminResult.isIAmAdmin());
         assertThat(adminResult.getCategories(), hasSize(greaterThan(0)));
 
@@ -216,8 +216,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
         final DraftingTournamentInfo userResultBefore = myRest().get(DRAFTING + tid,
                 userSession, DraftingTournamentInfo.class);
-        assertEquals(Optional.empty(), userResultBefore.getMyCategoryId());
-        assertEquals(Optional.empty(), userResultBefore.getBidState());
+        assertEquals(emptyMap(), userResultBefore.getCategoryState());
         assertFalse(userResultBefore.isIAmAdmin());
 
         myRest().voidPost(TOURNAMENT_ENLIST, userSession,
@@ -228,15 +227,13 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
         final DraftingTournamentInfo userResultAfter = myRest().get(DRAFTING + tid,
                 userSession, DraftingTournamentInfo.class);
-        assertEquals(Optional.of(cid),  userResultAfter.getMyCategoryId());
-        assertEquals(Optional.of(Want), userResultAfter.getBidState());
+        assertEquals(singletonMap(cid, Want), userResultAfter.getCategoryState());
         assertFalse(userResultAfter.isIAmAdmin());
 
         final DraftingTournamentInfo anonymousResult = myRest().get(DRAFTING + tid,
                 DraftingTournamentInfo.class);
-        assertEquals(Optional.empty(), anonymousResult.getMyCategoryId());
+        assertEquals(emptyMap(), anonymousResult.getCategoryState());
         assertFalse(anonymousResult.isIAmAdmin());
-        assertEquals(Optional.empty(), anonymousResult.getBidState());
         assertThat(adminResult.getCategories(), hasSize(greaterThan(0)));
     }
 
@@ -260,8 +257,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
 
         final DraftingTournamentInfo afterResign = myRest().get(DRAFTING + tid,
                 userSession, DraftingTournamentInfo.class);
-        assertEquals(Optional.of(cid1),  afterResign.getMyCategoryId());
-        assertEquals(Optional.of(Quit), afterResign.getBidState());
+        assertEquals(singletonMap(cid1, Quit), afterResign.getCategoryState());
 
         myRest().voidPost(TOURNAMENT_ENLIST, userSession, EnlistTournament.builder()
                 .tid(tid)
@@ -313,25 +309,21 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                         .build());
     }
 
+    @Inject
+    private Simulator simulator;
+
     @Test
     public void enlistOffline() {
         final Tid tid = daoGenerator.genTournament(
                 daoGenerator.genPlace(0), Draft);
         final int cid = daoGenerator.genCategory(tid, 1);
         final String name = UUID.randomUUID().toString();
-        final Uid uid = myRest().post(TOURNAMENT_ENLIST_OFFLINE, adminSession.getSession(),
-                EnlistOffline.builder()
-                        .tid(tid)
-                        .cid(cid)
-                        .bidState(Here)
-                        .name(name)
-                        .build())
-                .readEntity(Uid.class);
+        final Bid bid = simulator.enlistParticipant(tid, adminSession, cid, Optional.empty(), name);
         final CategoryInfo digests = myRest().get(
                 CATEGORY_MEMBERS + tid.getTid() + "/" + cid, CategoryInfo.class);
         assertThat(digests.getUsers(),
                 hasItem(allOf(
                         hasProperty("name", is(name)),
-                        hasProperty("uid", is(uid)))));
+                        hasProperty("bid", is(bid)))));
     }
 }

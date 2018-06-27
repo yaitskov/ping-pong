@@ -4,10 +4,10 @@
     <match-score-conflict></match-score-conflict>
     <div class="form-group">
       <a ng-click="$ctrl.showReview()"
-         ng-show="$ctrl.matchScore.winUid" class="btn btn-success">
+         ng-show="$ctrl.matchScore.winBid" class="btn btn-success">
         Accept score
       </a>
-      <a ng-click="$ctrl.continuePlayMatch()" ng-show="!$ctrl.matchScore.winUid" class="btn btn-success">
+      <a ng-click="$ctrl.continuePlayMatch()" ng-show="!$ctrl.matchScore.winBid" class="btn btn-success">
         Accept score
       </a>
       <a href="#!/my/match/open-dispute/{{$ctrl.matchId}}" class="btn btn-danger">

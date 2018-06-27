@@ -1,13 +1,13 @@
 package org.dan.ping.pong.app.match.rule.service.tennis.atp;
 
 import static java.util.stream.Collectors.toList;
-import static org.dan.ping.pong.app.group.GroupServiceTest.UID2;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID3;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID4;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID5;
+import static org.dan.ping.pong.app.group.GroupServiceTest.BID2;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID3;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID4;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID5;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpDIII;
 import static org.dan.ping.pong.app.match.rule.service.tennis.atp.AtpDIIPercentWonSetsRuleTest.BASE;
-import static org.dan.ping.pong.app.match.rule.service.tennis.atp.AtpDIRuleServiceTest.UIDS_3_4_5;
+import static org.dan.ping.pong.app.match.rule.service.tennis.atp.AtpDIRuleServiceTest.BIDS_3_4_5;
 import static org.dan.ping.pong.app.sport.tennis.TennisSportTest.CLASSIC_TENNIS_RULES;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.contains;
@@ -41,7 +41,7 @@ public class AtpDIIIPercentWonGamesRuleServiceTest {
     @Test
     public void test() {
         final List<DecreasingDoubleScalarReason> result = sut.score(
-                BASE::stream, UIDS_3_4_5, null,
+                BASE::stream, BIDS_3_4_5, null,
                 GroupRuleParams.builder()
                         .tournament(TournamentMemState.builder()
                                 .sport(SportType.Tennis)
@@ -60,9 +60,9 @@ public class AtpDIIIPercentWonGamesRuleServiceTest {
                 everyItem(is(AtpDIII)));
         assertThat(
                 result.stream()
-                        .map(DecreasingDoubleScalarReason::getUid)
+                        .map(DecreasingDoubleScalarReason::getBid)
                         .collect(toList()),
-                contains(UID3, UID5, UID4, UID2));
+                contains(BID3, BID5, BID4, BID2));
         assertThat(
                 result.stream()
                         .map(DecreasingDoubleScalarReason::getValue)

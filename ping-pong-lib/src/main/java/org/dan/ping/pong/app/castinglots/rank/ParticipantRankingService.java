@@ -4,7 +4,6 @@ import static java.util.Comparator.comparingInt;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.MasterOutcome;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
@@ -14,6 +13,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import com.google.common.cache.LoadingCache;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.CastingLotsDaoIf;
 import org.dan.ping.pong.app.group.GroupService;
@@ -74,32 +74,32 @@ public class ParticipantRankingService {
                 + tournament.getTid() + " has no master tournament"));
 
         final TournamentMemState masterTournament = tournamentCache.get(masterTid);
-        final Map<Integer, Map<Uid, Integer>> cid2Uid2Position = new HashMap<>();
+        final Map<Integer, Map<Bid, Integer>> cid2Bid2Position = new HashMap<>();
 
         return bids.stream().map(bid -> {
-            final int masterCid = masterTournament.getParticipant(bids.get(0).getUid()).getCid();
-            Map<Uid, Integer> uid2Position = cid2Uid2Position.get(masterCid);
+            final int masterCid = masterTournament.getParticipant(bids.get(0).getBid()).getCid();
+            Map<Bid, Integer> uid2Position = cid2Bid2Position.get(masterCid);
             if (uid2Position == null) {
                 log.info("Find order in cid {} of tid {}",
                         masterCid, masterTournament.getTid());
                 final List<TournamentResultEntry> groupOrdered = groupService
                         .resultOfAllGroupsInCategory(masterTournament, masterCid);
-                cid2Uid2Position.put(masterCid, uid2Position = new HashMap<>());
+                cid2Bid2Position.put(masterCid, uid2Position = new HashMap<>());
                 for (int i = 0; i < groupOrdered.size(); ++i) {
-                    uid2Position.put(groupOrdered.get(i).getUser().getUid(), i);
+                    uid2Position.put(groupOrdered.get(i).getUser().getBid(), i);
                 }
             }
-            return UidIdx.builder()
-                    .index(ofNullable(uid2Position.get(bid.getUid()))
+            return BidIdx.builder()
+                    .index(ofNullable(uid2Position.get(bid.getBid()))
                             .orElseGet(() -> {
-                                log.warn("no uid {} in cid {}", bid.getUid(), masterCid);
+                                log.warn("no bid {} in cid {}", bid.getBid(), masterCid);
                                 return 0;
                             }))
-                    .uid(bid.getUid())
+                    .bid(bid.getBid())
                     .build();
-        }).collect(Collectors.toCollection(() -> new TreeSet<>(UidIdx.uidIdxComparator)))
+        }).collect(Collectors.toCollection(() -> new TreeSet<>(BidIdx.uidIdxComparator)))
                 .stream()
-                .map(uidIdx -> tournament.getParticipant(uidIdx.getUid()))
+                .map(uidIdx -> tournament.getParticipant(uidIdx.getBid()))
                 .collect(toList());
     }
 
@@ -129,6 +129,7 @@ public class ParticipantRankingService {
                 .collect(toList());
         orderedBids.addAll(participantIdx.values());
         return orderedBids;
+
     }
 
     private List<ParticipantMemState> sortBySignUp(List<ParticipantMemState> bids,

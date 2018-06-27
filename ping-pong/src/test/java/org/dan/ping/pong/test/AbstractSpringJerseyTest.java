@@ -3,11 +3,10 @@ package org.dan.ping.pong.test;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertThat;
 
-import org.dan.ping.pong.sys.JerseyConfig;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.mock.MyRest;
+import org.dan.ping.pong.sys.JerseyConfig;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.After;

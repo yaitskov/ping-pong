@@ -21,7 +21,7 @@ import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.sport.SportType;
@@ -43,7 +43,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 @Getter
-@ToString(of = {"uidPlayer", "categoryDbId", "tid", "placeId", "params"})
+@ToString(of = {"bidPlayer", "categoryDbId", "tid", "placeId", "params"})
 public class TournamentScenario implements SessionAware {
     private SportType sport = SportType.PingPong;
     private Optional<String> name = empty();
@@ -54,7 +54,7 @@ public class TournamentScenario implements SessionAware {
     private final Set<Player> playOffPlayers = new HashSet<>();
     private final Map<PlayerCategory, List<Player>> champions = new HashMap<>();
     private final Map<Player, TestUserSession> playersSessions = new HashMap<>();
-    private final Map<Uid, Player> uidPlayer = new LinkedHashMap<>();
+    private final Map<Bid, Player> bidPlayer = new LinkedHashMap<>();
     private final Map<PlayerCategory, Integer> categoryDbId = new HashMap<>();
     private final Map<Set<Player>, PlayHook> hooksOnMatches = new HashMap<>();
     private final Map<Player, EnlistMode> playerPresence = new HashMap<>();
@@ -87,7 +87,7 @@ public class TournamentScenario implements SessionAware {
         final TournamentScenario result = new TournamentScenario();
         result.setTestAdmin(testAdmin);
         result.setPlaceId(placeId);
-        result.getUidPlayer().putAll(uidPlayer);
+        result.getBidPlayer().putAll(bidPlayer);
         result.getPlayersByCategories().putAll(playersByCategories);
         result.name(name.get()).tables(tables).sport(sport)
                 .getPlayersSessions().putAll(playersSessions);
@@ -100,9 +100,9 @@ public class TournamentScenario implements SessionAware {
         return testAdmin.getSession();
     }
 
-    public Uid player2Uid(Player p) {
+    public Bid player2Bid(Player p) {
         return ofNullable(playersSessions.get(p))
-                .map(TestUserSession::getUid)
+                .map(TestUserSession::getBid)
                 .orElseThrow(() -> new RuntimeException("No uid for player " + p));
     }
 
@@ -291,10 +291,10 @@ public class TournamentScenario implements SessionAware {
         return this;
     }
 
-    public void addPlayer(Uid uid, Player player) {
-        assertNull(getUidPlayer().put(uid, player));
+    public void addPlayer(Bid bid, Player player) {
+        assertNull(getBidPlayer().put(bid, player));
         playersSessions.put(player, TestUserSession.builder()
-                .uid(uid)
+                .bid(bid)
                 .build());
     }
 }

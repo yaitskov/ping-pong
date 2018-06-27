@@ -18,11 +18,12 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.L1_3P;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
-import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
@@ -249,9 +250,9 @@ public class CastingLotsService {
     @Inject
     private Clocker clocker;
 
-    public void addParticipant(Uid uid, TournamentMemState tournament, DbUpdater batch) {
-        final ParticipantMemState participant = tournament.getParticipant(uid);
-        log.info("Add participant {} to group", uid, participant.getGid());
+    public void addParticipant(Bid bid, TournamentMemState tournament, DbUpdater batch) {
+        final ParticipantMemState participant = tournament.getParticipant(bid);
+        log.info("Add participant {} to group", bid, participant.getGid());
         int[] priority = new int[1];
         tournament.getParticipants().values().stream()
                 .filter(p -> p.getGid().equals(participant.getGid())
@@ -267,7 +268,7 @@ public class CastingLotsService {
                                             ? Over
                                             : Place,
                                     isDeadParticipant
-                                            ? Optional.of(uid)
+                                            ? Optional.of(bid)
                                             : Optional.empty(),
                                     Optional.empty());
                         });
@@ -298,7 +299,7 @@ public class CastingLotsService {
                     int matchIdx = matchIndexes.get(iQuitter);
                     matchService.assignBidToMatch(tournament,
                             playOffMatches.get(matchIdx).getMid(),
-                            FILLER_LOSER_UID, batch);
+                            FILLER_LOSER_BID, batch);
                 }
             }
         }

@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 
 import java.util.List;
 import java.util.Map;
@@ -24,7 +24,7 @@ public class PlayOffMatches {
     private List<PlayOffMatch> matches;
     private List<RootTaggedMatch> rootTaggedMatches = emptyList();
     private List<MatchLink> transitions = emptyList();
-    private Map<Uid, String> participants;
+    private Map<Bid, String> participants;
 
     public static class PlayOffMatchesBuilder {
         List<MatchLink> transitions = emptyList();

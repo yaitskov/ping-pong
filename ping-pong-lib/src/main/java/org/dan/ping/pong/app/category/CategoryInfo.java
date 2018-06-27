@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dan.ping.pong.app.user.UserLink;
+import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.user.UserRole;
 
 import java.util.List;
@@ -18,5 +18,5 @@ import java.util.List;
 public class CategoryInfo {
     private CategoryLink link;
     private UserRole role;
-    private List<UserLink> users;
+    private List<ParticipantLink> users;
 }

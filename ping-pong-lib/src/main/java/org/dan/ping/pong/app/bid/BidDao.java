@@ -12,6 +12,7 @@ import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.sys.db.DbUpdater;
+import org.dan.ping.pong.util.collection.MaxValue;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -24,23 +25,21 @@ public interface BidDao {
     Set<BidState> TERMINAL_BID_STATES = ImmutableSet.of(Win1, Win2, Win3,
             Expl, Lost, Quit);
 
-    void setBidState(Tid tid, Uid uid, BidState target,
+    void setBidState(Tid tid, Bid bid, BidState target,
             Collection<BidState> expected, Instant now, DbUpdater batch);
 
     void markParticipantsBusy(TournamentMemState tournament,
-            Collection<Uid> uids, Instant now, DbUpdater batch);
+            Collection<Bid> bids, Instant now, DbUpdater batch);
 
     void setGroupForUids(DbUpdater batch, int gid, Tid tid, List<ParticipantMemState> groupBids);
 
     void enlist(ParticipantMemState bid, Optional<Integer> providedRank, DbUpdater batch);
 
-    Optional<DatedParticipantState> getParticipantInfo(Tid tid, Uid uid);
-
     void setCategory(SetCategory setCategory, Instant now, DbUpdater batch);
 
     void resetStateByTid(Tid tid, Instant now, DbUpdater batch);
 
-    Map<Uid, ParticipantMemState> loadParticipants(Tid tid);
+    Map<Bid, ParticipantMemState> loadParticipants(Tid tid, MaxValue<Bid> maxBid);
 
     void renameParticipant(Uid uid, String newName, DbUpdater batch);
 

@@ -1,6 +1,6 @@
 package org.dan.ping.pong.app.tournament.console;
 
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.springframework.context.annotation.Primary;
@@ -18,10 +18,11 @@ public class ConsoleStrategyDispatcher implements ConsoleStrategy {
     private ConsoleStrategyImpl consoleStrategy;
 
     @Override
-    public void onGroupComplete(int gid, TournamentMemState tournament, Set<Uid> loserUids, DbUpdater batch) {
+    public void onGroupComplete(int gid, TournamentMemState tournament,
+            Set<Bid> loserBids, DbUpdater batch) {
         if (tournament.getRule().consoleP()) {
-            consoleStrategy.onGroupComplete(gid, tournament, loserUids, batch);
+            consoleStrategy.onGroupComplete(gid, tournament, loserBids, batch);
         }
-        noConsoleStrategy.onGroupComplete(gid, tournament, loserUids, batch);
+        noConsoleStrategy.onGroupComplete(gid, tournament, loserBids, batch);
     }
 }

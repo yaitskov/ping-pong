@@ -4,6 +4,7 @@ import static org.dan.ping.pong.app.match.dispute.DisputeStatus.CLAIMED;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -23,7 +24,11 @@ public class MatchDisputeService {
 
     public DisputeId openDispute(TournamentMemState tournament,
             DisputeClaimRequest claim, DbUpdater batch, Uid uid) {
-        validate(tournament, claim, uid);
+        MatchInfo m = tournament.getMatchById(claim.getMid());
+        final Bid bid = tournament.findBidByMidAndUid(m, uid);
+        m.checkParticipant(bid);
+
+        validate(tournament, claim, bid);
         final Instant now = clocker.get();
         final DisputeMemState dispute = DisputeMemState
                 .builder()
@@ -31,7 +36,7 @@ public class MatchDisputeService {
                 .status(CLAIMED)
                 .did(tournament.getNextDispute().next())
                 .mid(claim.getMid())
-                .plaintiff(uid)
+                .plaintiff(bid)
                 .plaintiffComment(claim.getComment())
                 .judgeComment(Optional.empty())
                 .judge(Optional.empty())
@@ -45,18 +50,14 @@ public class MatchDisputeService {
     }
 
     private void validate(TournamentMemState tournament,
-            DisputeClaimRequest claim, Uid uid) {
+            DisputeClaimRequest claim, Bid bid) {
         claim.getComment().filter(c -> c.length() < 40)
                 .ifPresent(c -> {
                     throw badRequest("comment-longer-than", "n", 40);
                 });
-        tournament.getParticipant(uid);
         tournament.checkState(Open);
-        MatchInfo m = tournament.getMatchById(claim.getMid());
-        m.checkParticipant(uid);
-
         if (tournament.getDisputes().stream()
-                .filter(d -> d.getPlaintiff().equals(uid)).count() > 10) {
+                .filter(d -> d.getPlaintiff().equals(bid)).count() > 10) {
             throw badRequest("tournament-dispute-limit");
         }
     }

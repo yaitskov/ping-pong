@@ -268,20 +268,20 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                             .checkTournamentComplete(restState(Lost).bid(p1, Win1))
                             .resolveCategories();
                     final int masterTid = scenario.getTid().getTid();
-                    final int p2Uid = scenario.player2Uid(p2).getId();
+                    final int p2Bid = scenario.player2Bid(p2).intValue();
                     final Tid consoleTid = scenario.getConsoleTid().get();
                     assertThat(
-                            myRest().get(BID_PENDING_MATCHES  + masterTid  + "/" + p2Uid,
+                            myRest().get(BID_PENDING_MATCHES  + masterTid  + "/" + p2Bid,
                                     MyPendingMatchList.class).getMatches(),
                             hasItem(
                                     allOf(hasProperty("tid", is(consoleTid)),
                                             hasProperty("enemy", optionalWithValue(
-                                                    hasProperty("uid", is(scenario.player2Uid(p3))))),
+                                                    hasProperty("bid", is(scenario.player2Bid(p3))))),
                                             hasProperty("state", is(MatchState.Game)))));
 
-                    final int p1Uid = scenario.player2Uid(p1).getId();
+                    final int p1Bid = scenario.player2Bid(p1).intValue();
                     assertThat(
-                            myRest().get(BID_PENDING_MATCHES + masterTid + "/" + p1Uid,
+                            myRest().get(BID_PENDING_MATCHES + masterTid + "/" + p1Bid,
                                     MyPendingMatchList.class).getMatches(),
                             is(Collections.emptyList()));
 
@@ -290,8 +290,8 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                             hasProperty("matches", hasItem(allOf(
                                     hasProperty("tid", is(consoleTid)),
                                     hasProperty("participants", hasItems(
-                                            hasProperty("uid", is(scenario.player2Uid(p2))),
-                                            hasProperty("uid", is(scenario.player2Uid(p3)))))))));
+                                            hasProperty("uid", is(scenario.player2Bid(p2))),
+                                            hasProperty("uid", is(scenario.player2Bid(p3)))))))));
                 });
     }
 

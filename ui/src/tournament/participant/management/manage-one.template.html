@@ -5,12 +5,12 @@
     <a class="btn btn-primary"
        title="change group"
        ng-show="$ctrl.participant"
-       href="#!/my/tournament/{{$ctrl.tournamentId}}/change-group/{{$ctrl.participant.user.uid}}">
+       href="#!/my/tournament/{{$ctrl.tournamentId}}/change-group/{{$ctrl.participantId}}">
       A → B
     </a>
     <a class="btn btn-primary"
        ng-show="$ctrl.participant"
-       href="#!/my/tournament/{{$ctrl.tournamentId}}/change-category/{{$ctrl.participant.user.uid}}">
+       href="#!/my/tournament/{{$ctrl.tournamentId}}/change-category/{{$ctrl.participantId}}">
       <span class="glyphicon glyphicon-step-forward"/>
       {{ 'category-lbl' | translate }}
     </a>
@@ -37,7 +37,7 @@
         </td>
         <td>
           <a class="btn btn-warning"
-             href="#!/participant/rename/{{$ctrl.tournamentId}}/{{$ctrl.participant.user.uid}}">
+             href="#!/participant/rename/{{$ctrl.tournamentId}}/{{$ctrl.participantId}}">
             <span class="glyphicon glyphicon-pencil"></span>
           </a> {{$ctrl.participant.user.name}}
         </td>

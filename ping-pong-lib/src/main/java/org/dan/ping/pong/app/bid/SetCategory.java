@@ -14,6 +14,6 @@ import org.dan.ping.pong.app.tournament.Tid;
 @AllArgsConstructor
 public class SetCategory {
     private Tid tid;
-    private Uid uid;
+    private Bid bid;
     private int cid;
 }

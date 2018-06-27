@@ -1,32 +1,23 @@
 package org.dan.ping.pong.app.match;
 
-import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.dan.ping.pong.app.bid.BidState.Win1;
-import static org.dan.ping.pong.app.bid.BidState.Win2;
-import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.match.MatchInfo.MID;
-import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
-import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
-import static org.dan.ping.pong.jooq.Tables.BID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.jooq.Tables.SET_SCORE;
-import static org.dan.ping.pong.jooq.Tables.TOURNAMENT;
 import static org.dan.ping.pong.jooq.Tables.USERS;
 import static org.dan.ping.pong.jooq.tables.Matches.MATCHES;
-import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.JUST_A_ROW;
 import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
-import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.jooq.tables.Users;
 import org.dan.ping.pong.jooq.tables.records.MatchesRecord;
 import org.dan.ping.pong.sys.db.DbUpdateSql;
@@ -34,7 +25,6 @@ import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.collection.MaxValue;
 import org.jooq.DSLContext;
 import org.jooq.TableField;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,7 +44,7 @@ public class MatchDaoServer implements MatchDao {
     private DSLContext jooq;
 
     public void createMatch(MatchInfo matchInfo, DbUpdater batch) {
-        final List<Uid> participantUids = matchInfo
+        final List<Bid> participantBids = matchInfo
                 .participants().collect(toList());
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.insertInto(
@@ -67,12 +57,12 @@ public class MatchDaoServer implements MatchDao {
                         MATCHES.PRIORITY,
                         MATCHES.LEVEL,
                         MATCHES.TYPE,
-                        MATCHES.UID_LESS,
-                        MATCHES.UID_MORE,
+                        MATCHES.BID_LESS,
+                        MATCHES.BID_MORE,
                         MATCHES.TAG,
                         MATCHES.WIN_MID,
                         MATCHES.LOSE_MID,
-                        MATCHES.UID_WIN,
+                        MATCHES.BID_WIN,
                         MATCHES.STARTED,
                         MATCHES.ENDED)
                         .values(matchInfo.getMid(),
@@ -83,8 +73,8 @@ public class MatchDaoServer implements MatchDao {
                                 matchInfo.getPriority(),
                                 matchInfo.getLevel(),
                                 matchInfo.getType(),
-                                participantUids.size() > 0 ? participantUids.get(0) : null,
-                                participantUids.size() > 1 ? participantUids.get(1) : null,
+                                participantBids.size() > 0 ? participantBids.get(0) : null,
+                                participantBids.size() > 1 ? participantBids.get(1) : null,
                                 matchInfo.getTag().orElse(null),
                                 matchInfo.getWinnerMid(),
                                 matchInfo.getLoserMid(),
@@ -100,14 +90,14 @@ public class MatchDaoServer implements MatchDao {
 
     @Override
     public void createGroupMatch(DbUpdater batch, Mid mid, Tid tid, int gid, int cid, int priorityGroup,
-            Uid uid1, Uid uid2, Optional<MatchTag> tag, MatchState place) {
+            Bid bid1, Bid bid2, Optional<MatchTag> tag, MatchState place) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.insertInto(MATCHES, MATCHES.MID, MATCHES.TID,
                         MATCHES.GID, MATCHES.CID,
                         MATCHES.STATE, MATCHES.PRIORITY, MATCHES.TYPE,
-                        MATCHES.UID_LESS, MATCHES.UID_MORE, MATCHES.TAG)
+                        MATCHES.BID_LESS, MATCHES.BID_MORE, MATCHES.TAG)
                         .values(mid, tid, Optional.of(gid), cid, place, priorityGroup,
-                                Grup, uid1, uid2, tag.orElse(null)))
+                                Grup, bid1, bid2, tag.orElse(null)))
                 .onFailure((u) -> internalError("Create group match", MID, mid))
                 .mustAffectRows(Optional.of(1))
                 .logBefore(() -> log.info("Create match {} in group {} of tournament {}",
@@ -155,14 +145,14 @@ public class MatchDaoServer implements MatchDao {
     @Override
     public void insertScores(MatchInfo mInfo, DbUpdater batch) {
         mInfo.getParticipantIdScore().forEach(
-                (uid, sets) ->
+                (bid, sets) ->
                         sets.forEach(games -> batch.exec(
                                 DbUpdateSql.builder()
                                         .query(jooq.insertInto(SET_SCORE, SET_SCORE.TID,
-                                                SET_SCORE.MID, SET_SCORE.UID,
+                                                SET_SCORE.MID, SET_SCORE.BID,
                                                 SET_SCORE.GAMES)
                                                 .values(mInfo.getTid(), mInfo.getMid(),
-                                                        uid, games))
+                                                        bid, games))
                                         .build())));
     }
 
@@ -174,7 +164,7 @@ public class MatchDaoServer implements MatchDao {
                         mInfo.getMid(), mInfo.winnerId(), expected))
                 .query(jooq.update(MATCHES)
                         .set(MATCHES.STATE, MatchState.Over)
-                        .set(MATCHES.UID_WIN, mInfo.winnerId())
+                        .set(MATCHES.BID_WIN, mInfo.winnerId())
                         .set(MATCHES.ENDED, mInfo.getEndedAt())
                         .where(MATCHES.TID.eq(mInfo.getTid()),
                                 MATCHES.MID.eq(mInfo.getMid()),
@@ -186,8 +176,8 @@ public class MatchDaoServer implements MatchDao {
         scores.forEach(score -> batch.exec(
                 DbUpdateSql.builder()
                         .query(jooq.insertInto(SET_SCORE, SET_SCORE.TID, SET_SCORE.MID,
-                                SET_SCORE.UID, SET_SCORE.GAMES)
-                                .values(tid, mid, score.getUid(), score.getScore()))
+                                SET_SCORE.BID, SET_SCORE.GAMES)
+                                .values(tid, mid, score.getBid(), score.getScore()))
                         .build()));
     }
 
@@ -205,57 +195,6 @@ public class MatchDaoServer implements MatchDao {
                                 .where(MATCHES.TID.eq(match.getTid()),
                                         MATCHES.MID.eq(match.getMid()),
                                         MATCHES.STATE.eq(Place)))
-                        .build());
-    }
-
-    @Override
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<CompleteMatch> findCompleteMatches(Tid tid) {
-        return jooq
-                .select(MATCHES.MID, MATCHES.STARTED, MATCHES.TYPE,
-                        MATCHES.ENDED, ENEMY_USER.UID,
-                        ENEMY_USER.NAME, USERS.UID, USERS.NAME)
-                .from(TOURNAMENT)
-                .innerJoin(MATCHES)
-                .on(TOURNAMENT.TID.eq(MATCHES.TID))
-                .innerJoin(USERS)
-                .on(MATCHES.UID_LESS.eq(USERS.UID))
-                .innerJoin(ENEMY_USER)
-                .on(MATCHES.UID_MORE.eq(ENEMY_USER.UID))
-                .where(TOURNAMENT.TID.eq(tid),
-                        MATCHES.STATE.eq(Over))
-                .orderBy(MATCHES.STARTED)
-                .fetch()
-                .map(r -> CompleteMatch.builder()
-                        .mid(r.get(MATCHES.MID))
-                        .started(r.get(MATCHES.STARTED).get())
-                        .ended(r.get(MATCHES.ENDED).get())
-                        .type(r.get(MATCHES.TYPE))
-                        .participants(asList(
-                                UserLink.builder()
-                                        .name(r.get(USERS.NAME))
-                                        .uid(r.get(USERS.UID))
-                                        .build(),
-                                UserLink.builder()
-                                        .name(r.get(ENEMY_USER.NAME))
-                                        .uid(r.get(ENEMY_USER.UID))
-                                        .build()))
-                        .build());
-    }
-
-    @Override
-    @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<UserLink> findWinners(Tid tid) {
-        return jooq.select(USERS.NAME, BID.UID)
-                .from(BID)
-                .innerJoin(USERS).on(BID.UID.eq(USERS.UID))
-                .where(BID.TID.eq(tid), BID.STATE.in(Win1, Win2, Win3))
-                .orderBy(BID.STATE.asc())
-                .fetch()
-                .map(r -> UserLink
-                        .builder()
-                        .name(r.get(USERS.NAME))
-                        .uid(r.get(BID.UID))
                         .build());
     }
 
@@ -296,22 +235,22 @@ public class MatchDaoServer implements MatchDao {
     }
 
     @Override
-    public void setParticipant(MatchInfo mInfo, Uid uid, DbUpdater batch) {
+    public void setParticipant(MatchInfo mInfo, Bid bid, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(NON_ZERO_ROWS)
                 .query(jooq.update(MATCHES)
-                        .set(pickField(mInfo.numberOfParticipants()), uid)
+                        .set(pickField(mInfo.numberOfParticipants()), bid)
                         .where(MATCHES.TID.eq(mInfo.getTid()),
                                 MATCHES.MID.eq(mInfo.getMid())))
                 .build());
     }
 
-    private TableField<MatchesRecord, Uid> pickField(int n) {
+    private TableField<MatchesRecord, Bid> pickField(int n) {
         switch (n) {
             case 1:
-                return MATCHES.UID_LESS;
+                return MATCHES.BID_LESS;
             case 2:
-                return MATCHES.UID_MORE;
+                return MATCHES.BID_MORE;
             default:
                 throw internalError("n scouhd be 1 or 2");
         }
@@ -322,18 +261,18 @@ public class MatchDaoServer implements MatchDao {
         return jooq.select(MATCHES.MID, MATCHES.GID, MATCHES.CID,
                 MATCHES.WIN_MID, MATCHES.LOSE_MID, MATCHES.PRIORITY,
                 MATCHES.STATE, MATCHES.TYPE, MATCHES.ENDED,
-                MATCHES.UID_LESS, MATCHES.UID_MORE, MATCHES.UID_WIN,
+                MATCHES.BID_LESS, MATCHES.BID_MORE, MATCHES.BID_WIN,
                 MATCHES.STARTED, MATCHES.LEVEL, MATCHES.TAG)
                 .from(MATCHES)
                 .where(MATCHES.TID.eq(tid))
                 .fetch()
                 .map(r -> {
-                    final Map<Uid, List<Integer>> uids = new HashMap<>();
-                    ofNullable(r.get(MATCHES.UID_LESS))
-                            .filter(uid -> uid.getId() > 0)
+                    final Map<Bid, List<Integer>> uids = new HashMap<>();
+                    ofNullable(r.get(MATCHES.BID_LESS))
+                            .filter(uid -> uid.intValue() > 0)
                             .ifPresent(uid -> uids.put(uid, new ArrayList<>()));
-                    ofNullable(r.get(MATCHES.UID_MORE))
-                            .filter(uid -> uid.getId() > 0)
+                    ofNullable(r.get(MATCHES.BID_MORE))
+                            .filter(uid -> uid.intValue() > 0)
                             .ifPresent(uid -> uids.put(uid, new ArrayList<>()));
                     return MatchInfo.builder()
                             .mid(maxMid.apply(r.get(MATCHES.MID)))
@@ -346,10 +285,10 @@ public class MatchDaoServer implements MatchDao {
                             .level(ofNullable(r.get(MATCHES.LEVEL)).orElse(0))
                             .priority(r.get(MATCHES.PRIORITY))
                             .winnerMid(r.get(MATCHES.WIN_MID))
-                            .winnerId(ofNullable(r.get(MATCHES.UID_WIN)))
+                            .winnerId(ofNullable(r.get(MATCHES.BID_WIN)))
                             .startedAt(r.get(MATCHES.STARTED))
                             .endedAt(r.get(MATCHES.ENDED))
-                            .losersMeet(uids.size() == 1 && uids.containsKey(FILLER_LOSER_UID))
+                            .losersMeet(uids.size() == 1 && uids.containsKey(FILLER_LOSER_BID))
                             .participantIdScore(uids)
                             .tid(tid)
                             .build();
@@ -359,33 +298,33 @@ public class MatchDaoServer implements MatchDao {
     @Override
     public void deleteSets(DbUpdater batch, MatchInfo mInfo, int setNumber) {
         final int limit = mInfo.playedSets() - setNumber;
-        mInfo.participants().forEach(uid -> {
-            final List<Integer> participantScore = mInfo.getParticipantScore(uid);
+        mInfo.participants().forEach(bid -> {
+            final List<Integer> participantScore = mInfo.getParticipantScore(bid);
             if (participantScore.isEmpty()) {
-                log.info("Uid {} in mid {} has no scores", uid, mInfo.getMid());
+                log.info("Bid {} in mid {} has no scores", bid, mInfo.getMid());
                 return;
             }
             batch.exec(DbUpdateSql.builder()
                     .mustAffectRows(empty())
                     .logBefore(() -> log.info("Delete sets after {} in mid {} for uid {}",
-                            setNumber, mInfo.getMid(), uid))
+                            setNumber, mInfo.getMid(), bid))
                     .query(jooq.query("delete from "
                                     + SET_SCORE.getSchema().getName() + "." + SET_SCORE.getName()
                                     + " where " + SET_SCORE.TID.getName() + " = ? and "
                                     + SET_SCORE.MID.getName() + " = ? and "
-                                    + SET_SCORE.UID.getName() + " = ? order by "
+                                    + SET_SCORE.BID.getName() + " = ? order by "
                                     + SET_SCORE.SET_ID.getName() + " desc limit ?",
-                            mInfo.getTid(), mInfo.getMid(), uid, limit))
+                            mInfo.getTid(), mInfo.getMid(), bid, limit))
                     .build());
         });
     }
 
     @Override
-    public void removeSecondParticipant(DbUpdater batch, MatchInfo mInfo, Uid uidKeep) {
+    public void removeSecondParticipant(DbUpdater batch, MatchInfo mInfo, Bid bidKeep) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(MATCHES)
-                        .set(MATCHES.UID_LESS, uidKeep)
-                        .set(MATCHES.UID_MORE, (Uid) null)
+                        .set(MATCHES.BID_LESS, bidKeep)
+                        .set(MATCHES.BID_MORE, (Bid) null)
                         .where(MATCHES.TID.eq(mInfo.getTid()),
                                 MATCHES.MID.eq(mInfo.getMid())))
                 .build());
@@ -395,23 +334,23 @@ public class MatchDaoServer implements MatchDao {
     public void removeParticipants(DbUpdater batch, MatchInfo mInfo) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(MATCHES)
-                        .set(MATCHES.UID_LESS, (Uid) null)
-                        .set(MATCHES.UID_MORE, (Uid) null)
+                        .set(MATCHES.BID_LESS, (Bid) null)
+                        .set(MATCHES.BID_MORE, (Bid) null)
                         .where(MATCHES.TID.eq(mInfo.getTid()),
                                 MATCHES.MID.eq(mInfo.getMid())))
                 .build());
     }
 
     @Override
-    public void removeScores(DbUpdater batch, MatchInfo mInfo, Uid uid, int played) {
+    public void removeScores(DbUpdater batch, MatchInfo mInfo, Bid bid, int played) {
         batch.exec(DbUpdateSql.builder()
                 .logBefore(() -> log.info("Delete all scores for mid {} uid {}",
-                        mInfo.getMid(), uid))
+                        mInfo.getMid(), bid))
                 .mustAffectRows(Optional.of(played))
                 .query(jooq.deleteFrom(SET_SCORE)
                         .where(SET_SCORE.TID.eq(mInfo.getTid()),
                                 SET_SCORE.MID.eq(mInfo.getMid()),
-                                SET_SCORE.UID.eq(uid)))
+                                SET_SCORE.BID.eq(bid)))
                 .build());
     }
 
@@ -419,7 +358,7 @@ public class MatchDaoServer implements MatchDao {
     public void setWinnerId(MatchInfo mInfo, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(MATCHES)
-                        .set(MATCHES.UID_WIN, mInfo.getWinnerId().orElse(null))
+                        .set(MATCHES.BID_WIN, mInfo.getWinnerId().orElse(null))
                         .where(MATCHES.TID.eq(mInfo.getTid()),
                                 MATCHES.MID.eq(mInfo.getMid())))
                 .build());

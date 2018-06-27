@@ -27,7 +27,6 @@ import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserRegRequest;
 import org.dan.ping.pong.app.user.UserType;
-import org.dan.ping.pong.sys.db.DbStrictUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 import org.jooq.DSLContext;
 import org.springframework.transaction.annotation.Transactional;

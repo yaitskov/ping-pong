@@ -60,7 +60,7 @@ public class UserSessionGenerator {
             final TestUserSession session = generate(prefix + prefixes.get(i), UserType.User);
             result.add(session);
             uids.append(" ").append(prefixes.get(i))
-                    .append("/").append(session.getUid());
+                    .append("/").append(session.getBid());
         }
         log.info("Generated {} users with prefix [{}]: [{} ]", prefixes.size(), prefix,
                 uids.toString());

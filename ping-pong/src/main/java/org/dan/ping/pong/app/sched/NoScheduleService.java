@@ -29,7 +29,7 @@ public class NoScheduleService implements ScheduleService {
             DbUpdater batch, Instant now) {
         selectForScheduling(tournament).forEach(match -> {
             tableService.markAsSchedule(match, now, batch);
-            bidDao.markParticipantsBusy(tournament, match.uids(), now, batch);
+            bidDao.markParticipantsBusy(tournament, match.bids(), now, batch);
         });
     }
 

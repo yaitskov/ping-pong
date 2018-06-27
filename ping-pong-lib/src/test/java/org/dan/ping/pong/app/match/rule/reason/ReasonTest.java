@@ -3,10 +3,10 @@ package org.dan.ping.pong.app.match.rule.reason;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID3;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID4;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID5;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID6;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID3;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID4;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID5;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID6;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.F2F;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.LostBalls;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.LostSets;
@@ -40,11 +40,11 @@ public class ReasonTest {
     @SneakyThrows
     public void deserialize() {
         final ObjectMapper om = ObjectMapperProvider.get();
-        final List<Reason> value = asList(new F2fReason(1, UID3, UID4),
+        final List<Reason> value = asList(new F2fReason(1, BID3, BID4),
                 new InfoReason(F2F),
-                new DecreasingIntScalarReason(UID6, 1, WonSets),
-                new DecreasingLongScalarReason(UID4, 1232222L, LostBalls),
-                new IncreasingIntScalarReason(UID5, 3, LostSets));
+                new DecreasingIntScalarReason(BID6, 1, WonSets),
+                new DecreasingLongScalarReason(BID4, 1232222L, LostBalls),
+                new IncreasingIntScalarReason(BID5, 3, LostSets));
         assertThat(toClasses(om.readValue(om.writerFor(Reason.REASON_CHAIN_TYPE)
                         .writeValueAsString(value),
                 Reason.REASON_CHAIN_TYPE)),
@@ -52,7 +52,7 @@ public class ReasonTest {
 
         S s = om.readValue(
                 om.writeValueAsBytes(
-                        new S(singletonList(Optional.of(new F2fReason(1, UID3, UID4))))),
+                        new S(singletonList(Optional.of(new F2fReason(1, BID3, BID4))))),
                 S.class);
         assertEquals( s.getReasons().get(0).get().getClass(), F2fReason.class);
     }

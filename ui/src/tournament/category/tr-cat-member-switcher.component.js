@@ -16,7 +16,7 @@ angular.module('tournamentCategory').
                              Participant.setCategory(
                                  {cid: cid,
                                   tid: $routeParams.tournamentId,
-                                  uid: $routeParams.participantId},
+                                  bid: $routeParams.participantId},
                                  function (ok) {
                                      history.back();
                                  },

@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.playoff;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 
@@ -14,5 +15,5 @@ import java.util.Set;
 @Builder
 public class PlayOffResultEntries {
    private List<TournamentResultEntry> entries;
-   private Set<Uid> playOffUids;
+   private Set<Bid> playOffBids;
 }

@@ -4,10 +4,13 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static org.dan.ping.pong.app.group.GroupRulesConst.DM_ORDER_RULES_S2A2G11;
 import static org.dan.ping.pong.app.group.GroupRulesConst.G8Q1;
+import static org.dan.ping.pong.app.group.GroupServiceTest.BID2;
 import static org.dan.ping.pong.app.group.GroupServiceTest.UID2;
 import static org.dan.ping.pong.app.match.MatchInfoConst.GROUP_DM_MATCH;
 import static org.dan.ping.pong.app.match.MatchInfoConst.GROUP_ORIGIN_MATCH;
 import static org.dan.ping.pong.app.match.MatchInfoConst.PLAY_OFF_MATCH_HF;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID3;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID4;
 import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID3;
 import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID4;
 import static org.dan.ping.pong.app.tournament.PlayOffRulesConst.L1_S3A2G11;
@@ -17,7 +20,7 @@ import static org.hamcrest.Matchers.is;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.junit.Test;
@@ -33,23 +36,26 @@ public class TournamentMemStateTest {
     private final int gid1 = 1;
     private final int gid2 = 2;
 
-    private Map<Uid, ParticipantMemState> participants =
-            ImmutableMap.<Uid, ParticipantMemState>builder()
-                    .put(UID2, ParticipantMemState
+    private Map<Bid, ParticipantMemState> participants =
+            ImmutableMap.<Bid, ParticipantMemState>builder()
+                    .put(BID2, ParticipantMemState
                             .builder()
                             .uid(UID2)
+                            .bid(BID2)
                             .cid(CID)
                             .gid(Optional.of(gid1))
                             .build())
-                    .put(UID3, ParticipantMemState
+                    .put(BID3, ParticipantMemState
                             .builder()
+                            .bid(BID3)
                             .uid(UID3)
                             .cid(CID)
                             .gid(Optional.of(gid2))
                             .build())
-                    .put(UID4, ParticipantMemState
+                    .put(BID4, ParticipantMemState
                             .builder()
                             .uid(UID4)
+                            .bid(BID4)
                             .cid(CID)
                             .gid(Optional.empty())
                             .build())
@@ -62,13 +68,13 @@ public class TournamentMemStateTest {
 
     @Test
     public void uidsInGroup() {
-        assertThat(tournament.uidsInGroup(gid1), is(singleton(UID2)));
+        assertThat(tournament.bidsInGroup(gid1), is(singleton(BID2)));
     }
 
     @Test
     public void uidsInCategory() {
-        assertThat(tournament.uidsInCategory(CID - 2), is(emptySet()));
-        assertThat(tournament.uidsInCategory(CID), is(ImmutableSet.of(UID3, UID4, UID2)));
+        assertThat(tournament.bidsInCategory(CID - 2), is(emptySet()));
+        assertThat(tournament.bidsInCategory(CID), is(ImmutableSet.of(BID3, BID4, BID2)));
     }
 
     @Test

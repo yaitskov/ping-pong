@@ -13,6 +13,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import com.google.common.cache.LoadingCache;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.match.MatchDao;
@@ -21,6 +22,7 @@ import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
+import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.RelatedTids;
 import org.dan.ping.pong.app.tournament.TournamentCache;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -62,22 +64,27 @@ public class TableService {
 
     private List<MatchInfo> selectForScheduling(
             int matchesToSchedule, TournamentMemState tournament) {
-        final Set<Uid> pickedUids = new HashSet<>();
+        final Set<Bid> pickedBids = new HashSet<>();
         return tournament.getMatches().values().stream()
-                .filter(minfo -> minfo.getState() == Place)
-                .filter(minfo -> minfo.getParticipantIdScore().size() == 2)
-                .filter(minfo -> minfo.getParticipantIdScore().keySet().stream()
+                .filter(mInfo -> mInfo.getState() == Place)
+                .filter(mInfo -> mInfo.getParticipantIdScore().size() == 2)
+                .filter(mInfo -> mInfo.getParticipantIdScore().keySet().stream()
                         .map(uid -> tournament.getParticipants().get(uid).getBidState())
                         .allMatch(bidState -> bidState == BidState.Wait))
                 .sorted(comparingInt(MatchInfo::getPriority)
                         .thenComparing(MatchInfo::getMid))
                 .collect(toList())
                 .stream()
-                .filter(minfo -> minfo.getParticipantIdScore().keySet().stream()
-                         .noneMatch(pickedUids::contains))
-                .map(minfo -> {
-                    minfo.getParticipantIdScore().keySet().forEach(pickedUids::add);
-                    return minfo;
+                .filter(mInfo -> mInfo.getParticipantIdScore().keySet().stream()
+                         .noneMatch(pickedBids::contains))
+                .map(mInfo -> {
+                    mInfo.getParticipantIdScore().keySet()
+                            .stream()
+                            .map(tournament::getParticipant)
+                            .map(ParticipantMemState::getUid)
+                            .flatMap(uid -> tournament.findBidsByUid(uid).stream())
+                            .forEach(pickedBids::add);
+                    return mInfo;
                 })
                 .limit(matchesToSchedule)
                 .collect(toList());
@@ -143,7 +150,7 @@ public class TableService {
             final MatchInfo match = matches.get(i);
             tableDao.locateMatch(freeTables.get(i), match.getMid(), batch);
             markAsSchedule(match, now, batch);
-            bidDao.markParticipantsBusy(tournament, match.uids(), now, batch);
+            bidDao.markParticipantsBusy(tournament, match.bids(), now, batch);
         }
         if (freeTables.isEmpty()
                 && !matches.isEmpty()

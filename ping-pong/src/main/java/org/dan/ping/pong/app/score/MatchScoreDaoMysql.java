@@ -5,9 +5,9 @@ import static org.dan.ping.pong.jooq.Tables.MATCHES;
 import static org.dan.ping.pong.jooq.Tables.SET_SCORE;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.bid.Uid;
 import org.jooq.DSLContext;
 
 import java.util.ArrayList;
@@ -23,9 +23,9 @@ public class MatchScoreDaoMysql implements MatchScoreDao {
     private DSLContext jooq;
 
     @Override
-    public Map<Mid, Map<Uid, List<Integer>>> load(Tid tid) {
-        final Map<Mid, Map<Uid, List<Integer>>> result = new HashMap<>();
-        jooq.select(SET_SCORE.MID, SET_SCORE.UID, SET_SCORE.GAMES)
+    public Map<Mid, Map<Bid, List<Integer>>> load(Tid tid) {
+        final Map<Mid, Map<Bid, List<Integer>>> result = new HashMap<>();
+        jooq.select(SET_SCORE.MID, SET_SCORE.BID, SET_SCORE.GAMES)
                 .from(SET_SCORE)
                 .innerJoin(MATCHES)
                 .on(SET_SCORE.TID.eq(MATCHES.TID), SET_SCORE.MID.eq(MATCHES.MID))
@@ -34,17 +34,17 @@ public class MatchScoreDaoMysql implements MatchScoreDao {
                 .fetch()
                 .forEach(r -> {
                     final Mid mid = r.get(SET_SCORE.MID);
-                    final Uid uid = r.get(SET_SCORE.UID);
+                    final Bid bid = r.get(SET_SCORE.BID);
                     final int games = r.get(SET_SCORE.GAMES);
-                    Map<Uid, List<Integer>> scores = result.get(mid);
+                    Map<Bid, List<Integer>> scores = result.get(mid);
                     if (scores == null) {
                         scores = new HashMap<>();
-                        scores.put(uid, new ArrayList<>(singletonList(games)));
+                        scores.put(bid, new ArrayList<>(singletonList(games)));
                         result.put(mid, scores);
                     } else {
-                        List<Integer> sets = scores.get(uid);
+                        List<Integer> sets = scores.get(bid);
                         if (sets == null) {
-                            scores.put(uid, new ArrayList<>(singletonList(games)));
+                            scores.put(bid, new ArrayList<>(singletonList(games)));
                         } else {
                             sets.add(games);
                         }

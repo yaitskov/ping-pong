@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.sport;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.SetScoreReq;
@@ -21,18 +22,18 @@ public interface Sport<T extends MatchRules> {
 
     SportType getType();
 
-    default Map<Uid, Integer> calcWonSets(Map<Uid, List<Integer>> participantScores) {
-        final List<Uid> uids = new ArrayList<>(participantScores.keySet());
-        if (uids.isEmpty()) {
+    default Map<Bid, Integer> calcWonSets(Map<Bid, List<Integer>> participantScores) {
+        final List<Bid> bids = new ArrayList<>(participantScores.keySet());
+        if (bids.isEmpty()) {
             return Collections.emptyMap();
         }
-        final Uid uidA = uids.get(0);
-        if (uids.size() == 1) {
-            return ImmutableMap.of(uidA, 0);
+        final Bid bidA = bids.get(0);
+        if (bids.size() == 1) {
+            return ImmutableMap.of(bidA, 0);
         }
-        final List<Integer> setsA = participantScores.get(uidA);
-        final Uid uidB = uids.get(1);
-        final List<Integer> setsB = participantScores.get(uidB);
+        final List<Integer> setsA = participantScores.get(bidA);
+        final Bid bidB = bids.get(1);
+        final List<Integer> setsB = participantScores.get(bidB);
         int wonsA = 0;
         int wonsB = 0;
         for (int i = 0; i < setsA.size(); ++i) {
@@ -42,12 +43,12 @@ public interface Sport<T extends MatchRules> {
                 ++wonsB;
             }
         }
-        return ImmutableMap.of(uidA, wonsA, uidB, wonsB);
+        return ImmutableMap.of(bidA, wonsA, bidB, wonsB);
     }
 
-    Optional<Uid> findWinnerId(T rules, Map<Uid, Integer> wonSets);
+    Optional<Bid> findWinnerId(T rules, Map<Bid, Integer> wonSets);
 
-    void checkWonSets(T rules, Map<Uid, Integer> uidWonSets);
+    void checkWonSets(T rules, Map<Bid, Integer> uidWonSets);
 
     default List<SetScoreReq> expandScoreSet(T rules, SetScoreReq score) {
         throw PiPoEx.badRequest("Sport does not support countOnlySets feature");

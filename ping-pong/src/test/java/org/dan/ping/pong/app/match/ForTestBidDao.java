@@ -4,10 +4,11 @@ import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.jooq.tables.Bid.BID;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
-import org.dan.ping.pong.jooq.Tables;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidState;
-import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.jooq.Tables;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +33,11 @@ public class ForTestBidDao {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public Optional<BidState> getState(Tid tid, Uid uid) {
+    public Optional<BidState> getState(Tid tid, Bid bid) {
         return ofNullable(
                 jooq.select(Tables.BID.STATE)
                         .from(Tables.BID)
-                        .where(Tables.BID.TID.eq(tid), Tables.BID.UID.eq(uid))
+                        .where(Tables.BID.TID.eq(tid), Tables.BID.BID_.eq(bid))
                         .fetchOne())
                 .map(Record1::value1);
     }

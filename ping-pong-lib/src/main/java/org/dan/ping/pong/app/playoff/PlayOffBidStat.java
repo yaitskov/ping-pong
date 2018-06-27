@@ -13,6 +13,7 @@ import static org.dan.ping.pong.app.match.rule.reason.IncreasingIntScalarReason.
 
 import lombok.Getter;
 import lombok.Setter;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 
@@ -30,14 +31,14 @@ public class PlayOffBidStat {
             .thenComparingLong(s -> -s.getCumulativeSetsBalance())
             .thenComparingLong(s -> -s.getCumulativeBallsBalance());
 
-    private Uid uid;
+    private Bid bid;
     private int highestLevel;
     private int lostMatches;
     private long cumulativeSetsBalance;
     private long cumulativeBallsBalance;
 
-    public PlayOffBidStat(Uid uid) {
-        this.uid = uid;
+    public PlayOffBidStat(Bid bid) {
+        this.bid = bid;
     }
 
     public void incLost() {
@@ -58,10 +59,10 @@ public class PlayOffBidStat {
 
     public List<Optional<Reason>> toReasonChain() {
         return Stream.of(
-                ofIntD(uid, highestLevel, Level),
-                ofIntI(uid, lostMatches, LostMatches),
-                ofLongD(uid, cumulativeSetsBalance, CumDiffSets),
-                ofLongD(uid, cumulativeBallsBalance, CumDiffBalls))
+                ofIntD(bid, highestLevel, Level),
+                ofIntI(bid, lostMatches, LostMatches),
+                ofLongD(bid, cumulativeSetsBalance, CumDiffSets),
+                ofLongD(bid, cumulativeBallsBalance, CumDiffBalls))
                 .map(Optional::of)
                 .collect(toList());
     }

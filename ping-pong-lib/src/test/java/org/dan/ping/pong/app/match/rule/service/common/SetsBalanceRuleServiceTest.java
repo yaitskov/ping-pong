@@ -2,9 +2,9 @@ package org.dan.ping.pong.app.match.rule.service.common;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
-import static org.dan.ping.pong.app.group.GroupServiceTest.UID2;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID3;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID4;
+import static org.dan.ping.pong.app.group.GroupServiceTest.BID2;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID3;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID4;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.SetsBalance;
 import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.ofIntD;
 import static org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleServiceTest.MATCHES_UIDS_2_3_4_S;
@@ -39,8 +39,8 @@ public class SetsBalanceRuleServiceTest {
                                         .build())
                                 .build())
                         .get().collect(toList()),
-                is(asList(ofIntD(UID3, 4, SetsBalance),
-                        ofIntD(UID4, 0, SetsBalance),
-                        ofIntD(UID2, -4, SetsBalance))));
+                is(asList(ofIntD(BID3, 4, SetsBalance),
+                        ofIntD(BID4, 0, SetsBalance),
+                        ofIntD(BID2, -4, SetsBalance))));
     }
 }

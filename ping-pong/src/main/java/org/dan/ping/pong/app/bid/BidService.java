@@ -17,11 +17,10 @@ import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.match.MatchState.INCOMPLETE_MATCH_STATES;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
-import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
-import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -35,9 +34,7 @@ import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.tournament.ChildTournamentProvider;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
-import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
-import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
@@ -54,33 +51,29 @@ import javax.inject.Named;
 @Slf4j
 public class BidService {
     public static final List<BidState> WIN_STATES = asList(Win1, Win2, Win3);
-    public static final Set<BidState> TERMINAL_RECOVERABLE_STATES = ImmutableSet.of(Win1, Win2, Win3, Lost, Play);
+    public static final Set<BidState> TERMINAL_RECOVERABLE_STATES
+            = ImmutableSet.of(Win1, Win2, Win3, Lost, Play);
 
     @Inject
     private BidDao bidDao;
 
-    public void paid(TournamentMemState tournament, Uid uid, DbUpdater batch) {
-        setBidState(tournament.getParticipant(uid), Paid, singletonList(Want), batch);
+    public void paid(TournamentMemState tournament, Bid bid, DbUpdater batch) {
+        setBidState(tournament.getParticipant(bid), Paid, singletonList(Want), batch);
     }
 
-    public void readyToPlay(TournamentMemState tournament, Uid uid, DbUpdater batch) {
-        setBidState(tournament.getParticipant(uid), Here, asList(Paid, Want), batch);
+    public void readyToPlay(TournamentMemState tournament, Bid bid, DbUpdater batch) {
+        setBidState(tournament.getParticipant(bid), Here, asList(Paid, Want), batch);
     }
 
     public List<ParticipantState> findEnlisted(TournamentMemState tournament) {
         return tournament.participants()
                 .map(p -> ParticipantState
                         .builder()
-                        .user(p.toLink())
+                        .user(p.toBidLink())
                         .state(p.getBidState())
                         .category(tournament.getCategory(p.getCid()))
                         .build())
                 .collect(toList());
-    }
-
-    public DatedParticipantState getParticipantState(Tid tid, Uid uid) {
-        return bidDao.getParticipantInfo(tid, uid)
-                .orElseThrow(() -> notFound("Participant has not been found"));
     }
 
     @Inject
@@ -88,18 +81,18 @@ public class BidService {
 
     public void setCategory(TournamentMemState tournament, SetCategory setCategory, DbUpdater batch) {
         tournament.checkCategory(setCategory.getCid());
-        tournament.getParticipant(setCategory.getUid()).setCid(setCategory.getCid());
+        tournament.getParticipant(setCategory.getBid()).setCid(setCategory.getCid());
         bidDao.setCategory(setCategory, clocker.get(), batch);
     }
 
     public void setBidState(TournamentMemState tournament, SetBidState setState, DbUpdater batch) {
-        setBidState(tournament.getParticipant(setState.getUid()), setState.getTarget(),
+        setBidState(tournament.getParticipant(setState.getBid()), setState.getTarget(),
                 singletonList(setState.getExpected()), batch);
     }
 
     public void setBidState(ParticipantMemState bid, BidState target,
             Collection<BidState> expected, DbUpdater batch) {
-        if (FILLER_LOSER_UID.equals(bid.getUid()) || bid.state() == target) {
+        if (FILLER_LOSER_BID.equals(bid.getBid()) || bid.state() == target) {
             return;
         }
         log.info("Set bid {} state {}", bid.getUid(), target);
@@ -109,39 +102,39 @@ public class BidService {
                             + bid.state() + " but expected " + expected);
         }
         bid.setBidState(target);
-        bidDao.setBidState(bid.getTid(), bid.getUid(),
+        bidDao.setBidState(bid.getTid(), bid.getBid(),
                 target, expected, clocker.get(), batch);
     }
 
     @Inject
     private ChildTournamentProvider childTournamentProvider;
 
-    public List<UserLink> findByState(TournamentMemState tournament, List<BidState> states) {
+    public List<ParticipantLink> findByState(TournamentMemState tournament, List<BidState> states) {
         return Stream.concat(
                 childTournamentProvider.getChild(tournament)
                         .map(consoleTournament -> findByStateNonRecursive(consoleTournament, states))
                         .orElseGet(Stream::empty),
                 findByStateNonRecursive(tournament, states))
-                .sorted(Comparator.comparing(UserLink::getName))
+                .sorted(Comparator.comparing(ParticipantLink::getName))
                 .collect(toList());
     }
 
-    public Stream<UserLink> findByStateNonRecursive(TournamentMemState tournament,
+    public Stream<ParticipantLink> findByStateNonRecursive(TournamentMemState tournament,
             List<BidState> states) {
         return tournament.getParticipants().values().stream()
                 .filter(p -> states.contains(p.state()))
-                .filter(p -> tournament.participantMatches(p.getUid())
+                .filter(p -> tournament.participantMatches(p.getBid())
                         .anyMatch(m -> INCOMPLETE_MATCH_STATES.contains(m.getState())))
-                .map(ParticipantMemState::toLink);
+                .map(ParticipantMemState::toBidLink);
     }
 
-    public List<UserLink> findWithMatch(TournamentMemState tournament) {
+    public List<ParticipantLink> findWithMatch(TournamentMemState tournament) {
         return tournament.getParticipants().values().stream()
-                .filter(p -> tournament.participantMatches(p.getUid())
+                .filter(p -> tournament.participantMatches(p.getBid())
                         .anyMatch(m -> m.getState() == Over
                                 || m.playedSets() > 0))
-                .map(ParticipantMemState::toLink)
-                .sorted(Comparator.comparing(UserLink::getName))
+                .map(ParticipantMemState::toBidLink)
+                .sorted(Comparator.comparing(ParticipantLink::getName))
                 .collect(toList());
     }
 
@@ -154,7 +147,7 @@ public class BidService {
     public void changeGroup(TournamentMemState tournament, ChangeGroupReq req, DbUpdater batch) {
         log.info("Change group {}");
 
-        final ParticipantMemState bid = tournament.getBid(req.getUid());
+        final ParticipantMemState bid = tournament.getBid(req.getBid());
 
         final Optional<Integer> opExpectedGid = Optional.of(req.getExpectedGid());
         if (tournament.getState() != Open) {
@@ -183,9 +176,9 @@ public class BidService {
         bidDao.setGroupForUids(batch, targetGid, req.getTid(), singletonList(bid));
         bid.setGid(Optional.of(targetGid));
         // cancel matches in the source group
-        cancelMatchesOf(tournament, req.getUid(), batch);
+        cancelMatchesOf(tournament, req.getBid(), batch);
         // generate matches in target group
-        castingLotsService.addParticipant(req.getUid(), tournament, batch);
+        castingLotsService.addParticipant(req.getBid(), tournament, batch);
 
         tryCompleteSourceGroup(tournament, req.getExpectedGid(), batch);
     }
@@ -208,14 +201,14 @@ public class BidService {
     @Inject
     private BidService bidService;
 
-    public void cancelMatchesOf(TournamentMemState tournament, Uid uid, DbUpdater batch) {
-        log.info("Cancel matches of {} in group", uid);
+    public void cancelMatchesOf(TournamentMemState tournament, Bid bid, DbUpdater batch) {
+        log.info("Cancel matches of {} in group", bid);
         final List<MatchInfo> matchesToBeRemoved = tournament
-                .participantMatches(uid)
+                .participantMatches(bid)
                 .filter(m -> m.getGid().isPresent())
                 .collect(toList());
 
-        matchesToBeRemoved.forEach(m -> m.getOpponentUid(uid).ifPresent(oUid -> {
+        matchesToBeRemoved.forEach(m -> m.getOpponentBid(bid).ifPresent(oUid -> {
             final ParticipantMemState opBid = tournament.getBidOrExpl(oUid);
             setBidState(
                     opBid,
@@ -237,14 +230,17 @@ public class BidService {
     }
 
     public void rename(TournamentMemState tournament, DbUpdater batch, BidRename bidRename) {
-        final ParticipantMemState bid = tournament.getParticipant(bidRename.getUid());
+        final ParticipantMemState bid = tournament.getParticipant(bidRename.getBid());
         if (!bid.getName().equals(bidRename.getExpectedName())) {
             throw badRequest("user name mismatch",
                     ImmutableMap.of(
                             "expected", bidRename.getExpectedName(),
                             "was", bid.getName()));
         }
-        bidDao.renameParticipant(bidRename.getUid(), bidRename.getNewName(), batch);
-        bid.setName(bidRename.getNewName());
+        bidDao.renameParticipant(bid.getUid(), bidRename.getNewName(), batch);
+        tournament.getUidCid2Bid().get(bid.getUid()).values()
+                .stream()
+                .map(tournament::getParticipant)
+                .forEach(p -> p.setName(bidRename.getNewName()));
     }
 }

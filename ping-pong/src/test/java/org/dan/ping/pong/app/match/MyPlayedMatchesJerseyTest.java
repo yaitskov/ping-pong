@@ -58,17 +58,17 @@ public class MyPlayedMatchesJerseyTest extends AbstractSpringJerseyTest {
         assertThat(played.getPlayOff(), contains(
                 allOf(
                         hasProperty("opponent",
-                                hasProperty("uid", is(scenario.player2Uid(p1)))),
-                        hasProperty("winnerUid", is(Optional.of(scenario.player2Uid(p2)))))));
+                                hasProperty("uid", is(scenario.player2Bid(p1)))),
+                        hasProperty("winnerUid", is(Optional.of(scenario.player2Bid(p2)))))));
 
         assertThat(played.getInGroup(), contains(
                 allOf(
                         hasProperty("opponent",
-                                hasProperty("uid", is(scenario.player2Uid(p1)))),
-                        hasProperty("winnerUid", is(Optional.of(scenario.player2Uid(p1))))),
+                                hasProperty("uid", is(scenario.player2Bid(p1)))),
+                        hasProperty("winnerUid", is(Optional.of(scenario.player2Bid(p1))))),
                 allOf(
                         hasProperty("opponent",
-                                hasProperty("uid", is(scenario.player2Uid(p3)))),
-                        hasProperty("winnerUid", is(Optional.of(scenario.player2Uid(p2)))))));
+                                hasProperty("uid", is(scenario.player2Bid(p3)))),
+                        hasProperty("winnerUid", is(Optional.of(scenario.player2Bid(p2)))))));
     }
 }

@@ -1,13 +1,13 @@
 package org.dan.ping.pong.app.match.rule.service.common;
 
-import static java.util.Collections.*;
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID3;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID4;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID5;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID6;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID3;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID4;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID5;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID6;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableSet;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
@@ -25,7 +26,6 @@ import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +35,9 @@ import java.util.stream.Stream;
 
 public class PickRandomlyRuleServiceTest {
     public static final Uid UID7 = new Uid(7);
+    public static final Bid BID7 = new Bid(7);
     public static final Uid UID8 = new Uid(8);
+    public static final Bid BID8 = new Bid(8);
 
     public static final Supplier<Stream<MatchInfo>> FAILING_SUPPLIER = () -> {
         throw new IllegalStateException();
@@ -54,28 +56,28 @@ public class PickRandomlyRuleServiceTest {
 
     @Test
     public void shuffleOneGroup() {
-        final Set<Uid> uidsProvider = ImmutableSet.of(UID3, UID4, UID5);
-        List<Uid> uids = shuffle(uidsProvider, 3);
+        final Set<Bid> uidsProvider = ImmutableSet.of(BID3, BID4, BID5);
+        List<Bid> uids = shuffle(uidsProvider, 3);
         assertThat(uids, is(shuffle(uidsProvider, 3)));
         assertThat(uids, not(is(shuffle(uidsProvider, 2))));
     }
 
     @Test
     public void keepOrderWithInGroupWhenShuffleManyGroups() {
-        final Set<Uid> uidsProvider = ImmutableSet.of(UID3, UID4, UID5, UID6, UID7, UID8);
+        final Set<Bid> uidsProvider = ImmutableSet.of(BID3, BID4, BID5, BID6, BID7, BID8);
         final TournamentMemState tournament = tournamentWithParticipants(uidsProvider);
-        final List<Uid> g1Uids = shuffleOneGroup(tournament, 1);
-        final List<Uid> g2Uids = shuffleOneGroup(tournament, 2);
-        final List<Uid> uids = shuffle(uidsProvider, 0, tournament);
-        assertThat(uids, is(shuffle(uidsProvider, 0, tournament)));
+        final List<Bid> g1Uids = shuffleOneGroup(tournament, 1);
+        final List<Bid> g2Uids = shuffleOneGroup(tournament, 2);
+        final List<Bid> bids = shuffle(uidsProvider, 0, tournament);
+        assertThat(bids, is(shuffle(uidsProvider, 0, tournament)));
 
-        validateOrder(g1Uids, uids);
-        validateOrder(g2Uids, uids);
+        validateOrder(g1Uids, bids);
+        validateOrder(g2Uids, bids);
     }
 
     @Test
     public void mixUidsFromDifferentGroups() {
-        final Set<Uid> uidsProvider = ImmutableSet.of(UID3, UID4, UID5, UID6, UID7, UID8);
+        final Set<Bid> uidsProvider = ImmutableSet.of(BID3, BID4, BID5, BID6, BID7, BID8);
         final TournamentMemState tournament = tournamentWithParticipants(uidsProvider);
         final Map<Integer, Integer> gidUids = shuffle(uidsProvider, 0, tournament)
                 .stream()
@@ -88,45 +90,54 @@ public class PickRandomlyRuleServiceTest {
         assertThat(gidUids.get(1), allOf(greaterThan(0), lessThan(3)));
     }
 
-    private TournamentMemState tournamentWithParticipants(Set<Uid> uidsProvider) {
+    private TournamentMemState tournamentWithParticipants(Set<Bid> bidsProvider) {
         return TournamentMemState.builder()
-                .participants(uidsProvider.stream()
-                        .collect(toMap(o -> o, o -> ParticipantMemState
-                                .builder()
-                                .uid(o)
-                                .gid(Optional.of(o.getId() % 2 == 0 ? 1 : 2))
-                                .build())))
+                .participants(
+                        bidsProvider
+                                .stream()
+                                .collect(toMap(
+                                        o -> o,
+                                        o -> ParticipantMemState
+                                                .builder()
+                                                .bid(o)
+                                                .uid(new Uid(o.intValue()))
+                                                .gid(Optional.of(o.intValue() % 2 == 0 ? 1 : 2))
+                                                .build())))
                 .build();
     }
 
-    private void validateOrder(List<Uid> g1Uids, List<Uid> uids) {
-        for (int i = 0; i < g1Uids.size(); ++i) {
-            final Uid uid = g1Uids.get(i);
-            final int uidIdx = uids.indexOf(uid);
-            for (int j = i + 1; j < g1Uids.size(); ++j) {
-                assertThat(uidIdx, lessThan(uids.indexOf(g1Uids.get(j))));
+    private void validateOrder(List<Bid> g1Bids, List<Bid> bids) {
+        for (int i = 0; i < g1Bids.size(); ++i) {
+            final Bid uid = g1Bids.get(i);
+            final int uidIdx = bids.indexOf(uid);
+            for (int j = i + 1; j < g1Bids.size(); ++j) {
+                assertThat(uidIdx, lessThan(bids.indexOf(g1Bids.get(j))));
             }
         }
     }
 
-    private List<Uid> shuffleOneGroup(TournamentMemState tournament, int gid) {
-        return shuffle(tournament.getParticipants().values()
-                .stream().filter(p -> p.getGid().get().equals(gid))
-                .map(ParticipantMemState::getUid)
-                .collect(toSet()), gid);
+    private List<Bid> shuffleOneGroup(TournamentMemState tournament, int gid) {
+        return shuffle(
+                tournament.getParticipants()
+                        .values()
+                        .stream()
+                        .filter(p -> p.getGid().get().equals(gid))
+                        .map(ParticipantMemState::getBid)
+                        .collect(toSet()),
+                gid);
     }
 
-    private List<Uid> shuffle(Set<Uid> uidsProvider, int gid) {
-        return shuffle(uidsProvider, gid, null);
+    private List<Bid> shuffle(Set<Bid> bidsProvider, int gid) {
+        return shuffle(bidsProvider, gid, null);
     }
 
-    private List<Uid> shuffle(Set<Uid> uidsProvider, int gid,
+    private List<Bid> shuffle(Set<Bid> bidsProvider, int gid,
             TournamentMemState tournament) {
-        return sut.score(FAILING_SUPPLIER, uidsProvider,
+        return sut.score(FAILING_SUPPLIER, bidsProvider,
                 new PickRandomlyRule(),
-                GroupRuleParams.ofParams(gid, tournament, null, null, uidsProvider))
+                GroupRuleParams.ofParams(gid, tournament, null, null, bidsProvider))
                 .get()
-                .map(Reason::getUid)
+                .map(Reason::getBid)
                 .collect(toList());
     }
 }

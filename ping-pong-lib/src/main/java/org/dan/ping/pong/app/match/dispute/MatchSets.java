@@ -5,6 +5,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 
 import java.util.Iterator;
@@ -16,9 +17,9 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 public class MatchSets {
-    private Map<Uid, List<Integer>> sets;
+    private Map<Bid, List<Integer>> sets;
 
-    public static MatchSets ofSets(Map<Uid, List<Integer>> sets) {
+    public static MatchSets ofSets(Map<Bid, List<Integer>> sets) {
         return new MatchSets(sets);
     }
 
@@ -29,18 +30,18 @@ public class MatchSets {
     }
 
     public int validateEqualNumberSets() {
-        final Iterator<Uid> uidIterator = sets.keySet().iterator();
-        final Uid uid1 = uidIterator.next();
-        final Uid uid2 = uidIterator.next();
-        final List<Integer> score1 = sets.get(uid1);
-        final List<Integer> score2 = sets.get(uid2);
+        final Iterator<Bid> bidIterator = sets.keySet().iterator();
+        final Bid bid1 = bidIterator.next();
+        final Bid bid2 = bidIterator.next();
+        final List<Integer> score1 = sets.get(bid1);
+        final List<Integer> score2 = sets.get(bid2);
         if (score1.size() != score2.size()) {
             throw badRequest("Set number mismatch");
         }
         return score1.size();
     }
 
-    public void validateParticipants(Set<Uid> expected) {
+    public void validateParticipants(Set<Bid> expected) {
         if (!expected.equals(sets.keySet())) {
             throw badRequest("match has different participants");
         }

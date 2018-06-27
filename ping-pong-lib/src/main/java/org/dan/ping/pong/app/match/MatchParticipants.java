@@ -7,7 +7,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import com.google.common.collect.ImmutableMap;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.sys.hash.HashAggregator;
 import org.dan.ping.pong.sys.hash.Hashable;
 
@@ -19,30 +19,30 @@ import java.util.Set;
 @EqualsAndHashCode
 public class MatchParticipants implements Comparable<MatchParticipants>, Hashable {
     public static final Comparator<MatchParticipants> MATCH_PARTICIPANTS_COMPARATOR = Comparator
-            .comparing(MatchParticipants::getUidLess)
-            .thenComparing(MatchParticipants::getUidMore);
+            .comparing(MatchParticipants::getBidLess)
+            .thenComparing(MatchParticipants::getBidMore);
 
-    private final Uid uidLess;
-    private final Uid uidMore;
+    private final Bid bidLess;
+    private final Bid bidMore;
 
-    public MatchParticipants(Uid uidLess, Uid uidMore) {
-        if (uidLess.equals(uidMore)) {
-            throw internalError("match uids equal " + uidLess);
+    public MatchParticipants(Bid bidLess, Bid bidMore) {
+        if (bidLess.equals(bidMore)) {
+            throw internalError("match uids equal " + bidLess);
         }
-        if (uidLess.compareTo(uidMore) < 0) {
-            this.uidLess = uidLess;
-            this.uidMore = uidMore;
+        if (bidLess.compareTo(bidMore) < 0) {
+            this.bidLess = bidLess;
+            this.bidMore = bidMore;
         } else {
-            this.uidLess = uidMore;
-            this.uidMore = uidLess;
+            this.bidLess = bidMore;
+            this.bidMore = bidLess;
         }
     }
 
     public static MatchParticipants create(MatchInfo match) {
-        if (match.uids().size() != 2) {
+        if (match.bids().size() != 2) {
             throw internalError("group match doesn't have enough participants");
         }
-        final Iterator<Uid> a = match.uids().iterator();
+        final Iterator<Bid> a = match.bids().iterator();
         return new MatchParticipants(a.next(), a.next());
     }
 
@@ -53,7 +53,7 @@ public class MatchParticipants implements Comparable<MatchParticipants>, Hashabl
 
     @Override
     public void hashTo(HashAggregator sink) {
-        sink.hash(uidLess).hash(uidMore);
+        sink.hash(bidLess).hash(bidMore);
     }
 
     public MatchInfo toFakeMatch() {
@@ -61,12 +61,12 @@ public class MatchParticipants implements Comparable<MatchParticipants>, Hashabl
                 .tag(MATCH_TAG_DISAMBIGUATION)
                 .participantIdScore(
                         ImmutableMap.of(
-                                uidLess, emptyList(),
-                                uidMore, emptyList()))
+                                bidLess, emptyList(),
+                                bidMore, emptyList()))
                 .build();
     }
 
-    public boolean hasAll(Set<Uid> uids) {
-        return uids.contains(uidLess) && uids.contains(uidMore);
+    public boolean hasAll(Set<Bid> bids) {
+        return bids.contains(bidLess) && bids.contains(bidMore);
     }
 }

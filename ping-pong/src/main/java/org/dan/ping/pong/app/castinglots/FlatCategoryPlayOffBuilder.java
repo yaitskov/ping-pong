@@ -6,7 +6,7 @@ import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.PLAY_OFF_SEEDS;
 import static org.dan.ping.pong.app.match.MatchService.roundPlayOffBase;
-import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
@@ -104,13 +104,13 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
 
             final ParticipantMemState strongBid = orderedBids.get(iStrongBid);
             matchService.assignBidToMatch(tournament, match.getMid(),
-                    strongBid.getUid(), batch);
+                    strongBid.getBid(), batch);
 
             if (iWeakBid >= orderedBids.size()) {
-                matchService.assignBidToMatch(tournament, match.getMid(), FILLER_LOSER_UID, batch);
+                matchService.assignBidToMatch(tournament, match.getMid(), FILLER_LOSER_BID, batch);
             } else {
                 final ParticipantMemState weakBid = orderedBids.get(iWeakBid);
-                matchService.assignBidToMatch(tournament, match.getMid(), weakBid.getUid(), batch);
+                matchService.assignBidToMatch(tournament, match.getMid(), weakBid.getBid(), batch);
             }
         }
     }

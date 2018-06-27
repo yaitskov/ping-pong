@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 
 @Getter
 @Setter
@@ -17,14 +17,14 @@ import org.dan.ping.pong.app.bid.Uid;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IdentifiedScore {
-    private Uid uid;
+    private Bid bid;
     private int score;
 
     public String toString() {
-        return format("(uid=%d, score=%d", uid.getId(), score);
+        return format("(uid=%d, score=%d", bid.intValue(), score);
     }
 
-    public static IdentifiedScore scoreOf(Uid uid, int score) {
-        return IdentifiedScore.builder().uid(uid).score(score).build();
+    public static IdentifiedScore scoreOf(Bid bid, int score) {
+        return IdentifiedScore.builder().bid(bid).score(score).build();
     }
 }

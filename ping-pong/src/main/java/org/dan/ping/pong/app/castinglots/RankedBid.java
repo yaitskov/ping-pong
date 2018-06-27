@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dan.ping.pong.app.user.UserLink;
+import org.dan.ping.pong.app.bid.ParticipantLink;
 
 import java.util.Optional;
 
@@ -15,7 +15,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RankedBid {
-    private UserLink user;
+    private ParticipantLink user;
     private Optional<Integer> seed;
     private Optional<Integer> providedRank;
 }

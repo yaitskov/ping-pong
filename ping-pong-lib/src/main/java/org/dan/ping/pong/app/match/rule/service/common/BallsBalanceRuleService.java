@@ -4,7 +4,7 @@ import static org.dan.ping.pong.app.match.rule.OrderRuleName.BallsBalance;
 import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.ofEntry;
 import static org.dan.ping.pong.util.FuncUtils.SUM_INT;
 
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
@@ -28,7 +28,7 @@ public class BallsBalanceRuleService implements GroupOrderRuleService {
     @Override
     public Optional<Stream<? extends Reason>> score(
             Supplier<Stream<MatchInfo>> matches,
-            Set<Uid> _uids,
+            Set<Bid> _bids,
             GroupOrderRule _rule, GroupRuleParams _params) {
         return Optional.of(uid2BallsBalance(matches.get()).entrySet()
                 .stream()
@@ -36,22 +36,22 @@ public class BallsBalanceRuleService implements GroupOrderRuleService {
                 .sorted());
     }
 
-    public Map<Uid, Integer> uid2BallsBalance(Stream<MatchInfo> matches) {
-        final Map<Uid, Integer> uid2BallsBalance = new HashMap<>();
+    public Map<Bid, Integer> uid2BallsBalance(Stream<MatchInfo> matches) {
+        final Map<Bid, Integer> bid2BallsBalance = new HashMap<>();
         matches.forEach(m -> {
-            final Uid[] uids = m.uidsArray();
+            final Bid[] bids = m.bidsArray();
 
-            m.getParticipantScore(uids[0])
+            m.getParticipantScore(bids[0])
                     .forEach(b -> {
-                        uid2BallsBalance.merge(uids[0], b, SUM_INT);
-                        uid2BallsBalance.merge(uids[1], -b, SUM_INT);
+                        bid2BallsBalance.merge(bids[0], b, SUM_INT);
+                        bid2BallsBalance.merge(bids[1], -b, SUM_INT);
                     });
-            m.getParticipantScore(uids[1])
+            m.getParticipantScore(bids[1])
                     .forEach(b -> {
-                        uid2BallsBalance.merge(uids[1], b, SUM_INT);
-                        uid2BallsBalance.merge(uids[0], -b, SUM_INT);
+                        bid2BallsBalance.merge(bids[1], b, SUM_INT);
+                        bid2BallsBalance.merge(bids[0], -b, SUM_INT);
                     });
         });
-        return uid2BallsBalance;
+        return bid2BallsBalance;
     }
 }

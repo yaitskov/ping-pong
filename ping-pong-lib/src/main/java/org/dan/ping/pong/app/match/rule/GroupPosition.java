@@ -11,7 +11,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.filter.DisambiguationScope;
 import org.dan.ping.pong.app.match.rule.filter.FilterMarker;
@@ -31,7 +31,7 @@ import java.util.Set;
 @Setter
 @Builder
 public class GroupPosition {
-    private Set<Uid> competingUids;
+    private Set<Bid> competingBids;
     private Optional<Reason> reason = Optional.empty();
     private Optional<GroupOrderRule> rule = Optional.empty();
     private MatchParticipantScope participantScope = AT_LEAST_ONE;
@@ -69,8 +69,8 @@ public class GroupPosition {
     }
 
     public boolean isSame(GroupPosition sub) {
-        final int aSize = competingUids.size();
-        final int bSize = sub.competingUids.size();
+        final int aSize = competingBids.size();
+        final int bSize = sub.competingBids.size();
         return (aSize + bSize == 0 || aSize == bSize)
                 && participantScope == sub.participantScope
                 && disambiguationScope == sub.disambiguationScope
@@ -91,10 +91,10 @@ public class GroupPosition {
             result.add(outcomeScope);
         }
         if (disambiguationScope != ORIGIN_MATCHES
-                || params.getGroupMatches().size() != matchesInGroup(competingUids.size())) {
+                || params.getGroupMatches().size() != matchesInGroup(competingBids.size())) {
             result.add(disambiguationScope);
         }
-        if (competingUids.size() > 0) {
+        if (competingBids.size() > 0) {
             result.add(participantScopeFilter());
         }
         return result;
@@ -104,9 +104,9 @@ public class GroupPosition {
         switch (participantScope) {
             case AT_LEAST_ONE:
                 return s -> s.filter(
-                        m -> m.uids().stream().anyMatch(competingUids::contains));
+                        m -> m.bids().stream().anyMatch(competingBids::contains));
             case BOTH:
-                return s -> s.filter(m -> competingUids.containsAll(m.uids()));
+                return s -> s.filter(m -> competingBids.containsAll(m.bids()));
             default:
                 throw internalError("unknown participant scope "
                         + participantScope);

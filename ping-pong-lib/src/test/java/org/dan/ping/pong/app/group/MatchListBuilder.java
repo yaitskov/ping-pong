@@ -6,7 +6,7 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchTag.DISAMBIGUATION;
 
 import com.google.common.collect.ImmutableMap;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchTag;
 
@@ -27,33 +27,33 @@ public class MatchListBuilder {
         return this;
     }
 
-    public MatchListBuilder om(Uid u1, Integer g1, Uid u2, Integer g2) {
+    public MatchListBuilder om(Bid u1, Integer g1, Bid u2, Integer g2) {
         result.add(match(u1, g1, u2, g2, Optional.empty()));
         return this;
     }
 
-    public MatchListBuilder brokenMatch(Uid u1, Integer g1, Uid u2, Integer g2) {
+    public MatchListBuilder brokenMatch(Bid u1, Integer g1, Bid u2, Integer g2) {
         final MatchInfo match = match(u1, g1, u2, g2, Optional.empty());
         match.setState(Break);
         result.add(match);
         return this;
     }
 
-    public MatchListBuilder dm(Uid u1, Integer g1, Uid u2, Integer g2) {
+    public MatchListBuilder dm(Bid u1, Integer g1, Bid u2, Integer g2) {
         result.add(match(u1, g1, u2, g2,
                 Optional.of(MatchTag.builder().prefix(DISAMBIGUATION).build())));
         return this;
     }
 
-    private MatchInfo match(Uid uid1, int g1, Uid uid2, int g2, Optional<MatchTag> tag) {
+    private MatchInfo match(Bid bid1, int g1, Bid bid2, int g2, Optional<MatchTag> tag) {
         return MatchInfo.builder()
                 .gid(ogid)
                 .tag(tag)
                 .state(Over)
                 .participantIdScore(ImmutableMap.of(
-                        uid1, singletonList(g1),
-                        uid2, singletonList(g2)))
-                .winnerId(Optional.of(g1 > g2 ? uid1 : uid2))
+                        bid1, singletonList(g1),
+                        bid2, singletonList(g2)))
+                .winnerId(Optional.of(g1 > g2 ? bid1 : bid2))
                 .build();
     }
 

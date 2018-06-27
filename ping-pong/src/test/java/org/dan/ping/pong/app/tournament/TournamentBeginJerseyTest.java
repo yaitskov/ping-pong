@@ -3,9 +3,9 @@ package org.dan.ping.pong.app.tournament;
 import static org.dan.ping.pong.app.bid.BidResource.BID_SET_STATE;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentService.PLACE_IS_BUSY;
 import static org.dan.ping.pong.app.tournament.TournamentService.TID;
 import static org.dan.ping.pong.mock.simulator.EnlistMode.Enlist;
@@ -24,8 +24,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.SetBidState;
-import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.UncheckedParticipantsError;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.simulator.Simulator;
@@ -57,17 +57,17 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
 
         simulator.simulate(scenario);
         TestUserSession session1 = scenario.getPlayersSessions().get(p1);
-        final Uid uid1 = session1.getUid();
+        final Bid bid1 = session1.getBid();
         TestUserSession session2 = scenario.getPlayersSessions().get(p2);
-        final Uid uid2 = session2.getUid();
+        final Bid bid2 = session2.getBid();
         final Response re = myRest().post(BEGIN_TOURNAMENT,
                 scenario.getTestAdmin().getSession(), scenario.getTid());
         assertEquals(400, re.getStatus());
         assertThat(
                 re.readEntity(UncheckedParticipantsError.class),
                 hasProperty("users", hasItems(
-                        hasProperty("uid", is(uid1)),
-                        hasProperty("uid", is(uid2)))));
+                        hasProperty("uid", is(bid1)),
+                        hasProperty("uid", is(bid2)))));
 
 
         myRest().voidPost(TOURNAMENT_RESIGN, session1, scenario.getTid());
@@ -81,7 +81,7 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
                         .expected(Paid)
                         .target(Here)
                         .tid(scenario.getTid())
-                        .uid(uid2)
+                        .bid(bid2)
                         .build());
 
         myRest().voidPost(BEGIN_TOURNAMENT, scenario.getTestAdmin(), scenario.getTid());

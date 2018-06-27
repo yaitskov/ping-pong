@@ -9,6 +9,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.sport.pingpong.PingPongSport;
@@ -27,6 +28,7 @@ public class GroupServiceTest {
     private static final int CID = 1;
     public static final int GID = 1;
     public static final Uid UID2 = new Uid(2);
+    public static final Bid BID2 = new Bid(2);
 
     GroupService sut;
 
@@ -58,12 +60,13 @@ public class GroupServiceTest {
             Optional<Integer> gid, Map<Integer, GroupInfo> groups) {
         return TournamentMemState.builder()
                         .participants(ImmutableMap
-                                .of(UID2, ParticipantMemState.builder()
-                                .gid(gid)
-                                .uid(UID2)
-                                .cid(CID)
-                                .tid(new Tid(1))
-                                .build()))
+                                .of(BID2, ParticipantMemState.builder()
+                                        .gid(gid)
+                                        .uid(UID2)
+                                        .bid(BID2)
+                                        .cid(CID)
+                                        .tid(new Tid(1))
+                                        .build()))
                         .groups(groups).build();
     }
 }

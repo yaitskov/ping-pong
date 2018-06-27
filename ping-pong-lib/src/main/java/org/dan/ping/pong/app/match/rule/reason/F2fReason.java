@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 
 @Getter
@@ -21,8 +21,8 @@ import org.dan.ping.pong.app.match.rule.OrderRuleName;
 @AllArgsConstructor(onConstructor = @__(@JsonIgnore))
 public class F2fReason implements Reason {
     private int won;
-    private Uid uid;
-    private Uid opponentUid;
+    private Bid bid;
+    private Bid opponentBid;
 
     @Override
     public int compareTo(Reason r) {
@@ -35,7 +35,7 @@ public class F2fReason implements Reason {
     };
 
     public String toString() {
-        return format(WON_PATTERNS[won], uid.getId(), opponentUid.getId());
+        return format(WON_PATTERNS[won], bid.intValue(), opponentBid.intValue());
     }
 
     @Override

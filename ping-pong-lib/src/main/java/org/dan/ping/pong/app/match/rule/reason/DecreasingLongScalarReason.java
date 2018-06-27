@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 
 @Getter
@@ -22,7 +22,7 @@ public class DecreasingLongScalarReason implements Reason {
     @JsonIgnore
     @Getter(onMethod = @__(@JsonIgnore))
     @Setter(onMethod = @__(@JsonIgnore))
-    private Uid uid;
+    private Bid bid;
     private long value;
     private OrderRuleName rule;
 
@@ -30,8 +30,8 @@ public class DecreasingLongScalarReason implements Reason {
         return ofLongD(null, n, rule);
     }
 
-    public static DecreasingLongScalarReason ofLongD(Uid uid, long n, OrderRuleName rule) {
-        return new DecreasingLongScalarReason(uid, n, rule);
+    public static DecreasingLongScalarReason ofLongD(Bid bid, long n, OrderRuleName rule) {
+        return new DecreasingLongScalarReason(bid, n, rule);
     }
 
     @Override

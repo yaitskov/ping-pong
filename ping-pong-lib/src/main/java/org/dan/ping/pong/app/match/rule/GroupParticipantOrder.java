@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.rule.filter.DisambiguationScope;
 import org.dan.ping.pong.app.match.rule.filter.MatchOutcomeScope;
@@ -28,12 +29,12 @@ public class GroupParticipantOrder {
         return ambiguousPositions.isEmpty();
     }
 
-    public static GroupParticipantOrder orderOf(Set<Uid> uids) {
+    public static GroupParticipantOrder orderOf(Set<Bid> bids) {
         final GroupPositionIdx zeroPos = new GroupPositionIdx(0);
         return GroupParticipantOrder.builder()
                 .positions(new TreeMap<>(ImmutableMap.of(zeroPos, GroupPosition
                         .builder()
-                        .competingUids(uids)
+                        .competingBids(bids)
                         .participantScope(MatchParticipantScope.AT_LEAST_ONE)
                         .disambiguationScope(DisambiguationScope.ORIGIN_MATCHES)
                         .outcomeScope(MatchOutcomeScope.ALL_MATCHES)
@@ -43,9 +44,9 @@ public class GroupParticipantOrder {
                 .build();
     }
 
-    public List<Uid> determinedUids() {
+    public List<Bid> determinedBids() {
         return positions.values().stream()
-                .flatMap(p -> p.getCompetingUids().stream())
+                .flatMap(p -> p.getCompetingBids().stream())
                 .collect(toList());
     }
 

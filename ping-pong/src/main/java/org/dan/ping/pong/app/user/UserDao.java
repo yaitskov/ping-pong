@@ -11,10 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.sys.error.PiPoEx;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -121,5 +124,46 @@ public class UserDao {
             log.info("User {} changed email from {} to {}",
                     userInfo.getUid(), userInfo.getEmail(), update.getEmail());
         }
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public Uid registerOffline(Instant now, OfflineUserRegRequest regRequest, Uid adminUid) {
+        validateRegOfflineLimits(now, adminUid, 1);
+        return registerOfflineNoValidation(regRequest, adminUid);
+    }
+
+    @Transactional(TRANSACTION_MANAGER)
+    public Uid registerOfflineNoValidation(OfflineUserRegRequest regRequest, Uid adminUid) {
+        return jooq
+                .insertInto(USERS, USERS.NAME, USERS.TYPE, USERS.REF_UID)
+                .values(regRequest.getName(), UserType.OfUsr, adminUid)
+                .returning(USERS.UID)
+                .fetchOne()
+                .getValue(USERS.UID);
+    }
+
+    public void validateRegOfflineLimits(Instant now, Uid adminUid, int requested) {
+        final int lastDay = count(adminUid, now.minus(1, ChronoUnit.DAYS))
+                .fetchOne().value1();
+        if (lastDay + requested > 100) {
+            throw badRequest("Too many offline users has been registered");
+        }
+        final int lastWeek = count(adminUid, now.minus(7, ChronoUnit.DAYS))
+                .fetchOne().value1();
+        if (lastWeek + requested > 300) {
+            throw badRequest("Too many offline users has been registered");
+        }
+        final int lastMonth = count(adminUid, now.minus(31, ChronoUnit.DAYS))
+                .fetchOne().value1();
+        if (lastMonth + requested > 1000) {
+            throw badRequest("Too many offline users has been registered");
+        }
+    }
+
+    public SelectConditionStep<Record1<Integer>> count(Uid adminUid, Instant oneDay) {
+        return jooq.select(USERS.UID.count())
+                .from(USERS)
+                .where(USERS.REF_UID.eq(adminUid),
+                        USERS.CREATED.ge(oneDay));
     }
 }

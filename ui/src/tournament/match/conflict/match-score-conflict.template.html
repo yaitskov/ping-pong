@@ -32,25 +32,25 @@
     </tr>
     <tr>
       <td translate="Total" />
-      <td class="alert" ng-class="{'success': $ctrl.participants[0].uid == $ctrl.matchScore.winUid, 'danger': $ctrl.participants[1].uid == $ctrl.matchScore.winUid}">
+      <td class="alert" ng-class="{'success': $ctrl.participants[0].uid == $ctrl.matchScore.winBid, 'danger': $ctrl.participants[1].uid == $ctrl.matchScore.winBid}">
         {{$ctrl.matchScore.wonSets[$ctrl.participants[0].uid]}}
       </td>
-      <td class="alert" ng-class="{'success': $ctrl.participants[1].uid == $ctrl.matchScore.winUid, 'danger': $ctrl.participants[0].uid == $ctrl.matchScore.winUid}">
+      <td class="alert" ng-class="{'success': $ctrl.participants[1].uid == $ctrl.matchScore.winBid, 'danger': $ctrl.participants[0].uid == $ctrl.matchScore.winBid}">
         {{$ctrl.matchScore.wonSets[$ctrl.participants[1].uid]}}
       </td>
     </tr>
-    <tr ng-show="$ctrl.matchScore.winUid">
+    <tr ng-show="$ctrl.matchScore.winBid">
       <td translate="Winner" />
       <td colspan="2">
         <span ng-repeat="participant in $ctrl.participants">
           <a href="#!/my/tournament/{{$ctrl.matchScore.tid}}/participant/{{participant.uid}}"
-             ng-if="participant.uid == $ctrl.matchScore.winUid">
+             ng-if="participant.uid == $ctrl.matchScore.winBid">
             <you name="participant.name"/>
           </a>
         </span>
       </td>
     </tr>
-    <tr ng-show="!$ctrl.matchScore.winUid">
+    <tr ng-show="!$ctrl.matchScore.winBid">
       <td colspan="3" translate="match-continues" />
     </tr>
   </table>

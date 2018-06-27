@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -8,7 +9,7 @@ import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.group.GroupService.DM_TAG;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName._DisambiguationPreview;
-import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.createLoserBid;
 import static org.dan.ping.pong.app.user.UserRole.Admin;
 import static org.dan.ping.pong.app.user.UserRole.Spectator;
@@ -22,6 +23,7 @@ import com.google.common.collect.ImmutableSet;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryLink;
@@ -38,11 +40,15 @@ import org.dan.ping.pong.app.sport.MatchRules;
 import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.sys.error.PiPoEx;
+import org.dan.ping.pong.util.counter.BidSeqGen;
 import org.dan.ping.pong.util.counter.DidSeqGen;
 import org.dan.ping.pong.util.counter.IdSeqGen;
 import org.dan.ping.pong.util.counter.MidSeqGen;
 
 import java.time.Instant;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -63,7 +69,8 @@ public class TournamentMemState {
     private TournamentType type;
     private Pid pid;
     private Set<Uid> adminIds;
-    private Map<Uid, ParticipantMemState> participants;
+    private Map<Bid, ParticipantMemState> participants;
+    private Map<Uid, Map<Integer, Bid>> uidCid2Bid;
     private Map<Mid, MatchInfo> matches;
     private Map<Integer, GroupInfo> groups;
     private Map<Integer, CategoryLink> categories;
@@ -80,6 +87,7 @@ public class TournamentMemState {
     private DidSeqGen nextDispute;
     private IdSeqGen nextGroup;
     private MidSeqGen nextMatch;
+    private BidSeqGen nextBid;
 
     public Optional<MatchInfo> maybeMatchById(Mid mid) {
         return ofNullable(matches.get(mid));
@@ -94,10 +102,10 @@ public class TournamentMemState {
         return adminIds.contains(uid);
     }
 
-    public ParticipantMemState getParticipant(Uid uid) {
-        return ofNullable(participants.get(uid))
-                .orElseThrow(() -> notFound("User " + uid
-                        + " does participate in the tournament " + tid));
+    public ParticipantMemState getParticipant(Bid bid) {
+        return ofNullable(participants.get(bid))
+                .orElseThrow(() -> notFound("Participant " + bid
+                        + " does not participate in the tournament " + tid));
     }
 
     public Stream<ParticipantMemState> participants() {
@@ -114,22 +122,22 @@ public class TournamentMemState {
         }
     }
 
-    public ParticipantMemState getBid(Uid bid) {
+    public ParticipantMemState getBid(Bid bid) {
         return participants.get(bid);
     }
 
-    public ParticipantMemState getBidOrQuit(Uid uid) {
+    public ParticipantMemState getBidOrQuit(Bid uid) {
         return getBidOr(uid,  Quit);
     }
 
-    public ParticipantMemState getBidOrExpl(Uid uid) {
+    public ParticipantMemState getBidOrExpl(Bid uid) {
         return getBidOr(uid,  Expl);
     }
 
-    public ParticipantMemState getBidOr(Uid bid, BidState state) {
+    public ParticipantMemState getBidOr(Bid bid, BidState state) {
         final ParticipantMemState result = participants.get(bid);
         if (result == null) {
-            if (FILLER_LOSER_UID.equals(bid)) {
+            if (FILLER_LOSER_BID.equals(bid)) {
                 return createLoserBid(tid, -1, state);
             }
             throw internalError("User " + bid
@@ -178,9 +186,9 @@ public class TournamentMemState {
         return matches().filter(m -> m.getCid() == cid);
     }
 
-    public Stream<MatchInfo> participantMatches(Uid uid) {
+    public Stream<MatchInfo> participantMatches(Bid bid) {
         return matches.values().stream()
-                .filter(m -> m.getParticipantIdScore().containsKey(uid));
+                .filter(m -> m.getParticipantIdScore().containsKey(bid));
     }
 
     public void checkState(TournamentState expectedState) {
@@ -247,16 +255,16 @@ public class TournamentMemState {
                 .collect(toList());
     }
 
-    public Set<Uid> uidsInGroup(int gid) {
+    public Set<Bid> bidsInGroup(int gid) {
         final Optional<Integer> ogid = Optional.of(gid);
         return participants.values().stream().filter(p -> p.getGid().equals(ogid))
-                .map(ParticipantMemState::getUid)
+                .map(ParticipantMemState::getBid)
                 .collect(toSet());
     }
 
-    public Set<Uid> uidsInCategory(int cid) {
+    public Set<Bid> bidsInCategory(int cid) {
         return participants.values().stream().filter(p -> p.getCid() == cid)
-                .map(ParticipantMemState::getUid)
+                .map(ParticipantMemState::getBid)
                 .collect(toSet());
     }
 
@@ -288,5 +296,25 @@ public class TournamentMemState {
 
     public Stream<GroupInfo> findGroupsByCategory(int cid) {
         return groups.values().stream().filter(gi -> gi.getCid() == cid);
+    }
+
+    public Collection<Bid> findBidsByUid(Uid uid) {
+        return ofNullable(uidCid2Bid.get(uid))
+                .map(Map::values)
+                .orElseThrow(() -> notFound("User doesn't participant in the tournament"));
+    }
+
+    public Bid findBidByMidAndUid(MatchInfo m, Uid uid) {
+        return ofNullable(uidCid2Bid.get(uid))
+                .flatMap(map -> ofNullable(map.get(m.getCid())))
+                .orElseThrow(() -> notFound("User doesn't participant"));
+    }
+
+    public Bid registerParticipant(ParticipantMemState participant) {
+        participants.put(participant.getBid(), participant);
+        uidCid2Bid.computeIfAbsent(
+                participant.getUid(), k -> new HashMap<>())
+                .put(participant.getCid(), participant.getBid());
+        return participant.getBid();
     }
 }

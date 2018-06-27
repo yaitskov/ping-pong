@@ -1,6 +1,6 @@
 package org.dan.ping.pong.app.match.rule.service.common;
 
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.group.HisIntPair;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
@@ -30,34 +30,34 @@ public abstract class AbstractWeightedMatchesRuleService implements GroupOrderRu
     @Override
     public Optional<Stream<? extends Reason>> score(
             Supplier<Stream<MatchInfo>> matches,
-            Set<Uid> _uids,
+            Set<Bid> _bids,
             GroupOrderRule rule, GroupRuleParams params) {
-        final Map<Uid, WeightSetsReason> uid2Reason = new HashMap<>();
+        final Map<Bid, WeightSetsReason> bid2Reason = new HashMap<>();
         final TournamentMemState tournament = params.getTournament();
 
         matches.get().forEach(m -> {
-            final Map<Uid, Integer> uid2Sets = sports.calcWonSets(tournament, m);
-            merge(uid2Reason, m.uidsArray(), uid2Sets);
+            final Map<Bid, Integer> uid2Sets = sports.calcWonSets(tournament, m);
+            merge(bid2Reason, m.bidsArray(), uid2Sets);
         });
-        return Optional.of(uid2Reason.values().stream().sorted(comparatorWeightSetsReason()));
+        return Optional.of(bid2Reason.values().stream().sorted(comparatorWeightSetsReason()));
     }
 
     private void merge(
-            Map<Uid, WeightSetsReason> uid2Reason,
-            Uid[] uids,
-            Map<Uid, Integer> uid2Sets) {
+            Map<Bid, WeightSetsReason> bid2Reason,
+            Bid[] bids,
+            Map<Bid, Integer> bid2Sets) {
         for (int i = 0; i < 2; ++i) {
-            WeightSetsReason reason = uid2Reason.get(uids[i]);
+            WeightSetsReason reason = bid2Reason.get(bids[i]);
             if (reason == null) {
-                uid2Reason.put(uids[i],
+                bid2Reason.put(bids[i],
                         reason = new WeightSetsReason(
-                                uids[i], getName(),
+                                bids[i], getName(),
                                 new TreeSet<>(comparatorCmpValueCounter())));
             }
             final CmpValueCounter<HisIntPair> zeroRepeats = new CmpValueCounter<>(
                     new HisIntPair(
-                            uid2Sets.get(uids[i]),
-                            uid2Sets.get(uids[1 - i])),
+                            bid2Sets.get(bids[i]),
+                            bid2Sets.get(bids[1 - i])),
                     0);
             final TreeSet<CmpValueCounter<HisIntPair>> weightSets = (TreeSet) reason.getWeightSets();
             final CmpValueCounter<HisIntPair> sameScore = weightSets.lower(zeroRepeats);

@@ -1,13 +1,14 @@
 package org.dan.ping.pong.app.match;
 
-import org.dan.ping.pong.app.tournament.TournamentMemState;
-import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.collection.MaxValue;
 
-import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,7 @@ public interface MatchDao {
     void createMatch(MatchInfo matchInfo, DbUpdater dbStrictUpdater);
 
     void createGroupMatch(DbUpdater batch, Mid mid, Tid tid, int gid, int cid, int priorityGroup,
-            Uid uid1, Uid uid2, Optional<MatchTag> tag, MatchState place);
+            Bid bid1, Bid bid2, Optional<MatchTag> tag, MatchState place);
 
     void  createPlayOffMatch(DbUpdater batch, Mid mid, Tid tid, Integer cid,
             Optional<Mid> winMid, Optional<Mid> loseMid,
@@ -32,25 +33,21 @@ public interface MatchDao {
 
     void markAsSchedule(MatchInfo match, DbUpdater batch);
 
-    List<CompleteMatch> findCompleteMatches(Tid tid);
-
-    List<UserLink> findWinners(Tid tid);
-
     void deleteAllByTid(TournamentMemState tournament, DbUpdater batch, int size);
 
     void deleteByIds(Tid tid, Collection<Mid> mids, DbUpdater batch);
 
-    void setParticipant(MatchInfo mInfo, Uid uid, DbUpdater batch);
+    void setParticipant(MatchInfo mInfo, Bid bid, DbUpdater batch);
 
     List<MatchInfo> load(Tid tid, MaxValue<Mid> maxMid);
 
     void deleteSets(DbUpdater batch, MatchInfo mInfo, int setNumber);
 
-    void removeSecondParticipant(DbUpdater batch, MatchInfo mInfo, Uid uidKeep);
+    void removeSecondParticipant(DbUpdater batch, MatchInfo mInfo, Bid uidKeep);
 
     void removeParticipants(DbUpdater batch, MatchInfo mInfo);
 
-    void removeScores(DbUpdater batch, MatchInfo mInfo, Uid uid, int played);
+    void removeScores(DbUpdater batch, MatchInfo mInfo, Bid bid, int played);
 
     void setWinnerId(MatchInfo mInfo, DbUpdater batch);
 

@@ -524,7 +524,7 @@
                                 </customType>
                                 <customType>
                                     <name>Scores</name>
-                                    <type>java.util.Map&lt;org.dan.ping.pong.app.bid.Uid,java.util.List&lt;java.lang.Integer&gt;&gt;</type>
+                                    <type>java.util.Map&lt;org.dan.ping.pong.app.bid.Bid,java.util.List&lt;java.lang.Integer&gt;&gt;</type>
                                     <binding>org.dan.ping.pong.sys.db.converters.MatchScoresConverter</binding>
                                 </customType>
                                 <customType>
@@ -885,8 +885,13 @@
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>Instant</name>
+                                    <expression>.*users\.(created)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
                                     <name>Uid</name>
-                                    <expression>.*users\.(uid)</expression>
+                                    <expression>.*users\.(uid|ref_uid)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

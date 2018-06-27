@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.tournament.TournamentService.TID;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
@@ -8,8 +9,8 @@ import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
 import com.google.common.cache.CacheLoader;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidDao;
-import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.group.GroupDao;
@@ -19,6 +20,7 @@ import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.playoff.PowerRange;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.dan.ping.pong.util.collection.MaxValue;
+import org.dan.ping.pong.util.counter.BidSeqGen;
 import org.dan.ping.pong.util.counter.DidSeqGen;
 import org.dan.ping.pong.util.counter.IdSeqGen;
 import org.dan.ping.pong.util.counter.MidSeqGen;
@@ -59,12 +61,14 @@ public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> 
         log.info("Loading tournament {}", tid);
         final TournamentRow row = tournamentDao.getRow(tid)
                 .orElseThrow(() -> notFound(TOURNAMENT_NOT_FOUND, TID, tid));
-        final MaxValue<Mid> maxMid = new MaxValue<>(Mid.of(0));
+        final MaxValue<Mid> maxMid = new MaxValue<>(Mid.of(1));
+        final MaxValue<Bid> maxBid = new MaxValue<>(Bid.of(1));
         final Map<Mid, MatchInfo> matchMap = combineMatchesAndSets(
                 matchDao.load(tid, maxMid),
                 matchScoreDao.load(tid));
         final MaxValue<Integer> maxCid = new MaxValue<>(0);
         final MaxValue<Integer> maxGid = new MaxValue<>(0);
+        final Map<Bid, ParticipantMemState> participants = bidDao.loadParticipants(tid, maxBid);
         return TournamentMemState.builder()
                 .name(row.getName())
                 .condActions(OneTimeCondActions
@@ -73,7 +77,11 @@ public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> 
                         .build())
                 .powerRange(new PowerRange())
                 .type(row.getType())
-                .participants(bidDao.loadParticipants(tid))
+                .uidCid2Bid(participants.values().stream()
+                        .collect(groupingBy(ParticipantMemState::getUid,
+                                toMap(ParticipantMemState::getCid,
+                                        ParticipantMemState::getBid))))
+                .participants(participants)
                 .categories(categoryDao.listCategoriesByTid(tid).stream()
                         .peek(c -> maxCid.accept(c.getCid()))
                         .collect(toMap(CategoryLink::getCid, o -> o)))
@@ -82,6 +90,7 @@ public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> 
                 .nextGroup(new IdSeqGen(maxGid.getMax()))
                 .nextDispute(new DidSeqGen(0)) // to be load
                 .nextMatch(new MidSeqGen(maxMid.getMax()))
+                .nextBid(new BidSeqGen(maxBid.getMax()))
                 .matches(matchMap)
                 .tid(tid)
                 .sport(row.getSport())
@@ -97,13 +106,13 @@ public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> 
     }
 
     private Map<Mid, MatchInfo> combineMatchesAndSets(List<MatchInfo> matches,
-            Map<Mid, Map<Uid, List<Integer>>> sets) {
+            Map<Mid, Map<Bid, List<Integer>>> sets) {
         return matches.stream().collect(
                 toMap(MatchInfo::getMid,
                         m -> {
                             ofNullable(sets.get(m.getMid()))
-                                    .ifPresent(psets -> psets.forEach((uid, usets) ->
-                                            m.getParticipantIdScore().put(uid, usets)));
+                                    .ifPresent(psets -> psets.forEach((bid, usets) ->
+                                            m.getParticipantIdScore().put(bid, usets)));
                             return m;
                         }));
     }

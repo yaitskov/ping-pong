@@ -39,6 +39,7 @@ import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupWithMembers;
 import org.dan.ping.pong.app.group.TournamentGroups;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
+import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
@@ -73,16 +74,16 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
 
         simulator.simulate(scenario);
 
-        final List<UserLink> result = myRest().post(
+        final List<ParticipantLink> result = myRest().post(
                 FIND_BIDS_BY_STATE,
                 scenario.getTestAdmin(),
                 FindByState.builder().tid(scenario.getTid())
                         .states(asList(Wait, Play)).build())
                 .readEntity(
-                        new GenericType<List<UserLink>>() {});
+                        new GenericType<List<ParticipantLink>>() {});
 
-        assertThat(result.stream().map(UserLink::getUid)
-                .collect(toSet()), is(scenario.getUidPlayer().keySet()));
+        assertThat(result.stream().map(ParticipantLink::getBid)
+                .collect(toSet()), is(scenario.getBidPlayer().keySet()));
     }
 
     @Test
@@ -97,7 +98,9 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
 
         final BidProfile profile = myRest()
                 .get(PROFILE + scenario.getTid().getTid() + TID_SLASH_UID
-                        + scenario.player2Uid(p1).getId(), BidProfile.class);
+                                + scenario.player2Bid(p1).intValue(),
+                        scenario,
+                        BidProfile.class);
 
         assertThat(profile, allOf(
                 hasProperty("state", is(Here)),
@@ -121,15 +124,15 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
         final ImperativeSimulator simulator = isf.create(scenario);
         simulator.run(ImperativeSimulator::beginTournament);
 
-        final Uid uidP3 = scenario.player2Uid(p3);
+        final Bid bidP3 = scenario.player2Bid(p3);
 
         final int tid = scenario.getTid().getTid();
         final TournamentGroups groupsInfo = myRest()
                 .get(GROUP_LIST + tid, TournamentGroups.class);
 
-        final int sourceGid = findSourceGroup(uidP3, tid, groupsInfo);
+        final int sourceGid = findSourceGroup(bidP3, tid, groupsInfo);
 
-        changeGroup(scenario, uidP3, sourceGid, findTargetGroup(groupsInfo, sourceGid));
+        changeGroup(scenario, bidP3, sourceGid, findTargetGroup(groupsInfo, sourceGid));
 
         simulator.run(c -> c
                 .reloadMatchMap()
@@ -155,12 +158,12 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
                 .findAny();
     }
 
-    private Integer findSourceGroup(Uid uidP3, int tid, TournamentGroups groupsInfo) {
+    private Integer findSourceGroup(Bid bidP3, int tid, TournamentGroups groupsInfo) {
         return groupsInfo.getGroups().stream()
                 .map(groupInfo -> myRest().get(MEMBERS + tid + "/" + groupInfo.getGid(),
                         GroupWithMembers.class))
                 .filter(members -> members.getMembers().stream()
-                        .anyMatch(member -> member.getUid().equals(uidP3)))
+                        .anyMatch(member -> member.getBid().equals(bidP3)))
                 .map(GroupWithMembers::getGid)
                 .findAny()
                 .get();
@@ -176,17 +179,17 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
         final ImperativeSimulator simulator = isf.create(scenario);
         simulator.run(ImperativeSimulator::beginTournament);
 
-        final Uid uidP3 = scenario.player2Uid(p3);
-        final Uid uidP4 = scenario.player2Uid(p4);
+        final Bid bidP3 = scenario.player2Bid(p3);
+        final Bid bidP4 = scenario.player2Bid(p4);
 
         final int tid = scenario.getTid().getTid();
         final TournamentGroups groupsInfo = myRest()
                 .get(GROUP_LIST + tid, TournamentGroups.class);
 
-        final int sourceGid = findSourceGroup(uidP3, tid, groupsInfo);
+        final int sourceGid = findSourceGroup(bidP3, tid, groupsInfo);
 
-        changeGroup(scenario, uidP3, sourceGid, Optional.empty());
-        changeGroup(scenario, uidP4, sourceGid,
+        changeGroup(scenario, bidP3, sourceGid, Optional.empty());
+        changeGroup(scenario, bidP4, sourceGid,
                 findTargetGroup(
                         myRest().get(GROUP_LIST + tid, TournamentGroups.class),
                         sourceGid));
@@ -202,12 +205,12 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
                         .bid(p3, Win2).bid(p1, Win1)));
     }
 
-    private void changeGroup(TournamentScenario scenario, Uid uidP3,
+    private void changeGroup(TournamentScenario scenario, Bid bidP3,
             int sourceGid, Optional<Integer> targetGid) {
         myRest().voidPost(BID_CHANGE_GROUP, scenario.getTestAdmin(),
                 ChangeGroupReq.builder()
                         .tid(scenario.getTid())
-                        .uid(uidP3)
+                        .bid(bidP3)
                         .expectedGid(sourceGid)
                         .targetGid(targetGid)
                         .build());
@@ -232,8 +235,8 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
                                     .build())
                             .readEntity(new GenericType<List<UserLink>>() {});
                     assertThat(users,
-                            hasItems(hasProperty("uid", Matchers.is(scenario.player2Uid(p1))),
-                                    hasProperty("uid", Matchers.is(scenario.player2Uid(p2)))));
+                            hasItems(hasProperty("uid", Matchers.is(scenario.player2Bid(p1))),
+                                    hasProperty("uid", Matchers.is(scenario.player2Bid(p2)))));
                 });
     }
 
@@ -255,7 +258,7 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
                             hasItem(
                                     allOf(
                                             hasProperty("name", Matchers.is("p2 renamed")),
-                                            hasProperty("uid", Matchers.is(scenario.player2Uid(p2))))));
+                                            hasProperty("uid", Matchers.is(scenario.player2Bid(p2))))));
                 });
     }
 }

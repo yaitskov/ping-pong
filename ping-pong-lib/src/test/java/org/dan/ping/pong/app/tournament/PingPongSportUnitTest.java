@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.Mid;
@@ -36,8 +37,8 @@ public class PingPongSportUnitTest {
 
     private static final PingPongSport RULES = new PingPongSport();
 
-    private static final Uid UID_A = new Uid(1);
-    private static final Uid UID_B = new Uid(2);
+    private static final Bid BID_A = new Bid(1);
+    private static final Bid BID_B = new Bid(2);
     public static final PingPongSport PING_PONG_SPORT = new PingPongSport();
 
     @Test
@@ -107,12 +108,12 @@ public class PingPongSportUnitTest {
 
     @Test
     public void uidAWinsConfidently() {
-        findWinner(UID_A, asList(11, 11, 11), asList(0, 1, 2));
+        findWinner(BID_A, asList(11, 11, 11), asList(0, 1, 2));
     }
 
     @Test
     public void uidBBarelyWins() {
-        findWinner(UID_B, asList(11, 11, 9, 14, 12), asList(0, 0, 11, 16, 14));
+        findWinner(BID_B, asList(11, 11, 9, 14, 12), asList(0, 0, 11, 16, 14));
     }
 
     private void cannotFindWinner(List<Integer> a, List<Integer> b) {
@@ -121,8 +122,8 @@ public class PingPongSportUnitTest {
                         PING_PONG_SPORT.calcWonSets(match(a, b).getParticipantIdScore())));
     }
 
-    private void findWinner(Uid uid, List<Integer> a, List<Integer> b) {
-        assertEquals(Optional.of(uid),
+    private void findWinner(Bid bid, List<Integer> a, List<Integer> b) {
+        assertEquals(Optional.of(bid),
                 PING_PONG_SPORT.findWinnerId(PING_PONG_RULE,
                         PING_PONG_SPORT.calcWonSets(match(a, b).getParticipantIdScore())));
     }
@@ -130,15 +131,15 @@ public class PingPongSportUnitTest {
     private MatchInfo match(List<Integer> a, List<Integer> b) {
         assertThat(a.size(), equalTo(b.size()));
         return MatchInfo.builder()
-                .participantIdScore(ImmutableMap.of(UID_A, a, UID_B, b))
+                .participantIdScore(ImmutableMap.of(BID_A, a, BID_B, b))
                 .build();
     }
 
     @Test
     public void findWinnerId3To1() {
-        assertEquals(Optional.of(new Uid(111)),
+        assertEquals(Optional.of(new Bid(111)),
                 PING_PONG_SPORT.findWinnerId(PING_PONG_RULE, ImmutableMap.of(
-                        new Uid(111), 3, new Uid(222), 1)));
+                        new Bid(111), 3, new Bid(222), 1)));
     }
 
     @Test
@@ -153,7 +154,7 @@ public class PingPongSportUnitTest {
                                 .tid(tid)
                                 .setOrdNumber(0)
                                 .mid(mid)
-                                .scores(asList(scoreOf(UID_A, 1), scoreOf(UID_B, 3)))
+                                .scores(asList(scoreOf(BID_A, 1), scoreOf(BID_B, 3)))
                                 .build()),
                 hasItems(
                         allOf(
@@ -162,19 +163,19 @@ public class PingPongSportUnitTest {
                                 hasProperty("setOrdNumber", is(0)),
                                 hasProperty("scores", hasItems(
                                         allOf(
-                                                hasProperty("uid", is(UID_A)),
+                                                hasProperty("bid", is(BID_A)),
                                                 hasProperty("score", is(PING_PONG_RULE.getMinGamesToWin()))),
                                         allOf(
-                                                hasProperty("uid", is(UID_B)),
+                                                hasProperty("bid", is(BID_B)),
                                                 hasProperty("score", is(PING_PONG_RULE.getMinPossibleGames())))))),
                         allOf(
                                 hasProperty("setOrdNumber", is(1)),
                                 hasProperty("scores", hasItems(
                                         allOf(
-                                                hasProperty("uid", is(UID_A)),
+                                                hasProperty("bid", is(BID_A)),
                                                 hasProperty("score", is(PING_PONG_RULE.getMinPossibleGames()))),
                                         allOf(
-                                                hasProperty("uid", is(UID_B)),
+                                                hasProperty("bid", is(BID_B)),
                                                 hasProperty("score", is(PING_PONG_RULE.getMinGamesToWin()))))))));
     }
 }

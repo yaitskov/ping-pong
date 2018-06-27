@@ -19,6 +19,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
@@ -79,7 +80,7 @@ public class MatchEditorService {
                 .findEffectedMatches(tournament, rescoringMatch, newSets);
         affectedMatchesService.validateEffectHash(tournament, rescore, affectedMatches);
 
-        final Optional<Uid> newWinner = sports.findNewWinnerUid(tournament, newSets, rescoringMatch);
+        final Optional<Bid> newWinner = sports.findNewWinnerBid(tournament, newSets, rescoringMatch);
         log.info("New winner {} in mid {}", newWinner, rescoringMatch.getMid());
         reopenTournamentIfOpenMatch(tournament, batch, affectedMatches, newWinner);
         overrideMatchSets(batch, rescoringMatch, newSets);
@@ -134,7 +135,7 @@ public class MatchEditorService {
     }
 
     private void matchRescoreGivesWinner(TournamentMemState tournament, DbUpdater batch,
-            MatchInfo mInfo, Optional<Uid> newWinner, AffectedMatches affectedMatches) {
+            MatchInfo mInfo, Optional<Bid> newWinner, AffectedMatches affectedMatches) {
         if (matchHadWinner(mInfo)) {
             removeWinnerUidIf(batch, mInfo);
             resetMatches(tournament, batch, affectedMatches);
@@ -168,7 +169,7 @@ public class MatchEditorService {
     private TournamentTerminator tournamentTerminator;
 
     private void reopenTournamentIfOpenMatch(TournamentMemState tournament, DbUpdater batch,
-            AffectedMatches affectedMatches, Optional<Uid> newWinner) {
+            AffectedMatches affectedMatches, Optional<Bid> newWinner) {
         if (tournament.getState() == Close) {
             if (!affectedMatches.getToBeCreated().isEmpty()
                     || !affectedMatches.getToBeReset().isEmpty()
@@ -241,31 +242,31 @@ public class MatchEditorService {
                 aMatch -> removeParticipant(
                         tournament, batch,
                         tournament.getMatchById(aMatch.getMid()),
-                        aMatch.getUid()));
+                        aMatch.getBid()));
         matchRemover.deleteByMids(tournament, batch, affectedMatches.getToBeRemoved());
 
         affectedMatches.getToBeCreated().forEach(
                 mp -> groupService.createDisambiguateMatches(batch, tournament,
-                        tournament.getParticipant(mp.getUidLess()).gid(), mp));
+                        tournament.getParticipant(mp.getBidLess()).gid(), mp));
     }
 
     private void removeParticipant(TournamentMemState tournament,
-            DbUpdater batch, MatchInfo mInfo, Uid uid) {
+            DbUpdater batch, MatchInfo mInfo, Bid bid) {
         final int played = mInfo.playedSets();
-        if (!mInfo.removeParticipant(uid)) {
-            log.warn("No uid {} is not in mid {}", uid, mInfo.getMid());
+        if (!mInfo.removeParticipant(bid)) {
+            log.warn("No uid {} is not in mid {}", bid, mInfo.getMid());
             return;
         }
-        matchDao.removeScores(batch, mInfo, uid, played);
-        mInfo.leftUid().ifPresent(ouid -> {
-            matchDao.removeScores(batch, mInfo, ouid, played);
-            mInfo.getParticipantScore(ouid).clear();
+        matchDao.removeScores(batch, mInfo, bid, played);
+        mInfo.leftBid().ifPresent(obid -> {
+            matchDao.removeScores(batch, mInfo, obid, played);
+            mInfo.getParticipantScore(obid).clear();
         });
         final int numberOfParticipants = mInfo.numberOfParticipants();
         if (numberOfParticipants == 1) {
-            log.warn("Remove first uid {} from mid {}", uid, mInfo.getMid());
-            final Uid opUid = mInfo.leftUid().get();
-            final ParticipantMemState opponent = tournament.getBidOrQuit(opUid);
+            log.warn("Remove first uid {} from mid {}", bid, mInfo.getMid());
+            final Bid opBid = mInfo.leftBid().get();
+            final ParticipantMemState opponent = tournament.getBidOrQuit(opBid);
             final BidState opoState = opponent.state();
             switch (opoState) {
                 case Expl:
@@ -277,12 +278,11 @@ public class MatchEditorService {
                     break;
             }
             resetBidStateTo(batch, opponent, Wait);
-            final ParticipantMemState bid = tournament.getBidOrQuit(uid);
-            resetBidStateTo(batch, bid, Wait);
+            resetBidStateTo(batch, tournament.getBidOrQuit(bid), Wait);
             removeWinnerUidIf(batch, mInfo);
-            matchDao.removeSecondParticipant(batch, mInfo, opUid);
+            matchDao.removeSecondParticipant(batch, mInfo, opBid);
         } else if (numberOfParticipants == 0) {
-            log.warn("Remove last uid {} from mid {}", uid, mInfo.getMid());
+            log.warn("Remove last uid {} from mid {}", bid, mInfo.getMid());
             matchService.changeStatus(batch, mInfo, Draft);
             matchDao.removeParticipants(batch, mInfo);
         } else {

@@ -50,9 +50,8 @@ public class CategoryService {
                 .link(cLink)
                 .role(tournament.
                         detectRole(ouid))
-                .users(tournament.getParticipants().values().stream()
-                        .filter(m -> m.getCid() == cid)
-                        .map(ParticipantMemState::toLink)
+                .users(tournament.findBidsByCategory(cid)
+                        .map(ParticipantMemState::toBidLink)
                         .collect(toList()))
                 .build();
     }

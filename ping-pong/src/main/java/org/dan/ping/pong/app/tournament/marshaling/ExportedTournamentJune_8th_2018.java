@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -33,7 +33,7 @@ public class ExportedTournamentJune_8th_2018 implements ExportedTournament {
     private Tid tid;
     private String name;
     private TournamentType type;
-    private Map<Uid, ParticipantMemState> participants;
+    private Map<Bid, ParticipantMemState> participants;
     private Map<Mid, MatchInfo> matches;
     private Map<Integer, GroupInfo> groups;
     private Map<Integer, CategoryLink> categories;

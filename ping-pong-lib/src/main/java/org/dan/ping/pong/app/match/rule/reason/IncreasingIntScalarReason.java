@@ -1,26 +1,26 @@
 package org.dan.ping.pong.app.match.rule.reason;
 
 import lombok.NoArgsConstructor;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 
 import java.util.Map;
 
 @NoArgsConstructor
 public class IncreasingIntScalarReason extends DecreasingIntScalarReason {
-    public IncreasingIntScalarReason(Uid uid, int n, OrderRuleName rule) {
-        super(uid, n, rule);
+    public IncreasingIntScalarReason(Bid bid, int n, OrderRuleName rule) {
+        super(bid, n, rule);
     }
 
     public static IncreasingIntScalarReason ofIntI(int n, OrderRuleName rule) {
         return ofIntI(null, n, rule);
     }
 
-    public static IncreasingIntScalarReason ofIntI(Uid uid, int n, OrderRuleName rule) {
-        return new IncreasingIntScalarReason(uid, n, rule);
+    public static IncreasingIntScalarReason ofIntI(Bid bid, int n, OrderRuleName rule) {
+        return new IncreasingIntScalarReason(bid, n, rule);
     }
 
-    public static IncreasingIntScalarReason ofEntry(Map.Entry<Uid, Integer> e,
+    public static IncreasingIntScalarReason ofEntry(Map.Entry<Bid, Integer> e,
             OrderRuleName rule) {
         return ofIntI(e.getKey(), e.getValue(), rule);
     }

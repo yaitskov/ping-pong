@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
@@ -22,9 +23,10 @@ import java.util.Optional;
 @AllArgsConstructor
 public class GroupParticipantResult {
     private Uid uid;
+    private Bid bid;
     private String name;
-    private Map<Uid, GroupMatchResult> originMatches;
-    private Map<Uid, GroupMatchResult> dmMatches;
+    private Map<Bid, GroupMatchResult> originMatches;
+    private Map<Bid, GroupMatchResult> dmMatches;
     private int seedPosition;
     private int finishPosition;
     private List<Optional<Reason>> reasonChain;

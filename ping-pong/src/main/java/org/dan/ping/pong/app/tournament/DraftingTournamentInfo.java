@@ -1,5 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
+import static java.util.Collections.emptyMap;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +15,7 @@ import org.dan.ping.pong.app.place.PlaceLink;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 @Getter
@@ -28,11 +31,10 @@ public class DraftingTournamentInfo {
     private Optional<Tid> previousTid = Optional.empty();
     private Optional<Double> ticketPrice = Optional.empty();
     private PlaceLink place;
-    private Optional<Integer> myCategoryId = Optional.empty();
+    private Map<Integer, BidState> categoryState = emptyMap();
     private boolean iAmAdmin;
     private Collection<CategoryLink> categories;
     private TournamentState state;
-    private Optional<BidState> bidState = Optional.empty();
     private TournamentRules rules;
     private int enlisted;
 }

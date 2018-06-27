@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.tournament.Tid;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class RescoreMatch {
     private Tid tid;
     private Mid mid;
     private Optional<String> effectHash = Optional.empty();
-    private Map<Uid, List<Integer>> sets;
+    private Map<Bid, List<Integer>> sets;
 
     public static class RescoreMatchBuilder {
         Optional<String> effectHash = Optional.empty();

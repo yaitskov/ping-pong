@@ -14,6 +14,7 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENL
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S2A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
+import static org.dan.ping.pong.app.user.UserResource.OFFLINE_USER_REGISTER;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -30,6 +31,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.Mid;
@@ -41,6 +43,7 @@ import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.tournament.EnlistOffline;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.tournament.TournamentRules;
+import org.dan.ping.pong.app.user.OfflineUserRegRequest;
 import org.dan.ping.pong.mock.simulator.Player;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc;
@@ -89,7 +92,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
 
         assertThat(gp, allOf(hasProperty("participants", contains(
                 allOf(
-                        hasProperty("uid", is(s.player2Uid(p1))),
+                        hasProperty("uid", is(s.player2Bid(p1))),
                         hasProperty("seedPosition", is(0)),
                         hasProperty("finishPosition", is(1)),
                         hasProperty("dmMatches", aMapWithSize(is(2))),
@@ -111,7 +114,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                                         hasProperty("value", is(3)))))),
                         hasProperty("name", containsString("p1"))),
                 allOf(
-                        hasProperty("uid", is(s.player2Uid(p2))),
+                        hasProperty("uid", is(s.player2Bid(p2))),
                         hasProperty("seedPosition", is(1)),
                         hasProperty("finishPosition", is(2)),
                         hasProperty("dmMatches", aMapWithSize(is(2))),
@@ -133,7 +136,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                                         hasProperty("value", is(2)))))),
                         hasProperty("name", containsString("p2"))),
                 allOf(
-                        hasProperty("uid", is(s.player2Uid(p3))),
+                        hasProperty("uid", is(s.player2Bid(p3))),
                         hasProperty("seedPosition", is(2)),
                         hasProperty("finishPosition", is(0)),
                         hasProperty("dmMatches", aMapWithSize(is(2))),
@@ -394,8 +397,8 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                     .get(GROUP_POPULATIONS + scenario.getTid().getTid() + CID + cid,
                             GroupPopulations.class);
 
-            final Uid joinedUid = enlistParticipant(scenario, cid, populations, "p4");
-            scenario.addPlayer(joinedUid, p4);
+            final Bid joinedBid = enlistParticipant(scenario, cid, populations, "p4");
+            scenario.addPlayer(joinedBid, p4);
             c.reloadMatchMap()
                     // dm disappeared .scoreSet(p3, 11, p1, 0)
                     .scoreSet(p1, 9, p4, 11)
@@ -407,20 +410,29 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
         });
     }
 
-    private Uid enlistParticipant(TournamentScenario scenario, int cid, GroupPopulations populations, String p5) {
+    private Bid enlistParticipant(TournamentScenario scenario, int cid, GroupPopulations populations, String p5) {
         return enlistParticipant(scenario, cid, Optional.of(populations.getLinks().get(0).getGid()), p5);
     }
 
-    private Uid enlistParticipant(TournamentScenario scenario, int cid, Optional<Integer> gid, String p5) {
+    private Bid enlistParticipant(TournamentScenario scenario, int cid,
+            Optional<Integer> gid, String p5) {
+        final Uid uid = myRest().post(OFFLINE_USER_REGISTER, scenario,
+                OfflineUserRegRequest
+                        .builder()
+                        .name(p5)
+                        .build()).readEntity(Uid.class);
+
         return myRest().post(TOURNAMENT_ENLIST_OFFLINE, scenario,
                 EnlistOffline.builder()
                         .groupId(gid)
+                        .uid(uid)
                         .tid(scenario.getTid())
                         .cid(cid)
                         .bidState(BidState.Wait)
-                        .name(p5)
-                        .build()).readEntity(Uid.class);
+                        .build())
+                .readEntity(Bid.class);
     }
+
 
     @Test
     public void expelParticipantWithDmMatches() {

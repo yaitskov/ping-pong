@@ -7,9 +7,9 @@ import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.castinglots.CastingLotsResource.CID_IN;
 import static org.dan.ping.pong.app.castinglots.CastingLotsResource.GET_MANUAL_BIDS_ORDER;
 import static org.dan.ping.pong.app.castinglots.CastingLotsResource.ORDER_BIDS_MANUALLY;
+import static org.dan.ping.pong.app.tournament.CastingLotsRulesConst.BALANCED_MANUAL;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S1A2G11_PRNK;
-import static org.dan.ping.pong.app.tournament.CastingLotsRulesConst.BALANCED_MANUAL;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -23,7 +23,7 @@ import static org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc.restState
 import static org.junit.Assert.assertEquals;
 
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
@@ -59,20 +59,23 @@ public class ManualSeedJerseyTest extends AbstractSpringJerseyTest {
 
         simulator.simulate(scenario);
         final int cid = scenario.getCategoryDbId().get(c1);
-        final List<Uid> uids = scenario.getUidPlayer().keySet().stream().sorted().collect(Collectors.toList());
+        final List<Bid> bids = scenario.getBidPlayer().keySet()
+                .stream().sorted().collect(Collectors.toList());
         myRest().voidPost(ORDER_BIDS_MANUALLY, scenario,
                 OrderCategoryBidsManually
                         .builder()
                         .cid(cid)
                         .tid(scenario.getTid())
-                        .uids(uids)
+                        .bids(bids)
                         .build());
 
         final List<RankedBid> result = myRest()
                 .get(GET_MANUAL_BIDS_ORDER + scenario.getTid().getTid() + CID_IN + cid,
                         new GenericType<List<RankedBid>>(){});
-        assertEquals(asList(1, 2, 3), result.stream().map(r -> r.getSeed().get()).collect(Collectors.toList()));
-        assertEquals(uids, result.stream().map(r -> r.getUser().getUid()).collect(Collectors.toList()));
+        assertEquals(asList(1, 2, 3), result.stream()
+                .map(r -> r.getSeed().get()).collect(Collectors.toList()));
+        assertEquals(bids, result.stream().map(r -> r.getUser().getBid())
+                .collect(Collectors.toList()));
     }
 
     @Inject
@@ -90,8 +93,8 @@ public class ManualSeedJerseyTest extends AbstractSpringJerseyTest {
                                     .builder()
                                     .cid(scenario.getCategoryDbId().get(c1))
                                     .tid(scenario.getTid())
-                                    .uids(Stream.of(p3, p4, p1, p2)
-                                            .map(scenario::player2Uid)
+                                    .bids(Stream.of(p3, p4, p1, p2)
+                                            .map(scenario::player2Bid)
                                             .collect(Collectors.toList()))
                                     .build());
                     c.beginTournament()

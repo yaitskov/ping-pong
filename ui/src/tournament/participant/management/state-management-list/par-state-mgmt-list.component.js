@@ -33,7 +33,7 @@ angular.module('participant').
                          this.markAsPaid = function (participant) {
                              requestStatus.startLoading("Paying");
                              Participant.setState(
-                                 {uid: participant.user.uid,
+                                 {bid: participant.user.bid,
                                   tid: $routeParams.tournamentId,
                                   expected: 'Want',
                                   target: 'Paid'},
@@ -46,7 +46,7 @@ angular.module('participant').
                          this.participantIsHere = function (participant) {
                              requestStatus.startLoading("Marking participant presence");
                              Participant.setState(
-                                 {uid: participant.user.uid,
+                                 {bid: participant.user.bid,
                                   tid: $routeParams.tournamentId,
                                   expected: 'Paid',
                                   target: 'Here'},
@@ -59,7 +59,7 @@ angular.module('participant').
                          this.resetToWant = function (participant) {
                              requestStatus.startLoading("Reseting participant");
                              Participant.setState(
-                                 {uid: participant.user.uid,
+                                 {bid: participant.user.bid,
                                   tid: $routeParams.tournamentId,
                                   expected: participant.state,
                                   target: 'Want'},

@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.match;
 
 import static java.util.Collections.emptyList;
 
+import com.google.common.collect.ImmutableList;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,5 +28,23 @@ public class PlayedMatchList {
     public static class PlayedMatchListBuilder {
         List<PlayedMatchLink> inGroup = emptyList();
         List<PlayedMatchLink> playOff = emptyList();
+    }
+
+    public PlayedMatchList merge(PlayedMatchList b) {
+        return PlayedMatchList
+                .builder()
+                .participant(participant)
+                .progress(progress.merge(b.progress))
+                .inGroup(ImmutableList
+                        .<PlayedMatchLink>builder()
+                        .addAll(inGroup)
+                        .addAll(b.inGroup)
+                        .build())
+                .playOff(ImmutableList
+                        .<PlayedMatchLink>builder()
+                        .addAll(playOff)
+                        .addAll(b.playOff)
+                        .build())
+                .build();
     }
 }

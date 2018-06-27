@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.playoff;
 
 import lombok.RequiredArgsConstructor;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 
 import java.util.Comparator;
@@ -19,10 +19,10 @@ public class PlayOffBidComparator implements Comparator<PlayOffBidStat> {
             return r;
         }
         for (TournamentResultEntry e : groupEntries) {
-            final Uid u = e.getUser().getUid();
-            if (o1.getUid().equals(u)) {
+            final Bid u = e.getUser().getBid();
+            if (o1.getBid().equals(u)) {
                 return -1;
-            } else if (o2.getUid().equals(u)) {
+            } else if (o2.getBid().equals(u)) {
                 return 1;
             }
         }

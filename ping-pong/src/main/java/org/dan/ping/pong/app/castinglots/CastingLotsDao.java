@@ -18,6 +18,8 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.rank.OrderDirection;
 import org.dan.ping.pong.app.group.GroupSchedule;
@@ -30,7 +32,6 @@ import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
-import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.jooq.tables.records.BidRecord;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.jooq.DSLContext;
@@ -84,11 +85,11 @@ public class CastingLotsDao implements CastingLotsDaoIf {
     public int addGroupMatch(DbUpdater batch,
             TournamentMemState tournament, int priorityGroup,
             ParticipantMemState bid1, ParticipantMemState bid2,
-            MatchState state, Optional<Uid> winnerId, Optional<MatchTag> tag) {
+            MatchState state, Optional<Bid> winnerId, Optional<MatchTag> tag) {
         final Mid mid = tournament.getNextMatch().next();
         matchDao.createGroupMatch(batch, mid, bid1.getTid(),
                 bid1.getGid().get(), bid1.getCid(), ++priorityGroup,
-                bid1.getUid(), bid2.getUid(), tag, Place);
+                bid1.getBid(), bid2.getBid(), tag, Place);
         tournament.getMatches().put(mid, MatchInfo.builder()
                 .tid(bid1.getTid())
                 .mid(mid)
@@ -99,8 +100,8 @@ public class CastingLotsDao implements CastingLotsDaoIf {
                 .winnerId(winnerId)
                 .gid(bid1.getGid())
                 .participantIdScore(ImmutableMap.of(
-                        bid1.getUid(), new ArrayList<>(),
-                        bid2.getUid(), new ArrayList<>()))
+                        bid1.getBid(), new ArrayList<>(),
+                        bid2.getBid(), new ArrayList<>()))
                 .type(Grup)
                 .cid(bid1.getCid())
                 .build());
@@ -191,10 +192,10 @@ public class CastingLotsDao implements CastingLotsDaoIf {
         batch.add(jooq.update(BID).set(BID.SEED, Optional.empty())
                 .where(BID.TID.eq(order.getTid()),
                         BID.CID.eq(order.getCid())));
-        for (Uid uid : order.getUids()) {
+        for (Bid bid : order.getBids()) {
              batch.add(jooq.update(BID)
                      .set(BID.SEED, Optional.of(batch.size()))
-                     .where(BID.TID.eq(order.getTid()), BID.UID.eq(uid)));
+                     .where(BID.TID.eq(order.getTid()), BID.BID_.eq(bid)));
         }
         jooq.batch(batch).execute();
         final List<Uid> unseededUids = jooq.select(BID.UID).from(BID)
@@ -212,7 +213,7 @@ public class CastingLotsDao implements CastingLotsDaoIf {
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
     public List<RankedBid> loadManualBidsOrder(Tid tid, int cid) {
-        return jooq.select(USERS.NAME, USERS.UID, BID.PROVIDED_RANK, BID.SEED)
+        return jooq.select(USERS.NAME, BID.BID_, BID.PROVIDED_RANK, BID.SEED)
                 .from(BID)
                 .innerJoin(USERS)
                 .on(BID.UID.eq(USERS.UID))
@@ -220,9 +221,9 @@ public class CastingLotsDao implements CastingLotsDaoIf {
                 .orderBy(BID.SEED)
                 .fetch()
                 .map(r -> RankedBid.builder()
-                        .user(UserLink.builder()
+                        .user(ParticipantLink.builder()
                                 .name(r.get(USERS.NAME))
-                                .uid(r.get(USERS.UID))
+                                .bid(r.get(BID.BID_))
                                 .build())
                         .providedRank(r.get(BID.PROVIDED_RANK))
                         .seed(r.get(BID.SEED))

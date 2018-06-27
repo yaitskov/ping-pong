@@ -2,13 +2,13 @@ package org.dan.ping.pong.app.match.rule.service.tennis.atp;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
-import static org.dan.ping.pong.app.group.GroupServiceTest.UID2;
+import static org.dan.ping.pong.app.group.GroupServiceTest.BID2;
 import static org.dan.ping.pong.app.match.MatchState.Over;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID3;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID4;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID5;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID3;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID4;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID5;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpDII;
-import static org.dan.ping.pong.app.match.rule.service.tennis.atp.AtpDIRuleServiceTest.UIDS_3_4_5;
+import static org.dan.ping.pong.app.match.rule.service.tennis.atp.AtpDIRuleServiceTest.BIDS_3_4_5;
 import static org.dan.ping.pong.app.sport.tennis.TennisSportTest.CLASSIC_TENNIS_RULES;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.contains;
@@ -47,58 +47,58 @@ public class AtpDIIPercentWonSetsRuleTest {
 
     static final List<MatchInfo> BASE = asList(
             MatchInfo.builder().state(Over)
-                    .winnerId(Optional.of(UID3))
+                    .winnerId(Optional.of(BID3))
                     .gid(Optional.of(1))
                     .tag(Optional.empty())
                     .participantIdScore(ImmutableMap.of(
-                            UID3, asList(6, 6),
-                            UID2, asList(0, 0)))
+                            BID3, asList(6, 6),
+                            BID2, asList(0, 0)))
                     .build(),
             MatchInfo.builder().state(Over)
-                    .winnerId(Optional.of(UID4))
+                    .winnerId(Optional.of(BID4))
                     .gid(Optional.of(1))
                     .tag(Optional.empty())
                     .participantIdScore(
-                            ImmutableMap.of(UID4, asList(6, 1, 6),
-                                    UID2, asList(0, 6, 0)))
+                            ImmutableMap.of(BID4, asList(6, 1, 6),
+                                    BID2, asList(0, 6, 0)))
                     .build(),
             MatchInfo.builder().state(Over)
-                    .winnerId(Optional.of(UID5))
+                    .winnerId(Optional.of(BID5))
                     .gid(Optional.of(1))
                     .tag(Optional.empty())
                     .participantIdScore(
-                            ImmutableMap.of(UID5, asList(6, 6),
-                                    UID2, asList(0, 0)))
+                            ImmutableMap.of(BID5, asList(6, 6),
+                                    BID2, asList(0, 0)))
                     .build(),
 
             MatchInfo.builder().state(Over)
-                    .winnerId(Optional.of(UID3))
+                    .winnerId(Optional.of(BID3))
                     .gid(Optional.of(1))
                     .tag(Optional.empty())
                     .participantIdScore(
-                            ImmutableMap.of(UID3, asList(6, 6),
-                                    UID4, asList(0, 0)))
+                            ImmutableMap.of(BID3, asList(6, 6),
+                                    BID4, asList(0, 0)))
                     .build(),
             MatchInfo.builder().state(Over)
-                    .winnerId(Optional.of(UID5))
+                    .winnerId(Optional.of(BID5))
                     .gid(Optional.of(1))
                     .tag(Optional.empty())
                     .participantIdScore(
-                            ImmutableMap.of(UID3, asList(3, 2),
-                                    UID5, asList(6, 6)))
+                            ImmutableMap.of(BID3, asList(3, 2),
+                                    BID5, asList(6, 6)))
                     .build(),
             MatchInfo.builder().state(Over)
-                    .winnerId(Optional.of(UID4))
+                    .winnerId(Optional.of(BID4))
                     .gid(Optional.of(1))
                     .tag(Optional.empty())
                     .participantIdScore(
-                            ImmutableMap.of(UID4, asList(6, 6),
-                                    UID5, asList(0, 0)))
+                            ImmutableMap.of(BID4, asList(6, 6),
+                                    BID5, asList(0, 0)))
                     .build());
 
     @Test
     public void test() {
-        final List<DecreasingDoubleScalarReason> result = sut.score(BASE::stream, UIDS_3_4_5, null,
+        final List<DecreasingDoubleScalarReason> result = sut.score(BASE::stream, BIDS_3_4_5, null,
                 GroupRuleParams.builder()
                         .tournament(TournamentMemState.builder()
                                 .sport(SportType.Tennis)
@@ -126,8 +126,8 @@ public class AtpDIIPercentWonSetsRuleTest {
                 everyItem(is(AtpDII)));
         assertThat(
                 result.stream()
-                        .map(DecreasingDoubleScalarReason::getUid)
+                        .map(DecreasingDoubleScalarReason::getBid)
                         .collect(toList()),
-                contains(UID5, UID3, UID4, UID2));
+                contains(BID5, BID3, BID4, BID2));
     }
 }

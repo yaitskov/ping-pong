@@ -1,6 +1,7 @@
 package org.dan.ping.pong.sys.type.number;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,11 @@ public class ImmutableNumber extends AbstractNumber {
     @Override
     @JsonValue
     public int intValue() {
+        return value;
+    }
+
+    @JsonIgnore
+    public int getValidateValue() {
         return value;
     }
 }

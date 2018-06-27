@@ -3,7 +3,7 @@ package org.dan.ping.pong.app.match.rule.service.common;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.LostSets;
 import static org.dan.ping.pong.app.match.rule.reason.IncreasingIntScalarReason.ofEntry;
 
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 
@@ -15,7 +15,7 @@ public class LostSetsRuleService extends WonSetsRuleService {
         return LostSets;
     }
 
-    protected Function<Map.Entry<Uid, Integer>, Reason> reasonFactory() {
+    protected Function<Map.Entry<Bid, Integer>, Reason> reasonFactory() {
         return (e) -> ofEntry(e, getName());
     }
 

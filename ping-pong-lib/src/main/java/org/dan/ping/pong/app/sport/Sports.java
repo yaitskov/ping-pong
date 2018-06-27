@@ -7,7 +7,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.collect.Multimap;
 import lombok.RequiredArgsConstructor;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.SetScoreReq;
 import org.dan.ping.pong.app.match.dispute.MatchSets;
@@ -41,27 +41,27 @@ public class Sports {
         get(tournament.getSport()).validate(tournament.selectMatchRule(match), match);
     }
 
-    public Map<Uid, Integer> calcWonSets(TournamentMemState tournament, MatchInfo matchInfo) {
+    public Map<Bid, Integer> calcWonSets(TournamentMemState tournament, MatchInfo matchInfo) {
         return get(tournament.getSport()).calcWonSets(matchInfo.getParticipantIdScore());
     }
 
-    public Optional<Uid> findWinnerId(MatchRules rules, Map<Uid, Integer> wonSets) {
+    public Optional<Bid> findWinnerId(MatchRules rules, Map<Bid, Integer> wonSets) {
         return get(rules.sport()).findWinnerId(rules, wonSets);
     }
 
-    public Optional<Uid> findWinner(TournamentMemState tournament, MatchInfo matchInfo) {
+    public Optional<Bid> findWinner(TournamentMemState tournament, MatchInfo matchInfo) {
         return findWinnerByScores(tournament.selectMatchRule(matchInfo),
                 matchInfo.getParticipantIdScore());
     }
 
-    public Optional<Uid> findWinnerByScores(MatchRules rules, Map<Uid, List<Integer>> sets) {
+    public Optional<Bid> findWinnerByScores(MatchRules rules, Map<Bid, List<Integer>> sets) {
         final Sport sport = get(rules.sport());
         return sport.findWinnerId(rules, sport.calcWonSets(sets));
     }
 
-    public void checkWonSets(MatchRules rules, Map<Uid, Integer> uidWonSets) {
+    public void checkWonSets(MatchRules rules, Map<Bid, Integer> bidWonSets) {
         final Sport sport = get(rules.sport());
-        sport.checkWonSets(rules, uidWonSets);
+        sport.checkWonSets(rules, bidWonSets);
     }
 
     public List<SetScoreReq> expandScoreSet(MatchRules matchRules, SetScoreReq score) {
@@ -69,10 +69,10 @@ public class Sports {
         return sport.expandScoreSet(matchRules, score);
     }
 
-    public Optional<Uid> findNewWinnerUid(TournamentMemState tournament,
+    public Optional<Bid> findNewWinnerBid(TournamentMemState tournament,
             MatchSets newSets, MatchInfo mInfo) {
         if (mInfo.getWinnerId().isPresent()) {
-            final Optional<Uid> actualPracticalWinnerUid = findWinner(tournament, mInfo);
+            final Optional<Bid> actualPracticalWinnerUid = findWinner(tournament, mInfo);
             // actual uid always = formal uid if actual one is presented,
             // because walkover can happen if match has no scored sets
             // or presented sets are not enough to find out winner

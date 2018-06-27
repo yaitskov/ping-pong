@@ -2,9 +2,9 @@ package org.dan.ping.pong.app.match.rule.service.common;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
-import static org.dan.ping.pong.app.group.GroupServiceTest.UID2;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID3;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID4;
+import static org.dan.ping.pong.app.group.GroupServiceTest.BID2;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID3;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID4;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.WeightedMatches;
 import static org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleServiceTest.UIDS_2_3_4;
 import static org.hamcrest.Matchers.is;
@@ -37,18 +37,18 @@ public class WeightedMatchesRuleServiceTest {
     public static final List<MatchInfo> MATCHES_UIDS_2_3_4_NO_SAME = asList(
             MatchInfo.builder()
                     .participantIdScore(
-                            ImmutableMap.of(UID2, asList(3, 2, 1),
-                                    UID3, asList(6, 6, 6)))
+                            ImmutableMap.of(BID2, asList(3, 2, 1),
+                                    BID3, asList(6, 6, 6)))
                     .build(),
             MatchInfo.builder()
                     .participantIdScore(
-                            ImmutableMap.of(UID3, asList(1, 6, 0, 1),
-                                    UID4, asList(6, 1, 6, 6)))
+                            ImmutableMap.of(BID3, asList(1, 6, 0, 1),
+                                    BID4, asList(6, 1, 6, 6)))
                     .build(),
             MatchInfo.builder()
                     .participantIdScore(
-                            ImmutableMap.of(UID4, asList(2, 6, 1, 6, 0),
-                                    UID2, asList(6, 5, 6, 3, 6)))
+                            ImmutableMap.of(BID4, asList(2, 6, 1, 6, 0),
+                                    BID2, asList(6, 5, 6, 3, 6)))
                     .build());
 
     @Test
@@ -63,8 +63,8 @@ public class WeightedMatchesRuleServiceTest {
                 .get()
                 .map(WeightSetsReason.class::cast)
                 .collect(toList());
-        assertThat(result.stream().map(WeightSetsReason::getUid).collect(toList()),
-                is(asList(UID3, UID4, UID2)));
+        assertThat(result.stream().map(WeightSetsReason::getBid).collect(toList()),
+                is(asList(BID3, BID4, BID2)));
         assertThat(result.stream().map(WeightSetsReason::getRule).collect(toList()),
                 is(asList(WeightedMatches, WeightedMatches, WeightedMatches)));
 

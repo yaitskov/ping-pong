@@ -11,6 +11,7 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_CON
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_EXPEL;
 
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidId;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
@@ -51,12 +52,12 @@ public class RestEntityGenerator {
             myRest.voidPost(BID_PAID, adminSession,
                     BidId.builder()
                             .tid(tid)
-                            .uid(userSession.getUid())
+                            .bid(userSession.getBid())
                             .build());
             myRest.voidPost(BID_READY_TO_PLAY, adminSession,
                     BidId.builder()
                             .tid(tid)
-                            .uid(userSession.getUid())
+                            .bid(userSession.getBid())
                             .build());
         }
     }
@@ -75,32 +76,34 @@ public class RestEntityGenerator {
             TestUserSession userSession = participants.get(i);
             EnlistMode enlistMode = ofNullable(enlistModes.get(userSession)).orElse(EnlistMode.Pass);
             if (enlistMode.compareTo(EnlistMode.Enlist) >= 0) {
-                myRest.voidPost(TOURNAMENT_ENLIST, userSession,
+                final Bid bid = myRest.post(TOURNAMENT_ENLIST, userSession,
                         EnlistTournament.builder()
                                 .tid(tid)
                                 .categoryId(cid)
                                 .providedRank(getProvidedRank(ranks, i))
-                                .build());
+                                .build())
+                        .readEntity(Bid.class);
+                userSession.setBid(bid);
             }
             if (enlistMode.compareTo(EnlistMode.Pay) >= 0) {
                 myRest.voidPost(BID_PAID, adminSession,
                         BidId.builder()
                                 .tid(tid)
-                                .uid(userSession.getUid())
+                                .bid(userSession.getBid())
                                 .build());
             }
             if (enlistMode.compareTo(EnlistMode.Pass) >= 0) {
                 myRest.voidPost(BID_READY_TO_PLAY, adminSession,
                         BidId.builder()
                                 .tid(tid)
-                                .uid(userSession.getUid())
+                                .bid(userSession.getBid())
                                 .build());
             }
             if (enlistMode == EnlistMode.Expel) {
                 myRest.voidPost(TOURNAMENT_EXPEL, adminSession,
                         ExpelParticipant.builder()
                                 .tid(tid)
-                                .uid(userSession.getUid())
+                                .bid(userSession.getBid())
                                 .targetBidState(BidState.Expl)
                                 .build());
             }
@@ -108,7 +111,7 @@ public class RestEntityGenerator {
                 myRest.voidPost(TOURNAMENT_EXPEL, adminSession,
                         ExpelParticipant.builder()
                                 .tid(tid)
-                                .uid(userSession.getUid())
+                                .bid(userSession.getBid())
                                 .targetBidState(BidState.Quit)
                                 .build());
             }

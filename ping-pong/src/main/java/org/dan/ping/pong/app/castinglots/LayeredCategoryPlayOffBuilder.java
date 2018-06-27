@@ -11,7 +11,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ArrayListMultimap;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchTag;
@@ -57,16 +57,16 @@ public class LayeredCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
 
         final TournamentMemState masterTournament = tournamentCache.get(masterTid);
 
-        final int masterCid = masterTournament.getParticipant(bids.get(0).getUid()).getCid();
+        final int masterCid = masterTournament.getParticipant(bids.get(0).getBid()).getCid();
         final List<GroupInfo> orderedGroups = masterTournament.getGroupsByCategory(masterCid);
         orderedGroups.sort(Comparator.comparing(GroupInfo::getOrdNumber));
-        final ArrayListMultimap<Integer, Uid> bidsByFinalGroupPosition = ArrayListMultimap.create();
+        final ArrayListMultimap<Integer, Bid> bidsByFinalGroupPosition = ArrayListMultimap.create();
 
         orderedGroups.forEach(groupInfo -> {
-            final List<Uid> orderedUids = groupService.orderUidsInGroup(groupInfo.getGid(), masterTournament,
+            final List<Bid> orderedBids = groupService.orderBidsInGroup(groupInfo.getGid(), masterTournament,
                     groupService.findAllMatchesInGroup(masterTournament, groupInfo.getGid()));
-            for (int i = 0; i < orderedUids.size(); ++i) {
-                bidsByFinalGroupPosition.put(i, orderedUids.get(i));
+            for (int i = 0; i < orderedBids.size(); ++i) {
+                bidsByFinalGroupPosition.put(i, orderedBids.get(i));
             }
         });
         log.info("Found {} layers in {} groups in cid {}",

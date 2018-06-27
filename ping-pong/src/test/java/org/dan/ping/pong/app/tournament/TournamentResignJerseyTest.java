@@ -5,11 +5,11 @@ import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S3A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S3A2G11;
-import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.Hook.AfterMatch;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Score;
@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 import com.google.common.collect.ImmutableSet;
 import lombok.RequiredArgsConstructor;
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.ForTestBidDao;
 import org.dan.ping.pong.app.match.ForTestMatchDao;
 import org.dan.ping.pong.app.match.MatchDao;
@@ -75,8 +75,8 @@ public class TournamentResignJerseyTest extends AbstractSpringJerseyTest {
         simulator.simulate(scenario);
         final Map<Player, TestUserSession> session = scenario.getPlayersSessions();
         myRest().voidPost(TOURNAMENT_RESIGN, session.get(p1), scenario.getTid());
-        final Uid uid = session.get(p1).getUid();
-        assertEquals(Optional.of(Quit), bidDao.getState(scenario.getTid(), uid));
+        final Bid bid = session.get(p1).getBid();
+        assertEquals(Optional.of(Quit), bidDao.getState(scenario.getTid(), bid));
     }
 
     @Inject

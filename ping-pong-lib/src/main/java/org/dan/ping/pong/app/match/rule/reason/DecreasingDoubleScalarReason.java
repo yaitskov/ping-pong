@@ -6,16 +6,13 @@ import static java.lang.String.format;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.util.json.DoubleContextSerializer;
 import org.dan.ping.pong.util.json.Precision;
-
-import java.util.Map;
 
 @Getter
 @Setter
@@ -25,7 +22,7 @@ public class DecreasingDoubleScalarReason implements Reason {
     @JsonIgnore
     @Getter(onMethod = @__(@JsonIgnore))
     @Setter(onMethod = @__(@JsonIgnore))
-    private Uid uid;
+    private Bid bid;
 
     @Precision(4)
     @JsonSerialize(using = DoubleContextSerializer.class)
@@ -46,7 +43,7 @@ public class DecreasingDoubleScalarReason implements Reason {
         if (Double.compare(that.value, value) != 0) {
             return false;
         }
-        if (!uid.equals(that.uid)) {
+        if (!bid.equals(that.bid)) {
             return false;
         }
         return rule == that.rule;
@@ -56,7 +53,7 @@ public class DecreasingDoubleScalarReason implements Reason {
     public int hashCode() {
         int result;
         long temp;
-        result = uid.hashCode();
+        result = bid.hashCode();
         temp = Double.doubleToLongBits(value);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + rule.hashCode();
@@ -76,8 +73,8 @@ public class DecreasingDoubleScalarReason implements Reason {
     }
 
     public static DecreasingDoubleScalarReason ofDoubleD(
-            Uid uid, double n, OrderRuleName rule) {
-        return new DecreasingDoubleScalarReason(uid, n, rule);
+            Bid bid, double n, OrderRuleName rule) {
+        return new DecreasingDoubleScalarReason(bid, n, rule);
     }
 
     @Override

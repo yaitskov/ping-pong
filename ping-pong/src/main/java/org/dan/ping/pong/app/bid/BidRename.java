@@ -14,7 +14,7 @@ import org.dan.ping.pong.app.tournament.Tid;
 @AllArgsConstructor
 public class BidRename {
     private Tid tid;
-    private Uid uid;
+    private Bid bid;
     private String expectedName;
     private String newName;
 }

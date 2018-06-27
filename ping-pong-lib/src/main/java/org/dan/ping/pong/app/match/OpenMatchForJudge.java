@@ -10,9 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.table.TableLink;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.user.UserLink;
 
 import java.time.Instant;
 import java.util.List;
@@ -28,7 +28,7 @@ public class OpenMatchForJudge {
     private Mid mid;
     private Tid tid;
     private Optional<TableLink> table = empty();
-    private List<UserLink> participants = emptyList();
+    private List<ParticipantLink> participants = emptyList();
     private Optional<Instant> started = empty();
     private MyPendingMatchSport sport;
     private int playedSets;
@@ -37,6 +37,6 @@ public class OpenMatchForJudge {
     public static class OpenMatchForJudgeBuilder {
         Optional<Instant> started = empty();
         Optional<TableLink> table = empty();
-        List<UserLink> participants = emptyList();
+        List<ParticipantLink> participants = emptyList();
     }
 }

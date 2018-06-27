@@ -15,6 +15,7 @@ export default class ManageOneCtrl extends SimpleController {
 
     $onInit() {
         this.tournamentId = this.$routeParams.tournamentId;
+        this.participantId = this.$routeParams.participantId;
         this.participant = null;
         this.BidTerminalStates = new Set(['Quit', 'Expl', 'Win1', 'Win2', 'Win3']);
         this.binder(this.$scope, {
@@ -25,8 +26,8 @@ export default class ManageOneCtrl extends SimpleController {
             },
             'event.request.status.ready': (event) => {
                 this.requestStatus.startLoading('Loading participant');
-                this.Participant.state(
-                    {uid: this.$routeParams.userId,
+                this.Participant.profile(
+                    {participantId: this.$routeParams.participantId,
                      tournamentId: this.$routeParams.tournamentId},
                     (state) => {
                         this.requestStatus.complete();

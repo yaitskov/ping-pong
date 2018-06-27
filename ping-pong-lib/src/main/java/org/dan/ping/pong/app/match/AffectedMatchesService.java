@@ -18,7 +18,7 @@ import static org.dan.ping.pong.sys.hash.HashAggregator.createHashAggregator;
 
 import com.google.common.collect.Sets.SetView;
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.dispute.MatchSets;
 import org.dan.ping.pong.app.match.rule.GroupParticipantOrder;
@@ -87,30 +87,30 @@ public class AffectedMatchesService {
     }
 
     private void findPlayOffAffectedMatches(TournamentMemState tournament,
-            Uid uid, List<MatchInfo> matches, List<MatchUid> result) {
+            Bid bid, List<MatchInfo> matches, List<MatchBid> result) {
         matches.stream()
-                .filter(m -> m.getParticipantIdScore().containsKey(uid))
+                .filter(m -> m.getParticipantIdScore().containsKey(bid))
                 .forEach(m -> {
-                    result.add(MatchUid.builder().uid(uid).mid(m.getMid()).build());
+                    result.add(MatchBid.builder().bid(bid).mid(m.getMid()).build());
                     m.getWinnerId().ifPresent(wUid -> {
-                        if (wUid.equals(uid)) {
+                        if (wUid.equals(bid)) {
                             m.getWinnerMid().ifPresent(wMid ->
-                                    findPlayOffAffectedMatches(tournament, uid,
+                                    findPlayOffAffectedMatches(tournament, bid,
                                             singletonList(tournament.getMatchById(wMid)), result));
                             m.getLoserMid().ifPresent(lMid ->
                                     findPlayOffAffectedMatches(tournament,
-                                            m.getOpponentUid(uid)
+                                            m.getOpponentBid(bid)
                                                     .orElseThrow(() -> internalError("no loser")),
                                             singletonList(tournament.getMatchById(lMid)), result));
                         } else {
                             m.getWinnerMid().ifPresent(wMid ->
                                     findPlayOffAffectedMatches(tournament,
-                                            m.getOpponentUid(uid)
+                                            m.getOpponentBid(bid)
                                                     .orElseThrow(() -> internalError("no winner")),
                                             singletonList(tournament.getMatchById(wMid)), result));
                             m.getLoserMid().ifPresent(lMid ->
                                     findPlayOffAffectedMatches(tournament,
-                                            uid,
+                                            bid,
                                             singletonList(tournament.getMatchById(lMid)), result));
 
                         }
@@ -118,7 +118,7 @@ public class AffectedMatchesService {
                     if (m.getState() == Auto) {
                         m.getLoserMid().ifPresent(lMid ->
                                 findPlayOffAffectedMatches(tournament,
-                                        uid,
+                                        bid,
                                         singletonList(tournament.getMatchById(lMid)), result));
                     }
                 });
@@ -164,21 +164,21 @@ public class AffectedMatchesService {
         return (int) matches.stream().filter(MatchInfo::continues).count();
     }
 
-    private List<Uid> uidsByGroup(TournamentMemState tournament, Optional<Integer> ogid) {
+    private List<Bid> bidsByGroup(TournamentMemState tournament, Optional<Integer> ogid) {
         return tournament.getParticipants().values().stream()
                 .filter(p -> p.getGid().equals(ogid))
-                .map(ParticipantMemState::getUid)
+                .map(ParticipantMemState::getBid)
                 .collect(toList());
     }
 
-    private List<MatchUid> playOffMatchesAffectedByUids(
-            TournamentMemState tournament, List<Uid> uids) {
+    private List<MatchBid> playOffMatchesAffectedByUids(
+            TournamentMemState tournament, List<Bid> bids) {
         final List<MatchInfo> basePlayOffMatches = playOffService
                 .findBaseMatches(tournament,
-                        tournament.getBid(uids.get(0)).getCid(),
+                        tournament.getBid(bids.get(0)).getCid(),
                         Optional.empty());
-        final List<MatchUid> result = new ArrayList<>();
-        uids.forEach(
+        final List<MatchBid> result = new ArrayList<>();
+        bids.forEach(
                 uid -> findPlayOffAffectedMatches(
                         tournament, uid, basePlayOffMatches, result));
         return result;
@@ -211,7 +211,7 @@ public class AffectedMatchesService {
                         .toBeRemoved(presentDmMatches.stream()
                                 .map(MatchInfo::getMid).collect(toSet()))
                         .toBeReset(playOffMatchesAffectedByUids(tournament,
-                                uidsByGroup(tournament, ogmi.getGid())))
+                                bidsByGroup(tournament, ogmi.getGid())))
                         .build();
             } else {
                 return findAffectedMatchesIfOriginMatchesStayComplete(tournament,
@@ -229,7 +229,7 @@ public class AffectedMatchesService {
         final Set<MatchParticipants> uidsOfPresentDmMatches = uidsOfMatches(presentDmMatches);
         final Set<Mid> midsToBeRemoved = presentDmMatches.stream()
                 .filter(m2 -> newDmMatchesToGenerate.stream()
-                        .noneMatch(dm -> dm.hasAll(m2.uids())))
+                        .noneMatch(dm -> dm.hasAll(m2.bids())))
                 .map(MatchInfo::getMid)
                 .collect(toSet());
         final SetView<MatchParticipants> toBeCreated = difference(
@@ -243,7 +243,7 @@ public class AffectedMatchesService {
                                 concat(newOriginMatches.stream(),
                                         presentDmMatches.stream()
                                         .filter(m2 -> newDmMatchesToGenerate
-                                                .containsAll(m2.uids()))),
+                                                .containsAll(m2.bids()))),
                                 newDmMatchesToGenerate.stream()
                                         .filter(m2 -> !presentDmMatches.contains(m2))
                                         .map(MatchParticipants::toFakeMatch))
@@ -251,37 +251,37 @@ public class AffectedMatchesService {
                 .build();
     }
 
-    private List<MatchUid> playOffMatchesAffectedByGroupWithPossibleDm(
+    private List<MatchBid> playOffMatchesAffectedByGroupWithPossibleDm(
             TournamentMemState tournament,
             List<MatchInfo> allGroupMatches,
             List<MatchInfo> allNewGroupMatches) {
         final int gid = allGroupMatches.get(0).groupId();
-        final Set<Uid> groupUids = tournament.uidsInGroup(gid);
+        final Set<Bid> groupBids = tournament.bidsInGroup(gid);
         final GroupParticipantOrder order = groupParticipantOrderService
                 .findOrder(ofParams(gid, tournament, allGroupMatches,
                         tournament.orderRules(),
-                        new HashSet<>(groupUids)));
+                        new HashSet<>(groupBids)));
         final GroupParticipantOrder newOrder = groupParticipantOrderService
                 .findOrder(ofParams(gid, tournament, allNewGroupMatches,
                         tournament.orderRules(),
-                        groupUids));
+                        groupBids));
 
-        final List<Uid> wasDeterminedUids = order.determinedUids();
-        final List<Uid> newDeterminedUids = newOrder.determinedUids();
-        final List<Uid> affectedUids = new ArrayList<>();
-        for (int i = 0; i < wasDeterminedUids.size(); ++i) {
-            Uid u = wasDeterminedUids.get(i);
+        final List<Bid> wasDeterminedBids = order.determinedBids();
+        final List<Bid> newDeterminedBids = newOrder.determinedBids();
+        final List<Bid> affectedBids = new ArrayList<>();
+        for (int i = 0; i < wasDeterminedBids.size(); ++i) {
+            Bid u = wasDeterminedBids.get(i);
             if (u == null /*was not determined*/) {
                 continue;
             }
-            if (i >= newDeterminedUids.size() || !u.equals(newDeterminedUids.get(i))) {
-                affectedUids.add(u);
+            if (i >= newDeterminedBids.size() || !u.equals(newDeterminedBids.get(i))) {
+                affectedBids.add(u);
             }
         }
-        if (affectedUids.isEmpty()) {
+        if (affectedBids.isEmpty()) {
             return emptyList();
         }
-        return playOffMatchesAffectedByUids(tournament, affectedUids);
+        return playOffMatchesAffectedByUids(tournament, affectedBids);
     }
 
     @Inject
@@ -293,7 +293,7 @@ public class AffectedMatchesService {
         final GroupParticipantOrder order = groupParticipantOrderService
                 .findOrder(ofParams(gid,
                         tournament, originMatches, tournament.orderRules(),
-                        tournament.uidsInGroup(gid)));
+                        tournament.bidsInGroup(gid)));
 
         if (order.unambiguous()) {
             return NO_AFFECTED_MATCHES;
@@ -302,13 +302,13 @@ public class AffectedMatchesService {
         final Set<MatchParticipants> disambiguationMatches = new HashSet<>();
         for (GroupPositionIdx ambiPos : order.getAmbiguousPositions()) {
              final GroupPosition gPosition = order.getPositions().get(ambiPos);
-             final List<Uid> competingUids = new ArrayList<>(
-                     gPosition.getCompetingUids());
-             for (int i = 0; i < competingUids.size(); ++i) {
-                 final Uid uid1 = competingUids.get(i);
-                 for (int j = i + 1; j < competingUids.size(); ++j) {
+             final List<Bid> competingBids = new ArrayList<>(
+                     gPosition.getCompetingBids());
+             for (int i = 0; i < competingBids.size(); ++i) {
+                 final Bid bid1 = competingBids.get(i);
+                 for (int j = i + 1; j < competingBids.size(); ++j) {
                      disambiguationMatches.add(
-                             new MatchParticipants(uid1, competingUids.get(j)));
+                             new MatchParticipants(bid1, competingBids.get(j)));
                  }
              }
         }
@@ -327,11 +327,11 @@ public class AffectedMatchesService {
     private AffectedMatches findEffectMatchesByMatchInPlayOff(
             TournamentMemState tournament, MatchInfo mInfo,
             MatchSets newSets) {
-        final Optional<Uid> newWinner = sports.findNewWinnerUid(tournament, newSets, mInfo);
+        final Optional<Bid> newWinner = sports.findNewWinnerBid(tournament, newSets, mInfo);
         if (newWinner.equals(mInfo.getWinnerId())) {
             return NO_AFFECTED_MATCHES;
         }
-        final List<MatchUid> result = new ArrayList<>();
+        final List<MatchBid> result = new ArrayList<>();
         mInfo.getParticipantIdScore().keySet()
                 .forEach(uid -> findPlayOffAffectedMatches(
                         tournament, uid, singletonList(mInfo), result));

@@ -2,7 +2,7 @@ package org.dan.ping.pong.app.match.rule.service.meta;
 
 import static org.dan.ping.pong.app.match.rule.OrderRuleName._DisambiguationPreview;
 
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
@@ -23,7 +23,7 @@ public class DisambiguationPreviewRuleService implements GroupOrderRuleService {
 
     @Override
     public Optional<Stream<? extends Reason>> score(
-            Supplier<Stream<MatchInfo>> _matches, Set<Uid> _uids,
+            Supplier<Stream<MatchInfo>> _matches, Set<Bid> _bids,
             GroupOrderRule _rule, GroupRuleParams _params) {
         return Optional.empty();
     }

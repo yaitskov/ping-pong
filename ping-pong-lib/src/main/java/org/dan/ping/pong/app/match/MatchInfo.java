@@ -6,15 +6,13 @@ import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.match.MatchTag.DISAMBIGUATION;
 import static org.dan.ping.pong.app.match.dispute.MatchSets.ofSets;
-import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
-import static org.dan.ping.pong.app.tournament.ParticipantMemState.UID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.BID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
-import com.fasterxml.jackson.annotation.JacksonAnnotation;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,11 +21,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.dispute.MatchSets;
 import org.dan.ping.pong.app.playoff.RootTaggedMatch;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.tournament.marshaling.StrictUniMap;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -37,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -60,9 +57,9 @@ public class MatchInfo {
     private MatchState state;
     private Optional<Mid> loserMid = Optional.empty();
     private Optional<Mid> winnerMid = Optional.empty();
-    private Optional<Uid> winnerId = Optional.empty();
+    private Optional<Bid> winnerId = Optional.empty();
     @JsonInclude // export to json removes all keys
-    private Map<Uid, List<Integer>> participantIdScore = emptyMap();
+    private Map<Bid, List<Integer>> participantIdScore = emptyMap();
     private Optional<Instant> startedAt = Optional.empty();
     private Optional<Instant> endedAt = Optional.empty();
     private int priority;
@@ -74,7 +71,7 @@ public class MatchInfo {
      * */
     private boolean losersMeet;
 
-    public Uid winnerId() {
+    public Bid winnerId() {
         return winnerId.orElseThrow(() -> internalError("no winner in match", MID, mid));
     }
 
@@ -85,10 +82,10 @@ public class MatchInfo {
         return 0;
     }
 
-    public void checkParticipant(Uid uid) {
-        if (!participantIdScore.containsKey(uid)) {
+    public void checkParticipant(Bid bid) {
+        if (!participantIdScore.containsKey(bid)) {
             throw badRequest("user-not-plays-match",
-                    ImmutableMap.of(USER, uid, MATCH, mid));
+                    ImmutableMap.of(USER, bid, MATCH, mid));
         }
     }
 
@@ -105,16 +102,16 @@ public class MatchInfo {
         return participantIdScore.size();
     }
 
-    public boolean addParticipant(Uid uid) {
-        if (FILLER_LOSER_UID.equals(uid) && participantIdScore.containsKey(uid)) {
+    public boolean addParticipant(Bid bid) {
+        if (FILLER_LOSER_BID.equals(bid) && participantIdScore.containsKey(bid)) {
             losersMeet = true;
         } else {
-            if (participantIdScore.containsKey(uid)) {
-                log.warn("ReAdd uid {} to mid {}. Allowed for rescore", uid, mid);
+            if (participantIdScore.containsKey(bid)) {
+                log.warn("ReAdd uid {} to mid {}. Allowed for rescore", bid, mid);
                 return true;
             }
             checkParticipantSpace();
-            participantIdScore.put(uid, new ArrayList<>());
+            participantIdScore.put(bid, new ArrayList<>());
         }
         return false;
     }
@@ -125,28 +122,28 @@ public class MatchInfo {
         participantIdScore = scores.getSets();
     }
 
-    public List<Integer> getParticipantScore(Uid uid) {
-        if (FILLER_LOSER_UID.equals(uid)) {
+    public List<Integer> getParticipantScore(Bid bid) {
+        if (FILLER_LOSER_BID.equals(bid)) {
             return emptyList();
         }
-        return participantIdScore.get(uid);
+        return participantIdScore.get(bid);
     }
 
-    public boolean removeParticipant(Uid uid) {
+    public boolean removeParticipant(Bid bid) {
         if (losersMeet) {
-            if (FILLER_LOSER_UID.equals(uid)) {
+            if (FILLER_LOSER_BID.equals(bid)) {
                 losersMeet = false;
                 return true;
             }
             return false;
         } else {
-            return participantIdScore.remove(uid) != null;
+            return participantIdScore.remove(bid) != null;
         }
     }
 
-    public Stream<Uid> participants() {
+    public Stream<Bid> participants() {
         if (losersMeet) {
-            return Stream.of(FILLER_LOSER_UID, FILLER_LOSER_UID);
+            return Stream.of(FILLER_LOSER_BID, FILLER_LOSER_BID);
         }
         return getParticipantIdScore().keySet().stream();
     }
@@ -177,23 +174,11 @@ public class MatchInfo {
         return gid.orElseThrow(() -> internalError("Match is not in a group", MID, mid));
     }
 
-    public void replaceParticipantUids(StrictUniMap<Uid> users) {
-        final List<Uid> oldUids = participantIdScore.keySet()
-                .stream().collect(Collectors.toList());
-
-        oldUids.forEach(uid -> {
-            if (FILLER_LOSER_UID.equals(uid)) {
-                return;
-            }
-            participantIdScore.put(users.apply(uid), participantIdScore.remove(uid));
-        });
-    }
-
     public static class MatchInfoBuilder {
         Optional<Integer> gid = Optional.empty();
         Optional<Mid> loserMid = Optional.empty();
         Optional<Mid> winnerMid = Optional.empty();
-        Optional<Uid> winnerId = Optional.empty();
+        Optional<Bid> winnerId = Optional.empty();
         Optional<Instant> startedAt = Optional.empty();
         Optional<Instant> endedAt = Optional.empty();
     }
@@ -202,47 +187,47 @@ public class MatchInfo {
         return "Mid(" + mid + ")";
     }
 
-    public Map<Uid, Integer> getSetScore(int setOrdNumber) {
-        final Map<Uid, Integer> setScore = new HashMap<>();
+    public Map<Bid, Integer> getSetScore(int setOrdNumber) {
+        final Map<Bid, Integer> setScore = new HashMap<>();
         participantIdScore.forEach(
-                (uid, sets) -> setScore.put(uid, sets.get(setOrdNumber)));
+                (bid, sets) -> setScore.put(bid, sets.get(setOrdNumber)));
         return setScore;
     }
 
     public void addSetScore(List<IdentifiedScore> scores) {
-        scores.forEach(score -> participantIdScore.get(score.getUid()).add(score.getScore()));
+        scores.forEach(score -> participantIdScore.get(score.getBid()).add(score.getScore()));
     }
 
-    public Set<Uid> uids() {
+    public Set<Bid> bids() {
         return participantIdScore.keySet();
     }
 
-    public Uid[] uidsArray() {
-        return uids().toArray(new Uid[2]);
+    public Bid[] bidsArray() {
+        return bids().toArray(new Bid[2]);
     }
 
-    public Optional<Uid> leftUid() {
+    public Optional<Bid> leftBid() {
         return participantIdScore.keySet().stream().findAny();
     }
 
-    public Uid opponentUid(Uid uid) {
-        return getOpponentUid(uid)
+    public Bid opponentBid(Bid bid) {
+        return getOpponentBid(bid)
                 .orElseThrow(() -> internalError(
-                        "Uid is not participant of match",
-                        ImmutableMap.of(UID, uid, MID, mid)));
+                        "Bid is not participant of match",
+                        ImmutableMap.of(BID, bid, MID, mid)));
     }
 
-    public Optional<Uid> getOpponentUid(Uid uid) {
-        if (FILLER_LOSER_UID.equals(uid) && losersMeet) {
-            return Optional.of(uid);
+    public Optional<Bid> getOpponentBid(Bid bid) {
+        if (FILLER_LOSER_BID.equals(bid) && losersMeet) {
+            return Optional.of(bid);
         }
         return participantIdScore.keySet().stream()
-                .filter(participantUid -> !participantUid.equals(uid))
+                .filter(participantUid -> !participantUid.equals(bid))
                 .findFirst();
     }
 
-    public boolean hasParticipant(Uid uid) {
-        return participantIdScore.containsKey(uid);
+    public boolean hasParticipant(Bid bid) {
+        return participantIdScore.containsKey(bid);
     }
 
     public Optional<Duration> duration(Instant now) {

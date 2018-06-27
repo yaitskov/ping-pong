@@ -93,7 +93,7 @@ angular.
                              requestStatus.startLoading(['ExpellingOf', {name: participant.name}]);
                              Tournament.expel(
                                  {tid: self.tournament.tid,
-                                  uid: participant.uid},
+                                  bid: participant.bid},
                                  function (ok) {
                                      self.expelAndOpenTournament();
                                  },

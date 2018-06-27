@@ -74,7 +74,7 @@ angular.
                                   isArray: true
                               },
                               scoreMatch: {
-                                  url: '/api/match/participant/score',
+                                  url: '/api/match/admin/score',
                                   method: 'POST',
                                   headers: {
                                       'Content-Type': 'application/json',

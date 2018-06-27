@@ -6,6 +6,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.sport.Sport;
@@ -46,30 +47,30 @@ public class TennisSport implements Sport<TennisMatchRules> {
 
     @Override
     public void validate(TennisMatchRules rules, MatchInfo match) {
-        final Map<Uid, List<Integer>> scores = match.getParticipantIdScore();
-        final Iterator<Uid> uidIterator = scores.keySet().iterator();
-        final Uid uidA = uidIterator.next();
-        final Uid uidB = uidIterator.next();
-        validateLength(rules, scores, uidA, uidB);
+        final Map<Bid, List<Integer>> scores = match.getParticipantIdScore();
+        final Iterator<Bid> uidIterator = scores.keySet().iterator();
+        final Bid bidA = uidIterator.next();
+        final Bid bidB = uidIterator.next();
+        validateLength(rules, scores, bidA, bidB);
         final int[] wonSets = new int[2];
-        for (int iSet = 0; iSet < scores.get(uidA).size(); ++iSet) {
+        for (int iSet = 0; iSet < scores.get(bidA).size(); ++iSet) {
             if (wonSets[PlayerA] == wonSets[PlayerB] && iSet == rules.getSetsToWin()) {
-                validateSuperTieBreakSet(rules, iSet, scores.get(uidA).get(iSet),
-                        scores.get(uidB).get(iSet));
+                validateSuperTieBreakSet(rules, iSet, scores.get(bidA).get(iSet),
+                        scores.get(bidB).get(iSet));
             } else {
                 wonSets[validateUsualSet(rules, iSet,
-                        scores.get(uidA).get(iSet),
-                        scores.get(uidB).get(iSet))]++;
+                        scores.get(bidA).get(iSet),
+                        scores.get(bidB).get(iSet))]++;
             }
         }
     }
 
     private void validateLength(TennisMatchRules rules,
-            Map<Uid, List<Integer>> scores,
-            Uid uidA, Uid uidB) {
-        validateLength(scores.get(uidA), rules.getSetsToWin());
-        validateLength(scores.get(uidB), rules.getSetsToWin());
-        if (scores.get(uidA).size() != scores.get(uidB).size()) {
+            Map<Bid, List<Integer>> scores,
+            Bid bidA, Bid bidB) {
+        validateLength(scores.get(bidA), rules.getSetsToWin());
+        validateLength(scores.get(bidB), rules.getSetsToWin());
+        if (scores.get(bidA).size() != scores.get(bidB).size()) {
             throw badRequest(SET_LENGTH_MISMATCH);
         }
     }
@@ -141,15 +142,15 @@ public class TennisSport implements Sport<TennisMatchRules> {
         return Tennis;
     }
 
-    public Optional<Uid> findWinnerId(TennisMatchRules rules, Map<Uid, Integer> wonSets) {
+    public Optional<Bid> findWinnerId(TennisMatchRules rules, Map<Bid, Integer> wonSets) {
         return wonSets.entrySet().stream()
                 .filter(e -> e.getValue() >= rules.getSetsToWin())
                 .map(Map.Entry::getKey)
                 .findAny();
     }
 
-    public void checkWonSets(TennisMatchRules rules, Map<Uid, Integer> uidWonSets) {
-        final Collection<Integer> wonSets = uidWonSets.values();
+    public void checkWonSets(TennisMatchRules rules, Map<Bid, Integer> bidWonSets) {
+        final Collection<Integer> wonSets = bidWonSets.values();
         wonSets.stream()
                 .filter(n -> n > rules.getSetsToWin()).findAny()
                 .ifPresent(o -> {

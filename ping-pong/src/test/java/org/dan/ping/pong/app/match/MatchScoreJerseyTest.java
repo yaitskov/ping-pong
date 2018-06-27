@@ -1,10 +1,10 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Arrays.asList;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_FIND_BY_PARTICIPANTS;
 import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
-import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulator;
@@ -47,9 +47,9 @@ public class MatchScoreJerseyTest extends AbstractSpringJerseyTest {
         simulator.run(ImperativeSimulator::beginTournament);
 
         final int tid = scenario.getTid().getTid();
-        final Uid uid1 = scenario.player2Uid(p1);
+        final Bid bid1 = scenario.player2Bid(p1);
         final Mid mid = myRest().get(MATCH_FIND_BY_PARTICIPANTS + tid + "/"
-                        + uid1.getId() + "/" + FILLER_LOSER_UID.getId(),
+                        + bid1.intValue() + "/" + FILLER_LOSER_BID.intValue(),
                 new GenericType<List<Mid>>(){}).get(0);
         final Response response = myRest().post(
                 SCORE_SET,
@@ -61,9 +61,9 @@ public class MatchScoreJerseyTest extends AbstractSpringJerseyTest {
                         .setOrdNumber(0)
                         .scores(asList(
                                 IdentifiedScore.builder()
-                                        .uid(uid1).score(11).build(),
+                                        .bid(bid1).score(11).build(),
                                 IdentifiedScore.builder()
-                                        .uid(FILLER_LOSER_UID).score(0).build()))
+                                        .bid(FILLER_LOSER_BID).score(0).build()))
                         .build());
 
         assertThat(response.readEntity(Error.class),

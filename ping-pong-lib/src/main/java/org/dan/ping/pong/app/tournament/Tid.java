@@ -1,21 +1,23 @@
 package org.dan.ping.pong.app.tournament;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.dan.ping.pong.sys.type.number.ImmutableNumber;
 
 import javax.validation.constraints.Min;
 
-@EqualsAndHashCode
-@RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
-public class Tid implements Comparable<Tid> {
+public class Tid extends ImmutableNumber {
     public static final String TOURNAMENT_ID_SHOULD_BE_A_POSITIVE_NUMBER = "tournament id should be a positive number";
 
-    @Getter(onMethod = @__(@JsonValue))
+    @JsonCreator
+    public Tid(int value) {
+        super(value);
+    }
+
     @Min(value = 1, message = TOURNAMENT_ID_SHOULD_BE_A_POSITIVE_NUMBER)
-    private final int tid;
+    public int getValidateValue() {
+        return super.getValidateValue();
+    }
 
     // jax-rsp
     @JsonCreator
@@ -27,12 +29,8 @@ public class Tid implements Comparable<Tid> {
         return new Tid(id);
     }
 
-    public String toString() {
-        return String.valueOf(tid);
-    }
-
-    @Override
-    public int compareTo(Tid o) {
-        return Integer.compare(tid, o.tid);
+    @JsonIgnore
+    public int getTid() {
+        return intValue();
     }
 }

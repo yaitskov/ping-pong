@@ -4,6 +4,7 @@ import static org.dan.ping.pong.app.match.rule.OrderRuleName.WonSets;
 import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.ofEntry;
 import static org.dan.ping.pong.util.FuncUtils.SUM_INT;
 
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
@@ -36,7 +37,7 @@ public class WonSetsRuleService implements GroupOrderRuleService {
     @Override
     public Optional<Stream<? extends Reason>> score(
             Supplier<Stream<MatchInfo>> matches,
-            Set<Uid> _uids,
+            Set<Bid> _bids,
             GroupOrderRule rule, GroupRuleParams params) {
 
         return Optional.of(findUid2Sets(matches.get(), params).entrySet()
@@ -45,22 +46,22 @@ public class WonSetsRuleService implements GroupOrderRuleService {
                 .sorted());
     }
 
-    public Map<Uid, Integer> findUid2Sets(
+    public Map<Bid, Integer> findUid2Sets(
             Stream<MatchInfo> matches, GroupRuleParams params) {
-        final Map<Uid, Integer> uid2WonSets = new HashMap<>();
+        final Map<Bid, Integer> bid2WonSets = new HashMap<>();
         final TournamentMemState tournament = params.getTournament();
 
         matches.forEach(m -> {
-            final Map<Uid, Integer> uid2Sets = sports.calcWonSets(tournament, m);
-            final Uid[] matchUids = m.uidsArray();
+            final Map<Bid, Integer> bid2Sets = sports.calcWonSets(tournament, m);
+            final Bid[] matchUids = m.bidsArray();
 
-            uid2WonSets.merge(matchUids[0], uid2Sets.get(matchUids[index(0)]), SUM_INT);
-            uid2WonSets.merge(matchUids[1], uid2Sets.get(matchUids[index(1)]), SUM_INT);
+            bid2WonSets.merge(matchUids[0], bid2Sets.get(matchUids[index(0)]), SUM_INT);
+            bid2WonSets.merge(matchUids[1], bid2Sets.get(matchUids[index(1)]), SUM_INT);
         });
-        return uid2WonSets;
+        return bid2WonSets;
     }
 
-    protected Function<Map.Entry<Uid, Integer>, Reason> reasonFactory() {
+    protected Function<Map.Entry<Bid, Integer>, Reason> reasonFactory() {
         return (e) -> ofEntry(e, getName());
     }
 

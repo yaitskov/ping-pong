@@ -3,18 +3,18 @@ package org.dan.ping.pong.app.match;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.app.bid.BidResource.TID_SLASH_UID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.BID;
 import static org.dan.ping.pong.app.tournament.TournamentService.TID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
 import org.dan.ping.pong.app.user.UserInfo;
-import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.util.time.Clocker;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -38,15 +38,14 @@ public class MatchResource {
     public static final String MY_PENDING_MATCHES = "/match/list/my/pending/";
     public static final String BID_PENDING_MATCHES = "/match/list/bid/pending/";
     public static final String OPEN_MATCHES_FOR_JUDGE = "/match/judge/list/open/";
-    public static final String COMPLETE_MATCHES = "/match/list/completed/";
     public static final String SCORE_SET = "/match/participant/score";
     public static final String MATCH_WATCH_LIST_OPEN = "/match/watch/list/open/";
     public static final String MATCH_RESET_SET_SCORE = "/match/reset-set-score";
     public static final String TID_JP = "{tid}";
     public static final String UID_JP = "{uid}";
+    public static final String BID_JP = "{bid}";
     public static final String UID = "uid";
     private static final String MATCH_RULES = "/match/rules/";
-    private static final String MATCH_TOURNAMENT_WINNERS = "/match/tournament-winners/";
     private static final String MID = "mid";
     private static final String MID_JP = "{mid}";
     public static final String MATCH_FOR_JUDGE = "/match/for-judge/";
@@ -63,15 +62,15 @@ public class MatchResource {
     private MatchService matchService;
 
     @GET
-    @Path(MATCH_FIND_BY_PARTICIPANTS + TID_JP + "/" + UID_JP + "/{uid2}")
+    @Path(MATCH_FIND_BY_PARTICIPANTS + TID_JP + "/" + BID_JP + "/{bid2}")
     @Consumes(APPLICATION_JSON)
     public void findMatchesByParticipants(
             @Suspended AsyncResponse response,
             @PathParam(TID) Tid tid,
-            @PathParam(UID) Uid uid1,
-            @PathParam("uid2") Uid uid2) {
+            @PathParam(BID) Bid bid1,
+            @PathParam("bid2") Bid bid2) {
         tournamentAccessor.read(tid, response,
-                tournament -> matchService.findMatchesByParticipants(tournament, uid1, uid2));
+                tournament -> matchService.findMatchesByParticipants(tournament, bid1, bid2));
     }
 
     @GET
@@ -83,18 +82,21 @@ public class MatchResource {
             @PathParam(TID) Tid tid) {
         final Uid uid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.read(tid, response,
-                tournament -> matchService.findPendingMatchesIncludeConsole(tournament, uid));
+                tournament -> matchService.findAllBidsOfUid(tournament, uid)
+                        .stream()
+                        .map((bid) -> matchService.findPendingMatchesIncludeConsole(tournament, bid))
+                        .reduce(MyPendingMatchList::merge));
     }
 
     @GET
-    @Path(BID_PENDING_MATCHES + TID_JP + TID_SLASH_UID + UID_JP)
+    @Path(BID_PENDING_MATCHES + TID_JP + TID_SLASH_UID + BID_JP)
     @Consumes(APPLICATION_JSON)
     public void findBidPendingMatches(
             @Suspended AsyncResponse response,
             @PathParam(TID) Tid tid,
-            @PathParam(UID) Uid uid) {
+            @PathParam(BID) Bid bid) {
         tournamentAccessor.read(tid, response,
-                tournament -> matchService.findPendingMatchesIncludeConsole(tournament, uid));
+                tournament -> matchService.findPendingMatchesIncludeConsole(tournament, bid));
     }
 
     @GET
@@ -119,7 +121,10 @@ public class MatchResource {
             @PathParam(TID) Tid tid) {
         final Uid uid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.read(tid, response,
-                tournament -> matchService.findPlayedMatchesByBid(tournament, uid));
+                tournament -> matchService.findAllBidsOfUid(tournament, uid)
+                        .stream()
+                        .map((bid) -> matchService.findPlayedMatchesByBid(tournament, bid))
+                        .reduce(PlayedMatchList::merge));
     }
 
     @GET
@@ -127,9 +132,9 @@ public class MatchResource {
     public void findJudgedMatches(
             @Suspended AsyncResponse response,
             @PathParam(TID) Tid tid,
-            @PathParam(UID) Uid uid) {
+            @PathParam(BID) Bid bid) {
         tournamentAccessor.read(tid, response,
-                tournament -> matchService.findPlayedMatchesByBid(tournament, uid));
+                tournament -> matchService.findPlayedMatchesByBid(tournament, bid));
     }
 
     @Inject
@@ -145,7 +150,6 @@ public class MatchResource {
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             SetScoreReq score) {
-        //response.setTimeout(30, TimeUnit.SECONDS);
         final Uid uid = authService.userInfoBySession(session).getUid();
         log.info("User {} sets scores {} for match {}",
                 uid, score.getScores(), score.getMid());
@@ -198,12 +202,6 @@ public class MatchResource {
     }
 
     @GET
-    @Path(MATCH_TOURNAMENT_WINNERS + TID_JP)
-    public List<UserLink> findWinners(@PathParam(TID) Tid tid) {
-        return matchDao.findWinners(tid);
-    }
-
-    @GET
     @Path(OPEN_MATCHES_FOR_JUDGE + TID_JP)
     @Consumes(APPLICATION_JSON)
     public void findOpenMatchesForJudge(
@@ -228,12 +226,5 @@ public class MatchResource {
             @PathParam(MID) Mid mid) {
         tournamentAccessor.read(tid, response,
                 tournament -> matchService.getMatchForJudge(tournament, mid));
-    }
-
-    @GET
-    @Path(COMPLETE_MATCHES + TID_JP)
-    @Consumes(APPLICATION_JSON)
-    public List<CompleteMatch> findCompleteMatches(@PathParam(TID) Tid tid) {
-        return matchDao.findCompleteMatches(tid);
     }
 }

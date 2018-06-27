@@ -2,8 +2,8 @@ package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.app.castinglots.CastingLotsResource.ORDER_BIDS_MANUALLY;
 import static org.dan.ping.pong.app.group.GroupRulesConst.G8Q1;
-import static org.dan.ping.pong.app.match.MatchRulesConst.S1A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_WATCH_LIST_OPEN;
+import static org.dan.ping.pong.app.match.MatchRulesConst.S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_EXPEL;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_INVALIDATE_CACHE;
@@ -18,7 +18,7 @@ import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.junit.Assert.assertEquals;
 
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.castinglots.OrderCategoryBidsManually;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy;
@@ -75,8 +75,8 @@ public class Kw04FirstTournamentJerseyTest extends AbstractSpringJerseyTest {
         myRest().voidPost(ORDER_BIDS_MANUALLY, scenario,
                 OrderCategoryBidsManually
                         .builder()
-                        .uids(scenario.getUidPlayer().keySet().stream()
-                                .sorted(Comparator.comparing(Uid::getId).reversed())
+                        .bids(scenario.getBidPlayer().keySet().stream()
+                                .sorted(Comparator.comparing(Bid::intValue).reversed())
                                 .collect(Collectors.toList()))
                         .cid(scenario.getCategoryDbId().get(c1))
                         .tid(scenario.getTid())
@@ -85,7 +85,7 @@ public class Kw04FirstTournamentJerseyTest extends AbstractSpringJerseyTest {
         myRest().voidPost(TOURNAMENT_EXPEL, scenario, ExpelParticipant
                 .builder()
                 .tid(scenario.getTid())
-                .uid(scenario.getPlayersSessions().get(p1).getUid())
+                .bid(scenario.getPlayersSessions().get(p1).getBid())
                 .build());
 
         myRest().voidPost(BEGIN_TOURNAMENT, scenario, scenario.getTid());

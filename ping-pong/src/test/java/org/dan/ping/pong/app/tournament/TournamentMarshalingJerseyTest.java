@@ -75,9 +75,9 @@ public class TournamentMarshalingJerseyTest extends AbstractSpringJerseyTest {
                 .get(DRAFTING + exportedTid, DraftingTournamentInfo.class);
         final int importedCid = importedDrafting.getCategories().stream().findFirst()
                 .map(CategoryLink::getCid).get();
-        List<TournamentResultEntry> imported = resetUids(
+        List<TournamentResultEntry> imported = resetBids(
                 is.getTournamentResult(importedCid, exportedTid.getTid()));
-        List<TournamentResultEntry> original = resetUids(is.getTournamentResult());
+        List<TournamentResultEntry> original = resetBids(is.getTournamentResult());
         assertThat(imported.size(), is(original.size()));
         for (int i = 0; i < imported.size(); ++i) {
             final TournamentResultEntry oi = original.get(i);
@@ -85,7 +85,7 @@ public class TournamentMarshalingJerseyTest extends AbstractSpringJerseyTest {
             assertThat("item " + i,  ii, allOf(
                     hasProperty("user",
                             allOf(
-                                    hasProperty("uid", not(oi.getUser().getUid())),
+                                    hasProperty("bid", not(oi.getUser().getBid())),
                                     hasProperty("name", is(oi.getUser().getName())))),
                     hasProperty("state", is(oi.getState())),
                     hasProperty("playOffStep", is(oi.getPlayOffStep())),
@@ -93,7 +93,7 @@ public class TournamentMarshalingJerseyTest extends AbstractSpringJerseyTest {
         }
     }
 
-    private List<TournamentResultEntry> resetUids(List<TournamentResultEntry> entries) {
+    private List<TournamentResultEntry> resetBids(List<TournamentResultEntry> entries) {
         entries.stream()
                 .map(TournamentResultEntry::getReasonChain)
                 .flatMap(List::stream)
@@ -101,7 +101,7 @@ public class TournamentMarshalingJerseyTest extends AbstractSpringJerseyTest {
                 .map(Optional::get)
                 .filter(item -> item instanceof F2fReason)
                 .map(F2fReason.class::cast)
-                .forEach(reason -> reason.setUid(null));
+                .forEach(reason -> reason.setBid(null));
         return entries;
     }
 

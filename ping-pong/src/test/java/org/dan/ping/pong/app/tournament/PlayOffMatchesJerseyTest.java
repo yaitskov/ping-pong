@@ -1,15 +1,15 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.util.Collections.emptyList;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S1A2G11_NP;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_LC_S1A2G11_NP;
 import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
-import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_PLAY_OFF_MATCHES;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RULES;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S1A2G11_NP;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_LC_S1A2G11_NP;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableMap;
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.playoff.PlayOffMatches;
@@ -68,12 +68,12 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
                         hasProperty("level", is(1)),
                         hasProperty("id", is(simulator.resolveMid(p1, p2))),
                         hasProperty("state", is(Game)),
-                        hasProperty("score", is(ImmutableMap.of(scenario.player2Uid(p1), 0,
-                                scenario.player2Uid(p2), 0))),
+                        hasProperty("score", is(ImmutableMap.of(scenario.player2Bid(p1), 0,
+                                scenario.player2Bid(p2), 0))),
                         hasProperty("winnerId", is(Optional.empty())),
                         hasProperty("walkOver", is(false))));
         assertEquals(emptyList(), matches.getTransitions());
-        assertEquals(scenario.getUidPlayer().keySet(), matches.getParticipants().keySet());
+        assertEquals(scenario.getBidPlayer().keySet(), matches.getParticipants().keySet());
     }
 
     @Test
@@ -109,8 +109,8 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
                         hasProperty("level", is(1)),
                         hasProperty("id", is(p1p4Match)),
                         hasProperty("state", is(Game)),
-                        hasProperty("score", is(ImmutableMap.of(scenario.player2Uid(p1), 0,
-                                scenario.player2Uid(p4), 0))),
+                        hasProperty("score", is(ImmutableMap.of(scenario.player2Bid(p1), 0,
+                                scenario.player2Bid(p4), 0))),
                         hasProperty("winnerId", is(Optional.empty())),
                         hasProperty("walkOver", is(false))));
 
@@ -120,8 +120,8 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
                         hasProperty("level", is(1)),
                         hasProperty("id", is(p2p3Match)),
                         hasProperty("state", is(Game)),
-                        hasProperty("score", is(ImmutableMap.of(scenario.player2Uid(p2), 0,
-                                scenario.player2Uid(p3), 0))),
+                        hasProperty("score", is(ImmutableMap.of(scenario.player2Bid(p2), 0,
+                                scenario.player2Bid(p3), 0))),
                         hasProperty("winnerId", is(Optional.empty())),
                         hasProperty("walkOver", is(false))));
 
@@ -141,21 +141,21 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
                         hasProperty("from", is(p1p4Match)),
                         hasProperty("from", is(p2p3Match))));
 
-        assertEquals(scenario.getUidPlayer().keySet(), matches.getParticipants().keySet());
+        assertEquals(scenario.getBidPlayer().keySet(), matches.getParticipants().keySet());
     }
 
     private void playOff1Defeat4Guys_when_p1p4Played(Mid p1p4Match, Mid p2p3Match,
             TournamentScenario scenario, PlayOffMatches matches) {
-        final Uid uid1 = scenario.player2Uid(p1);
+        final Bid bid1 = scenario.player2Bid(p1);
         assertThat(matches.getMatches().stream()
                         .filter(m -> m.getId().equals(p1p4Match)).findAny().get(),
                 allOf(
                         hasProperty("level", is(1)),
                         hasProperty("id", is(p1p4Match)),
                         hasProperty("state", is(Over)),
-                        hasProperty("score", is(ImmutableMap.of(uid1, 1,
-                                scenario.player2Uid(p4), 0))),
-                        hasProperty("winnerId", is(Optional.of(uid1))),
+                        hasProperty("score", is(ImmutableMap.of(bid1, 1,
+                                scenario.player2Bid(p4), 0))),
+                        hasProperty("winnerId", is(Optional.of(bid1))),
                         hasProperty("walkOver", is(false))));
 
         assertThat(matches.getMatches().stream()
@@ -166,25 +166,25 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
                         hasProperty("level", is(2)),
                         hasProperty("id", notNullValue()),
                         hasProperty("state", is(Draft)),
-                        hasProperty("score", is(ImmutableMap.of(scenario.player2Uid(p1), 0))),
+                        hasProperty("score", is(ImmutableMap.of(scenario.player2Bid(p1), 0))),
                         hasProperty("winnerId", is(Optional.empty())),
                         hasProperty("walkOver", is(false))));
 
-        assertEquals(scenario.getUidPlayer().keySet(), matches.getParticipants().keySet());
+        assertEquals(scenario.getBidPlayer().keySet(), matches.getParticipants().keySet());
     }
 
     private void playOff1Defeat4Guys_when_p3Quit(Mid p1p4Match, Mid p2p3Match,
             TournamentScenario scenario, PlayOffMatches matches) {
-        final Uid uid2 = scenario.player2Uid(p2);
+        final Bid bid2 = scenario.player2Bid(p2);
         assertThat(matches.getMatches().stream()
                         .filter(m -> m.getId().equals(p2p3Match)).findAny().get(),
                 allOf(
                         hasProperty("level", is(1)),
                         hasProperty("id", is(p2p3Match)),
                         hasProperty("state", is(Over)),
-                        hasProperty("score", is(ImmutableMap.of(uid2, 0,
-                                scenario.player2Uid(p3), 0))),
-                        hasProperty("winnerId", is(Optional.of(uid2))),
+                        hasProperty("score", is(ImmutableMap.of(bid2, 0,
+                                scenario.player2Bid(p3), 0))),
+                        hasProperty("winnerId", is(Optional.of(bid2))),
                         hasProperty("walkOver", is(true))));
 
         assertThat(matches.getMatches().stream()
@@ -194,8 +194,8 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
                 allOf(
                         hasProperty("level", is(2)),
                         hasProperty("id", notNullValue()),
-                        hasProperty("score", is(ImmutableMap.of(uid2, 0,
-                                scenario.player2Uid(p1), 0))),
+                        hasProperty("score", is(ImmutableMap.of(bid2, 0,
+                                scenario.player2Bid(p1), 0))),
                         hasProperty("state", is(Game)),
                         hasProperty("winnerId", is(Optional.empty())),
                         hasProperty("walkOver", is(false))));
@@ -212,9 +212,9 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
 
         final PlayOffMatches matches = matches(scenario);
 
-        final Uid uid1 = scenario.player2Uid(p1);
-        final Uid uid3 = scenario.player2Uid(p3);
-        final Uid uid2 = scenario.player2Uid(p2);
+        final Bid bid1 = scenario.player2Bid(p1);
+        final Bid bid3 = scenario.player2Bid(p3);
+        final Bid bid2 = scenario.player2Bid(p2);
         assertThat(matches.getMatches(),
                 hasItems(
                         allOf(
@@ -222,29 +222,29 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
                                 hasProperty("state", is(Over)),
                                 hasProperty("walkOver", is(true)),
                                 hasProperty("score", is(ImmutableMap.of(
-                                        FILLER_LOSER_UID, 0,
-                                        uid1, 0))),
-                                hasProperty("winnerId", is(Optional.of(uid1)))),
+                                        FILLER_LOSER_BID, 0,
+                                        bid1, 0))),
+                                hasProperty("winnerId", is(Optional.of(bid1)))),
                         allOf(
                                 hasProperty("level", is(2)),
                                 hasProperty("state", is(Draft)),
                                 hasProperty("score", is(ImmutableMap.of(
-                                        uid1, 0))),
+                                        bid1, 0))),
                                 hasProperty("walkOver", is(false)),
                                 hasProperty("winnerId", is(Optional.empty()))),
                         allOf(
                                 hasProperty("level", is(1)),
                                 hasProperty("state", is(Game)),
                                 hasProperty("score", is(ImmutableMap.of(
-                                        uid3, 0,
-                                        uid2, 0))),
+                                        bid3, 0,
+                                        bid2, 0))),
                                 hasProperty("walkOver", is(false)),
                                 hasProperty("winnerId", is(Optional.empty())))));
 
         assertThat(matches.getParticipants().keySet(),
                 allOf(
-                        not(hasItem(FILLER_LOSER_UID)),
-                        hasItems(uid1, uid2, uid3)));
+                        not(hasItem(FILLER_LOSER_BID)),
+                        hasItems(bid1, bid2, bid3)));
     }
 
     @Test

@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.group.HisIntPair;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.util.collection.CmpValueCounter;
@@ -22,7 +22,7 @@ public class WeightSetsReason implements Reason {
     @JsonIgnore
     @Getter(onMethod = @__(@JsonIgnore))
     @Setter(onMethod = @__(@JsonIgnore))
-    private Uid uid;
+    private Bid bid;
     private OrderRuleName rule;
     private Collection<CmpValueCounter<HisIntPair>> weightSets;
 

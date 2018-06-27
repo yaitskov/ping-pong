@@ -1,12 +1,12 @@
 package org.dan.ping.pong.app.match;
 
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S3A2G11;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_FIND_BY_PARTICIPANTS;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_LIST_JUDGED;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchType.POff;
-import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S3A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -21,7 +21,7 @@ import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
@@ -58,39 +58,39 @@ public class ListJudgedMatchesJerseyTest extends AbstractSpringJerseyTest {
 
         final int tid = scenario.getTid().getTid();
 
-        final Uid uidP1 = scenario.player2Uid(p1);
-        final Uid uidP2 = scenario.player2Uid(p2);
+        final Bid bidP1 = scenario.player2Bid(p1);
+        final Bid bidP2 = scenario.player2Bid(p2);
 
         assertThat(myRest().get(MATCH_LIST_JUDGED + tid + "/"
-                        + uidP1.getId(), PlayedMatchList.class),
+                        + bidP1.intValue(), PlayedMatchList.class),
                 allOf(
                         hasProperty("progress",
                                 allOf(
                                         hasProperty("totalMatches", is(2L)),
                                         hasProperty("leftMatches", is(0L)))),
                         hasProperty("participant",
-                                hasProperty("uid", is(uidP1))),
+                                hasProperty("uid", is(bidP1))),
                         hasProperty("inGroup", hasItem(allOf(
-                                hasProperty("opponent", hasProperty("uid", is(uidP2))),
-                                hasProperty("winnerUid", is(Optional.of(uidP2))))))));
+                                hasProperty("opponent", hasProperty("uid", is(bidP2))),
+                                hasProperty("winnerUid", is(Optional.of(bidP2))))))));
 
-        final Uid uidP3 = scenario.player2Uid(p3);
+        final Bid bidP3 = scenario.player2Bid(p3);
 
         assertThat(myRest().get(MATCH_LIST_JUDGED + tid + "/"
-                        + uidP2.getId(), PlayedMatchList.class),
+                        + bidP2.intValue(), PlayedMatchList.class),
                 allOf(
                         hasProperty("progress",
                                 allOf(
                                         hasProperty("totalMatches", is(2L)),
                                         hasProperty("leftMatches", is(1L)))),
                         hasProperty("participant",
-                                hasProperty("uid", is(uidP2))),
+                                hasProperty("uid", is(bidP2))),
                         hasProperty("inGroup", hasItems(
                                 allOf(
-                                        hasProperty("opponent", hasProperty("uid", is(uidP1))),
-                                        hasProperty("winnerUid", is(Optional.of(uidP2)))),
+                                        hasProperty("opponent", hasProperty("uid", is(bidP1))),
+                                        hasProperty("winnerUid", is(Optional.of(bidP2)))),
                                 allOf(
-                                        hasProperty("opponent", hasProperty("uid", is(uidP3))),
+                                        hasProperty("opponent", hasProperty("uid", is(bidP3))),
                                         hasProperty("winnerUid", is(Optional.empty())))))));
     }
 
@@ -103,20 +103,20 @@ public class ListJudgedMatchesJerseyTest extends AbstractSpringJerseyTest {
         simulator.run(ImperativeSimulator::beginTournament);
 
         final int tid = scenario.getTid().getTid();
-        final Uid uidP1 = scenario.player2Uid(p1);
+        final Bid bidP1 = scenario.player2Bid(p1);
 
-        final Mid mid = myRest().get(MATCH_FIND_BY_PARTICIPANTS + tid + "/" + uidP1.getId() + "/1",
+        final Mid mid = myRest().get(MATCH_FIND_BY_PARTICIPANTS + tid + "/" + bidP1.intValue() + "/1",
                 new GenericType<List<Mid>>(){}).get(0);
 
         assertThat(myRest().get(MATCH_LIST_JUDGED + tid + "/"
-                        + uidP1.getId(), PlayedMatchList.class),
+                        + bidP1.intValue(), PlayedMatchList.class),
                 allOf(
-                        hasProperty("participant", hasProperty("uid", is(uidP1))),
+                        hasProperty("participant", hasProperty("uid", is(bidP1))),
                         hasProperty("inGroup", is(Collections.emptyList())),
                         hasProperty("playOff", everyItem(
                                 allOf(
-                                        hasProperty("winnerUid", is(Optional.of(uidP1))),
-                                        hasProperty("opponent", hasProperty("uid", is(FILLER_LOSER_UID))),
+                                        hasProperty("winnerUid", is(Optional.of(bidP1))),
+                                        hasProperty("opponent", hasProperty("uid", is(FILLER_LOSER_BID))),
                                         hasProperty("mid", is(mid)))))));
 
         simulator.run(c -> assertThat(c.matchResult(mid),
@@ -127,7 +127,7 @@ public class ListJudgedMatchesJerseyTest extends AbstractSpringJerseyTest {
                         hasProperty("playedSets", is(0)),
                         hasProperty("disputes", is(0)),
                         hasProperty("participants", hasItems(
-                                hasProperty("uid", is(FILLER_LOSER_UID)),
-                                hasProperty("uid", is(uidP1)))))));
+                                hasProperty("uid", is(FILLER_LOSER_BID)),
+                                hasProperty("uid", is(bidP1)))))));
     }
 }

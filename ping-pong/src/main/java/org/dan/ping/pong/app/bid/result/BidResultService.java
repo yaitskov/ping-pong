@@ -1,6 +1,8 @@
 package org.dan.ping.pong.app.bid.result;
 
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -23,14 +25,14 @@ public class BidResultService {
     @Inject
     private TournamentService tournamentService;
 
-    public BidResult getResults(TournamentMemState tournament, Uid uid) {
-        final ParticipantMemState participant = tournament.getParticipant(uid);
+    public BidResult getResults(TournamentMemState tournament, Bid bid) {
+        final ParticipantMemState participant = tournament.getParticipant(bid);
         final List<TournamentResultEntry> resultEntries = tournamentService
                 .tournamentResult(tournament, participant.getCid());
 
         for (int iPos = 0 ;iPos < resultEntries.size(); ++iPos) {
             final TournamentResultEntry entry = resultEntries.get(iPos);
-            if (entry.getUser().getUid().equals(uid)) {
+            if (entry.getUser().getBid().equals(bid)) {
                 return BidResult.builder()
                         .user(entry.getUser())
                         .position(Optional.of(iPos))
@@ -38,14 +40,14 @@ public class BidResultService {
                         .tournament(tournament.toLink())
                         .beated(neighbour(resultEntries, iPos + 1))
                         .conceded(neighbour(resultEntries, iPos - 1))
-                        .matches(Optional.of(matches(tournament, uid)))
+                        .matches(Optional.of(matches(tournament, bid)))
                         .time(Optional.of(time(tournament, participant)))
                         .build();
             }
         }
         return BidResult.builder()
                 .normal(Optional.empty())
-                .user(participant.toLink())
+                .user(participant.toBidLink())
                 .position(Optional.empty())
                 .state(participant.state())
                 .tournament(tournament.toLink())
@@ -75,7 +77,7 @@ public class BidResultService {
 
     private LongSummaryStatistics matchTimes(TournamentMemState tournament,
             ParticipantMemState participant, Instant now) {
-        return tournament.participantMatches(participant.getUid())
+        return tournament.participantMatches(participant.getBid())
                 .map(m -> m.duration(now))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -83,7 +85,7 @@ public class BidResultService {
                 .summaryStatistics();
     }
 
-    private BidMatchesStat matches(TournamentMemState tournament, Uid uid) {
+    private BidMatchesStat matches(TournamentMemState tournament, Bid uid) {
         final CounterInt total = new CounterInt();
         final CounterInt won = new CounterInt();
         final CounterInt lost = new CounterInt();
@@ -101,7 +103,7 @@ public class BidResultService {
                 .build();
     }
 
-    private Optional<UserLink> neighbour(
+    private Optional<ParticipantLink> neighbour(
             List<TournamentResultEntry> resultEntries, int iPos) {
         if (iPos < 0 || iPos >= resultEntries.size()) {
             return Optional.empty();

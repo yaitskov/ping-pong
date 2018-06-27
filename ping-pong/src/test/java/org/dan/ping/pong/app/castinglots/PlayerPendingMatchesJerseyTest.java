@@ -13,10 +13,10 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.JerseySpringTest;
+import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.match.MyPendingMatch;
 import org.dan.ping.pong.app.match.MyPendingMatchList;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
-import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
@@ -62,9 +62,9 @@ public class PlayerPendingMatchesJerseyTest extends AbstractSpringJerseyTest {
             assertThat(matches.getMatches().stream().map(MyPendingMatch::getEnemy)
                             .filter(Optional::isPresent)
                             .map(Optional::get)
-                            .map(UserLink::getUid)
+                            .map(ParticipantLink::getBid)
                             .collect(toSet()),
-                    is(scenario.getUidPlayer().keySet().stream().filter(id -> !id.equals(userSession.getUid()))
+                    is(scenario.getBidPlayer().keySet().stream().filter(id -> !id.equals(userSession.getBid()))
                             .collect(toSet())));
         }
     }

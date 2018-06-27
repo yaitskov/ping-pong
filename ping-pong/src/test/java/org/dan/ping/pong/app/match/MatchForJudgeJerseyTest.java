@@ -1,10 +1,10 @@
 package org.dan.ping.pong.app.match;
 
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_FIND_BY_PARTICIPANTS;
 import static org.dan.ping.pong.app.match.MatchResource.MATCH_FOR_JUDGE;
 import static org.dan.ping.pong.app.match.MatchType.POff;
-import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -17,7 +17,7 @@ import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulator;
@@ -49,9 +49,9 @@ public class MatchForJudgeJerseyTest extends AbstractSpringJerseyTest {
         simulator.run(ImperativeSimulator::beginTournament);
 
         final int tid = scenario.getTid().getTid();
-        final Uid uid1 = scenario.player2Uid(p1);
+        final Bid bid1 = scenario.player2Bid(p1);
         final Mid mid = myRest().get(MATCH_FIND_BY_PARTICIPANTS + tid + "/"
-                        + uid1.getId() + "/" + FILLER_LOSER_UID.getId(),
+                        + bid1.intValue() + "/" + FILLER_LOSER_BID.intValue(),
                 new GenericType<List<Mid>>(){}).get(0);
         OpenMatchForJudge match = myRest().get(
                 MATCH_FOR_JUDGE + tid + "/" + mid.intValue(),
@@ -68,7 +68,7 @@ public class MatchForJudgeJerseyTest extends AbstractSpringJerseyTest {
                 hasProperty("tid", is(scenario.getTid())),
                 hasProperty("table", is(Optional.empty())),
                 hasProperty("participants", hasItems(
-                        hasProperty("uid", is(FILLER_LOSER_UID)),
-                        hasProperty("uid", is(uid1))))));
+                        hasProperty("uid", is(FILLER_LOSER_BID)),
+                        hasProperty("uid", is(bid1))))));
     }
 }

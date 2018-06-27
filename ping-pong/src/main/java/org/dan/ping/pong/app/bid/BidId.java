@@ -9,6 +9,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.tournament.Tid;
 
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Setter
 @Builder
@@ -17,6 +19,8 @@ import org.dan.ping.pong.app.tournament.Tid;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class BidId {
-    private Uid uid;
+    @NotNull
+    private Bid bid;
+    @NotNull
     private Tid tid;
 }

@@ -17,8 +17,8 @@ import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentService;
+import org.dan.ping.pong.app.user.OfflineUserRegRequest;
 import org.dan.ping.pong.app.user.UserDao;
-import org.dan.ping.pong.app.user.UserRegRequest;
 import org.dan.ping.pong.sys.error.PiPoEx;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,9 +67,9 @@ public class TournamentMarshalingService {
         expTournament.setTid(tid);
         createCategories(expTournament);
         createGroups(expTournament);
-        final StrictUniMap<Uid> users = createUsers(expTournament);
+        final StrictUniMap<Uid> users = createUsers(expTournament, importerUid);
         enlistUsers(users, expTournament);
-        createMatches(users, expTournament);
+        createMatches(expTournament);
         fillSets(expTournament);
         return tid;
     }
@@ -98,12 +98,9 @@ public class TournamentMarshalingService {
     @Inject
     private MatchDao matchDao;
 
-    private void createMatches(StrictUniMap<Uid> users,
-            ExportedTournament expTournament) throws PiPoEx {
+    private void createMatches(ExportedTournament expTournament) throws PiPoEx {
         expTournament.getMatches().values().forEach(mi -> {
             mi.setTid(expTournament.getTid());
-            mi.setWinnerId(mi.getWinnerId().map(users));
-            mi.replaceParticipantUids(users);
             matchDao.createMatch(mi, DB_STRICT_UPDATER);
         });
     }
@@ -137,14 +134,17 @@ public class TournamentMarshalingService {
     @Inject
     private UserDao userDao;
 
-    private StrictUniMap<Uid> createUsers(ExportedTournament expTournament) {
+    private StrictUniMap<Uid> createUsers(ExportedTournament expTournament, Uid importerUid) {
+        userDao.validateRegOfflineLimits(
+                clocker.get(), importerUid, expTournament.getParticipants().size());
         return StrictUniMap.of(
                 "users",
                 expTournament.getParticipants().values().stream()
                         .collect(toMap(
                                 ParticipantMemState::getUid,
-                                pa -> userDao.register(UserRegRequest.builder()
+                                pa -> userDao.registerOfflineNoValidation(OfflineUserRegRequest
+                                        .builder()
                                         .name(pa.getName())
-                                        .build()))));
+                                        .build(), importerUid))));
     }
 }

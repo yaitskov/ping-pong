@@ -13,10 +13,10 @@ import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.
 import static org.dan.ping.pong.app.match.rule.reason.IncreasingIntScalarReason.ofIntI;
 import static org.dan.ping.pong.app.playoff.PlayOffBidStat.PLAY_OFF_BID_STAT_COMPARATOR;
 import static org.dan.ping.pong.app.tournament.GroupMaxMap.findMaxes;
-import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_UID;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -82,7 +82,7 @@ public class PlayOffService {
 
     public PlayOffResultEntries playOffResult(TournamentMemState tournament, int cid,
             List<TournamentResultEntry> groupOrdered) {
-        final Map<Uid, PlayOffBidStat> uidStat = new HashMap<>();
+        final Map<Bid, PlayOffBidStat> uidStat = new HashMap<>();
         final MatchRules matchRules = tournament.playOffMatchRules();
         final Sport sport = sports.get(matchRules.sport());
         final PowerRange powerRange = tournament.getPowerRange();
@@ -91,8 +91,8 @@ public class PlayOffService {
         categoryService.findMatchesInCategoryStream(tournament, cid)
                 .filter(m -> !m.getGid().isPresent())
                 .forEach(m -> {
-                    if (m.uids().size() < 2) {
-                        m.uids().forEach(uid -> {
+                    if (m.bids().size() < 2) {
+                        m.bids().forEach(uid -> {
                             uidStat.compute(uid, (u, stat) -> {
                                 if (stat == null) {
                                     stat = new PlayOffBidStat(u);
@@ -103,14 +103,14 @@ public class PlayOffService {
                         });
                         return;
                     }
-                    final Uid[] uids = m.uidsArray();
-                    final Map<Uid, Integer> ballsBalance = ballsBalanceRuleService
+                    final Bid[] bids = m.bidsArray();
+                    final Map<Bid, Integer> ballsBalance = ballsBalanceRuleService
                             .uid2BallsBalance(Stream.of(m));
-                    final Map<Uid, Integer> sets = sports.calcWonSets(tournament, m);
-                    final int setBalance = sets.get(uids[0]) - sets.get(uids[1]);
+                    final Map<Bid, Integer> sets = sports.calcWonSets(tournament, m);
+                    final int setBalance = sets.get(bids[0]) - sets.get(bids[1]);
                     final long setPower = powerRange.value(maxSetDiff, m.getLevel());
                     final long ballPower = powerRange.value(maxBallsDiff, m.getLevel());
-                    uidStat.compute(uids[0], (u, stat) -> {
+                    uidStat.compute(bids[0], (u, stat) -> {
                         if (stat == null) {
                             stat = new PlayOffBidStat(u);
                         }
@@ -122,7 +122,7 @@ public class PlayOffService {
                         }
                         return stat;
                     });
-                    uidStat.compute(uids[1], (u, stat) -> {
+                    uidStat.compute(bids[1], (u, stat) -> {
                         if (stat == null) {
                             stat = new PlayOffBidStat(u);
                         }
@@ -139,14 +139,14 @@ public class PlayOffService {
         if (uidStat.isEmpty()) {
             return tournamentOfSingle(tournament, cid);
         }
-        uidStat.remove(FILLER_LOSER_UID);
+        uidStat.remove(FILLER_LOSER_BID);
         return PlayOffResultEntries.builder()
                 .entries(
                         uidStat.values().stream()
                                 .sorted(new PlayOffBidComparator(PLAY_OFF_BID_STAT_COMPARATOR, groupOrdered))
                                 .map(stat -> statToResultEntry(stat, tournament))
                                 .collect(toList()))
-                .playOffUids(uidStat.keySet())
+                .playOffBids(uidStat.keySet())
                 .build();
     }
 
@@ -156,7 +156,7 @@ public class PlayOffService {
                 .stream()
                 .filter(bid -> bid.state() == Win1 && bid.getCid() == cid)
                 .map(bid -> TournamentResultEntry.builder()
-                        .user(bid.toLink())
+                        .user(bid.toBidLink())
                         .playOffStep(Optional.of(1))
                         .state(Win1)
                         .reasonChain(Stream
@@ -171,8 +171,8 @@ public class PlayOffService {
                 .collect(toList());
         return PlayOffResultEntries
                 .builder()
-                .playOffUids(entries.stream()
-                        .map(e -> e.getUser().getUid())
+                .playOffBids(entries.stream()
+                        .map(e -> e.getUser().getBid())
                         .collect(Collectors.toSet()))
                 .entries(entries)
                 .build();
@@ -181,9 +181,9 @@ public class PlayOffService {
     private TournamentResultEntry statToResultEntry(PlayOffBidStat stat,
             TournamentMemState tournament) {
         final ParticipantMemState participant = tournament.getParticipant(
-                stat.getUid());
+                stat.getBid());
         return TournamentResultEntry.builder()
-                .user(participant.toLink())
+                .user(participant.toBidLink())
                 .playOffStep(Optional.of(stat.getHighestLevel()))
                 .state(participant.state())
                 .reasonChain(stat.toReasonChain())
@@ -207,7 +207,7 @@ public class PlayOffService {
             int cid, Optional<MatchTag> tag) {
         final List<MatchLink> transitions = new ArrayList<>();
         final List<PlayOffMatch> matches = new ArrayList<>();
-        final Map<Uid, String> participants = new HashMap<>();
+        final Map<Bid, String> participants = new HashMap<>();
 
         findPlayOffMatches(tournament, cid, tag)
                 .stream()
@@ -218,7 +218,7 @@ public class PlayOffService {
                                     .from(m.getMid())
                                     .to(wMid)
                                     .build()));
-                    if (!m.hasParticipant(FILLER_LOSER_UID)) {
+                    if (!m.hasParticipant(FILLER_LOSER_BID)) {
                         m.getLoserMid().ifPresent(lMid -> transitions.add(
                                 MatchLink.builder()
                                         .from(m.getMid())
@@ -228,11 +228,11 @@ public class PlayOffService {
                     m.getParticipantIdScore()
                             .keySet()
                             .stream()
-                            .filter(uid -> !FILLER_LOSER_UID.equals(uid))
-                            .forEach(uid -> participants.computeIfAbsent(uid,
+                            .filter(bid -> !FILLER_LOSER_BID.equals(bid))
+                            .forEach(bid -> participants.computeIfAbsent(bid,
                                     (u -> tournament.getParticipant(u).getName())));
 
-                    final Map<Uid, Integer> score = sports.calcWonSets(tournament, m);
+                    final Map<Bid, Integer> score = sports.calcWonSets(tournament, m);
                     matches.add(PlayOffMatch.builder()
                             .id(m.getMid())
                             .level(m.getLevel())
@@ -255,11 +255,11 @@ public class PlayOffService {
     }
 
     private boolean isWalkOver(TournamentMemState tournament, MatchInfo m,
-            Map<Uid, Integer> score) {
+            Map<Bid, Integer> score) {
         if (m.getState() != Over) {
             return false;
         }
-        final Optional<Uid> calculatedWinner = sports.findWinnerId(
+        final Optional<Bid> calculatedWinner = sports.findWinnerId(
                 tournament.selectMatchRule(m), score);
         return !calculatedWinner.equals(m.getWinnerId());
     }

@@ -14,7 +14,9 @@ import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
 import static org.dan.ping.pong.app.match.MatchResource.SCORE_SET;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST_OFFLINE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
+import static org.dan.ping.pong.app.user.UserResource.OFFLINE_USER_REGISTER;
 import static org.dan.ping.pong.mock.simulator.Hook.AfterMatch;
 import static org.dan.ping.pong.mock.simulator.Hook.AfterScore;
 import static org.junit.Assert.assertEquals;
@@ -25,9 +27,11 @@ import static org.junit.Assert.assertTrue;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.bid.Uid;
-import org.dan.ping.pong.app.match.SetScoreReq;
+import org.dan.ping.pong.app.group.GroupPopulations;
 import org.dan.ping.pong.app.match.ForTestBidDao;
 import org.dan.ping.pong.app.match.ForTestMatchDao;
 import org.dan.ping.pong.app.match.IdentifiedScore;
@@ -37,19 +41,22 @@ import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
 import org.dan.ping.pong.app.match.RescoreMatch;
+import org.dan.ping.pong.app.match.SetScoreReq;
 import org.dan.ping.pong.app.match.SetScoreResult;
 import org.dan.ping.pong.app.place.ForTestPlaceDao;
 import org.dan.ping.pong.app.table.TableInfo;
+import org.dan.ping.pong.app.tournament.EnlistOffline;
 import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentDao;
 import org.dan.ping.pong.app.tournament.TournamentRow;
 import org.dan.ping.pong.app.tournament.TournamentState;
-import org.dan.ping.pong.app.user.UserLink;
+import org.dan.ping.pong.app.user.OfflineUserRegRequest;
 import org.dan.ping.pong.app.user.UserType;
 import org.dan.ping.pong.mock.DaoEntityGenerator;
 import org.dan.ping.pong.mock.MyRest;
 import org.dan.ping.pong.mock.RestEntityGenerator;
+import org.dan.ping.pong.mock.SessionAware;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.TournamentProps;
 import org.dan.ping.pong.mock.UserSessionGenerator;
@@ -133,15 +140,17 @@ public class Simulator {
                     forTestBidDao.findByTidAndState(scenario.getTid(),
                             cid,
                             bidStates)
-                            .stream().map(uid -> scenario.getUidPlayer().get(uid))
+                            .stream().map(uid -> scenario.getBidPlayer().get(uid))
                             .collect(toList()));
             assertEquals(
                     scenario.getPlayersSessions().keySet().stream()
-                            .filter(player -> !scenario.getChampions().get(playerCategory).contains(player))
-                            .filter(player -> scenario.getPlayersCategory().get(player).equals(playerCategory))
+                            .filter(player -> !scenario.getChampions()
+                                    .get(playerCategory).contains(player))
+                            .filter(player -> scenario.getPlayersCategory()
+                                    .get(player).equals(playerCategory))
                             .collect(toSet()),
                     forTestBidDao.findByTidAndState(scenario.getTid(), cid, asList(Lost, Quit, Expl))
-                            .stream().map(uid -> scenario.getUidPlayer().get(uid))
+                            .stream().map(uid -> scenario.getBidPlayer().get(uid))
                             .collect(toSet()));
         }
         assertEquals(Optional.of(scenario.getExpectedTerminalState()),
@@ -250,7 +259,7 @@ public class Simulator {
                             .mid(mid)
                             .effectHash(Optional.of(checkHash))
                             .sets(newScore.entrySet().stream()
-                                    .collect(toMap(e -> (Uid) scenario.player2Uid(e.getKey()),
+                                    .collect(toMap(e -> (Bid) scenario.player2Bid(e.getKey()),
                                             Map.Entry::getValue)))
                             .build());
     }
@@ -276,16 +285,16 @@ public class Simulator {
                                 IdentifiedScore.builder()
                                         .score(setOutcome.get(
                                                 game.getParticipants().get(0)))
-                                        .uid(scenario.getPlayersSessions()
+                                        .bid(scenario.getPlayersSessions()
                                                 .get(game.getParticipants()
-                                                        .get(0)).getUid())
+                                                        .get(0)).getBid())
                                         .build(),
                                 IdentifiedScore.builder()
                                         .score(setOutcome.get(
                                                 game.getParticipants().get(1)))
-                                        .uid(scenario.getPlayersSessions()
+                                        .bid(scenario.getPlayersSessions()
                                                 .get(game.getParticipants()
-                                                        .get(1)).getUid())
+                                                        .get(1)).getBid())
                                         .build()))
                         .build());
 
@@ -334,11 +343,11 @@ public class Simulator {
     }
 
     private Set<Player> matchToPlayers(TournamentScenario scenario, OpenMatchForJudge match) {
-        return match.getParticipants().stream().map(UserLink::getUid)
-                .map(uid -> ofNullable(scenario.getUidPlayer().get(uid))
-                        .orElseThrow(() -> new IllegalStateException("uid "
-                                + uid + " is not known among "
-                                + scenario.getUidPlayer().keySet())))
+        return match.getParticipants().stream().map(ParticipantLink::getBid)
+                .map(bid -> ofNullable(scenario.getBidPlayer().get(bid))
+                        .orElseThrow(() -> new IllegalStateException("bid "
+                                + bid + " is not known among "
+                                + scenario.getBidPlayer().keySet())))
                 .collect(toSet());
     }
 
@@ -374,33 +383,57 @@ public class Simulator {
         final List<Player> players = scenario.getPlayersByCategories().values()
                 .stream().filter(p -> playersSession.get(p) == null)
                 .sorted().collect(toList());
+
+        final List<TestUserSession> userSessions = genUserSessions(players, prefix);
+
+//        playersSession.forEach((pl, ses) -> {
+//            if (ses == null) {
+//                return;
+//            }
+//            scenario.getBidPlayer().put(ses.getBid(), pl);
+//        });
+        fillPlayersSessions(playersSession, players, userSessions);
+        genCategories(scenario, prefix, tid);
+        enlist(scenario, tid);
+        fillBidPlayerMap(scenario, players, userSessions);
+    }
+
+    public void fillBidPlayerMap(TournamentScenario scenario, List<Player> players,
+            List<TestUserSession> userSessions) {
+        final Iterator<TestUserSession> sessions = userSessions.iterator();
+        for (Player player : players) {
+            TestUserSession user = sessions.next();
+            scenario.getBidPlayer().put(user.getBid(), player);
+        }
+    }
+
+    public void fillPlayersSessions(Map<Player, TestUserSession> playersSession,
+            List<Player> players, List<TestUserSession> userSessions) {
+        final Iterator<TestUserSession> sessions = userSessions.iterator();
+        for (Player player : players) {
+            TestUserSession user = sessions.next();
+            playersSession.put(player, user);
+        }
+    }
+
+    private List<TestUserSession> genUserSessions(List<Player> players, String prefix) {
         final List<String> playerLabels = players.stream()
                 .map(p -> "_p" + p.getNumber())
                 .collect(toList());
         final List<TestUserSession> userSessions = userSessionGenerator
                 .generateUserSessions(prefix, playerLabels);
-        final Iterator<TestUserSession> sessions = userSessions.iterator();
         assertEquals(players.size(), userSessions.size());
         restGenerator.generateSignInLinks(userSessions);
-        playersSession.forEach((pl, ses) -> {
-            if (ses == null) {
-                return;
-            }
-            scenario.getUidPlayer().put(ses.getUid(), pl);
-        });
-        for (Player player : players) {
-            TestUserSession user = sessions.next();
-            playersSession.put(player, user);
-            scenario.getUidPlayer().put(user.getUid(), player);
-        }
-        int catId = 0;
-        for (PlayerCategory category : scenario.getCategoryDbId().keySet()) {
-            daoGenerator.genCategory(prefix + " " + category, tid, ++catId);
-            scenario.getCategoryDbId().put(category, catId);
-        }
+        return userSessions;
+    }
+
+    public void enlist(TournamentScenario scenario, Tid tid) {
+        int catId;
         for (PlayerCategory category : scenario.getCategoryDbId().keySet()) {
             catId = scenario.getCategoryDbId().get(category);
-            Map<TestUserSession, EnlistMode> m = scenario.getPlayerPresence().keySet()
+            Map<TestUserSession, EnlistMode> m = scenario
+                    .getPlayerPresence()
+                    .keySet()
                     .stream().collect(Collectors.toMap(
                             player -> scenario.getPlayersSessions().get(player),
                             player -> scenario.getPlayerPresence().get(player)));
@@ -416,5 +449,43 @@ public class Simulator {
                             .map(player -> ofNullable(scenario.getProvidedRanks().get(player)))
                             .collect(toList()));
         }
+    }
+
+    public void genCategories(TournamentScenario scenario, String prefix, Tid tid) {
+        int catId = 0;
+        for (PlayerCategory category : scenario.getCategoryDbId().keySet()) {
+            daoGenerator.genCategory(prefix + " " + category, tid, ++catId);
+            scenario.getCategoryDbId().put(category, catId);
+        }
+    }
+
+    public Bid enlistParticipant(TournamentScenario scenario,
+            int cid, GroupPopulations populations, String p5) {
+        return enlistParticipant(scenario, cid,
+                Optional.of(populations.getLinks().get(0).getGid()), p5);
+    }
+
+    public Bid enlistParticipant(TournamentScenario scenario, int cid,
+            Optional<Integer> gid, String p5) {
+        return enlistParticipant(scenario.getTid(), scenario, cid, gid, p5);
+    }
+
+    public Bid enlistParticipant(Tid tid,  SessionAware sessionAware, int cid,
+            Optional<Integer> gid, String p5) {
+        final Uid uid = rest.post(OFFLINE_USER_REGISTER, sessionAware,
+                OfflineUserRegRequest
+                        .builder()
+                        .name(p5)
+                        .build()).readEntity(Uid.class);
+
+        return rest.post(TOURNAMENT_ENLIST_OFFLINE, sessionAware,
+                EnlistOffline.builder()
+                        .groupId(gid)
+                        .uid(uid)
+                        .tid(tid)
+                        .cid(cid)
+                        .bidState(BidState.Wait)
+                        .build())
+                .readEntity(Bid.class);
     }
 }

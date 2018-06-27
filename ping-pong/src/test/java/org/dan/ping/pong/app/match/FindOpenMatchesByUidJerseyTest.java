@@ -3,8 +3,8 @@ package org.dan.ping.pong.app.match;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidResource.TID_SLASH_UID;
 import static org.dan.ping.pong.app.bid.BidState.Play;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S3A2G11;
 import static org.dan.ping.pong.app.match.MatchResource.BID_PENDING_MATCHES;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S3A2G11;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -14,8 +14,8 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.JerseySpringTest;
+import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
-import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
@@ -45,7 +45,7 @@ public class FindOpenMatchesByUidJerseyTest extends AbstractSpringJerseyTest {
 
         final MyPendingMatchList matches = myRest()
                 .get(BID_PENDING_MATCHES + scenario.getTid().getTid()
-                        + TID_SLASH_UID + scenario.player2Uid(p1).getId(),
+                        + TID_SLASH_UID + scenario.player2Bid(p1).intValue(),
                         MyPendingMatchList.class);
         assertThat(matches.isShowTables(), is(false));
         assertThat(matches.getBidState(), is(Play));
@@ -54,10 +54,10 @@ public class FindOpenMatchesByUidJerseyTest extends AbstractSpringJerseyTest {
                         .map(MyPendingMatch::getEnemy)
                         .filter(Optional::isPresent)
                         .map(Optional::get)
-                        .map(UserLink::getUid)
+                        .map(ParticipantLink::getBid)
                         .collect(toSet()),
                 is(ImmutableSet.of(
-                        scenario.player2Uid(p2),
-                        scenario.player2Uid(p3))));
+                        scenario.player2Bid(p2),
+                        scenario.player2Bid(p3))));
     }
 }

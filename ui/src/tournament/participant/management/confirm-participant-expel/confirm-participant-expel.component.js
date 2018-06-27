@@ -14,7 +14,7 @@ angular.module('participant').
             self.expelAs = (expelAs) => {
                 requestStatus.startLoading('Expelling');
                 Tournament.expel(
-                    {uid: self.bid.user.uid,
+                    {bid: self.bid.user.bid,
                      tid: self.bid.tid,
                      targetBidState: expelAs},
                     (ok) => {

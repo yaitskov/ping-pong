@@ -4,14 +4,12 @@ import static java.util.Comparator.comparing;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.WeightedMatches;
 import static org.dan.ping.pong.util.collection.IterableComparator.LengthPolicy.LongerSmaller;
 
-import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.group.HisIntPair;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.reason.WeightSetsReason;
 import org.dan.ping.pong.util.collection.CmpValueCounter;
 import org.dan.ping.pong.util.collection.IterableComparator;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.function.Function;
 

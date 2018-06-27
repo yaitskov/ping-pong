@@ -9,9 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
-import org.dan.ping.pong.app.user.UserLink;
 
 import java.util.List;
 
@@ -23,14 +23,14 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class EffectedMatch {
     private Mid mid;
-    private List<UserLink> participants;
+    private List<ParticipantLink> participants;
 
     public static EffectedMatch ofMatchInfo(TournamentMemState tournament, MatchInfo minfo) {
         return EffectedMatch.builder()
                 .mid(minfo.getMid())
                 .participants(minfo.getParticipantIdScore()
                         .keySet().stream().map(tournament::getBid)
-                        .map(ParticipantMemState::toLink).collect(toList()))
+                        .map(ParticipantMemState::toBidLink).collect(toList()))
                 .build();
     }
 }

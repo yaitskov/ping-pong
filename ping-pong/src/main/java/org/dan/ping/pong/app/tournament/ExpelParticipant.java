@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.sys.validation.TidBodyRequired;
@@ -28,7 +29,7 @@ public class ExpelParticipant {
 
     @Valid
     @NotNull
-    private Uid uid;
+    private Bid bid;
 
     @NotNull
     private BidState targetBidState = Expl;

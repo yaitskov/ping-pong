@@ -16,7 +16,6 @@ import static org.dan.ping.pong.app.match.rule.OrderRuleName.WonSets;
 import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.ofIntD;
 import static org.dan.ping.pong.app.match.rule.reason.IncreasingIntScalarReason.ofIntI;
 import static org.dan.ping.pong.app.match.rule.reason.InfoReason.notApplicableRule;
-import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST_OFFLINE;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S3A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
@@ -32,9 +31,6 @@ import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.bid.BidState;
-import org.dan.ping.pong.app.bid.Uid;
-import org.dan.ping.pong.app.tournament.EnlistOffline;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.mock.simulator.Player;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
@@ -75,20 +71,20 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
         assertThat(participantResultByFinish(l, 1), reasonChain1(1));
 
         assertThat(participantResultBySeed(l, 0),
-                hasProperty("uid", is(scenario.player2Uid(p1))));
+                hasProperty("uid", is(scenario.player2Bid(p1))));
         assertThat(participantResultBySeed(l, 1),
-                hasProperty("uid", is(scenario.player2Uid(p2))));
+                hasProperty("uid", is(scenario.player2Bid(p2))));
 
         simulator.run(c -> c.scoreSet(p1, 2, p2, 11));
 
         final Collection<GroupParticipantResult> l2 = participantsResult(tid, gid);
         assertThat(participantResultByFinish(l2, 0),
                 allOf(
-                        hasProperty("uid", is(scenario.player2Uid(p2))),
+                        hasProperty("uid", is(scenario.player2Bid(p2))),
                         reasonChain2(1)));
         assertThat(participantResultByFinish(l2, 1),
                 allOf(
-                        hasProperty("uid", is(scenario.player2Uid(p1))),
+                        hasProperty("uid", is(scenario.player2Bid(p1))),
                         reasonChain2(0)));
 
         simulator.run(c -> c.scoreSet3(1, p1, 11, p2, 5));
@@ -96,12 +92,12 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
         final Collection<GroupParticipantResult> l3 = participantsResult(tid, gid);
         assertThat(participantResultByFinish(l3, 0),
                 allOf(
-                        hasProperty("uid", is(scenario.player2Uid(p1))),
+                        hasProperty("uid", is(scenario.player2Bid(p1))),
                         hasProperty("state", is(Win1)),
                         reasonChain3(1)));
         assertThat(participantResultByFinish(l3, 1),
                 allOf(
-                        hasProperty("uid", is(scenario.player2Uid(p2))),
+                        hasProperty("uid", is(scenario.player2Bid(p2))),
                         hasProperty("state", is(Lost)),
                         reasonChain3(0)));
     }
@@ -177,19 +173,6 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
                         hasProperty("finishPosition", is(1))));
     }
 
-    private Uid enlistParticipant(TournamentScenario scenario, int cid,
-            Optional<Integer> groupId, String p5) {
-        return myRest().post(TOURNAMENT_ENLIST_OFFLINE, scenario,
-                EnlistOffline.builder()
-                        .groupId(groupId)
-                        .tid(scenario.getTid())
-                        .cid(cid)
-                        .bidState(BidState.Wait)
-                        .name(p5)
-                        .build())
-                .readEntity(Uid.class);
-    }
-
     @Test
     public void groupOf2AddNewAndInvalidateCache() {
         final TournamentScenario scenario = begin().name("groupOf2AddNew")
@@ -203,7 +186,8 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
         final TournamentGroups g = groupList(tid);
         final int gid = g.getGroups().stream().findFirst().get().getGid();
 
-        enlistParticipant(scenario,
+
+        simulator.enlistParticipant(scenario,
                 scenario.getCategoryDbId().get(c1), Optional.of(gid), "p3");
         simulator.invalidateTournamentCache();
 
@@ -225,7 +209,7 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
             GroupParticipants r, Player player) {
         return r.getParticipants().stream()
                 .filter(
-                        p -> p.getUid().equals(scenario.player2Uid(player)))
+                        p -> p.getUid().equals(scenario.player2Bid(player)))
                 .findAny()
                 .get();
     }

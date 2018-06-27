@@ -4,7 +4,7 @@ import static java.util.Optional.empty;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UidOrder;
 import static org.dan.ping.pong.app.match.rule.reason.IncreasingIntScalarReason.ofIntI;
 
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
@@ -27,14 +27,14 @@ public class OrderUidRuleService implements GroupOrderRuleService {
     @Override
     public Optional<Stream<? extends Reason>> score(
             Supplier<Stream<MatchInfo>> _matches,
-            Set<Uid> uids,
+            Set<Bid> bids,
             GroupOrderRule rule,
             GroupRuleParams params) {
         if (params.isDisambiguationMatchesWillBeCreated()) {
             return empty();
         }
         CounterInt c = new CounterInt();
-        return Optional.of(uids.stream().sorted()
+        return Optional.of(bids.stream().sorted()
                 .map(uid -> ofIntI(uid, c.postInc(), getName())));
     }
 }

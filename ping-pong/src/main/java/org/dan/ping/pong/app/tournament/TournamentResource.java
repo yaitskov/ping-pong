@@ -151,9 +151,12 @@ public class TournamentResource {
             throw badRequest("Bid state must be " + BidState.Want);
         }
         final UserInfo user = authService.userInfoBySession(session);
-        tournamentAccessor.update(enlistment.getTid(), response, (tournament, batch) -> {
-            tournamentService.enlistOnline(enlistment, tournament, user, batch);
-        });
+        tournamentAccessor.update(
+                enlistment.getTid(),
+                response,
+                (tournament, batch) ->  {
+                    return tournamentService.enlistOnline(enlistment, tournament, user, batch);
+                });
     }
 
     @Inject
@@ -181,10 +184,7 @@ public class TournamentResource {
     public void enlistOffline(
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
-            EnlistOffline enlistment) {
-        if (enlistment.getCid() < 1) {
-            throw badRequest("Category id is missing");
-        }
+            @Valid EnlistOffline enlistment) {
         final Uid adminUid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(enlistment.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
@@ -204,7 +204,6 @@ public class TournamentResource {
             tournament.checkAdmin(adminUid);
             tournamentService.update(tournament, update, batch);
         });
-
     }
 
     @POST
@@ -216,8 +215,10 @@ public class TournamentResource {
             int tid) {
         final Uid uid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(new Tid(tid), response, (tournament, batch) -> {
-            tournamentService.leaveTournament(tournament.getParticipant(uid),
-                    tournament, BidState.Quit, batch);
+            tournament.findBidsByUid(uid)
+                    .forEach(bid -> tournamentService.leaveTournament(
+                            tournament.getParticipant(bid),
+                            tournament, BidState.Quit, batch));
         });
     }
 
@@ -241,7 +242,7 @@ public class TournamentResource {
         tournamentAccessor.update(expelParticipant.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(uid);
             tournamentService.leaveTournament(
-                    tournament.getParticipant(expelParticipant.getUid()),
+                    tournament.getParticipant(expelParticipant.getBid()),
                     tournament, expelParticipant.getTargetBidState(), batch);
         });
     }

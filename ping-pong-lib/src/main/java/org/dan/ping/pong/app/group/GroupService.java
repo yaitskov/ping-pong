@@ -30,6 +30,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.CastingLotsDaoIf;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
@@ -104,13 +105,13 @@ public class GroupService {
     @Inject
     private GroupParticipantOrderService groupParticipantOrderService;
 
-    public List<Uid> orderUidsInGroup(int gid, TournamentMemState tournament,
+    public List<Bid> orderBidsInGroup(int gid, TournamentMemState tournament,
             List<MatchInfo> groupMatches) {
         final GroupParticipantOrder orderedUids = groupParticipantOrderService
                 .findOrder(ofParams(gid, tournament, groupMatches, tournament.orderRules(),
-                        tournament.uidsInGroup(gid)));
+                        tournament.bidsInGroup(gid)));
         if (orderedUids.unambiguous()) {
-            return orderedUids.determinedUids();
+            return orderedUids.determinedBids();
         }
         throw new NoDisambiguateMatchesException(orderedUids);
     }
@@ -157,7 +158,7 @@ public class GroupService {
                 .category(tournament.getCategory(groupInfo.getCid()))
                 .members(tournament.getParticipants().values().stream()
                         .filter(p -> p.getGid().equals(of(gid)))
-                        .map(ParticipantMemState::toLink)
+                        .map(ParticipantMemState::toBidLink)
                         .collect(toList()))
                 .build();
     }
@@ -171,21 +172,21 @@ public class GroupService {
         final List<MatchInfo> groupMatches = findAllMatchesInGroup(tournament, gid);
         final GroupParticipantOrder order = groupParticipantOrderService.findOrder(
                 ofParams(gid, tournament, groupMatches, tournament.orderRules(),
-                        tournament.uidsInGroup(gid)));
+                        tournament.bidsInGroup(gid)));
 
         final List<ParticipantMemState> seedBidsOrder = rankingService
                 .sort(groupBids(tournament, gid), rules.getCasting(), tournament);
-        final List<Uid> finalPositions = order.getPositions()
+        final List<Bid> finalPositions = order.getPositions()
                 .values()
                 .stream()
-                .map(e -> e.getReason().get().getUid())
+                .map(e -> e.getReason().get().getBid())
                 .collect(toList());
         final boolean possibleDm = matchesInGroup(finalPositions.size()) < groupMatches.size();
-        final Map<Uid, GroupParticipantResult> result = order.getPositions()
+        final Map<Bid, GroupParticipantResult> result = order.getPositions()
                 .values()
                 .stream()
                 .collect(toMap(
-                        e -> e.getReason().get().getUid(),
+                        e -> e.getReason().get().getBid(),
                         e -> groupPosToResult(tournament, e, possibleDm)));
 
 
@@ -194,7 +195,7 @@ public class GroupService {
         range(0, finalPositions.size()).forEach(
                 i -> result.get(finalPositions.get(i)).setFinishPosition(i));
         range(0,  finalPositions.size()).forEach(
-                i -> result.get(seedBidsOrder.get(i).getUid()).setSeedPosition(i));
+                i -> result.get(seedBidsOrder.get(i).getBid()).setSeedPosition(i));
 
         final GroupRules groupRules = tournament.getRule().getGroup().get();
 
@@ -208,16 +209,16 @@ public class GroupService {
 
     private void arrangeMatchesByUids(TournamentMemState tournament,
             List<MatchInfo> groupMatches,
-            Map<Uid, GroupParticipantResult> result) {
+            Map<Bid, GroupParticipantResult> result) {
         groupMatches.forEach(m -> {
             if (m.getTag().isPresent()) {
-                m.participants().forEach(uid -> result.get(uid)
+                m.participants().forEach(bid -> result.get(bid)
                         .getDmMatches()
-                        .put(m.opponentUid(uid), matchResult(uid, tournament, m)));
+                        .put(m.opponentBid(bid), matchResult(bid, tournament, m)));
             } else {
-                m.participants().forEach(uid -> result.get(uid)
+                m.participants().forEach(bid -> result.get(bid)
                         .getOriginMatches()
-                        .put(m.opponentUid(uid), matchResult(uid, tournament, m)));
+                        .put(m.opponentBid(bid), matchResult(bid, tournament, m)));
             }
         });
     }
@@ -226,10 +227,11 @@ public class GroupService {
             TournamentMemState tournament, GroupPosition gp,
             boolean possibleDm) {
         final ParticipantMemState bid = tournament.getParticipant(
-                gp.getReason().get().getUid());
+                gp.getReason().get().getBid());
         return GroupParticipantResult.builder()
                 .name(bid.getName())
                 .uid(bid.getUid())
+                .bid(bid.getBid())
                 .state(bid.state())
                 .reasonChain(gp.reasonChain())
                 .dmMatches(possibleDm ? new HashMap<>() : emptyMap())
@@ -242,25 +244,25 @@ public class GroupService {
                 .filter(bid -> bid.getGid().equals(of(gid))).collect(toList());
     }
 
-    private GroupMatchResult matchResult(Uid uid, TournamentMemState tournament, MatchInfo m) {
-        final Uid oUid = m.getOpponentUid(uid)
-                .orElseThrow(() -> internalError("no opponent uid" + uid));
-        final Map<Uid, Integer> uid2WonSets = sports.calcWonSets(tournament, m);
-        final Optional<Uid> scoreWinner = sports.findWinnerId(
+    private GroupMatchResult matchResult(Bid bid, TournamentMemState tournament, MatchInfo m) {
+        final Bid oBid = m.getOpponentBid(bid)
+                .orElseThrow(() -> internalError("no opponent bid" + bid));
+        final Map<Bid, Integer> uid2WonSets = sports.calcWonSets(tournament, m);
+        final Optional<Bid> scoreWinner = sports.findWinnerId(
                 tournament.selectMatchRule(m), uid2WonSets);
         return GroupMatchResult.builder()
-                .state(participantMatchState(uid, scoreWinner, m))
+                .state(participantMatchState(bid, scoreWinner, m))
                 .mid(m.getMid())
                 .sets(HisIntPair.builder()
-                        .his(uid2WonSets.get(uid))
-                        .enemy(uid2WonSets.get(oUid))
+                        .his(uid2WonSets.get(bid))
+                        .enemy(uid2WonSets.get(oBid))
                         .build())
-                .games(pairGames(uid, oUid, m.getParticipantIdScore()))
+                .games(pairGames(bid, oBid, m.getParticipantIdScore()))
                 .build();
     }
 
     private ParticipantMatchState participantMatchState(
-            Uid uid, Optional<Uid> scoreWinner, MatchInfo m) {
+            Bid bid, Optional<Bid> scoreWinner, MatchInfo m) {
         if (m.getWinnerId().isPresent()) {
             if (scoreWinner.isPresent()) {
                 if (scoreWinner.equals(m.getWinnerId())) {
@@ -268,7 +270,7 @@ public class GroupService {
                 }
                 throw internalError("match is over by score but winner does not mismatch");
             } else {
-                if (m.getWinnerId().get().equals(uid)) {
+                if (m.getWinnerId().get().equals(bid)) {
                     return WalkWiner;
                 } else {
                     return WalkOver;
@@ -288,9 +290,9 @@ public class GroupService {
         }
     }
 
-    private List<HisIntPair> pairGames(Uid uid, Uid oUid, Map<Uid, List<Integer>> scores) {
-        final List<Integer> setsA = scores.get(uid);
-        final List<Integer> setsB = scores.get(oUid);
+    private List<HisIntPair> pairGames(Bid bid, Bid oBid, Map<Bid, List<Integer>> scores) {
+        final List<Integer> setsA = scores.get(bid);
+        final List<Integer> setsB = scores.get(oBid);
         final List<HisIntPair> result = new ArrayList<>();
         for (int i = 0; i < setsA.size(); ++i) {
             result.add(HisIntPair.builder()
@@ -314,15 +316,15 @@ public class GroupService {
                                         ? new PreviewDisambiguationDirective()
                                         : r)
                                 .collect(toList()),
-                        tournament.uidsInCategory(cid)));
+                        tournament.bidsInCategory(cid)));
 
         return order.getPositions().values()
                 .stream()
                 .map(gp -> {
-                    final Uid uid = gp.getReason().get().getUid();
-                    final ParticipantMemState participant = tournament.getParticipant(uid);
+                    final Bid bid = gp.getReason().get().getBid();
+                    final ParticipantMemState participant = tournament.getParticipant(bid);
                     return TournamentResultEntry.builder()
-                            .user(participant.toLink())
+                            .user(participant.toBidLink())
                             .playOffStep(empty())
                             .state(participant.state())
                             .reasonChain(gp.reasonChain())
@@ -335,7 +337,7 @@ public class GroupService {
         return tournament.getParticipants().values().stream()
                 .filter(bid -> bid.state() == Win1 && bid.getCid() == cid)
                 .map(bid -> TournamentResultEntry.builder()
-                        .user(bid.toLink())
+                        .user(bid.toBidLink())
                         .playOffStep(Optional.empty())
                         .state(Win1)
                         .reasonChain(emptyList())
@@ -344,7 +346,7 @@ public class GroupService {
     }
 
     public boolean notExpelledInGroup(TournamentMemState tournament, ParticipantMemState b) {
-        return b.state() != Expl || tournament.participantMatches(b.getUid())
+        return b.state() != Expl || tournament.participantMatches(b.getBid())
                 .anyMatch(m -> !m.getGid().isPresent());
     }
 
@@ -399,15 +401,15 @@ public class GroupService {
         final int gid = allGroupMatches.get(0).getGid().get();
 
         for (GroupPosition group : e.getUids().ambiguousGroups()) {
-            createDisambiguateMatches(batch, tournament, gid, group.getCompetingUids());
+            createDisambiguateMatches(batch, tournament, gid, group.getCompetingBids());
         }
     }
 
     public void createDisambiguateMatches(
             DbUpdater batch, TournamentMemState tournament,
-            int gid, Collection<Uid> uids) {
+            int gid, Collection<Bid> bids) {
         castingLotsDao.generateGroupMatches(batch, tournament, gid,
-                uids.stream()
+                bids.stream()
                         .map(tournament::getParticipant)
                         .collect(toList()), 0,
                 MATCH_TAG_DISAMBIGUATION);
@@ -416,6 +418,6 @@ public class GroupService {
     public void createDisambiguateMatches(DbUpdater batch, TournamentMemState tournament,
             int gid, MatchParticipants mp) {
         createDisambiguateMatches(batch, tournament, gid,
-                asList(mp.getUidLess(), mp.getUidMore()));
+                asList(mp.getBidLess(), mp.getBidMore()));
     }
 }

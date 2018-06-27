@@ -16,4 +16,6 @@ ALTER TABLE set_score change uid bid smallint unsigned NOT NULL;
 
 ALTER TABLE match_dispute change plaintiff plaintiff smallint unsigned NOT NULL;
 
+ALTER TABLE users add column ref_uid int(11) null;
+
 --rollback

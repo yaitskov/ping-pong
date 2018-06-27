@@ -7,7 +7,7 @@ import static org.dan.ping.pong.app.match.rule.reason.DecreasingDoubleScalarReas
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.util.FuncUtils.SUM_INT;
 
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
@@ -35,12 +35,12 @@ public class AtpDIIIPercentWonGamesRuleService implements GroupOrderRuleService 
     @Override
     public Optional<Stream<? extends Reason>> score(
             Supplier<Stream<MatchInfo>> matches,
-            Set<Uid> _uids, GroupOrderRule _rule, GroupRuleParams params) {
-        final Map<Uid, Integer> uid2WonBalls = new TreeMap<>();
-        final Map<Uid, Integer> uid2LostBalls = new HashMap<>();
+            Set<Bid> _bids, GroupOrderRule _rule, GroupRuleParams params) {
+        final Map<Bid, Integer> uid2WonBalls = new TreeMap<>();
+        final Map<Bid, Integer> uid2LostBalls = new HashMap<>();
 
         matches.get().forEach(m -> {
-            final Uid[] uids = m.uidsArray();
+            final Bid[] uids = m.bidsArray();
             final TennisMatchRules rules = (TennisMatchRules) params
                     .getTournament().selectMatchRule(m);
 

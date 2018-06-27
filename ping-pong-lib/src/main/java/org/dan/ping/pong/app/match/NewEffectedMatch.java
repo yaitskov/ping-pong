@@ -28,8 +28,8 @@ public class NewEffectedMatch {
                 .map(nm -> NewEffectedMatch
                         .builder()
                         .participants(asList(
-                                tournament.getParticipant(nm.getUidLess()).toLink(),
-                                tournament.getParticipant(nm.getUidMore()).toLink()))
+                                tournament.getParticipant(nm.getBidLess()).toLink(),
+                                tournament.getParticipant(nm.getBidMore()).toLink()))
                         .build())
                 .collect(toList());
     }

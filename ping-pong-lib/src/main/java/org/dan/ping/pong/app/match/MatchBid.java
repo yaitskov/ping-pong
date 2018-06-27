@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.sys.hash.HashAggregator;
 import org.dan.ping.pong.sys.hash.Hashable;
@@ -26,28 +26,28 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class MatchUid implements Comparable<MatchUid>, Hashable {
-    private static final Comparator<MatchUid> COMPARATOR = Comparator
-            .comparing(MatchUid::getMid)
-            .thenComparing(MatchUid::getUid);
+public class MatchBid implements Comparable<MatchBid>, Hashable {
+    private static final Comparator<MatchBid> COMPARATOR = Comparator
+            .comparing(MatchBid::getMid)
+            .thenComparing(MatchBid::getBid);
 
     private Mid mid;
-    private Uid uid;
+    private Bid bid;
 
     @Override
-    public int compareTo(MatchUid o) {
+    public int compareTo(MatchBid o) {
         return COMPARATOR.compare(this, o);
     }
 
     @Override
     public void hashTo(HashAggregator sink) {
-        sink.hash(uid).hash(mid);
+        sink.hash(bid).hash(mid);
     }
 
     public static List<EffectedMatch> toEffectedMatchesByReset(
-            TournamentMemState tournament, List<MatchUid> toBeReset) {
+            TournamentMemState tournament, List<MatchBid> toBeReset) {
         return toBeReset.stream()
-                .map(MatchUid::getMid)
+                .map(MatchBid::getMid)
                 .sorted()
                 .distinct()
                 .map(tournament::getMatchById)

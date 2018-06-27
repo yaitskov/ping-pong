@@ -168,7 +168,7 @@ angular.module('cloudSport').
                     when('/my/tournament/presence/:tournamentId', {
                         template: '<par-state-mgmt-list/>'
                     }).
-                    when('/my/tournament/:tournamentId/participant/:userId', {
+                    when('/my/tournament/:tournamentId/participant/:participantId', {
                         template: '<manage-one-participant/>'
                     }).
                     when('/my/tournament/categories/:tournamentId', {

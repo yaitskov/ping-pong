@@ -8,7 +8,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.IdentifiedScore;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.SetScoreReq;
@@ -39,20 +39,20 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
 
     @Override
     public void validate(PingPongMatchRules rules, MatchInfo match) {
-        final Map<Uid, List<Integer>> scores = match.getParticipantIdScore();
-        final Iterator<Uid> uidIterator = scores.keySet().iterator();
-        final Uid uidA = uidIterator.next();
-        final Uid uidB = uidIterator.next();
+        final Map<Bid, List<Integer>> scores = match.getParticipantIdScore();
+        final Iterator<Bid> uidIterator = scores.keySet().iterator();
+        final Bid bidA = uidIterator.next();
+        final Bid bidB = uidIterator.next();
         final int[] wonSets = new int[2];
-        final int bSets = scores.get(uidB).size();
-        final int aSets = scores.get(uidA).size();
+        final int bSets = scores.get(bidB).size();
+        final int aSets = scores.get(bidA).size();
         if (bSets != aSets) {
             throw badRequest(SET_LENGTH_MISMATCH);
         }
         for (int iSet = 0; iSet < aSets; ++iSet) {
             ++wonSets[validate(rules, iSet,
-                    scores.get(uidA).get(iSet),
-                    scores.get(uidB).get(iSet))];
+                    scores.get(bidA).get(iSet),
+                    scores.get(bidB).get(iSet))];
             if (wonSets[A] > rules.getSetsToWin()) {
                 throw badRequest(TO_MANY_SETS);
             }
@@ -96,14 +96,14 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
     }
 
     @Override
-    public Optional<Uid> findWinnerId(PingPongMatchRules rules, Map<Uid, Integer> wonSets) {
+    public Optional<Bid> findWinnerId(PingPongMatchRules rules, Map<Bid, Integer> wonSets) {
         return wonSets.entrySet().stream()
                 .filter(e -> e.getValue() >= rules.getSetsToWin())
                 .map(Map.Entry::getKey)
                 .findAny();
     }
 
-    public void checkWonSets(PingPongMatchRules rules, Map<Uid, Integer> uidWonSets) {
+    public void checkWonSets(PingPongMatchRules rules, Map<Bid, Integer> uidWonSets) {
         final Collection<Integer> wonSets = uidWonSets.values();
         wonSets.stream()
                 .filter(n -> n >  rules.getSetsToWin()).findAny()
@@ -121,16 +121,16 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
     @Override
     public List<SetScoreReq> expandScoreSet(PingPongMatchRules rules, SetScoreReq score) {
         final List<SetScoreReq> result = new ArrayList<>();
-        final int uidIdxA = 0;
-        final int uidIdxB = 1;
+        final int bidIdxA = 0;
+        final int bidIdxB = 1;
         int winnerIdx;
         int loserIdx;
-        if (score.getScores().get(uidIdxA).getScore() < score.getScores().get(uidIdxB).getScore()) {
-            winnerIdx = uidIdxB;
-            loserIdx = uidIdxA;
+        if (score.getScores().get(bidIdxA).getScore() < score.getScores().get(bidIdxB).getScore()) {
+            winnerIdx = bidIdxB;
+            loserIdx = bidIdxA;
         } else {
-            winnerIdx = uidIdxA;
-            loserIdx = uidIdxB;
+            winnerIdx = bidIdxA;
+            loserIdx = bidIdxB;
         }
         final int loserWonSets = score.getScores().get(loserIdx).getScore();
         if (loserWonSets > 0) {
@@ -153,7 +153,7 @@ public class PingPongSport implements Sport<PingPongMatchRules> {
 
     private IdentifiedScore buildScore(SetScoreReq scores, int loserIdx, int score) {
         return IdentifiedScore.builder()
-                .uid(scores.getScores().get(loserIdx).getUid())
+                .bid(scores.getScores().get(loserIdx).getBid())
                 .score(score)
                 .build();
     }

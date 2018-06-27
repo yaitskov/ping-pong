@@ -5,7 +5,7 @@ import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.
 import static org.dan.ping.pong.util.FuncUtils.SUM_INT;
 
 import lombok.Setter;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
@@ -37,20 +37,20 @@ public class SetsBalanceRuleService implements GroupOrderRuleService {
     @Override
     public Optional<Stream<? extends Reason>> score(
             Supplier<Stream<MatchInfo>> matches,
-            Set<Uid> _uids,
+            Set<Bid> _bids,
             GroupOrderRule rule, GroupRuleParams params) {
 
-        final Map<Uid, Integer> uid2SetsBalance = new HashMap<>();
+        final Map<Bid, Integer> bid2SetsBalance = new HashMap<>();
         final TournamentMemState tournament = params.getTournament();
 
         matches.get().forEach(m -> {
-            final Map<Uid, Integer> uid2Sets = sports.calcWonSets(tournament, m);
-            final Uid[] matchUids = m.uidsArray();
-            final int balance = uid2Sets.get(matchUids[0]) - uid2Sets.get(matchUids[1]);
-            uid2SetsBalance.merge(matchUids[0], balance, SUM_INT);
-            uid2SetsBalance.merge(matchUids[1], -balance, SUM_INT);
+            final Map<Bid, Integer> bid2Sets = sports.calcWonSets(tournament, m);
+            final Bid[] matchBids = m.bidsArray();
+            final int balance = bid2Sets.get(matchBids[0]) - bid2Sets.get(matchBids[1]);
+            bid2SetsBalance.merge(matchBids[0], balance, SUM_INT);
+            bid2SetsBalance.merge(matchBids[1], -balance, SUM_INT);
         });
-        return Optional.of(uid2SetsBalance.entrySet()
+        return Optional.of(bid2SetsBalance.entrySet()
                 .stream()
                 .map((e) -> ofEntry(e, getName()))
                 .sorted());

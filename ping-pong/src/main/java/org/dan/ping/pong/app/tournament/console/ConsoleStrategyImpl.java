@@ -1,21 +1,16 @@
 package org.dan.ping.pong.app.tournament.console;
 
-import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
-import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.TERMINAL_STATE;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
-import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableSet;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.bid.BidState;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
@@ -59,7 +54,7 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
     @SneakyThrows
     public void onGroupComplete(
             int gid, TournamentMemState masterTournament,
-            Set<Uid> loserUids, DbUpdater batch) {
+            Set<Bid> loserBids, DbUpdater batch) {
         final RelatedTids relatedTids = tournamentRelationCache.get(masterTournament.getTid());
 
         final TournamentMemState consoleTournament = tournamentCache.load(
@@ -70,8 +65,8 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
 
         batch.onFailure(() -> tournamentCache.invalidate(consoleTournament.getTid()));
         log.info("Enlist loser bids {} to console tournament {}",
-                loserUids, consoleTournament.getTid());
-        loserUids.stream()
+                loserBids, consoleTournament.getTid());
+        loserBids.stream()
                 .map(masterTournament::getParticipant)
                 .forEach(bid ->
                         tournamentService.enlistOnlineWithoutValidation(

@@ -2,11 +2,10 @@ package org.dan.ping.pong.app.match.rule.service.ping;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
-import static org.dan.ping.pong.app.group.GroupServiceTest.UID2;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID3;
-import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.UID4;
+import static org.dan.ping.pong.app.group.GroupServiceTest.BID2;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID3;
+import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID4;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.Punkts;
-import static org.dan.ping.pong.app.match.rule.OrderRuleName.WonSets;
 import static org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason.ofIntD;
 import static org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleServiceTest.MATCHES_UIDS_2_3_4_S;
 import static org.dan.ping.pong.app.match.rule.service.common.BallsBalanceRuleServiceTest.UIDS_2_3_4;
@@ -31,8 +30,8 @@ public class CountJustPunktsRuleServiceTest {
                                         .build())
                                 .build())
                         .get().collect(toList()),
-                is(asList(ofIntD(UID3, 4, Punkts),
-                        ofIntD(UID4, 3, Punkts),
-                        ofIntD(UID2, 1, Punkts))));
+                is(asList(ofIntD(BID3, 4, Punkts),
+                        ofIntD(BID4, 3, Punkts),
+                        ofIntD(BID2, 1, Punkts))));
     }
 }

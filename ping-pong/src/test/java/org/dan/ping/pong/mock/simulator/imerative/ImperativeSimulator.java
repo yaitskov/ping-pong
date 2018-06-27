@@ -48,14 +48,16 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidRename;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.bid.ParticipantState;
-import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupParticipants;
+import org.dan.ping.pong.app.group.GroupPopulations;
 import org.dan.ping.pong.app.group.TournamentGroups;
 import org.dan.ping.pong.app.match.IdentifiedScore;
 import org.dan.ping.pong.app.match.MatchResult;
@@ -72,7 +74,6 @@ import org.dan.ping.pong.app.tournament.MyTournamentInfo;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 import org.dan.ping.pong.app.tournament.TournamentState;
-import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.mock.MyRest;
 import org.dan.ping.pong.mock.RestEntityGenerator;
 import org.dan.ping.pong.mock.simulator.Player;
@@ -156,8 +157,8 @@ public class ImperativeSimulator {
             final CategoryInfo catInfo = myRest.get(
                     CATEGORY_MEMBERS + tid + "/" + category.getCid(),
                     CategoryInfo.class);
-            for (UserLink userLink : catInfo.getUsers()) {
-                final Player player = scenario.getUidPlayer().get(userLink.getUid());
+            for (ParticipantLink userLink : catInfo.getUsers()) {
+                final Player player = scenario.getBidPlayer().get(userLink.getBid());
                 final PlayerCategory catLabel = scenario.getPlayersCategory().get(player);
                 consoleScenario.getCategoryDbId().put(catLabel, category.getCid());
                 consoleScenario.getPlayersByCategories().put(catLabel, player);
@@ -234,7 +235,7 @@ public class ImperativeSimulator {
 
     public void checkAllBidsState(BidStatesDesc expectedPattern) {
         final Map<Player, BidState> got = enlistedParticipants().stream()
-                .collect(toMap(p -> uid2Player(p.getUser().getUid()),
+                .collect(toMap(p -> bid2Player(p.getUser().getBid()),
                         ParticipantState::getState));
         final Map<Player, BidState> expected = got.keySet().stream().collect(
                 toMap(o -> o, o -> expectedPattern.getRest()));
@@ -255,11 +256,11 @@ public class ImperativeSimulator {
         return myRest.get(GROUP_LIST + tid(), TournamentGroups.class);
     }
 
-    private Player uid2Player(Uid uid) {
-        return ofNullable(scenario.getUidPlayer().get(uid))
+    private Player bid2Player(Bid bid) {
+        return ofNullable(scenario.getBidPlayer().get(bid))
                 .orElseThrow(
                         () -> new RuntimeException(
-                                "no player label for uid " + uid));
+                                "no player label for bid " + bid));
     }
 
     public ImperativeSimulator playerQuits(Player p) {
@@ -282,7 +283,7 @@ public class ImperativeSimulator {
                 scenario.getTestAdmin(),
                 ExpelParticipant.builder()
                         .tid(scenario.getTid())
-                        .uid(scenario.player2Uid(p))
+                        .bid(scenario.player2Bid(p))
                         .targetBidState(targetState)
                         .build());
         reloadMatchMap();
@@ -314,7 +315,7 @@ public class ImperativeSimulator {
         final List<TournamentResultEntry> tournamentResult = getTournamentResult(categoryId, tid());
         try {
             assertThat(tournamentResult.stream()
-                            .map(tr -> uid2Player(tr.getUser().getUid())).collect(toList()),
+                            .map(tr -> bid2Player(tr.getUser().getBid())).collect(toList()),
                     anyOf(p.stream().map(Matchers::is).collect(toList())));
         } catch (AssertionError e) {
             log.error("failed tournament results: {}", tournamentResult);
@@ -396,9 +397,9 @@ public class ImperativeSimulator {
                         .effectHash(Optional.of(DONT_CHECK_HASH))
                         .mid(resolveMid(p1, p2))
                         .sets(ImmutableMap.of(
-                                scenario.player2Uid(p1),
+                                scenario.player2Bid(p1),
                                 games1,
-                                scenario.player2Uid(p2),
+                                scenario.player2Bid(p2),
                                 games2))
                         .build());
         return doAutoReload();
@@ -461,7 +462,7 @@ public class ImperativeSimulator {
     private IdentifiedScore identifiedScore(Player p1, int games1) {
         return IdentifiedScore.builder()
                 .score(games1)
-                .uid(scenario.player2Uid(p1))
+                .bid(scenario.player2Bid(p1))
                 .build();
     }
 
@@ -490,7 +491,7 @@ public class ImperativeSimulator {
         matchMap.putAll(openMatches().getMatches().stream().collect(toMap(
                 m -> m.getParticipants().stream()
                         .map(
-                                pl -> uid2Player(pl.getUid()))
+                                pl -> bid2Player(pl.getBid()))
                         .collect(toSet()),
                 OpenMatchForJudge::getMid)));
         return this;
@@ -507,15 +508,26 @@ public class ImperativeSimulator {
     }
 
     public ImperativeSimulator renameBid(Player p, String newName) {
-        final Uid uid = scenario.player2Uid(p);
+        final Bid bid = scenario.player2Bid(p);
         myRest.post(BID_RENAME, scenario.getTestAdmin(),
                 BidRename
                         .builder()
                         .expectedName(scenario.getPlayersSessions().get(p).getName())
                         .tid(scenario.getTid())
                         .newName(newName)
-                        .uid(uid)
+                        .bid(bid)
                         .build());
         return this;
+    }
+
+    public Bid enlistParticipant(TournamentScenario scenario,
+            int cid, GroupPopulations populations, String p5) {
+        return enlistParticipant(scenario, cid,
+                Optional.of(populations.getLinks().get(0).getGid()), p5);
+    }
+
+    public Bid enlistParticipant(TournamentScenario scenario, int cid,
+            Optional<Integer> gid, String p5) {
+        return simulator.enlistParticipant(scenario, cid, gid, p5);
     }
 }

@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableMap;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.junit.Rule;
@@ -28,8 +29,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class TennisSportTest {
-    private static final Uid UID_A = new Uid(1);
-    private static final Uid UID_B = new Uid(2);
+    private static final Bid BID_A = new Bid(1);
+    private static final Bid BID_B = new Bid(2);
 
     private TennisSport sut = new TennisSport();
     public static final  TennisMatchRules CLASSIC_TENNIS_RULES = TennisMatchRules.builder()
@@ -142,12 +143,12 @@ public class TennisSportTest {
 
     @Test
     public void winsUidA() {
-        findWinner(Optional.of(UID_A), 2, 1);
+        findWinner(Optional.of(BID_A), 2, 1);
     }
 
     @Test
     public void winsUidB() {
-        findWinner(Optional.of(UID_B), 0, 2);
+        findWinner(Optional.of(BID_B), 0, 2);
     }
 
     @Test
@@ -157,29 +158,29 @@ public class TennisSportTest {
 
     @Test
     public void checkWonSetsPassWithoutWinner() {
-        sut.checkWonSets(CLASSIC_TENNIS_RULES, ImmutableMap.of(UID_A, 1, UID_B, 1));
+        sut.checkWonSets(CLASSIC_TENNIS_RULES, ImmutableMap.of(BID_A, 1, BID_B, 1));
     }
 
     @Test
     public void checkWonSetsPassWithWinner() {
-        sut.checkWonSets(CLASSIC_TENNIS_RULES, ImmutableMap.of(UID_A, 1, UID_B, 2));
-        sut.checkWonSets(CLASSIC_TENNIS_RULES, ImmutableMap.of(UID_A, 0, UID_B, 2));
+        sut.checkWonSets(CLASSIC_TENNIS_RULES, ImmutableMap.of(BID_A, 1, BID_B, 2));
+        sut.checkWonSets(CLASSIC_TENNIS_RULES, ImmutableMap.of(BID_A, 0, BID_B, 2));
     }
 
     @Test
     public void checkWonSetsFailWith2Winners() {
         expect(WINNERS_ARE_MORE_THAT_1);
-        sut.checkWonSets(CLASSIC_TENNIS_RULES, ImmutableMap.of(UID_A, 2, UID_B, 2));
+        sut.checkWonSets(CLASSIC_TENNIS_RULES, ImmutableMap.of(BID_A, 2, BID_B, 2));
     }
 
     @Test
     public void checkWonSetsFailToManySets() {
         expect(WON_SETS_MORE_THAT_REQUIRED);
-        sut.checkWonSets(CLASSIC_TENNIS_RULES, ImmutableMap.of(UID_A, 1, UID_B, 3));
+        sut.checkWonSets(CLASSIC_TENNIS_RULES, ImmutableMap.of(BID_A, 1, BID_B, 3));
     }
 
-    private void findWinner(Optional<Uid> uid, int a, int b) {
-        assertEquals(uid, sut.findWinnerId(CLASSIC_TENNIS_RULES, ImmutableMap.of(UID_A, a, UID_B, b)));
+    private void findWinner(Optional<Bid> bid, int a, int b) {
+        assertEquals(bid, sut.findWinnerId(CLASSIC_TENNIS_RULES, ImmutableMap.of(BID_A, a, BID_B, b)));
     }
 
     private void expect(String error) {
@@ -197,7 +198,7 @@ public class TennisSportTest {
     private MatchInfo match(List<Integer> a, List<Integer> b) {
         return MatchInfo.builder()
                 .participantIdScore(
-                        ImmutableMap.of(new Uid(2), a, new Uid(3), b))
+                        ImmutableMap.of(new Bid(2), a, new Bid(3), b))
                 .build();
     }
 }

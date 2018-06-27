@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.tournament.Tid;
 
@@ -23,6 +23,6 @@ import java.util.Optional;
 public class DisputeClaimRequest {
     private Tid tid;
     private Mid mid;
-    private Map<Uid, List<Integer>> sets;
+    private Map<Bid, List<Integer>> sets;
     private Optional<String> comment;
 }

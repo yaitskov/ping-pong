@@ -18,7 +18,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ChangeGroupReq {
     private Tid tid;
-    private Uid uid;
+    private Bid bid;
     private int expectedGid;
     private Optional<Integer> targetGid;
 }

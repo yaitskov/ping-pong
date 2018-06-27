@@ -87,7 +87,6 @@ public class OneCategorySim {
                         .presence(EnlistMode.Enlist, p1, p2, p3, p4));
     }
 
-
     @Test
     @SneakyThrows
     public void schedule3ConcurrentGames() {

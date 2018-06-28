@@ -714,7 +714,7 @@ public class MatchService {
                                 .participants(
                                         m.bids().stream()
                                                 .map(tournament::getParticipant)
-                                                .map(ParticipantMemState::toLink)
+                                                .map(ParticipantMemState::toBidLink)
                                                 .collect(toList()))
                                 .build())
                         .collect(toList()));

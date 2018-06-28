@@ -27,6 +27,7 @@ import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.group.GroupDao;
@@ -225,9 +226,9 @@ public class CastingLotsService {
     }
 
     public void checkAllThatAllHere(List<ParticipantMemState> readyBids) {
-        final List<UserLink> notHere = readyBids.stream()
+        final List<ParticipantLink> notHere = readyBids.stream()
                 .filter(bid -> WANT_PAID.contains(bid.state()))
-                .map(ParticipantMemState::toLink)
+                .map(ParticipantMemState::toBidLink)
                 .collect(toList());
         if (notHere.isEmpty()) {
             return;

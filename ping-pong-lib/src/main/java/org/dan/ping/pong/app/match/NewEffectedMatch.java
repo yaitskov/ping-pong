@@ -8,8 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
-import org.dan.ping.pong.app.user.UserLink;
 
 import java.util.List;
 import java.util.Set;
@@ -20,7 +20,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NewEffectedMatch {
-    private List<UserLink> participants;
+    private List<ParticipantLink> participants;
 
     public static List<NewEffectedMatch> toNewDisambiguationMatches(
             TournamentMemState tournament, Set<MatchParticipants> toBeCreated) {
@@ -28,8 +28,8 @@ public class NewEffectedMatch {
                 .map(nm -> NewEffectedMatch
                         .builder()
                         .participants(asList(
-                                tournament.getParticipant(nm.getBidLess()).toLink(),
-                                tournament.getParticipant(nm.getBidMore()).toLink()))
+                                tournament.getParticipant(nm.getBidLess()).toBidLink(),
+                                tournament.getParticipant(nm.getBidMore()).toBidLink()))
                         .build())
                 .collect(toList());
     }

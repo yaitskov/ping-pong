@@ -92,7 +92,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
 
         assertThat(gp, allOf(hasProperty("participants", contains(
                 allOf(
-                        hasProperty("uid", is(s.player2Bid(p1))),
+                        hasProperty("bid", is(s.player2Bid(p1))),
                         hasProperty("seedPosition", is(0)),
                         hasProperty("finishPosition", is(1)),
                         hasProperty("dmMatches", aMapWithSize(is(2))),
@@ -114,7 +114,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                                         hasProperty("value", is(3)))))),
                         hasProperty("name", containsString("p1"))),
                 allOf(
-                        hasProperty("uid", is(s.player2Bid(p2))),
+                        hasProperty("bid", is(s.player2Bid(p2))),
                         hasProperty("seedPosition", is(1)),
                         hasProperty("finishPosition", is(2)),
                         hasProperty("dmMatches", aMapWithSize(is(2))),
@@ -136,7 +136,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                                         hasProperty("value", is(2)))))),
                         hasProperty("name", containsString("p2"))),
                 allOf(
-                        hasProperty("uid", is(s.player2Bid(p3))),
+                        hasProperty("bid", is(s.player2Bid(p3))),
                         hasProperty("seedPosition", is(2)),
                         hasProperty("finishPosition", is(0)),
                         hasProperty("dmMatches", aMapWithSize(is(2))),

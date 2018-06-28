@@ -5,6 +5,7 @@ import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.mock.Generators.genStr;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.sport.SportType;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DaoEntityGeneratorWithAdmin {
 
+    @Getter
     private final TestAdmin testAdmin;
     private final DaoEntityGenerator daoEntityGenerator;
 

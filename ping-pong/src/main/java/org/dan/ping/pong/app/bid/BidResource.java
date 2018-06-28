@@ -4,6 +4,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.app.match.MatchResource.BID_JP;
 import static org.dan.ping.pong.app.match.MatchResource.TID_JP;
+import static org.dan.ping.pong.app.tournament.ParticipantMemState.BID;
 import static org.dan.ping.pong.app.tournament.TournamentService.TID;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,6 @@ import javax.ws.rs.container.Suspended;
 @Path("/")
 @Produces(APPLICATION_JSON)
 public class BidResource {
-    private static final String BID = "bid";
     public static final String PROFILE = "/bid/profile/";
     public static final String FIND_BIDS_BY_STATE = "/bid/find-by-state";
     public static final String FIND_BIDS_WITH_MATCH = "/bid/find-with-match/";

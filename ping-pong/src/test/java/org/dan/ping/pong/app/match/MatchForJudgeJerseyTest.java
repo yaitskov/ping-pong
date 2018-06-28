@@ -68,7 +68,7 @@ public class MatchForJudgeJerseyTest extends AbstractSpringJerseyTest {
                 hasProperty("tid", is(scenario.getTid())),
                 hasProperty("table", is(Optional.empty())),
                 hasProperty("participants", hasItems(
-                        hasProperty("uid", is(FILLER_LOSER_BID)),
-                        hasProperty("uid", is(bid1))))));
+                        hasProperty("bid", is(FILLER_LOSER_BID)),
+                        hasProperty("bid", is(bid1))))));
     }
 }

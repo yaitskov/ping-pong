@@ -71,20 +71,20 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
         assertThat(participantResultByFinish(l, 1), reasonChain1(1));
 
         assertThat(participantResultBySeed(l, 0),
-                hasProperty("uid", is(scenario.player2Bid(p1))));
+                hasProperty("bid", is(scenario.player2Bid(p1))));
         assertThat(participantResultBySeed(l, 1),
-                hasProperty("uid", is(scenario.player2Bid(p2))));
+                hasProperty("bid", is(scenario.player2Bid(p2))));
 
         simulator.run(c -> c.scoreSet(p1, 2, p2, 11));
 
         final Collection<GroupParticipantResult> l2 = participantsResult(tid, gid);
         assertThat(participantResultByFinish(l2, 0),
                 allOf(
-                        hasProperty("uid", is(scenario.player2Bid(p2))),
+                        hasProperty("bid", is(scenario.player2Bid(p2))),
                         reasonChain2(1)));
         assertThat(participantResultByFinish(l2, 1),
                 allOf(
-                        hasProperty("uid", is(scenario.player2Bid(p1))),
+                        hasProperty("bid", is(scenario.player2Bid(p1))),
                         reasonChain2(0)));
 
         simulator.run(c -> c.scoreSet3(1, p1, 11, p2, 5));
@@ -92,12 +92,12 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
         final Collection<GroupParticipantResult> l3 = participantsResult(tid, gid);
         assertThat(participantResultByFinish(l3, 0),
                 allOf(
-                        hasProperty("uid", is(scenario.player2Bid(p1))),
+                        hasProperty("bid", is(scenario.player2Bid(p1))),
                         hasProperty("state", is(Win1)),
                         reasonChain3(1)));
         assertThat(participantResultByFinish(l3, 1),
                 allOf(
-                        hasProperty("uid", is(scenario.player2Bid(p2))),
+                        hasProperty("bid", is(scenario.player2Bid(p2))),
                         hasProperty("state", is(Lost)),
                         reasonChain3(0)));
     }
@@ -209,7 +209,7 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
             GroupParticipants r, Player player) {
         return r.getParticipants().stream()
                 .filter(
-                        p -> p.getUid().equals(scenario.player2Bid(player)))
+                        p -> p.getBid().equals(scenario.player2Bid(player)))
                 .findAny()
                 .get();
     }

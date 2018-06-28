@@ -66,8 +66,8 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
         assertThat(
                 re.readEntity(UncheckedParticipantsError.class),
                 hasProperty("users", hasItems(
-                        hasProperty("uid", is(bid1)),
-                        hasProperty("uid", is(bid2)))));
+                        hasProperty("bid", is(bid1)),
+                        hasProperty("bid", is(bid2)))));
 
 
         myRest().voidPost(TOURNAMENT_RESIGN, session1, scenario.getTid());

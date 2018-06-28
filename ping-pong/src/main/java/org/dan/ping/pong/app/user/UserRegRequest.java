@@ -8,18 +8,16 @@ import lombok.Setter;
 
 import java.util.Optional;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRegRequest {
-    @Max(80)
-    @Min(3)
+    @Size(min = 3, max = 80)
     private String name;
-    @Max(40)
+    @Size(min = 5, max = 40)
     private Optional<String> email;
     private Optional<String> phone;
     private String sessionPart;

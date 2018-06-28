@@ -23,6 +23,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 
 @Slf4j
 @Path("/")
@@ -62,7 +64,8 @@ public class UserResource {
             @Valid OfflineUserRegRequest regRequest) {
         final UserInfo userInfo = authService.userInfoBySession(session);
         if (userInfo.getUserType() != Admin) {
-            throw badRequest("Must be admin");
+            throw badRequest("Must " + userInfo.getUid()
+                    + " be admin but " + userInfo.getUserType());
         }
         final Uid uid = userDao.registerOffline(clocker.get(), regRequest, userInfo.getUid());
         log.info("Register user [{}] with uid {}", regRequest.getName(), uid);

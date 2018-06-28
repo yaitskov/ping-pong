@@ -290,8 +290,8 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                             hasProperty("matches", hasItem(allOf(
                                     hasProperty("tid", is(consoleTid)),
                                     hasProperty("participants", hasItems(
-                                            hasProperty("uid", is(scenario.player2Bid(p2))),
-                                            hasProperty("uid", is(scenario.player2Bid(p3)))))))));
+                                            hasProperty("bid", is(scenario.player2Bid(p2))),
+                                            hasProperty("bid", is(scenario.player2Bid(p3)))))))));
                 });
     }
 

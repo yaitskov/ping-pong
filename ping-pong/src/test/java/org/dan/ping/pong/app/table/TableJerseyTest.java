@@ -58,7 +58,7 @@ public class TableJerseyTest extends AbstractSpringJerseyTest {
         final Tid tid = daoGenerator.genTournament(placeId, Draft, 1);
         final int cid = daoGenerator.genCategory(tid, 1);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
-        restEntityGenerator.enlistParticipants(myRest(), adminSession, tid, cid, participants);
+        restEntityGenerator.participantsEnlistThemselves(myRest(), adminSession, tid, cid, participants);
         myRest().voidPost(BEGIN_TOURNAMENT, adminSession, tid);
         final List<MyPendingMatch> c = participants.stream().map(p -> findMatch(tid, p).getMatches())
                 .flatMap(List::stream)
@@ -76,7 +76,7 @@ public class TableJerseyTest extends AbstractSpringJerseyTest {
         final Tid tid = daoGenerator.genTournament(placeId, Draft, 1);
         final int cid = daoGenerator.genCategory(tid, 1);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
-        restEntityGenerator.enlistParticipants(myRest(), adminSession, tid, cid, participants);
+        restEntityGenerator.participantsEnlistThemselves(myRest(), adminSession, tid, cid, participants);
         final Response response = myRest().post(BEGIN_TOURNAMENT, adminSession.getSession(), tid);
         assertThat(response.getStatus(), is(400));
         assertThat(response.readEntity(String.class), containsString("doesn't have any table"));

@@ -48,6 +48,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.place.ForTestPlaceDao;
@@ -60,7 +61,6 @@ import org.dan.ping.pong.mock.TestAdmin;
 import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.UserSessionGenerator;
 import org.dan.ping.pong.mock.simulator.Simulator;
-import org.dan.ping.pong.simulate.SimulationCtx;
 import org.dan.ping.pong.sys.error.TemplateError;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
 import org.hamcrest.Matchers;
@@ -81,7 +81,7 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 @Category(JerseySpringTest.class)
-@ContextConfiguration(classes = {SimulationCtx.class, ForTestPlaceDao.class})
+@ContextConfiguration(classes = JerseyWithSimulator.class)
 public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     static class DigestList extends ArrayList<TournamentDigest> {}
 
@@ -289,7 +289,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final int cid = daoGenerator.genCategory(tid, 1);
 
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
-        restEntityGenerator.enlistParticipants(myRest(), adminSession, tid, cid, participants);
+        restEntityGenerator.participantsEnlistThemselves(myRest(), adminSession, tid, cid, participants);
 
         final List<OpenTournamentDigest> openBefore = myRest()
                 .get(RUNNING_TOURNAMENTS, new GenericType<List<OpenTournamentDigest>>() {});
@@ -318,7 +318,8 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                 daoGenerator.genPlace(0), Draft);
         final int cid = daoGenerator.genCategory(tid, 1);
         final String name = UUID.randomUUID().toString();
-        final Bid bid = simulator.enlistParticipant(tid, adminSession, cid, Optional.empty(), name);
+        final Bid bid = simulator.enlistParticipant(tid, adminSession, cid, Optional.empty(), name,
+                BidState.Want);
         final CategoryInfo digests = myRest().get(
                 CATEGORY_MEMBERS + tid.getTid() + "/" + cid, CategoryInfo.class);
         assertThat(digests.getUsers(),

@@ -12,6 +12,7 @@ import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.ParticipantLink;
@@ -48,7 +49,8 @@ public class FindOpenMatchesByUidJerseyTest extends AbstractSpringJerseyTest {
                         + TID_SLASH_UID + scenario.player2Bid(p1).intValue(),
                         MyPendingMatchList.class);
         assertThat(matches.isShowTables(), is(false));
-        assertThat(matches.getBidState(), is(Play));
+        assertThat(matches.getBidState(),
+                is(ImmutableMap.of(scenario.getCategoryDbId().get(c1), Play)));
         assertThat(
                 matches.getMatches().stream()
                         .map(MyPendingMatch::getEnemy)

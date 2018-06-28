@@ -69,10 +69,10 @@ public class ListJudgedMatchesJerseyTest extends AbstractSpringJerseyTest {
                                         hasProperty("totalMatches", is(2L)),
                                         hasProperty("leftMatches", is(0L)))),
                         hasProperty("participant",
-                                hasProperty("uid", is(bidP1))),
+                                hasProperty("bid", is(bidP1))),
                         hasProperty("inGroup", hasItem(allOf(
-                                hasProperty("opponent", hasProperty("uid", is(bidP2))),
-                                hasProperty("winnerUid", is(Optional.of(bidP2))))))));
+                                hasProperty("opponent", hasProperty("bid", is(bidP2))),
+                                hasProperty("winnerBid", is(Optional.of(bidP2))))))));
 
         final Bid bidP3 = scenario.player2Bid(p3);
 
@@ -84,14 +84,14 @@ public class ListJudgedMatchesJerseyTest extends AbstractSpringJerseyTest {
                                         hasProperty("totalMatches", is(2L)),
                                         hasProperty("leftMatches", is(1L)))),
                         hasProperty("participant",
-                                hasProperty("uid", is(bidP2))),
+                                hasProperty("bid", is(bidP2))),
                         hasProperty("inGroup", hasItems(
                                 allOf(
-                                        hasProperty("opponent", hasProperty("uid", is(bidP1))),
-                                        hasProperty("winnerUid", is(Optional.of(bidP2)))),
+                                        hasProperty("opponent", hasProperty("bid", is(bidP1))),
+                                        hasProperty("winnerBid", is(Optional.of(bidP2)))),
                                 allOf(
-                                        hasProperty("opponent", hasProperty("uid", is(bidP3))),
-                                        hasProperty("winnerUid", is(Optional.empty())))))));
+                                        hasProperty("opponent", hasProperty("bid", is(bidP3))),
+                                        hasProperty("winnerBid", is(Optional.empty())))))));
     }
 
     @Test
@@ -111,12 +111,12 @@ public class ListJudgedMatchesJerseyTest extends AbstractSpringJerseyTest {
         assertThat(myRest().get(MATCH_LIST_JUDGED + tid + "/"
                         + bidP1.intValue(), PlayedMatchList.class),
                 allOf(
-                        hasProperty("participant", hasProperty("uid", is(bidP1))),
+                        hasProperty("participant", hasProperty("bid", is(bidP1))),
                         hasProperty("inGroup", is(Collections.emptyList())),
                         hasProperty("playOff", everyItem(
                                 allOf(
-                                        hasProperty("winnerUid", is(Optional.of(bidP1))),
-                                        hasProperty("opponent", hasProperty("uid", is(FILLER_LOSER_BID))),
+                                        hasProperty("winnerBid", is(Optional.of(bidP1))),
+                                        hasProperty("opponent", hasProperty("bid", is(FILLER_LOSER_BID))),
                                         hasProperty("mid", is(mid)))))));
 
         simulator.run(c -> assertThat(c.matchResult(mid),
@@ -127,7 +127,7 @@ public class ListJudgedMatchesJerseyTest extends AbstractSpringJerseyTest {
                         hasProperty("playedSets", is(0)),
                         hasProperty("disputes", is(0)),
                         hasProperty("participants", hasItems(
-                                hasProperty("uid", is(FILLER_LOSER_BID)),
-                                hasProperty("uid", is(bidP1)))))));
+                                hasProperty("bid", is(FILLER_LOSER_BID)),
+                                hasProperty("bid", is(bidP1)))))));
     }
 }

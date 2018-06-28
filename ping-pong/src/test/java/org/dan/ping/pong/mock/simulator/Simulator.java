@@ -466,11 +466,11 @@ public class Simulator {
 
     public Bid enlistParticipant(TournamentScenario scenario, int cid,
             Optional<Integer> gid, String p5) {
-        return enlistParticipant(scenario.getTid(), scenario, cid, gid, p5);
+        return enlistParticipant(scenario.getTid(), scenario, cid, gid, p5, BidState.Wait);
     }
 
-    public Bid enlistParticipant(Tid tid,  SessionAware sessionAware, int cid,
-            Optional<Integer> gid, String p5) {
+    public Bid enlistParticipant(Tid tid, SessionAware sessionAware, int cid,
+            Optional<Integer> gid, String p5, BidState state) {
         final Uid uid = rest.post(OFFLINE_USER_REGISTER, sessionAware,
                 OfflineUserRegRequest
                         .builder()
@@ -483,7 +483,7 @@ public class Simulator {
                         .uid(uid)
                         .tid(tid)
                         .cid(cid)
-                        .bidState(BidState.Wait)
+                        .bidState(state)
                         .build())
                 .readEntity(Bid.class);
     }

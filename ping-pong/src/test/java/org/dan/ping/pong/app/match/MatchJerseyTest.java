@@ -187,11 +187,11 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 hasProperty("participants", hasItems(
                         allOf(
                                 hasProperty("name", notNullValue()),
-                                hasProperty("uid", is(scenario.getPlayersSessions()
+                                hasProperty("bid", is(scenario.getPlayersSessions()
                                         .get(p1).getBid()))),
                         allOf(
                                 hasProperty("name", notNullValue()),
-                                hasProperty("uid", is(scenario.getPlayersSessions()
+                                hasProperty("bid", is(scenario.getPlayersSessions()
                                         .get(p2).getBid()))))))));
     }
 

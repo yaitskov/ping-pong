@@ -36,19 +36,20 @@ public class RestEntityGenerator {
 
     public void enlistParticipants(SessionAware adminSession,
             Tid tid, int cid, List<TestUserSession> participants) {
-        enlistParticipants(rest, adminSession, tid, cid, participants);
+        participantsEnlistThemselves(rest, adminSession, tid, cid, participants);
     }
 
-    public void enlistParticipants(MyRest myRest, SessionAware adminSession,
+    public void participantsEnlistThemselves(MyRest myRest, SessionAware adminSession,
             Tid tid, int cid, List<TestUserSession> participants) {
         for (int i = 0; i < participants.size(); ++i) {
             TestUserSession userSession = participants.get(i);
-            myRest.voidPost(TOURNAMENT_ENLIST, userSession,
+            Bid bid = myRest.post(TOURNAMENT_ENLIST, userSession,
                     EnlistTournament.builder()
                             .tid(tid)
                             .categoryId(cid)
                             .providedRank(empty())
-                            .build());
+                            .build()).readEntity(Bid.class);
+            userSession.setBid(bid);
             myRest.voidPost(BID_PAID, adminSession,
                     BidId.builder()
                             .tid(tid)

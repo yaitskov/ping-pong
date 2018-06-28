@@ -118,7 +118,8 @@ public class TournamentService {
     private void validateEnlistOffline(TournamentMemState tournament, EnlistOffline enlist) {
         if (tournament.getState() == Draft) {
             if (!VALID_ENLIST_BID_STATES.contains(enlist.getBidState())) {
-                throw badRequest("Bid state could be " + VALID_ENLIST_BID_STATES);
+                throw badRequest("Bid state could be "
+                        + VALID_ENLIST_BID_STATES + " but " + enlist.getBidState());
             }
             enlist.getGroupId()
                     .ifPresent(gid -> { throw badRequest("group is not expected"); });

@@ -843,7 +843,7 @@ public class MatchService {
                 .sorted(Comparator.comparing(m -> m.getEndedAt().orElse(Instant.MIN)))
                 .collect(toList());
         return PlayedMatchList.builder()
-                .participant(tournament.getParticipant(bid).toLink())
+                .participant(tournament.getParticipant(bid).toBidLink())
                 .progress(tournamentProgress(tournament, bid))
                 .inGroup(completeMatches.stream().filter(m -> m.getType() == Grup)
                         .map(m -> PlayedMatchLink.builder()
@@ -872,7 +872,7 @@ public class MatchService {
         final MatchInfo m = tournament.getMatchById(mid);
         return MatchResult.builder()
                 .participants(m.getParticipantIdScore().keySet().stream()
-                        .map(uid -> tournament.getBidOrExpl(uid).toLink())
+                        .map(uid -> tournament.getBidOrExpl(uid).toBidLink())
                         .collect(toList()))
                 .score(matchScore(tournament, m))
                 .role(detectRole(tournament, m, ouid))

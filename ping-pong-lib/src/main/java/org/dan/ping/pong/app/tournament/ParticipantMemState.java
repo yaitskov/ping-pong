@@ -30,7 +30,7 @@ public class ParticipantMemState implements UserLinkIf {
     public static final Uid FILLER_LOSER_UID = new Uid(1);
     public static final Bid FILLER_LOSER_BID = new Bid(1);
     public static final String UID = "UID";
-    public static final String BID = "BID";
+    public static final String BID = "bid";
 
     private Tid tid;
     private Uid uid;

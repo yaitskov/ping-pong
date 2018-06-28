@@ -4,16 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class OfflineUserRegRequest {
-    @Min(value = 3)
-    @Max(value = 80)
+    @Size(min = 2, max= 80)
     private String name;
 }

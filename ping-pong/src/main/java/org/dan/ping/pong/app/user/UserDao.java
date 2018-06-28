@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.user;
 
 import static java.util.Optional.ofNullable;
+import static org.dan.ping.pong.app.user.UserType.Admin;
 import static org.dan.ping.pong.jooq.Tables.ADMIN;
 import static org.dan.ping.pong.jooq.Tables.USERS;
 import static org.dan.ping.pong.jooq.tables.Sessions.SESSIONS;
@@ -101,6 +102,10 @@ public class UserDao {
                 .values(uid, said)
                 .onDuplicateKeyIgnore()
                 .execute();
+
+        jooq.update(USERS)
+                .set(USERS.TYPE, Admin)
+                .where(USERS.UID.eq(uid)).execute();
     }
 
     @Transactional(TRANSACTION_MANAGER)

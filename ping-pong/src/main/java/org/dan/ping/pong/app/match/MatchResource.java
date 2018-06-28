@@ -42,7 +42,6 @@ public class MatchResource {
     public static final String MATCH_WATCH_LIST_OPEN = "/match/watch/list/open/";
     public static final String MATCH_RESET_SET_SCORE = "/match/reset-set-score";
     public static final String TID_JP = "{tid}";
-    public static final String UID_JP = "{uid}";
     public static final String BID_JP = "{bid}";
     public static final String UID = "uid";
     private static final String MATCH_RULES = "/match/rules/";
@@ -128,7 +127,7 @@ public class MatchResource {
     }
 
     @GET
-    @Path(MATCH_LIST_JUDGED + TID_JP + TID_SLASH_UID + UID_JP)
+    @Path(MATCH_LIST_JUDGED + TID_JP + TID_SLASH_UID + BID_JP)
     public void findJudgedMatches(
             @Suspended AsyncResponse response,
             @PathParam(TID) Tid tid,

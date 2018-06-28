@@ -43,5 +43,5 @@ public interface BidDao {
 
     void renameParticipant(Uid uid, String newName, DbUpdater batch);
 
-    void removeByIds(Tid tid, List<Uid> toBeRemoveUids, DbUpdater batch);
+    void removeByIds(Tid tid, List<Bid> toBeRemoveBids, DbUpdater batch);
 }

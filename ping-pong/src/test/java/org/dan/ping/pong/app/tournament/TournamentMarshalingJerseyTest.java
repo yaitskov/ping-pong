@@ -85,7 +85,7 @@ public class TournamentMarshalingJerseyTest extends AbstractSpringJerseyTest {
             assertThat("item " + i,  ii, allOf(
                     hasProperty("user",
                             allOf(
-                                    hasProperty("bid", not(oi.getUser().getBid())),
+                                    hasProperty("bid", is(oi.getUser().getBid())),
                                     hasProperty("name", is(oi.getUser().getName())))),
                     hasProperty("state", is(oi.getState())),
                     hasProperty("playOffStep", is(oi.getPlayOffStep())),

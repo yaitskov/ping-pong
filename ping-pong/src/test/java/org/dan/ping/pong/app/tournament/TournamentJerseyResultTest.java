@@ -128,7 +128,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
         assertEquals(asList(p1, p2, p3),
                 r.getParticipants().stream()
                         .sorted(Comparator.comparingInt(GroupParticipantResult::getFinishPosition))
-                        .map(GroupParticipantResult::getUid)
+                        .map(GroupParticipantResult::getBid)
                         .map(e -> scenario.getBidPlayer().get(e))
                         .collect(toList()));
     }
@@ -172,7 +172,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
         assertEquals(asList(p1, p2, p3),
                 r.getParticipants().stream()
                         .sorted(Comparator.comparingInt(GroupParticipantResult::getFinishPosition))
-                        .map(GroupParticipantResult::getUid)
+                        .map(GroupParticipantResult::getBid)
                         .map(e -> scenario.getBidPlayer().get(e))
                         .collect(toList()));
     }

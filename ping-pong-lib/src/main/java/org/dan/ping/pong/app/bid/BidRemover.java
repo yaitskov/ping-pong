@@ -22,10 +22,10 @@ public class BidRemover {
         // remove all disputes
         matchRemover.removeByCategory(tournament, cid, batch);
 
-        final List<Uid> toBeRemoveUids = tournament.findBidsByCategory(cid)
-                .map(ParticipantMemState::getUid)
+        final List<Bid> toBeRemoveBids = tournament.findBidsByCategory(cid)
+                .map(ParticipantMemState::getBid)
                 .collect(toList());
-        bidDao.removeByIds(tournament.getTid(), toBeRemoveUids, batch);
-        toBeRemoveUids.forEach(uid -> tournament.getParticipants().remove(uid));
+        bidDao.removeByIds(tournament.getTid(), toBeRemoveBids, batch);
+        toBeRemoveBids.forEach(uid -> tournament.getParticipants().remove(uid));
     }
 }

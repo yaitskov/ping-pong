@@ -59,24 +59,24 @@ public class BidDaoServer implements BidDao {
     @Override
     public void markParticipantsBusy(TournamentMemState tournament,
             Collection<Bid> bids, Instant now, DbUpdater batch) {
-        final List<Uid> finalUids = bids.stream()
+        final List<Bid> finalBids = bids.stream()
                 .map(tournament::getBid)
                 .filter(bid -> bid.state() == Wait)
                 .peek(bid -> bid.setBidState(Play))
-                .map(ParticipantMemState::getUid)
+                .map(ParticipantMemState::getBid)
                 .collect(toList());
-        if (finalUids.isEmpty()) {
+        if (finalBids.isEmpty()) {
             return;
         }
         batch.exec(DbUpdateSql.builder()
-                .mustAffectRows(Optional.of(finalUids.size()))
-                .onFailure(u -> internalError("One of uids " + finalUids + " was busy"))
-                .logBefore(() -> log.info("Make bids {} as playing if it's waiting", finalUids))
+                .mustAffectRows(Optional.of(finalBids.size()))
+                .onFailure(u -> internalError("One of uids " + finalBids + " was busy"))
+                .logBefore(() -> log.info("Make bids {} as playing if it's waiting", finalBids))
                 .query(jooq.update(BID)
                         .set(BID.STATE, Play)
                         .set(BID.UPDATED, Optional.of(now))
                         .where(BID.TID.eq(tournament.getTid()),
-                                BID.UID.in(finalUids),
+                                BID.BID_.in(finalBids),
                                 BID.STATE.eq(Wait)))
                 .build());
     }
@@ -88,7 +88,7 @@ public class BidDaoServer implements BidDao {
                 .query(setGid(gid, tid, groupBids))
                 .logBefore(() -> log.info("update gid {} for {}", gid,
                         groupBids.stream()
-                                .map(ParticipantMemState::getUid)
+                                .map(ParticipantMemState::getBid)
                                 .collect(toList())))
                 .mustAffectRows(of(-1))
                 .build());
@@ -98,9 +98,8 @@ public class BidDaoServer implements BidDao {
         return jooq.update(BID)
                 .set(BID.GID, Optional.of(gid))
                 .where(BID.TID.eq(tid),
-                        BID.UID.in(groupBids.stream()
-                                .map(ParticipantMemState::getUid)
-                                .map(Uid::getId)
+                        BID.BID_.in(groupBids.stream()
+                                .map(ParticipantMemState::getBid)
                                 .collect(Collectors.toList())));
     }
 
@@ -179,12 +178,12 @@ public class BidDaoServer implements BidDao {
     }
 
     @Override
-    public void removeByIds(Tid tid, List<Uid> uids, DbUpdater batch) {
+    public void removeByIds(Tid tid, List<Bid> bids, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.deleteFrom(BID)
-                        .where(BID.TID.eq(tid), BID.UID.in(uids)))
-                .mustAffectRows(Optional.of(uids.size()))
-                .logBefore(() -> log.info("Remove uids {} from tournament {}", uids, tid))
+                        .where(BID.TID.eq(tid), BID.BID_.in(bids)))
+                .mustAffectRows(Optional.of(bids.size()))
+                .logBefore(() -> log.info("Remove bids {} from tournament {}", bids, tid))
                 .build());
     }
 }

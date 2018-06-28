@@ -17,7 +17,8 @@ import javax.validation.constraints.Size;
 public class UserRegRequest {
     @Size(min = 3, max = 80)
     private String name;
-    @Size(min = 5, max = 40)
+    //@Size(min = 5, max = 40)
+    //@Length(min = 5, max = 40)
     private Optional<String> email;
     private Optional<String> phone;
     private String sessionPart;

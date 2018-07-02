@@ -2,6 +2,7 @@ package org.dan.ping.pong.mock.simulator;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
@@ -15,9 +16,11 @@ import static org.dan.ping.pong.mock.simulator.MatchOutcome.W32;
 import static org.junit.Assert.assertNull;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Table;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -47,19 +50,20 @@ import java.util.stream.Stream;
 public class TournamentScenario implements SessionAware {
     private SportType sport = SportType.PingPong;
     private Optional<String> name = empty();
+    private PlayerCategory defaultCategory;
     private final Multimap<Set<Player>, GameEnd> groupMatches = ArrayListMultimap.create();
     private final Multimap<Set<Player>, GameEnd> playOffMatches = ArrayListMultimap.create();
     private final Multimap<PlayerCategory, Player> playersByCategories = HashMultimap.create();
-    private final Map<Player, PlayerCategory> playersCategory = new HashMap<>();
+    private final Map<Player, List<PlayerCategory>> playersCategory = new HashMap<>();
     private final Set<Player> playOffPlayers = new HashSet<>();
     private final Map<PlayerCategory, List<Player>> champions = new HashMap<>();
     private final Map<Player, TestUserSession> playersSessions = new HashMap<>();
     private final Map<Bid, Player> bidPlayer = new LinkedHashMap<>();
     private final Map<PlayerCategory, Integer> categoryDbId = new HashMap<>();
     private final Map<Set<Player>, PlayHook> hooksOnMatches = new HashMap<>();
-    private final Map<Player, EnlistMode> playerPresence = new HashMap<>();
+    private final Table<Player, PlayerCategory, EnlistMode> playerPresence = HashBasedTable.create();
     private final List<HookCallbackPro> onBeforeAnyMatch = new ArrayList<>();
-    private final Map<Player, ProvidedRank> providedRanks = new HashMap<>();
+    private final Table<Player, PlayerCategory, ProvidedRank> providedRanks = HashBasedTable.create();
 
     private TournamentState expectedTerminalState = TournamentState.Close;
 
@@ -83,10 +87,23 @@ public class TournamentScenario implements SessionAware {
         return this;
     }
 
+    public TestUserSession findSession(Player p) {
+        return playersSessions.get(p);
+    }
+
+    public Bid findBid(Player p) {
+        final Map<PlayerCategory, Bid> catBid = playersSessions.get(p).getCatBid();
+        if (catBid.size() == 1){
+            return catBid.get(defaultCategory);
+        }
+        throw new IllegalStateException("Ambiguous category for " + p);
+    }
+
     public TournamentScenario createConsoleTournament() {
         final TournamentScenario result = new TournamentScenario();
         result.setTestAdmin(testAdmin);
         result.setPlaceId(placeId);
+        result.defaultCategory = defaultCategory;
         result.getBidPlayer().putAll(bidPlayer);
         result.getPlayersByCategories().putAll(playersByCategories);
         result.name(name.get()).tables(tables).sport(sport)
@@ -101,9 +118,14 @@ public class TournamentScenario implements SessionAware {
     }
 
     public Bid player2Bid(Player p) {
+        return player2Bid(p, defaultCategory);
+    }
+
+    public Bid player2Bid(Player p, PlayerCategory category) {
         return ofNullable(playersSessions.get(p))
-                .map(TestUserSession::getBid)
-                .orElseThrow(() -> new RuntimeException("No uid for player " + p));
+                .flatMap(tus -> ofNullable(tus.getCatBid().get(category)))
+                .orElseThrow(() -> new RuntimeException("No bid for player " + p
+                        + " in category " + category));
     }
 
     private TournamentRules rules;
@@ -125,7 +147,7 @@ public class TournamentScenario implements SessionAware {
     }
 
     public TournamentScenario rank(ProvidedRank rank, Player... players) {
-        Stream.of(players).forEach(player -> providedRanks.put(player, rank));
+        Stream.of(players).forEach(player -> providedRanks.put(player, defaultCategory, rank));
         return this;
     }
 
@@ -166,8 +188,6 @@ public class TournamentScenario implements SessionAware {
 
     private TournamentScenario match(Player pa, MatchOutcome outcome, Player pb,
             SetGenerator setGenerator) {
-        playersSessions.put(pa, null);
-        playersSessions.put(pb, null);
         GameEnd match = GameEnd.game(pa, outcome, pb, setGenerator);
         if (!playOffPlayers.contains(pa) && !playOffPlayers.contains(pb)) {
             final HashSet<Player> key = new HashSet<>(match.getParticipants());
@@ -269,20 +289,32 @@ public class TournamentScenario implements SessionAware {
         return this;
     }
 
+    public TournamentScenario cat(PlayerCategory c) {
+        defaultCategory = c;
+        return this;
+    }
+
+    private void registerPlayerCat(Player p, PlayerCategory c) {
+        ofNullable(playersCategory.putIfAbsent(p, new ArrayList<>(singletonList(c))))
+                .ifPresent(oldCat -> {
+                    if (oldCat.contains(c)) {
+                        throw new IllegalStateException("player "
+                                + p + " is already in category " + oldCat);
+                    }
+                    oldCat.add(c);
+                });
+    }
+
     public TournamentScenario category(PlayerCategory c, Player... ps) {
+        defaultCategory = c;
         categoryDbId.put(c, null);
         playersByCategories.putAll(c, asList(ps));
-        asList(ps).forEach(p ->
-                ofNullable(playersCategory.putIfAbsent(p, c))
-                        .ifPresent(oldCat -> {
-                            throw new IllegalStateException("player "
-                                    + p + " is at category " + oldCat);
-                        }));
+        asList(ps).forEach(p -> registerPlayerCat(p, c));
         return this;
     }
 
     public TournamentScenario presence(EnlistMode mode, Player... players) {
-        asList(players).forEach(player -> playerPresence.put(player, mode));
+        asList(players).forEach(player -> playerPresence.put(player, defaultCategory, mode));
         return this;
     }
 
@@ -293,8 +325,12 @@ public class TournamentScenario implements SessionAware {
 
     public void addPlayer(Bid bid, Player player) {
         assertNull(getBidPlayer().put(bid, player));
+        registerPlayerCat(player, defaultCategory);
         playersSessions.put(player, TestUserSession.builder()
-                .bid(bid)
+                .catBid(new HashMap<>(ImmutableMap.of(defaultCategory, bid)))
+                .player(player)
+                .name(name +  "_" + player)
+                .email(name + "_" + player + "@gmail.com")
                 .build());
     }
 }

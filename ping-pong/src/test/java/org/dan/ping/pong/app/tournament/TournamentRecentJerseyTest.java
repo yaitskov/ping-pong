@@ -78,7 +78,7 @@ public class TournamentRecentJerseyTest extends AbstractSpringJerseyTest {
                 .rules(RULES_G8Q1_S1A2G11)
                 .category(c1, p1, p2)
                 .doNotBegin();
-        final TestUserSession userSession = pastScenario.getPlayersSessions().get(p1);
+        final TestUserSession userSession = pastScenario.findSession(p1);
 
         futureScenario.getPlayersSessions().put(p1, userSession);
 

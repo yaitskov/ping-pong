@@ -91,6 +91,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 import javax.ws.rs.core.GenericType;
@@ -159,9 +160,10 @@ public class ImperativeSimulator {
                     CategoryInfo.class);
             for (ParticipantLink userLink : catInfo.getUsers()) {
                 final Player player = scenario.getBidPlayer().get(userLink.getBid());
-                final PlayerCategory catLabel = scenario.getPlayersCategory().get(player);
-                consoleScenario.getCategoryDbId().put(catLabel, category.getCid());
-                consoleScenario.getPlayersByCategories().put(catLabel, player);
+                scenario.getPlayersCategory().get(player).forEach(catLabel -> {
+                    consoleScenario.getCategoryDbId().put(catLabel, category.getCid());
+                    consoleScenario.getPlayersByCategories().put(catLabel, player);
+                });
             }
         });
 
@@ -185,7 +187,20 @@ public class ImperativeSimulator {
         return checkTournament(Close, expected);
     }
 
+    public ImperativeSimulator checkTournamentComplete(
+            PlayerCategory category,
+            BidStatesDesc expected) {
+        return checkTournament(Optional.of(category), Close, expected);
+    }
+
     public ImperativeSimulator checkTournament(
+            TournamentState expectedTournamentState,
+            BidStatesDesc expected) {
+        return checkTournament(Optional.empty(), expectedTournamentState, expected);
+    }
+
+    public ImperativeSimulator checkTournament(
+            Optional<PlayerCategory> category,
             TournamentState expectedTournamentState,
             BidStatesDesc expected) {
         assertEquals(expectedTournamentState, getTournamentInfo().getState());
@@ -219,8 +234,16 @@ public class ImperativeSimulator {
             default:
                 throw new IllegalArgumentException("state " + expectedTournamentState);
         }
-        checkAllBidsState(expected);
+        checkAllBidsState(expected, createFilter(category));
         return this;
+    }
+
+    private Predicate<ParticipantState> createFilter(Optional<PlayerCategory> category) {
+        if (category.isPresent()) {
+            final int cid = scenario.getCategoryDbId().get(category.get());
+            return (ps) -> ps.getCategory().getCid() == cid;
+        }
+        return (ps) -> true;
     }
 
     public MyTournamentInfo getTournamentInfo() {
@@ -233,8 +256,12 @@ public class ImperativeSimulator {
                 new GenericType<List<ParticipantState>>() {});
     }
 
-    public void checkAllBidsState(BidStatesDesc expectedPattern) {
-        final Map<Player, BidState> got = enlistedParticipants().stream()
+    public void checkAllBidsState(
+            BidStatesDesc expectedPattern,
+            Predicate<ParticipantState> particpiantFilter) {
+        final Map<Player, BidState> got = enlistedParticipants()
+                .stream()
+                .filter(particpiantFilter)
                 .collect(toMap(p -> bid2Player(p.getUser().getBid()),
                         ParticipantState::getState));
         final Map<Player, BidState> expected = got.keySet().stream().collect(
@@ -261,6 +288,11 @@ public class ImperativeSimulator {
                 .orElseThrow(
                         () -> new RuntimeException(
                                 "no player label for bid " + bid));
+    }
+
+    public ImperativeSimulator cat(PlayerCategory category) {
+        scenario.cat(category);
+        return this;
     }
 
     public ImperativeSimulator playerQuits(Player p) {
@@ -299,6 +331,12 @@ public class ImperativeSimulator {
 
     public ImperativeSimulator checkResult(Player... p) {
         return checkResult(getOnlyCid(), singletonList(asList(p)));
+    }
+
+    public ImperativeSimulator checkResult(PlayerCategory pc, Player... p) {
+        return checkResult(
+                scenario.getCategoryDbId().get(pc),
+                singletonList(asList(p)));
     }
 
     public ImperativeSimulator checkResult(List<Player>... p) {
@@ -409,6 +447,10 @@ public class ImperativeSimulator {
         return scoreSet(0, p1, games1, p2, games2);
     }
 
+    public ImperativeSimulator scoreSet(PlayerCategory category, Player p1, int games1, Player p2, int games2) {
+        return scoreSet(category, 0, p1, games1, p2, games2);
+    }
+
     public ImperativeSimulator scoreSet2(Player p1, int games1, Player p2, int games2) {
         return scoreSet(0, p1, games1, p2, games2)
                 .scoreSet(1, p1, games1, p2, games2);
@@ -444,13 +486,18 @@ public class ImperativeSimulator {
     }
 
     public ImperativeSimulator scoreSet(int set, Player p1, int games1, Player p2, int games2) {
+        return scoreSet(scenario.getDefaultCategory(), set, p1, games1, p2, games2);
+    }
+
+    public ImperativeSimulator scoreSet(PlayerCategory category,
+            int set, Player p1, int games1, Player p2, int games2) {
         final Response response = myRest.post(SCORE_SET, scenario.getTestAdmin(),
                 SetScoreReq.builder()
                         .tid(scenario.getTid())
                         .mid(resolveMid(p1, p2))
                         .setOrdNumber(set)
-                        .scores(asList(identifiedScore(p1, games1),
-                                identifiedScore(p2, games2)))
+                        .scores(asList(identifiedScore(category, p1, games1),
+                                identifiedScore(category, p2, games2)))
                         .build());
         final SetScoreResult setScoreResult = response.readEntity(SetScoreResult.class);
         if (setScoreResult.getScoreOutcome() == MatchContinues) {
@@ -459,10 +506,11 @@ public class ImperativeSimulator {
         return doAutoReload();
     }
 
-    private IdentifiedScore identifiedScore(Player p1, int games1) {
+    private IdentifiedScore identifiedScore(
+            PlayerCategory category, Player p1, int games1) {
         return IdentifiedScore.builder()
                 .score(games1)
-                .bid(scenario.player2Bid(p1))
+                .bid(scenario.player2Bid(p1, category))
                 .build();
     }
 

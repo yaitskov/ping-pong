@@ -126,14 +126,17 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .rules(TournamentRulesConst.RULES_G8Q1_S1A2G11).build());
         final int cid = daoGenerator.genCategory(tid, 1);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
-        restGenerator.enlistParticipants(tid, cid, participants);
+        restGenerator.enlistParticipants(tid, cid, c1, participants);
         assertEquals(emptyList(), restGenerator.listOpenMatches(tid).getMatches());
         restGenerator.beginTournament(tid);
 
         final List<OpenMatchForJudge> adminOpenMatches = restGenerator.listOpenMatches(tid).getMatches();
 
         assertEquals(
-                participants.stream().map(TestUserSession::getBid).collect(toSet()),
+                participants.stream()
+                        .map(TestUserSession::getCatBid)
+                        .map(m -> m.get(c1))
+                        .collect(toSet()),
                 adminOpenMatches.stream().map(OpenMatchForJudge::getParticipants)
                         .flatMap(List::stream)
                         .map(ParticipantLink::getBid)
@@ -145,14 +148,14 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         .mid(adminOpenMatches.get(0).getMid())
                         .scores(asList(
                                 IdentifiedScore.builder().score(LOSER_SCORE)
-                                        .bid(participants.get(LOSER).getBid()).build(),
+                                        .bid(participants.get(LOSER).getCatBid().get(c1)).build(),
                                 IdentifiedScore.builder().score(WINNER_SCORE)
-                                        .bid(participants.get(WINER).getBid()).build()))
+                                        .bid(participants.get(WINER).getCatBid().get(c1)).build()))
                         .build());
 
         assertEquals(Stream.of(Win1, Lost).map(Optional::of).collect(toList()),
-                asList(forTestBidDao.getState(tid, participants.get(WINER).getBid()),
-                        forTestBidDao.getState(tid, participants.get(LOSER).getBid())));
+                asList(forTestBidDao.getState(tid, participants.get(WINER).getCatBid().get(c1)),
+                        forTestBidDao.getState(tid, participants.get(LOSER).getCatBid().get(c1))));
 
         assertEquals(Stream.of(Over, Close).map(Optional::of).collect(toList()),
                 asList(forTestMatchDao.getById(adminOpenMatches.get(0).getTid(),
@@ -188,11 +191,11 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                         allOf(
                                 hasProperty("name", notNullValue()),
                                 hasProperty("bid", is(scenario.getPlayersSessions()
-                                        .get(p1).getBid()))),
+                                        .get(p1).getCatBid().get(c1)))),
                         allOf(
                                 hasProperty("name", notNullValue()),
                                 hasProperty("bid", is(scenario.getPlayersSessions()
-                                        .get(p2).getBid()))))))));
+                                        .get(p2).getCatBid().get(c1)))))))));
     }
 
     @Inject
@@ -264,7 +267,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 .pause(p1, p2, PlayHook.builder()
                         .type(Hook.AfterScore)
                         .callback((s, meta) -> {
-                            myRest().voidPost(SCORE_SET, s.getPlayersSessions().get(p1),
+                            myRest().voidPost(SCORE_SET, s.findSession(p1),
                                     SetScoreReq.builder()
                                             .tid(s.getTid())
                                             .mid(meta.getOpenMatch().getMid())
@@ -272,11 +275,11 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                                             .scores(asList(
                                                     IdentifiedScore.builder()
                                                             .score(11)
-                                                            .bid(s.getPlayersSessions().get(p1).getBid())
+                                                            .bid(s.findBid(p1))
                                                             .build(),
                                                     IdentifiedScore.builder()
                                                             .score(2)
-                                                            .bid(s.getPlayersSessions().get(p2).getBid())
+                                                            .bid(s.findBid(p2))
                                                             .build()))
                                             .build());
                             return HookDecision.Skip;
@@ -299,7 +302,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 .pause(p1, p2, PlayHook.builder()
                         .type(Hook.AfterScore)
                         .callback((s, meta) -> {
-                            final Response re = myRest().post(SCORE_SET, s.getPlayersSessions().get(p1),
+                            final Response re = myRest().post(SCORE_SET, s.findSession(p1),
                                     SetScoreReq.builder()
                                             .setOrdNumber(0)
                                             .tid(s.getTid())
@@ -307,11 +310,11 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                                             .scores(asList(
                                                     IdentifiedScore.builder()
                                                             .score(11)
-                                                            .bid(s.getPlayersSessions().get(p1).getBid())
+                                                            .bid(s.findBid(p1))
                                                             .build(),
                                                     IdentifiedScore.builder()
                                                             .score(3)
-                                                            .bid(s.getPlayersSessions().get(p2).getBid())
+                                                            .bid(s.findBid(p2))
                                                             .build()))
                                             .build());
                             assertEquals(400, re.getStatus());

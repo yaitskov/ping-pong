@@ -85,7 +85,7 @@ public class Kw04FirstTournamentJerseyTest extends AbstractSpringJerseyTest {
         myRest().voidPost(TOURNAMENT_EXPEL, scenario, ExpelParticipant
                 .builder()
                 .tid(scenario.getTid())
-                .bid(scenario.getPlayersSessions().get(p1).getBid())
+                .bid(scenario.findBid(p1))
                 .build());
 
         myRest().voidPost(BEGIN_TOURNAMENT, scenario, scenario.getTid());

@@ -33,6 +33,7 @@ import static org.dan.ping.pong.mock.Generators.genPlaceLocation;
 import static org.dan.ping.pong.mock.Generators.genPlaceName;
 import static org.dan.ping.pong.mock.Generators.genStr;
 import static org.dan.ping.pong.mock.UserSessionGenerator.USER_SESSION;
+import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasEntry;
@@ -289,7 +290,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final int cid = daoGenerator.genCategory(tid, 1);
 
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
-        restEntityGenerator.participantsEnlistThemselves(myRest(), adminSession, tid, cid, participants);
+        restEntityGenerator.participantsEnlistThemselves(myRest(), adminSession, tid, cid, c1, participants);
 
         final List<OpenTournamentDigest> openBefore = myRest()
                 .get(RUNNING_TOURNAMENTS, new GenericType<List<OpenTournamentDigest>>() {});

@@ -64,7 +64,8 @@ public class PlayerPendingMatchesJerseyTest extends AbstractSpringJerseyTest {
                             .map(Optional::get)
                             .map(ParticipantLink::getBid)
                             .collect(toSet()),
-                    is(scenario.getBidPlayer().keySet().stream().filter(id -> !id.equals(userSession.getBid()))
+                    is(scenario.getBidPlayer().keySet().stream()
+                            .filter(id -> !id.equals(userSession.getCatBid().get(c1)))
                             .collect(toSet())));
         }
     }

@@ -2,6 +2,7 @@ package org.dan.ping.pong.mock;
 
 import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.mock.simulator.PlayerCategory;
 
 import java.util.List;
 
@@ -13,8 +14,10 @@ public class RestEntityGeneratorWithAdmin {
     @Inject
     private RestEntityGenerator restEntityGenerator;
 
-    public void enlistParticipants(Tid tid, int cid, List<TestUserSession> participants) {
-        restEntityGenerator.enlistParticipants(testAdmin, tid, cid, participants);
+    public void enlistParticipants(Tid tid, int cid,
+            PlayerCategory category, List<TestUserSession> participants) {
+        restEntityGenerator.enlistParticipants(
+                testAdmin, tid, cid, category, participants);
     }
 
     public void beginTournament(Tid tid) {

@@ -8,6 +8,7 @@ import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.mock.AdminSessionGenerator.ADMIN_SESSION;
+import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -58,7 +59,8 @@ public class TableJerseyTest extends AbstractSpringJerseyTest {
         final Tid tid = daoGenerator.genTournament(placeId, Draft, 1);
         final int cid = daoGenerator.genCategory(tid, 1);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
-        restEntityGenerator.participantsEnlistThemselves(myRest(), adminSession, tid, cid, participants);
+        restEntityGenerator.participantsEnlistThemselves(
+                myRest(), adminSession, tid, cid, c1, participants);
         myRest().voidPost(BEGIN_TOURNAMENT, adminSession, tid);
         final List<MyPendingMatch> c = participants.stream().map(p -> findMatch(tid, p).getMatches())
                 .flatMap(List::stream)
@@ -76,7 +78,8 @@ public class TableJerseyTest extends AbstractSpringJerseyTest {
         final Tid tid = daoGenerator.genTournament(placeId, Draft, 1);
         final int cid = daoGenerator.genCategory(tid, 1);
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
-        restEntityGenerator.participantsEnlistThemselves(myRest(), adminSession, tid, cid, participants);
+        restEntityGenerator.participantsEnlistThemselves(myRest(),
+                adminSession, tid, cid, c1, participants);
         final Response response = myRest().post(BEGIN_TOURNAMENT, adminSession.getSession(), tid);
         assertThat(response.getStatus(), is(400));
         assertThat(response.readEntity(String.class), containsString("doesn't have any table"));

@@ -11,6 +11,7 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_CON
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_ENLIST;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_EXPEL;
 
+import com.google.common.collect.Table;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidId;
 import org.dan.ping.pong.app.bid.BidState;
@@ -19,6 +20,8 @@ import org.dan.ping.pong.app.tournament.EnlistTournament;
 import org.dan.ping.pong.app.tournament.ExpelParticipant;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.mock.simulator.EnlistMode;
+import org.dan.ping.pong.mock.simulator.Player;
+import org.dan.ping.pong.mock.simulator.PlayerCategory;
 import org.dan.ping.pong.mock.simulator.ProvidedRank;
 
 import java.util.List;
@@ -35,12 +38,12 @@ public class RestEntityGenerator {
     private DaoEntityGenerator daoEntityGenerator;
 
     public void enlistParticipants(SessionAware adminSession,
-            Tid tid, int cid, List<TestUserSession> participants) {
-        participantsEnlistThemselves(rest, adminSession, tid, cid, participants);
+            Tid tid, int cid, PlayerCategory category, List<TestUserSession> participants) {
+        participantsEnlistThemselves(rest, adminSession, tid, cid, category, participants);
     }
 
     public void participantsEnlistThemselves(MyRest myRest, SessionAware adminSession,
-            Tid tid, int cid, List<TestUserSession> participants) {
+            Tid tid, int cid, PlayerCategory category, List<TestUserSession> participants) {
         for (int i = 0; i < participants.size(); ++i) {
             TestUserSession userSession = participants.get(i);
             Bid bid = myRest.post(TOURNAMENT_ENLIST, userSession,
@@ -49,16 +52,16 @@ public class RestEntityGenerator {
                             .categoryId(cid)
                             .providedRank(empty())
                             .build()).readEntity(Bid.class);
-            userSession.setBid(bid);
+            userSession.getCatBid().put(category, bid);
             myRest.voidPost(BID_PAID, adminSession,
                     BidId.builder()
                             .tid(tid)
-                            .bid(userSession.getBid())
+                            .bid(userSession.getCatBid().put(category, bid))
                             .build());
             myRest.voidPost(BID_READY_TO_PLAY, adminSession,
                     BidId.builder()
                             .tid(tid)
-                            .bid(userSession.getBid())
+                            .bid(userSession.getCatBid().put(category, bid))
                             .build());
         }
     }
@@ -70,12 +73,16 @@ public class RestEntityGenerator {
     }
 
     public void enlistParticipants(MyRest myRest, SessionAware adminSession,
-            Map<TestUserSession, EnlistMode> enlistModes,
-            Tid tid, int cid, List<TestUserSession> participants,
+            Table<Player, PlayerCategory, EnlistMode> enlistModes,
+            Tid tid, int cid,
+            PlayerCategory category,
+            List<TestUserSession> participants,
             List<Optional<ProvidedRank>> ranks) {
         for (int i = 0; i < participants.size(); ++i) {
             TestUserSession userSession = participants.get(i);
-            EnlistMode enlistMode = ofNullable(enlistModes.get(userSession)).orElse(EnlistMode.Pass);
+            EnlistMode enlistMode = ofNullable(
+                    enlistModes.get(userSession.getPlayer(), category))
+                    .orElse(EnlistMode.Pass);
             if (enlistMode.compareTo(EnlistMode.Enlist) >= 0) {
                 final Bid bid = myRest.post(TOURNAMENT_ENLIST, userSession,
                         EnlistTournament.builder()
@@ -84,27 +91,27 @@ public class RestEntityGenerator {
                                 .providedRank(getProvidedRank(ranks, i))
                                 .build())
                         .readEntity(Bid.class);
-                userSession.setBid(bid);
+                userSession.getCatBid().put(category, bid);
             }
             if (enlistMode.compareTo(EnlistMode.Pay) >= 0) {
                 myRest.voidPost(BID_PAID, adminSession,
                         BidId.builder()
                                 .tid(tid)
-                                .bid(userSession.getBid())
+                                .bid(userSession.getCatBid().get(category))
                                 .build());
             }
             if (enlistMode.compareTo(EnlistMode.Pass) >= 0) {
                 myRest.voidPost(BID_READY_TO_PLAY, adminSession,
                         BidId.builder()
                                 .tid(tid)
-                                .bid(userSession.getBid())
+                                .bid(userSession.getCatBid().get(category))
                                 .build());
             }
             if (enlistMode == EnlistMode.Expel) {
                 myRest.voidPost(TOURNAMENT_EXPEL, adminSession,
                         ExpelParticipant.builder()
                                 .tid(tid)
-                                .bid(userSession.getBid())
+                                .bid(userSession.getCatBid().get(category))
                                 .targetBidState(BidState.Expl)
                                 .build());
             }
@@ -112,7 +119,7 @@ public class RestEntityGenerator {
                 myRest.voidPost(TOURNAMENT_EXPEL, adminSession,
                         ExpelParticipant.builder()
                                 .tid(tid)
-                                .bid(userSession.getBid())
+                                .bid(userSession.getCatBid().get(category))
                                 .targetBidState(BidState.Quit)
                                 .build());
             }
@@ -133,8 +140,13 @@ public class RestEntityGenerator {
         return rest.get(OPEN_MATCHES_FOR_JUDGE + tid.getTid(), OpenMatchForJudgeList.class);
     }
 
+    public TestUserSession generateSignInLinks(TestUserSession userSession) {
+        rest.voidAnonymousPost(
+                AUTH_GENERATE_SIGN_IN_LINK, userSession.getEmail());
+        return userSession;
+    }
+
     public void generateSignInLinks(List<TestUserSession> users) {
-        users.forEach(user
-                -> rest.voidAnonymousPost(AUTH_GENERATE_SIGN_IN_LINK, user.getEmail()));
+        users.forEach(this::generateSignInLinks);
     }
 }

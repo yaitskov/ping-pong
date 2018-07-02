@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class PlayerCategory {
+public class PlayerCategory implements Comparable<PlayerCategory> {
     public static final PlayerCategory c1 = category(1);
     public static final PlayerCategory c2 = category(2);
     public static final PlayerCategory c3 = category(3);
@@ -23,5 +23,10 @@ public class PlayerCategory {
     @Override
     public String toString() {
         return String.format("c(%d)", number);
+    }
+
+    @Override
+    public int compareTo(PlayerCategory o) {
+        return Integer.compare(number, o.number);
     }
 }

@@ -19,6 +19,7 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RES
 import static org.dan.ping.pong.app.user.UserResource.OFFLINE_USER_REGISTER;
 import static org.dan.ping.pong.mock.simulator.Hook.AfterMatch;
 import static org.dan.ping.pong.mock.simulator.Hook.AfterScore;
+import static org.dan.ping.pong.mock.simulator.Player.p35;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -69,7 +70,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
@@ -144,9 +144,11 @@ public class Simulator {
             assertEquals(
                     scenario.getPlayersSessions().keySet().stream()
                             .filter(player -> !scenario.getChampions()
-                                    .get(playerCategory).contains(player))
+                                    .get(playerCategory)
+                                    .contains(player))
                             .filter(player -> scenario.getPlayersCategory()
-                                    .get(player).equals(playerCategory))
+                                    .get(player)
+                                    .contains(playerCategory))
                             .collect(toSet()),
                     forTestBidDao.findByTidAndState(scenario.getTid(), cid, asList(Lost, Quit, Expl))
                             .stream().map(bid -> scenario.getBidPlayer().get(bid))
@@ -263,13 +265,23 @@ public class Simulator {
                             .build());
     }
 
+    private PlayerCategory findCat(TournamentScenario scenario, Player p) {
+        final List<PlayerCategory> playerCategories = scenario.getPlayersCategory()
+                .get(p);
+        if (playerCategories.size() > 1) {
+            throw new IllegalStateException("Ambiguous categories for " + p);
+        }
+        return playerCategories.get(0);
+    }
+
     private SetScoreResultName scoreSet(Set<Player> players, TournamentScenario scenario,
             OpenMatchForJudge openMatch, GameEnd game) {
         final Map<Player, Integer> setOutcome = game.getSetGenerator().generate(scenario);
         final int ordNumber = game.getSetGenerator().getSetNumber() - 1;
         if (setOutcome.size() == 1) {
             Player resigningPlayer = setOutcome.keySet().stream().findFirst().get();
-            rest.voidPost(TOURNAMENT_RESIGN, scenario.getPlayersSessions().get(resigningPlayer),
+            rest.voidPost(TOURNAMENT_RESIGN,
+                    scenario.getPlayersSessions().get(resigningPlayer),
                     scenario.getTid());
             log.info("Player {} resigned in match with {}", resigningPlayer, players);
             scenario.chooseMatchMap(openMatch).remove(players, game);
@@ -284,16 +296,18 @@ public class Simulator {
                                 IdentifiedScore.builder()
                                         .score(setOutcome.get(
                                                 game.getParticipants().get(0)))
-                                        .bid(scenario.getPlayersSessions()
-                                                .get(game.getParticipants()
-                                                        .get(0)).getBid())
+                                        .bid(scenario.getPlayersSessions().get(
+                                                game.getParticipants().get(0))
+                                                .getCatBid()
+                                                .get(findCat(scenario, game.getParticipants().get(0))))
                                         .build(),
                                 IdentifiedScore.builder()
                                         .score(setOutcome.get(
                                                 game.getParticipants().get(1)))
-                                        .bid(scenario.getPlayersSessions()
-                                                .get(game.getParticipants()
-                                                        .get(1)).getBid())
+                                        .bid(scenario.getPlayersSessions().get(
+                                                game.getParticipants().get(1))
+                                                .getCatBid()
+                                                .get(findCat(scenario, game.getParticipants().get(1))))
                                         .build()))
                         .build());
 
@@ -359,7 +373,7 @@ public class Simulator {
                 .orElseGet(() -> "todo")
                 + " " + valueGenerator.genName(8);
         if (scenario.getTestAdmin() == null) {
-            testAdmin = userSessionGenerator.generate(prefix + " admin", UserType.Admin);
+            testAdmin = userSessionGenerator.generate(p35, prefix + " admin", UserType.Admin);
             scenario.setTestAdmin(testAdmin);
         } else {
             testAdmin = scenario.getTestAdmin();
@@ -378,76 +392,48 @@ public class Simulator {
                         .state(TournamentState.Draft)
                         .build());
         scenario.setTid(tid);
-        final Map<Player, TestUserSession> playersSession = scenario.getPlayersSessions();
-        final List<Player> players = scenario.getPlayersByCategories().values()
-                .stream().filter(p -> playersSession.get(p) == null)
-                .sorted().collect(toList());
-
-        final List<TestUserSession> userSessions = genUserSessions(players, prefix);
-
-//        playersSession.forEach((pl, ses) -> {
-//            if (ses == null) {
-//                return;
-//            }
-//            scenario.getBidPlayer().put(ses.getBid(), pl);
-//        });
-        fillPlayersSessions(playersSession, players, userSessions);
         genCategories(scenario, prefix, tid);
-        enlist(scenario, tid);
-        fillBidPlayerMap(scenario, players, userSessions);
-    }
 
-    public void fillBidPlayerMap(TournamentScenario scenario, List<Player> players,
-            List<TestUserSession> userSessions) {
-        final Iterator<TestUserSession> sessions = userSessions.iterator();
-        for (Player player : players) {
-            TestUserSession user = sessions.next();
-            scenario.getBidPlayer().put(user.getBid(), player);
+        for (PlayerCategory category : scenario.getPlayersByCategories().keySet()
+                .stream().sorted().collect(toList())) {
+            scenario
+                    .getPlayersByCategories()
+                    .get(category)
+                    .stream()
+
+                    .sorted()
+                    .forEach(player ->
+                            scenario.getPlayersSessions().computeIfAbsent(player,
+                                    (p) -> restGenerator.generateSignInLinks(
+                                            userSessionGenerator.generate(p,
+                                                    prefix + "_p" + p.getNumber(), UserType.User))));
+
+            enlist(category, scenario, tid);
         }
     }
 
-    public void fillPlayersSessions(Map<Player, TestUserSession> playersSession,
-            List<Player> players, List<TestUserSession> userSessions) {
-        final Iterator<TestUserSession> sessions = userSessions.iterator();
-        for (Player player : players) {
-            TestUserSession user = sessions.next();
-            playersSession.put(player, user);
-        }
-    }
-
-    private List<TestUserSession> genUserSessions(List<Player> players, String prefix) {
-        final List<String> playerLabels = players.stream()
-                .map(p -> "_p" + p.getNumber())
+    public void enlist(PlayerCategory category, TournamentScenario scenario, Tid tid) {
+        final int catId = scenario.getCategoryDbId().get(category);
+        final List<TestUserSession> sessions = scenario.getPlayersByCategories()
+                .get(category)
+                .stream()
+                .sorted()
+                .map(player -> scenario.getPlayersSessions().get(player))
                 .collect(toList());
-        final List<TestUserSession> userSessions = userSessionGenerator
-                .generateUserSessions(prefix, playerLabels);
-        assertEquals(players.size(), userSessions.size());
-        restGenerator.generateSignInLinks(userSessions);
-        return userSessions;
-    }
-
-    public void enlist(TournamentScenario scenario, Tid tid) {
-        int catId;
-        for (PlayerCategory category : scenario.getCategoryDbId().keySet()) {
-            catId = scenario.getCategoryDbId().get(category);
-            Map<TestUserSession, EnlistMode> m = scenario
-                    .getPlayerPresence()
-                    .keySet()
-                    .stream().collect(Collectors.toMap(
-                            player -> scenario.getPlayersSessions().get(player),
-                            player -> scenario.getPlayerPresence().get(player)));
-            restGenerator.enlistParticipants(rest, testAdmin,
-                    m, tid,
-                    catId,
-                    scenario.getPlayersByCategories().get(category)
-                            .stream()
-                            .map(player -> scenario.getPlayersSessions().get(player))
-                            .collect(toList()),
-                    scenario.getPlayersByCategories().get(category)
-                            .stream()
-                            .map(player -> ofNullable(scenario.getProvidedRanks().get(player)))
-                            .collect(toList()));
-        }
+        restGenerator.enlistParticipants(rest, testAdmin,
+                scenario.getPlayerPresence(), tid,
+                catId,
+                category,
+                sessions,
+                scenario.getPlayersByCategories().get(category)
+                        .stream()
+                        .map(player -> ofNullable(
+                                scenario.getProvidedRanks().get(player, category)))
+                        .collect(toList()));
+        sessions.forEach((session) ->
+            session.getCatBid().values()
+                    .forEach(bid -> scenario.getBidPlayer()
+                            .put(bid, session.getPlayer())));
     }
 
     public void genCategories(TournamentScenario scenario, String prefix, Tid tid) {

@@ -48,7 +48,7 @@ public class MyPlayedMatchesJerseyTest extends AbstractSpringJerseyTest {
 
         final PlayedMatchList played = myRest()
                 .get(MATCH_LIST_PLAYED_ME + scenario.getTid().getTid(),
-                        scenario.getPlayersSessions().get(p2),
+                        scenario.findSession(p2),
                         PlayedMatchList.class);
 
         assertThat(played.getProgress(),

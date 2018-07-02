@@ -51,15 +51,15 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
                 .doNotBegin()
                 .rules(RULES_G8Q1_S1A2G11)
                 .name("failDueUnchecked")
+                .category(c1, p1, p2, p3, p4)
                 .presence(Enlist, p1)
-                .presence(Pay, p2)
-                .category(c1, p1, p2, p3, p4);
+                .presence(Pay, p2);
 
         simulator.simulate(scenario);
-        TestUserSession session1 = scenario.getPlayersSessions().get(p1);
-        final Bid bid1 = session1.getBid();
-        TestUserSession session2 = scenario.getPlayersSessions().get(p2);
-        final Bid bid2 = session2.getBid();
+        TestUserSession session1 = scenario.findSession(p1);
+        final Bid bid1 = session1.getCatBid().get(c1);
+        TestUserSession session2 = scenario.findSession(p2);
+        final Bid bid2 = session2.getCatBid().get(c1);
         final Response re = myRest().post(BEGIN_TOURNAMENT,
                 scenario.getTestAdmin().getSession(), scenario.getTid());
         assertEquals(400, re.getStatus());

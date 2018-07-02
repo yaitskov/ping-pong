@@ -4,7 +4,7 @@ import sportDefaultGroupRules from 'tournament/parameters/group/sportDefaultGrou
 export default function defaultTournamentRules(sport) {
     return {
         match: defaultMatchRules(sport),
-        place: {ar: 'NO'},
+        place: {ad: 'NO'},
         casting: {
             policy: 'pr',
             direction: 'd',

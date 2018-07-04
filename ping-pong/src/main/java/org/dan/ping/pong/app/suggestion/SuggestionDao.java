@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.suggestion;
 import static org.dan.ping.pong.jooq.Tables.USERS;
 import static org.dan.ping.pong.jooq.tables.SuggestName.SUGGEST_NAME;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
+import static org.dan.ping.pong.sys.db.DbUpdateSql.NON_ZERO_ROWS;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Uid;
@@ -27,6 +28,7 @@ public class SuggestionDao {
             Uid requesterUid, Uid targetUid, Instant now, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .logBefore(() -> log.info("suggestion index [{}][{}]", pattern, type))
+                .mustAffectRows(NON_ZERO_ROWS)
                 .query(jooq.insertInto(
                         SUGGEST_NAME,
                         SUGGEST_NAME.REQUESTER_UID, SUGGEST_NAME.UID,

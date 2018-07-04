@@ -17,6 +17,7 @@ import org.dan.ping.pong.app.group.GroupResource;
 import org.dan.ping.pong.app.match.MatchResource;
 import org.dan.ping.pong.app.match.dispute.MatchDisputeResource;
 import org.dan.ping.pong.app.place.PlaceResource;
+import org.dan.ping.pong.app.suggestion.ParticipantSuggestionResource;
 import org.dan.ping.pong.app.table.TableResource;
 import org.dan.ping.pong.app.tournament.TournamentResource;
 import org.dan.ping.pong.app.tournament.marshaling.TournamentMarshalingResource;
@@ -61,6 +62,7 @@ public class JerseyConfig extends ResourceConfig {
                 asList(UserResource.class, SysAdminSignInResource.class,
                         PlaceResource.class, TournamentResource.class,
                         WarmUpResource.class,
+                        ParticipantSuggestionResource.class,
                         TournamentMarshalingResource.class,
                         GroupResource.class, MatchDisputeResource.class,
                         BidResource.class, CategoryResource.class,

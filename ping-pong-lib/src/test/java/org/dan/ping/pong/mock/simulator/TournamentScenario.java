@@ -99,6 +99,12 @@ public class TournamentScenario implements SessionAware {
         throw new IllegalStateException("Ambiguous category for " + p);
     }
 
+    public int catId(PlayerCategory category) {
+        return ofNullable(categoryDbId.get(category))
+                .orElseThrow(() -> new RuntimeException(
+                        "no category " + category + " in tournament " + tid));
+    }
+
     public TournamentScenario createConsoleTournament() {
         final TournamentScenario result = new TournamentScenario();
         result.setTestAdmin(testAdmin);

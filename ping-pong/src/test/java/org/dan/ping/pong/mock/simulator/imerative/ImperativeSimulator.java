@@ -569,13 +569,13 @@ public class ImperativeSimulator {
     }
 
     public Bid enlistParticipant(TournamentScenario scenario,
-            int cid, GroupPopulations populations, String p5) {
+            int cid, GroupPopulations populations, String name) {
         return enlistParticipant(scenario, cid,
-                Optional.of(populations.getLinks().get(0).getGid()), p5);
+                Optional.of(populations.getLinks().get(0).getGid()), name);
     }
 
     public Bid enlistParticipant(TournamentScenario scenario, int cid,
-            Optional<Integer> gid, String p5) {
-        return simulator.enlistParticipant(scenario, cid, gid, p5);
+            Optional<Integer> gid, String name) {
+        return simulator.enlistParticipant(scenario, cid, gid, name);
     }
 }

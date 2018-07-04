@@ -357,6 +357,11 @@
             <artifactId>jersey-media-multipart</artifactId>
             <version>${jersey.version}</version>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework</groupId>-->
+            <!--<artifactId>spring-context</artifactId>-->
+            <!--<version>${spring.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
@@ -452,6 +457,11 @@
                                 </schema>
                             </schemata>
                             <customTypes>
+                                <customType>
+                                    <name>SuggestionIndexType</name>
+                                    <type>org.dan.ping.pong.app.suggestion.SuggestionIndexType</type>
+                                    <binding>org.dan.ping.pong.app.suggestion.SuggestionIndexTypeConverter</binding>
+                                </customType>
                                 <customType>
                                     <name>TournamentRule</name>
                                     <type>org.dan.ping.pong.app.tournament.TournamentRules</type>
@@ -599,6 +609,21 @@
                                 </customType>
                             </customTypes>
                             <forcedTypes>
+                                <forcedType>
+                                    <name>Instant</name>
+                                    <expression>.*suggest_name\.created</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>SuggestionIndexType</name>
+                                    <expression>.*suggest_name\.type</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>Uid</name>
+                                    <expression>.*suggest_name\.(uid|requester_uid)</expression>
+                                    <types>.*</types>
+                                </forcedType>
                                 <forcedType>
                                     <name>DisputeStatus</name>
                                     <expression>.*match_dispute\.status</expression>

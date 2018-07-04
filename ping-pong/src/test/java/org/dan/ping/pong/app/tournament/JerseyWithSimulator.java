@@ -14,6 +14,7 @@ import org.dan.ping.pong.app.sched.ScheduleCtx;
 import org.dan.ping.pong.app.score.MatchScoreCtx;
 import org.dan.ping.pong.app.score.MatchScoreDaoMysql;
 import org.dan.ping.pong.app.sport.SportCtx;
+import org.dan.ping.pong.app.suggestion.SuggestionCtx;
 import org.dan.ping.pong.app.table.TableCtx;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.mock.simulator.Simulator;
@@ -22,6 +23,7 @@ import org.springframework.context.annotation.Import;
 
 @Import({BaseTestContext.class, PlaceCtx.class, SportCtx.class, CategoryCtx.class,
         TournamentCtx.class, BidCtx.class, CastingLotsCtx.class,
+        SuggestionCtx.class,
         MatchCtx.class, MatchScoreCtx.class, TableCtx.class,
         ScheduleCtx.class,
         GroupCtx.class, MatchScoreDaoMysql.class, ForTestMatchDao.class,

@@ -8,9 +8,9 @@ import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
 
 import com.google.common.collect.ImmutableSet;
-import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.collection.MaxValue;
 

@@ -15,4 +15,5 @@
     <include relativeToChangelogFile="true" file="r1.0.010.warm-up.changelog.sql"/>
     <include relativeToChangelogFile="true" file="r1.0.011.local-id.changelog.sql"/>
     <include relativeToChangelogFile="true" file="r1.0.012.local-bid.changelog.sql"/>
+    <include relativeToChangelogFile="true" file="r1.0.013.name-suggestion.changelog.sql"/>
 </databaseChangeLog>

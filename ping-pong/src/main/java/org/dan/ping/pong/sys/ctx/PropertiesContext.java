@@ -4,7 +4,6 @@ package org.dan.ping.pong.sys.ctx;
 import static java.util.Collections.sort;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.config.CustomEditorConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -16,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 @Slf4j
-@Import(CustomEditorConfigurer.class)
+@Import(TypeAdapterCtx.class)
 public class PropertiesContext {
     private static final String PING_PONG_PROPERTIES = "ping-pong.properties";
     public static final int DEFAULT_PROPERTY_PRIORITY = 1;

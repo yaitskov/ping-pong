@@ -7,11 +7,6 @@ public class MatchTagConverter extends AbstractConverter<String, MatchTag> {
         super(String.class, MatchTag.class);
     }
 
-    //public static final MatchTag MASTER_TOURNAMENT_TAG = MatchTag.builder()
-    //.number(0)
-    //.prefix("master")
-    //.build();
-
     @Override
     public MatchTag from(String s) {
         if (s == null) {

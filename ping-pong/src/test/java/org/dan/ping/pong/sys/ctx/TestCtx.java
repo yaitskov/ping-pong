@@ -9,12 +9,13 @@ import org.dan.ping.pong.app.place.PlaceCtx;
 import org.dan.ping.pong.app.sched.ScheduleCtx;
 import org.dan.ping.pong.app.score.MatchScoreCtx;
 import org.dan.ping.pong.app.sport.SportCtx;
+import org.dan.ping.pong.app.suggestion.SuggestionCtx;
 import org.dan.ping.pong.app.table.TableCtx;
 import org.dan.ping.pong.app.tournament.TournamentCtx;
 import org.springframework.context.annotation.Import;
 
 @Import({BaseTestContext.class, PlaceCtx.class, SportCtx.class, CategoryCtx.class,
-        TournamentCtx.class, BidCtx.class, CastingLotsCtx.class,
+        TournamentCtx.class, BidCtx.class, CastingLotsCtx.class, SuggestionCtx.class,
         MatchCtx.class, MatchScoreCtx.class, TableCtx.class, ScheduleCtx.class,
         GroupCtx.class})
 public class TestCtx {

@@ -188,7 +188,7 @@ public class TournamentResource {
         final Uid adminUid = authService.userInfoBySession(session).getUid();
         tournamentAccessor.update(enlistment.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(adminUid);
-            return tournamentService.enlistOffline(tournament, enlistment, batch);
+            return tournamentService.enlistOffline(adminUid, tournament, enlistment, batch);
         });
     }
 

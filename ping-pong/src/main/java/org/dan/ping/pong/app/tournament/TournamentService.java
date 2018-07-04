@@ -63,6 +63,7 @@ import org.dan.ping.pong.app.playoff.PlayOffMatches;
 import org.dan.ping.pong.app.playoff.PlayOffResultEntries;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleService;
+import org.dan.ping.pong.app.suggestion.SuggestionService;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserLinkIf;
@@ -541,7 +542,10 @@ public class TournamentService {
     @Inject
     private UserDao userDao;
 
-    public Bid enlistOffline(TournamentMemState tournament,
+    @Inject
+    private SuggestionService suggestionService;
+
+    public Bid enlistOffline(Uid adminUid, TournamentMemState tournament,
             EnlistOffline enlistment, DbUpdater batch) {
         validateEnlistOffline(tournament, enlistment);
         final Bid participantId = tournament.getNextBid().next();
@@ -567,6 +571,8 @@ public class TournamentService {
                         .build());
         enlist(tournament, participantId, enlistment.getProvidedRank(),
                 batch, enlistment.getGroupId());
+
+        suggestionService.createSuggestion(adminUid, uInfo.getName(), uInfo.getUid(), batch);
 
         return participantId;
     }

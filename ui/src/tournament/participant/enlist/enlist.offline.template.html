@@ -57,17 +57,16 @@
     </div>
   </div>
 
-  <form novalidate name="$ctrl.form" ng-show="$ctrl.categoryId" ng-submit="$ctrl.enlist('Here')">
+  <form novalidate name="$ctrl.form" ng-show="$ctrl.categoryId" ng-submit="$ctrl.register()">
     <div class="form-group"
-         ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.firstName.$dirty) && $ctrl.form.firstName.$invalid}">
-      <label for="fullName">{{ 'Full name' | translate }}</label>
+         ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.fullName.$dirty) && $ctrl.form.fullName.$invalid}">
+      <label for="fullName" translate="Full name"/>
       <person-name-field name="fullName" id="fullName"
                          ng-maxlength="40" required
                          ng-minlength="5" ng-model="$ctrl.fullName"/>
       <p class="help-block"
-         ng-show="$ctrl.form.fullName.$error.required">
-        {{ 'FullName is required' | translate }}
-      </p>
+         translate="FullName is required"
+         ng-show="$ctrl.form.fullName.$error.required"/>
       <p class="help-block"
          ng-show="$ctrl.form.fullName.$error.minlength || $ctrl.form.fullName.$error.maxlength">
         {{ 'full-name-length-range' | translate : '{min: 5, max: 40}' }}
@@ -79,29 +78,38 @@
       <label>{{ $ctrl.rules.casting.pro.label }}</label>
       <div touch-spin options="$ctrl.rankRange" ng-model="$ctrl.rank"></div>
     </div>
+    <div class="form-group" ng-show="$ctrl.fullName">
+      <div class="alert alert-info"
+           ng-show="$ctrl.suggestionFiredVersion = $ctrl.suggestionCompleteVersion">
+        {{ 'Looking for sportsman' | translate }} <span class="glyphicon glyphicon-refresh spinning-fast"/>
+      </div>
+      <label translate="Existing offline accounts" ng-show="$ctrl.suggestions.length"/>
+      <table class="table" ng-show="$ctrl.suggestions.length">
+        <tr ng-repeat="suggestion in $ctrl.suggestions">
+          <td style="padding-left: 0px;">
+            <a class="btn btn-primary" title="Enlist or send invite"
+               ng-click="$ctrl.enlist(suggestion.uid, suggestion.name)">
+              <span class="glyphicon glyphicon-plus"/>
+            </a>
+          </td>
+          <td>
+            {{ suggestion.name }}
+          </td>
+        </tr>
+      </table>
+    </div>
+
     <div class="form-group">
       <a title="Enlist participant, mark him as paid and ready to participate"
-         ng-click="$ctrl.enlist('Here')"
-         ng-show="$ctrl.tournament.state == 'Draft'"
+         ng-click="$ctrl.register()"
+         ng-show="$ctrl.form.fullName.$valid && ($ctrl.tournament.state == 'Draft' || $ctrl.tournament.state == 'Open')"
          class="btn btn-primary">
-        {{ 'Ready to Play' | translate }}
-      </a>
-      <a title="Just enlist participant"
-         ng-click="$ctrl.enlist('Want')"
-         ng-show="$ctrl.tournament.state == 'Draft'"
-         class="btn btn-default">
-        {{ 'Just Enlist' | translate }}
-      </a>
-      <a title="Just enlist participant"
-         ng-click="$ctrl.enlist('Wait')"
-         ng-show="$ctrl.tournament.state == 'Open'"
-         class="btn btn-primary">
-        {{ 'Ready to Play' | translate }}
+        {{ 'New User and Enlist' | translate }}
       </a>
       <a title="Return to tournament control panel"
          back-button
          class="btn btn-default">
-        {{ 'Back btn' | translate }}
+        <span class="glyphicon glyphicon-circle-arrow-left"/>
       </a>
       <button ng-show="false" type="submit">
       </button>
@@ -115,12 +123,12 @@
   <div class="form-group" ng-show="$ctrl.enlisted.length">
     <table class="table">
       <tr>
-        <td>{{ 'Right now enlisted' | translate }}</td>
+        <td translate=>{{ 'Right now enlisted' | translate }}</td>
         <td>{{$ctrl.enlisted.length}}</td>
       </tr>
       <tr ng-repeat="enlisted in $ctrl.enlisted">
         <td colspan="2">
-          <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{enlisted.uid}}">
+          <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{enlisted.bid}}">
             {{enlisted.name}}
           </a>
         </td>

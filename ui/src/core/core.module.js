@@ -43,6 +43,9 @@ import './tournament/tournament.service.js';
 import './category/category.module.js';
 import './category/category.service.js';
 
+import './suggestion/suggestion.module.js';
+import './suggestion/suggestion.service.js';
+
 import './casting/casting.module.js';
 import './casting/casting.service.js';
 
@@ -54,6 +57,7 @@ angular.module('core', ['core.tournament', 'core.match',
                         'localStorage', 'core.place',
                         'core.table', 'core.city', 'core.country',
                         'core.participant', 'core.user',
+                        'core.suggestion',
                         'core.validate', 'core.category',
                         'core.requestStatus', 'core.ui']).
     filter('isEmpty', function () {

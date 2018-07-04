@@ -4,11 +4,12 @@ export default class EnlistOfflineCtrl extends SimpleController {
     static get $inject () {
         return ['$routeParams', 'Tournament', 'mainMenu', '$q', 'Group',
                 'requestStatus', 'Participant', '$http', 'auth', 'pageCtx',
-                'binder', '$scope', 'WarmUp'];
+                'binder', '$scope', 'WarmUp', 'Suggestion'];
     }
 
     $onInit() {
         this.enlistPath = '/api/tournament/enlist-offline';
+        this.registerOfflinePath = '/api/anonymous/offline-user/register';
         this.WarmUp.warmUp(this.enlistPath);
         this.groupId = null;
         this.categoryId = null;
@@ -18,10 +19,43 @@ export default class EnlistOfflineCtrl extends SimpleController {
         this.rank = 1;
         this.rankRange = {};
         this.enlisted = [];
+        this.suggestions = [];
         this.form = {};
 
         this.mainMenu.setTitle('Offline enlist');
 
+        this.suggestionFiredVersion = 1;
+        this.suggestionCompleteVersion = 1;
+        this.negativeCache = new Set();
+
+        this.$scope.$watch('$ctrl.fullName', (newV, oldV) => {
+            newV = (newV || "").trim().toLowerCase();
+            if (!newV) {
+                return;
+            }
+            if (this.negativeCache.has(newV)) {
+                return;
+            }
+            if (oldV && newV.length > oldV.length && this.suggestions.length == 0) {
+                return;
+            }
+            let v = ++this.suggestionVersion;
+            this.Suggestion.suggestions(
+                {pattern: newV,
+                 page: {size: 100, page: 0}},
+                (suggestions) => {
+                    if (!suggestions.length) {
+                        this.negativeCache.add(newV);
+                    }
+                    if (this.suggestionCompleteVersion > v) {
+                        console.log(`drop suggestion version ${v}`);
+                        return;
+                    }
+                    this.suggestionCompleteVersion = v;
+                    this.suggestions = suggestions;
+                },
+                (...a) => this.requestStatus.failed(...a));
+        });
         const req = {tournamentId: this.$routeParams.tournamentId};
         this.binder(this.$scope, {
             'event.request.status.ready': (event) => {
@@ -97,11 +131,39 @@ export default class EnlistOfflineCtrl extends SimpleController {
         }
     }
 
-    enlist(bidState) {
+    register() {
         this.form.$setSubmitted();
         if (!this.form.$valid) {
             return;
         }
+        this.requestStatus.startLoading('User registration...');
+        this.$http.post(this.registerOfflinePath, {name: this.fullName},
+                        {headers: {session: this.auth.mySession()}}).
+            then(
+                (resp) => {
+                    this.requestStatus.complete();
+                    this.form.$setPristine(true);
+                    jQuery(this.form.fullName.$$element).focus();
+                    this.enlist(resp.data, this.fullName);
+                },
+                (...a) => this.requestStatus.failed(...a));
+    }
+
+    findBidState() {
+        switch (this.tournament.state) {
+        case 'Draft':
+            return 'Here';
+        case 'Open':
+            return 'Wait';
+        default:
+            throw Error(`bad tournament state ${this.tournament.state}`);
+        }
+    }
+
+    enlist(uid, name) {
+        this.fullName = '';
+        this.suggestions = [];
+
         this.requestStatus.startLoading('Enlisting', this.tournament);
         if (!this.categoryId) {
             this.requestStatus.validationFailed("CategoryNotChosen");
@@ -109,8 +171,8 @@ export default class EnlistOfflineCtrl extends SimpleController {
         }
         var req = {tid: this.tournamentId,
                    cid: this.categoryId,
-                   bidState: bidState,
-                   name: this.fullName
+                   bidState: this.findBidState(),
+                   uid: uid
                   };
         if (this.rules.casting.pro) {
             req.providedRank = this.rank;
@@ -123,11 +185,8 @@ export default class EnlistOfflineCtrl extends SimpleController {
             then(
                 (resp) => {
                     this.requestStatus.complete();
-                    this.enlisted.unshift({uid: resp.data,
-                                           name: this.fullName});
-                    this.fullName = '';
-                    this.form.$setPristine(true);
-                    jQuery(this.form.fullName.$$element).focus();
+                    this.enlisted.unshift({bid: resp.data,
+                                           name: name});
                     if (this.groupId === 0) {
                         this.loadGroupPopulations(this.$routeParams.tournamentId, this.categoryId);
                     } else if (this.groupId) {

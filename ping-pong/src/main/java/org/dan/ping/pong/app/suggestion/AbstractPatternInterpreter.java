@@ -14,38 +14,48 @@ public abstract class AbstractPatternInterpreter {
         if (pattern.length() == 1) {
             interpretSingleLetterPattern(pattern, result);
         } else if (pattern.length() == 2) {
-            fullInitials(pattern, result);
-            first3Last3Name(pattern, result);
+            exact2Letters(pattern, result);
         } else if (pattern.length() > 2) {
             interpretMore2LettersPattern(pattern, result);
+        } else if (pattern.isEmpty()) {
+            // ok
         } else {
             throw internalError("pattern [" + pattern + "] is not handled");
         }
         return result;
     }
 
-    private void interpretMore2LettersPattern(
+    protected void exact2Letters(String pattern, List<PatternInterpretation> result) {
+        fullInitials(pattern, result);
+        first3Last3Name(pattern, result);
+    }
+
+    protected void interpretMore2LettersPattern(
             String pattern, List<PatternInterpretation> result) {
         final int spaceIdx = pattern.indexOf(' ');
         if (spaceIdx > 0) {
-            String part2 = pattern.substring(spaceIdx + 1);
+            String part2 = pattern.substring(spaceIdx + 1).trim();
             String part1 = pattern.substring(0, spaceIdx);
-            if (part1.length() < part2.length()) {
-                String tmp = part1;
-                part1 = part2;
-                part2 = tmp;
+            if (part1.length() == 1 && part2.length() == 1) {
+                fullInitials(part1 + part2, result);
+            } else {
+                if (part1.length() < part2.length()) {
+                    String tmp = part1;
+                    part1 = part2;
+                    part2 = tmp;
+                }
+                final String prefix1 = cutPrefix(part1);
+                final String prefix2 = cutPrefix(part2);
+                first3Last3Name(prefix1 + prefix2, result);
+                fullInitials("" + part1.charAt(0) + part2.charAt(0), result);
             }
-            final String prefix1 = cutPrefix(part1);
-            final String prefix2 = cutPrefix(part2);
-            first3Last3Name(prefix1 + prefix2, result);
-            fullInitials(prefix1.substring(0, 2), result);
         } else {
             first3Last3Name(pattern.substring(0, 3), result);
             fullInitials(pattern.substring(0, 2), result);
         }
     }
 
-    private void interpretSingleLetterPattern(
+    protected void interpretSingleLetterPattern(
             String pattern, List<PatternInterpretation> result) {
         result.add(PatternInterpretation
                 .builder()
@@ -55,7 +65,7 @@ public abstract class AbstractPatternInterpreter {
                 .build());
     }
 
-    private void fullInitials(String pattern, List<PatternInterpretation> result) {
+    protected void fullInitials(String pattern, List<PatternInterpretation> result) {
         result.add(PatternInterpretation
                 .builder()
                 .idxType(Initials)
@@ -63,7 +73,7 @@ public abstract class AbstractPatternInterpreter {
                 .build());
     }
 
-    private String cutPrefix(String part) {
+    protected String cutPrefix(String part) {
         switch (part.length()) {
             case 1:
                 return part + "__";
@@ -76,7 +86,7 @@ public abstract class AbstractPatternInterpreter {
         }
     }
 
-    private void first3Last3Name(String pattern, List<PatternInterpretation> result) {
+    protected void first3Last3Name(String pattern, List<PatternInterpretation> result) {
         result.add(PatternInterpretation
                 .builder()
                 .pattern(appendWildCardSuffix(pattern))

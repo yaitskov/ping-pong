@@ -3,6 +3,8 @@ module.exports = {
     'unexpected-match-state': 'nieoczekiwany stan {{state}} meczu',
     'unknown-match-state': 'nieznany stan {{state}} meczu',
     'place-is-busy': 'Miejsce jest zajęte turniejem {{tid}}',
+    'Multiple category enlistment': 'Wielokrotny zapis do kategorii',
+    'Multiple tournament enlistment': 'Wielokrotny zapis do turnieju',
     'tournament-not-in-draft': 'Turniej {{tid}} nie pobiera i ma stan {{state}}',
     'feature-requires-https-protocol': '<div class="clearfix">'
             + '<span class="text-above-btn pull-left">Opcja wymaga dostętpu przez HTTPS</span><br/>'

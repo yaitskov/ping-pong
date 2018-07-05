@@ -3,6 +3,8 @@ module.exports = {
     'unexpected-match-state': 'Unexpected match state {{state}}',
     'unknown-match-state': 'Unknown match state {{state}}',
     'place-is-busy': 'Place is used by tournament {{tid}}',
+    'Multiple category enlistment': 'Multiple category enlistment',
+    'Multiple tournament enlistment': 'Multiple tournament enlistment',
     'tournament-not-in-draft': 'Tournament {{tid}} is not in draft state but {{state}}',
     'feature-requires-https-protocol': 'The feature requires to access the site via'
           + ' HTTPS protocol. <br/><a class="btn btn-primary" href="{{url}}">Switch protocol</a>',

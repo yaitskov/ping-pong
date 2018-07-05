@@ -36,9 +36,11 @@ public class TournamentRules {
     private Optional<GroupRules> group = Optional.empty();
     private Optional<PlaceRules> place = Optional.empty();
     private Optional<RewardRules> rewards = Optional.empty();
+    private Optional<EnlistPolicy> enlist = Optional.empty();
 
     public static class TournamentRulesBuilder {
         int version = FIRST_VERSION;
+        Optional<EnlistPolicy> enlist = Optional.empty();
         Optional<PlayOffRule> playOff = Optional.empty();
         Optional<GroupRules> group = Optional.empty();
         Optional<RewardRules> rewards = Optional.empty();

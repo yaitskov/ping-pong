@@ -187,7 +187,7 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
         final int gid = g.getGroups().stream().findFirst().get().getGid();
 
 
-        simulator.enlistParticipant(scenario,
+        simulator.enlistNewParticipant(scenario,
                 scenario.getCategoryDbId().get(c1), Optional.of(gid), "p3");
         simulator.invalidateTournamentCache();
 

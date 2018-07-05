@@ -1,12 +1,20 @@
 package org.dan.ping.pong.mock;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.apache.commons.io.IOUtils;
+import org.dan.ping.pong.sys.ctx.jackson.ObjectMapperProvider;
+import org.dan.ping.pong.sys.error.Error;
+import org.dan.ping.pong.sys.error.PiPoEx;
 
+import java.io.InputStream;
 import java.net.URI;
 
 import javax.ws.rs.client.Client;
@@ -18,6 +26,7 @@ import javax.ws.rs.core.Response;
 
 @RequiredArgsConstructor
 public class MyRest {
+    private static final ObjectMapper om = ObjectMapperProvider.get();
     private final Client client;
     private final URI baseUri;
 
@@ -39,6 +48,24 @@ public class MyRest {
 
     public <T> Response post(String path, SessionAware sessionAware, T entity) {
         return post(path, sessionAware.getSession(), entity);
+    }
+
+    @SneakyThrows
+    public <T, R> R post(String path, SessionAware sessionAware, T entity, Class<R> respClass) {
+        final Response response = post(path, sessionAware.getSession(), entity);
+        switch (response.getStatus()) {
+            case 200:
+            case 201:
+                return response.readEntity(respClass);
+            case 400:
+                throw new PiPoEx(400, response.readEntity(Error.class), null);
+            default:
+                throw new PiPoEx(response.getStatus(), new Error("post req ["
+                        + path + "] with ["
+                        + om.writeValueAsString(entity)
+                        + "] responded [" + response.getStatus() + "] ["
+                        + IOUtils.toString((InputStream) response.getEntity(), UTF_8)), null);
+        }
     }
 
     public <T> Invocation.Builder postBuilder(String path, String session) {

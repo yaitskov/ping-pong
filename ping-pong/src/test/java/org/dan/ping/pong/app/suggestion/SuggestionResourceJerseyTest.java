@@ -48,7 +48,7 @@ public class SuggestionResourceJerseyTest extends AbstractSpringJerseyTest {
         final String p1 = namePart();
         final String p2 = namePart();
         final String name = p1 + " " + p2;
-        simulator.enlistParticipant(scenario, scenario.catId(c1), Optional.empty(), name);
+        simulator.enlistNewParticipant(scenario, scenario.catId(c1), Optional.empty(), name);
 
         final List<UserLink> suggestedUsers = myRest()
                 .post(PARTICIPANT_SUGGESTION, scenario,

@@ -69,14 +69,14 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
         simulator.run(c -> {
             c.beginTournament();
             final int cid = scenario.getCategoryDbId().get(c1);
-            final Bid bidP3 = c.enlistParticipant(scenario, cid, Optional.empty(), "p3");
+            final Bid bidP3 = c.enlistNewParticipant(scenario, cid, Optional.empty(), "p3");
             final GroupPopulations populations = myRest()
                     .get(GROUP_POPULATIONS + scenario.getTid().getTid() + CID + cid,
                             GroupPopulations.class);
             final int newGid = populations.getLinks().stream()
                     .map(GroupLink::getGid)
                     .max(Integer::compare).get();
-            final Bid bidP4 = c.enlistParticipant(scenario, cid, Optional.of(newGid), "p4");
+            final Bid bidP4 = c.enlistNewParticipant(scenario, cid, Optional.of(newGid), "p4");
 
             scenario.addPlayer(bidP3, p3);
             scenario.addPlayer(bidP4, p4);
@@ -105,14 +105,14 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
         simulator.run(c -> {
             c.beginTournament();
             final int cid = scenario.getCategoryDbId().get(c1);
-            final Bid bidP5 = c.enlistParticipant(scenario, cid, Optional.empty(), "p5");
+            final Bid bidP5 = c.enlistNewParticipant(scenario, cid, Optional.empty(), "p5");
             final GroupPopulations populations = myRest()
                     .get(GROUP_POPULATIONS + scenario.getTid().getTid() + CID + cid,
                             GroupPopulations.class);
             final int newGid = populations.getLinks().stream()
                     .map(GroupLink::getGid)
                     .max(Integer::compare).get();
-            final Bid bidP6 = c.enlistParticipant(scenario, cid, Optional.of(newGid), "p6");
+            final Bid bidP6 = c.enlistNewParticipant(scenario, cid, Optional.of(newGid), "p6");
 
             scenario.addPlayer(bidP5, p5);
             scenario.addPlayer(bidP6, p6);
@@ -161,7 +161,7 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                     .get(GROUP_POPULATIONS + scenario.getTid().getTid() + CID + cid,
                             GroupPopulations.class);
 
-            final Bid joinedBid = c.enlistParticipant(scenario, cid, populations, "p4");
+            final Bid joinedBid = c.enlistNewParticipant(scenario, cid, populations, "p4");
             scenario.addPlayer(joinedBid, p4);
             c.scoreSet(p1, 11, p2, 3)
                     .reloadMatchMap()
@@ -191,7 +191,7 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                     .get(GROUP_POPULATIONS + scenario.getTid().getTid() + CID + cid,
                             GroupPopulations.class);
 
-            final Bid joinedBid = c.enlistParticipant(scenario, cid,
+            final Bid joinedBid = c.enlistNewParticipant(scenario, cid,
                     Optional.of(populations.getLinks().get(1).getGid()), "p5");
 
             scenario.addPlayer(joinedBid, p5);
@@ -222,7 +222,7 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                             .get(GROUP_POPULATIONS + scenario.getTid().getTid() + CID + cid,
                                     GroupPopulations.class);
 
-                    final Bid joinedBid = c.enlistParticipant(scenario, cid, populations, "p4");
+                    final Bid joinedBid = c.enlistNewParticipant(scenario, cid, populations, "p4");
                     scenario.addPlayer(joinedBid, p4);
                     c.scoreSet(p2, 11, p3, 3)
                             .scoreSet(p2, 11, p4, 4)
@@ -249,7 +249,7 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                             final GroupPopulations populations = myRest()
                                     .get(GROUP_POPULATIONS + s.getTid().getTid() + CID + cid,
                                             GroupPopulations.class);
-                            final Bid bid = simulator.enlistParticipant(s, cid, populations, "p4");
+                            final Bid bid = simulator.enlistNewParticipant(s, cid, populations, "p4");
                             s.addPlayer(bid, p4);
                             assertThat(myRest().get(BID_PENDING_MATCHES + s.getTid().getTid()
                                             + "/" + bid.intValue(),
@@ -286,7 +286,7 @@ public class EnlistOfflineOpenTournamentJerseyTest extends AbstractSpringJerseyT
                             final GroupPopulations populations = myRest()
                                     .get(GROUP_POPULATIONS + s.getTid().getTid() + CID + cid,
                                             GroupPopulations.class);
-                            final Bid bid = simulator.enlistParticipant(s, cid, populations, "p4");
+                            final Bid bid = simulator.enlistNewParticipant(s, cid, populations, "p4");
                             s.addPlayer(bid, p4);
                             return HookDecision.Skip;
                         })

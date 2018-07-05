@@ -568,14 +568,26 @@ public class ImperativeSimulator {
         return this;
     }
 
-    public Bid enlistParticipant(TournamentScenario scenario,
+    public Bid enlistNewParticipant(TournamentScenario scenario,
             int cid, GroupPopulations populations, String name) {
-        return enlistParticipant(scenario, cid,
+        return enlistNewParticipant(scenario, cid,
                 Optional.of(populations.getLinks().get(0).getGid()), name);
     }
 
-    public Bid enlistParticipant(TournamentScenario scenario, int cid,
+    public Bid enlistNewParticipant(PlayerCategory c, String name) {
+        return enlistNewParticipant(scenario, scenario.catId(c), Optional.empty(), name);
+    }
+
+    public Bid enlistExistingParticipant(PlayerCategory c, Player p,
+            BidState state, Optional<Integer> oGid) {
+        return simulator.enlistExistingParticipant(
+                scenario.getTid(), scenario, scenario.catId(c),
+                oGid, state,
+                scenario.getPlayersSessions().get(p).getUid());
+    }
+
+    public Bid enlistNewParticipant(TournamentScenario scenario, int cid,
             Optional<Integer> gid, String name) {
-        return simulator.enlistParticipant(scenario, cid, gid, name);
+        return simulator.enlistNewParticipant(scenario, cid, gid, name);
     }
 }

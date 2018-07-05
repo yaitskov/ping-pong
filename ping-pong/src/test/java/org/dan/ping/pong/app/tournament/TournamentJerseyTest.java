@@ -319,7 +319,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                 daoGenerator.genPlace(0), Draft);
         final int cid = daoGenerator.genCategory(tid, 1);
         final String name = UUID.randomUUID().toString();
-        final Bid bid = simulator.enlistParticipant(tid, adminSession, cid, Optional.empty(), name,
+        final Bid bid = simulator.enlistNewParticipant(tid, adminSession, cid, Optional.empty(), name,
                 BidState.Want);
         final CategoryInfo digests = myRest().get(
                 CATEGORY_MEMBERS + tid.getTid() + "/" + cid, CategoryInfo.class);

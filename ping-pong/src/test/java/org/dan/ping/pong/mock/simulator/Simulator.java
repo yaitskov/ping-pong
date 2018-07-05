@@ -444,25 +444,29 @@ public class Simulator {
         }
     }
 
-    public Bid enlistParticipant(TournamentScenario scenario,
+    public Bid enlistNewParticipant(TournamentScenario scenario,
             int cid, GroupPopulations populations, String p5) {
-        return enlistParticipant(scenario, cid,
+        return enlistNewParticipant(scenario, cid,
                 Optional.of(populations.getLinks().get(0).getGid()), p5);
     }
 
-    public Bid enlistParticipant(TournamentScenario scenario, int cid,
+    public Bid enlistNewParticipant(TournamentScenario scenario, int cid,
             Optional<Integer> gid, String name) {
-        return enlistParticipant(scenario.getTid(), scenario, cid, gid, name, BidState.Wait);
+        return enlistNewParticipant(scenario.getTid(), scenario, cid, gid, name, BidState.Wait);
     }
 
-    public Bid enlistParticipant(Tid tid, SessionAware sessionAware, int cid,
+    public Bid enlistNewParticipant(Tid tid, SessionAware sessionAware, int cid,
             Optional<Integer> gid, String name, BidState state) {
         final Uid uid = rest.post(OFFLINE_USER_REGISTER, sessionAware,
                 OfflineUserRegRequest
                         .builder()
                         .name(name)
                         .build()).readEntity(Uid.class);
+        return enlistExistingParticipant(tid, sessionAware, cid, gid, state, uid);
+    }
 
+    public Bid enlistExistingParticipant(Tid tid, SessionAware sessionAware,
+            int cid, Optional<Integer> gid, BidState state, Uid uid) {
         return rest.post(TOURNAMENT_ENLIST_OFFLINE, sessionAware,
                 EnlistOffline.builder()
                         .groupId(gid)
@@ -470,7 +474,6 @@ public class Simulator {
                         .tid(tid)
                         .cid(cid)
                         .bidState(state)
-                        .build())
-                .readEntity(Bid.class);
+                        .build(), Bid.class);
     }
 }

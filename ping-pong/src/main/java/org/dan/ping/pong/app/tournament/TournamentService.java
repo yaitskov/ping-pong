@@ -22,6 +22,7 @@ import static org.dan.ping.pong.app.group.ConsoleTournament.INDEPENDENT_RULES;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.table.TableService.STATE;
+import static org.dan.ping.pong.app.tournament.EnlistPolicy.ONCE_PER_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
@@ -109,11 +110,11 @@ public class TournamentService {
         return tournamentDao.create(uid, newTournament);
     }
 
-    private void validateEnlistOnline(TournamentMemState tournament, Enlist enlist) {
+    private void validateEnlistOnline(TournamentMemState tournament, Enlist enlist, Uid uid) {
         if (tournament.getState() != Draft) {
             throw notDraftError(tournament);
         }
-        validateEnlist(tournament, enlist);
+        validateEnlist(tournament, enlist, uid);
     }
 
     private void validateEnlistOffline(TournamentMemState tournament, EnlistOffline enlist) {
@@ -139,7 +140,7 @@ public class TournamentService {
         } else {
             throw notDraftError(tournament);
         }
-        validateEnlist(tournament, enlist);
+        validateEnlist(tournament, enlist, enlist.getUid());
     }
 
     private PiPoEx notDraftError(TournamentMemState tournament) {
@@ -148,10 +149,15 @@ public class TournamentService {
                         TID, tournament.getTid()));
     }
 
-    private void validateEnlist(TournamentMemState tournament, Enlist enlist) {
+    private void validateEnlist(TournamentMemState tournament, Enlist enlist, Uid uid) {
         if (tournament.getType() != Classic) {
             throw badRequest("Tournament does not allow direct enlistment");
         }
+
+        tournament.getRule().getEnlist()
+                .orElse(ONCE_PER_TOURNAMENT)
+                .validate(tournament, enlist.getCid(), uid);
+
         tournament.checkCategory(enlist.getCid());
         final CastingLotsRule casting = tournament.getRule().getCasting();
         if (casting.getPolicy() == ParticipantRankingPolicy.ProvidedRating) {
@@ -171,7 +177,7 @@ public class TournamentService {
 
     public Bid enlistOnline(EnlistTournament enlistment,
             TournamentMemState tournament, UserLinkIf user, DbUpdater batch) {
-        validateEnlistOnline(tournament, enlistment);
+        validateEnlistOnline(tournament, enlistment, user.getUid());
         return enlistOnlineWithoutValidation(enlistment, tournament, user, batch);
     }
 

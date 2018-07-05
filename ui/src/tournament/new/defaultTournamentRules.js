@@ -5,6 +5,7 @@ export default function defaultTournamentRules(sport) {
     return {
         match: defaultMatchRules(sport),
         place: {ad: 'NO'},
+        enlist: 'OT',
         casting: {
             policy: 'pr',
             direction: 'd',

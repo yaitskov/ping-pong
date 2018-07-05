@@ -14,6 +14,7 @@ import './play-off/play-off-tr-params.component.js';
 import './match/headless-common-match-params.component.js';
 import './match/match-params.component.js';
 import './arena/arena-params.component.js';
+import './enlist/enlist-params.component.js';
 
 angular.
     module('tournament').

@@ -46,7 +46,7 @@
             ng-model="$ctrl.bid"
             ng-change="$ctrl.bidChange()"
             required name="bids" id="bids">
-      <option ng-repeat="bid in $ctrl.bids | orderBy : 'name'" value="{{bid.uid}}">
+      <option ng-repeat="bid in $ctrl.bids | orderBy : 'name'" value="{{bid.bid}}">
         {{bid.name}}
       </option>
     </select>

@@ -10,8 +10,8 @@ export default class JudgeMatchListCtrl extends AngularBean {
         if (this.bid) {
             match.participants = [
                 match.enemy,
-                {uid: this.bid,
-                 name: this.cutil.findValBy(this.bids, {uid: +this.bid}).name}];
+                {bid: this.bid,
+                 name: this.cutil.findValBy(this.bids, {bid: +this.bid}).name}];
         }
         this.pageCtx.put('last-scoring-match', match);
         this.$location.path('/judge/score/set/' + this.tournamentId + '/' + match.mid);
@@ -58,7 +58,7 @@ export default class JudgeMatchListCtrl extends AngularBean {
                 this.bids = bids || [];
                 if (bids.length) {
                     this.bid = "" + this.cutil.findValByO(
-                        bids, {uid: +this.pageCtx.get('last-bid')}, bids[0]).uid;
+                        bids, {bid: +this.pageCtx.get('last-bid')}, bids[0]).bid;
                     this.bidChange();
                 }
             },

@@ -14,8 +14,7 @@ module.exports = {
     'cash': 'gotówka',
     'Categories': 'Kategorie',
     'My category': 'Moja kategoria',
-    'open-tournament-resign-warn': 'Turniej jest już otwarty. Bierzesz w nim udział.'
-        + ' Gdy teraz zrezygnujesz, nie możesz zmienić zdania!',
+    'tournament-resign-warn': 'Podtwierdź rezygnacje z kategorii "{{name}}".',
     'Resign btn': 'Zresygnować',
     'Enlist Me btn': 'Zapisać mnie',
     'previous tournament': 'Powszedni turniej w serii',

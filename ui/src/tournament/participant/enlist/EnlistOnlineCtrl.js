@@ -8,9 +8,10 @@ export default class EnlistOnlineCtrl extends SimpleController {
     }
 
     $onInit() {
+        this.extraCategories = false;
         this.info = this.InfoPopup.createScope();
         this.tournament = {};
-        this.expectEnlist = false;
+        this.activeCategories = 0;
         this.showQuitConfirm = false;
 
         const setLastTournament = this.eBarier.create(
@@ -44,7 +45,7 @@ export default class EnlistOnlineCtrl extends SimpleController {
         this.mainMenu.setTitle(['Drafting to', {name: tournament.name}]);
         setLastTournament.got('got.tr', tournament);
         this.tournament = tournament;
-        this.expectEnlist = this.findExpectEnlist();
+        this.activeCategories = this.countActiveCategories();
         var rnkOptions = tournament.rules.casting.pro;
         if (tournament.rules.casting.pro) {
             this.rankRange = {min: rnkOptions.minValue, max: rnkOptions.maxValue};
@@ -52,20 +53,19 @@ export default class EnlistOnlineCtrl extends SimpleController {
         }
     }
 
-    findExpectEnlist() {
-        if (this.tournament.state != 'Draft') {
+    countActiveCategories() {
+        return Object.values(this.tournament.categoryState || {}).
+            filter(s => s != 'Quit').length;
+    }
+
+    showActivateExtra() {
+        const ac = this.countActiveCategories();
+        if (!ac) {
             return false;
         }
-        const activeCategories = Object.values(this.tournament.categoryState || {}).
-              filter(s => s != 'Quit').length;
-        switch (this.tournament.rules.enlist) {
-        case 'OC':
-            return activeCategories > 0 && activeCategories < this.tournament.categories.length;
-        case 'OT':
-            return activeCategories == 0;
-        default:
-            throw new Error(`Unknown enlist policy ${this.tournament.rules.enlist}`);
-        }
+        return !this.extraCategories &&
+            ac < this.tournament.categories.length &&
+            this.tournament.rules.enlist == 'OC';
     }
 
     categoryBtnClasses(cid) {
@@ -84,13 +84,23 @@ export default class EnlistOnlineCtrl extends SimpleController {
         };
     }
 
+    activateExtra() {
+        this.extraCategories = true ^ this.extraCategories;
+    }
+
     showCategoryBtn(cid) {
         const state = (this.tournament.categoryState || {})[cid];
-        if (this.expectEnlist) {
-            return !state || state == 'Quit';
-        } else {
-            return !!state;
+        if (this.tournament.state == 'Draft') {
+            switch (this.tournament.rules.enlist) {
+            case 'OC':
+                return this.extraCategories || !this.activeCategories || state != 'Quit';
+            case 'OT':
+                return this.activeCategories && state != 'Quit' || !this.activeCategories;
+            default:
+                throw new Error(`Bad enlist policy ${this.tournament.rules.enlist}`);
+            }
         }
+        return this.activeCategories == 0 || state;
     }
 
     toggleEnlistment(cid) {
@@ -154,11 +164,19 @@ export default class EnlistOnlineCtrl extends SimpleController {
     setCategoryState(cid, state) {
         this.tournament.categoryState = this.tournament.categoryState || {};
         this.tournament.categoryState[cid] = state;
-        this.expectEnlist = this.findExpectEnlist();
+        this.extraCategories = false;
+        this.activeCategories = this.countActiveCategories();
     }
 
     categoryName(cid) {
-        return this.cutil.findValByO(this.tournament.categories, {cid: cid}).name;
+        if (!this.tournament.categories)  {
+            return '';
+        }
+        const category = this.cutil.findValByO(this.tournament.categories, {cid: cid});
+        if (category) {
+            return category.name;
+        }
+        return '';
     }
 
     resign(cid) {

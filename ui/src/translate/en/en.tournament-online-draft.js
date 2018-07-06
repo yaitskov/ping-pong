@@ -14,8 +14,7 @@ module.exports = {
     'cash': 'cash',
     'Categories': 'Categories',
     'My category': 'My category',
-    'open-tournament-resign-warn': 'Tournament is open. You are participate.'
-        + ' If you resign right now, there is no way back!',
+    'tournament-resign-warn': 'Confirm resignation from category "{{name}}".',
     'Resign btn': 'Resign',
     'Enlist Me btn': 'Enlist me',
     'previous tournament': 'Previous tournament in the seria',

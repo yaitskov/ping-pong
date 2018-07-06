@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.tournament;
 import static org.dan.ping.pong.app.bid.BidResource.BID_SET_STATE;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
+import static org.dan.ping.pong.app.tournament.ResignTournament.resignOfTid;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11;
@@ -70,7 +71,7 @@ public class TournamentBeginJerseyTest extends AbstractSpringJerseyTest {
                         hasProperty("bid", is(bid2)))));
 
 
-        myRest().voidPost(TOURNAMENT_RESIGN, session1, scenario.getTid());
+        myRest().voidPost(TOURNAMENT_RESIGN, session1, resignOfTid(scenario.getTid()));
 
         assertEquals(400, myRest().post(BEGIN_TOURNAMENT,
                 scenario.getTestAdmin().getSession(), scenario.getTid())

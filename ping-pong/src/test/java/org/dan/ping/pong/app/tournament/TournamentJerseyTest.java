@@ -12,6 +12,7 @@ import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.category.CategoryResource.CATEGORY_MEMBERS;
 import static org.dan.ping.pong.app.place.PlaceMemState.NO_ADMIN_ACCESS_TO_PLACE;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
+import static org.dan.ping.pong.app.tournament.ResignTournament.resignOfTid;
 import static org.dan.ping.pong.app.tournament.TournamentResource.BEGIN_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentResource.DRAFTING;
 import static org.dan.ping.pong.app.tournament.TournamentResource.EDITABLE_TOURNAMENTS;
@@ -239,7 +240,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     }
 
     @Test
-    public void resign() {
+    public void resignReenlistToOtherCategory() {
         final Tid tid = daoGenerator.genTournament(
                 daoGenerator.genPlace(0), Draft);
         final int cid1 = daoGenerator.genCategory(tid, 1);
@@ -251,7 +252,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
         final List<TournamentDigest> digests = myRest().get(TOURNAMENT_ENLISTED,
                 userSession, DigestList.class);
         assertThat(digests, hasItem(hasProperty("tid", is(tid))));
-        myRest().voidPost(TOURNAMENT_RESIGN, userSession, tid);
+        myRest().voidPost(TOURNAMENT_RESIGN, userSession, resignOfTid(tid));
         assertThat(myRest().get(TOURNAMENT_ENLISTED,
                 userSession, DigestList.class),
                 not(hasItem(hasProperty("tid", is(tid)))));

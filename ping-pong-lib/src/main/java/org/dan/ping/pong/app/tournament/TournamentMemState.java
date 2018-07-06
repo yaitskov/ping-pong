@@ -5,7 +5,16 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
+import static org.dan.ping.pong.app.bid.BidState.Here;
+import static org.dan.ping.pong.app.bid.BidState.Lost;
+import static org.dan.ping.pong.app.bid.BidState.Paid;
+import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
+import static org.dan.ping.pong.app.bid.BidState.Wait;
+import static org.dan.ping.pong.app.bid.BidState.Want;
+import static org.dan.ping.pong.app.bid.BidState.Win1;
+import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.group.GroupService.DM_TAG;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName._DisambiguationPreview;
@@ -54,6 +63,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import javax.validation.Valid;
 
 @Getter
 @Setter
@@ -316,5 +327,23 @@ public class TournamentMemState {
                 participant.getUid(), k -> new HashMap<>())
                 .put(participant.getCid(), participant.getBid());
         return participant.getBid();
+    }
+
+    public static final Set<BidState> ACTIVE_BID_STATES = ImmutableSet.of(
+            Want, Paid, Here, Wait, Play, Expl, Lost, Win1, Win2, Win3);
+
+    public long countActiveEnlistments(Uid uid) {
+        return findBidsByUid(uid)
+                .stream()
+                .map(this::getParticipant)
+                .map(ParticipantMemState::getBidState)
+                .filter(ACTIVE_BID_STATES::contains)
+                .count();
+    }
+
+    public Bid allocateBidFor(int cid, Uid uid) {
+        return ofNullable(getUidCid2Bid().get(uid))
+                .flatMap(m -> ofNullable(m.get(cid)))
+                .orElseGet(() -> getNextBid().next());
     }
 }

@@ -186,7 +186,7 @@ public class TournamentService {
             UserLinkIf user, DbUpdater batch) {
         log.info("Uid {} enlists to tid {} in cid {}",
                 user.getUid(), tournament.getTid(), enlistment.getCategoryId());
-        final Bid bid = tournament.getNextBid().next();
+        final Bid bid = tournament.allocateBidFor(enlistment.getCategoryId(), user.getUid());
         return enlistToConsole(bid, enlistment, tournament, user, batch);
     }
 
@@ -554,9 +554,10 @@ public class TournamentService {
     public Bid enlistOffline(Uid adminUid, TournamentMemState tournament,
             EnlistOffline enlistment, DbUpdater batch) {
         validateEnlistOffline(tournament, enlistment);
-        final Bid participantId = tournament.getNextBid().next();
         final UserInfo uInfo = userDao.getUserByUid(enlistment.getUid())
                 .orElseThrow(() -> notFound("user not found"));
+        final Bid participantId = tournament.allocateBidFor(
+                enlistment.getCid(), enlistment.getUid());
 
         final Instant now = clocker.get();
         if (tournament.getState() == Open && !enlistment.getGroupId().isPresent()) {

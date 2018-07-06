@@ -71,6 +71,7 @@ import org.dan.ping.pong.app.match.SetScoreResult;
 import org.dan.ping.pong.app.tournament.CopyTournament;
 import org.dan.ping.pong.app.tournament.ExpelParticipant;
 import org.dan.ping.pong.app.tournament.MyTournamentInfo;
+import org.dan.ping.pong.app.tournament.ResignTournament;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 import org.dan.ping.pong.app.tournament.TournamentState;
@@ -290,18 +291,20 @@ public class ImperativeSimulator {
                                 "no player label for bid " + bid));
     }
 
-    public ImperativeSimulator cat(PlayerCategory category) {
-        scenario.cat(category);
-        return this;
+    public ImperativeSimulator playerQuits(Player p) {
+        return playerQuits(p, Optional.of(scenario.getDefaultCategory()));
     }
 
-    public ImperativeSimulator playerQuits(Player p) {
+    public ImperativeSimulator playerQuits(Player p, Optional<PlayerCategory> category) {
         myRest.voidPost(TOURNAMENT_RESIGN,
                 ofNullable(scenario.getPlayersSessions().get(p))
                         .orElseThrow(
                                 () -> new RuntimeException(
                                         "no session for player " + p)),
-                scenario.getTid());
+               ResignTournament.builder()
+                       .tid(scenario.getTid())
+                       .cid(category.map(scenario::catId))
+                       .build());
         reloadMatchMap();
         return this;
     }

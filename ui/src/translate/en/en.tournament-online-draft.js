@@ -1,5 +1,8 @@
 module.exports = {
-        // tournament details page
+    'cannot resign in terminal state': 'You cannot resign in a terminal state',
+    'enlisted to category': 'You have been enlisted to the tournament ({{name}} category)',
+    'resigned from category': 'You have resigned from the tournament ({{name}} category)',
+    'extra category': 'extra category',
     'tournament name': 'Name',
     'tournament city': 'City',
     'tournament place': 'Place',
@@ -11,8 +14,6 @@ module.exports = {
     'cash': 'cash',
     'Categories': 'Categories',
     'My category': 'My category',
-    'you-have-been-expelled': 'Sorry to say, but you have been expelled from this tournament.'
-        + ' Ask administrator for clarification.',
     'open-tournament-resign-warn': 'Tournament is open. You are participate.'
         + ' If you resign right now, there is no way back!',
     'Resign btn': 'Resign',

@@ -4,12 +4,13 @@ export default class EnlistOnlineCtrl extends SimpleController {
     static get $inject () {
         return ['$routeParams', 'Tournament', 'auth', 'mainMenu', 'binder',
                 '$scope', '$http', '$location', 'requestStatus', 'cutil',
-                'pageCtx', 'eBarier', '$rootScope'];
+                'pageCtx', 'eBarier', '$rootScope', 'InfoPopup'];
     }
 
     $onInit() {
-        this.myCategory = this.pageCtx.get('my-category-' + this.$routeParams.tournamentId) || {};
-        this.tournament = null;
+        this.info = this.InfoPopup.createScope();
+        this.tournament = {};
+        this.expectEnlist = false;
         this.showQuitConfirm = false;
 
         const setLastTournament = this.eBarier.create(
@@ -43,96 +44,106 @@ export default class EnlistOnlineCtrl extends SimpleController {
         this.mainMenu.setTitle(['Drafting to', {name: tournament.name}]);
         setLastTournament.got('got.tr', tournament);
         this.tournament = tournament;
+        this.expectEnlist = this.findExpectEnlist();
         var rnkOptions = tournament.rules.casting.pro;
         if (tournament.rules.casting.pro) {
             this.rankRange = {min: rnkOptions.minValue, max: rnkOptions.maxValue};
             this.rank = rnkOptions.minValue;
         }
-        if (this.tournament.myCategoryId) {
-            this.myCategory = {cid: tournament.myCategoryId,
-                               name: this.cutil.findValBy(this.tournament.categories,
-                                                          {cid: tournament.myCategoryId}).name};
+    }
+
+    findExpectEnlist() {
+        if (this.tournament.state != 'Draft') {
+            return false;
+        }
+        const activeCategories = Object.values(this.tournament.categoryState || {}).
+              filter(s => s != 'Quit').length;
+        switch (this.tournament.rules.enlist) {
+        case 'OC':
+            return activeCategories > 0 && activeCategories < this.tournament.categories.length;
+        case 'OT':
+            return activeCategories == 0;
+        default:
+            throw new Error(`Unknown enlist policy ${this.tournament.rules.enlist}`);
         }
     }
 
-    activate(cid) {
-        this.myCategory.cid = cid;
-        this.pageCtx.put('my-category-' + this.$routeParams.tournamentId, this.myCategory);
+    categoryBtnClasses(cid) {
+        if (!this.tournament.categoryState) {
+            return {};
+        }
+        const state = this.tournament.categoryState[cid] || '';
+        if (this.tournament.state == 'Draft') {
+            return {'btn-primary': state == 'Want'};
+        }
+        return {
+            'btn-primary': state == 'Play' || state == 'Wait' || state == 'Here',
+            'btn-danger':  state == 'Lost' || state == 'Quit' ,
+            'btn-warning': state == 'Expl',
+            'btn-succes': state.substr(0, 3) == 'Win'
+        };
+    }
+
+    showCategoryBtn(cid) {
+        const state = (this.tournament.categoryState || {})[cid];
+        if (this.expectEnlist) {
+            return !state || state == 'Quit';
+        } else {
+            return !!state;
+        }
+    }
+
+    toggleEnlistment(cid) {
+        const bidState = (this.tournament.categoryState || {})[cid];
+        if (this.tournament.state == 'Draft') {
+            if (bidState == 'Want') {
+                this.showQuitConfirm = cid;
+            } else {
+                this.enlistMe(cid);
+            }
+        } else {
+            if (this.cutil.has(bidState, ['Paid', 'Here', 'Play', 'Wait'])) {
+                this.showQuitConfirm = cid;
+            } else {
+                this.info.transInfo('cannot resign in terminal state');
+            }
+        }
     }
 
     showScheduleLink() {
-        return this.tournament &&
-            this.cutil.has(this.tournament.bidState, ['Paid', 'Here', 'Play', 'Wait']);
+        return Object.values(this.tournament.categoryState || {}).length;
+    }
+
+    showThanksForEnlist() {
+        return Object.values(this.tournament.categoryState || {}).
+            filter(s => this.cutil.has(s, ['Paid', 'Here', 'Play', 'Wait', 'Want'])).length;
     }
 
     showResultLink() {
-        return this.tournament &&
-            this.cutil.has(this.tournament.bidState, ['Quit', 'Win1', 'Win2', 'Win3', 'Lost', 'Expl']);
-    }
-
-    canResignFutureTournament() {
-        return this.tournament &&
-            this.cutil.has(this.tournament.bidState,
-                           ['Want', 'Paid', 'Here']);
-    }
-
-    canResignActiveTournament() {
-        return this.tournament &&
-            !this.showQuitConfirm &&
-            this.cutil.has(this.tournament.bidState,
-                      ['Play', 'Wait', 'Rest']);
-    }
-
-    showCategoryList() {
-        return this.tournament &&
-            (!this.tournament.bidState ||
-             this.tournament.bidState == 'Quit');
-    }
-
-    showMyCategory() {
-        return this.tournament &&
-            this.cutil.has(this.tournament.bidState,
-                           ['Want', 'Paid', 'Here', 'Play', 'Wait', 'Rest']);
-    }
-
-    canEnlist() {
-        return this.tournament &&
-            (!this.tournament.bidState || this.tournament.bidState == 'Quit') &&
-            this.tournament.state == 'Draft' &&
-            !this.tournament.iamAdmin;
-    };
-
-    ensureResign() {
-        this.showQuitConfirm = true;
+        return this.showScheduleLink();
     }
 
     showEnlisted() {
-        this.pageCtx.put('categories', {list: this.tournament.categories,
-                                   currentCid: this.myCategory ? this.myCategory.cid : 0});
         this.$location.path('/tournament/enlisted/' + this.tournament.tid);
     }
 
-    enlistMe() {
+    enlistMe(cid) {
+        this.showQuitConfirm = false;
         this.requestStatus.startLoading('Enlisting', this.tournament);
-        if (!this.myCategory.cid) {
-            this.requestStatus.validationFailed('CategoryNotChosen');
-            return;
-        }
         if (this.auth.isAuthenticated()) {
-            var req = {tid: this.tournament.tid,
-                       categoryId: this.myCategory.cid};
+            var req = {tid: this.tournament.tid, categoryId: cid};
             if (this.tournament.rules.casting.pro) {
                 req.providedRank = this.rank;
             }
             this.$http.post('/api/tournament/enlist',
                             req, {headers: {session: this.auth.mySession()}}).
                 then(
-                    (okResp) => {
+                    (ok) => {
                         this.requestStatus.complete();
-                        this.tournament.myCategoryId = this.myCategory.cid;
-                        this.tournament.bidState = 'Want';
-                        this.myCategory.name = this.cutil.findValBy(this.tournament.categories,
-                                                                    {cid: this.myCategory.cid}).name;
+                        this.setCategoryState(cid, 'Want');
+                        this.info.transInfo('enlisted to category',
+                                            {name: this.categoryName(cid)});
+
                     },
                     (...a) => this.requestStatus.failed(...a));
         } else {
@@ -140,13 +151,26 @@ export default class EnlistOnlineCtrl extends SimpleController {
         }
     }
 
-    resign() {
+    setCategoryState(cid, state) {
+        this.tournament.categoryState = this.tournament.categoryState || {};
+        this.tournament.categoryState[cid] = state;
+        this.expectEnlist = this.findExpectEnlist();
+    }
+
+    categoryName(cid) {
+        return this.cutil.findValByO(this.tournament.categories, {cid: cid}).name;
+    }
+
+    resign(cid) {
+        this.showQuitConfirm = 0;
         this.requestStatus.startLoading('Resigning', this.tournament);
         this.Tournament.resign(
-            this.tournament.tid,
+            {tid: this.tournament.tid, cid: cid},
             () => {
-                this.tournament.bidState = 'Quit';
+                this.setCategoryState(cid, 'Quit');
                 this.requestStatus.complete();
+                this.info.transInfo('resigned from category',
+                                    {name: this.categoryName(cid)});
             },
             (...a) => this.requestStatus.failed(...a));
     }

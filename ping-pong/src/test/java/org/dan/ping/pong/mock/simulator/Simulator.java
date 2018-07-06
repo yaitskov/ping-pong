@@ -47,6 +47,7 @@ import org.dan.ping.pong.app.match.SetScoreResult;
 import org.dan.ping.pong.app.place.ForTestPlaceDao;
 import org.dan.ping.pong.app.table.TableInfo;
 import org.dan.ping.pong.app.tournament.EnlistOffline;
+import org.dan.ping.pong.app.tournament.ResignTournament;
 import org.dan.ping.pong.app.tournament.SetScoreResultName;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentDao;
@@ -282,7 +283,7 @@ public class Simulator {
             Player resigningPlayer = setOutcome.keySet().stream().findFirst().get();
             rest.voidPost(TOURNAMENT_RESIGN,
                     scenario.getPlayersSessions().get(resigningPlayer),
-                    scenario.getTid());
+                    ResignTournament.resignOfTid(scenario.getTid()));
             log.info("Player {} resigned in match with {}", resigningPlayer, players);
             scenario.chooseMatchMap(openMatch).remove(players, game);
             return SetScoreResultName.MatchComplete;

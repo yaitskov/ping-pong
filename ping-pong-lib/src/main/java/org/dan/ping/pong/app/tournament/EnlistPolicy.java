@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.util.Optional.ofNullable;
+import static org.dan.ping.pong.app.tournament.TournamentMemState.ACTIVE_BID_STATES;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,6 +15,16 @@ public enum EnlistPolicy {
         public void validate(TournamentMemState tournament, int cid, Uid uid) {
             ofNullable(tournament.getUidCid2Bid().get(uid))
                     .ifPresent((m) -> {
+                        final long activeEnlistments = tournament.countActiveEnlistments(uid);
+                        if (activeEnlistments == 0
+                                || (activeEnlistments == 1
+                                && ofNullable(m.get(cid))
+                                .map(tournament::getParticipant)
+                                .map(ParticipantMemState::getBidState)
+                                .map(ACTIVE_BID_STATES::contains)
+                                .orElse(false))) {
+                                return;
+                        }
                         throw badRequest(MULTIPLE_TOURNAMENT_ENLISTMENT, "uid", uid);
                     });
         }
@@ -24,9 +35,12 @@ public enum EnlistPolicy {
         public void validate(TournamentMemState tournament, int cid, Uid uid) {
             ofNullable(tournament.getUidCid2Bid().get(uid))
                     .flatMap(m -> ofNullable(m.get(cid)))
-                    .ifPresent((bid) -> {
-                        throw badRequest(MULTIPLE_CATEGORY_ENLISTMENT,
-                                ImmutableMap.of("bid", bid, "uid", uid));
+                    .map(tournament::getParticipant)
+                    .ifPresent((par) -> {
+                        if (ACTIVE_BID_STATES.contains(par.getBidState())) {
+                            throw badRequest(MULTIPLE_CATEGORY_ENLISTMENT,
+                                    ImmutableMap.of("bid", par.getBid(), "uid", uid));
+                        }
                     });
         }
     };

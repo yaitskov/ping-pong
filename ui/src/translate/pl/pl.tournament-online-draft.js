@@ -1,4 +1,8 @@
 module.exports = {
+    'cannot resign in terminal state': 'Nie morzesz zrezygnować w stanie końcowym',
+    'enlisted to category': 'Zapisałeś do turnieju (w {{name}} kategorii)',
+    'resigned from category': 'Wycofałeś z turnieju (w {{name}} kategorii)',
+    'extra category': 'dodatkową kategorię',
     'tournament name': 'Nazwa',
     'tournament city': 'Miasto',
     'tournament place': 'Miejsce',
@@ -10,8 +14,6 @@ module.exports = {
     'cash': 'gotówka',
     'Categories': 'Kategorie',
     'My category': 'Moja kategoria',
-    'you-have-been-expelled': 'Przykro mi powiedzieć, ale zostałeś wydalony z turneja.'
-        + ' Poproś administratora o wyjaśnienie.',
     'open-tournament-resign-warn': 'Turniej jest już otwarty. Bierzesz w nim udział.'
         + ' Gdy teraz zrezygnujesz, nie możesz zmienić zdania!',
     'Resign btn': 'Zresygnować',

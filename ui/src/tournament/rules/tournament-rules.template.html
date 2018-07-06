@@ -2,7 +2,7 @@
 <request-status></request-status>
 <div class="container">
   <div class="form-group toggle-btn">
-    <label>{{ 'match-lbl' | translate }}</label>
+    <label translate="match-lbl"/>
     <a class="pull-right arrow"
        simple-toggler="#match-parameters">
       <span class="glyphicon glyphicon-menu-down"></span>
@@ -11,85 +11,63 @@
   </div>
   <div id="match-parameters" class="toggle-panel in">
     <div class="form-group">
-      <label for="stw">{{ 'Sets to win a match' | translate }}</label>
+      <label for="stw" translate="Sets to win a match"/>
       <input id="stw" class="form-control" readonly ng-model="$ctrl.rules.match.stw"/>
     </div>
     <div class="form-group">
-      <label for="minScoreToWin">{{ 'Min score to win a set' | translate }}</label>
+      <label for="minScoreToWin" translate="Min score to win a set"/>
       <input id="minScoreToWin" class="form-control" readonly ng-model="$ctrl.rules.match.mgtw"/>
     </div>
     <div class="form-group">
-      <label for="scoreAdvance">{{ 'Min score advance to win a set' | translate }}</label>
+      <label for="scoreAdvance" translate="Min score advance to win a set"/>
       <input id="scoreAdvance" class="form-control" readonly ng-model="$ctrl.rules.match.maig"/>
-      <p class="help-block">
-        {{ 'min-score-advance-help' | translate }}
-      </p>
+      <p class="help-block" translate="min-score-advance-help"/>
     </div>
   </div>
   <div class="form-group toggle-btn">
-    <label>{{ 'group-lbl' | translate }}</label>
-    <div class="btn btn-danger pull-right" ng-show="!$ctrl.rules.group">
-      {{ 'no-lbl' | translate }}
-    </div>
+    <label translate="group-lbl"/>
+    <div class="btn btn-danger pull-right"
+         translate="no-lbl"
+         ng-show="!$ctrl.rules.group"/>
   </div>
   <div id="group-parameters" class="toggle-panel" ng-show="$ctrl.rules.group">
     <div class="form-group">
-      <label>{{ 'Quits from a group' | translate }}</label>
+      <label translate="Quits from a group"/>
       <div>
-        <a class="btn btn-default"
-           ng-class="{'btn-primary': $ctrl.rules.group.quits == 1}">
-          {{ 'first-best' | translate }}
-        </a>
-        <a class="btn btn-default"
-           ng-class="{'btn-success': $ctrl.rules.group.quits == 2}">
-          {{ 'first-2-best' | translate }}
-        </a>
+        <a class="btn btn-default" translate="first-best"
+           ng-class="{'btn-primary': $ctrl.rules.group.quits == 1}"/>
+        <a class="btn btn-default" translate="first-2-best"
+           ng-class="{'btn-success': $ctrl.rules.group.quits == 2}"/>
       </div>
-      <p class="help-block">
-        {{ $ctrl.rules.group.quits }}
-        {{ 'quits-group-help' | translate }}
-      </p>
+      <p class="help-block" translate="quits-group-help"/>
     </div>
   </div>
   <div class="form-group toggle-btn">
-    <label>{{ 'play-off-lbl' | translate }}</label>
-    <div class="btn btn-danger pull-right" ng-show="!$ctrl.rules.playOff">
-      {{ 'no-lbl' | translate }}
-    </div>
+    <label translate="play-off-lbl"/>
+    <div class="btn btn-danger pull-right"
+         translate="no-lbl"
+         ng-show="!$ctrl.rules.playOff"/>
   </div>
   <div id="play-off-parameters" class="toggle-panel" ng-show="$ctrl.rules.playOff">
     <div class="form-group">
-      <label class="toggle-option">
-        {{ 'max-losses' | translate }}
-      </label>
-      <a class="btn btn-default"
-         ng-class="{'btn-primary': $ctrl.rules.playOff.losings == 1}">
-        {{ 'up-to-1-loss' | translate }}
-      </a>
-      <a class="btn btn-default"
-         ng-class="{'btn-success': $ctrl.rules.playOff.losings == 2}">
-        {{ 'up-to-2-losses' | translate }}
-      </a>
+      <label class="toggle-option" translate="max-losses"/>
+      <a class="btn btn-default" translate="up-to-1-loss"
+         ng-class="{'btn-primary': $ctrl.rules.playOff.losings == 1}"/>
+      <a class="btn btn-default" translate="up-to-2-losses"
+         ng-class="{'btn-success': $ctrl.rules.playOff.losings == 2}"/>
     </div>
     <div class="form-group" ng-show="$ctrl.rules.playOff.losings == 1">
-      <label class="toggle-option">
-        {{ 'Match for 3rd place' | translate }}
-      </label>
-      <a class="btn btn-default"
-         ng-class="{'btn-primary': $ctrl.rules.playOff.tpm == 1}">
-        {{ 'yes-lbl' | translate }}
-      </a>
-      <a class="btn btn-default"
-         ng-class="{'btn-danger': $ctrl.rules.playOff.tpm == 0}">
-        {{ 'no-lbl' | translate }}
-      </a>
+      <label class="toggle-option" translate="Match for 3rd place"/>
+      <a class="btn btn-default" translate="yes-lbl"
+         ng-class="{'btn-primary': $ctrl.rules.playOff.tpm == 1}"/>
+      <a class="btn btn-default" translate="no-lbl"
+         ng-class="{'btn-danger': $ctrl.rules.playOff.tpm == 0}"/>
     </div>
   </div>
-  <div class="form-group">
-  </div>
+  <div class="form-group"/>
   <div class="form-group">
     <a class="btn btn-primary" back-button>
-      <span class="glyphicon glyphicon-circle-arrow-left"></span>
+      <span class="glyphicon glyphicon-circle-arrow-left"/>
     </a>
   </div>
 </div>

@@ -121,16 +121,29 @@ export default class EnlistOnlineCtrl extends SimpleController {
     }
 
     showScheduleLink() {
-        return Object.values(this.tournament.categoryState || {}).length;
+        return this.tournament.state != 'Draft' &&
+            this.filterCategoriesByStates(['Play', 'Wait', 'Here']);
+    }
+
+    filterCategoriesByStates(states) {
+        return Object.values(this.tournament.categoryState || {}).
+            filter(s => this.cutil.has(s, states)).length;
     }
 
     showThanksForEnlist() {
-        return Object.values(this.tournament.categoryState || {}).
-            filter(s => this.cutil.has(s, ['Paid', 'Here', 'Play', 'Wait', 'Want'])).length;
+        return this.filterCategoriesByStates(['Paid', 'Here', 'Want', 'Play', 'Wait']);
+    }
+
+    showPlayedMatches() {
+        return this.tournament.state != 'Draft' &&
+            this.filterCategoriesByStates(
+                ['Lost', 'Play', 'Wait', 'Win1', 'Win2', 'Win3', 'Quit', 'Expl']);
     }
 
     showResultLink() {
-        return this.showScheduleLink();
+        return this.tournament.state != 'Draft' &&
+            this.filterCategoriesByStates(
+                ['Lost', 'Play', 'Wait', 'Win1', 'Win2', 'Win3', 'Quit', 'Expl']);
     }
 
     showEnlisted() {

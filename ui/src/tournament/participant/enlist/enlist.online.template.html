@@ -127,9 +127,8 @@
     </a>
     <a class="btn btn-primary label-info" role="button"
        ng-show="$ctrl.tournament.previousTid"
-       href="#!/tournament/drafting/{{$ctrl.tournament.previousTid}}">
-      {{ 'previous tournament' | translate }}
-    </a>
+       translate="previous tournament"
+       href="#!/tournaments/{{$ctrl.tournament.previousTid}}"/>
   </div>
   <div class="form-group" ng-show="$ctrl.tournament.state == 'Close'">
     <div class="alert alert-info"

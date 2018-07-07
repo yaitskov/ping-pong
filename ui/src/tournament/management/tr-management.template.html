@@ -147,7 +147,7 @@
       <table class="table table-bordered">
         <tr ng-repeat="participant in $ctrl.errorHasUncheckedUsers | orderBy : 'name'">
           <td>
-            <a href="#!/my/tournament/{{$ctrl.tournament.tid}}/participant/{{participant.uid}}">
+            <a href="#!/my/tournament/{{$ctrl.tournament.tid}}/participant/{{participant.bid}}">
               {{participant.name}}
             </a>
           </td>

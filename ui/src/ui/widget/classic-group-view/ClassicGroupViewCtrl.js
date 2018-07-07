@@ -104,7 +104,7 @@ export default class ClassicGroupViewCtrl extends SimpleController {
         if (!p1.matches) {
             return false;
         }
-        var m = p1.matches[p2.uid];
+        var m = p1.matches[p2.bid];
         if (m) {
             return m.sets.his < m.sets.enemy;
         }
@@ -115,7 +115,7 @@ export default class ClassicGroupViewCtrl extends SimpleController {
         if (!p1.matches) {
             return false;
         }
-        var m = p1.matches[p2.uid];
+        var m = p1.matches[p2.bid];
         if (m) {
             return m.sets.his > m.sets.enemy;
         }

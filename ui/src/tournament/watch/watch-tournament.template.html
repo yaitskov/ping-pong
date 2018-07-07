@@ -31,7 +31,7 @@
               </span>
             </td>
             <td>
-              <a href="#!/participant/result/{{$ctrl.tid}}/{{winner.uid}}">{{winner.name}}</a>
+              <a href="#!/participant/result/{{$ctrl.tid}}/{{winner.bid}}">{{winner.name}}</a>
             </td>
           </tr>
         </tbody>
@@ -52,7 +52,7 @@
             title="{{ 'Opponents participating in the match' | translate }}">
           <a ng-repeat="participant in match.participants"
              class="btn btn-default"
-             href="#!/participant/result/{{$ctrl.tid}}/{{participant.uid}}">
+             href="#!/participant/result/{{$ctrl.tid}}/{{participant.bid}}">
             {{participant.name}}
           </a>
         </td>

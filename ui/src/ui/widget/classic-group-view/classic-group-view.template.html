@@ -6,7 +6,7 @@
       </td>
       <td translate="Participant lbl" />
       <td ng-repeat="participant in $ctrl.participants" class="text-center">
-        <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}"
+        <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.bid}}"
            title="{{participant.name}}"
            class="text-black">
           {{ $index + 1 }} {{participant.name | initials}}
@@ -22,7 +22,7 @@
     <tr ng-repeat="participant in $ctrl.participants">
       <td>{{$index + 1}}</td>
       <td>
-        <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}"
+        <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.bid}}"
            ng-class="{'text-success': participant.finishPosition < $ctrl.quitsGroup, 'text-danger': participant.state == 'Expl'}">
           <span ng-show="participant.state == 'Expl'"  class="cloud-sport-font">
             ☠
@@ -31,38 +31,38 @@
         </a>
       </td>
       <td ng-repeat="p2 in $ctrl.participants" class="text-center">
-        <span ng-show="participant.uid == p2.uid">
-          <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}"
+        <span ng-show="participant.bid == p2.bid">
+          <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.bid}}"
              title="{{participant.name}}"
              class="text-muted">
             {{participant.name | initials}}
           </a>
         </span>
-        <span ng-show="participant.uid != p2.uid">
-          <a ng-show="participant.matches[p2.uid]"
-             href="#!/match/management/{{$ctrl.tournamentId}}/{{participant.matches[p2.uid].mid}}">
-            <span ng-show="participant.matches[p2.uid].state == 'Pending'" class="text-muted">
+        <span ng-show="participant.bid != p2.bid">
+          <a ng-show="participant.matches[p2.bid]"
+             href="#!/match/management/{{$ctrl.tournamentId}}/{{participant.matches[p2.bid].mid}}">
+            <span ng-show="participant.matches[p2.bid].state == 'Pending'" class="text-muted">
               <span class="pending">𝄞</span>
             </span>
-            <span ng-show="participant.matches[p2.uid].state == 'Run'">
-              <span ng-repeat="set in participant.matches[p2.uid].games" class="small">
+            <span ng-show="participant.matches[p2.bid].state == 'Run'">
+              <span ng-repeat="set in participant.matches[p2.bid].games" class="small">
                 {{set.his}}&nbsp;:&nbsp;{{set.enemy}}
-                <span ng-show="$index + 1 != participant.matches[p2.uid].games.length">,</span>
+                <span ng-show="$index + 1 != participant.matches[p2.bid].games.length">,</span>
               </span>
               <sup>
                 <span class="glyphicon glyphicon-refresh spinning-slow tiny"/>
               </sup>
             </span>
-            <span ng-show="participant.matches[p2.uid].state == 'Over'"
+            <span ng-show="participant.matches[p2.bid].state == 'Over'"
                   ng-class="{'text-danger': $ctrl.isLost(participant, p2), 'text-success': $ctrl.isWon(participant, p2)}">
               <span ng-switch="$ctrl.scoreShowMode">
                 <span ng-switch-when="sets">
-                  {{participant.matches[p2.uid].sets.his}}&nbsp;:&nbsp;{{participant.matches[p2.uid].sets.enemy}}
+                  {{participant.matches[p2.bid].sets.his}}&nbsp;:&nbsp;{{participant.matches[p2.bid].sets.enemy}}
                 </span>
                 <span ng-switch-when="games">
-                  <span ng-repeat="set in participant.matches[p2.uid].games" class="small">
+                  <span ng-repeat="set in participant.matches[p2.bid].games" class="small">
                     {{set.his}}&nbsp;:&nbsp;{{set.enemy}}
-                    <span ng-show="$index + 1 != participant.matches[p2.uid].games.length">,</span>
+                    <span ng-show="$index + 1 != participant.matches[p2.bid].games.length">,</span>
                   </span>
                 </span>
                 <span ng-switch-default>
@@ -70,11 +70,11 @@
                 </span>
               </span>
             </span>
-            <span ng-show="participant.matches[p2.uid].state == 'WalkOver'" class="text-danger"
+            <span ng-show="participant.matches[p2.bid].state == 'WalkOver'" class="text-danger"
                   title="participant walked over the match">
               <span class="walk-over cloud-sport-font">⚐</span>
             </span>
-            <span ng-show="participant.matches[p2.uid].state == 'WalkWiner'" class="text-success"
+            <span ng-show="participant.matches[p2.bid].state == 'WalkWiner'" class="text-success"
                   title="enemy walked over the match">
               <span class="win-over cloud-sport-font">☺</span>
             </span>

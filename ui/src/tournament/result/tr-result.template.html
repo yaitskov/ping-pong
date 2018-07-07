@@ -61,7 +61,7 @@
           <span ng-switch-default>{{$index + 1}}</span>
         </td>
         <td title="{{ 'Opponents participating in the match' | translate }}">
-          <a href="#!/participant/result/{{$ctrl.tournament.tid}}/{{participant.user.uid}}"
+          <a href="#!/participant/result/{{$ctrl.tournament.tid}}/{{participant.user.bid}}"
              ng-class="{'text-danger': participant.state == 'Expl', 'text-success': participant.state.startsWith('Win')}">
             {{participant.user.name}}
           </a>
@@ -80,7 +80,7 @@
           <span ng-switch-default>{{$ctrl.numOfPlayOffParticipants + $index + 1}}</span>
         </td>
         <td title="{{ 'Opponents participating in the match' | translate }}">
-          <a href="#!/participant/result/{{$ctrl.tournament.tid}}/{{participant.user.uid}}">
+          <a href="#!/participant/result/{{$ctrl.tournament.tid}}/{{participant.user.bid}}">
             {{participant.user.name}}
           </a>
         </td>

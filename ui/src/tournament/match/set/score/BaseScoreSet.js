@@ -83,9 +83,9 @@ export default class BaseScoreSet extends AngularBean {
     }
 
     findScores() {
-        return [{uid: this.participants[this.winnerIdx].uid,
+        return [{bid: this.participants[this.winnerIdx].bid,
                  score: this.scores[this.winnerIdx]},
-                {uid: this.participants[1 - this.winnerIdx].uid,
+                {bid: this.participants[1 - this.winnerIdx].bid,
                  score: this.scores[1 - this.winnerIdx]}];
     }
 

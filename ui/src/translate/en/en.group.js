@@ -72,5 +72,8 @@ module.exports = {
     'group-order-rule-AtpWeightedMatches-description':
           'Greatest number of matches played.('
           + 'Comment: 2-1 won-loss record beats a 2-0 won-loss record; a 1-2 record'
-          + 'beats a 1-0 record)'
+          + 'beats a 1-0 record)',
+
+    'group-order-rule-BallsBalance-description': 'Difference between won and lost balls in all considered matches',
+    'group-order-rule-SetsBalance-description': 'Difference between won and lost sets in all considered matches'
 };

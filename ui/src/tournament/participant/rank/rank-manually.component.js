@@ -16,7 +16,7 @@ angular.module('participant').
                              Casting.orderBidsManually(
                                  {tid: $routeParams.tournamentId,
                                   cid: $routeParams.categoryId,
-                                  uids: self.rankedBids.map((bid) => bid.user.uid)},
+                                  uids: self.rankedBids.map((bid) => bid.user.bid)},
                                  (ok) => {
                                      requestStatus.complete(ok);
                                      window.history.back();

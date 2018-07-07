@@ -43,7 +43,7 @@
   <div ng-repeat="bid in $ctrl.rankedBids" class="clearfix list-item">
     <div class="name pull-left">
       <span>{{$index}}. </span>
-      <a href="#!/my/tournament/{{$ctrl.tournament.tid}}/participant/{{bid.user.uid}}">
+      <a href="#!/my/tournament/{{$ctrl.tournament.tid}}/participant/{{bid.user.bid}}">
         {{bid.user.name}}
       </a>
     </div>

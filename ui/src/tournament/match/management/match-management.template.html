@@ -99,7 +99,7 @@
           <a ng-repeat="participant in $ctrl.match.participants"
              class="btn btn-default"
              ng-class="{'btn-primary': $ctrl.winnerIdx == $index}"
-             href="#!/my/tournament/{{$ctrl.match.tid}}/participant/{{participant.uid}}">
+             href="#!/my/tournament/{{$ctrl.match.tid}}/participant/{{participant.bid}}">
             <you name="participant.name"/>
           </a>
         </td>

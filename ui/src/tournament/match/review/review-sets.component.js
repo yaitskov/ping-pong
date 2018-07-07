@@ -37,10 +37,10 @@ angular.
                                  self.participants = self.matchReview.participants;
                                  let result = [];
                                  if (self.participants && self.participants.length == 2) {
-                                     let l = self.matchScore.sets[self.participants[0].uid].length;
+                                     let l = self.matchScore.sets[self.participants[0].bid].length;
                                      for (let i of l) {
-                                         result.push({a: self.matchScore.sets[self.participants[0].uid][i],
-                                                      b: self.matchScore.sets[self.participants[1].uid][i]});
+                                         result.push({a: self.matchScore.sets[self.participants[0].bid][i],
+                                                      b: self.matchScore.sets[self.participants[1].bid][i]});
                                      }
                                  }
                                  self.sets = result;

@@ -14,7 +14,7 @@
         <tr ng-repeat="participant in $ctrl.members">
           <td>{{$index + 1}}</td>
           <td title="{{ 'Opponents participating in the match' | translate }}">
-            <a href="#!/participant/profile/{{$ctrl.tournamentId}}/{{participant.uid}}">
+            <a href="#!/participant/profile/{{$ctrl.tournamentId}}/{{participant.bid}}">
               {{participant.name}}
             </a>
           </td>

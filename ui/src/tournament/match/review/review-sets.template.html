@@ -2,7 +2,7 @@
   <tr>
     <td translate="Sets" />
     <td ng-repeat="participant in $ctrl.participants">
-      <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.uid}}">
+      <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{participant.bid}}">
         <you name="participant.name | compactName"/>
       </a>
     </td>
@@ -37,19 +37,19 @@
   </tr>
   <tr ng-class="{'bottom-line': !$ctrl.config.edit}">
     <td translate="Total" />
-    <td class="alert" ng-class="{'alert-success': $ctrl.participants[0].uid == $ctrl.matchScore.winBid, 'alert-danger': $ctrl.participants[1].uid == $ctrl.matchScore.winBid}">
-      {{$ctrl.matchScore.wonSets[$ctrl.participants[0].uid]}}
+    <td class="alert" ng-class="{'alert-success': $ctrl.participants[0].bid == $ctrl.matchScore.winBid, 'alert-danger': $ctrl.participants[1].bid == $ctrl.matchScore.winBid}">
+      {{$ctrl.matchScore.wonSets[$ctrl.participants[0].bid]}}
     </td>
-    <td class="alert" ng-class="{'alert-success': $ctrl.participants[1].uid == $ctrl.matchScore.winBid, 'alert-danger': $ctrl.participants[0].uid == $ctrl.matchScore.winBid}">
-      {{$ctrl.matchScore.wonSets[$ctrl.participants[1].uid]}}
+    <td class="alert" ng-class="{'alert-success': $ctrl.participants[1].bid == $ctrl.matchScore.winBid, 'alert-danger': $ctrl.participants[0].bid == $ctrl.matchScore.winBid}">
+      {{$ctrl.matchScore.wonSets[$ctrl.participants[1].bid]}}
     </td>
   </tr>
   <tr ng-show="$ctrl.matchScore.winBid">
     <td translate="Winner" />
     <td colspan="2">
       <span ng-repeat="participant in $ctrl.participants">
-        <a href="#!/my/tournament/{{$ctrl.matchScore.tid}}/participant/{{participant.uid}}"
-           ng-if="participant.uid == $ctrl.matchScore.winBid">
+        <a href="#!/my/tournament/{{$ctrl.matchScore.tid}}/participant/{{participant.bid}}"
+           ng-if="participant.bid == $ctrl.matchScore.winBid">
           <you name="participant.name"/>
         </a>
       </span>

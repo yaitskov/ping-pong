@@ -14,10 +14,10 @@ angular.
                          self.yourSetScore = self.conflict.yourSetScore;
                          self.participants = self.conflict.participants;
                          var result = [];
-                         var l = self.matchScore.sets[self.participants[0].uid].length;
+                         var l = self.matchScore.sets[self.participants[0].bid].length;
                          for (var i = 0; i < l; ++i) {
-                             result.push({a: self.matchScore.sets[self.participants[0].uid][i],
-                                          b: self.matchScore.sets[self.participants[1].uid][i]});
+                             result.push({a: self.matchScore.sets[self.participants[0].bid][i],
+                                          b: self.matchScore.sets[self.participants[1].bid][i]});
                          }
                          this.sets = result;
                          this.isWon = function (set) {

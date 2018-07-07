@@ -49,7 +49,7 @@ angular.
 
                          self.mergeSetScore = function (setScore) {
                              setScore.scores.forEach(score => {
-                                 self.match.score.sets[score.uid][setScore.setOrdNumber] = score.score;
+                                 self.match.score.sets[score.bid][setScore.setOrdNumber] = score.score;
                              });
                              $rootScope.$broadcast('event.review.match.data', self.match);
                          };

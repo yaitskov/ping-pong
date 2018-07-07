@@ -46,7 +46,7 @@ angular.
                                          self.bids = bids;
                                          if (bids.length) {
                                              self.bid = "" + cutil.findValByO(
-                                                 bids, {uid: +pageCtx.get('last-bid-complete')}, bids[0]).uid;
+                                                 bids, {uid: +pageCtx.get('last-bid-complete')}, bids[0]).bid;
                                              self.bidChange();
                                          }
                                      },

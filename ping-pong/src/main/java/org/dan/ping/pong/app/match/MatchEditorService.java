@@ -5,6 +5,9 @@ import static org.dan.ping.pong.app.bid.BidService.TERMINAL_RECOVERABLE_STATES;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
+import static org.dan.ping.pong.app.bid.BidState.Win1;
+import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.match.MatchState.Auto;
 import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
@@ -22,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
-import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.dispute.MatchSets;
 import org.dan.ping.pong.app.playoff.PlayOffService;
@@ -44,6 +46,7 @@ import javax.inject.Named;
 
 @Slf4j
 public class MatchEditorService {
+    public static final ImmutableSet<BidState> RESETABLE_BID_STATES = ImmutableSet.of(Lost, Win1, Win2, Win3);
     private static final Set<MatchState> GAME_PLACE_EXPECTED = ImmutableSet.of(Place, Game);
     private static final Set<MatchState> OVER_EXPECTED = singleton(Over);
 
@@ -129,8 +132,8 @@ public class MatchEditorService {
             log.info("Reset rest lost bids to wait in gid {} of tid {}", gid, tournament.getTid());
             tournament.getParticipants().values().stream()
                     .filter(p -> p.getGid().equals(mInfo.getGid()))
-                    .filter(p -> p.getBidState() == Lost)
-                    .forEach(p -> bidService.setBidState(p, Wait, singleton(Lost), batch));
+                    .filter(p -> RESETABLE_BID_STATES.contains(p.getBidState()))
+                    .forEach(p -> bidService.setBidState(p, Wait, RESETABLE_BID_STATES, batch));
         });
     }
 

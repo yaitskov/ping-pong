@@ -494,15 +494,14 @@ public class ImperativeSimulator {
 
     public ImperativeSimulator scoreSet(PlayerCategory category,
             int set, Player p1, int games1, Player p2, int games2) {
-        final Response response = myRest.post(SCORE_SET, scenario.getTestAdmin(),
+        final SetScoreResult setScoreResult = myRest.post(SCORE_SET, scenario.getTestAdmin(),
                 SetScoreReq.builder()
                         .tid(scenario.getTid())
                         .mid(resolveMid(p1, p2))
                         .setOrdNumber(set)
                         .scores(asList(identifiedScore(category, p1, games1),
                                 identifiedScore(category, p2, games2)))
-                        .build());
-        final SetScoreResult setScoreResult = response.readEntity(SetScoreResult.class);
+                        .build(), SetScoreResult.class);
         if (setScoreResult.getScoreOutcome() == MatchContinues) {
             return this;
         }

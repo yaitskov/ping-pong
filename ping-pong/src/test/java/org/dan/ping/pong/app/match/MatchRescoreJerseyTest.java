@@ -8,9 +8,16 @@ import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.group.GroupRulesConst.G8Q2;
 import static org.dan.ping.pong.app.match.AffectedMatchesService.DONT_CHECK_HASH;
+import static org.dan.ping.pong.app.match.MatchState.Game;
+import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.match.MatchState.Place;
+import static org.dan.ping.pong.app.sport.SportType.Tennis;
+import static org.dan.ping.pong.app.sport.tennis.TennisSportTest.CLASSIC_TENNIS_RULES;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S1A2G11_NP;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S2A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S3A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S3A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11;
@@ -21,9 +28,6 @@ import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S3A
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S3A2G11_3P;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S3A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S3A2G11_NP_3P;
-import static org.dan.ping.pong.app.match.MatchState.Game;
-import static org.dan.ping.pong.app.match.MatchState.Over;
-import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.mock.simulator.FixedSetGenerator.game;
 import static org.dan.ping.pong.mock.simulator.HookDecision.Score;
@@ -50,6 +54,8 @@ import org.dan.ping.pong.test.AbstractSpringJerseyTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
+
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -813,5 +819,92 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void rescoreJustPlayOff2NpEndIncomplete3p() {
         rescoreJustPlayOff2EndIncomplete(RULES_JP_S3A2G11_NP_3P, "JustPlayOff2NPEndIncomplete3p");
+    }
+
+    @Test
+    public void rescoreLastMatchOfLoserMiniTour() {
+        isf.create(begin()
+                .sport(Tennis)
+                .name("rescoreLastMatchOfLoserMini")
+                .rules(RULES_G_S2A2G11_NP.withMatch(CLASSIC_TENNIS_RULES)
+                        .withGroup(Optional.of(G8Q2)))
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(0, p1, 6, p2, 4)
+                        .scoreSet(1, p1, 6, p2, 3)
+                        .scoreSet(0, p2, 6, p3, 3)
+                        .scoreSet(1, p2, 6, p3, 2)
+                        .scoreSet(0, p1, 2, p3, 6)
+                        .scoreSet(1, p1, 1, p3, 6)
+                        .checkTournamentComplete(restState(Lost).bid(p2, Win1).bid(p3, Win2))
+                        .rescoreMatch(p1, p3, 6, 2, 6, 1)
+                        .checkResult(p1, p2, p3)
+                        .checkTournamentComplete(restState(Lost).bid(p1, Win1).bid(p2, Win2)));
+    }
+
+    @Test
+    public void rescoreLastMatchOfLoserMiniTourQ() {
+        isf.create(begin()
+                .sport(Tennis)
+                .name("rescoreLstMtchOfLoserMiniQ")
+                .rules(RULES_G_S2A2G11_NP.withMatch(CLASSIC_TENNIS_RULES)
+                        .withGroup(Optional.of(G8Q2)))
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(0, p1, 6, p2, 4)
+                        .scoreSet(1, p1, 6, p2, 3)
+                        .scoreSet(0, p2, 6, p3, 3)
+                        .scoreSet(1, p2, 6, p3, 2)
+                        .playerQuits(p3)
+                        //.scoreSet(0, p1, 2, p3, 6)
+                        //.scoreSet(1, p1, 1, p3, 6)
+                        .checkTournamentComplete(restState(Quit).bid(p1, Win1).bid(p2, Win2))
+                        .rescoreMatch(p2, p1, 6, 2, 6, 1)
+                        .checkResult(p2, p1, p3)
+                        .checkTournamentComplete(restState(Quit).bid(p2, Win1).bid(p1, Win2)));
+    }
+
+    @Test
+    public void rescoreLastMatchOfLoserMiniTourQ2() {
+        isf.create(begin()
+                .sport(Tennis)
+                .name("rescoreLstMtchOfLoserMiniQ2")
+                .rules(RULES_G_S2A2G11_NP.withMatch(CLASSIC_TENNIS_RULES)
+                        .withGroup(Optional.of(G8Q2)))
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(0, p1, 6, p2, 4)
+                        .scoreSet(1, p1, 6, p2, 3)
+                        .scoreSet(0, p2, 6, p3, 3)
+                        .scoreSet(1, p2, 6, p3, 2)
+                        .playerQuits(p3)
+                        //.scoreSet(0, p1, 2, p3, 6)
+                        //.scoreSet(1, p1, 1, p3, 6)
+                        .checkTournamentComplete(restState(Quit).bid(p1, Win1).bid(p2, Win2))
+                        .rescoreMatch(p3, p2, 6, 2, 6, 1)
+                        .checkResult(p1, p3, p2)
+                        .checkTournamentComplete(restState(Lost).bid(p1, Win1).bid(p3, Win2)));
+    }
+
+    @Test
+    public void rescoreLastMatchOfLoserMiniTourE() {
+        isf.create(begin()
+                .sport(Tennis)
+                .name("rescoreLstMtchOfLoserMiniE")
+                .rules(RULES_G_S2A2G11_NP.withMatch(CLASSIC_TENNIS_RULES)
+                        .withGroup(Optional.of(G8Q2)))
+                .category(c1, p1, p2, p3))
+                .run(c -> c.beginTournament()
+                        .scoreSet(0, p1, 6, p2, 4)
+                        .scoreSet(1, p1, 6, p2, 3)
+                        .scoreSet(0, p2, 6, p3, 3)
+                        .scoreSet(1, p2, 6, p3, 2)
+                        .expelPlayer(p3)
+                        //.scoreSet(0, p1, 2, p3, 6)
+                        //.scoreSet(1, p1, 1, p3, 6)
+                        .checkTournamentComplete(restState(Expl).bid(p1, Win1).bid(p2, Win2))
+                        .rescoreMatch(p3, p2, 6, 2, 6, 1)
+                        .checkResult(p1, p3, p2)
+                        .checkTournamentComplete(restState(Win2).bid(p1, Win1).bid(p3, Expl)));
     }
 }

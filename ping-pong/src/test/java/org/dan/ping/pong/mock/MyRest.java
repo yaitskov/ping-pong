@@ -39,7 +39,7 @@ public class MyRest {
     }
 
     public <T> void voidPost(String path, String session, T entity) {
-        assertThat(post(path, session, entity).getStatus(), lessThan(205));
+        post(path, () -> session, entity, String.class);
     }
 
     public <T> void voidAnonymousPost(String path, T entity) {

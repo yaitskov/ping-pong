@@ -95,10 +95,10 @@ public class BidService {
         if (FILLER_LOSER_BID.equals(bid.getBid()) || bid.state() == target) {
             return;
         }
-        log.info("Set bid {} state {}", bid.getUid(), target);
+        log.info("Set bid {} state {}", bid.getBid(), target);
         if (!expected.contains(bid.state())) {
             throw internalError(
-                    "Bid " + bid.getUid() + " state "
+                    "Bid " + bid.getBid() + " state "
                             + bid.state() + " but expected " + expected);
         }
         bid.setBidState(target);

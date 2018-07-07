@@ -141,9 +141,7 @@ export default class EnlistOnlineCtrl extends SimpleController {
     }
 
     showResultLink() {
-        return this.tournament.state != 'Draft' &&
-            this.filterCategoriesByStates(
-                ['Lost', 'Play', 'Wait', 'Win1', 'Win2', 'Win3', 'Quit', 'Expl']);
+        return this.tournament.state != 'Draft';
     }
 
     showEnlisted() {

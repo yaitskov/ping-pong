@@ -3,7 +3,11 @@
          ng-click="$ctrl.removeMessageByIndex($index)"
          ng-repeat="message in $ctrl.messages">
         <span ng-switch="message.format">
-            <span ng-switch-when="translate" ng-bind-html="message.translated"/>
+            <span ng-switch-when="translate">
+                <span ng-show="message.options.loading"
+                      class="glyphicon glyphicon-refresh spinning-fast"/>
+                <span ng-bind-html="message.translated"/>
+            </span>
             <span ng-switch-when="verb">
                  <pre ng-bind-html="message.text"></pre>
             </span>

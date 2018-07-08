@@ -8,6 +8,7 @@ module.exports = {
     'Download btn': 'Ściągać',
     'Publish btn': 'Opublikować',
     'Downloading lbl': 'Pobieranie',
+    'Loading tournaments': 'Loading tournaments',
     'preview lbl': 'Zapowiedź',
     'screenshot posted': 'Screenshot has been posted',
     'your-photos': 'Strona domowa',

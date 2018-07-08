@@ -4,13 +4,12 @@
 </div>
 
 <div class="container-fluid list judge">
-  <request-status></request-status>
   <div ng-repeat="tournament in $ctrl.tournaments"
-       clickable="/my/tournament/{{tournament.tid}}"
+       clickable="{{$ctrl.viewUrl(tournament)}}"
        ng-class="{'complete': tournament.state == 'Close'}"
        class="list-item tournament clearfix">
     <div class="name pull-left">
-      <a href="#!/my/tournament/{{tournament.tid}}">
+      <a ng-href="'#!' + $ctrl.viewUrl(tournament)">
         {{tournament.name}}
       </a>
     </div>
@@ -21,9 +20,7 @@
       <span class="date" ng-show="tournament.state != 'Close'">
         {{tournament.opensAt|shortDate}}
       </span>
-      <span ng-show="tournament.state == 'Close'">
-        {{ 'complete status' | translate }}
-      </span>
+      <span ng-show="tournament.state == 'Close'" translate="complete status"/>
     </div>
   </div>
 </div>

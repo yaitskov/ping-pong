@@ -25,6 +25,7 @@ export default class InfoPopupWidget extends SimpleController {
     }
 
     showMessage(msg) {
+        this._parseOptions(msg);
         if (msg.format == 'translate') {
             this.trans.trans([msg.text, msg.params],
                              (translated) => {
@@ -48,6 +49,15 @@ export default class InfoPopupWidget extends SimpleController {
            this.messages.splice(10);
         }
         //this.$timeout(() => this.$scope.$digest());
+    }
+
+    _parseOptions(msg) {
+        if (msg.text.endsWith("...")) {
+            msg.options = {loading: true};
+            msg.text = msg.text.substr(0, msg.text.length - 3);
+        } else {
+            msg.options = {loading: false};
+        }
     }
 
     removeMessageById(msgId) {

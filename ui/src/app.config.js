@@ -118,7 +118,10 @@ angular.module('cloudSport').
                         template: '<tr-group-member-switcher/>'
                     }).
                     when('/subsequent/tournaments/:tournamentId', {
-                        template: '<sequel-tournament-list/>'
+                        template: '<sequel-tournament-admin-list/>'
+                    }).
+                    when('/subsequent/tournaments/participate/:tournamentId', {
+                        template: '<sequel-tournament-participant-list/>'
                     }).
                     when('/my/matches/judgement/:tournamentId', {
                         template: '<judge-match-list-to-judge/>'

@@ -63,6 +63,8 @@ export default class RequestStatusService extends AngularBean {
     responseStatusToError(response) {
         if (response.status == 502 || response.status == -1) {
             return this.responseToErr(response.data, "Server is not available");
+        } else if (response.status == 504) {
+            return this.responseToErr(response.data, "Server is to slow. Request timeout.");
         } else if (response.status == 401) {
             return this.responseToErr(response.data, 'authentication-error');
         } else if (response.status == 403) {

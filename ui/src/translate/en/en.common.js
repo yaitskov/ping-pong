@@ -8,6 +8,7 @@ module.exports = {
     'Download btn': 'Download',
     'Publish btn': 'Publish',
     'Downloading lbl': 'Downloading',
+    'Loading tournaments': 'Loading tournaments',
     'preview lbl': 'Preview',
     'screenshot posted': 'Screenshot has been posted',
     'your-photos': 'Your homepage',

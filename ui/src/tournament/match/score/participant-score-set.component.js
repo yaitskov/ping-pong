@@ -11,7 +11,7 @@ angular.
                                pageCtx, requestStatus, $scope, $rootScope, binder) {
                          this.match = pageCtx.get('last-scoring-match');
                          this.match.participants = [this.match.enemy,
-                                                    {uid: auth.myUid(), name: '*you*'}];
+                                                    {bid: this.match.bid, name: '*you*'}];
                          var self = this;
                          self.showConflict = function (conflict) {
                              pageCtx.put('match-score-conflict-' + $routeParams.matchId, conflict);

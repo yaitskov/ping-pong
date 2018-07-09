@@ -763,6 +763,7 @@ public class MatchService {
                                         : PARTICIPANT_MATCH_COMPARATOR)
                                 .map(m -> MyPendingMatch.builder()
                                         .mid(m.getMid())
+                                        .bid(bid)
                                         .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
                                         .state(m.getState())
                                         .playedSets(m.playedSets())

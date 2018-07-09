@@ -39,7 +39,7 @@
     <table class="table">
       <tr ng-repeat="member in $ctrl.members | orderBy : 'name'">
         <td ng-show="$ctrl.catInfo.role == 'Admin'">
-          <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{member.uid}}">
+          <a href="#!/my/tournament/{{$ctrl.tournamentId}}/participant/{{member.bid}}">
             {{member.name}}
           </a>
         </td>

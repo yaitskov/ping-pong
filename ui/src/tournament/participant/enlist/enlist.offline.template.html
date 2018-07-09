@@ -1,9 +1,7 @@
 <main-menu></main-menu>
 <div class="container enlist-form">
   <div class="form-group clearfix" ng-show="$ctrl.categories.length > 1">
-    <div class="pull-left category-label">
-      {{ 'Categories' | translate }}
-    </div>
+    <div class="pull-left category-label" translate="Categories"/>
     <div class="pull-left category-value">
       <div class="row" ng-repeat="category in $ctrl.categories">
         <a class="btn btn-default category"
@@ -16,9 +14,7 @@
   </div>
 
   <div class="form-group clearfix" ng-show="$ctrl.tournament.state == 'Open'">
-    <div class="pull-left category-label">
-      {{ 'Groups' | translate }}
-    </div>
+    <div class="pull-left category-label" translate="Groups"/>
     <div class="pull-left category-value">
       <table class="table">
         <tr>
@@ -47,13 +43,11 @@
   </div>
 
   <div class="form-group" ng-show="!$ctrl.categoryId">
-    <div class="alert alert-info">
-      {{ 'trounament has no categories' | translate }}
-    </div>
+    <div class="alert alert-info" translate="tournament has no categories"/>
     <div>
-      <a class="btn btn-primary" href="#!/my/tournament/categories/{{$ctrl.tournament.tid}}">
-        {{ 'add category btn' | translate }}
-      </a>
+      <a class="btn btn-primary"
+         translate="add category btn"
+         href="#!/my/tournament/categories/{{$ctrl.tournament.tid}}"/>
     </div>
   </div>
 
@@ -81,14 +75,15 @@
     <div class="form-group" ng-show="$ctrl.fullName">
       <div class="alert alert-info"
            ng-show="$ctrl.suggestionFiredVersion = $ctrl.suggestionCompleteVersion">
-        {{ 'Looking for sportsman' | translate }} <span class="glyphicon glyphicon-refresh spinning-fast"/>
+        {{ 'Looking for sportsman' | translate }}
+        <span class="glyphicon glyphicon-refresh spinning-fast"/>
       </div>
       <label translate="Existing offline accounts" ng-show="$ctrl.suggestions.length"/>
       <table class="table" ng-show="$ctrl.suggestions.length">
         <tr ng-repeat="suggestion in $ctrl.suggestions">
           <td style="padding-left: 0px;">
             <a class="btn btn-primary" title="Enlist or send invite"
-               ng-click="$ctrl.enlist(suggestion.bid, suggestion.name)">
+               ng-click="$ctrl.enlist(suggestion.uid, suggestion.name)">
               <span class="glyphicon glyphicon-plus"/>
             </a>
           </td>
@@ -102,17 +97,15 @@
     <div class="form-group">
       <a title="Enlist participant, mark him as paid and ready to participate"
          ng-click="$ctrl.register()"
+         translate="New User and Enlist"
          ng-show="$ctrl.form.fullName.$valid && ($ctrl.tournament.state == 'Draft' || $ctrl.tournament.state == 'Open')"
-         class="btn btn-primary">
-        {{ 'New User and Enlist' | translate }}
-      </a>
+         class="btn btn-primary"/>
       <a title="Return to tournament control panel"
          back-button
          class="btn btn-default">
         <span class="glyphicon glyphicon-circle-arrow-left"/>
       </a>
-      <button ng-show="false" type="submit">
-      </button>
+      <button ng-show="false" type="submit"></button>
     </div>
   </form>
 
@@ -123,7 +116,7 @@
   <div class="form-group" ng-show="$ctrl.enlisted.length">
     <table class="table">
       <tr>
-        <td translate=>{{ 'Right now enlisted' | translate }}</td>
+        <td translate="Right now enlisted"/>
         <td>{{$ctrl.enlisted.length}}</td>
       </tr>
       <tr ng-repeat="enlisted in $ctrl.enlisted">

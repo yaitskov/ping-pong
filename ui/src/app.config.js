@@ -126,9 +126,6 @@ angular.module('cloudSport').
                     when('/my/matches/judgement/:tournamentId', {
                         template: '<judge-match-list-to-judge/>'
                     }).
-                    when('/watch/tournament/:tournamentId', {
-                        template: '<watch-tournament/>'
-                    }).
                     when('/group/members/:tournamentId/:groupId', {
                         template: '<participant-group/>'
                     }).

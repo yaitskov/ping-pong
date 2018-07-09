@@ -30,7 +30,6 @@ import './match/list/judge-judged/judge-judged-matches.component.js';
 import './match/score/match-score-editor.component.js';
 import './list/draft/tr-draft-list.component.js';
 import './management/tr-management.component.js';
-import './watch/watch-tournament.component.js';
 import './rules/tournament-rules.component.js';
 import './list/watch/watch-tournament-list.component.js';
 import './list/manage/manage-tr-list.component.js';

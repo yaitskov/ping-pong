@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.category;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Uid;
@@ -20,6 +21,8 @@ import javax.inject.Inject;
 
 @Slf4j
 public class CategoryService {
+    public static final String NOT_EMPTY_CATEGORY_CANNOT_BE_REMOVED = "Not empty category cannot be removed";
+
     public int findCidOrCreate(TournamentMemState tournament, int gid,
             TournamentMemState consoleTournament, DbUpdater batch) {
         final int masterCid = tournament.getGroup(gid).getCid();
@@ -81,6 +84,9 @@ public class CategoryService {
 
     public void removeCategory(TournamentMemState tournament, int cid, DbUpdater batch) {
         log.info("Remove category {}/{}", cid, tournament.getCategory(cid).getName());
+        if (tournament.findBidsByCategory(cid).count() > 0) {
+            throw badRequest(NOT_EMPTY_CATEGORY_CANNOT_BE_REMOVED);
+        }
         gidRemover.removeByCategory(tournament, cid, batch);
         categoryDao.delete(tournament.getTid(), cid, batch);
         tournament.getCategories().remove(cid);

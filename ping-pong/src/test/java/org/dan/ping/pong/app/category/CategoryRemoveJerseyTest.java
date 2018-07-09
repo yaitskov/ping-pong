@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.category;
 
 import static org.dan.ping.pong.app.category.CategoryResource.CATEGORY_DELETE;
+import static org.dan.ping.pong.app.category.CategoryService.NOT_EMPTY_CATEGORY_CANNOT_BE_REMOVED;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S3A2G11;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -14,7 +15,9 @@ import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulator;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
+import org.dan.ping.pong.sys.error.PiPoEx;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
@@ -35,13 +38,19 @@ public class CategoryRemoveJerseyTest extends AbstractSpringJerseyTest {
         final ImperativeSimulator simulator = isf.create(scenario);
         simulator.run(ImperativeSimulator::beginTournament);
 
-        assertThat(myRest().post(
-                CATEGORY_DELETE,
-                scenario,
-                RemoveCategory.builder()
-                        .cid(scenario.getCategoryDbId().get(c1))
-                        .tid(scenario.getTid())
-                        .build()).getStatus(),
-                is(200));
+        try {
+            myRest().post(
+                    CATEGORY_DELETE,
+                    scenario,
+                    RemoveCategory.builder()
+                            .cid(scenario.getCategoryDbId().get(c1))
+                            .tid(scenario.getTid())
+                            .build(),
+                    Error.class);
+            Assert.fail();
+        } catch (PiPoEx e) {
+            assertThat(e.getClientMessage().getMessage(),
+                    is(NOT_EMPTY_CATEGORY_CANNOT_BE_REMOVED));
+        }
     }
 }

@@ -8,7 +8,8 @@ export default class AjaxInfo extends AbstractAjaxInfo {
 
     scope($scope) {
         const result = new ScopedAjaxInfo(
-            this.InfoPopup.createScope(), this.InfoPopup, this.requestStatus);
+            this.InfoPopup.createScope(), this.InfoPopup,
+            this.requestStatus, this.$http, this.auth);
         result.bind($scope);
         return result;
     }

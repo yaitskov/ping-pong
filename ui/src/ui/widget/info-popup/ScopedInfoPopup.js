@@ -51,6 +51,6 @@ export default class ScopedInfoPopup {
             return;
         }
         this._sendRemove(msg.id);
-        delete this.messages[idx];
+        this.messages.splice(idx, idx + 1);
     }
 }

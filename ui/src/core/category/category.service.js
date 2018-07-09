@@ -13,13 +13,18 @@ angular.
                                      }
                                  },
                                  ofTournament: {
-                                     url: '/api/category/find/by/tid/:tournamentId',
+                                     url: '/api/category/find/by/tid/:tid',
                                      method: 'GET',
                                      cache: false,
                                      headers: {
                                          session: 1
                                      },
                                      isArray: true
+                                 },
+                                 deleteCat: {
+                                     url: '/api/category/delete',
+                                     headers: {session: true},
+                                     method: 'POST'
                                  }
                              });
                          }

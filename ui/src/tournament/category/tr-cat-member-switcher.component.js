@@ -32,7 +32,7 @@ angular.module('tournamentCategory').
                              'event.request.status.ready': (e) => {
                                  requestStatus.startLoading('Load categories');
                                  Category.ofTournament(
-                                     {tournamentId: $routeParams.tournamentId},
+                                     {tid: $routeParams.tournamentId},
                                      function (categories) {
                                          requestStatus.complete();
                                          self.categories = categories;

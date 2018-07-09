@@ -1,40 +1,42 @@
 <main-menu></main-menu>
 <div class="container">
-  <request-status></request-status>
-  <div class="alert alert-info" ng-switch="$ctrl.matches.bidState">
-    <div ng-switch-when="Win1"
-         translate="congrat-1st-place",
-         translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
-    </div>
-    <div ng-switch-when="Win2"
-         translate="congrat-2st-place",
-         translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
-    </div>
-    <div ng-switch-when="Win3"
-         translate="congrat-3rd-place",
-         translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
-    </div>
-    <div ng-switch-when="Lost" translate="congrat-lost"
-         translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
-    </div>
-    <div ng-switch-when="Quit" translate="congrat-quit"
-         translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
-    </div>
-    <div ng-switch-when="Expl" translate="congrat-expelled"
-         translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
-    </div>
-    <div ng-switch-when="Wait">
-      <div ng-show="$ctrl.matches.matches.length" translate="wait-for-free-place-to-place"/>
-      <div ng-show="!$ctrl.matches.matches" translate="no-matches-left-to-play"/>
-    </div>
-    <div ng-switch-when="Play">
-      <div ng-show="$ctrl.matches.matches.length" translate="pick-your-match-to-score"/>
-    </div>
-    <div ng-switch-when="Want" translate="you-enlisted-pay"/>
-    <div ng-switch-when="Paid" translate="you-paid-check"/>
-    <div ng-switch-when="Here" translate="you-ready-wait-begin"/>
-    <div ng-switch-default>
-      {{ 'unsupported-player-state' | translate : '{name: $ctrl.matches.bidState}' }}
+  <div ng-repeat="cat in $ctrl.categories">
+    <h3 ng-show="cat.name">{{cat.name}}:</h3>
+    <div class="alert alert-info" ng-switch="$ctrl.matches.bidState[cat.cid]">
+      <div ng-switch-when="Win1"
+           translate="congrat-1st-place",
+           translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
+      </div>
+      <div ng-switch-when="Win2"
+           translate="congrat-2st-place",
+           translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
+      </div>
+      <div ng-switch-when="Win3"
+           translate="congrat-3rd-place",
+           translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
+      </div>
+      <div ng-switch-when="Lost" translate="congrat-lost"
+           translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
+      </div>
+      <div ng-switch-when="Quit" translate="congrat-quit"
+           translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
+      </div>
+      <div ng-switch-when="Expl" translate="congrat-expelled"
+           translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">
+      </div>
+      <div ng-switch-when="Wait">
+        <div ng-show="$ctrl.matches.matches.length" translate="wait-for-free-place-to-place"/>
+        <div ng-show="!$ctrl.matches.matches" translate="no-matches-left-to-play"/>
+      </div>
+      <div ng-switch-when="Play">
+        <div ng-show="$ctrl.matches.matches.length" translate="pick-your-match-to-score"/>
+      </div>
+      <div ng-switch-when="Want" translate="you-enlisted-pay"/>
+      <div ng-switch-when="Paid" translate="you-paid-check"/>
+      <div ng-switch-when="Here" translate="you-ready-wait-begin"/>
+      <div ng-switch-default>
+        {{ 'unsupported-player-state' | translate : '{name: bidState}' }}
+      </div>
     </div>
   </div>
   <div class="form-group">

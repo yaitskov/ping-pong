@@ -440,6 +440,7 @@ public class TournamentDaoMySql implements TournamentDao {
         return justCreate(CreateTournament.builder()
                 .name(copyTournament.getName())
                 .rules(rules)
+                .sport(rules.getMatch().sport())
                 .state(Draft)
                 .type(tInfo.getType())
                 .opensAt(copyTournament.getOpensAt())

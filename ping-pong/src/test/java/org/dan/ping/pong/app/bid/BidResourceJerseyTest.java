@@ -19,12 +19,14 @@ import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G3Q2_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S3A2G11;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.Player.p5;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
+import static org.dan.ping.pong.mock.simulator.PlayerCategory.c2;
 import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
@@ -39,6 +41,8 @@ import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupWithMembers;
 import org.dan.ping.pong.app.group.TournamentGroups;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
+import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc;
@@ -124,11 +128,10 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
 
         final Bid bidP3 = scenario.player2Bid(p3);
 
-        final int tid = scenario.getTid().getTid();
         final TournamentGroups groupsInfo = myRest()
-                .get(GROUP_LIST + tid, TournamentGroups.class);
+                .get(GROUP_LIST + scenario.getTid(), TournamentGroups.class);
 
-        final int sourceGid = findSourceGroup(bidP3, tid, groupsInfo);
+        final int sourceGid = findGroupByBid(bidP3, scenario.getTid(), groupsInfo);
 
         changeGroup(scenario, bidP3, sourceGid, findTargetGroup(groupsInfo, sourceGid));
 
@@ -156,15 +159,50 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
                 .findAny();
     }
 
-    private Integer findSourceGroup(Bid bidP3, int tid, TournamentGroups groupsInfo) {
+    private Integer findGroupByBid(Bid bid, Tid tid, TournamentGroups groupsInfo) {
         return groupsInfo.getGroups().stream()
                 .map(groupInfo -> myRest().get(MEMBERS + tid + "/" + groupInfo.getGid(),
                         GroupWithMembers.class))
                 .filter(members -> members.getMembers().stream()
-                        .anyMatch(member -> member.getBid().equals(bidP3)))
+                        .anyMatch(member -> member.getBid().equals(bid)))
                 .map(GroupWithMembers::getGid)
                 .findAny()
                 .get();
+    }
+
+    @Test
+    public void changeToExGroupFromOtherCategory() {
+        final TournamentScenario scenario = begin()
+                .name("changeToExGroupInOthCat")
+                .rules(RULES_G_S1A2G11_NP)
+                .category(c1, p1, p2, p3)
+                .category(c2, p4, p5);
+
+        final ImperativeSimulator simulator = isf.create(scenario).usePlayerSession();
+        simulator.run(ImperativeSimulator::beginTournament);
+
+        final Bid bidP3 = scenario.player2Bid(p3, c1);
+        final Bid bidP4 = scenario.player2Bid(p4, c2);
+
+        final TournamentGroups groupsInfo = myRest()
+                .get(GROUP_LIST + scenario.getTid(), TournamentGroups.class);
+
+        final int sourceGid = findGroupByBid(bidP3, scenario.getTid(), groupsInfo);
+        final int targetGid = findGroupByBid(bidP4, scenario.getTid(), groupsInfo);
+
+        changeGroup(scenario, bidP3, sourceGid, Optional.of(targetGid));
+        scenario.bidChangedCategory(bidP3, c1, c2);
+
+        simulator.run(c -> c
+                .reloadMatchMap()
+                .scoreSet(c1, p1, 11, p2, 3)
+                .scoreSet(c2, p3, 11, p4, 7)
+                .scoreSet(c2, p3, 11, p5, 8)
+                .scoreSet(c2, p4, 11, p5, 9)
+                .checkResult(c1, p1, p2)
+                .checkResult(c2, p3, p4, p5)
+                .checkTournamentComplete(c1, BidStatesDesc.restState(Lost).bid(p1, Win1))
+                .checkTournamentComplete(c2, BidStatesDesc.restState(Lost).bid(p3, Win1)));
     }
 
     @Test
@@ -180,16 +218,15 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
         final Bid bidP3 = scenario.player2Bid(p3);
         final Bid bidP4 = scenario.player2Bid(p4);
 
-        final int tid = scenario.getTid().getTid();
         final TournamentGroups groupsInfo = myRest()
-                .get(GROUP_LIST + tid, TournamentGroups.class);
+                .get(GROUP_LIST + scenario.getTid(), TournamentGroups.class);
 
-        final int sourceGid = findSourceGroup(bidP3, tid, groupsInfo);
+        final int sourceGid = findGroupByBid(bidP3, scenario.getTid(), groupsInfo);
 
         changeGroup(scenario, bidP3, sourceGid, Optional.empty());
         changeGroup(scenario, bidP4, sourceGid,
                 findTargetGroup(
-                        myRest().get(GROUP_LIST + tid, TournamentGroups.class),
+                        myRest().get(GROUP_LIST + scenario.getTid(), TournamentGroups.class),
                         sourceGid));
 
         simulator.run(c -> c
@@ -203,12 +240,12 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
                         .bid(p3, Win2).bid(p1, Win1)));
     }
 
-    private void changeGroup(TournamentScenario scenario, Bid bidP3,
+    private void changeGroup(TournamentScenario scenario, Bid bid,
             int sourceGid, Optional<Integer> targetGid) {
         myRest().voidPost(BID_CHANGE_GROUP, scenario.getTestAdmin(),
                 ChangeGroupReq.builder()
                         .tid(scenario.getTid())
-                        .bid(bidP3)
+                        .bid(bid)
                         .expectedGid(sourceGid)
                         .targetGid(targetGid)
                         .build());

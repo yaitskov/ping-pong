@@ -28,6 +28,8 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_INV
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
+import static org.dan.ping.pong.mock.simulator.imerative.SessionSource.Admin;
+import static org.dan.ping.pong.mock.simulator.imerative.SessionSource.Player;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.empty;
@@ -77,6 +79,7 @@ import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.mock.MyRest;
 import org.dan.ping.pong.mock.RestEntityGenerator;
+import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.simulator.Player;
 import org.dan.ping.pong.mock.simulator.PlayerCategory;
 import org.dan.ping.pong.mock.simulator.Simulator;
@@ -96,7 +99,6 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.Response;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -111,6 +113,7 @@ public class ImperativeSimulator {
     private final MyRest myRest;
     private final Map<Set<Player>, Mid> matchMap = new HashMap<>();
     private boolean matchMapAutoReload;
+    private SessionSource sessionSource = Admin;
 
     private static final ObjectMapper objectMapper = ObjectMapperProvider.get();;
 
@@ -259,10 +262,10 @@ public class ImperativeSimulator {
 
     public void checkAllBidsState(
             BidStatesDesc expectedPattern,
-            Predicate<ParticipantState> particpiantFilter) {
+            Predicate<ParticipantState> participantFilter) {
         final Map<Player, BidState> got = enlistedParticipants()
                 .stream()
-                .filter(particpiantFilter)
+                .filter(participantFilter)
                 .collect(toMap(p -> bid2Player(p.getUser().getBid()),
                         ParticipantState::getState));
         final Map<Player, BidState> expected = got.keySet().stream().collect(
@@ -492,9 +495,32 @@ public class ImperativeSimulator {
         return scoreSet(scenario.getDefaultCategory(), set, p1, games1, p2, games2);
     }
 
+    public ImperativeSimulator useAdminSession() {
+        sessionSource = Admin;
+        return this;
+    }
+
+    public ImperativeSimulator usePlayerSession() {
+        sessionSource = Player;
+        return this;
+    }
+
+    private TestUserSession pickSessionForScoring(Player p) {
+        switch (sessionSource) {
+            case Admin:
+                return scenario.getTestAdmin();
+            case Player:
+                return scenario.getPlayersSessions().get(p);
+            default:
+                throw new IllegalStateException("bad session source " + sessionSource);
+        }
+    }
+
     public ImperativeSimulator scoreSet(PlayerCategory category,
             int set, Player p1, int games1, Player p2, int games2) {
-        final SetScoreResult setScoreResult = myRest.post(SCORE_SET, scenario.getTestAdmin(),
+        final SetScoreResult setScoreResult = myRest.post(
+                SCORE_SET,
+                pickSessionForScoring(p1),
                 SetScoreReq.builder()
                         .tid(scenario.getTid())
                         .mid(resolveMid(p1, p2))

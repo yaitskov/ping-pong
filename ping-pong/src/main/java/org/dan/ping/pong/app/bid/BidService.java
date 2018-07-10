@@ -26,6 +26,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
+import org.dan.ping.pong.app.group.GroupInfo;
+import org.dan.ping.pong.app.group.GroupLink;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -38,9 +40,11 @@ import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
+import java.security.acl.Group;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -80,9 +84,51 @@ public class BidService {
     private Clocker clocker;
 
     public void setCategory(TournamentMemState tournament, SetCategory setCategory, DbUpdater batch) {
-        tournament.checkCategory(setCategory.getCid());
-        tournament.getParticipant(setCategory.getBid()).setCid(setCategory.getCid());
-        bidDao.setCategory(setCategory, clocker.get(), batch);
+        if (setCategory.getExpectedCid() == setCategory.getExpectedCid()) {
+            return;
+        }
+        tournament.checkCategory(setCategory.getTargetCid());
+        tournament.checkCategory(setCategory.getExpectedCid());
+        final ParticipantMemState par = tournament.getParticipant(setCategory.getBid());
+        if (par.getCid() != setCategory.getExpectedCid()) {
+            throw badRequest("Category has been changed by someone else");
+        }
+        switch (tournament.getState()) {
+            case Open:
+                changeCategoryInRunningTournament(tournament, setCategory, batch);
+                break;
+            case Draft:
+                changeCategoryInDraft(tournament, setCategory.getTargetCid(), batch, par);
+                break;
+            default:
+                throw badRequest("Tournament state not allow category change");
+        }
+    }
+
+    public void changeCategoryInDraft(TournamentMemState tournament,
+            int targetCid, DbUpdater batch, ParticipantMemState par) {
+        final Map<Integer, Bid> cidBidMap = tournament
+                .getUidCid2Bid().get(par.getUid());
+
+        if (cidBidMap.remove(par.getCid()) == null) {
+            throw internalError("no category " + par.getCid());
+        }
+        cidBidMap.put(targetCid, par.getBid());
+        bidDao.setCategory(SetCategory.builder()
+                .bid(par.getBid())
+                .targetCid(targetCid)
+                .expectedCid(par.getCid())
+                .tid(tournament.getTid())
+                .build(), clocker.get(), batch);
+        par.setCid(targetCid);
+    }
+
+    private void changeCategoryInRunningTournament(
+            TournamentMemState tournament, SetCategory setCategory, DbUpdater batch) {
+        // find target group
+        // if no group? => find place in the ladder base
+        // from group to play off or from play off to play off
+        // from group to group => reuse group change
     }
 
     public void setBidState(TournamentMemState tournament, SetBidState setState, DbUpdater batch) {
@@ -175,6 +221,13 @@ public class BidService {
 
         bidDao.setGroupForUids(batch, targetGid, req.getTid(), singletonList(bid));
         bid.setGid(Optional.of(targetGid));
+        final GroupInfo targetGroup = tournament.getGroup(targetGid);
+        final GroupInfo sourceGroup = tournament.getGroup(req.getExpectedGid());
+
+        if (targetGroup.getCid() != sourceGroup.getCid()) {
+            changeCategoryInDraft(tournament, targetGroup.getCid(), batch, bid);
+        }
+
         // cancel matches in the source group
         cancelMatchesOf(tournament, req.getBid(), batch);
         // generate matches in target group

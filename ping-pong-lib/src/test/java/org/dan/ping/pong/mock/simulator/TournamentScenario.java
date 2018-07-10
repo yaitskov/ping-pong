@@ -29,6 +29,7 @@ import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.mock.SessionAware;
@@ -338,5 +339,15 @@ public class TournamentScenario implements SessionAware {
                 .name(name +  "_" + player)
                 .email(name + "_" + player + "@gmail.com")
                 .build());
+    }
+
+    public TournamentScenario bidChangedCategory(Bid bid, PlayerCategory c1, PlayerCategory c2) {
+        final Player p = bidPlayer.get(bid);
+        final TestUserSession session = playersSessions.get(p);
+        if (!session.getCatBid().remove(c1).equals(bid)) {
+            throw new IllegalStateException("wrong bid");
+        }
+        session.getCatBid().put(c2, bid);
+        return this;
     }
 }

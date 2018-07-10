@@ -126,7 +126,7 @@ public class BidDaoServer implements BidDao {
     public void setCategory(SetCategory setCategory, Instant now, DbUpdater batch) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.update(BID)
-                        .set(BID.CID, setCategory.getCid())
+                        .set(BID.CID, setCategory.getTargetCid())
                         .set(BID.UPDATED, Optional.of(now))
                         .where(BID.TID.eq(setCategory.getTid()),
                                 BID.BID_.eq(setCategory.getBid())))

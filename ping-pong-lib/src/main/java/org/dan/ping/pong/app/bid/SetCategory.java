@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.dan.ping.pong.app.tournament.Tid;
 
+import java.util.Optional;
+
 @Getter
 @Setter
 @Builder
@@ -15,5 +17,7 @@ import org.dan.ping.pong.app.tournament.Tid;
 public class SetCategory {
     private Tid tid;
     private Bid bid;
-    private int cid;
+    private int expectedCid;
+    private int targetCid;
+    private Optional<Integer> targetGid;
 }

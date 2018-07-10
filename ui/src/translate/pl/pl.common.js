@@ -35,6 +35,9 @@ module.exports = {
     'privacy-policy': 'Polityka prywantości',
     'terms-of-service': 'Warunki usługi',
 
+    'Mark as Quit': 'Zaznaczyć zrezygnował',
+    'Participant Expel title': 'Wydalenie uczestnika',
+
     'app-version-lbl': 'Wersja',
     'support-lbl': 'Wsparcie'
 };

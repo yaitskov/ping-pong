@@ -20,7 +20,7 @@ export default class EnlistOfflineCtrl extends SimpleController {
         this.ajax.doAjax('Loading groups', this.Group.list,
                          {tournamentId: this.tournamentId},
                          (r) => this.groups = r.groups);
-        this.ajax.doAjax('Load participant', this.Participant.profile,
+        this.ajax.doAjax('Loading participant', this.Participant.profile,
                          {tournamentId: this.tournamentId,
                           participantId: this.participantId},
                          (bid) => this.bid = bid);

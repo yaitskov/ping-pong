@@ -35,6 +35,9 @@ module.exports = {
     'privacy-policy': 'Privacy Policy',
     'terms-of-service': 'Terms of Service',
 
+    'Mark as Quit': 'Mark as Quit',
+    'Participant Expel title': 'Participant Expel',
+
     'app-version-lbl': 'Version',
     'support-lbl': 'Support'
 };

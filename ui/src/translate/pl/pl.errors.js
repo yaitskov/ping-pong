@@ -2,6 +2,7 @@ module.exports = {
     'match-not-in-tournament': 'Mecz {{mid}} nie należy do turnieju',
     'Not empty category cannot be removed': 'Nie pusta kategoria nie może być skasowna',
     'No groups': 'Turniej nie ma grup',
+    'source group is complete': 'Grupa żródłowa jest zamknięta',
     'unexpected-match-state': 'nieoczekiwany stan {{state}} meczu',
     'unknown-match-state': 'nieznany stan {{state}} meczu',
     'place-is-busy': 'Miejsce jest zajęte turniejem {{tid}}',

@@ -3,6 +3,9 @@ package org.dan.ping.pong.app.bid;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
+import static java.util.Comparator.comparingLong;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -27,7 +30,6 @@ import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
 import org.dan.ping.pong.app.group.GroupInfo;
-import org.dan.ping.pong.app.group.GroupLink;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -37,10 +39,10 @@ import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.tournament.ChildTournamentProvider;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
+import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
-import java.security.acl.Group;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -84,14 +86,14 @@ public class BidService {
     private Clocker clocker;
 
     public void setCategory(TournamentMemState tournament, SetCategory setCategory, DbUpdater batch) {
-        if (setCategory.getExpectedCid() == setCategory.getExpectedCid()) {
-            return;
-        }
         tournament.checkCategory(setCategory.getTargetCid());
         tournament.checkCategory(setCategory.getExpectedCid());
         final ParticipantMemState par = tournament.getParticipant(setCategory.getBid());
         if (par.getCid() != setCategory.getExpectedCid()) {
             throw badRequest("Category has been changed by someone else");
+        }
+        if (setCategory.getTargetCid() == setCategory.getExpectedCid()) {
+            return;
         }
         switch (tournament.getState()) {
             case Open:
@@ -125,10 +127,48 @@ public class BidService {
 
     private void changeCategoryInRunningTournament(
             TournamentMemState tournament, SetCategory setCategory, DbUpdater batch) {
-        // find target group
-        // if no group? => find place in the ladder base
-        // from group to play off or from play off to play off
-        // from group to group => reuse group change
+        final TournamentRules rules = tournament.getRule();
+        if (rules.getGroup().isPresent()) { // if groups possible
+            final ParticipantMemState par = tournament.getParticipant(setCategory.getBid());
+            changeGroup(tournament, ChangeGroupReq
+                    .builder()
+                    .tid(tournament.getTid())
+                    .bid(setCategory.getBid())
+                    .expectedGid(par.gid())
+                    .targetGid(findBestGroup(tournament,
+                            setCategory.getTargetCid(),
+                            setCategory.getTargetGid()))
+                    .build(),
+                    batch);
+
+        } else {
+            // if free base play off position or  possible to extend ladder
+            // find target group if not specified (pick the smallest one)
+            // if no group? => find place in the ladder base
+            // from group to play off or from play off to play off
+            throw badRequest("Change category in open playoff tournament not implemented");
+        }
+    }
+
+    private Optional<Integer> findBestGroup(
+            TournamentMemState tournament,
+            int targetCid, Optional<Integer> targetGid) {
+        if (targetGid.isPresent()) {
+            return targetGid;
+        }
+        final Map<Integer, Long> gidPopulation = tournament.participants()
+                .filter(p -> p.getCid() == targetCid)
+                .collect(groupingBy(ParticipantMemState::gid, counting()));
+
+        tournament.findGroupsByCategory(targetCid)
+                .map(GroupInfo::getGid)
+                .forEach(gid -> gidPopulation.putIfAbsent(gid, 0L));
+
+        return gidPopulation.entrySet()
+                .stream()
+                .sorted(comparingLong(Map.Entry::getValue))
+                .findFirst()
+                .map(Map.Entry::getKey);
     }
 
     public void setBidState(TournamentMemState tournament, SetBidState setState, DbUpdater batch) {

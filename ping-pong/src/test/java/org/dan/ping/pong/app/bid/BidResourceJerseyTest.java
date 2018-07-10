@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidResource.BID_CHANGE_GROUP;
+import static org.dan.ping.pong.app.bid.BidResource.BID_SET_CATEGORY;
 import static org.dan.ping.pong.app.bid.BidResource.FIND_BIDS_BY_STATE;
 import static org.dan.ping.pong.app.bid.BidResource.PROFILE;
 import static org.dan.ping.pong.app.bid.BidResource.TID_SLASH_UID;
@@ -171,6 +172,38 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
     }
 
     @Test
+    public void changeCategoryInOpenTrWithGroups() {
+        final TournamentScenario scenario = begin()
+                .name("chngToCatInOpTrWithGrps")
+                .rules(RULES_G_S1A2G11_NP)
+                .category(c1, p1, p2, p3)
+                .category(c2, p4, p5);
+
+        final ImperativeSimulator simulator = isf.create(scenario).usePlayerSession();
+        simulator.run(ImperativeSimulator::beginTournament);
+
+        final Bid bidP3 = scenario.player2Bid(p3, c1);
+
+        changeCategory(scenario, bidP3, scenario.catId(c1), scenario.catId(c2));
+        scenario.bidChangedCategory(bidP3, c1, c2);
+
+        playTrOf2Cat(simulator);
+    }
+
+    public void playTrOf2Cat(ImperativeSimulator simulator) {
+        simulator.run(c -> c
+                .reloadMatchMap()
+                .scoreSet(c1, p1, 11, p2, 3)
+                .scoreSet(c2, p3, 11, p4, 7)
+                .scoreSet(c2, p3, 11, p5, 8)
+                .scoreSet(c2, p4, 11, p5, 9)
+                .checkResult(c1, p1, p2)
+                .checkResult(c2, p3, p4, p5)
+                .checkTournamentComplete(c1, BidStatesDesc.restState(Lost).bid(p1, Win1))
+                .checkTournamentComplete(c2, BidStatesDesc.restState(Lost).bid(p3, Win1)));
+    }
+
+    @Test
     public void changeToExGroupFromOtherCategory() {
         final TournamentScenario scenario = begin()
                 .name("changeToExGroupInOthCat")
@@ -193,16 +226,7 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
         changeGroup(scenario, bidP3, sourceGid, Optional.of(targetGid));
         scenario.bidChangedCategory(bidP3, c1, c2);
 
-        simulator.run(c -> c
-                .reloadMatchMap()
-                .scoreSet(c1, p1, 11, p2, 3)
-                .scoreSet(c2, p3, 11, p4, 7)
-                .scoreSet(c2, p3, 11, p5, 8)
-                .scoreSet(c2, p4, 11, p5, 9)
-                .checkResult(c1, p1, p2)
-                .checkResult(c2, p3, p4, p5)
-                .checkTournamentComplete(c1, BidStatesDesc.restState(Lost).bid(p1, Win1))
-                .checkTournamentComplete(c2, BidStatesDesc.restState(Lost).bid(p3, Win1)));
+        playTrOf2Cat(simulator);
     }
 
     @Test
@@ -238,6 +262,17 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
                 .checkResult(p1, p3, p4, p2)
                 .checkTournamentComplete(BidStatesDesc.restState(Lost)
                         .bid(p3, Win2).bid(p1, Win1)));
+    }
+
+    private void changeCategory(TournamentScenario scenario, Bid bid,
+            int sourceCid, int targetCid) {
+        myRest().voidPost(BID_SET_CATEGORY, scenario.getTestAdmin(),
+                SetCategory.builder()
+                        .tid(scenario.getTid())
+                        .bid(bid)
+                        .expectedCid(sourceCid)
+                        .targetCid(targetCid)
+                        .build());
     }
 
     private void changeGroup(TournamentScenario scenario, Bid bid,

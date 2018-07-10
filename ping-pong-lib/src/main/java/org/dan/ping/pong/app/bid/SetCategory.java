@@ -19,5 +19,9 @@ public class SetCategory {
     private Bid bid;
     private int expectedCid;
     private int targetCid;
-    private Optional<Integer> targetGid;
+    private Optional<Integer> targetGid = Optional.empty();
+
+    public static class SetCategoryBuilder {
+        Optional<Integer> targetGid = Optional.empty();
+    }
 }

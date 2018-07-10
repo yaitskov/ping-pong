@@ -191,7 +191,8 @@ public class MatchService {
         return winUidO;
     }
 
-    SetScoreResult setScoreResult(TournamentMemState tournament, SetScoreResultName name, MatchInfo matchInfo) {
+    SetScoreResult setScoreResult(
+            TournamentMemState tournament, SetScoreResultName name, MatchInfo matchInfo) {
         switch (name) {
             case LastMatchComplete:
             case MatchComplete:

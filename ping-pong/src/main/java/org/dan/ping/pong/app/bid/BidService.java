@@ -20,6 +20,7 @@ import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.match.MatchState.INCOMPLETE_MATCH_STATES;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
+import static org.dan.ping.pong.app.tournament.EnlistPolicy.MULTIPLE_CATEGORY_ENLISTMENT;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
@@ -95,6 +96,7 @@ public class BidService {
         if (setCategory.getTargetCid() == setCategory.getExpectedCid()) {
             return;
         }
+        ensureNoMultipleCategoryEnlistment(tournament, setCategory.getTargetCid(), par);
         switch (tournament.getState()) {
             case Open:
                 changeCategoryInRunningTournament(tournament, setCategory, batch);
@@ -104,6 +106,14 @@ public class BidService {
                 break;
             default:
                 throw badRequest("Tournament state not allow category change");
+        }
+    }
+
+    private void ensureNoMultipleCategoryEnlistment(
+            TournamentMemState tournament, int targetCid, ParticipantMemState par) {
+        final Map<Integer, Bid> cid2Bids = tournament.getUidCid2Bid().get(par.getUid());
+        if (cid2Bids.containsKey(targetCid)) {
+            throw badRequest(MULTIPLE_CATEGORY_ENLISTMENT);
         }
     }
 
@@ -265,6 +275,7 @@ public class BidService {
         final GroupInfo sourceGroup = tournament.getGroup(req.getExpectedGid());
 
         if (targetGroup.getCid() != sourceGroup.getCid()) {
+            ensureNoMultipleCategoryEnlistment(tournament, targetGroup.getCid(), bid);
             changeCategoryInDraft(tournament, targetGroup.getCid(), batch, bid);
         }
 

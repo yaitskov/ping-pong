@@ -25,7 +25,6 @@ import org.dan.ping.pong.mock.simulator.PlayerCategory;
 import org.dan.ping.pong.mock.simulator.ProvidedRank;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -89,8 +88,8 @@ public class RestEntityGenerator {
                                 .tid(tid)
                                 .categoryId(cid)
                                 .providedRank(getProvidedRank(ranks, i))
-                                .build())
-                        .readEntity(Bid.class);
+                                .build(),
+                        Bid.class);
                 userSession.getCatBid().put(category, bid);
             }
             if (enlistMode.compareTo(EnlistMode.Pay) >= 0) {
@@ -131,9 +130,7 @@ public class RestEntityGenerator {
     }
 
     public Tid createConsoleTournament(SessionAware testAdmin, Tid masterTid) {
-        return rest
-                .post(TOURNAMENT_CONSOLE_CREATE, testAdmin, masterTid)
-                .readEntity(Tid.class);
+        return rest.post(TOURNAMENT_CONSOLE_CREATE, testAdmin, masterTid, Tid.class);
     }
 
     public OpenMatchForJudgeList listOpenMatchesForJudge(Tid tid) {

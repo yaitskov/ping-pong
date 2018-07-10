@@ -11,6 +11,7 @@ import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S1A2
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
+import static org.dan.ping.pong.mock.simulator.Player.p4;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c2;
 import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
@@ -18,6 +19,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
+import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.sys.error.PiPoEx;
@@ -86,12 +89,33 @@ public class Tournament2CategoriesJerseyTest extends AbstractSpringJerseyTest {
                 .run(c -> {
                     try {
                         c.enlistExistingParticipant(c1, p2, Here, Optional.empty());
-                        Assert.fail();
+                        Assert.fail("dead");
                     } catch (PiPoEx e) {
                         assertThat(
                                 e.getClientMessage().getMessage(),
                                 is(MULTIPLE_TOURNAMENT_ENLISTMENT));
                     }
                 });
+    }
+
+    @Test
+    public void preventChangeCategoryToMakeDoubleParticipation() {
+        final TournamentScenario scenario = begin()
+                .name("preventChngCatDoublePart")
+                .rules(RULES_G_S1A2G11_NP_OC)
+                .category(c1, p1, p2)
+                .category(c2, p2, p4);
+
+        isf.create(scenario).run(c -> {
+            final Bid bidP2 = scenario.player2Bid(p2, c1);
+
+            try {
+                c.changeCategory(scenario, bidP2, scenario.catId(c1), scenario.catId(c2));
+                Assert.fail("dead");
+            } catch (PiPoEx e){
+                assertThat(e.getClientMessage().getMessage(),
+                        is(MULTIPLE_CATEGORY_ENLISTMENT));
+            }
+        });
     }
 }

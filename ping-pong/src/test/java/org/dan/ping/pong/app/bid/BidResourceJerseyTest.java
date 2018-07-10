@@ -3,8 +3,6 @@ package org.dan.ping.pong.app.bid;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toSet;
-import static org.dan.ping.pong.app.bid.BidResource.BID_CHANGE_GROUP;
-import static org.dan.ping.pong.app.bid.BidResource.BID_SET_CATEGORY;
 import static org.dan.ping.pong.app.bid.BidResource.FIND_BIDS_BY_STATE;
 import static org.dan.ping.pong.app.bid.BidResource.PROFILE;
 import static org.dan.ping.pong.app.bid.BidResource.TID_SLASH_UID;
@@ -43,7 +41,6 @@ import org.dan.ping.pong.app.group.GroupWithMembers;
 import org.dan.ping.pong.app.group.TournamentGroups;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.mock.TestUserSession;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc;
@@ -134,7 +131,7 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
 
         final int sourceGid = findGroupByBid(bidP3, scenario.getTid(), groupsInfo);
 
-        changeGroup(scenario, bidP3, sourceGid, findTargetGroup(groupsInfo, sourceGid));
+        simulator.changeGroup(scenario, bidP3, sourceGid, findTargetGroup(groupsInfo, sourceGid));
 
         simulator.run(c -> c
                 .reloadMatchMap()
@@ -184,7 +181,7 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
 
         final Bid bidP3 = scenario.player2Bid(p3, c1);
 
-        changeCategory(scenario, bidP3, scenario.catId(c1), scenario.catId(c2));
+        simulator.changeCategory(scenario, bidP3, scenario.catId(c1), scenario.catId(c2));
         scenario.bidChangedCategory(bidP3, c1, c2);
 
         playTrOf2Cat(simulator);
@@ -223,7 +220,7 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
         final int sourceGid = findGroupByBid(bidP3, scenario.getTid(), groupsInfo);
         final int targetGid = findGroupByBid(bidP4, scenario.getTid(), groupsInfo);
 
-        changeGroup(scenario, bidP3, sourceGid, Optional.of(targetGid));
+        simulator.changeGroup(scenario, bidP3, sourceGid, Optional.of(targetGid));
         scenario.bidChangedCategory(bidP3, c1, c2);
 
         playTrOf2Cat(simulator);
@@ -247,8 +244,8 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
 
         final int sourceGid = findGroupByBid(bidP3, scenario.getTid(), groupsInfo);
 
-        changeGroup(scenario, bidP3, sourceGid, Optional.empty());
-        changeGroup(scenario, bidP4, sourceGid,
+        simulator.changeGroup(scenario, bidP3, sourceGid, Optional.empty());
+        simulator.changeGroup(scenario, bidP4, sourceGid,
                 findTargetGroup(
                         myRest().get(GROUP_LIST + scenario.getTid(), TournamentGroups.class),
                         sourceGid));
@@ -262,28 +259,6 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
                 .checkResult(p1, p3, p4, p2)
                 .checkTournamentComplete(BidStatesDesc.restState(Lost)
                         .bid(p3, Win2).bid(p1, Win1)));
-    }
-
-    private void changeCategory(TournamentScenario scenario, Bid bid,
-            int sourceCid, int targetCid) {
-        myRest().voidPost(BID_SET_CATEGORY, scenario.getTestAdmin(),
-                SetCategory.builder()
-                        .tid(scenario.getTid())
-                        .bid(bid)
-                        .expectedCid(sourceCid)
-                        .targetCid(targetCid)
-                        .build());
-    }
-
-    private void changeGroup(TournamentScenario scenario, Bid bid,
-            int sourceGid, Optional<Integer> targetGid) {
-        myRest().voidPost(BID_CHANGE_GROUP, scenario.getTestAdmin(),
-                ChangeGroupReq.builder()
-                        .tid(scenario.getTid())
-                        .bid(bid)
-                        .expectedGid(sourceGid)
-                        .targetGid(targetGid)
-                        .build());
     }
 
     @Test

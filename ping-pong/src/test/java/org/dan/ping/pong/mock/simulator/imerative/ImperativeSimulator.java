@@ -7,7 +7,9 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.dan.ping.pong.app.bid.BidResource.BID_CHANGE_GROUP;
 import static org.dan.ping.pong.app.bid.BidResource.BID_RENAME;
+import static org.dan.ping.pong.app.bid.BidResource.BID_SET_CATEGORY;
 import static org.dan.ping.pong.app.bid.BidResource.ENLISTED_BIDS;
 import static org.dan.ping.pong.app.category.CategoryResource.CATEGORIES_BY_TID;
 import static org.dan.ping.pong.app.category.CategoryResource.CATEGORY_MEMBERS;
@@ -53,8 +55,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidRename;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.bid.ChangeGroupReq;
 import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.bid.ParticipantState;
+import org.dan.ping.pong.app.bid.SetCategory;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.group.GroupInfo;
@@ -617,5 +621,27 @@ public class ImperativeSimulator {
     public Bid enlistNewParticipant(TournamentScenario scenario, int cid,
             Optional<Integer> gid, String name) {
         return simulator.enlistNewParticipant(scenario, cid, gid, name);
+    }
+
+    public void changeCategory(TournamentScenario scenario, Bid bid,
+            int sourceCid, int targetCid) {
+        myRest.voidPost(BID_SET_CATEGORY, scenario.getTestAdmin(),
+                SetCategory.builder()
+                        .tid(scenario.getTid())
+                        .bid(bid)
+                        .expectedCid(sourceCid)
+                        .targetCid(targetCid)
+                        .build());
+    }
+
+    public void changeGroup(TournamentScenario scenario, Bid bid,
+            int sourceGid, Optional<Integer> targetGid) {
+        myRest.voidPost(BID_CHANGE_GROUP, scenario.getTestAdmin(),
+                ChangeGroupReq.builder()
+                        .tid(scenario.getTid())
+                        .bid(bid)
+                        .expectedGid(sourceGid)
+                        .targetGid(targetGid)
+                        .build());
     }
 }

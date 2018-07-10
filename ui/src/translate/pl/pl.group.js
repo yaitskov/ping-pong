@@ -1,4 +1,5 @@
 module.exports = {
+    'Pick group for participant': 'Wybierz grupu dla uczestnika',
     'Change group': 'Zmiana grupy',
     'Changing group': 'Zmiana grupy',
     'Loading groups': 'Ladowanie grup',

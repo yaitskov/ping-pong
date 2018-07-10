@@ -1,4 +1,5 @@
 module.exports = {
+    'Pick group for participant': 'Pick group for participant',
     'Change group': 'Change group',
     'Changing group': 'Changing group',
     'Loading groups': 'Loading groups',

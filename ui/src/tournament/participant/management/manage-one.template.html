@@ -31,9 +31,7 @@
   <div class="form-group" ng-show="$ctrl.participant">
     <table class="table">
       <tr>
-        <td>
-          {{ 'participant name' | translate }}
-        </td>
+        <td translate="participant name"/>
         <td>
           <a class="btn btn-warning"
              href="#!/participant/rename/{{$ctrl.tournamentId}}/{{$ctrl.participantId}}">
@@ -42,27 +40,29 @@
         </td>
       </tr>
       <tr>
-        <td>
-          {{ 'Category' | translate }}
-        </td>
+        <td translate="Category"/>
         <td>
           <a href="#!/my/tournament/{{$ctrl.tournamentId}}/category/{{$ctrl.participant.category.cid}}/members">
             {{$ctrl.participant.category.name}}
           </a>
         </td>
       </tr>
-      <tr>
+      <tr ng-show="$ctrl.participant.group">
+        <td translate="group-lbl"/>
         <td>
-          {{ 'bid state' | translate }}
+          <a href="#">
+            {{$ctrl.participant.group.label}}
+          </a>
         </td>
+      </tr>
+      <tr>
+        <td translate="bid state"/>
         <td>
           {{$ctrl.participant.state | translate}}
         </td>
       </tr>
       <tr>
-        <td>
-          {{ 'Enlisted at' | translate }}
-        </td>
+        <td translate="Enlisted at"/>
         <td>
           {{$ctrl.participant.enlistedAt}}
         </td>

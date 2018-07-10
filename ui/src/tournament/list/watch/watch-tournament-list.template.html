@@ -3,7 +3,6 @@
   <div class="alert alert-info" translate="There is no any open tournament."/>
 </div>
 <div class="container-fluid list">
-  <request-status></request-status>
   <div ng-repeat="tournament in $ctrl.tournaments"
        clickable="/tournament/result/{{tournament.tid}}"
        ng-class="{'complete': tournament.state == 'Close'}"

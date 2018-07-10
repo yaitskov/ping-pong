@@ -6,5 +6,5 @@ module.exports = {
     'Offline enlist': 'Offline enlist',
     'Offline enlist to': 'Offline enlist to {{name}}',
     'Enlisting': 'Enlisting',
-    'User registration...': 'User registration...'
+    'User registration': 'User registration'
 };

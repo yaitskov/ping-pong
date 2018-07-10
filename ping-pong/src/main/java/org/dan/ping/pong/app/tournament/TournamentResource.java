@@ -45,7 +45,7 @@ public class TournamentResource {
     public static final String TOURNAMENT_STATE = TOURNAMENT + "state";
     public static final String BEGIN_TOURNAMENT = TOURNAMENT + "begin";
     public static final String CANCEL_TOURNAMENT = TOURNAMENT + "cancel";
-    public static final String DRAFTING = TOURNAMENT + "drafting/";
+    public static final String DRAFTING = "tournament/drafting/";
     public static final String MY_TOURNAMENT = "/tournament/mine/";
     public static final String TOURNAMENT_RULES = TOURNAMENT + "rules";
     public static final String GET_TOURNAMENT_RULES = TOURNAMENT_RULES + "/";

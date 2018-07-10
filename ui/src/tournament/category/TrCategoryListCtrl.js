@@ -2,7 +2,7 @@ import SimpleController from 'core/angular/SimpleController.js';
 
 export default class TrCategoryListCtrl extends SimpleController {
     static get $inject () {
-        return ['mainMenu', '$routeParams', 'AjaxInfo',
+        return ['mainMenu', '$routeParams', 'AjaxInfo', 'Tournament',
                 'pageCtx', '$location', '$scope', 'Category'];
     }
 

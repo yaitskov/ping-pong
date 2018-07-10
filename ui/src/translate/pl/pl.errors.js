@@ -1,5 +1,6 @@
 module.exports = {
     'match-not-in-tournament': 'Mecz {{mid}} nie należy do turnieju',
+    'Not empty category cannot be removed': 'Nie pusta kategoria nie może być skasowna',
     'unexpected-match-state': 'nieoczekiwany stan {{state}} meczu',
     'unknown-match-state': 'nieznany stan {{state}} meczu',
     'place-is-busy': 'Miejsce jest zajęte turniejem {{tid}}',

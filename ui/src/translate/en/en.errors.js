@@ -1,5 +1,6 @@
 module.exports = {
     'match-not-in-tournament': 'Match {{mid}} is not associated with the tournament',
+    'Not empty category cannot be removed': 'Not empty category cannot be removed',
     'unexpected-match-state': 'Unexpected match state {{state}}',
     'unknown-match-state': 'Unknown match state {{state}}',
     'place-is-busy': 'Place is used by tournament {{tid}}',

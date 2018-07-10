@@ -2,14 +2,15 @@ import SimpleController from 'core/angular/SimpleController.js';
 
 export default class EnlistOfflineCtrl extends SimpleController {
     static get $inject () {
-        return ['$routeParams', 'Tournament', 'mainMenu', '$q', 'Group',
-                'requestStatus', 'Participant', '$http', 'auth', 'pageCtx',
-                'binder', '$scope', 'WarmUp', 'Suggestion'];
+        return ['$routeParams', 'Tournament', 'mainMenu', 'Group',
+                'Participant',  'pageCtx', 'AjaxInfo',
+                '$scope', 'WarmUp', 'Suggestion'];
     }
 
     $onInit() {
         this.enlistPath = '/api/tournament/enlist-offline';
         this.registerOfflinePath = '/api/anonymous/offline-user/register';
+        this.ajax = this.AjaxInfo.scope(this.$scope);
         this.WarmUp.warmUp(this.enlistPath);
         this.groupId = null;
         this.categoryId = null;
@@ -28,81 +29,79 @@ export default class EnlistOfflineCtrl extends SimpleController {
         this.suggestionCompleteVersion = 1;
         this.negativeCache = new Set();
 
-        this.$scope.$watch('$ctrl.fullName', (newV, oldV) => {
-            newV = (newV || "").trim().toLowerCase();
-            if (!newV) {
-                return;
+        this.$scope.$watch('$ctrl.fullName', (n, o) => this.fullNameWatcher(n, o));
+
+        this.ajax.doAjax(
+            '', this.Tournament.aDrafting,
+            {tournamentId: this.$routeParams.tournamentId},
+            (t) => this.setTournament(t));
+    }
+
+    setTournament(tournament) {
+        this.tournament = tournament;
+        this.rules = tournament.rules;
+        var rnkOptions = this.rules.casting.pro;
+        if (rnkOptions) {
+            this.rankRange = {min: rnkOptions.minValue, max: rnkOptions.maxValue};
+        }
+        this.mainMenu.setTitle(['Offline enlist to', {name: tournament.name}]);
+        this.categories = tournament.categories;
+        var wasCategoryId = this.pageCtx.get('offline-category-' + tournament.tid);
+        for (let cat of tournament.categories) {
+            if (!wasCategoryId || wasCategoryId == cat.cid) {
+                this.categoryId = cat.cid;
+                break;
             }
-            if (this.negativeCache.has(newV)) {
-                return;
+        }
+        if (!this.categoryId) {
+            for (let cat of tournament.categories) {
+                this.categoryId = cat.cid;
+                break;
             }
-            if (oldV && newV.length > oldV.length && this.suggestions.length == 0) {
-                return;
-            }
-            let v = ++this.suggestionVersion;
-            this.Suggestion.suggestions(
-                {pattern: newV,
-                 page: {size: 100, page: 0}},
-                (suggestions) => {
-                    if (!suggestions.length) {
-                        this.negativeCache.add(newV);
-                    }
-                    if (this.suggestionCompleteVersion > v) {
-                        console.log(`drop suggestion version ${v}`);
-                        return;
-                    }
-                    this.suggestionCompleteVersion = v;
-                    this.suggestions = suggestions;
-                },
-                (...a) => this.requestStatus.failed(...a));
-        });
-        const req = {tournamentId: this.$routeParams.tournamentId};
-        this.binder(this.$scope, {
-            'event.request.status.ready': (event) => {
-                this.requestStatus.startLoading('Loading');
-                this.$q.all([
-                    this.Tournament.aDrafting(req).$promise,
-                    this.Tournament.parameters(req).$promise]).
-                    then(
-                        (responses) => {
-                            const tournament = responses[0];
-                            this.tournament = tournament;
-                            this.rules = responses[1];
-                            var rnkOptions = this.rules.casting.pro;
-                            if (rnkOptions) {
-                                this.rankRange = {min: rnkOptions.minValue, max: rnkOptions.maxValue};
-                            }
-                            this.requestStatus.complete();
-                            this.mainMenu.setTitle(['Offline enlist to', {name: tournament.name}]);
-                            this.categories = tournament.categories;
-                            var wasCategoryId = this.pageCtx.get('offline-category-' + this.$routeParams.tournamentId);
-                            for (var i in tournament.categories) {
-                                if (!wasCategoryId || wasCategoryId == tournament.categories[i].cid) {
-                                    this.categoryId = tournament.categories[i].cid;
-                                    break;
-                                }
-                            }
-                            if (!this.categoryId) {
-                                for (var i in tournament.categories) {
-                                    this.categoryId = tournament.categories[i].cid;
-                                    break;
-                                }
-                            }
-                            if (this.tournament.state == 'Open' && this.categoryId) {
-                                this.loadGroupPopulations(this.$routeParams.tournamentId, this.categoryId);
-                            }
-                        },
-                        (...a) => this.requestStatus.failed(...a));
-            }
-        });
+        }
+        if (this.tournament.state == 'Open' && this.categoryId) {
+            this.loadGroupPopulations(tournament.tid, this.categoryId);
+        }
+    }
+
+    fullNameWatcher(newV, oldV) {
+        newV = (newV || "").trim().toLowerCase();
+        if (!newV) {
+            return;
+        }
+        if (this.negativeCache.has(newV)) {
+            return;
+        }
+        if (oldV && newV.length > oldV.length && this.suggestions.length == 0) {
+            return;
+        }
+        let v = ++this.suggestionVersion;
+        this.ajax.doAjax(
+            '',
+            this.Suggestion.suggestions,
+            {pattern: newV, page: {size: 100, page: 0}},
+            (suggestions) => {
+                if (!suggestions.length) {
+                    this.negativeCache.add(newV);
+                }
+                if (this.suggestionCompleteVersion > v) {
+                    console.log(`drop suggestion version ${v}`);
+                    return;
+                }
+                this.suggestionCompleteVersion = v;
+                this.suggestions = suggestions;
+            });
     }
 
     loadGroupPopulations(tid, cid) {
-        this.requestStatus.startLoading('Loading');
-        this.Group.populations(
+        this.ajax.doAjax(
+            '', this.Group.populations,
             {tournamentId: tid, categoryId: cid},
             (ok) => {
                 this.categoryGroups = ok;
+                if (!this.categoryGroups.links) {
+                    return;
+                }
                 if (this.groupId === 0) {
                     for (let glink of this.categoryGroups.links) {
                         this.groupId = Math.max(glink.gid, this.groupId);
@@ -113,9 +112,7 @@ export default class EnlistOfflineCtrl extends SimpleController {
                         break;
                     }
                 }
-                this.requestStatus.complete();
-            },
-            (...a) => this.requestStatus.failed(...a));
+            });
     }
 
     activate(cid) {
@@ -136,17 +133,15 @@ export default class EnlistOfflineCtrl extends SimpleController {
         if (!this.form.$valid) {
             return;
         }
-        this.requestStatus.startLoading('User registration...');
-        this.$http.post(this.registerOfflinePath, {name: this.fullName},
-                        {headers: {session: this.auth.mySession()}}).
-            then(
-                (resp) => {
-                    this.requestStatus.complete();
-                    this.form.$setPristine(true);
-                    jQuery(this.form.fullName.$$element).focus();
-                    this.enlist(resp.data, this.fullName);
-                },
-                (...a) => this.requestStatus.failed(...a));
+        this.ajax.doPost(
+            'User registration',
+            this.registerOfflinePath,
+            {name: this.fullName},
+            (uid) => {
+                this.form.$setPristine(true);
+                jQuery(this.form.fullName.$$element).focus();
+                this.enlist(uid, this.fullName);
+            });
     }
 
     findBidState() {
@@ -164,9 +159,13 @@ export default class EnlistOfflineCtrl extends SimpleController {
         this.fullName = '';
         this.suggestions = [];
 
-        this.requestStatus.startLoading('Enlisting', this.tournament);
+        if (this.noCategoryMsg) {
+            this.ajax.scope.removeMessage(this.noCategoryMsg);
+            delete this.noCategoryMsg;
+        }
+
         if (!this.categoryId) {
-            this.requestStatus.validationFailed("CategoryNotChosen");
+            this.noCategoryMsg = this.ajax.scope.transError("CategoryNotChosen");
             return;
         }
         var req = {tid: this.tournamentId,
@@ -180,20 +179,16 @@ export default class EnlistOfflineCtrl extends SimpleController {
         if (this.groupId) {
             req.groupId = this.groupId;
         }
-        this.$http.post(this.enlistPath, req,
-                        {headers: {session: this.auth.mySession()}}).
-            then(
-                (resp) => {
-                    this.requestStatus.complete();
-                    this.enlisted.unshift({bid: resp.data,
-                                           name: name});
-                    if (this.groupId === 0) {
-                        this.loadGroupPopulations(this.$routeParams.tournamentId, this.categoryId);
-                    } else if (this.groupId) {
-                        this.categoryGroups.populations[
-                            this.categoryGroups.links.findIndex((link) => link.gid == this.groupId)] += 1;
-                    }
-                },
-                (...a) => this.requestStatus.failed(...a));
+        this.ajax.doPost(
+            '', this.enlistPath, req,
+            (bid) => {
+                this.enlisted.unshift({bid: bid, name: name});
+                if (this.groupId === 0) {
+                    this.loadGroupPopulations(this.$routeParams.tournamentId, this.categoryId);
+                } else if (this.groupId) {
+                    this.categoryGroups.populations[
+                        this.categoryGroups.links.findIndex((link) => link.gid == this.groupId)] += 1;
+                }
+            });
     }
 }

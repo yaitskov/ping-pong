@@ -32,8 +32,8 @@ public class TennisMatchRuleValidator {
         if (rule.getMinAdvanceInGames() < 1 || rule.getMinAdvanceInGames() > 100) {
             errors.put(MATCH_RULE + ".min-advance-in-games", ofTemplate(OUT_OF_RANGE));
         }
-        if (rule.getSuperTieBreakGames() < 1 || rule.getSuperTieBreakGames() > 100) {
-            errors.put(SUPER_TIEBREAK_GAMES, ofTemplate(OUT_OF_RANGE));
-        }
+        rule.getSuperTieBreakGames()
+                .filter(games -> games < 1 || games > 100)
+                .ifPresent((games) -> errors.put(SUPER_TIEBREAK_GAMES, ofTemplate(OUT_OF_RANGE)));
     }
 }

@@ -2,16 +2,16 @@ package org.dan.ping.pong.app.sport.tennis;
 
 import static com.google.common.primitives.Ints.asList;
 import static java.util.Collections.emptyList;
-import static org.dan.ping.pong.app.sport.tennis.TennisSport.DIFFERENCE_BETWEEN_GAMES_CANNOT_BE_LESS_THAN;
+import static org.dan.ping.pong.app.sport.tennis.TennisMatchRules.DIFFERENCE_BETWEEN_GAMES_CANNOT_BE_LESS_THAN;
 import static org.dan.ping.pong.app.sport.tennis.TennisSport.DIFFERENCE_BETWEEN_GAMES_CANNOT_BE_MORE_THAN;
 import static org.dan.ping.pong.app.sport.tennis.TennisSport.GAMES_CANNOT_BE_EQUAL;
-import static org.dan.ping.pong.app.sport.tennis.TennisSport.GAMES_CANNOT_BE_LESS_THAN;
+import static org.dan.ping.pong.app.sport.tennis.TennisMatchRules.GAMES_CANNOT_BE_LESS_THAN;
 import static org.dan.ping.pong.app.sport.tennis.TennisSport.SET_LENGTH_MISMATCH;
 import static org.dan.ping.pong.app.sport.tennis.TennisSport.TO_MANY_SETS;
 import static org.dan.ping.pong.app.sport.tennis.TennisSport.WINNERS_ARE_MORE_THAT_1;
-import static org.dan.ping.pong.app.sport.tennis.TennisSport.WINNER_HAS_TO_MUCH_GAMES;
+import static org.dan.ping.pong.app.sport.tennis.TennisMatchRules.WINNER_HAS_TO_MUCH_GAMES;
 import static org.dan.ping.pong.app.sport.tennis.TennisSport.WINNER_SHOULD_GET_N_BALLS_IN_SUPER_TIEBREAK;
-import static org.dan.ping.pong.app.sport.tennis.TennisSport.WINNER_SHOULD_HAVE_AT_LEAST_N_GAMES;
+import static org.dan.ping.pong.app.sport.tennis.SuperTieBreakAdapter.WINNER_SHOULD_HAVE_AT_LEAST_N_GAMES;
 import static org.dan.ping.pong.app.sport.tennis.TennisSport.WON_SETS_MORE_THAT_REQUIRED;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasProperty;
@@ -19,7 +19,6 @@ import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableMap;
 import org.dan.ping.pong.app.bid.Bid;
-import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,14 +36,14 @@ public class TennisSportTest {
             .setsToWin(2)
             .minGamesToWin(6)
             .minAdvanceInGames(2)
-            .superTieBreakGames(10)
+            .superTieBreakGames(Optional.of(10))
             .build();
 
     public static final TennisMatchRules SHORT_TENNIS_RULES = TennisMatchRules.builder()
             .setsToWin(1)
             .minGamesToWin(6)
             .minAdvanceInGames(2)
-            .superTieBreakGames(10)
+            .superTieBreakGames(Optional.of(10))
             .build();
 
     @Test

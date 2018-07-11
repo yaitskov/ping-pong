@@ -18,6 +18,8 @@ import org.dan.ping.pong.app.match.MyPendingMatchTennisSport;
 import org.dan.ping.pong.app.sport.MatchRules;
 import org.dan.ping.pong.app.sport.SportType;
 
+import java.util.Optional;
+
 @Getter
 @Setter
 @Wither
@@ -27,6 +29,10 @@ import org.dan.ping.pong.app.sport.SportType;
 @AllArgsConstructor
 public class TennisMatchRules implements MatchRules {
     public static final String STBG = "stbg";
+    public static final String GAMES_CANNOT_BE_LESS_THAN = "Games cannot be less than";
+    public static final String DIFFERENCE_BETWEEN_GAMES_CANNOT_BE_LESS_THAN = "Difference between games cannot be less than";
+    public static final String WINNER_HAS_TO_MUCH_GAMES = "Winner has to much games";
+
     @JsonProperty(MGTW)
     private int minGamesToWin; // 6
     @JsonProperty(MAIG)
@@ -36,7 +42,11 @@ public class TennisMatchRules implements MatchRules {
     @JsonProperty(STW)
     private int setsToWin; // 2
     @JsonProperty(STBG)
-    private int superTieBreakGames;  // 10
+    private Optional<Integer> superTieBreakGames = Optional.empty();  // 10
+
+    public static class TennisMatchRulesBuilder {
+        Optional<Integer> superTieBreakGames = Optional.empty();
+    }
 
     public SportType sport() {
         return SportType.Tennis;

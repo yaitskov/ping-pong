@@ -2,6 +2,9 @@ package org.dan.ping.pong.app.tournament;
 
 import static java.util.Arrays.asList;
 import static org.dan.ping.pong.app.match.IdentifiedScore.scoreOf;
+import static org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules.BALLS_CANNOT_BE_LESS_THAN;
+import static org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules.DIFFERENCE_BETWEEN_BALLS_CANNOT_BE_LESS_THAN;
+import static org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules.WINNER_SHOULD_HAVE_AT_LEAST_N_BALLS;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -73,21 +76,21 @@ public class PingPongSportUnitTest {
     @Test
     public void validateFailsOnMaxGamesToSmall() {
         thrown.expect(hasProperty("message",
-                containsString("Winner should have at least")));
+                containsString(WINNER_SHOULD_HAVE_AT_LEAST_N_BALLS)));
         validate(10, 0);
     }
 
     @Test
     public void validateFailsOnNegaiteveGames() {
         thrown.expect(hasProperty("message",
-                containsString("Games cannot be less than")));
+                containsString(BALLS_CANNOT_BE_LESS_THAN)));
         validate(10, -1);
     }
 
     @Test
     public void validateFailsOnCloseGames() {
         thrown.expect(hasProperty("message",
-                containsString("Difference between games cannot be less than")));
+                containsString(DIFFERENCE_BETWEEN_BALLS_CANNOT_BE_LESS_THAN)));
         validate(11, 10);
     }
 

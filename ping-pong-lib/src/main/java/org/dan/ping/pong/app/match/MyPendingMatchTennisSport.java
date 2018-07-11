@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Optional;
+
 @Getter
 @Setter
 @Builder
@@ -25,7 +27,12 @@ public class MyPendingMatchTennisSport implements MyPendingMatchSport {
     @JsonProperty(MAIG)
     private int minAdvanceInGames;
     @JsonProperty(STBG)
-    private int superTieBreakGames;
+    private Optional<Integer> superTieBreakGames = Optional.empty();
     @JsonProperty(STW)
     private int setsToWin;
+
+
+    public static class MyPendingMatchTennisSportBuilder {
+        Optional<Integer> superTieBreakGames = Optional.empty();
+    }
 }

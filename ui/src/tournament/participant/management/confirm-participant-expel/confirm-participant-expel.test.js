@@ -13,7 +13,7 @@ describe('confirm-participant-expel', () => {
         expect(initEventFired).toBeTrue();
     });
 
-    const waitingBid = {user: {name: 'p1', uid: 2}, state: 'Wait', tid: 1};
+    const waitingBid = {name: 'p1', bid: 2, state: 'Wait', tid: 1};
 
     ij('confirm event shows the dialog', ($rootScope) => {
         expect(ctx.element.find('#confirmParticipantExpel').hasClass('in')).toBeFalse();
@@ -34,7 +34,7 @@ describe('confirm-participant-expel', () => {
 
         jsHttpBackend.onPostMatch(/api.tournament.expel/,
                                           [e => e.toEqual(jasmine.objectContaining(
-                                            {uid: 2, tid: 1, targetBidState: 'Quit'}))]).
+                                            {bid: 2, tid: 1, targetBidState: 'Quit'}))]).
                     respondObject('ok');
 
         ctx.element.find('#expel-as-quit').click();

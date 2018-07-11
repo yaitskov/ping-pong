@@ -2,16 +2,15 @@ package org.dan.ping.pong.app.sport.tennis;
 
 import static com.google.common.primitives.Ints.asList;
 import static java.util.Collections.emptyList;
+import static org.dan.ping.pong.app.sport.tennis.SuperTieBreakAdapter.WINNER_SHOULD_HAVE_AT_LEAST_N_GAMES;
 import static org.dan.ping.pong.app.sport.tennis.TennisMatchRules.DIFFERENCE_BETWEEN_GAMES_CANNOT_BE_LESS_THAN;
+import static org.dan.ping.pong.app.sport.tennis.TennisMatchRules.GAMES_CANNOT_BE_LESS_THAN;
+import static org.dan.ping.pong.app.sport.tennis.TennisMatchRules.WINNER_HAS_TO_MUCH_GAMES;
 import static org.dan.ping.pong.app.sport.tennis.TennisSport.DIFFERENCE_BETWEEN_GAMES_CANNOT_BE_MORE_THAN;
 import static org.dan.ping.pong.app.sport.tennis.TennisSport.GAMES_CANNOT_BE_EQUAL;
-import static org.dan.ping.pong.app.sport.tennis.TennisMatchRules.GAMES_CANNOT_BE_LESS_THAN;
 import static org.dan.ping.pong.app.sport.tennis.TennisSport.SET_LENGTH_MISMATCH;
 import static org.dan.ping.pong.app.sport.tennis.TennisSport.TO_MANY_SETS;
 import static org.dan.ping.pong.app.sport.tennis.TennisSport.WINNERS_ARE_MORE_THAT_1;
-import static org.dan.ping.pong.app.sport.tennis.TennisMatchRules.WINNER_HAS_TO_MUCH_GAMES;
-import static org.dan.ping.pong.app.sport.tennis.TennisSport.WINNER_SHOULD_GET_N_BALLS_IN_SUPER_TIEBREAK;
-import static org.dan.ping.pong.app.sport.tennis.SuperTieBreakAdapter.WINNER_SHOULD_HAVE_AT_LEAST_N_GAMES;
 import static org.dan.ping.pong.app.sport.tennis.TennisSport.WON_SETS_MORE_THAT_REQUIRED;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasProperty;
@@ -72,7 +71,7 @@ public class TennisSportTest {
         validateClassic(asList(7), asList(6));
         validateClassic(asList(7, 7), asList(6, 5));
         validateClassic(asList(7, 4), asList(6, 6));
-        validateClassic(asList(7, 0, 9), asList(6, 6, 10));
+        validateClassic(asList(7, 0, 8), asList(6, 6, 10));
         validateClassic(asList(7, 3, 0), asList(6, 6, 10));
         validateClassic(asList(7, 3, 6), asList(6, 6, 10));
     }
@@ -124,13 +123,13 @@ public class TennisSportTest {
 
     @Test
     public void validateFailNotEnoughForSuperTieBreak() {
-        expect(WINNER_SHOULD_GET_N_BALLS_IN_SUPER_TIEBREAK);
+        expect(WINNER_SHOULD_HAVE_AT_LEAST_N_GAMES);
         validateClassic(asList(6, 4, 6), asList(4, 6, 4));
     }
 
     @Test
     public void validateFailToMatchForSuperTieBreak() {
-        expect(WINNER_SHOULD_GET_N_BALLS_IN_SUPER_TIEBREAK);
+        expect(WINNER_HAS_TO_MUCH_GAMES);
         validateClassic(asList(6, 4, 11), asList(4, 6, 4));
     }
 

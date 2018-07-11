@@ -28,7 +28,7 @@ export default class ConfirmParticipantExpelCtrl extends SimpleController {
             (ok) => this.bid.state = expelAs);
     }
 
-    expelUrl(tid, uid) {
-        return `#!/my/tournament/${tid}/participant/${uid}`;
+    expelUrl(tid, bid) {
+        return `#!/my/tournament/${tid}/participant/${bid}`;
     }
 }

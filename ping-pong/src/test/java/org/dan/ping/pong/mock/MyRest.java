@@ -56,6 +56,7 @@ public class MyRest {
         switch (response.getStatus()) {
             case 200:
             case 201:
+            case 204:
                 return response.readEntity(respClass);
             case 400:
                 throw new PiPoEx(400, response.readEntity(Error.class), null);

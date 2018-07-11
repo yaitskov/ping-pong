@@ -26,7 +26,6 @@ public class TennisSport implements Sport<TennisMatchRules> {
     public static final String TO_MANY_SETS = "to many sets";
     public static final String DIFFERENCE_BETWEEN_GAMES_CANNOT_BE_MORE_THAN = "Difference between games cannot be more than";
     public static final String GAMES_CANNOT_BE_EQUAL = "Games cannot be equal";
-    public static final String WINNER_SHOULD_GET_N_BALLS_IN_SUPER_TIEBREAK = "Winner should get n balls in super tiebreak";
     public static final String SET_LENGTH_MISMATCH = "set length mismatch";
     public static final String WON_SETS_MORE_THAT_REQUIRED = "won sets more that required";
     public static final String WINNERS_ARE_MORE_THAT_1 = "winners are more that 1";

@@ -30,7 +30,7 @@ describe('group-rule-parameters-dialog', () => {
            toEqual(['am', 'jnc']));
         it('match participant scope keys',
            () => expect(ctx.ctrl.matchParticipantScopeKeys.sort()).
-           toEqual(['alo', 'BOTH']));
+           toEqual(['BOTH', 'alo']));
         it('translate match outcome scope', () =>
            ctx.transAs('#match-outcome-scope label:first', 'Count broken matches'));
         it('translate participant scope', () =>

@@ -6,12 +6,12 @@ const UidB = 2;
 const Tid = 3;
 
 const ParticipantA = {
-    uid: UidA,
+    bid: UidA,
     name: 'p1'
 };
 
 const ParticipantB = {
-    uid: UidB,
+    bid: UidB,
     name: 'p2'
 };
 
@@ -107,8 +107,8 @@ describe('base-score-set', () => {
         expect(ctx.ctrl.possibleWinScores).toEqual([11, 12, 13, 14]);
         expect(ctx.ctrl.possibleLostScores).toEqual([10]);
         expect(captured[0]).toEqual({setOrdNumber: 0,
-                                     scores: [{uid: UidA, score: 12},
-                                              {uid: UidB, score: 10}]});
+                                     scores: [{bid: UidA, score: 12},
+                                              {bid: UidB, score: 10}]});
 
         ctx.element.find('#extend-win-score').click();
 
@@ -116,8 +116,8 @@ describe('base-score-set', () => {
         expect(ctx.ctrl.possibleWinScores).toEqual([14, 15, 16, 17]);
         expect(ctx.ctrl.possibleLostScores).toEqual([13]);
         expect(captured[1]).toEqual({setOrdNumber: 0,
-                                     scores: [{uid: UidA, score: 15},
-                                              {uid: UidB, score: 13}]});
+                                     scores: [{bid: UidA, score: 15},
+                                              {bid: UidB, score: 13}]});
     });
 
     ij('shrink win balls in ping pong match', ($rootScope) => {
@@ -148,8 +148,8 @@ describe('base-score-set', () => {
             ctx.ctrl.scores = [-1, -1];
             ctx.ctrl.pickLost(1, 777);
             expect(captured).toEqual([{setOrdNumber: 0,
-                                       scores: [{uid: UidA, score: -1},
-                                                {uid: UidB, score: 777}]}]);
+                                       scores: [{bid: UidA, score: -1},
+                                                {bid: UidB, score: 777}]}]);
         });
     });
 
@@ -177,7 +177,7 @@ describe('base-score-set', () => {
             expect(captured).toEqual([{mid: undefined,
                                        tid: Tid,
                                        setOrdNumber: 0,
-                                       scores: [{uid: UidA, score: 11}, {uid: UidB, score: 0}]}]);
+                                       scores: [{bid: UidA, score: 11}, {bid: UidB, score: 0}]}]);
         });
     });
 

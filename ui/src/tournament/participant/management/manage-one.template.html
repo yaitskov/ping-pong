@@ -33,10 +33,11 @@
       <tr>
         <td translate="participant name"/>
         <td>
+          {{$ctrl.participant.name}}
           <a class="btn btn-warning"
              href="#!/participant/rename/{{$ctrl.tournamentId}}/{{$ctrl.participantId}}">
-            <span class="glyphicon glyphicon-pencil"></span>
-          </a> {{$ctrl.participant.user.name}}
+            <span class="glyphicon glyphicon-pencil"/>
+          </a>
         </td>
       </tr>
       <tr>

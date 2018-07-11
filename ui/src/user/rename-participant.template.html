@@ -3,14 +3,13 @@
     <form novalidate name="$ctrl.form" ng-submit="$ctrl.rename()">
         <div class="form-group"
              ng-class="{'has-error':  ($ctrl.form.$submitted || $ctrl.form.firstName.$dirty) && $ctrl.form.firstName.$invalid}">
-            <label for="fullName">{{ 'Full name' | translate }}</label>
+            <label for="fullName" translate="Full name"/>
             <person-name-field name="fullName" id="fullName"
                                ng-maxlength="40" required
                                ng-minlength="5" ng-model="$ctrl.fullName"/>
             <p class="help-block"
-               ng-show="$ctrl.form.fullName.$error.required">
-                {{ 'FullName is required' | translate }}
-            </p>
+               translate="FullName is required"
+               ng-show="$ctrl.form.fullName.$error.required"/>
             <p class="help-block"
                ng-show="$ctrl.form.fullName.$error.minlength || $ctrl.form.fullName.$error.maxlength">
                 {{ 'full-name-length-range' | translate : '{min: 5, max: 40}' }}

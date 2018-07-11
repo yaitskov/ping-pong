@@ -1,18 +1,32 @@
 <div class="form-group" id="supertie-break-games"
      ng-show="$ctrl.rules.match['@type'] == 'TE'">
+  <label class="toggle-option" translate="Play super tie break"/>
+  <div class="btn-toolbar">
+    <a class="btn btn-default"
+       ng-click="$ctrl.rules.match.stbg = $ctrl.rules.match.stbg || 10"
+       translate="yes-lbl"
+       ng-class="{'btn-success': $ctrl.rules.match.stbg}"/>
+    <a class="btn btn-default"
+       ng-click="$ctrl.rules.match.stbg = null"
+       translate="no-lbl"
+       ng-class="{'btn-danger': !$ctrl.rules.match.stbg}"/>
+  </div>
+</div>
+</div>
+<div class="form-group" id="supertie-break-games" default-button-type
+     ng-show="$ctrl.rules.match['@type'] == 'TE' && $ctrl.rules.match.stbg">
   <label translate="Super tie break games"/>
-  <div touch-spin options="$ctrl.sets"
-       ng-model="$ctrl.rules.match.stbg"></div>
+  <div touch-spin options="$ctrl.sets" ng-model="$ctrl.rules.match.stbg"/>
   <p class="help-block" translate="super-time-break-games-help"/>
 </div>
-<div class="form-group" id="sets-to-win-match">
+<div class="form-group" default-button-type id="sets-to-win-match">
   <label translate="Sets to win a match"/>
   <div touch-spin options="$ctrl.sets"
        ng-model="$ctrl.rules.match.stw"/>
   <p class="help-block" translate="match-score-help"/>
 </div>
 <div class="form-group" id="min-games-to-win"
-     ng-show="!$ctrl.rules.match.cos"
+     ng-show="!$ctrl.rules.match.cos" default-button-type
      ng-class="{'has-error': $ctrl.errors['match-rule.min-games-to-win']}">
   <label ng-show="$ctrl.rules.match['@type'] == 'TE'"
          translate="Min games to win a set"/>
@@ -28,7 +42,7 @@
   <p class="help-block" ng-show="$ctrl.rules.match['@type'] == 'TE'"
      translate="min-games-to-win-set-help"/>
 </div>
-<div class="form-group" id="min-game-advance"
+<div class="form-group" id="min-game-advance" default-button-type
      ng-show="!$ctrl.rules.match.cos">
   <label translate="Min score advance to win a set"/>
   <div touch-spin options="$ctrl.advance"

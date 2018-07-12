@@ -3,7 +3,7 @@ import pickScoreStrategy from './pickScoreStrategy.js';
 
 export default class BaseScoreSet extends AngularBean {
     static get $inject() {
-        return ['requestStatus', '$scope', '$location',
+        return ['$scope', '$location', 'InfoPopup',
                 'syncTranslate', '$rootScope', 'binder', '$routeParams'];
     }
 
@@ -35,12 +35,18 @@ export default class BaseScoreSet extends AngularBean {
 
     noBalance() {
         const sport = this.match.sport;
-        const winScore = this.scoreStrategy.defaultWinnerScore(sport, this.match.playedSets);
+        const winScore = this.scoreStrategy.defaultWinnerScore(
+            sport, this.match.playedSets);
         this.scores[this.winnerIdx] = winScore;
-        this.possibleWinScores = this.scoreStrategy.winnerOptions(sport, winScore, this.match.playedSets);
-        this.possibleLostScores = this.scoreStrategy.loserOptions(sport,
-                                                                  this.scores[this.winnerIdx],
-                                                                  this.match.playedSets);
+        this.possibleWinScores = this.scoreStrategy.winnerOptions(
+            sport, winScore, this.match.playedSets);
+        this.possibleLostScores = this.scoreStrategy.loserOptions(
+            sport, this.scores[this.winnerIdx], this.match.playedSets);
+    }
+
+    showExtend() {
+        return this.scoreStrategy && this.scoreStrategy.showExtend(
+            this.match.sport, this.match.playedSets);
     }
 
     extendWinScore() {
@@ -115,13 +121,12 @@ export default class BaseScoreSet extends AngularBean {
     }
 
     scoreIsProvided() {
-        this.requestStatus.startLoading("Documenting the score");
         if (this.scores[0] < 0 || this.scores[1] < 0) {
-            this.requestStatus.validationFailed("Not all participants have been scored");
+            this.info.transError("Not all participants have been scored");
             return;
         }
         if (this.scores[0] == this.scores[1]) {
-            this.requestStatus.validationFailed("Participants cannot have same scores");
+            this.info.transError("Participants cannot have same scores");
             return;
         }
         this.$rootScope.$broadcast(
@@ -133,8 +138,8 @@ export default class BaseScoreSet extends AngularBean {
     }
 
     nextScore(okResp) {
-        this.requestStatus.startLoading(
-            ['Set n scored. Match continues', {n: 1 + this.match.playedSets}]);
+        this.info.transInfo(
+            'Set n scored. Match continues', {n: 1 + this.match.playedSets});
         this.match.playedSets = okResp.nextSetNumberToScore;
         this.nextScoreUpdated();
         this.reset();
@@ -151,6 +156,8 @@ export default class BaseScoreSet extends AngularBean {
 
     constructor() {
         super(...arguments);
+        this.info = this.InfoPopup.createScope(this.$scope);
+
         this.sBtnTrans = this.syncTranslate.create();
         this.winnerIdx = 0;
 

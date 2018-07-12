@@ -1,20 +1,15 @@
 <form>
   <div class="container admin-score">
-    <base-score-set></base-score-set>
-    <div class="form-group">
-      <request-status></request-status>
-    </div>
+    <base-score-set/>
     <div class="form-group">
       <button class="btn btn-primary"
               ng-click="$ctrl.scoreMatchSet()">
         {{ $ctrl.setScoreBtn }}
       </button>
-      <button class="btn btn-default" back-button>
-        {{ 'Back btn' | translate }}
-      </button>
+      <button class="btn btn-default" back-button translate="Back btn"/>
       <a ng-show="$ctrl.nextSetNumber > 1"
          class="btn btn-warning" href="#!/match/edit-score/{{$ctrl.tournamentId}}/{{$ctrl.matchId}}">
-        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="glyphicon glyphicon-pencil"/>
       </a>
     </div>
   </div>

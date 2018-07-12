@@ -32,8 +32,12 @@ export default class InfoPopupService extends AngularBean {
         return this.showMessage({format: 'verb', level: 'danger', text: msg});
     }
 
-    createScope() {
-        return new ScopedInfoPopup(this);
+    createScope($scope) {
+        const result = new ScopedInfoPopup(this);
+        if ($scope) {
+            $scope.$on('$destroy', () => result.clearAll());
+        }
+        return result;
     }
 
     removeMessage(msg) {

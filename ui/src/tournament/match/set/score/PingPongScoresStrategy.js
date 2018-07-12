@@ -1,9 +1,10 @@
 import BaseScoresStrategy from './BaseScoresStrategy.js';
 
 export default class PingPongScoresStrategy extends BaseScoresStrategy {
-    showExtend() {
+    showExtend(rules, playedSets) {
         return true;
     }
+
     winnerOptions(rules, winScore, playedSets) {
         if (winScore == rules.mgtw) {
             return [rules.mgtw];
@@ -14,6 +15,7 @@ export default class PingPongScoresStrategy extends BaseScoresStrategy {
             throw new RangeError('win score ' + winScore + ' is too small');
         }
     }
+
     loserOptions(rules, winnerOption) {
         if (winnerOption == rules.mgtw) {
            let result = [];
@@ -24,6 +26,7 @@ export default class PingPongScoresStrategy extends BaseScoresStrategy {
         }
         return [winnerOption - rules.maig];
     }
+
     defaultWinnerScore(rules, playedSets) {
         return rules.mgtw;
     }

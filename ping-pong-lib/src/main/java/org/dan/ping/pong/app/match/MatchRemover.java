@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.match;
 
 import static java.util.stream.Collectors.toList;
 
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
@@ -21,7 +22,7 @@ public class MatchRemover {
     }
 
     public void removeByCategory(
-            TournamentMemState tournament, int cid, DbUpdater batch) {
+            TournamentMemState tournament, Cid cid, DbUpdater batch) {
         final List<Mid> toBeRemoved = tournament
                 .findMatchesByCid(cid)
                 .map(MatchInfo::getMid)

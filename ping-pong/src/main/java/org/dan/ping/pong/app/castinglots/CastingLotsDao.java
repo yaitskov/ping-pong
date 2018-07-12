@@ -22,6 +22,8 @@ import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.rank.OrderDirection;
+import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupSchedule;
 import org.dan.ping.pong.app.match.MatchDaoServer;
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -65,7 +67,7 @@ public class CastingLotsDao implements CastingLotsDaoIf {
     }
 
     @Override
-    public int generateGroupMatches(DbUpdater batch, TournamentMemState tournament, int gid,
+    public int generateGroupMatches(DbUpdater batch, TournamentMemState tournament, Gid gid,
             List<ParticipantMemState> groupBids, int priorityGroup,
             Optional<MatchTag> tag) {
         final Tid tid = tournament.getTid();
@@ -109,12 +111,13 @@ public class CastingLotsDao implements CastingLotsDaoIf {
         return priorityGroup;
     }
 
-    public Mid generatePlayOffMatches(DbUpdater batch, TournamentMemState tInfo, Integer cid,
+    public Mid generatePlayOffMatches(DbUpdater batch, TournamentMemState tInfo, Cid cid,
             int playOffStartPositions, int basePlayOffPriority) {
-        return generatePlayOffMatches(batch, tInfo, cid,playOffStartPositions, basePlayOffPriority, empty());
+        return generatePlayOffMatches(batch, tInfo, cid,
+                playOffStartPositions, basePlayOffPriority, empty());
     }
 
-    public Mid generatePlayOffMatches(DbUpdater batch, TournamentMemState tInfo, Integer cid,
+    public Mid generatePlayOffMatches(DbUpdater batch, TournamentMemState tInfo, Cid cid,
             int playOffStartPositions, int basePlayOffPriority, Optional<MatchTag> tag) {
         final Tid tid = tInfo.getTid();
         log.info("Generate play off matches for {} bids in tid {}",
@@ -212,7 +215,7 @@ public class CastingLotsDao implements CastingLotsDaoIf {
     }
 
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<RankedBid> loadManualBidsOrder(Tid tid, int cid) {
+    public List<RankedBid> loadManualBidsOrder(Tid tid, Cid cid) {
         return jooq.select(USERS.NAME, BID.BID_, BID.PROVIDED_RANK, BID.SEED)
                 .from(BID)
                 .innerJoin(USERS)

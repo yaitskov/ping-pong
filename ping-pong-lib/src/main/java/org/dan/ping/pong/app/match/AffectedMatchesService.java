@@ -19,6 +19,7 @@ import static org.dan.ping.pong.sys.hash.HashAggregator.createHashAggregator;
 import com.google.common.collect.Sets.SetView;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.dispute.MatchSets;
 import org.dan.ping.pong.app.match.rule.GroupParticipantOrder;
@@ -164,7 +165,7 @@ public class AffectedMatchesService {
         return (int) matches.stream().filter(MatchInfo::continues).count();
     }
 
-    private List<Bid> bidsByGroup(TournamentMemState tournament, Optional<Integer> ogid) {
+    private List<Bid> bidsByGroup(TournamentMemState tournament, Optional<Gid> ogid) {
         return tournament.getParticipants().values().stream()
                 .filter(p -> p.getGid().equals(ogid))
                 .map(ParticipantMemState::getBid)
@@ -255,14 +256,14 @@ public class AffectedMatchesService {
             TournamentMemState tournament,
             List<MatchInfo> allGroupMatches,
             List<MatchInfo> allNewGroupMatches) {
-        final int gid = allGroupMatches.get(0).groupId();
+        final Gid gid = allGroupMatches.get(0).groupId();
         final Set<Bid> groupBids = tournament.bidsInGroup(gid);
         final GroupParticipantOrder order = groupParticipantOrderService
-                .findOrder(ofParams(gid, tournament, allGroupMatches,
+                .findOrder(ofParams(Optional.of(gid), tournament, allGroupMatches,
                         tournament.orderRules(),
                         new HashSet<>(groupBids)));
         final GroupParticipantOrder newOrder = groupParticipantOrderService
-                .findOrder(ofParams(gid, tournament, allNewGroupMatches,
+                .findOrder(ofParams(Optional.of(gid), tournament, allNewGroupMatches,
                         tournament.orderRules(),
                         groupBids));
 
@@ -289,9 +290,9 @@ public class AffectedMatchesService {
 
     private AffectedMatches findPossibleDisambiguationMatchesToGenerate(
             TournamentMemState tournament, List<MatchInfo> originMatches) {
-        final int gid = originMatches.get(0).groupId();
+        final Gid gid = originMatches.get(0).groupId();
         final GroupParticipantOrder order = groupParticipantOrderService
-                .findOrder(ofParams(gid,
+                .findOrder(ofParams(Optional.of(gid),
                         tournament, originMatches, tournament.orderRules(),
                         tournament.bidsInGroup(gid)));
 

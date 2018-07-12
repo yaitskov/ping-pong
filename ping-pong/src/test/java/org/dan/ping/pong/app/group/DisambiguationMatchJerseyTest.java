@@ -34,6 +34,7 @@ import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.reason.DecreasingIntScalarReason;
@@ -391,7 +392,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                     .scoreSet(p1, 11, p2, 0)
                     .scoreSet(p3, 11, p2, 0);
 
-            final int cid = scenario.getCategoryDbId().get(c1);
+            final Cid cid = scenario.getCategoryDbId().get(c1);
 
             final GroupPopulations populations = myRest()
                     .get(GROUP_POPULATIONS + scenario.getTid().getTid() + CID + cid,
@@ -410,12 +411,12 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
         });
     }
 
-    private Bid enlistParticipant(TournamentScenario scenario, int cid, GroupPopulations populations, String p5) {
+    private Bid enlistParticipant(TournamentScenario scenario, Cid cid, GroupPopulations populations, String p5) {
         return enlistParticipant(scenario, cid, Optional.of(populations.getLinks().get(0).getGid()), p5);
     }
 
-    private Bid enlistParticipant(TournamentScenario scenario, int cid,
-            Optional<Integer> gid, String p5) {
+    private Bid enlistParticipant(TournamentScenario scenario, Cid cid,
+            Optional<Gid> gid, String p5) {
         final Uid uid = myRest().post(OFFLINE_USER_REGISTER, scenario,
                 OfflineUserRegRequest
                         .builder()

@@ -18,6 +18,7 @@ import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.category.CategoryService;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchTag;
@@ -45,7 +46,7 @@ import javax.inject.Inject;
 @Slf4j
 public class PlayOffService {
     public List<MatchInfo> findBaseMatches(TournamentMemState tournament,
-            int cid, Optional<MatchTag> tag) {
+            Cid cid, Optional<MatchTag> tag) {
         return findBaseMatches(findPlayOffMatches(tournament, cid, tag));
     }
 
@@ -62,10 +63,10 @@ public class PlayOffService {
     }
 
     public List<MatchInfo> findPlayOffMatches(
-            TournamentMemState tournament, int cid, Optional<MatchTag> tag) {
+            TournamentMemState tournament, Cid cid, Optional<MatchTag> tag) {
         return tournament.getMatches().values().stream()
                 .filter(matchInfo -> tag.map(t -> tag.equals(matchInfo.getTag())).orElse(true))
-                .filter(minfo -> minfo.getCid() == cid)
+                .filter(minfo -> minfo.getCid().equals(cid))
                 .filter(minfo -> !minfo.getGid().isPresent())
                 .sorted(Comparator.comparing(MatchInfo::getMid))
                 .collect(toList());
@@ -80,7 +81,7 @@ public class PlayOffService {
     @Inject
     private BallsBalanceRuleService ballsBalanceRuleService;
 
-    public PlayOffResultEntries playOffResult(TournamentMemState tournament, int cid,
+    public PlayOffResultEntries playOffResult(TournamentMemState tournament, Cid cid,
             List<TournamentResultEntry> groupOrdered) {
         final Map<Bid, PlayOffBidStat> uidStat = new HashMap<>();
         final MatchRules matchRules = tournament.playOffMatchRules();
@@ -150,11 +151,11 @@ public class PlayOffService {
                 .build();
     }
 
-    private PlayOffResultEntries tournamentOfSingle(TournamentMemState tournament, int cid) {
+    private PlayOffResultEntries tournamentOfSingle(TournamentMemState tournament, Cid cid) {
         final List<TournamentResultEntry> entries = tournament.getParticipants()
                 .values()
                 .stream()
-                .filter(bid -> bid.state() == Win1 && bid.getCid() == cid)
+                .filter(bid -> bid.state() == Win1 && bid.getCid().equals(cid))
                 .map(bid -> TournamentResultEntry.builder()
                         .user(bid.toBidLink())
                         .playOffStep(Optional.of(1))
@@ -204,7 +205,7 @@ public class PlayOffService {
     }
 
     public PlayOffMatches playOffMatches(TournamentMemState tournament,
-            int cid, Optional<MatchTag> tag) {
+            Cid cid, Optional<MatchTag> tag) {
         final List<MatchLink> transitions = new ArrayList<>();
         final List<PlayOffMatch> matches = new ArrayList<>();
         final Map<Bid, String> participants = new HashMap<>();
@@ -265,7 +266,7 @@ public class PlayOffService {
     }
 
     public Stream<MatchInfo> findMatchesByLevelAndCid(
-            int level, int cid, Stream<MatchInfo> stream) {
-        return stream.filter(m -> m.getCid() == cid && m.getLevel() == level);
+            int level, Cid cid, Stream<MatchInfo> stream) {
+        return stream.filter(m -> m.getCid().equals(cid) && m.getLevel() == level);
     }
 }

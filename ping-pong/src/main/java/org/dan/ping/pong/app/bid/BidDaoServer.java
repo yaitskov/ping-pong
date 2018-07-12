@@ -15,6 +15,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -82,7 +83,7 @@ public class BidDaoServer implements BidDao {
     }
 
     @Override
-    public void setGroupForUids(DbUpdater batch, int gid, Tid tid,
+    public void setGroupForUids(DbUpdater batch, Gid gid, Tid tid,
             List<ParticipantMemState> groupBids) {
         batch.exec(DbUpdateSql.builder()
                 .query(setGid(gid, tid, groupBids))
@@ -94,9 +95,9 @@ public class BidDaoServer implements BidDao {
                 .build());
     }
 
-    private UpdateConditionStep<BidRecord> setGid(int gid, Tid tid, List<ParticipantMemState> groupBids) {
+    private UpdateConditionStep<BidRecord> setGid(Gid gid, Tid tid, List<ParticipantMemState> groupBids) {
         return jooq.update(BID)
-                .set(BID.GID, Optional.of(gid))
+                .set(BID.GID, Optional.of(gid.intValue()))
                 .where(BID.TID.eq(tid),
                         BID.BID_.in(groupBids.stream()
                                 .map(ParticipantMemState::getBid)
@@ -112,11 +113,12 @@ public class BidDaoServer implements BidDao {
                         BID.STATE, BID.PROVIDED_RANK, BID.CREATED, BID.UPDATED, BID.GID, BID.BID_)
                         .values(bid.getCid(), bid.getTid(), bid.getUid(),
                                 bid.getBidState(), providedRank, bid.getEnlistedAt(),
-                                Optional.of(bid.getUpdatedAt()), bid.getGid(), bid.getBid())
+                                Optional.of(bid.getUpdatedAt()),
+                                bid.getGid().map(Gid::intValue), bid.getBid())
                         .onDuplicateKeyUpdate()
                         .set(BID.STATE, bid.getBidState())
                         .set(BID.UPDATED, Optional.of(bid.getUpdatedAt()))
-                        .set(BID.GID, bid.getGid())
+                        .set(BID.GID, bid.getGid().map(Gid::intValue))
                         .set(BID.PROVIDED_RANK, providedRank)
                         .set(BID.CID, bid.getCid()))
                 .build());
@@ -158,7 +160,7 @@ public class BidDaoServer implements BidDao {
                         r -> ParticipantMemState.builder()
                                 .tid(tid)
                                 .cid(r.get(BID.CID))
-                                .gid(r.get(BID.GID))
+                                .gid(r.get(BID.GID).map(Gid::new))
                                 .bid(maxBid.apply(r.get(BID.BID_)))
                                 .enlistedAt(r.get(BID.CREATED))
                                 .updatedAt(r.get(BID.UPDATED).orElse(r.get(BID.CREATED)))

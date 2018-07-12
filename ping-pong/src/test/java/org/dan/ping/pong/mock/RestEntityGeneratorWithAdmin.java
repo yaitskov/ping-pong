@@ -1,5 +1,6 @@
 package org.dan.ping.pong.mock;
 
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.mock.simulator.PlayerCategory;
@@ -14,7 +15,7 @@ public class RestEntityGeneratorWithAdmin {
     @Inject
     private RestEntityGenerator restEntityGenerator;
 
-    public void enlistParticipants(Tid tid, int cid,
+    public void enlistParticipants(Tid tid, Cid cid,
             PlayerCategory category, List<TestUserSession> participants) {
         restEntityGenerator.enlistParticipants(
                 testAdmin, tid, cid, category, participants);

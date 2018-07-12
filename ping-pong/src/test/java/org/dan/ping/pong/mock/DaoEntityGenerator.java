@@ -8,6 +8,7 @@ import static org.dan.ping.pong.sys.db.DbStrictUpdater.DB_STRICT_UPDATER;
 
 import org.dan.ping.pong.app.auth.AuthDao;
 import org.dan.ping.pong.app.category.CategoryDao;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.category.NewCategory;
 import org.dan.ping.pong.app.city.CityDao;
 import org.dan.ping.pong.app.city.CityLink;
@@ -161,7 +162,7 @@ public class DaoEntityGenerator {
     private CategoryDao categoryDao;
 
     @Transactional
-    public void genCategory(String name, Tid tid, int cid) {
+    public void genCategory(String name, Tid tid, Cid cid) {
         categoryDao.create(
                 NewCategory.builder()
                         .name(name)

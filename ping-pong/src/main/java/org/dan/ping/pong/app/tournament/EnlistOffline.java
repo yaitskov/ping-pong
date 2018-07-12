@@ -9,6 +9,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.group.Gid;
 import org.jooq.types.UByte;
 
 import java.util.Optional;
@@ -26,18 +28,18 @@ import javax.validation.constraints.Min;
 public class EnlistOffline implements Enlist {
     @Min(value = 1, message = "Category id is missing")
     @Max(value = UByte.MAX_VALUE, message = "Category id overflow")
-    private int cid;
+    private Cid cid;
     @Valid
     private Tid tid;
     @Valid
     private Uid uid;
     private BidState bidState;
     private Optional<Integer> providedRank = Optional.empty();
-    private Optional<Integer> groupId = Optional.empty();
+    private Optional<Gid> groupId = Optional.empty();
 
     public static class EnlistOfflineBuilder {
         BidState bidState = BidState.Here;
         Optional<Integer> providedRank = Optional.empty();
-        Optional<Integer> groupId = Optional.empty();
+        Optional<Gid> groupId = Optional.empty();
     }
 }

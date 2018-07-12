@@ -52,6 +52,7 @@ import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.category.CategoryInfo;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.city.CityLink;
 import org.dan.ping.pong.app.place.ForTestPlaceDao;
 import org.dan.ping.pong.app.place.Pid;
@@ -174,7 +175,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                         .header(SESSION, userSession.getSession())
                         .post(Entity.entity(EnlistTournament.builder()
                                 .tid(tid)
-                                .categoryId(daoGenerator.genCategory(tid, 1))
+                                .categoryId(daoGenerator.genCategory(tid))
                                 .build(), APPLICATION_JSON))
                         .getStatus());
 
@@ -202,7 +203,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
                         .phone(Optional.of(phone))
                         .build());
         final Tid tid = daoGenerator.genTournament(placeId);
-        final int cid = daoGenerator.genCategory(tid, 1);
+        final Cid cid = daoGenerator.genCategory(tid);
 
         final DraftingTournamentInfo adminResult = myRest().get(DRAFTING + tid.getTid(),
                 adminSession, DraftingTournamentInfo.class);
@@ -243,8 +244,8 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     public void resignReenlistToOtherCategory() {
         final Tid tid = daoGenerator.genTournament(
                 daoGenerator.genPlace(0), Draft);
-        final int cid1 = daoGenerator.genCategory(tid, 1);
-        final int cid2 = daoGenerator.genCategory(tid, 2);
+        final Cid cid1 = daoGenerator.genCategory(tid);
+        final Cid cid2 = daoGenerator.genCategory(tid, Cid.of(2));
         myRest().voidPost(TOURNAMENT_ENLIST, userSession, EnlistTournament.builder()
                 .tid(tid)
                 .categoryId(cid1)
@@ -288,7 +289,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     public void runningTournaments() {
         final Pid placeId = daoGenerator.genPlace(1);
         final Tid tid = daoGenerator.genTournament(placeId, Draft, 1);
-        final int cid = daoGenerator.genCategory(tid, 1);
+        final Cid cid = daoGenerator.genCategory(tid);
 
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
         restEntityGenerator.participantsEnlistThemselves(myRest(), adminSession, tid, cid, c1, participants);
@@ -318,7 +319,7 @@ public class TournamentJerseyTest extends AbstractSpringJerseyTest {
     public void enlistOffline() {
         final Tid tid = daoGenerator.genTournament(
                 daoGenerator.genPlace(0), Draft);
-        final int cid = daoGenerator.genCategory(tid, 1);
+        final Cid cid = daoGenerator.genCategory(tid);
         final String name = UUID.randomUUID().toString();
         final Bid bid = simulator.enlistNewParticipant(tid, adminSession, cid, Optional.empty(), name,
                 BidState.Want);

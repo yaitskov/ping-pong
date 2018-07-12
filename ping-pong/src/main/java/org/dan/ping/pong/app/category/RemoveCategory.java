@@ -14,5 +14,5 @@ import org.dan.ping.pong.app.tournament.Tid;
 @AllArgsConstructor
 public class RemoveCategory {
     private Tid tid;
-    private int cid;
+    private Cid cid;
 }

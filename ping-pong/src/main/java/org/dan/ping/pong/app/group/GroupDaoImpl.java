@@ -6,6 +6,7 @@ import static org.dan.ping.pong.app.castinglots.GroupState.Open;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.sys.db.DbUpdateSql;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.app.tournament.Tid;
@@ -24,7 +25,7 @@ public class GroupDaoImpl implements GroupDao {
     private DSLContext jooq;
 
     @Override
-    public void createGroup(int gid, DbUpdater batch, Tid tid, Integer cid, String label,
+    public void createGroup(Gid gid, DbUpdater batch, Tid tid, Cid cid, String label,
             int quits, int ordNumber) {
         batch.exec(DbUpdateSql
                 .builder()
@@ -37,7 +38,7 @@ public class GroupDaoImpl implements GroupDao {
     }
 
     @Override
-    public Map<Integer, GroupInfo> load(Tid tid, MaxValue<Integer> maxGid) {
+    public Map<Gid, GroupInfo> load(Tid tid, MaxValue<Gid> maxGid) {
         return jooq.select(GROUPS.GID, GROUPS.CID, GROUPS.SORT, GROUPS.LABEL)
                 .from(GROUPS)
                 .where(GROUPS.TID.eq(tid))
@@ -62,7 +63,7 @@ public class GroupDaoImpl implements GroupDao {
     }
 
     @Override
-    public void deleteByIds(DbUpdater batch, Tid tid, List<Integer> gids) {
+    public void deleteByIds(DbUpdater batch, Tid tid, List<Gid> gids) {
         batch.exec(DbUpdateSql.builder()
                 .mustAffectRows(Optional.of(gids.size()))
                 .query(jooq.deleteFrom(GROUPS)

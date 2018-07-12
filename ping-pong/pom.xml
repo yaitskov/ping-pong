@@ -504,12 +504,12 @@
                                 </customType>
                                 <customType>
                                     <name>Cid</name>
-                                    <type>java.lang.Integer</type>
+                                    <type>org.dan.ping.pong.app.category.Cid</type>
                                     <binding>org.dan.ping.pong.sys.db.converters.num.CidConverter</binding>
                                 </customType>
                                 <customType>
                                     <name>Gid</name>
-                                    <type>java.lang.Integer</type>
+                                    <type>org.dan.ping.pong.app.group.Gid</type>
                                     <binding>org.dan.ping.pong.sys.db.converters.num.GidConverter</binding>
                                 </customType>
                                 <customType>

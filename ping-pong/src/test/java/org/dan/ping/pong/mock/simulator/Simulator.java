@@ -32,6 +32,8 @@ import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupPopulations;
 import org.dan.ping.pong.app.match.ForTestBidDao;
 import org.dan.ping.pong.app.match.ForTestMatchDao;
@@ -136,7 +138,7 @@ public class Simulator {
                         .collect(toList()));
         List<BidState> bidStates = asList(BidState.Win1, BidState.Win2, BidState.Win3);
         for (PlayerCategory playerCategory : scenario.getChampions().keySet()) {
-            final int cid = scenario.getCategoryDbId().get(playerCategory);
+            final Cid cid = scenario.getCategoryDbId().get(playerCategory);
             assertEquals(scenario.getChampions().get(playerCategory),
                     forTestBidDao.findByTidAndState(scenario.getTid(), cid, bidStates)
                             .stream()
@@ -414,7 +416,7 @@ public class Simulator {
     }
 
     public void enlist(PlayerCategory category, TournamentScenario scenario, Tid tid) {
-        final int catId = scenario.getCategoryDbId().get(category);
+        final Cid catId = scenario.getCategoryDbId().get(category);
         final List<TestUserSession> sessions = scenario.getPlayersByCategories()
                 .get(category)
                 .stream()
@@ -440,24 +442,25 @@ public class Simulator {
     public void genCategories(TournamentScenario scenario, String prefix, Tid tid) {
         int catId = 0;
         for (PlayerCategory category : scenario.getCategoryDbId().keySet()) {
-            daoGenerator.genCategory(prefix + " " + category, tid, ++catId);
-            scenario.getCategoryDbId().put(category, catId);
+            Cid cat = new Cid(++catId);
+            daoGenerator.genCategory(prefix + " " + category, tid, cat);
+            scenario.getCategoryDbId().put(category, cat);
         }
     }
 
     public Bid enlistNewParticipant(TournamentScenario scenario,
-            int cid, GroupPopulations populations, String p5) {
+            Cid cid, GroupPopulations populations, String p5) {
         return enlistNewParticipant(scenario, cid,
                 Optional.of(populations.getLinks().get(0).getGid()), p5);
     }
 
-    public Bid enlistNewParticipant(TournamentScenario scenario, int cid,
-            Optional<Integer> gid, String name) {
+    public Bid enlistNewParticipant(TournamentScenario scenario, Cid cid,
+            Optional<Gid> gid, String name) {
         return enlistNewParticipant(scenario.getTid(), scenario, cid, gid, name, BidState.Wait);
     }
 
-    public Bid enlistNewParticipant(Tid tid, SessionAware sessionAware, int cid,
-            Optional<Integer> gid, String name, BidState state) {
+    public Bid enlistNewParticipant(Tid tid, SessionAware sessionAware, Cid cid,
+            Optional<Gid> gid, String name, BidState state) {
         final Uid uid = rest.post(OFFLINE_USER_REGISTER, sessionAware,
                 OfflineUserRegRequest
                         .builder()
@@ -467,7 +470,7 @@ public class Simulator {
     }
 
     public Bid enlistExistingParticipant(Tid tid, SessionAware sessionAware,
-            int cid, Optional<Integer> gid, BidState state, Uid uid) {
+            Cid cid, Optional<Gid> gid, BidState state, Uid uid) {
         return rest.post(TOURNAMENT_ENLIST_OFFLINE, sessionAware,
                 EnlistOffline.builder()
                         .groupId(gid)

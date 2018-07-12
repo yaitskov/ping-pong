@@ -1,11 +1,12 @@
 package org.dan.ping.pong.sys.db.converters.num;
 
+import org.dan.ping.pong.app.category.Cid;
 import org.jooq.types.UByte;
 
-public class CidConverter extends UByteConverter<Integer> {
+public class CidConverter extends UByteConverter<Cid> {
     @Override
-    protected Integer fromNonNull(UByte u) {
-        return u.intValue();
+    protected Cid fromNonNull(UByte u) {
+        return new Cid(u.intValue());
     }
 
     @Override
@@ -14,7 +15,7 @@ public class CidConverter extends UByteConverter<Integer> {
     }
 
     @Override
-    public Class<Integer> toType() {
-        return Integer.class;
+    public Class<Cid> toType() {
+        return Cid.class;
     }
 }

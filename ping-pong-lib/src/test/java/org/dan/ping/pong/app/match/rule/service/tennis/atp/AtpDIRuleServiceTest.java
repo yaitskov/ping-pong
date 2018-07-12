@@ -10,6 +10,7 @@ import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.
 import static org.dan.ping.pong.app.match.rule.GroupParticipantOrderServiceTest.BID5;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.AtpDI;
 import static org.dan.ping.pong.app.match.rule.reason.IncreasingIntScalarReason.ofIntI;
+import static org.dan.ping.pong.app.match.rule.service.tennis.atp.AtpDIIPercentWonSetsRuleTest.OGID;
 import static org.dan.ping.pong.app.sport.tennis.TennisSportTest.CLASSIC_TENNIS_RULES;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -46,7 +47,7 @@ public class AtpDIRuleServiceTest {
     private static final List<MatchInfo> BASE = asList(
             MatchInfo.builder().state(Over)
                     .winnerId(Optional.of(BID2))
-                    .gid(Optional.of(1))
+                    .gid(OGID)
                     .tag(Optional.empty())
                     .participantIdScore(
                             ImmutableMap.of(BID2, asList(6, 6),
@@ -54,7 +55,7 @@ public class AtpDIRuleServiceTest {
                     .build(),
             MatchInfo.builder().state(Over)
                     .winnerId(Optional.of(BID2))
-                    .gid(Optional.of(1))
+                    .gid(OGID)
                     .tag(Optional.empty())
                     .participantIdScore(
                             ImmutableMap.of(BID2, asList(6, 6),
@@ -62,7 +63,7 @@ public class AtpDIRuleServiceTest {
                     .build(),
             MatchInfo.builder().state(Over)
                     .winnerId(Optional.of(BID3))
-                    .gid(Optional.of(1))
+                    .gid(OGID)
                     .tag(Optional.empty())
                     .participantIdScore(
                             ImmutableMap.of(BID3, asList(6, 6),
@@ -70,7 +71,7 @@ public class AtpDIRuleServiceTest {
                     .build(),
             MatchInfo.builder().state(Over)
                     .winnerId(Optional.of(BID5))
-                    .gid(Optional.of(1))
+                    .gid(OGID)
                     .tag(Optional.empty())
                     .participantIdScore(
                             ImmutableMap.of(BID3, asList(3, 2),
@@ -78,7 +79,7 @@ public class AtpDIRuleServiceTest {
                     .build(),
             MatchInfo.builder().state(Over)
                     .winnerId(Optional.of(BID4))
-                    .gid(Optional.of(1))
+                    .gid(OGID)
                     .tag(Optional.empty())
                     .participantIdScore(
                             ImmutableMap.of(BID4, asList(6, 6),
@@ -90,7 +91,7 @@ public class AtpDIRuleServiceTest {
                     .add(
                             MatchInfo.builder().state(Over)
                                     .winnerId(Optional.of(BID2))
-                                    .gid(Optional.of(1))
+                                    .gid(OGID)
                                     .tag(Optional.empty())
                                     .participantIdScore(ImmutableMap.of(
                                             BID2, emptyList(),
@@ -104,7 +105,7 @@ public class AtpDIRuleServiceTest {
                     .add(
                             MatchInfo.builder().state(Over)
                                     .winnerId(Optional.of(BID2))
-                                    .gid(Optional.of(1))
+                                    .gid(OGID)
                                     .tag(Optional.empty())
                                     .participantIdScore(ImmutableMap.of(
                                             BID2, asList(6, 6),

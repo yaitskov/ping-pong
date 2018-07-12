@@ -11,8 +11,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.category.Cid;
 
 import java.util.Optional;
+
+import javax.validation.Valid;
 
 @Getter
 @Setter
@@ -21,13 +24,14 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class EnlistTournament implements Enlist {
-    private int categoryId;
+    @Valid
+    private Cid categoryId;
     private Tid tid;
     private Optional<Integer> providedRank = Optional.empty();
     private BidState bidState = Want;
 
     @JsonIgnore
-    public int getCid() {
+    public Cid getCid() {
         return categoryId;
     }
 

@@ -15,6 +15,8 @@ import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.app.user.UserLinkIf;
 
@@ -36,17 +38,17 @@ public class ParticipantMemState implements UserLinkIf {
     private Uid uid;
     private Bid bid;
     private BidState bidState;
-    private Optional<Integer> gid = Optional.empty();
-    private int cid;
+    private Optional<Gid> gid = Optional.empty();
+    private Cid cid;
     private String name;
     private Instant enlistedAt;
     private Instant updatedAt;
 
     public static class ParticipantMemStateBuilder {
-        Optional<Integer> gid = Optional.empty();
+        Optional<Gid> gid = Optional.empty();
     }
 
-    public int gid() {
+    public Gid gid() {
         return gid.orElseThrow(() -> internalError(
                 "Participant is not in a group",
                 ImmutableMap.of(TID, tid, UID, uid)));
@@ -74,11 +76,11 @@ public class ParticipantMemState implements UserLinkIf {
                 .build();
     }
 
-    public static ParticipantMemState createLoserBid(Tid tid, int cid) {
+    public static ParticipantMemState createLoserBid(Tid tid, Cid cid) {
         return createLoserBid(tid, cid, Lost);
     }
 
-    public static ParticipantMemState createLoserBid(Tid tid, int cid, BidState state) {
+    public static ParticipantMemState createLoserBid(Tid tid, Cid cid, BidState state) {
         return ParticipantMemState.builder()
                 .tid(tid)
                 .cid(cid)

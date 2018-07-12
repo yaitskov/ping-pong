@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.tournament.rules.TournamentRulesValidator;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.sys.validation.TidBodyRequired;
@@ -143,10 +144,7 @@ public class TournamentResource {
     public void enlist(
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
-            EnlistTournament enlistment) {
-        if (enlistment.getCategoryId() < 1) {
-            throw badRequest("Category is not set");
-        }
+            @Valid EnlistTournament enlistment) {
         if (enlistment.getBidState() != BidState.Want) {
             throw badRequest("Bid state must be " + BidState.Want);
         }
@@ -218,7 +216,7 @@ public class TournamentResource {
             tournament.findBidsByUid(uid).stream()
                     .map(tournament::getParticipant)
                     .filter(p -> resign.getCid()
-                            .map(cid -> cid == p.getCid()).orElse(true))
+                            .map(cid -> cid.equals(p.getCid())).orElse(true))
                     .forEach(bid -> tournamentService.leaveTournament(
                             bid, tournament, BidState.Quit, batch));
         });
@@ -404,7 +402,7 @@ public class TournamentResource {
     public void tournamentResult(
             @Suspended AsyncResponse response,
             @PathParam(TID) Tid tid,
-            @PathParam(CID) int cid) {
+            @PathParam(CID) Cid cid) {
         tournamentAccessor.read(tid, response,
                 (tournament) -> tournamentService.tournamentResult(tournament, cid));
     }
@@ -423,7 +421,7 @@ public class TournamentResource {
     public void playOffMatches(
             @Suspended AsyncResponse response,
             @PathParam(TID) Tid tid,
-            @PathParam(CID) int cid) {
+            @PathParam(CID) Cid cid) {
         tournamentAccessor.read(tid, response,
                 (tournament) -> tournamentService.playOffMatches(tournament, cid));
     }

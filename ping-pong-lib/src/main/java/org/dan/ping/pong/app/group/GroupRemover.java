@@ -3,6 +3,7 @@ package org.dan.ping.pong.app.group;
 import static java.util.stream.Collectors.toList;
 
 import org.dan.ping.pong.app.bid.BidRemover;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
@@ -17,12 +18,12 @@ public class GroupRemover {
     @Inject
     private BidRemover bidRemover;
 
-    public void removeByCategory(TournamentMemState tournament, int cid, DbUpdater batch) {
+    public void removeByCategory(TournamentMemState tournament, Cid cid, DbUpdater batch) {
         bidRemover.removeByCategory(tournament, cid, batch);
 
-        final List<Integer> gids = tournament.getGroups()
+        final List<Gid> gids = tournament.getGroups()
                 .values().stream()
-                .filter(gi -> gi.getCid() == cid)
+                .filter(gi -> gi.getCid().equals(cid))
                 .map(GroupInfo::getGid)
                 .collect(toList());
 

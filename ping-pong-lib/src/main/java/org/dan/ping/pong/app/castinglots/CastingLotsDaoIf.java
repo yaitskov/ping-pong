@@ -2,6 +2,7 @@ package org.dan.ping.pong.app.castinglots;
 
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.rank.OrderDirection;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
@@ -15,7 +16,7 @@ import java.util.Set;
 public interface CastingLotsDaoIf {
     List<Uid> loadSeed(Tid tid, Set<Uid> uids);
 
-    int generateGroupMatches(DbUpdater batch, TournamentMemState tournament, int gid,
+    int generateGroupMatches(DbUpdater batch, TournamentMemState tournament, Gid gid,
             List<ParticipantMemState> groupBids, int priorityGroup,
             Optional<MatchTag> tag);
 

@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.group.MatchListBuilder;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
@@ -85,7 +86,7 @@ public class GroupParticipantOrderServiceTest {
     public static final Bid BID4 = new Bid(4);
     public static final Uid UID4 = new Uid(4);
     public static final Bid BID5 = new Bid(5);
-    public static final int GID2 = 2;
+    public static final Gid GID2 = Gid.of(2);
     public static final Bid BID6 = new Bid(6);
 
     public static final Set<Bid> UIDS_2_3_4_5 = ImmutableSet.of(BID2, BID3, BID4, BID5);
@@ -143,9 +144,9 @@ public class GroupParticipantOrderServiceTest {
                 });
     }
 
-    private GroupRuleParams params(int gid, TournamentMemState tournament,
+    private GroupRuleParams params(Gid gid, TournamentMemState tournament,
             MatchListBuilder matchListBuilder, Set<Bid> bids) {
-        return GroupRuleParams.ofParams(gid, tournament,
+        return GroupRuleParams.ofParams(Optional.of(gid), tournament,
                 matchListBuilder.build(), tournament.orderRules(), new HashSet<>(bids));
     }
 
@@ -342,7 +343,7 @@ public class GroupParticipantOrderServiceTest {
     public void orderUidsInGroupRandomlyDisambiguates3Participants2OfThemHaveEqualStat() {
         checkOrder(uidSets(BID6, BID4, BID5, BID2, BID3),
                 sut.findOrder(params(GID, tournamentForOrder(),
-                        MatchListBuilder.matches().ogid(21)
+                        MatchListBuilder.matches().ogid(Gid.of(21))
                                 .om(BID2, 11, BID4, 2)
                                 .om(BID2, 11, BID5, 1)
 
@@ -369,7 +370,7 @@ public class GroupParticipantOrderServiceTest {
         assertEquals(emptyList(), order2.ambiguousGroups());
     }
 
-    private GroupParticipantOrder randomOrder(TournamentMemState tournament, int gid) {
+    private GroupParticipantOrder randomOrder(TournamentMemState tournament, Gid gid) {
         return sut.findOrder(params(gid, tournament,
                 MatchListBuilder.matches().ogid(gid)
                         .om(BID2, 11, BID4, 0)

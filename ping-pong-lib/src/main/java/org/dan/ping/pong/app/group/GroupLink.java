@@ -12,6 +12,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupLink {
-    private int gid;
+    private Gid gid;
     private String label;
 }

@@ -13,6 +13,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.match.MatchTag;
@@ -36,7 +37,7 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
     private ParticipantRankingService rankingService;
 
     @Override
-    public void build(TournamentMemState tournament, Integer cid,
+    public void build(TournamentMemState tournament, Cid cid,
             List<ParticipantMemState> bids, DbUpdater batch) {
         log.info("Flat casting in tournament {} in cid {}", tournament.getTid(), cid);
         validateBidsNumberInACategory(bids);
@@ -48,7 +49,7 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
     @Inject
     private BidService bidService;
 
-    private boolean oneParticipantInCategory(TournamentMemState tournament, Integer cid,
+    private boolean oneParticipantInCategory(TournamentMemState tournament, Cid cid,
             List<ParticipantMemState> bids, DbUpdater batch, Optional<MatchTag> tag) {
         if (bids.size() > 1) {
             return false;
@@ -59,7 +60,7 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
         return true;
     }
 
-    public void build(TournamentMemState tournament, Integer cid,
+    public void build(TournamentMemState tournament, Cid cid,
             List<ParticipantMemState> orderedBids, DbUpdater batch, Optional<MatchTag> tag) {
         validateBidsNumberInACategory(orderedBids);
         if (oneParticipantInCategory(tournament, cid, orderedBids, batch, tag)) {
@@ -82,7 +83,7 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
         }
     }
 
-    protected void assignBidsToBaseMatches(Integer cid, int basePositions,
+    protected void assignBidsToBaseMatches(Cid cid, int basePositions,
             List<ParticipantMemState> orderedBids,
             TournamentMemState tournament, DbUpdater batch, Optional<MatchTag> tag) {
         final List<Integer> seeds = ofNullable(PLAY_OFF_SEEDS.get(basePositions))

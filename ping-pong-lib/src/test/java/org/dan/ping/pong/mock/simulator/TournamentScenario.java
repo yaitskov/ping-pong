@@ -25,11 +25,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.match.OpenMatchForJudge;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.mock.SessionAware;
@@ -60,7 +60,7 @@ public class TournamentScenario implements SessionAware {
     private final Map<PlayerCategory, List<Player>> champions = new HashMap<>();
     private final Map<Player, TestUserSession> playersSessions = new HashMap<>();
     private final Map<Bid, Player> bidPlayer = new LinkedHashMap<>();
-    private final Map<PlayerCategory, Integer> categoryDbId = new HashMap<>();
+    private final Map<PlayerCategory, Cid> categoryDbId = new HashMap<>();
     private final Map<Set<Player>, PlayHook> hooksOnMatches = new HashMap<>();
     private final Table<Player, PlayerCategory, EnlistMode> playerPresence = HashBasedTable.create();
     private final List<HookCallbackPro> onBeforeAnyMatch = new ArrayList<>();
@@ -100,7 +100,7 @@ public class TournamentScenario implements SessionAware {
         throw new IllegalStateException("Ambiguous category for " + p);
     }
 
-    public int catId(PlayerCategory category) {
+    public Cid catId(PlayerCategory category) {
         return ofNullable(categoryDbId.get(category))
                 .orElseThrow(() -> new RuntimeException(
                         "no category " + category + " in tournament " + tid));

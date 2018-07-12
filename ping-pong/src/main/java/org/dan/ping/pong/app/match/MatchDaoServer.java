@@ -16,6 +16,8 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.jooq.tables.Users;
@@ -67,7 +69,7 @@ public class MatchDaoServer implements MatchDao {
                         MATCHES.ENDED)
                         .values(matchInfo.getMid(),
                                 matchInfo.getTid(),
-                                matchInfo.getGid(),
+                                matchInfo.getGid().map(Gid::intValue),
                                 matchInfo.getCid(),
                                 matchInfo.getState(),
                                 matchInfo.getPriority(),
@@ -89,14 +91,14 @@ public class MatchDaoServer implements MatchDao {
     }
 
     @Override
-    public void createGroupMatch(DbUpdater batch, Mid mid, Tid tid, int gid, int cid, int priorityGroup,
+    public void createGroupMatch(DbUpdater batch, Mid mid, Tid tid, Gid gid, Cid cid, int priorityGroup,
             Bid bid1, Bid bid2, Optional<MatchTag> tag, MatchState place) {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.insertInto(MATCHES, MATCHES.MID, MATCHES.TID,
                         MATCHES.GID, MATCHES.CID,
                         MATCHES.STATE, MATCHES.PRIORITY, MATCHES.TYPE,
                         MATCHES.BID_LESS, MATCHES.BID_MORE, MATCHES.TAG)
-                        .values(mid, tid, Optional.of(gid), cid, place, priorityGroup,
+                        .values(mid, tid, Optional.of(gid).map(Gid::intValue), cid, place, priorityGroup,
                                 Grup, bid1, bid2, tag.orElse(null)))
                 .onFailure((u) -> internalError("Create group match", MID, mid))
                 .mustAffectRows(Optional.of(1))
@@ -106,7 +108,7 @@ public class MatchDaoServer implements MatchDao {
     }
 
     @Override
-    public void createPlayOffMatch(DbUpdater batch, Mid mid, Tid tid, Integer cid,
+    public void createPlayOffMatch(DbUpdater batch, Mid mid, Tid tid, Cid cid,
             Optional<Mid> winMid, Optional<Mid> loseMid,
             int priority, int level, MatchType type,
             Optional<MatchTag> tag, MatchState draft) {
@@ -277,7 +279,7 @@ public class MatchDaoServer implements MatchDao {
                     return MatchInfo.builder()
                             .mid(maxMid.apply(r.get(MATCHES.MID)))
                             .cid(r.get(MATCHES.CID))
-                            .gid(r.get(MATCHES.GID))
+                            .gid(r.get(MATCHES.GID).map(Gid::new))
                             .tag(Optional.ofNullable(r.get(MATCHES.TAG)))
                             .state(r.get(MATCHES.STATE))
                             .type(r.get(MATCHES.TYPE))

@@ -47,7 +47,7 @@ public class CategoryDaoMysql implements CategoryDao {
     }
 
     @Override
-    public void delete(Tid tid, int cid, DbUpdater batch) {
+    public void delete(Tid tid, Cid cid, DbUpdater batch) {
         log.info("Delete category {}", cid);
         batch.exec(DbUpdateSql
                 .builder()

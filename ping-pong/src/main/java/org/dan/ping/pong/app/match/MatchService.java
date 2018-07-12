@@ -48,6 +48,7 @@ import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupService;
@@ -322,7 +323,7 @@ public class MatchService {
 
     public void tryToCompleteGroup(TournamentMemState tournament, MatchInfo matchInfo,
             DbUpdater batch, Collection<BidState> expected) {
-        final int gid = matchInfo.getGid().get();
+        final Gid gid = matchInfo.getGid().get();
         final Set<Bid> matchUids = matchInfo.getParticipantIdScore().keySet();
         matchUids.stream()
                 .map(tournament::getBidOrQuit)
@@ -333,7 +334,7 @@ public class MatchService {
         tryToCompleteGroup(tournament, gid, batch);
     }
 
-    public void tryToCompleteGroup(TournamentMemState tournament, int gid, DbUpdater batch) {
+    public void tryToCompleteGroup(TournamentMemState tournament, Gid gid, DbUpdater batch) {
         final Optional<List<MatchInfo>> oMatches = groupService
                 .checkGroupComplete(tournament, gid);
 
@@ -365,7 +366,7 @@ public class MatchService {
     @Inject
     private ConsoleStrategy consoleStrategy;
 
-    private void completeParticipationLeftBids(int gid, TournamentMemState tournament,
+    private void completeParticipationLeftBids(Gid gid, TournamentMemState tournament,
             Set<Bid> loserBids, DbUpdater batch) {
         consoleStrategy.onGroupComplete(gid, tournament, loserBids, batch);
     }
@@ -399,7 +400,7 @@ public class MatchService {
     @Inject
     private PlayOffService playOffService;
 
-    private Set<Bid> completeGroup(Integer gid, TournamentMemState tournament,
+    private Set<Bid> completeGroup(Gid gid, TournamentMemState tournament,
             List<MatchInfo> matches, DbUpdater batch) {
         log.info("Pick bids for playoff from gid {} in tid {}", gid, tournament.getTid());
         final int quits = tournament.getRule().getGroup().get().getQuits();
@@ -427,7 +428,7 @@ public class MatchService {
                 .collect(toList());
     }
 
-    private List<Bid> selectQuitingUids(Integer gid, TournamentMemState tournament,
+    private List<Bid> selectQuitingUids(Gid gid, TournamentMemState tournament,
             List<Bid> orderUids, int quits) {
         final List<Bid> quitUids = orderUids.stream()
                 .map(tournament::getBidOrExpl)

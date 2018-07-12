@@ -64,7 +64,7 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
         final int tid = scenario.getTid().getTid();
 
         final TournamentGroups g = groupList(tid);
-        final int gid = g.getGroups().stream().findFirst().get().getGid();
+        final Gid gid = g.getGroups().stream().findFirst().get().getGid();
 
         final Collection<GroupParticipantResult> l = participantsResult(tid, gid);
         assertThat(participantResultByFinish(l, 0), reasonChain1(0));
@@ -110,7 +110,7 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
         return l.stream().filter(p -> p.getSeedPosition() == seed).findAny().get();
     }
 
-    private Collection<GroupParticipantResult> participantsResult(int tid, int gid) {
+    private Collection<GroupParticipantResult> participantsResult(int tid, Gid gid) {
         return groupResult(tid, gid).getParticipants();
     }
 
@@ -155,7 +155,7 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
 
 
         final TournamentGroups g = groupList(tid);
-        final int gid = g.getGroups().stream().findFirst().get().getGid();
+        final Gid gid = g.getGroups().stream().findFirst().get().getGid();
         final GroupParticipants r = groupResult(tid, gid);
 
         assertThat(player(scenario, r, p1),
@@ -184,7 +184,7 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
         final int tid = scenario.getTid().getTid();
 
         final TournamentGroups g = groupList(tid);
-        final int gid = g.getGroups().stream().findFirst().get().getGid();
+        final Gid gid = g.getGroups().stream().findFirst().get().getGid();
 
 
         simulator.enlistNewParticipant(scenario,
@@ -196,7 +196,7 @@ public class GroupResultJerseyTest extends AbstractSpringJerseyTest {
         assertThat(r, notNullValue());
     }
 
-    private GroupParticipants groupResult(int tid, int gid) {
+    private GroupParticipants groupResult(int tid, Gid gid) {
         return myRest().get(GROUP_RESULT + tid + "/"
                 + gid, GroupParticipants.class);
     }

@@ -8,12 +8,14 @@ import static org.dan.ping.pong.app.match.rule.reason.IncreasingIntScalarReason.
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.reason.Reason;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.match.rule.service.GroupOrderRuleService;
 import org.dan.ping.pong.app.match.rule.service.GroupRuleParams;
+import org.dan.ping.pong.sys.type.number.ImmutableNumber;
 import org.dan.ping.pong.util.collection.CounterInt;
 
 import java.util.ArrayList;
@@ -34,10 +36,10 @@ public class PickRandomlyRuleService implements GroupOrderRuleService {
         return Random;
     }
 
-    private List<Bid> shufflePredicted(Collection<Bid> bids, int gid) {
+    private List<Bid> shufflePredicted(Collection<Bid> bids, Gid gid) {
         final List<Bid> result = new ArrayList<>(bids);
         Collections.sort(result);
-        Collections.shuffle(result, new Random(gid));
+        Collections.shuffle(result, new Random(gid.intValue()));
         return result;
     }
 
@@ -50,20 +52,21 @@ public class PickRandomlyRuleService implements GroupOrderRuleService {
         if (params.isDisambiguationMatchesWillBeCreated()) {
             return empty();
         }
-        final int gid = params.getGid();
-        if (allUidsInOneGroup(gid)) {
+        final Optional<Gid> ogid = params.getGid();
+        if (allUidsInOneGroup(ogid)) {
             final CounterInt c = new CounterInt();
-            return of(shufflePredicted(bids, gid).stream()
+            return of(shufflePredicted(bids, ogid.get()).stream()
                     .map(bid -> ofIntI(bid, c.postInc(), getName())));
         }
-        final Multimap<Integer, Bid> gidBids = HashMultimap.create();
+        final Multimap<Gid, Bid> gidBids = HashMultimap.create();
         bids.forEach(uid -> gidBids.put(
                 params.getTournament().getParticipant(uid).gid(), uid));
-        final List<Integer> gids = new ArrayList<>(gidBids.keySet());
+        final List<Gid> gids = new ArrayList<>(gidBids.keySet());
         Collections.sort(gids);
-        Collections.shuffle(gids, new Random(gids.stream().mapToInt(o -> o).sum()));
+        Collections.shuffle(gids, new Random(gids.stream()
+                .mapToInt(ImmutableNumber::intValue).sum()));
 
-        final Map<Integer, List<Bid>> gidOrderedBids = new HashMap<>();
+        final Map<Gid, List<Bid>> gidOrderedBids = new HashMap<>();
         gids.forEach(g -> gidOrderedBids.put(g, shufflePredicted(gidBids.get(g), g)));
         final List<Bid> allBids = new ArrayList<>();
         final List<Integer> toBeRemoved = new ArrayList<>();
@@ -87,7 +90,7 @@ public class PickRandomlyRuleService implements GroupOrderRuleService {
                 .map(bid -> ofIntI(bid, c.postInc(), getName())));
     }
 
-    private boolean allUidsInOneGroup(int gid) {
-        return gid > 0;
+    private boolean allUidsInOneGroup(Optional<Gid> gid) {
+        return gid.isPresent();
     }
 }

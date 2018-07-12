@@ -13,6 +13,8 @@ import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryLink;
+import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -21,8 +23,9 @@ import org.dan.ping.pong.app.playoff.PowerRange;
 import org.dan.ping.pong.app.score.MatchScoreDao;
 import org.dan.ping.pong.util.collection.MaxValue;
 import org.dan.ping.pong.util.counter.BidSeqGen;
+import org.dan.ping.pong.util.counter.CidSeqGen;
 import org.dan.ping.pong.util.counter.DidSeqGen;
-import org.dan.ping.pong.util.counter.IdSeqGen;
+import org.dan.ping.pong.util.counter.GidSeqGen;
 import org.dan.ping.pong.util.counter.MidSeqGen;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,8 +69,8 @@ public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> 
         final Map<Mid, MatchInfo> matchMap = combineMatchesAndSets(
                 matchDao.load(tid, maxMid),
                 matchScoreDao.load(tid));
-        final MaxValue<Integer> maxCid = new MaxValue<>(0);
-        final MaxValue<Integer> maxGid = new MaxValue<>(0);
+        final MaxValue<Cid> maxCid = new MaxValue<>(Cid.of(1));
+        final MaxValue<Gid> maxGid = new MaxValue<>(Gid.of(1));
         final Map<Bid, ParticipantMemState> participants = bidDao.loadParticipants(tid, maxBid);
         return TournamentMemState.builder()
                 .name(row.getName())
@@ -86,8 +89,8 @@ public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> 
                         .peek(c -> maxCid.accept(c.getCid()))
                         .collect(toMap(CategoryLink::getCid, o -> o)))
                 .groups(groupDao.load(tid, maxGid))
-                .nextCategory(new IdSeqGen(maxCid.getMax()))
-                .nextGroup(new IdSeqGen(maxGid.getMax()))
+                .nextCategory(new CidSeqGen(maxCid.getMax()))
+                .nextGroup(new GidSeqGen(maxGid.getMax()))
                 .nextDispute(new DidSeqGen(0)) // to be load
                 .nextMatch(new MidSeqGen(maxMid.getMax()))
                 .nextBid(new BidSeqGen(maxBid.getMax()))

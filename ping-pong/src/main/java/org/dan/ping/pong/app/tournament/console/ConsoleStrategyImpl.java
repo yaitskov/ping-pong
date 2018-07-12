@@ -12,6 +12,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.category.CategoryService;
+import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.sched.ScheduleService;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
 import org.dan.ping.pong.app.tournament.RelatedTids;
@@ -53,7 +55,7 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
     @Override
     @SneakyThrows
     public void onGroupComplete(
-            int gid, TournamentMemState masterTournament,
+            Gid gid, TournamentMemState masterTournament,
             Set<Bid> loserBids, DbUpdater batch) {
         final RelatedTids relatedTids = tournamentRelationCache.get(masterTournament.getTid());
 
@@ -61,7 +63,7 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
                 relatedTids.getChild().orElseThrow(() -> internalError("tournament  "
                         + masterTournament.getTid() + " has no console tournament")));
 
-        final int cid = categoryService.findCidOrCreate(masterTournament, gid, consoleTournament, batch);
+        final Cid cid = categoryService.findCidOrCreate(masterTournament, gid, consoleTournament, batch);
 
         batch.onFailure(() -> tournamentCache.invalidate(consoleTournament.getTid()));
         log.info("Enlist loser bids {} to console tournament {}",

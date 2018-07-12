@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.tournament.JerseyWithSimulator;
 import org.dan.ping.pong.mock.simulator.Simulator;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
@@ -58,7 +59,7 @@ public class ManualSeedJerseyTest extends AbstractSpringJerseyTest {
                 .name("reseed");
 
         simulator.simulate(scenario);
-        final int cid = scenario.getCategoryDbId().get(c1);
+        final Cid cid = scenario.getCategoryDbId().get(c1);
         final List<Bid> bids = scenario.getBidPlayer().keySet()
                 .stream().sorted().collect(Collectors.toList());
         myRest().voidPost(ORDER_BIDS_MANUALLY, scenario,

@@ -1,11 +1,12 @@
 package org.dan.ping.pong.sys.db.converters.num;
 
+import org.dan.ping.pong.app.group.Gid;
 import org.jooq.types.UByte;
 
-public class GidConverter extends UByteConverter<Integer> {
+public class GidConverter extends UByteConverter<Gid> {
     @Override
-    protected Integer fromNonNull(UByte u) {
-        return u.intValue();
+    protected Gid fromNonNull(UByte u) {
+        return new Gid(u.intValue());
     }
 
     @Override
@@ -14,7 +15,7 @@ public class GidConverter extends UByteConverter<Integer> {
     }
 
     @Override
-    public Class<Integer> toType() {
-        return Integer.class;
+    public Class<Gid> toType() {
+        return Gid.class;
     }
 }

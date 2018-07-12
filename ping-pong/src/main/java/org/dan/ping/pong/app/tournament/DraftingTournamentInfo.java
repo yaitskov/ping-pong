@@ -11,6 +11,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.category.CategoryLink;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.place.PlaceLink;
 
 import java.time.Instant;
@@ -31,7 +32,7 @@ public class DraftingTournamentInfo {
     private Optional<Tid> previousTid = Optional.empty();
     private Optional<Double> ticketPrice = Optional.empty();
     private PlaceLink place;
-    private Map<Integer, BidState> categoryState = emptyMap();
+    private Map<Cid, BidState> categoryState = emptyMap();
     private boolean iAmAdmin;
     private Collection<CategoryLink> categories;
     private TournamentState state;

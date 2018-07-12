@@ -21,6 +21,8 @@ import static org.hamcrest.Matchers.is;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
 import org.junit.Test;
@@ -32,9 +34,9 @@ public class TournamentMemStateTest {
     public static final TournamentRules G8Q1_S1A2G11_L1_S3A2G11 = RULES_G8Q1_S1A2G11.withPlayOff(Optional.of(L1_S3A2G11));
     public static final TournamentRules G8Q1_S1AG11_DM_S2A2G11 = RULES_G8Q1_S1A2G11.withGroup(
             Optional.of(G8Q1.withOrderRules(DM_ORDER_RULES_S2A2G11)));
-    private final int CID = 3;
-    private final int gid1 = 1;
-    private final int gid2 = 2;
+    private final Cid CID = Cid.of(3);
+    private final Gid gid1 = Gid.of(1);
+    private final Gid gid2 = Gid.of(2);
 
     private Map<Bid, ParticipantMemState> participants =
             ImmutableMap.<Bid, ParticipantMemState>builder()
@@ -73,7 +75,7 @@ public class TournamentMemStateTest {
 
     @Test
     public void uidsInCategory() {
-        assertThat(tournament.bidsInCategory(CID - 2), is(emptySet()));
+        assertThat(tournament.bidsInCategory(Cid.of(CID.intValue() - 2)), is(emptySet()));
         assertThat(tournament.bidsInCategory(CID), is(ImmutableSet.of(BID3, BID4, BID2)));
     }
 

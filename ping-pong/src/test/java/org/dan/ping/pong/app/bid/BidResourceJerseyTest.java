@@ -36,6 +36,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupWithMembers;
 import org.dan.ping.pong.app.group.TournamentGroups;
@@ -129,7 +130,7 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
         final TournamentGroups groupsInfo = myRest()
                 .get(GROUP_LIST + scenario.getTid(), TournamentGroups.class);
 
-        final int sourceGid = findGroupByBid(bidP3, scenario.getTid(), groupsInfo);
+        final Gid sourceGid = findGroupByBid(bidP3, scenario.getTid(), groupsInfo);
 
         simulator.changeGroup(scenario, bidP3, sourceGid, findTargetGroup(groupsInfo, sourceGid));
 
@@ -150,14 +151,14 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
                         .bid(p1, Win1).bid(p3, Win2)));
     }
 
-    private Optional<Integer> findTargetGroup(TournamentGroups groupsInfo, int sourceGid) {
+    private Optional<Gid> findTargetGroup(TournamentGroups groupsInfo, Gid sourceGid) {
         return groupsInfo.getGroups().stream()
-                .filter(gi -> gi.getGid() != sourceGid)
+                .filter(gi -> !gi.getGid().equals(sourceGid))
                 .map(GroupInfo::getGid)
                 .findAny();
     }
 
-    private Integer findGroupByBid(Bid bid, Tid tid, TournamentGroups groupsInfo) {
+    private Gid findGroupByBid(Bid bid, Tid tid, TournamentGroups groupsInfo) {
         return groupsInfo.getGroups().stream()
                 .map(groupInfo -> myRest().get(MEMBERS + tid + "/" + groupInfo.getGid(),
                         GroupWithMembers.class))
@@ -217,8 +218,8 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
         final TournamentGroups groupsInfo = myRest()
                 .get(GROUP_LIST + scenario.getTid(), TournamentGroups.class);
 
-        final int sourceGid = findGroupByBid(bidP3, scenario.getTid(), groupsInfo);
-        final int targetGid = findGroupByBid(bidP4, scenario.getTid(), groupsInfo);
+        final Gid sourceGid = findGroupByBid(bidP3, scenario.getTid(), groupsInfo);
+        final Gid targetGid = findGroupByBid(bidP4, scenario.getTid(), groupsInfo);
 
         simulator.changeGroup(scenario, bidP3, sourceGid, Optional.of(targetGid));
         scenario.bidChangedCategory(bidP3, c1, c2);
@@ -242,7 +243,7 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
         final TournamentGroups groupsInfo = myRest()
                 .get(GROUP_LIST + scenario.getTid(), TournamentGroups.class);
 
-        final int sourceGid = findGroupByBid(bidP3, scenario.getTid(), groupsInfo);
+        final Gid sourceGid = findGroupByBid(bidP3, scenario.getTid(), groupsInfo);
 
         simulator.changeGroup(scenario, bidP3, sourceGid, Optional.empty());
         simulator.changeGroup(scenario, bidP4, sourceGid,

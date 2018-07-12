@@ -1,6 +1,5 @@
 package org.dan.ping.pong.app.tournament;
 
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -36,6 +35,8 @@ import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryLink;
+import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.Mid;
@@ -50,21 +51,19 @@ import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.sys.error.PiPoEx;
 import org.dan.ping.pong.util.counter.BidSeqGen;
+import org.dan.ping.pong.util.counter.CidSeqGen;
 import org.dan.ping.pong.util.counter.DidSeqGen;
-import org.dan.ping.pong.util.counter.IdSeqGen;
+import org.dan.ping.pong.util.counter.GidSeqGen;
 import org.dan.ping.pong.util.counter.MidSeqGen;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import javax.validation.Valid;
 
 @Getter
 @Setter
@@ -81,10 +80,10 @@ public class TournamentMemState {
     private Pid pid;
     private Set<Uid> adminIds;
     private Map<Bid, ParticipantMemState> participants;
-    private Map<Uid, Map<Integer, Bid>> uidCid2Bid;
+    private Map<Uid, Map<Cid, Bid>> uidCid2Bid;
     private Map<Mid, MatchInfo> matches;
-    private Map<Integer, GroupInfo> groups;
-    private Map<Integer, CategoryLink> categories;
+    private Map<Gid, GroupInfo> groups;
+    private Map<Cid, CategoryLink> categories;
     private TournamentRules rule;
     private TournamentState state;
     private Optional<Instant> completeAt;
@@ -94,9 +93,9 @@ public class TournamentMemState {
     private List<DisputeMemState> disputes;
     private OneTimeCondActions condActions;
     private PowerRange powerRange;
-    private IdSeqGen nextCategory;
+    private CidSeqGen nextCategory;
     private DidSeqGen nextDispute;
-    private IdSeqGen nextGroup;
+    private GidSeqGen nextGroup;
     private MidSeqGen nextMatch;
     private BidSeqGen nextBid;
 
@@ -149,7 +148,7 @@ public class TournamentMemState {
         final ParticipantMemState result = participants.get(bid);
         if (result == null) {
             if (FILLER_LOSER_BID.equals(bid)) {
-                return createLoserBid(tid, -1, state);
+                return createLoserBid(tid, new Cid(-1), state);
             }
             throw internalError("User " + bid
                     + " does participate in the tournament " + tid);
@@ -157,9 +156,9 @@ public class TournamentMemState {
         return result;
     }
 
-    public List<GroupInfo> getGroupsByCategory(int cid) {
+    public List<GroupInfo> getGroupsByCategory(Cid cid) {
         return groups.values().stream()
-                .filter(groupInfo -> groupInfo.getCid() == cid)
+                .filter(groupInfo -> groupInfo.getCid().equals(cid))
                 .collect(toList());
     }
 
@@ -170,12 +169,12 @@ public class TournamentMemState {
         throw forbidden("You (" + uid + ") are not an administrator of " + tid);
     }
 
-    public CategoryLink getCategory(int cid) {
+    public CategoryLink getCategory(Cid cid) {
         return ofNullable(categories.get(cid))
                 .orElseThrow(() -> internalError("No category " + cid + " in tid " + tid));
     }
 
-    public void checkCategory(int cid) {
+    public void checkCategory(Cid cid) {
         if (categories.containsKey(cid)) {
             return;
         }
@@ -193,8 +192,8 @@ public class TournamentMemState {
         return matches.values().stream();
     }
 
-    public Stream<MatchInfo> findMatchesByCid(int cid) {
-        return matches().filter(m -> m.getCid() == cid);
+    public Stream<MatchInfo> findMatchesByCid(Cid cid) {
+        return matches().filter(m -> m.getCid().equals(cid));
     }
 
     public Stream<MatchInfo> participantMatches(Bid bid) {
@@ -219,14 +218,14 @@ public class TournamentMemState {
         return getRule().getRewards().orElse(RewardRules.defaultRewards);
     }
 
-    public Optional<Integer> findCidByName(String name) {
+    public Optional<Cid> findCidByName(String name) {
         return categories.values().stream()
                 .filter(category -> category.getName().equals(name))
                 .findAny()
                 .map(CategoryLink::getCid);
     }
 
-    public GroupInfo getGroup(int gid) {
+    public GroupInfo getGroup(Gid gid) {
         return ofNullable(groups.get(gid))
                 .orElseThrow(() -> internalError("Tournament " + tid + " has no group " + gid));
     }
@@ -260,21 +259,21 @@ public class TournamentMemState {
         return rule.group().getOrderRules();
     }
 
-    public List<MatchInfo> findGroupMatchesByCategory(int cid) {
+    public List<MatchInfo> findGroupMatchesByCategory(Cid cid) {
         return matches.values().stream()
-                .filter(m -> m.getCid() == cid && m.getGid().isPresent())
+                .filter(m -> m.getCid().equals(cid) && m.getGid().isPresent())
                 .collect(toList());
     }
 
-    public Set<Bid> bidsInGroup(int gid) {
-        final Optional<Integer> ogid = Optional.of(gid);
+    public Set<Bid> bidsInGroup(Gid gid) {
+        final Optional<Gid> ogid = Optional.of(gid);
         return participants.values().stream().filter(p -> p.getGid().equals(ogid))
                 .map(ParticipantMemState::getBid)
                 .collect(toSet());
     }
 
-    public Set<Bid> bidsInCategory(int cid) {
-        return participants.values().stream().filter(p -> p.getCid() == cid)
+    public Set<Bid> bidsInCategory(Cid cid) {
+        return participants.values().stream().filter(p -> p.getCid().equals(cid))
                 .map(ParticipantMemState::getBid)
                 .collect(toSet());
     }
@@ -301,12 +300,12 @@ public class TournamentMemState {
                         + " without group in tid  " + tid));
     }
 
-    public Stream<ParticipantMemState> findBidsByCategory(int cid) {
-        return participants().filter(p -> p.getCid() == cid);
+    public Stream<ParticipantMemState> findBidsByCategory(Cid cid) {
+        return participants().filter(p -> p.getCid().equals(cid));
     }
 
-    public Stream<GroupInfo> findGroupsByCategory(int cid) {
-        return groups.values().stream().filter(gi -> gi.getCid() == cid);
+    public Stream<GroupInfo> findGroupsByCategory(Cid cid) {
+        return groups.values().stream().filter(gi -> gi.getCid().equals(cid));
     }
 
     public Collection<Bid> findBidsByUid(Uid uid) {
@@ -341,7 +340,7 @@ public class TournamentMemState {
                 .count();
     }
 
-    public Bid allocateBidFor(int cid, Uid uid) {
+    public Bid allocateBidFor(Cid cid, Uid uid) {
         return ofNullable(getUidCid2Bid().get(uid))
                 .flatMap(m -> ofNullable(m.get(cid)))
                 .orElseGet(() -> getNextBid().next());

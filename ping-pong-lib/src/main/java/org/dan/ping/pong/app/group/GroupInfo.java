@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.category.Cid;
 
 @Getter
 @Setter
@@ -14,8 +15,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupInfo {
-    private int gid;
-    private int cid;
+    private Gid gid;
+    private Cid cid;
     private int ordNumber;
     private String label;
 

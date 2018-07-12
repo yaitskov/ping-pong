@@ -7,6 +7,7 @@ import static org.dan.ping.pong.mock.Generators.genStr;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.sport.SportType;
 import org.dan.ping.pong.app.sport.pingpong.PingPongMatchRules;
@@ -71,7 +72,11 @@ public class DaoEntityGeneratorWithAdmin {
         return daoEntityGenerator.genPlace(testAdmin.getUid(), tables);
     }
 
-    public int genCategory(Tid tid, int cid) {
+    public Cid genCategory(Tid tid) {
+        return genCategory(tid, Cid.of(1));
+    }
+
+    public Cid genCategory(Tid tid, Cid cid) {
         daoEntityGenerator.genCategory(UUID.randomUUID().toString(), tid, cid);
         return cid;
     }

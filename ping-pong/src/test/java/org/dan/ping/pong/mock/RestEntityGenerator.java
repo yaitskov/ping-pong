@@ -15,6 +15,7 @@ import com.google.common.collect.Table;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidId;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
 import org.dan.ping.pong.app.tournament.ExpelParticipant;
@@ -37,12 +38,12 @@ public class RestEntityGenerator {
     private DaoEntityGenerator daoEntityGenerator;
 
     public void enlistParticipants(SessionAware adminSession,
-            Tid tid, int cid, PlayerCategory category, List<TestUserSession> participants) {
+            Tid tid, Cid cid, PlayerCategory category, List<TestUserSession> participants) {
         participantsEnlistThemselves(rest, adminSession, tid, cid, category, participants);
     }
 
     public void participantsEnlistThemselves(MyRest myRest, SessionAware adminSession,
-            Tid tid, int cid, PlayerCategory category, List<TestUserSession> participants) {
+            Tid tid, Cid cid, PlayerCategory category, List<TestUserSession> participants) {
         for (int i = 0; i < participants.size(); ++i) {
             TestUserSession userSession = participants.get(i);
             Bid bid = myRest.post(TOURNAMENT_ENLIST, userSession,
@@ -73,7 +74,7 @@ public class RestEntityGenerator {
 
     public void enlistParticipants(MyRest myRest, SessionAware adminSession,
             Table<Player, PlayerCategory, EnlistMode> enlistModes,
-            Tid tid, int cid,
+            Tid tid, Cid cid,
             PlayerCategory category,
             List<TestUserSession> participants,
             List<Optional<ProvidedRank>> ranks) {

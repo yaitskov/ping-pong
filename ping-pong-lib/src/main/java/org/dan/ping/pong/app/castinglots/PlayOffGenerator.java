@@ -10,6 +10,7 @@ import static org.dan.ping.pong.app.match.MatchType.POff;
 import com.google.common.collect.ImmutableMap;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchState;
@@ -72,7 +73,7 @@ public class PlayOffGenerator {
     public static final Mid MID0 = new Mid(0);
 
     private final TournamentMemState tournament;
-    private final int cid;
+    private final Cid cid;
     private final boolean thirdPlaceMatch;
     private final MatchDao matchDao;
     private final Optional<MatchTag> tag;

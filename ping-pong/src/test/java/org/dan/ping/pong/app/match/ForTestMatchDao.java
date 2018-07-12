@@ -4,6 +4,7 @@ import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.jooq.Tables.MATCHES;
 import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -35,7 +36,7 @@ public class ForTestMatchDao {
                 .where(MATCHES.TID.eq(tid), MATCHES.MID.eq(mid))
                 .fetchOne()).map(r ->
                 MatchInfo.builder()
-                        .gid(r.get(MATCHES.GID))
+                        .gid(r.get(MATCHES.GID).map(Gid::new))
                         .mid(mid)
                         .cid(r.get(MATCHES.CID))
                         .type(r.get(MATCHES.TYPE))

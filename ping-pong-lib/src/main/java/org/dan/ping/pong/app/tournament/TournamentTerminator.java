@@ -4,6 +4,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.category.CategoryService;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
@@ -24,10 +25,11 @@ public class TournamentTerminator {
     @Inject
     private Clocker clocker;
 
-    public boolean endOfTournamentCategory(TournamentMemState tournament, int cid, DbUpdater batch) {
+    public boolean endOfTournamentCategory(
+            TournamentMemState tournament, Cid cid, DbUpdater batch) {
         final Tid tid = tournament.getTid();
         log.info("Tid {} complete in cid {}", tid, cid);
-        Set<Integer> incompleteCids = categoryService.findIncompleteCategories(tournament);
+        Set<Cid> incompleteCids = categoryService.findIncompleteCategories(tournament);
         if (incompleteCids.isEmpty()) {
             log.info("All matches of tid {} are complete", tid);
             setTournamentCompleteAt(tournament, clocker.get(), batch);

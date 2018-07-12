@@ -6,6 +6,7 @@ import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
@@ -21,8 +22,6 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
 
 @Slf4j
 @Path("/")
@@ -62,7 +61,7 @@ public class CastingLotsResource {
     @Consumes(APPLICATION_JSON)
     public List<RankedBid> getManualBidsOrder(
             @PathParam("tid") Tid tid,
-            @PathParam("cid") int cid) {
+            @PathParam("cid") Cid cid) {
         return castingLotsService.loadManualBidsOrder(tid, cid);
     }
 }

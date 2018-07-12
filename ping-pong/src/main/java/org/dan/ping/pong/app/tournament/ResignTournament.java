@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.category.Cid;
 
 import java.util.Optional;
 
@@ -17,7 +18,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ResignTournament {
     private Tid tid;
-    private Optional<Integer> cid;
+    private Optional<Cid> cid;
 
     public static ResignTournament resignOfTid(Tid tid) {
         return new ResignTournament(tid, Optional.empty());

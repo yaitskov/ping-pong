@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupWithMembers {
-    private int gid;
+    private Gid gid;
     private CategoryLink category;
     private String name;
     private List<ParticipantLink> members;

@@ -22,7 +22,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.match.dispute.MatchSets;
 import org.dan.ping.pong.app.playoff.RootTaggedMatch;
 import org.dan.ping.pong.app.tournament.Tid;
@@ -50,10 +51,10 @@ public class MatchInfo {
 
     private Mid mid;
     private Tid tid;
-    private int cid;
+    private Cid cid;
     private MatchType type;
     private Optional<MatchTag> tag = Optional.empty();
-    private Optional<Integer> gid = Optional.empty();
+    private Optional<Gid> gid = Optional.empty();
     private MatchState state;
     private Optional<Mid> loserMid = Optional.empty();
     private Optional<Mid> winnerMid = Optional.empty();
@@ -170,12 +171,12 @@ public class MatchInfo {
         return gid.isPresent();
     }
 
-    public int groupId() {
+    public Gid groupId() {
         return gid.orElseThrow(() -> internalError("Match is not in a group", MID, mid));
     }
 
     public static class MatchInfoBuilder {
-        Optional<Integer> gid = Optional.empty();
+        Optional<Gid> gid = Optional.empty();
         Optional<Mid> loserMid = Optional.empty();
         Optional<Mid> winnerMid = Optional.empty();
         Optional<Bid> winnerId = Optional.empty();

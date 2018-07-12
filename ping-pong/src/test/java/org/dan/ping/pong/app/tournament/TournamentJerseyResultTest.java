@@ -29,6 +29,7 @@ import static org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc.restState
 import static org.junit.Assert.assertEquals;
 
 import org.dan.ping.pong.JerseySpringTest;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupParticipantResult;
 import org.dan.ping.pong.app.group.GroupParticipants;
 import org.dan.ping.pong.app.group.TournamentGroups;
@@ -121,7 +122,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
 
         final int tid = scenario.getTid().getTid();
         final TournamentGroups g = myRest().get(GROUP_LIST + tid, TournamentGroups.class);
-        final int gid = g.getGroups().stream().findFirst().get().getGid();
+        final Gid gid = g.getGroups().stream().findFirst().get().getGid();
         final GroupParticipants r = myRest().get(GROUP_RESULT + tid + "/"
                 + gid, GroupParticipants.class);
 
@@ -165,7 +166,7 @@ public class TournamentJerseyResultTest extends AbstractSpringJerseyTest {
 
         final int tid = scenario.getTid().getTid();
         final TournamentGroups g = myRest().get(GROUP_LIST + tid, TournamentGroups.class);
-        final int gid = g.getGroups().stream().findFirst().get().getGid();
+        final Gid gid = g.getGroups().stream().findFirst().get().getGid();
         final GroupParticipants r = myRest().get(GROUP_RESULT + tid + "/"
                 + gid, GroupParticipants.class);
 

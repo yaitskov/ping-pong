@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.CastingLotsDaoIf;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.RelatedTids;
@@ -74,10 +75,10 @@ public class ParticipantRankingService {
                 + tournament.getTid() + " has no master tournament"));
 
         final TournamentMemState masterTournament = tournamentCache.get(masterTid);
-        final Map<Integer, Map<Bid, Integer>> cid2Bid2Position = new HashMap<>();
+        final Map<Cid, Map<Bid, Integer>> cid2Bid2Position = new HashMap<>();
 
         return bids.stream().map(bid -> {
-            final int masterCid = masterTournament.getParticipant(bids.get(0).getBid()).getCid();
+            final Cid masterCid = masterTournament.getParticipant(bids.get(0).getBid()).getCid();
             Map<Bid, Integer> uid2Position = cid2Bid2Position.get(masterCid);
             if (uid2Position == null) {
                 log.info("Find order in cid {} of tid {}",

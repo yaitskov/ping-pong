@@ -7,12 +7,13 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.category.Cid;
 
 public enum EnlistPolicy {
     @JsonProperty("OT")
     ONCE_PER_TOURNAMENT {
         @Override
-        public void validate(TournamentMemState tournament, int cid, Uid uid) {
+        public void validate(TournamentMemState tournament, Cid cid, Uid uid) {
             ofNullable(tournament.getUidCid2Bid().get(uid))
                     .ifPresent((m) -> {
                         final long activeEnlistments = tournament.countActiveEnlistments(uid);
@@ -32,7 +33,7 @@ public enum EnlistPolicy {
     @JsonProperty("OC")
     ONCE_PER_CATEGORY {
         @Override
-        public void validate(TournamentMemState tournament, int cid, Uid uid) {
+        public void validate(TournamentMemState tournament, Cid cid, Uid uid) {
             ofNullable(tournament.getUidCid2Bid().get(uid))
                     .flatMap(m -> ofNullable(m.get(cid)))
                     .map(tournament::getParticipant)
@@ -48,5 +49,5 @@ public enum EnlistPolicy {
     public static final String MULTIPLE_CATEGORY_ENLISTMENT = "Multiple category enlistment";
     public static final String MULTIPLE_TOURNAMENT_ENLISTMENT = "Multiple tournament enlistment";
 
-    public abstract void validate(TournamentMemState tournamentMemState, int cid, Uid uid);
+    public abstract void validate(TournamentMemState tournamentMemState, Cid cid, Uid uid);
 }

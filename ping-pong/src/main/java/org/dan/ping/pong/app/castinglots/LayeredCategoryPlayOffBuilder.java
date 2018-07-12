@@ -12,6 +12,7 @@ import com.google.common.collect.ArrayListMultimap;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchTag;
@@ -46,7 +47,7 @@ public class LayeredCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
     private GroupService groupService;
 
     @SneakyThrows
-    public void build(TournamentMemState tournament, Integer cid,
+    public void build(TournamentMemState tournament, Cid cid,
             List<ParticipantMemState> bids, DbUpdater batch) {
         log.info("Layered console casting for tid {} cid {}", tournament.getTid(), cid);
         validateBidsNumberInACategory(bids);
@@ -57,7 +58,7 @@ public class LayeredCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
 
         final TournamentMemState masterTournament = tournamentCache.get(masterTid);
 
-        final int masterCid = masterTournament.getParticipant(bids.get(0).getBid()).getCid();
+        final Cid masterCid = masterTournament.getParticipant(bids.get(0).getBid()).getCid();
         final List<GroupInfo> orderedGroups = masterTournament.getGroupsByCategory(masterCid);
         orderedGroups.sort(Comparator.comparing(GroupInfo::getOrdNumber));
         final ArrayListMultimap<Integer, Bid> bidsByFinalGroupPosition = ArrayListMultimap.create();

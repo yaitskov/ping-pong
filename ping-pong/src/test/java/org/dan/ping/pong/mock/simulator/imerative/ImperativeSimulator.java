@@ -61,6 +61,8 @@ import org.dan.ping.pong.app.bid.ParticipantState;
 import org.dan.ping.pong.app.bid.SetCategory;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.category.CategoryLink;
+import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupParticipants;
 import org.dan.ping.pong.app.group.GroupPopulations;
@@ -248,8 +250,8 @@ public class ImperativeSimulator {
 
     private Predicate<ParticipantState> createFilter(Optional<PlayerCategory> category) {
         if (category.isPresent()) {
-            final int cid = scenario.getCategoryDbId().get(category.get());
-            return (ps) -> ps.getCategory().getCid() == cid;
+            final Cid cid = scenario.getCategoryDbId().get(category.get());
+            return (ps) -> ps.getCategory().getCid().equals(cid);
         }
         return (ps) -> true;
     }
@@ -359,7 +361,7 @@ public class ImperativeSimulator {
     }
 
     @SneakyThrows
-    public ImperativeSimulator checkResult(int categoryId, List<List<Player>> p) {
+    public ImperativeSimulator checkResult(Cid categoryId, List<List<Player>> p) {
         final List<TournamentResultEntry> tournamentResult = getTournamentResult(categoryId, tid());
         try {
             assertThat(tournamentResult.stream()
@@ -394,15 +396,15 @@ public class ImperativeSimulator {
         return this;
     }
 
-    public GroupParticipants getGroupResult(int gid) {
+    public GroupParticipants getGroupResult(Gid gid) {
         return myRest.get(GROUP_RESULT + tid() + "/" + gid,
                 GroupParticipants.class);
     }
 
-    public int gidOf(int cid, int groupIndex) {
+    public Gid gidOf(Cid cid, int groupIndex) {
         final TournamentGroups tGroups = tournamentGroups();
         return tGroups.getGroups().stream()
-                .filter(g -> g.getCid() == cid)
+                .filter(g -> g.getCid().equals(cid))
                 .skip(groupIndex)
                 .map(GroupInfo::getGid)
                 .findFirst()
@@ -411,14 +413,14 @@ public class ImperativeSimulator {
                         + groupIndex));
     }
 
-    public List<TournamentResultEntry> getTournamentResult(Integer onlyCid, int tid) {
+    public List<TournamentResultEntry> getTournamentResult(Cid onlyCid, int tid) {
         return myRest.get(TOURNAMENT_RESULT + tid
                         + RESULT_CATEGORY + onlyCid,
                 new GenericType<List<TournamentResultEntry>>() {});
 
     }
 
-    private Integer getOnlyCid() {
+    private Cid getOnlyCid() {
         if (scenario.getCategoryDbId().size() > 1) {
             throw new RuntimeException("more than 1 category");
         }
@@ -601,7 +603,7 @@ public class ImperativeSimulator {
     }
 
     public Bid enlistNewParticipant(TournamentScenario scenario,
-            int cid, GroupPopulations populations, String name) {
+            Cid cid, GroupPopulations populations, String name) {
         return enlistNewParticipant(scenario, cid,
                 Optional.of(populations.getLinks().get(0).getGid()), name);
     }
@@ -611,20 +613,20 @@ public class ImperativeSimulator {
     }
 
     public Bid enlistExistingParticipant(PlayerCategory c, Player p,
-            BidState state, Optional<Integer> oGid) {
+            BidState state, Optional<Gid> oGid) {
         return simulator.enlistExistingParticipant(
                 scenario.getTid(), scenario, scenario.catId(c),
                 oGid, state,
                 scenario.getPlayersSessions().get(p).getUid());
     }
 
-    public Bid enlistNewParticipant(TournamentScenario scenario, int cid,
-            Optional<Integer> gid, String name) {
+    public Bid enlistNewParticipant(TournamentScenario scenario, Cid cid,
+            Optional<Gid> gid, String name) {
         return simulator.enlistNewParticipant(scenario, cid, gid, name);
     }
 
     public void changeCategory(TournamentScenario scenario, Bid bid,
-            int sourceCid, int targetCid) {
+            Cid sourceCid, Cid targetCid) {
         myRest.voidPost(BID_SET_CATEGORY, scenario.getTestAdmin(),
                 SetCategory.builder()
                         .tid(scenario.getTid())
@@ -635,7 +637,7 @@ public class ImperativeSimulator {
     }
 
     public void changeGroup(TournamentScenario scenario, Bid bid,
-            int sourceGid, Optional<Integer> targetGid) {
+            Gid sourceGid, Optional<Gid> targetGid) {
         myRest.voidPost(BID_CHANGE_GROUP, scenario.getTestAdmin(),
                 ChangeGroupReq.builder()
                         .tid(scenario.getTid())

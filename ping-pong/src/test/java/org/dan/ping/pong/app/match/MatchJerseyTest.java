@@ -33,6 +33,7 @@ import static org.junit.Assert.assertThat;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.ParticipantLink;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.place.ForTestPlaceDao;
 import org.dan.ping.pong.app.place.Pid;
 import org.dan.ping.pong.app.score.MatchScoreDao;
@@ -124,7 +125,7 @@ public class MatchJerseyTest extends AbstractSpringJerseyTest {
                 TournamentProps.builder()
                         .sport(SportType.PingPong)
                         .rules(TournamentRulesConst.RULES_G8Q1_S1A2G11).build());
-        final int cid = daoGenerator.genCategory(tid, 1);
+        final Cid cid = daoGenerator.genCategory(tid, Cid.of(1));
         final List<TestUserSession> participants = userSessionGenerator.generateUserSessions(2);
         restGenerator.enlistParticipants(tid, cid, c1, participants);
         assertEquals(emptyList(), restGenerator.listOpenMatches(tid).getMatches());

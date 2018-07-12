@@ -7,12 +7,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.filter.DisambiguationScope;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Getter
@@ -22,7 +24,7 @@ public class GroupRuleParams {
     private TournamentMemState tournament;
     private List<MatchInfo> groupMatches;
     private Set<Bid> bids;
-    private int gid;
+    private Optional<Gid> gid;
     private DisambiguationScope disambiguationMode;
     private boolean disambiguationMatchesWillBeCreated;
     private boolean countIncompleteMatches;
@@ -32,7 +34,7 @@ public class GroupRuleParams {
         DisambiguationScope disambiguationMode = ORIGIN_MATCHES;
     }
 
-    public static GroupRuleParams ofParams(int gid,
+    public static GroupRuleParams ofParams(Optional<Gid> gid,
             TournamentMemState tournament, List<MatchInfo> groupMatches,
             List<GroupOrderRule> orderRules,
             Set<Bid> bids) {

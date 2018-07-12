@@ -57,7 +57,7 @@ public class CategoryResource {
             @Suspended AsyncResponse response,
             @HeaderParam(SESSION) String session,
             @PathParam(TID) Tid tid,
-            @PathParam(CID) int cid) {
+            @PathParam(CID) Cid cid) {
         tournamentAccessor.read(tid, response,
                 (tournament) -> categoryService.categoryInfo(tournament, cid,
                         authService.userInfoBySessionQuite(session)

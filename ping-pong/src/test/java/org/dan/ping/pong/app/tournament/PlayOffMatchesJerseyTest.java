@@ -29,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 import com.google.common.collect.ImmutableMap;
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.playoff.PlayOffMatches;
@@ -58,7 +59,7 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
         final ImperativeSimulator simulator = isf.create(scenario);
         simulator.run(ImperativeSimulator::beginTournament);
 
-        final int cid = scenario.getCategoryDbId().get(c1);
+        final Cid cid = scenario.getCategoryDbId().get(c1);
         final PlayOffMatches matches = myRest().get(
                 TOURNAMENT_PLAY_OFF_MATCHES + scenario.getTid().getTid() + "/" + cid,
                 PlayOffMatches.class);
@@ -95,7 +96,7 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
     }
 
     private PlayOffMatches matches(TournamentScenario scenario) {
-        final int cid = scenario.getCategoryDbId().get(c1);
+        final Cid cid = scenario.getCategoryDbId().get(c1);
         return myRest().get(
                 TOURNAMENT_PLAY_OFF_MATCHES + scenario.getTid().getTid() + "/" + cid,
                 PlayOffMatches.class);

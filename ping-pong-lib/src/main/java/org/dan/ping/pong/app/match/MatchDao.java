@@ -1,11 +1,10 @@
 package org.dan.ping.pong.app.match;
 
 import org.dan.ping.pong.app.bid.Bid;
-import org.dan.ping.pong.app.bid.ParticipantLink;
-import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
-import org.dan.ping.pong.app.user.UserLink;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.collection.MaxValue;
 
@@ -17,10 +16,10 @@ import java.util.Set;
 public interface MatchDao {
     void createMatch(MatchInfo matchInfo, DbUpdater dbStrictUpdater);
 
-    void createGroupMatch(DbUpdater batch, Mid mid, Tid tid, int gid, int cid, int priorityGroup,
+    void createGroupMatch(DbUpdater batch, Mid mid, Tid tid, Gid gid, Cid cid, int priorityGroup,
             Bid bid1, Bid bid2, Optional<MatchTag> tag, MatchState place);
 
-    void  createPlayOffMatch(DbUpdater batch, Mid mid, Tid tid, Integer cid,
+    void  createPlayOffMatch(DbUpdater batch, Mid mid, Tid tid, Cid cid,
             Optional<Mid> winMid, Optional<Mid> loseMid,
             int priority, int level, MatchType type, Optional<MatchTag> tag, MatchState draft);
 

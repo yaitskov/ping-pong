@@ -8,6 +8,7 @@ import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
 
 import com.google.common.collect.ImmutableSet;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -31,7 +32,7 @@ public interface BidDao {
     void markParticipantsBusy(TournamentMemState tournament,
             Collection<Bid> bids, Instant now, DbUpdater batch);
 
-    void setGroupForUids(DbUpdater batch, int gid, Tid tid, List<ParticipantMemState> groupBids);
+    void setGroupForUids(DbUpdater batch, Gid gid, Tid tid, List<ParticipantMemState> groupBids);
 
     void enlist(ParticipantMemState bid, Optional<Integer> providedRank, DbUpdater batch);
 

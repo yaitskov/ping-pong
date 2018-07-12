@@ -15,14 +15,14 @@ import java.util.List;
 import java.util.Optional;
 
 public class MatchListBuilder {
-    private Optional<Integer> ogid;
+    private Optional<Gid> ogid;
 
     final List<MatchInfo> result = new ArrayList<>();
     public static MatchListBuilder matches() {
         return new MatchListBuilder();
     }
 
-    public MatchListBuilder ogid(Integer gid) {
+    public MatchListBuilder ogid(Gid gid) {
         ogid = Optional.of(gid);
         return this;
     }

@@ -51,6 +51,8 @@ import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryService;
+import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupRemover;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -129,7 +131,7 @@ public class TournamentService {
             if (enlist.getBidState() != Wait) {
                 throw badRequest("Bid state should be Wait");
             }
-            final Optional<Integer> ogid = enlist.getGroupId();
+            final Optional<Gid> ogid = enlist.getGroupId();
             if (ogid.isPresent()) {
                 if (!groupService.isNotCompleteGroup(tournament, ogid.get())) {
                     throw badRequest("group is complete");
@@ -209,7 +211,7 @@ public class TournamentService {
     }
 
     private void enlist(TournamentMemState tournament, Bid bid,
-            Optional<Integer> providedRank, DbUpdater batch, Optional<Integer> oGid) {
+            Optional<Integer> providedRank, DbUpdater batch, Optional<Gid> oGid) {
         bidDao.enlist(tournament.getParticipant(bid), providedRank, batch);
         if (tournament.getState() == Open) {
             oGid.ifPresent(gid -> {
@@ -253,7 +255,8 @@ public class TournamentService {
         if (tournament.getState() != TournamentState.Draft) {
             throw notDraftError(tournament);
         }
-        final List<ParticipantMemState> readyBids = castingLotsService.findBidsReadyToPlay(tournament);
+        final List<ParticipantMemState> readyBids = castingLotsService
+                .findBidsReadyToPlay(tournament);
         castingLotsService.checkAllThatAllHere(readyBids);
         if (readyBids.isEmpty()) {
             tournament.setState(TournamentState.Close);
@@ -489,7 +492,7 @@ public class TournamentService {
     @Inject
     private GroupService groupService;
 
-    public List<TournamentResultEntry> tournamentResult(TournamentMemState tournament, int cid) {
+    public List<TournamentResultEntry> tournamentResult(TournamentMemState tournament, Cid cid) {
         final List<TournamentResultEntry> groupOrdered = tournament.getRule().getGroup()
                 .map(gr -> groupService.resultOfAllGroupsInCategory(tournament, cid))
                 .orElse(emptyList());
@@ -604,7 +607,7 @@ public class TournamentService {
     @Inject
     private TournamentTerminator tournamentTerminator;
 
-    public PlayOffMatches playOffMatches(TournamentMemState tournament, int cid) {
+    public PlayOffMatches playOffMatches(TournamentMemState tournament, Cid cid) {
         return playOffService.playOffMatches(tournament, cid, Optional.empty());
     }
 
@@ -669,14 +672,14 @@ public class TournamentService {
 
     private void enlistPlayersFromCompleteGroups(TournamentMemState masterTournament,
             TournamentMemState consoleTournament, DbUpdater batch) {
-        final Map<Integer, List<MatchInfo>> matchesByGroup = groupService.groupMatchesByGroup(masterTournament);
-        final Set<Integer> incompleteGroups = groupService.findIncompleteGroups(masterTournament);
+        final Map<Gid, List<MatchInfo>> matchesByGroup = groupService.groupMatchesByGroup(masterTournament);
+        final Set<Gid> incompleteGroups = groupService.findIncompleteGroups(masterTournament);
         incompleteGroups.forEach(matchesByGroup::remove);
 
         matchesByGroup.forEach((gid, groupMatches) -> {
             final int quitsGroup = masterTournament.getRule().getGroup().get().getQuits();
             final List<Bid> orderedGroupUids = groupService.orderBidsInGroup(gid, masterTournament, groupMatches);
-            final int consoleCid = categoryService.findCidOrCreate(masterTournament, gid, consoleTournament, batch);
+            final Cid consoleCid = categoryService.findCidOrCreate(masterTournament, gid, consoleTournament, batch);
 
             orderedGroupUids.stream().skip(quitsGroup)
                     .map(masterTournament::getBidOrQuit)

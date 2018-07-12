@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
@@ -25,7 +26,7 @@ public class NoConsoleStrategy implements ConsoleStrategy {
     private static final Set<BidState> terminalStates = ImmutableSet.of(Quit, Expl, Lost);
 
     @Override
-    public void onGroupComplete(int gid, TournamentMemState tournament,
+    public void onGroupComplete(Gid gid, TournamentMemState tournament,
             Set<Bid> loserBids, DbUpdater batch) {
         loserBids.stream()
                 .map(tournament::getParticipant)

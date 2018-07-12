@@ -11,6 +11,7 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.ImmutableMap;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.sport.pingpong.PingPongSport;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -25,8 +26,8 @@ import java.util.Optional;
 
 
 public class GroupServiceTest {
-    private static final int CID = 1;
-    public static final int GID = 1;
+    private static final Cid CID = Cid.of(1);
+    public static final Gid GID = Gid.of(1);
     public static final Uid UID2 = new Uid(2);
     public static final Bid BID2 = new Bid(2);
 
@@ -57,7 +58,7 @@ public class GroupServiceTest {
     }
 
     private TournamentMemState tournamentForPopulations(
-            Optional<Integer> gid, Map<Integer, GroupInfo> groups) {
+            Optional<Gid> gid, Map<Gid, GroupInfo> groups) {
         return TournamentMemState.builder()
                         .participants(ImmutableMap
                                 .of(BID2, ParticipantMemState.builder()

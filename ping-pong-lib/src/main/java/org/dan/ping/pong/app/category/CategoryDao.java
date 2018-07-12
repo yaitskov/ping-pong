@@ -10,7 +10,7 @@ public interface CategoryDao {
 
     List<CategoryLink> listCategoriesByTid(Tid tid);
 
-    void delete(Tid tid, int cid, DbUpdater batch);
+    void delete(Tid tid, Cid cid, DbUpdater batch);
 
     void copy(Tid originTid, Tid tid);
 }

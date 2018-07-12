@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.tournament.Tid;
 
 import java.util.Optional;
@@ -19,6 +20,6 @@ import java.util.Optional;
 public class ChangeGroupReq {
     private Tid tid;
     private Bid bid;
-    private int expectedGid;
-    private Optional<Integer> targetGid;
+    private Gid expectedGid;
+    private Optional<Gid> targetGid;
 }

@@ -30,6 +30,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
+import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupInfo;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchDao;
@@ -90,10 +92,10 @@ public class BidService {
         tournament.checkCategory(setCategory.getTargetCid());
         tournament.checkCategory(setCategory.getExpectedCid());
         final ParticipantMemState par = tournament.getParticipant(setCategory.getBid());
-        if (par.getCid() != setCategory.getExpectedCid()) {
+        if (!par.getCid().equals(setCategory.getExpectedCid())) {
             throw badRequest("Category has been changed by someone else");
         }
-        if (setCategory.getTargetCid() == setCategory.getExpectedCid()) {
+        if (setCategory.getTargetCid().equals(setCategory.getExpectedCid())) {
             return;
         }
         ensureNoMultipleCategoryEnlistment(tournament, setCategory.getTargetCid(), par);
@@ -110,16 +112,16 @@ public class BidService {
     }
 
     private void ensureNoMultipleCategoryEnlistment(
-            TournamentMemState tournament, int targetCid, ParticipantMemState par) {
-        final Map<Integer, Bid> cid2Bids = tournament.getUidCid2Bid().get(par.getUid());
+            TournamentMemState tournament, Cid targetCid, ParticipantMemState par) {
+        final Map<Cid, Bid> cid2Bids = tournament.getUidCid2Bid().get(par.getUid());
         if (cid2Bids.containsKey(targetCid)) {
             throw badRequest(MULTIPLE_CATEGORY_ENLISTMENT);
         }
     }
 
     public void changeCategoryInDraft(TournamentMemState tournament,
-            int targetCid, DbUpdater batch, ParticipantMemState par) {
-        final Map<Integer, Bid> cidBidMap = tournament
+            Cid targetCid, DbUpdater batch, ParticipantMemState par) {
+        final Map<Cid, Bid> cidBidMap = tournament
                 .getUidCid2Bid().get(par.getUid());
 
         if (cidBidMap.remove(par.getCid()) == null) {
@@ -160,14 +162,14 @@ public class BidService {
         }
     }
 
-    private Optional<Integer> findBestGroup(
+    private Optional<Gid> findBestGroup(
             TournamentMemState tournament,
-            int targetCid, Optional<Integer> targetGid) {
+            Cid targetCid, Optional<Gid> targetGid) {
         if (targetGid.isPresent()) {
             return targetGid;
         }
-        final Map<Integer, Long> gidPopulation = tournament.participants()
-                .filter(p -> p.getCid() == targetCid)
+        final Map<Gid, Long> gidPopulation = tournament.participants()
+                .filter(p -> p.getCid().equals(targetCid))
                 .collect(groupingBy(ParticipantMemState::gid, counting()));
 
         tournament.findGroupsByCategory(targetCid)
@@ -245,7 +247,7 @@ public class BidService {
 
         final ParticipantMemState bid = tournament.getBid(req.getBid());
 
-        final Optional<Integer> opExpectedGid = Optional.of(req.getExpectedGid());
+        final Optional<Gid> opExpectedGid = Optional.of(req.getExpectedGid());
         if (tournament.getState() != Open) {
             throw badRequest("Tournament is not open");
         }
@@ -253,7 +255,7 @@ public class BidService {
             throw badRequest("Expected group is different",
                     "gid", bid.getGid());
         }
-        final Optional<Integer> opTargetGid = req.getTargetGid();
+        final Optional<Gid> opTargetGid = req.getTargetGid();
         if (bid.getGid().equals(opTargetGid)) {
             log.info("Target group is the same with expected");
             return;
@@ -262,7 +264,7 @@ public class BidService {
                 .ifPresent(matches -> {
                     throw badRequest("target group is complete");
                 }));
-        final int targetGid = req.getTargetGid()
+        final Gid targetGid = req.getTargetGid()
                 .orElseGet(() ->  castingLotsService.addGroup(tournament, batch, bid.getCid()));
         groupService.checkGroupComplete(tournament, req.getExpectedGid())
                 .ifPresent(matches -> {
@@ -274,7 +276,7 @@ public class BidService {
         final GroupInfo targetGroup = tournament.getGroup(targetGid);
         final GroupInfo sourceGroup = tournament.getGroup(req.getExpectedGid());
 
-        if (targetGroup.getCid() != sourceGroup.getCid()) {
+        if (!targetGroup.getCid().equals(sourceGroup.getCid())) {
             ensureNoMultipleCategoryEnlistment(tournament, targetGroup.getCid(), bid);
             changeCategoryInDraft(tournament, targetGroup.getCid(), batch, bid);
         }
@@ -294,7 +296,7 @@ public class BidService {
     @Inject
     private MatchService matchService;
 
-    private void tryCompleteSourceGroup(TournamentMemState tournament, int gid, DbUpdater batch) {
+    private void tryCompleteSourceGroup(TournamentMemState tournament, Gid gid, DbUpdater batch) {
         matchService.tryToCompleteGroup(tournament, gid, batch);
         scheduleService.afterMatchComplete(tournament, batch, clocker.get());
     }

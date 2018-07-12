@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
+import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.rule.reason.DecreasingDoubleScalarReason;
 import org.dan.ping.pong.app.match.rule.service.GroupRuleParams;
@@ -45,10 +46,11 @@ public class AtpDIIPercentWonSetsRuleTest {
     @Inject
     private AtpDIIPercentWonSetsRuleService sut;
 
+    static final Optional<Gid> OGID = Optional.of(Gid.of(1));
     static final List<MatchInfo> BASE = asList(
             MatchInfo.builder().state(Over)
                     .winnerId(Optional.of(BID3))
-                    .gid(Optional.of(1))
+                    .gid(OGID)
                     .tag(Optional.empty())
                     .participantIdScore(ImmutableMap.of(
                             BID3, asList(6, 6),
@@ -56,7 +58,7 @@ public class AtpDIIPercentWonSetsRuleTest {
                     .build(),
             MatchInfo.builder().state(Over)
                     .winnerId(Optional.of(BID4))
-                    .gid(Optional.of(1))
+                    .gid(OGID)
                     .tag(Optional.empty())
                     .participantIdScore(
                             ImmutableMap.of(BID4, asList(6, 1, 6),
@@ -64,7 +66,7 @@ public class AtpDIIPercentWonSetsRuleTest {
                     .build(),
             MatchInfo.builder().state(Over)
                     .winnerId(Optional.of(BID5))
-                    .gid(Optional.of(1))
+                    .gid(OGID)
                     .tag(Optional.empty())
                     .participantIdScore(
                             ImmutableMap.of(BID5, asList(6, 6),
@@ -73,7 +75,7 @@ public class AtpDIIPercentWonSetsRuleTest {
 
             MatchInfo.builder().state(Over)
                     .winnerId(Optional.of(BID3))
-                    .gid(Optional.of(1))
+                    .gid(OGID)
                     .tag(Optional.empty())
                     .participantIdScore(
                             ImmutableMap.of(BID3, asList(6, 6),
@@ -81,7 +83,7 @@ public class AtpDIIPercentWonSetsRuleTest {
                     .build(),
             MatchInfo.builder().state(Over)
                     .winnerId(Optional.of(BID5))
-                    .gid(Optional.of(1))
+                    .gid(OGID)
                     .tag(Optional.empty())
                     .participantIdScore(
                             ImmutableMap.of(BID3, asList(3, 2),
@@ -89,7 +91,7 @@ public class AtpDIIPercentWonSetsRuleTest {
                     .build(),
             MatchInfo.builder().state(Over)
                     .winnerId(Optional.of(BID4))
-                    .gid(Optional.of(1))
+                    .gid(OGID)
                     .tag(Optional.empty())
                     .participantIdScore(
                             ImmutableMap.of(BID4, asList(6, 6),

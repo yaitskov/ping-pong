@@ -19,6 +19,7 @@ import static org.hamcrest.junit.MatcherAssert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.app.category.CategoryLink;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.match.rule.reason.F2fReason;
 import org.dan.ping.pong.app.tournament.marshaling.ImportTournamentState;
 import org.dan.ping.pong.app.tournament.marshaling.TournamentEnvelope;
@@ -73,7 +74,7 @@ public class TournamentMarshalingJerseyTest extends AbstractSpringJerseyTest {
     private void checkImportedTournamentHasSameResults(ImperativeSimulator is, Tid exportedTid) {
         final DraftingTournamentInfo importedDrafting = myRest()
                 .get(DRAFTING + exportedTid, DraftingTournamentInfo.class);
-        final int importedCid = importedDrafting.getCategories().stream().findFirst()
+        final Cid importedCid = importedDrafting.getCategories().stream().findFirst()
                 .map(CategoryLink::getCid).get();
         List<TournamentResultEntry> imported = resetBids(
                 is.getTournamentResult(importedCid, exportedTid.getTid()));

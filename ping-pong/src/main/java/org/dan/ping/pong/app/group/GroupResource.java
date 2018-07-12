@@ -5,6 +5,7 @@ import static org.dan.ping.pong.app.match.MatchResource.TID_JP;
 import static org.dan.ping.pong.app.tournament.TournamentService.TID;
 
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentAccessor;
 
@@ -41,7 +42,7 @@ public class GroupResource {
     public void enlist(
             @Suspended AsyncResponse response,
             @PathParam(TID) Tid tid,
-            @PathParam("cid") int cid) {
+            @PathParam("cid") Cid cid) {
         tournamentAccessor.read(tid, response,
                 tournament -> groupService.populations(tournament, cid));
     }
@@ -52,7 +53,7 @@ public class GroupResource {
     public void getInfoAndMembers(
             @Suspended AsyncResponse response,
             @PathParam(TID) Tid tid,
-            @PathParam(GID) int gid) {
+            @PathParam(GID) Gid gid) {
         tournamentAccessor.read(tid, response,
                 tournament -> groupService.members(tournament, gid));
     }
@@ -74,7 +75,7 @@ public class GroupResource {
     public void result(
             @Suspended AsyncResponse response,
             @PathParam(TID) Tid tid,
-            @PathParam(GID) int gid) {
+            @PathParam(GID) Gid gid) {
         tournamentAccessor.read(tid, response,
                 tournament -> groupService.result(tournament, gid));
     }

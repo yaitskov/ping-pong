@@ -6,10 +6,14 @@ export default class PingPongScoresStrategy extends BaseScoresStrategy {
     }
 
     winnerOptions(rules, winScore, playedSets) {
-        if (winScore == rules.mgtw) {
-            return [rules.mgtw];
-        } else if (winScore > rules.mgtw) {
-            let base = winScore - (winScore % 3);
+        return this.winnerOptionsDefault(rules, winScore, playedSets, rules.mgtw);
+    }
+
+    winnerOptionsDefault(rules, winScore, playedSets, defaultWin) {
+        if (winScore == defaultWin) {
+            return [defaultWin];
+        } else if (winScore > defaultWin) {
+            let base = winScore; // - (winScore % 3);
             return [base - 1, base, base + 1, base + 2];
         } else {
             throw new RangeError('win score ' + winScore + ' is too small');
@@ -17,7 +21,11 @@ export default class PingPongScoresStrategy extends BaseScoresStrategy {
     }
 
     loserOptions(rules, winnerOption) {
-        if (winnerOption == rules.mgtw) {
+        return this.loserOptionsDefault(rules, winnerOption, rules.mgtw);
+    }
+
+    loserOptionsDefault(rules, winnerOption, defautWin) {
+        if (winnerOption == defautWin) {
            let result = [];
            for (let i = 0; i <= (winnerOption - rules.maig); ++i) {
                result.push(i);

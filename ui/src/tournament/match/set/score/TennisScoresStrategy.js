@@ -17,14 +17,14 @@ export default class TennisScoresStrategy extends BaseScoresStrategy {
 
     winnerOptions(rules, winScore, playedSets) {
         if (this._isSuperTieBreak(rules, playedSets)) {
-            return this.pingPong.winnerOptions(rules, winScore, playedSets);
+            return this.pingPong.winnerOptionsDefault(rules, winScore, playedSets, rules.stbg);
         }
         return [rules.mgtw, rules.mgtw + 1];
     }
 
     loserOptions(rules, winnerOption, playedSets) {
         if (this._isSuperTieBreak(rules, playedSets)) {
-            return this.pingPong.loserOptions(rules, winnerOption, playedSets);
+            return this.pingPong.loserOptionsDefault(rules, winnerOption, rules.stbg);
         }
         if (winnerOption == rules.mgtw) {
             let result = [];
@@ -46,7 +46,7 @@ export default class TennisScoresStrategy extends BaseScoresStrategy {
 
     defaultWinnerScore(rules, playedSets) {
         if (this._isSuperTieBreak(rules, playedSets)) {
-            return this.pingPong.defaultWinnerScore(rules, playedSets);
+            return rules.stbg;
         }
         return rules.mgtw;
     }

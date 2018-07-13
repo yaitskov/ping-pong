@@ -51,7 +51,7 @@ export default class BaseScoreSet extends AngularBean {
 
     extendWinScore() {
         const max = this.possibleWinScores[this.possibleWinScores.length - 1];
-        this.pick(this.winnerIdx, max + 1);
+        this.pick(this.winnerIdx, max + 1, true);
     }
 
     isLostToBig(playerIdx) {
@@ -70,16 +70,18 @@ export default class BaseScoreSet extends AngularBean {
         this.scores[playerIdx] = -1;
     }
 
-    pick(idx, score) {
+    pick(idx, score, extension) {
         this.scores[idx] = score;
         const sport = this.match.sport;
         this.possibleWinScores = this.scoreStrategy.winnerOptions(sport, score, this.match.playedSets);
         this.possibleLostScores = this.scoreStrategy.loserOptions(sport, score, this.match.playedSets);
         if (this.possibleLostScores.length == 1) {
             this.scores[1 - idx] = this.possibleLostScores[0];
-            this.$rootScope.$broadcast('event.base.match.set.pick.lost',
-                                       {setOrdNumber: this.match.playedSets,
-                                        scores: this.findScores()});
+            if (!extension) {
+                this.$rootScope.$broadcast('event.base.match.set.pick.lost',
+                                           {setOrdNumber: this.match.playedSets,
+                                            scores: this.findScores()});
+            }
         } else {
             const otherPlayerIdx = this.otherPlayer(idx);
             if (this.isLostToBig(otherPlayerIdx) || this.isLostToSmall(otherPlayerIdx)) {

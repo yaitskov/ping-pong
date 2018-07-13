@@ -22,7 +22,7 @@
   <div>
     <a class="btn btn-default score"
        ng-repeat="score in $ctrl.possibleWinScores"
-       ng-click="$ctrl.pick($ctrl.winnerIdx, score)"
+       ng-click="$ctrl.pick($ctrl.winnerIdx, score, $index == 0)"
        ng-class="{'btn-primary': score == $ctrl.scores[$ctrl.winnerIdx]}">
       {{score}}
     </a>

@@ -8,11 +8,11 @@ describe('ping pong scores strategy', () => {
     describe('winnerOptions', () => {
         it('advance less 14', () => {
             expect(pingPongStrategy.winnerOptions(rules, 12, 0)).toEqual([11, 12, 13, 14]);
-            expect(pingPongStrategy.winnerOptions(rules, 14, 0)).toEqual([11, 12, 13, 14]);
+            expect(pingPongStrategy.winnerOptions(rules, 14, 0)).toEqual([13, 14, 15, 16]);
         });
         it('advance less 17', () => {
             expect(pingPongStrategy.winnerOptions(rules, 15, 0)).toEqual([14, 15, 16, 17]);
-            expect(pingPongStrategy.winnerOptions(rules, 17, 0)).toEqual([14, 15, 16, 17]);
+            expect(pingPongStrategy.winnerOptions(rules, 17, 0)).toEqual([16, 17, 18, 19]);
         });
         it('no advance', () => {
             expect(pingPongStrategy.winnerOptions(rules, 11, 0)).toEqual([11]);

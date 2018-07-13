@@ -35,25 +35,29 @@ describe('tennis scores strategy', () => {
 
     describe('winnerOptions', () => {
         it('super tie break', () => {
-            expect(tennisStrategy.winnerOptions(rulesSTB2, 'winScore ignored', 2)).toEqual([10]);
+            expect(tennisStrategy.winnerOptions(rulesSTB2, 10, 2)).toEqual([10]);
         });
         it('no super tie break', () => {
-            expect(tennisStrategy.winnerOptions(rulesSTB2, 'winScore ignored', 0)).toEqual([6, 7]);
-            expect(tennisStrategy.winnerOptions(rulesSTB2, 'winScore ignored', 1)).toEqual([6, 7]);
+            expect(tennisStrategy.winnerOptions(rulesSTB2, 6, 0)).toEqual([6, 7]);
+            expect(tennisStrategy.winnerOptions(rulesSTB2, 6, 1)).toEqual([6, 7]);
         });
     });
 
     describe('loserOptions', () => {
-        it('super tie break', () => expect(tennisStrategy.loserOptions(rulesSTB2, 'winScore ignore', 2)).
-           toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
+        it('super tie break',
+           () => expect(tennisStrategy.loserOptions(rulesSTB2, 10, 2)).
+           toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8]));
 
-        it('winner got min games to win', () => expect(tennisStrategy.loserOptions(rulesSTB2, 6, 1)).
+        it('winner got min games to win',
+           () => expect(tennisStrategy.loserOptions(rulesSTB2, 6, 1)).
            toEqual([0, 1, 2, 3, 4]));
 
-        it('winner got min games + 1 to win', () => expect(tennisStrategy.loserOptions(rulesSTB2, 7, 1)).
+        it('winner got min games + 1 to win',
+           () => expect(tennisStrategy.loserOptions(rulesSTB2, 7, 1)).
            toEqual([5, 6]));
 
-        it('winner got to much games', () => expect(() => tennisStrategy.loserOptions(rulesSTB2, 8, 1)).
+        it('winner got to much games',
+           () => expect(() => tennisStrategy.loserOptions(rulesSTB2, 8, 1)).
            toThrow(new RangeError('winner got to much games: 8')));
     });
 

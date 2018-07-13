@@ -106,18 +106,12 @@ describe('base-score-set', () => {
         expect(ctx.ctrl.scores).toEqual([12, 10]);
         expect(ctx.ctrl.possibleWinScores).toEqual([11, 12, 13, 14]);
         expect(ctx.ctrl.possibleLostScores).toEqual([10]);
-        expect(captured[0]).toEqual({setOrdNumber: 0,
-                                     scores: [{bid: UidA, score: 12},
-                                              {bid: UidB, score: 10}]});
 
         ctx.element.find('#extend-win-score').click();
 
         expect(ctx.ctrl.scores).toEqual([15, 13]);
         expect(ctx.ctrl.possibleWinScores).toEqual([14, 15, 16, 17]);
         expect(ctx.ctrl.possibleLostScores).toEqual([13]);
-        expect(captured[1]).toEqual({setOrdNumber: 0,
-                                     scores: [{bid: UidA, score: 15},
-                                              {bid: UidB, score: 13}]});
     });
 
     ij('shrink win balls in ping pong match', ($rootScope) => {
@@ -129,7 +123,7 @@ describe('base-score-set', () => {
 
         ctx.ctrl.pick(ctx.ctrl.winnerIdx, 14);
 
-        expect(ctx.ctrl.possibleWinScores).toEqual([11, 12, 13, 14]);
+        expect(ctx.ctrl.possibleWinScores).toEqual([13, 14, 15, 16]);
         expect(ctx.ctrl.possibleLostScores).toEqual([12]);
         expect(ctx.ctrl.scores).toEqual([14, 12]);
 
@@ -154,17 +148,19 @@ describe('base-score-set', () => {
     });
 
     describe('event.match.set.score', () => {
-        ij('validation reject due not all participants are scored', (requestStatus, $rootScope) => {
-            spyOn(requestStatus, 'validationFailed');
+        ij('validation reject due not all participants are scored', ($rootScope) => {
+            spyOn(ctx.ctrl.info, 'transError');
             ctx.ctrl.scores = [-1, -1];
             $rootScope.$broadcast('event.match.set.score');
-            expect(requestStatus.validationFailed).toHaveBeenCalledWith("Not all participants have been scored");
+            expect(ctx.ctrl.info.transError).toHaveBeenCalledWith(
+                "Not all participants have been scored");
         });
-        ij('validation reject due not all participants are equally strong', (requestStatus, $rootScope) => {
-            spyOn(requestStatus, 'validationFailed');
+        ij('validation reject due not all participants are equally strong', ($rootScope) => {
+            spyOn(ctx.ctrl.info, 'transError');
             ctx.ctrl.scores = [11, 11];
             $rootScope.$broadcast('event.match.set.score');
-            expect(requestStatus.validationFailed).toHaveBeenCalledWith("Participants cannot have same scores");
+            expect(ctx.ctrl.info.transError).toHaveBeenCalledWith(
+                "Participants cannot have same scores");
         });
 
         ij('event.match.set.scored is emitted', ($rootScope) => {

@@ -61,7 +61,7 @@ public class TournamentCopyJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     final ImperativeSimulator consoleOrigin = c.beginTournament()
-                            .createConsoleTournament()
+                            .createConsoleGruTournament()
                             .resolveCategories();
 
                     final String copyName = scenario.getName() + " copy";
@@ -71,15 +71,15 @@ public class TournamentCopyJerseyTest extends AbstractSpringJerseyTest {
                             MY_TOURNAMENT + copyMasterTid.getTid(),
                             scenario.getTestAdmin(), MyTournamentInfo.class);
 
-                    assertThat(masterCopyInfo.getConsoleTid(),
+                    assertThat(masterCopyInfo.getConsoleGroupTid(),
                             not(optionalWithValue(is(consoleOrigin.getScenario().getTid()))));
-                    assertThat(masterCopyInfo.getConsoleTid(),
+                    assertThat(masterCopyInfo.getConsoleGroupTid(),
                             not(emptyOptional()));
                     assertThat(masterCopyInfo.getPreviousTid(),
                             is(Optional.of(scenario.getTid())));
 
                     final MyTournamentInfo consoleCopyInfo = myRest().get(
-                            MY_TOURNAMENT + masterCopyInfo.getConsoleTid().get(),
+                            MY_TOURNAMENT + masterCopyInfo.getConsoleGroupTid().get(),
                             scenario.getTestAdmin(), MyTournamentInfo.class);
 
                     assertThat(consoleCopyInfo.getMasterTid(),

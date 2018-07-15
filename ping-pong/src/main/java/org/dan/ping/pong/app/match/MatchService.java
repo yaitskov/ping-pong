@@ -8,6 +8,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Stream.concat;
 import static org.dan.ping.pong.app.bid.BidService.WIN_STATES;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
@@ -61,6 +62,7 @@ import org.dan.ping.pong.app.sched.TablesDiscovery;
 import org.dan.ping.pong.app.sport.MatchRules;
 import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.table.TableInfo;
+import org.dan.ping.pong.app.tournament.ChildTournamentProvider;
 import org.dan.ping.pong.app.tournament.ConfirmSetScore;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.RelatedTids;
@@ -288,6 +290,8 @@ public class MatchService {
     @Inject
     private TournamentTerminator tournamentTerminator;
 
+    private static Set<BidState> BID_STATES_ALLOWED_IN_CONSOLE = ImmutableSet.of(Lost);
+
     private void completePlayOffMatch(TournamentMemState tournament, MatchInfo mInfo,
             Bid winBid, DbUpdater batch) {
         final PlayOffRule playOffRule = tournament.getRule().getPlayOff().get();
@@ -304,8 +308,12 @@ public class MatchService {
         if (!isPyrrhic(lostParticipant)) {
             bidService.setBidState(lostParticipant,
                     playOffMatchLoserState(playOffRule, mInfo, lostParticipant), PLAY_WAIT, batch);
+            if (BID_STATES_ALLOWED_IN_CONSOLE.contains(lostParticipant.getBidState())) {
+                consoleStrategy.onParticipantLostPlayOff(tournament, lostParticipant, batch);
+            }
         } else if (lostParticipant.getBidState() == Quit && mInfo.getType() == Gold) {
-            bidService.setBidState(lostParticipant, Win2, singleton(lostParticipant.getBidState()), batch);
+            bidService.setBidState(lostParticipant, Win2,
+                    singleton(lostParticipant.getBidState()), batch);
         }
         mInfo.getLoserMid().ifPresent(
                 lMid -> assignBidToMatch(tournament, lMid, lostBid, batch));
@@ -738,19 +746,12 @@ public class MatchService {
     @SneakyThrows
     public MyPendingMatchList findPendingMatchesIncludeConsole(
             TournamentMemState tournament, Bid bid) {
-        final MyPendingMatchList masterResult = findPendingMatches(tournament, bid);
-        if (!masterResult.getMatches().isEmpty() || !tournament.getRule().consoleP()) {
-            return masterResult;
-        }
-        final RelatedTids relatedTids = relatedTidCache.get(tournament.getTid());
-        return relatedTids.getChild()
-                .map(tournamentCache::load)
-                .map(consoleTournament ->
-                        consoleTournament.getBid(bid) == null
-                                ? masterResult
-                                : findPendingMatches(consoleTournament, bid))
-                .orElseThrow(() -> internalError("Tournament " + tournament.getTid()
-                        + " has no console tournament"));
+        return concat(
+                Stream.of(findPendingMatches(tournament, bid)),
+                childTourProvider.getChildren(tournament)
+                        .map((t) -> findPendingMatches(t, bid)))
+                .reduce(MyPendingMatchList::merge)
+                .orElseThrow(() -> internalError("Tournament " + tournament.getTid() + " disappeared"));
     }
 
     public MyPendingMatchList findPendingMatches(
@@ -817,20 +818,19 @@ public class MatchService {
                         .collect(toList())));
     }
 
+    @Inject
+    private ChildTournamentProvider childTourProvider;
+
     @SneakyThrows
     public OpenMatchForJudgeList findOpenMatchesFurJudgeIncludingConsole(
             TournamentMemState tournament) {
-        final OpenMatchForJudgeList masterResult = findOpenMatchesForJudgeList(tournament);
-        if (!tournament.getRule().consoleP()) {
-            return masterResult;
-        }
-        final RelatedTids relatedTids = relatedTidCache.get(tournament.getTid());
-        final OpenMatchForJudgeList consoleResult = relatedTids.getChild()
-                .map(tournamentCache::load)
-                .map(this::findOpenMatchesForJudgeList)
-                .orElseThrow(() -> internalError("Tournament " + tournament.getTid()
-                        + " has no console tournament"));
-        return masterResult.merge(consoleResult);
+        return concat(
+                Stream.of(findOpenMatchesForJudgeList(tournament)),
+                childTourProvider.getChildren(tournament)
+                        .map(this::findOpenMatchesForJudgeList))
+                .reduce(OpenMatchForJudgeList::merge)
+                .orElseThrow(
+                        () -> internalError("Tournament " + tournament.getTid() + " disappeared"));
     }
 
     public OpenMatchForJudgeList findOpenMatchesForJudgeList(TournamentMemState tournament) {

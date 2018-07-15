@@ -58,7 +58,7 @@ public class TournamentListJerseyTest extends AbstractSpringJerseyTest {
                 .name("hideConsoleOnAdminList")
                 .rules(RULES_G8Q1_S1A2G11_NP);
         isf.create(scenario).run(c -> c.beginTournament()
-                .createConsoleTournament()
+                .createConsoleGruTournament()
                 .resolveCategories());
 
         assertThat(myRest().get(EDITABLE_TOURNAMENTS + "/21",

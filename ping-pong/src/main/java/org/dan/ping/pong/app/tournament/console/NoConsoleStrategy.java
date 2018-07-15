@@ -11,9 +11,12 @@ import com.google.common.collect.ImmutableSet;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
+import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.sys.db.DbUpdater;
+import org.dan.ping.pong.sys.error.PiPoEx;
 
 import java.util.Set;
 
@@ -32,5 +35,17 @@ public class NoConsoleStrategy implements ConsoleStrategy {
                 .map(tournament::getParticipant)
                 .filter(bid -> !terminalStates.contains(bid.getBidState()))
                 .forEach(bid -> bidService.setBidState(bid, Lost, asList(Wait, Rest), batch));
+    }
+
+    @Override
+    public void onPlayOffCategoryComplete(
+            Cid cid, TournamentMemState tournament, DbUpdater batch) {
+        throw PiPoEx.internalError("dead");
+    }
+
+    @Override
+    public void onParticipantLostPlayOff(
+            TournamentMemState tournament, ParticipantMemState lostParticipant, DbUpdater batch) {
+        throw PiPoEx.internalError("dead");
     }
 }

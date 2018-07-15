@@ -6,7 +6,6 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.RequiredArgsConstructor;
-import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.place.ArenaDistributionPolicy;
 import org.dan.ping.pong.app.place.PlaceRules;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -25,7 +24,10 @@ public class ScheduleServiceSelector implements ScheduleService {
     @Override
     public void beginTournament(TournamentMemState tournament, DbUpdater batch, Instant now) {
         if (tournament.getMatches().isEmpty() && tournament.getState() == Open) {
-            tournamentTerminator.endOfTournamentCategory(tournament, null, batch);
+            tournament.getCategories()
+                    .keySet()
+                    .forEach(cid -> tournamentTerminator.endOfTournamentCategory(
+                            tournament, cid, batch));
             return;
         }
         dispatch(tournament).beginTournament(tournament, batch, now);

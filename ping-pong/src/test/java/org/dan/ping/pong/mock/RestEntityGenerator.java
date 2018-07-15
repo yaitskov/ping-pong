@@ -20,6 +20,7 @@ import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
 import org.dan.ping.pong.app.tournament.ExpelParticipant;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.console.CreateConsoleTournamentReq;
 import org.dan.ping.pong.mock.simulator.EnlistMode;
 import org.dan.ping.pong.mock.simulator.Player;
 import org.dan.ping.pong.mock.simulator.PlayerCategory;
@@ -130,8 +131,8 @@ public class RestEntityGenerator {
         rest.voidPost(BEGIN_TOURNAMENT, testAdmin, tid);
     }
 
-    public Tid createConsoleTournament(SessionAware testAdmin, Tid masterTid) {
-        return rest.post(TOURNAMENT_CONSOLE_CREATE, testAdmin, masterTid, Tid.class);
+    public Tid createConsoleTournament(SessionAware testAdmin, CreateConsoleTournamentReq req) {
+        return rest.post(TOURNAMENT_CONSOLE_CREATE, testAdmin, req, Tid.class);
     }
 
     public OpenMatchForJudgeList listOpenMatchesForJudge(Tid tid) {

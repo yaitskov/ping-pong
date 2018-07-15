@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.castinglots.rank;
 
+import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -137,7 +138,7 @@ public class ParticipantRankingService {
             OrderDirection direction) {
         return bids.stream().sorted(
                 direction.setupOrder(
-                       comparingInt(bid -> bid.getUid().getId())))
+                       comparing(ParticipantMemState::getBid)))
                 .collect(toList());
     }
 }

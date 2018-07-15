@@ -9,18 +9,22 @@ import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.group.ConsoleTournament.INDEPENDENT_RULES;
+import static org.dan.ping.pong.app.match.MatchResource.BID_PENDING_MATCHES;
+import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
+import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
+import static org.dan.ping.pong.app.tournament.TournamentResource.GET_TOURNAMENT_RULES;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_CONSOLE_CREATE;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RULES;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G3Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11_NP;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_LC_S1A2G11_NP;
-import static org.dan.ping.pong.app.match.MatchResource.BID_PENDING_MATCHES;
-import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
-import static org.dan.ping.pong.app.tournament.TournamentResource.GET_TOURNAMENT_RULES;
-import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_CONSOLE_CREATE;
-import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RULES;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
+import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.ConOff;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
@@ -60,6 +64,9 @@ import javax.inject.Inject;
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = JerseyWithSimulator.class)
 public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
+    public static final TournamentRules JP_S1A2G11_NP_CON = RULES_JP_S1A2G11_NP
+            .withPlayOff(
+                    Optional.of(Losing1.withConsole(INDEPENDENT_RULES)));
     @Inject
     private ImperativeSimulatorFactory isf;
 
@@ -95,7 +102,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                             .scoreSet(p2, 11, p3, 5)
                             .scoreSet(p1, 11, p3, 4)
                             .checkTournamentComplete(restState(Lost).bid(p1, Win1))
-                            .createConsoleTournament()
+                            .createConsoleGruTournament()
                             .resolveCategories();
                     console.checkTournament(Draft, restState(Want).bid(p2, Here).bid(p3, Here));
                     myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
@@ -119,7 +126,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                     c.beginTournament()
                             .scoreSet(p1, 11, p2, 3);
 
-                    final ImperativeSimulator console = c.createConsoleTournament()
+                    final ImperativeSimulator console = c.createConsoleGruTournament()
                             .resolveCategories();
                     myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
                             TidIdentifiedRules.builder()
@@ -147,7 +154,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     final ImperativeSimulator console = c.beginTournament()
-                            .createConsoleTournament()
+                            .createConsoleGruTournament()
                             .scoreSet(p1, 11, p2, 3)
                             .scoreSet(p2, 11, p3, 5)
                             .scoreSet(p1, 11, p3, 4)
@@ -169,7 +176,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     final ImperativeSimulator console = c.beginTournament()
-                            .createConsoleTournament()
+                            .createConsoleGruTournament()
                             .scoreSet(p1, 11, p3, 4)
                             .scoreSet(p2, 11, p4, 6)
                             .scoreSet(p1, 11, p2, 3)
@@ -196,7 +203,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     final ImperativeSimulator console = c.beginTournament()
-                            .createConsoleTournament()
+                            .createConsoleGruTournament()
                             .expelPlayer(p4)
                             .scoreSet(p1, 11, p3, 4)
                             .scoreSet(p1, 11, p2, 3)
@@ -219,7 +226,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     final ImperativeSimulator console = c.beginTournament()
-                            .createConsoleTournament()
+                            .createConsoleGruTournament()
                             .expelPlayer(p3)
                             .scoreSet(p1, 11, p2, 3)
                             .checkTournamentComplete(restState(Expl).bid(p2, Lost).bid(p1, Win1))
@@ -238,7 +245,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     final ImperativeSimulator console = c.beginTournament()
-                            .createConsoleTournament()
+                            .createConsoleGruTournament()
                             .scoreSet(p1, 11, p3, 4)
                             .scoreSet(p1, 11, p2, 3)
                             .scoreSet(p2, 11, p3, 5)
@@ -261,7 +268,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     c.beginTournament()
-                            .createConsoleTournament()
+                            .createConsoleGruTournament()
                             .scoreSet(p1, 11, p3, 4)
                             .scoreSet(p1, 11, p2, 3)
                             .scoreSet(p2, 11, p3, 5)
@@ -303,7 +310,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     final ImperativeSimulator console = c.beginTournament()
-                            .createConsoleTournament()
+                            .createConsoleGruTournament()
                             .scoreSet(p1, 11, p2, 3)
                             .scoreSet(p3, 11, p4, 7)
                             .scoreSet(p1, 11, p3, 4)
@@ -325,7 +332,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     c.beginTournament()
-                            .createConsoleTournament();
+                            .createConsoleGruTournament();
 
                     myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
                             TidIdentifiedRules.builder()
@@ -355,7 +362,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     c.beginTournament()
-                            .createConsoleTournament();
+                            .createConsoleGruTournament();
 
                     myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
                             TidIdentifiedRules.builder()
@@ -394,7 +401,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     c.beginTournament()
-                            .createConsoleTournament();
+                            .createConsoleGruTournament();
 
                     myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
                             TidIdentifiedRules.builder()
@@ -433,7 +440,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     c.beginTournament()
-                            .createConsoleTournament();
+                            .createConsoleGruTournament();
                     myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
                             TidIdentifiedRules.builder()
                                     .tid(c.getConsoleScenario().getTid())
@@ -457,6 +464,28 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                             .checkTournamentComplete(restState(Lost)
                                     .bid(p3, Win1)
                                     .bid(p5, Win2).bid(p2, Win1));
+                });
+    }
+
+    @Test
+    public void consolePlayOffTour() {
+        final TournamentScenario scenario = begin().name("conOffTour")
+                .rules(RULES_JP_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4);
+        isf.create(scenario)
+                .run(c -> {
+                    final ImperativeSimulator console = c.beginTournament()
+                            .createConsoleTournament(ConOff)
+                            .scoreSet(p1, 11, p4, 5)
+                            .scoreSet(p2, 11, p3, 5)
+                            .scoreSet(p1, 11, p2, 3)
+                            .checkTournamentComplete(restState(Lost).bid(p2, Win2).bid(p1, Win1))
+                            .resolveCategories();
+
+                    console.checkTournament(Open, restState(Play))
+                            .scoreSet(p3, 11, p4, 7)
+                            .checkResult(p3, p4)
+                            .checkTournamentComplete(restState(Lost).bid(p3, Win1).bid(p4, Win2));
                 });
     }
 }

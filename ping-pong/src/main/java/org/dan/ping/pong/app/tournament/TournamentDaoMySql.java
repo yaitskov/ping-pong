@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.time.temporal.ChronoUnit.DAYS;
+import static java.util.Arrays.asList;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
@@ -20,7 +21,8 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.app.tournament.TournamentState.Replaced;
 import static org.dan.ping.pong.app.tournament.TournamentType.Classic;
-import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.Console;
+import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.ConGru;
+import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.ConOff;
 import static org.dan.ping.pong.jooq.Tables.BID;
 import static org.dan.ping.pong.jooq.Tables.CATEGORY;
 import static org.dan.ping.pong.jooq.Tables.MATCHES;
@@ -49,7 +51,9 @@ import org.jooq.impl.DSL;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -68,7 +72,8 @@ public class TournamentDaoMySql implements TournamentDao {
     private static final String GAMES_COMPLETE = "gamesComplete";
     private static final int DAYS_TO_SHOW_PAST_TOURNAMENT = 30;
     private static final String CATEGORIES = "categories";
-    private static final TournamentRelation CHILD_TID_REL = TOURNAMENT_RELATION.as("child_tid_rel");
+    private static final TournamentRelation CON_GRU_TID_REL = TOURNAMENT_RELATION.as("con_gru_rel");
+    private static final TournamentRelation CON_OFF_TID_REL = TOURNAMENT_RELATION.as("con_off_rel");
     private static final TournamentRelation MASTER_TID_REL = TOURNAMENT_RELATION.as("master_tid_rel");
 
     @Inject
@@ -485,21 +490,32 @@ public class TournamentDaoMySql implements TournamentDao {
 
     public RelatedTids getRelatedTids(Tid tid) {
         return ofNullable(jooq.select(
-                CHILD_TID_REL.CHILD_TID,
+                CON_GRU_TID_REL.CHILD_TID,
+                CON_OFF_TID_REL.CHILD_TID,
                 MASTER_TID_REL.PARENT_TID)
                 .from(TOURNAMENT)
-                .leftJoin(CHILD_TID_REL)
-                .on(TOURNAMENT.TID.eq(CHILD_TID_REL.PARENT_TID)
-                        .and(CHILD_TID_REL.TYPE.eq(Console)))
+                .leftJoin(CON_GRU_TID_REL)
+                .on(TOURNAMENT.TID.eq(CON_GRU_TID_REL.PARENT_TID)
+                        .and(CON_GRU_TID_REL.TYPE.eq(ConGru)))
+                .leftJoin(CON_OFF_TID_REL)
+                .on(TOURNAMENT.TID.eq(CON_OFF_TID_REL.PARENT_TID)
+                        .and(CON_OFF_TID_REL.TYPE.eq(ConOff)))
                 .leftJoin(MASTER_TID_REL)
                 .on(TOURNAMENT.TID.eq(MASTER_TID_REL.CHILD_TID)
-                        .and(MASTER_TID_REL.TYPE.eq(Console)))
+                        .and(MASTER_TID_REL.TYPE.in(asList(ConGru, ConOff))))
                 .where(TOURNAMENT.TID.eq(tid))
                 .fetchOne())
-                .map(r -> RelatedTids.builder()
-                        .child(ofNullable(r.get(CHILD_TID_REL.CHILD_TID)))
+                .map(r -> {
+                    final Map<TournamentRelationType, Tid> children = new HashMap<>();
+                    ofNullable(r.get(CON_GRU_TID_REL.CHILD_TID)).ifPresent(
+                            v -> children.put(ConGru, v));
+                    ofNullable(r.get(CON_OFF_TID_REL.CHILD_TID)).ifPresent(
+                            v -> children.put(ConOff, v));
+                    return RelatedTids.builder()
+                        .children(children)
                         .parent(ofNullable(r.get(MASTER_TID_REL.PARENT_TID)))
-                        .build())
+                            .build();
+                })
                 .orElseThrow(() -> notFound("tournament " + tid + " not found"));
     }
 
@@ -528,12 +544,12 @@ public class TournamentDaoMySql implements TournamentDao {
                         .build());
     }
 
-    public void createRelation(Tid tid, Tid consoleTid) {
+    public void createRelation(Tid tid, Tid consoleTid, TournamentRelationType type) {
         jooq.insertInto(TOURNAMENT_RELATION,
                 TOURNAMENT_RELATION.TYPE,
                 TOURNAMENT_RELATION.PARENT_TID,
                 TOURNAMENT_RELATION.CHILD_TID)
-                .values(TournamentRelationType.Console, tid, consoleTid)
+                .values(type, tid, consoleTid)
                 .execute();
     }
 

@@ -50,7 +50,7 @@ public class TournamentRules {
                 .build();
     }
 
-    public boolean consoleP() {
+    public boolean consoleInGroupP() {
         return group.map(GroupRules::getConsole).orElse(NO) != NO;
     }
 

@@ -4,7 +4,7 @@ import template from './param.form.template.html';
 import TournamentRulesCtrl from './TournamentRulesCtrl.js';
 
 import './seeding/seeding-tr-params.component.js';
-import './console/console-tr-params.component.js';
+import './console/console-tournament-rule-link.directive.js';
 import './group/headless-dm-match-params.component.js';
 import './group/group-rule-parameters-dialog.component.js';
 import './group/pick-group-rules-dialog.component.js';

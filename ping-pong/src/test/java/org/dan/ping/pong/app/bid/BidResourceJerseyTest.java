@@ -270,7 +270,7 @@ public class BidResourceJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     c.beginTournament()
-                            .createConsoleTournament()
+                            .createConsoleGruTournament()
                             .scoreSet(p1, 11, p2, 4)
                             .scoreSet(p3, 11, p4, 3)
                             .resolveCategories();

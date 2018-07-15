@@ -46,7 +46,8 @@ import javax.inject.Named;
 
 @Slf4j
 public class MatchEditorService {
-    public static final ImmutableSet<BidState> RESETABLE_BID_STATES = ImmutableSet.of(Lost, Win1, Win2, Win3);
+    public static final ImmutableSet<BidState> RESETABLE_BID_STATES = ImmutableSet
+            .of(Lost, Win1, Win2, Win3);
     private static final Set<MatchState> GAME_PLACE_EXPECTED = ImmutableSet.of(Place, Game);
     private static final Set<MatchState> OVER_EXPECTED = singleton(Over);
 

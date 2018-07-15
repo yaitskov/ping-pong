@@ -17,6 +17,8 @@ import org.dan.ping.pong.app.auth.AuthService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.tournament.console.ConsoleTournamentService;
+import org.dan.ping.pong.app.tournament.console.CreateConsoleTournamentReq;
 import org.dan.ping.pong.app.tournament.rules.TournamentRulesValidator;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.sys.validation.TidBodyRequired;
@@ -91,17 +93,21 @@ public class TournamentResource {
                 newTournament);
     }
 
+    @Inject
+    private ConsoleTournamentService consoleTournamentService;
+
     @POST
     @Path(TOURNAMENT_CONSOLE_CREATE)
     @Consumes(APPLICATION_JSON)
     public void createConsole(
             @HeaderParam(SESSION) String session,
             @Suspended AsyncResponse response,
-            @TidBodyRequired @Valid Tid parentId) {
+            @Valid CreateConsoleTournamentReq req) {
         final UserInfo user = authService.userInfoBySession(session);
-        tournamentAccessor.update(parentId, response, (tournament, batch) -> {
+        tournamentAccessor.update(req.getParentTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(user.getUid());
-            return tournamentService.createConsoleFor(tournament, user, batch);
+            return consoleTournamentService.getOrCreateConsoleFor(
+                    tournament, req.getConsoleType(), user, batch);
         });
     }
 

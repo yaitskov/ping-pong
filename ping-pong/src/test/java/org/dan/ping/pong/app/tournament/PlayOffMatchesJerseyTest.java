@@ -256,7 +256,7 @@ public class PlayOffMatchesJerseyTest extends AbstractSpringJerseyTest {
         isf.create(scenario)
                 .run(c -> {
                     c.beginTournament()
-                            .createConsoleTournament();
+                            .createConsoleGruTournament();
 
                     myRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
                             TidIdentifiedRules.builder()

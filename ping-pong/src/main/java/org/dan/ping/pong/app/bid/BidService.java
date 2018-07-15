@@ -209,9 +209,8 @@ public class BidService {
 
     public List<ParticipantLink> findByState(TournamentMemState tournament, List<BidState> states) {
         return Stream.concat(
-                childTournamentProvider.getChild(tournament)
-                        .map(consoleTournament -> findByStateNonRecursive(consoleTournament, states))
-                        .orElseGet(Stream::empty),
+                childTournamentProvider.getChildren(tournament)
+                        .flatMap(consoleTournament -> findByStateNonRecursive(consoleTournament, states)),
                 findByStateNonRecursive(tournament, states))
                 .sorted(Comparator.comparing(ParticipantLink::getName))
                 .collect(toList());
@@ -303,9 +302,6 @@ public class BidService {
 
     @Inject
     private MatchDao matchDao;
-
-    @Inject
-    private BidService bidService;
 
     public void cancelMatchesOf(TournamentMemState tournament, Bid bid, DbUpdater batch) {
         log.info("Cancel matches of {} in group", bid);

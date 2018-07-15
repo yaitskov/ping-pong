@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import org.dan.ping.pong.app.tournament.console.ConsoleCtx;
+import org.dan.ping.pong.app.tournament.console.ConsoleTournamentService;
 import org.dan.ping.pong.app.tournament.console.TournamentRelationCacheFactory;
 import org.dan.ping.pong.app.tournament.console.TournamentRelationCacheLoader;
 import org.dan.ping.pong.app.tournament.marshaling.TournamentMarshalingCtx;
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.Import;
         TournamentTerminator.class,
         ChildTournamentProvider.class,
         TournamentMarshalingCtx.class,
+        ConsoleTournamentService.class,
         TournamentService.class})
 public class TournamentCtx {
 }

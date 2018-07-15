@@ -335,7 +335,7 @@ public class OneCategorySim {
                 .category(c1, p1, p2, p3);
         isf.create(scenario)
                 .run(c -> c.beginTournament()
-                        .createConsoleTournament()
+                        .createConsoleGruTournament()
                         .scoreSet(p1, 11, p2, 3)
                         .scoreSet(p2, 11, p3, 5)
                         .scoreSet(p1, 11, p3, 4)
@@ -355,7 +355,7 @@ public class OneCategorySim {
                             .scoreSet(p2, 11, p3, 5)
                             .scoreSet(p1, 11, p3, 4)
                             .checkTournamentComplete(restState(Lost).bid(p1, Win1))
-                            .createConsoleTournament()
+                            .createConsoleGruTournament()
                             .resolveCategories();
 
                     console.getMyRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
@@ -390,7 +390,7 @@ public class OneCategorySim {
                             .scoreSet(p11, 11, p12, 5)
                             .scoreSet(p10, 11, p12, 4)
 
-                            .createConsoleTournament()
+                            .createConsoleGruTournament()
                             .resolveCategories();
 
                     console.getMyRest().voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),

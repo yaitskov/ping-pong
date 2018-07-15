@@ -30,6 +30,7 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_INV
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
+import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.ConGru;
 import static org.dan.ping.pong.mock.simulator.imerative.SessionSource.Admin;
 import static org.dan.ping.pong.mock.simulator.imerative.SessionSource.Player;
 import static org.hamcrest.Matchers.allOf;
@@ -83,6 +84,8 @@ import org.dan.ping.pong.app.tournament.ResignTournament;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 import org.dan.ping.pong.app.tournament.TournamentState;
+import org.dan.ping.pong.app.tournament.console.CreateConsoleTournamentReq;
+import org.dan.ping.pong.app.tournament.console.TournamentRelationType;
 import org.dan.ping.pong.mock.MyRest;
 import org.dan.ping.pong.mock.RestEntityGenerator;
 import org.dan.ping.pong.mock.TestUserSession;
@@ -147,9 +150,19 @@ public class ImperativeSimulator {
         return this;
     }
 
-    public ImperativeSimulator createConsoleTournament() {
+    public ImperativeSimulator createConsoleGruTournament() {
+        return createConsoleTournament(ConGru);
+    }
+
+    public ImperativeSimulator createConsoleTournament(TournamentRelationType type) {
         assertNull(consoleScenario);
-        scenario.consoleTid(restGenerator.createConsoleTournament(scenario, scenario.getTid()));
+        scenario.consoleTid(restGenerator.createConsoleTournament(
+                scenario,
+                CreateConsoleTournamentReq
+                        .builder()
+                        .parentTid(scenario.getTid())
+                        .consoleType(type)
+                        .build()));
         consoleScenario = scenario.createConsoleTournament();
         return this;
     }

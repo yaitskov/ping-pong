@@ -5,6 +5,7 @@ import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.tournament.console.ConsoleStrategy;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
@@ -25,23 +26,28 @@ public class TournamentTerminator {
     @Inject
     private Clocker clocker;
 
+    @Inject
+    private ConsoleStrategy consoleStrategy;
+
     public boolean endOfTournamentCategory(
             TournamentMemState tournament, Cid cid, DbUpdater batch) {
+        consoleStrategy.onPlayOffCategoryComplete(cid, tournament, batch);
         final Tid tid = tournament.getTid();
         log.info("Tid {} complete in cid {}", tid, cid);
-        Set<Cid> incompleteCids = categoryService.findIncompleteCategories(tournament);
+        final Set<Cid> incompleteCids = categoryService.findIncompleteCategories(tournament);
         if (incompleteCids.isEmpty()) {
             log.info("All matches of tid {} are complete", tid);
             setTournamentCompleteAt(tournament, clocker.get(), batch);
             setTournamentState(tournament, Close, batch);
             return true;
         } else {
-            log.info("Tid {} is fully complete", tid);
+            log.info("Tid {} is not fully complete due cats {}", tid, incompleteCids);
             return false;
         }
     }
 
-    public void setTournamentState(TournamentMemState tournament, TournamentState target, DbUpdater batch) {
+    public void setTournamentState(
+            TournamentMemState tournament, TournamentState target, DbUpdater batch) {
         log.info("Switch tid {} from state {} to {}",
                 tournament.getTid(), tournament.getState(), target);
         if (tournament.getState() != target) {

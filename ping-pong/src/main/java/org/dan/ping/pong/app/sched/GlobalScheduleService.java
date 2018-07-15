@@ -9,6 +9,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import com.google.common.cache.LoadingCache;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.tournament.RelatedTids;

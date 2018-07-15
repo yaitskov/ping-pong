@@ -38,12 +38,12 @@ public class DbContext {
             @Value("${db.jdbc.url}") String url) {
         HikariConfig config = new HikariConfig();
         config.setDataSourceClassName(driver);
-        config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        //config.setDriverClassName("com.mysql.cj.jdbc.Driver");
         config.addDataSourceProperty("user", user);
         config.addDataSourceProperty("password", password);
         config.addDataSourceProperty("url", url);
-        config.addDataSourceProperty("characterEncoding", "utf8");
-        config.addDataSourceProperty("useUnicode", "true");
+        //config.addDataSourceProperty("characterEncoding", "utf8");
+        //config.addDataSourceProperty("useUnicode", "true");
         config.setConnectionTestQuery("select 1");
         config.setMaximumPoolSize(1);
         config.setMinimumIdle(1);

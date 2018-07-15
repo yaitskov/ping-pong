@@ -37,6 +37,7 @@ import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.tournament.TournamentTerminator;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.Optional;
 import java.util.Set;
@@ -69,6 +70,7 @@ public class MatchEditorService {
     @Inject
     private Clocker clocker;
 
+    @Lazy
     @Inject
     @Named(SCHEDULE_SELECTOR)
     private ScheduleService scheduleService;

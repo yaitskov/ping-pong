@@ -48,6 +48,7 @@ import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.Comparator;
 import java.util.List;
@@ -244,6 +245,7 @@ public class CastingLotsService {
         return castingLotsDao.loadManualBidsOrder(tid, cid);
     }
 
+    @Lazy
     @Inject
     @Named(SCHEDULE_SELECTOR)
     private ScheduleService scheduleService;

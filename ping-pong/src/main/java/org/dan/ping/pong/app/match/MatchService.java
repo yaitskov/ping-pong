@@ -78,6 +78,7 @@ import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.TriFunc;
 import org.dan.ping.pong.util.time.Clocker;
+import org.springframework.context.annotation.Lazy;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -126,6 +127,7 @@ public class MatchService {
         return places;
     }
 
+    @Lazy
     @Inject
     @Named(SCHEDULE_SELECTOR)
     private ScheduleService scheduleService;

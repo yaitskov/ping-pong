@@ -73,6 +73,7 @@ import org.dan.ping.pong.sys.error.PiPoEx;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -244,6 +245,7 @@ public class TournamentService {
     @Inject
     private Clocker clocker;
 
+    @Lazy
     @Inject
     @Named(SCHEDULE_SELECTOR)
     private ScheduleService scheduleService;

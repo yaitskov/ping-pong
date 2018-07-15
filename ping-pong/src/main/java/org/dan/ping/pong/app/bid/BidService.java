@@ -45,6 +45,7 @@ import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -288,6 +289,7 @@ public class BidService {
         tryCompleteSourceGroup(tournament, req.getExpectedGid(), batch);
     }
 
+    @Lazy
     @Inject
     @Named(SCHEDULE_SELECTOR)
     private ScheduleService scheduleService;

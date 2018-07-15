@@ -11,10 +11,10 @@ alter table bid drop foreign key `bid_group_id`;
 ALTER TABLE bid change cid cid tinyint unsigned NOT NULL;
 ALTER TABLE bid change gid gid tinyint unsigned NULL;
 
-ALTER TABLE groups CHANGE gid gid tinyint unsigned NOT NULL;
-ALTER TABLE groups CHANGE cid cid tinyint unsigned NOT NULL;
-ALTER TABLE groups DROP PRIMARY KEY;
-ALTER TABLE groups ADD PRIMARY KEY(tid, gid);
+ALTER TABLE `groups` CHANGE gid gid tinyint unsigned NOT NULL;
+ALTER TABLE `groups` CHANGE cid cid tinyint unsigned NOT NULL;
+ALTER TABLE `groups` DROP PRIMARY KEY;
+ALTER TABLE `groups` ADD PRIMARY KEY(tid, gid);
 
 ALTER TABLE match_dispute CHANGE did did tinyint unsigned NOT NULL;
 ALTER TABLE match_dispute CHANGE mid mid smallint unsigned NOT NULL;
@@ -25,7 +25,7 @@ ALTER TABLE match_dispute ADD PRIMARY KEY(tid, did);
 alter table bid add constraint bid_tid_cid_idx
                    foreign key (tid, cid) references category(tid, cid);
 alter table bid add constraint bid_tid_gid_idx
-                   foreign key (tid, gid) references groups(tid, gid);
+                   foreign key (tid, gid) references `groups`(tid, gid);
 
 ALTER TABLE tables CHANGE mid mid smallint unsigned NULL;
 

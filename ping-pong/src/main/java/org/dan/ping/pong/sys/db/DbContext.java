@@ -38,6 +38,7 @@ public class DbContext {
             @Value("${db.jdbc.url}") String url) {
         HikariConfig config = new HikariConfig();
         config.setDataSourceClassName(driver);
+        config.setDriverClassName("com.mysql.cj.jdbc.Driver");
         config.addDataSourceProperty("user", user);
         config.addDataSourceProperty("password", password);
         config.addDataSourceProperty("url", url);

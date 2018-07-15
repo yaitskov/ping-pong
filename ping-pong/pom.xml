@@ -20,7 +20,7 @@
         <jooq.version>3.8.4</jooq.version>
         <aspectj.version>1.8.8</aspectj.version>
         <jersey.version>2.22.2</jersey.version>
-        <mysql-connector-java.version>5.1.38</mysql-connector-java.version>
+        <mysql-connector-java.version>8.0.11</mysql-connector-java.version>
         <restassured.version>3.0.1</restassured.version>
         <http.port>8080</http.port>
         <debug.port>5008</debug.port>
@@ -442,8 +442,8 @@
                 <configuration>
                     <skip>${skip.jooq}</skip>
                     <jdbc>
-                        <driver>com.mysql.jdbc.Driver</driver>
-                        <url>jdbc:mysql://127.0.0.1:${mysql.port}/ping_pong</url>
+                        <driver>com.mysql.cj.jdbc.Driver</driver>
+                        <url>jdbc:mysql://127.0.0.1:${mysql.port}/ping_pong?characterEncoding=utf8&amp;useSSL=false&amp;serverTimezone=GMT</url>
                         <user>root</user>
                         <password>root</password>
                     </jdbc>

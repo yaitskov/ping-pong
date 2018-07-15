@@ -116,13 +116,13 @@
                             <dependency>
                                 <groupId>mysql</groupId>
                                 <artifactId>mysql-connector-java</artifactId>
-                                <version>5.1.29</version>
+                                <version>8.0.11</version>
                             </dependency>
                         </dependencies>
                         <configuration>
                             <changeLogFile>src/main/resources/db/master.changelog.xml</changeLogFile>
-                            <driver>com.mysql.jdbc.Driver</driver>
-                            <url>jdbc:mysql://${mysql.host}:${mysql.port}/ping_pong?createDatabaseIfNotExist=true&amp;characterEncoding=utf8</url>
+                            <driver>com.mysql.cj.jdbc.Driver</driver>
+                            <url>jdbc:mysql://${mysql.host}:${mysql.port}/ping_pong?createDatabaseIfNotExist=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;serverTimezone=GMT</url>
                             <username>${mysql.user}</username>
                             <password>${mysql.password}</password>
                             <verbose>true</verbose>

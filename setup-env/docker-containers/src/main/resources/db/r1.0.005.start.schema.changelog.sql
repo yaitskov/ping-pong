@@ -38,7 +38,7 @@ create table city (
     foreign key (country_id) references country(country_id),
     foreign key (author_id) references users(uid));
 
-create table admin(
+create table `admin`(
     uid int(11) not null primary key,
     said int(11) not null,
     created timestamp(3) default current_timestamp(3),
@@ -71,7 +71,7 @@ create table place(
     foreign key (city_id) references city(city_id));
 
 create table place_admin(
-    uid int(11) not null references admin(uid),
+    uid int(11) not null references `admin`(uid),
     pid int(11) not null references place(pid),
     created timestamp(3) default current_timestamp(3),
     type varchar(8) not null, -- author, owner, editor
@@ -95,7 +95,7 @@ alter table tournament
      references tournament(tid);
 
 create table tournament_admin(
-    uid int(11) not null references admin(uid),
+    uid int(11) not null references `admin`(uid),
     tid int(11) not null references tournament(tid),
     created timestamp(3) default current_timestamp(3),
     type varchar(8) not null, -- author, owner, editor
@@ -125,7 +125,7 @@ alter table bid add constraint bid_tid_idx
 alter table bid add constraint bid_cid_idx
                    foreign key (cid) references category(cid);
 
-create table groups(
+create table `groups`(
     gid int(11) not null auto_increment primary key,
     tid int(11) not null references tournament(tid),
     cid int(11) not null references category(cid),
@@ -136,7 +136,7 @@ create table groups(
 
 create table matches(
     mid int(11) not null auto_increment primary key,
-    gid int(11) null references groups(gid),
+    gid int(11) null references `groups`(gid),
     tid int(11) not null references tournament(tid),
     cid int(11) not null references category(cid),
     uid_less int(11) null references users(uid),
@@ -170,6 +170,6 @@ create table set_score(
 alter table bid
       add constraint bid_group_id
          foreign key (gid)
-          references groups(gid);
+          references `groups`(gid);
 
 --rollback

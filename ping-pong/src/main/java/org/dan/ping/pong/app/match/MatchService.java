@@ -751,6 +751,7 @@ public class MatchService {
         return concat(
                 Stream.of(findPendingMatches(tournament, bid)),
                 childTourProvider.getChildren(tournament)
+                        .filter(ct -> ct.getParticipants().containsKey(bid))
                         .map((t) -> findPendingMatches(t, bid)))
                 .reduce(MyPendingMatchList::merge)
                 .orElseThrow(() -> internalError("Tournament " + tournament.getTid() + " disappeared"));

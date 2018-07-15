@@ -14,7 +14,6 @@ import static org.dan.ping.pong.app.match.MatchResource.BID_PENDING_MATCHES;
 import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
 import static org.dan.ping.pong.app.tournament.TournamentResource.GET_TOURNAMENT_RULES;
-import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_CONSOLE_CREATE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RULES;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G3Q1_S1A2G11_NP;
@@ -77,13 +76,12 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 .category(c1, p1, p2, p3);
         isf.create(scenario)
                 .run(c -> {
-                    c.beginTournament();
-                    final Tid consoleTid = myRest()
-                            .post(TOURNAMENT_CONSOLE_CREATE, scenario, scenario.getTid())
-                            .readEntity(Tid.class);
-
+                    final Tid consoleTid = c.beginTournament()
+                            .createConsoleGruTournament().getScenario()
+                            .getConsoleTid().get();
                     assertThat(consoleTid, greaterThan(scenario.getTid()));
-                    assertThat(myRest().get(GET_TOURNAMENT_RULES + consoleTid.getTid(), TournamentRules.class),
+                    assertThat(myRest().get(
+                            GET_TOURNAMENT_RULES + consoleTid.getTid(), TournamentRules.class),
                             allOf(hasProperty("group", is(Optional.empty())),
                                     hasProperty("match", is(RULES_G8Q1_S1A2G11.getMatch())),
                                     hasProperty("playOff", is(RULES_G8Q1_S1A2G11.getPlayOff()))));
@@ -278,7 +276,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                     final int p2Bid = scenario.player2Bid(p2).intValue();
                     final Tid consoleTid = scenario.getConsoleTid().get();
                     assertThat(
-                            myRest().get(BID_PENDING_MATCHES  + masterTid  + "/" + p2Bid,
+                            myRest().get(BID_PENDING_MATCHES + masterTid  + "/" + p2Bid,
                                     MyPendingMatchList.class).getMatches(),
                             hasItem(
                                     allOf(hasProperty("tid", is(consoleTid)),

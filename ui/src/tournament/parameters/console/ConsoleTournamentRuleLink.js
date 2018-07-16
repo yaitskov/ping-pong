@@ -15,7 +15,7 @@ export default class ConsoleTournamentRuleLink extends AngularBean {
 <many-button-toggler domain="['ir', 'NO']" selected-class="['btn-primary', 'btn-danger']"
                      label="Play-console-tournament"
                      ng-model="ngModel"/>
-<div class="form-group" ng-show="consoleTid">
+<div class="form-group" ng-show="ngModel != 'NO' && consoleTid">
     <a class="btn btn-primary"
        href="#!/my/tournament/parameters/{{consoleTid}}"
        translate="configure-console-tournament"/>
@@ -41,7 +41,7 @@ export default class ConsoleTournamentRuleLink extends AngularBean {
     }
 
     createConsoleTournament(scope) {
-        this.ajax.doAjax(
+        this.ajax.doPost(
             'creating-console-tournament',
             '/api/tournament/console/create',
             {parentTid: scope.parentTid,

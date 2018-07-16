@@ -29,6 +29,7 @@ export default function defaultTournamentRules(sport) {
             orderRules: sportDefaultGroupRules(sport)
         },
         playOff: {
+            con: 'NO',
             losings: 1,
             tpm: 1
         }

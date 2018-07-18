@@ -17,16 +17,32 @@ export default class PlayOffParamsCtrl extends BaseTrParamsCtrl {
         });
     }
 
+    watchForConsoleLayered() {
+        this.$scope.$watch('$ctrl.rules.casting.splitPolicy', (nv, ov) => {
+            if (!this.rules.playOff) {
+                return;
+            }
+            if (nv == 'cl' && ov != 'cl') {
+                this.rules.playOff.lrCon = 'ml';
+            } else if (nv && nv != 'cl' && ov == 'cl') {
+                delete this.rules.playOff.lrCon;
+            }
+        });
+    }
+
     onTournamentSet(tournament) {
         super.onTournamentSet(tournament);
         this.watchForPlayOff();
+        this.watchForConsoleLayered();
         this.usePlayOff = !!this.rules.playOff;
     }
 
     constructor() {
         super(...arguments);
-        this.playOffBackup = backedUpValue(defaultPlayOffRules, () => this.rules.playOff);
+        this.playOffBackup = backedUpValue(
+            defaultPlayOffRules, () => this.rules.playOff);
         this.usePlayOff = false;
-        this.scrollBottom = () => this.$timeout(() => window.scrollTo(0, document.body.scrollHeight), 100);
+        this.scrollBottom = () => this.$timeout(
+            () => window.scrollTo(0, document.body.scrollHeight), 100);
     }
 }

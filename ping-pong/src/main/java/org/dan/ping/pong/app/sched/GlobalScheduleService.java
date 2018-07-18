@@ -45,7 +45,7 @@ public class GlobalScheduleService implements ScheduleService {
     private boolean notParent(Tid busyTid, TournamentMemState tournament) {
         return !Optional.of(busyTid)
                 .equals(tournamentRelatedCache.get(tournament.getTid())
-                        .getParent());
+                        .parentTid());
     }
 
     @Override

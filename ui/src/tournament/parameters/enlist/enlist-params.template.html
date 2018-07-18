@@ -1,4 +1,5 @@
-<div class="form-group toggle-btn">
+<div class="form-group toggle-btn"
+     ng-show="!$ctrl.tournament.master">
     <label translate="Enlisting"/>
     <a class="pull-right arrow"
        simple-toggler="#enlist-parameters">
@@ -6,7 +7,9 @@
         <span class="glyphicon glyphicon-menu-up"/>
     </a>
 </div>
-<div id="enlist-parameters" class="toggle-panel in">
+<div id="enlist-parameters"
+     ng-show="!$ctrl.tournament.master"
+     class="toggle-panel in">
     <many-button-toggler id="enlist-policy" ng-model="$ctrl.rules.enlist"
                          domain="['OC', 'OT']"
                          selected-class="['btn-primary', 'btn-success']"

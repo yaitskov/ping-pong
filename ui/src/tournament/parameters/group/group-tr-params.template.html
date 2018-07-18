@@ -1,5 +1,5 @@
 <div class="form-group toggle-btn" id="group-parameters-toggler"
-     ng-show="!$ctrl.tournament.masterTid">
+     ng-show="$ctrl.rules.casting.splitPolicy != 'cl'">
     <label translate="group-lbl"/>
     <input type="checkbox"
            data-size="small"
@@ -46,7 +46,7 @@
     <group-order-rules/>
     <console-tournament-rule-link ng-model="$ctrl.rules.group.console"
                                   parent-tid="$ctrl.tournament.tid"
-                                  ng-show="$ctrl.tournament.tid && !$ctrl.tournament.masterTid"
+                                  ng-show="$ctrl.tournament.tid && !$ctrl.tournament.master.tid"
                                   console-type="ConGru"
                                   console-tid="$ctrl.tournament.consoleGroupTid"/>
 </div>

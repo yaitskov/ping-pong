@@ -492,6 +492,7 @@ public class TournamentDaoMySql implements TournamentDao {
         return ofNullable(jooq.select(
                 CON_GRU_TID_REL.CHILD_TID,
                 CON_OFF_TID_REL.CHILD_TID,
+                MASTER_TID_REL.TYPE,
                 MASTER_TID_REL.PARENT_TID)
                 .from(TOURNAMENT)
                 .leftJoin(CON_GRU_TID_REL)
@@ -513,7 +514,12 @@ public class TournamentDaoMySql implements TournamentDao {
                             v -> children.put(ConOff, v));
                     return RelatedTids.builder()
                         .children(children)
-                        .parent(ofNullable(r.get(MASTER_TID_REL.PARENT_TID)))
+                        .parent(ofNullable(r.get(MASTER_TID_REL.PARENT_TID))
+                                .map((mTid) -> TidRelation
+                                        .builder()
+                                        .tid(mTid)
+                                        .type(r.get(MASTER_TID_REL.TYPE))
+                                        .build()))
                             .build();
                 })
                 .orElseThrow(() -> notFound("tournament " + tid + " not found"));

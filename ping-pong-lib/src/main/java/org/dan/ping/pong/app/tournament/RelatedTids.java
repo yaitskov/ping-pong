@@ -10,6 +10,10 @@ import java.util.Optional;
 @Getter
 @Builder
 public class RelatedTids {
-    private final Optional<Tid> parent;
+    private final Optional<TidRelation> parent;
     private final Map<TournamentRelationType, Tid> children;
+
+    public Optional<Tid> parentTid() {
+        return parent.map(TidRelation::getTid);
+    }
 }

@@ -334,7 +334,7 @@ public class TournamentService {
                         .tid(tournament.getTid())
                         .consoleGroupTid(ofNullable(relatedTids.getChildren().get(ConGru)))
                         .consolePlayOffTid(ofNullable(relatedTids.getChildren().get(ConOff)))
-                        .masterTid(relatedTids.getParent())
+                        .master(relatedTids.getParent())
                         .build());
     }
 

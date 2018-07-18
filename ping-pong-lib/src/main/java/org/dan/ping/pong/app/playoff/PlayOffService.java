@@ -36,6 +36,7 @@ import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.RelatedTids;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.TidRelation;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 
@@ -239,7 +240,7 @@ public class PlayOffService {
         return PlayOffMatches.builder()
                 .transitions(transitions)
                 .matches(matches)
-                .masterTid(relatedTids.getParent())
+                .masterTid(relatedTids.parentTid())
                 .consoleTid(ofNullable(relatedTids.getChildren().get(ConOff)))
                 .rootTaggedMatches(findRootMatches(tournament)
                         .values().stream()

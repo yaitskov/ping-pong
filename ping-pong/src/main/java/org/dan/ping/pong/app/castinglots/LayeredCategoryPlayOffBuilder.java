@@ -53,8 +53,9 @@ public class LayeredCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
         validateBidsNumberInACategory(bids);
 
         final RelatedTids relatedTids = tournamentRelationCache.get(tournament.getTid());
-        final Tid masterTid = relatedTids.getParent().orElseThrow(() -> internalError("tid "
-                + tournament.getTid() + " has no master tournament"));
+        final Tid masterTid = relatedTids.parentTid()
+                .orElseThrow(() -> internalError("tid "
+                        + tournament.getTid() + " has no master tournament"));
 
         final TournamentMemState masterTournament = tournamentCache.get(masterTid);
 

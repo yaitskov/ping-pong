@@ -39,6 +39,17 @@ export default class GroupParamsCtrl extends BaseTrParamsCtrl {
             console.log(`useGroups change ${newValue} ${oldValue}`);
             this.rules.group = this.groupRuleBackup.map(newValue);
             this.generateGroupSchedule();
+            this.MessageBus.broadcast(
+                GroupOrderRulesCtrl.TopicTournamentRulesAvailable,
+                this.rules);
+        });
+    }
+
+    watchForConsoleLayered() {
+        this.$scope.$watch('$ctrl.rules.casting.splitPolicy', (nv, ov) => {
+            if (nv == 'cl' && ov != 'cl') {
+                this.useGroups = false;
+            }
         });
     }
 
@@ -77,6 +88,7 @@ export default class GroupParamsCtrl extends BaseTrParamsCtrl {
         this.MessageBus.broadcast(
             GroupOrderRulesCtrl.TopicTournamentRulesAvailable, tournament.rules);
         this.watchForUseGroups();
+        this.watchForConsoleLayered();
         const group = this.rules.group;
         this.useGroups = !!group;
         if (!group) {

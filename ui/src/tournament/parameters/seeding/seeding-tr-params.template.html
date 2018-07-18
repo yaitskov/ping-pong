@@ -9,7 +9,7 @@
 <div id="seeding-parameters" class="toggle-panel in">
     <many-button-toggler domain="['bm', 'cl']"
                          id="split-policy" label="split-policy-lbl"
-                         ng-show="$ctrl.tournament.masterTid"
+                         ng-show="$ctrl.tournament.master.tid"
                          ng-model="$ctrl.rules.casting.splitPolicy"/>
     <many-button-toggler domain="$ctrl.rankingPolicyDomain"
                          id="ranking-policy" label="rank-policy-lbl"

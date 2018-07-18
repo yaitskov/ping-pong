@@ -1,4 +1,6 @@
-<div class="form-group toggle-btn" ng-show="!$ctrl.tournament.masterTid" id="play-off-parameters-toggler">
+<div class="form-group toggle-btn"
+     ng-show="$ctrl.rules.casting.splitPolicy != 'cl'"
+     id="play-off-parameters-toggler">
   <label translate="play-off-lbl"/>
   <input type="checkbox"
          data-size="small"
@@ -19,6 +21,18 @@
   <console-tournament-rule-link ng-model="$ctrl.rules.playOff.con"
                                 parent-tid="$ctrl.tournament.tid"
                                 console-type="ConOff"
-                                ng-show="$ctrl.tournament.tid && !$ctrl.tournament.masterTid"
+                                ng-show="$ctrl.tournament.tid && !$ctrl.tournament.master.tid"
                                 console-tid="$ctrl.tournament.consolePlayOffTid"/>
+  <many-button-toggler ng-show="$ctrl.rules.casting.splitPolicy == 'cl'"
+                       domain="['ml', 'il']"
+                       label="Merge console layers"
+                       ng-model="$ctrl.rules.playOff.lrPol"/>
+  <many-button-toggler ng-show="$ctrl.rules.casting.splitPolicy == 'cl' && $ctrl.tournament.master.type == 'ConGru'"
+                       domain="['JL', 'AW3', 'AW2', 'AW1']"
+                       label="Console guests"
+                       ng-model="$ctrl.rules.playOff.conParts"/>
+  <many-button-toggler ng-show="$ctrl.tournament.master.type == 'ConOff'"
+                       domain="['JL', 'LUTS', 'AHF', 'AW3', 'AW2', 'AW1']"
+                       label="Console guests"
+                       ng-model="$ctrl.rules.playOff.conParts"/>
 </div>

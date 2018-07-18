@@ -25,6 +25,7 @@ import org.dan.ping.pong.app.place.PlaceDao;
 import org.dan.ping.pong.app.place.PlaceMemState;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.RelatedTids;
+import org.dan.ping.pong.app.tournament.TidRelation;
 import org.dan.ping.pong.app.tournament.TournamentCache;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.Tid;
@@ -100,7 +101,8 @@ public class TableService {
 
     @SneakyThrows
     void freeTablesForCompleteMatches(TournamentMemState tournament, PlaceMemState place, DbUpdater batch) {
-        final Set<Mid> parentMatches = tournamentRelatedCache.get(tournament.getTid()).getParent()
+        final Set<Mid> parentMatches = tournamentRelatedCache.get(tournament.getTid())
+                .parentTid()
                 .map(ptid -> tournamentCache.load(ptid))
                 .map(parentTournament -> parentTournament.getMatches().keySet())
                 .orElseGet(Collections::emptySet);

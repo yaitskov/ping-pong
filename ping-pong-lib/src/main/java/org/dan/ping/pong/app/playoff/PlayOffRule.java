@@ -31,6 +31,10 @@ public class PlayOffRule {
     private Optional<MatchRules> match = Optional.empty();
     @JsonProperty("con")
     private ConsoleTournament console = NO;
+    @JsonProperty("conParts")
+    private Optional<PlayOffGuests> consoleParticipants = Optional.empty();
+    @JsonProperty("lrPol")
+    private Optional<ConsoleLayersPolicy> layerPolicy = Optional.empty();
 
     public static final PlayOffRule L1_3P = PlayOffRule.builder()
             .losings(1)
@@ -50,5 +54,7 @@ public class PlayOffRule {
     public static class PlayOffRuleBuilder {
         Optional<MatchRules> match = Optional.empty();
         ConsoleTournament console = NO;
+        Optional<PlayOffGuests> consoleParticipants = Optional.empty();
+        Optional<ConsoleLayersPolicy> layerPolicy = Optional.empty();
     }
 }

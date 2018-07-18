@@ -31,5 +31,5 @@ public class MyTournamentInfo {
     private Optional<Tid> previousTid = Optional.empty();
     private Optional<Tid> consoleGroupTid = Optional.empty();
     private Optional<Tid> consolePlayOffTid = Optional.empty();
-    private Optional<Tid> masterTid = Optional.empty();
+    private Optional<TidRelation> master = Optional.empty();
 }

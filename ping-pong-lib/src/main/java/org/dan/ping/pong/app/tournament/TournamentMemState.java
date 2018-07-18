@@ -345,4 +345,8 @@ public class TournamentMemState {
                 .flatMap(m -> ofNullable(m.get(cid)))
                 .orElseGet(() -> getNextBid().next());
     }
+
+    public String toString() {
+        return "trMemSt id=" + tid + ", st=" + state + ", hc=" + hashCode();
+    }
 }

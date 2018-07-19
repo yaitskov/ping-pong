@@ -16,6 +16,7 @@ import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.ConsoleLayered;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.table.TableService.STATE;
@@ -47,6 +48,7 @@ import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
+import org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.Cid;
@@ -302,7 +304,7 @@ public class TournamentService {
                         .ticketPrice(tournament.getTicketPrice())
                         .previousTid(tournament.getPreviousTid())
                         .place(place.toLink())
-                        .categories(tournament.getCategories().values())
+                        .categories(tournament.categoryLinks())
                         .opensAt(tournament.getOpensAt())
                         .categoryState(userId
                                 .flatMap(u -> ofNullable(tournament.getUidCid2Bid().get(u)))
@@ -455,13 +457,16 @@ public class TournamentService {
                     ImmutableMap.of(TID, tournament.getTid(),
                             "state", tournament.getState()));
         }
-        if (tournament.getSport() != parameters.getRules().getMatch().sport()) {
+        final TournamentRules rules = parameters.getRules();
+        if (tournament.getSport() != rules.getMatch().sport()) {
             throw badRequest("sport mismatch");
         }
-        if (tournament.getType() == Console && parameters.getRules().getGroup().isPresent()) {
-            throw badRequest("console tournament cannot have groups");
+        if (tournament.getType() == Console
+                && rules.getCasting().getSplitPolicy() == ConsoleLayered
+                && rules.getGroup().isPresent()) {
+            throw badRequest("layred console tournament cannot have groups");
         }
-        tournament.setRule(parameters.getRules());
+        tournament.setRule(rules);
         tournamentDao.updateParams(tournament.getTid(), tournament.getRule(), batch);
     }
 
@@ -538,7 +543,7 @@ public class TournamentService {
                 .builder()
                 .state(tournament.getState())
                 .name(tournament.getName())
-                .categories(tournament.getCategories().values())
+                .categories(tournament.categoryLinks())
                 .hasGroups(tournament.getRule().getGroup().isPresent())
                 .hasPlayOff(tournament.getRule().getPlayOff().isPresent())
                 .build();

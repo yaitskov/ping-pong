@@ -593,6 +593,11 @@
                                     <binding>org.dan.ping.pong.app.bid.BidStateConverter</binding>
                                 </customType>
                                 <customType>
+                                    <name>CategoryState</name>
+                                    <type>org.dan.ping.pong.app.category.CategoryState</type>
+                                    <binding>org.dan.ping.pong.app.category.CategoryStateConverter</binding>
+                                </customType>
+                                <customType>
                                     <name>TournamentState</name>
                                     <type>org.dan.ping.pong.app.tournament.TournamentState</type>
                                     <binding>org.dan.ping.pong.app.tournament.TournamentStateConverter</binding>
@@ -767,6 +772,11 @@
                                 <forcedType>
                                     <name>OptionalString</name>
                                     <expression>.*category\.(gender)</expression>
+                                    <types>.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>CategoryState</name>
+                                    <expression>.*category\.(state)</expression>
                                     <types>.*</types>
                                 </forcedType>
                                 <forcedType>

@@ -49,12 +49,12 @@ public class GroupDivider {
         return result;
     }
 
-    <T> void bestToBest(List<T> bids, Map<Integer, List<T>> result, List<Integer> groups) {
+    <T> void bestToBest(List<T> bids, Map<Integer, List<T>> result, List<Integer> groupSizes) {
         final Iterator<T> bidIterator = bids.iterator();
-        for (int gi = 0; gi < groups.size(); ++gi) {
-            final int groupSize = groups.get(gi);
+        for (int gi = 0; gi < groupSizes.size(); ++gi) {
+            final int groupSize = groupSizes.get(gi);
             final List<T> groupBids = new ArrayList<>();
-            for (int ibid = 0; ibid < groupSize && bidIterator.hasNext(); ++ibid) {
+            for (int iBid = 0; iBid < groupSize && bidIterator.hasNext(); ++iBid) {
                 groupBids.add(bidIterator.next());
                 bidIterator.remove();
             }

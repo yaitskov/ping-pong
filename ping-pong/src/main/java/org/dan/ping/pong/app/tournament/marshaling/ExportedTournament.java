@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.dan.ping.pong.app.bid.Bid;
-import org.dan.ping.pong.app.category.CategoryLink;
+import org.dan.ping.pong.app.category.CategoryMemState;
 import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupInfo;
@@ -25,9 +25,9 @@ import java.util.Optional;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
-        defaultImpl = ExportedTournamentJune_8th_2018.class)
+        defaultImpl = ExportedTournamentJuly_19th_2018.class)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = ExportedTournamentJune_8th_2018.class, name = "June8th2018"),
+        @JsonSubTypes.Type(value = ExportedTournamentJuly_19th_2018.class, name = "June8th2018"),
         })
 public interface ExportedTournament {
     String getName();
@@ -38,7 +38,7 @@ public interface ExportedTournament {
     TournamentRules getRule();
     Tid getTid();
     void setTid(Tid tid);
-    Map<Cid, CategoryLink> getCategories();
+    Map<Cid, CategoryMemState> getCategories();
     Map<Gid, GroupInfo> getGroups();
     Map<Bid, ParticipantMemState> getParticipants();
     Map<Mid, MatchInfo> getMatches();

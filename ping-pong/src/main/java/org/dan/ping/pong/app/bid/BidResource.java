@@ -95,7 +95,7 @@ public class BidResource {
             final ParticipantMemState participant = tournament.getParticipant(bid);
             return BidProfile.builder()
                     .name(participant.getName())
-                    .category(tournament.getCategory(participant.getCid()))
+                    .category(tournament.getCategory(participant.getCid()).toLink())
                     .group(participant.getGid()
                             .map(gid -> tournament.getGroups().get(gid).toLink()))
                     .state(participant.state())

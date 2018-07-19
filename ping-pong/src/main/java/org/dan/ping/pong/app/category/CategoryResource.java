@@ -41,7 +41,7 @@ public class CategoryResource {
 
     @GET
     @Path(CATEGORIES_BY_TID + TID_JP)
-    public List<CategoryLink> findByTid(@PathParam(TID) Tid tid) {
+    public List<CategoryMemState> findByTid(@PathParam(TID) Tid tid) {
         return categoryDao.listCategoriesByTid(tid);
     }
 

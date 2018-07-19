@@ -156,7 +156,7 @@ public class GroupService {
         return GroupWithMembers.builder()
                 .gid(gid)
                 .name(groupInfo.getLabel())
-                .category(tournament.getCategory(groupInfo.getCid()))
+                .category(tournament.getCategory(groupInfo.getCid()).toLink())
                 .members(tournament.getParticipants().values().stream()
                         .filter(p -> p.getGid().equals(of(gid)))
                         .map(ParticipantMemState::toBidLink)

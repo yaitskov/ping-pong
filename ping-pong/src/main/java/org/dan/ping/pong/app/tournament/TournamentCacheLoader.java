@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.category.CategoryDao;
-import org.dan.ping.pong.app.category.CategoryLink;
+import org.dan.ping.pong.app.category.CategoryMemState;
 import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupDao;
@@ -87,7 +87,7 @@ public class TournamentCacheLoader extends CacheLoader<Tid, TournamentMemState> 
                 .participants(participants)
                 .categories(categoryDao.listCategoriesByTid(tid).stream()
                         .peek(c -> maxCid.accept(c.getCid()))
-                        .collect(toMap(CategoryLink::getCid, o -> o)))
+                        .collect(toMap(CategoryMemState::getCid, o -> o)))
                 .groups(groupDao.load(tid, maxGid))
                 .nextCategory(new CidSeqGen(maxCid.getMax()))
                 .nextGroup(new GidSeqGen(maxGid.getMax()))

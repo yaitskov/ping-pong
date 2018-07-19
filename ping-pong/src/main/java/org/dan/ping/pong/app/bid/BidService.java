@@ -81,7 +81,7 @@ public class BidService {
                         .builder()
                         .user(p.toBidLink())
                         .state(p.getBidState())
-                        .category(tournament.getCategory(p.getCid()))
+                        .category(tournament.getCategory(p.getCid()).toLink())
                         .build())
                 .collect(toList());
     }

@@ -16,4 +16,5 @@
     <include relativeToChangelogFile="true" file="r1.0.011.local-id.changelog.sql"/>
     <include relativeToChangelogFile="true" file="r1.0.012.local-bid.changelog.sql"/>
     <include relativeToChangelogFile="true" file="r1.0.013.name-suggestion.changelog.sql"/>
+    <include relativeToChangelogFile="true" file="r1.0.014.category-state.changelog.sql"/>
 </databaseChangeLog>

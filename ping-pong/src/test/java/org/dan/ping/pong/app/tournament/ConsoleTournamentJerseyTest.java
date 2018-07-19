@@ -10,6 +10,7 @@ import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
+import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.MasterOutcome;
 import static org.dan.ping.pong.app.match.MatchResource.BID_PENDING_MATCHES;
 import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
 import static org.dan.ping.pong.app.playoff.ConsoleLayersPolicy.IndependentLayers;
@@ -21,6 +22,7 @@ import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G3Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11_NP;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_LC_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
@@ -46,6 +48,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
+import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.match.MyPendingMatchList;
 import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
@@ -510,7 +513,47 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 });
     }
 
-    // console for group where group and play off is used
+    @Test
+    public void consoleForGroupWithGroupAndPlayOff() {
+        final TournamentScenario scenario = begin().name("conForGrpWithGrpAndPlayOff")
+                .rules(RULES_G3Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4, p5);
+        isf.create(scenario)
+                .run(master -> {
+                    master.beginTournament()
+                            .createConsoleGruTournament()
+                            .updateConsoleRules(RULES_G2Q1_S1A2G11_NP
+                                    .withCasting(RULES_G2Q1_S1A2G11_NP
+                                            .getCasting().withPolicy(MasterOutcome))
+                                    .withPlayOff(
+                                            Optional.of(Losing1
+                                                    .withConsoleParticipants(
+                                                            Optional.of(JustLosers)))));
+
+                    final ImperativeSimulator console = master // master groups
+                            .scoreSet(p1, 11, p2, 3)
+                            .scoreSet(p1, 11, p3, 7)
+                            .scoreSet(p2, 11, p3, 7)
+
+                            .scoreSet(p4, 11, p5, 5)
+                            .resolveCategories();
+
+                    console.checkTournament(Open, restState(Play))
+                            //.scoreSet(p2, 11, ?, 6)
+                            .scoreSet(p3, 11, p5, 8)
+                            // final
+                            .scoreSet(p2, 11, p3, 8)
+                            .checkResult(p2, p3, p5)
+                            .checkTournamentComplete(restState(Lost)
+                                    .bid(p3, Win2).bid(p2, Win1));
+
+                    master  // master play off
+                            .scoreSet(p1, 11, p4, 4)
+                            .checkResult(p1, p4, p2, p3, p5)
+                            .checkTournamentComplete(restState(Lost).bid(p4, Win2).bid(p1, Win1));
+                });
+    }
+
     // console for play off where all gets into 1 group and no play off
     // console for play off with play off up to 2 defeats
 

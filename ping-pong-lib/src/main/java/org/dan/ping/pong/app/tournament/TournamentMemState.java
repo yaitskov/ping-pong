@@ -35,6 +35,7 @@ import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.CategoryLink;
+import org.dan.ping.pong.app.category.CategoryMemState;
 import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupInfo;
@@ -83,7 +84,7 @@ public class TournamentMemState {
     private Map<Uid, Map<Cid, Bid>> uidCid2Bid;
     private Map<Mid, MatchInfo> matches;
     private Map<Gid, GroupInfo> groups;
-    private Map<Cid, CategoryLink> categories;
+    private Map<Cid, CategoryMemState> categories;
     private TournamentRules rule;
     private TournamentState state;
     private Optional<Instant> completeAt;
@@ -116,6 +117,13 @@ public class TournamentMemState {
         return ofNullable(participants.get(bid))
                 .orElseThrow(() -> notFound("Participant " + bid
                         + " does not participate in the tournament " + tid));
+    }
+
+    public List<CategoryLink> categoryLinks() {
+        return categories.values()
+                .stream()
+                .map(CategoryMemState::toLink)
+                .collect(toList());
     }
 
     public Stream<ParticipantMemState> participants() {
@@ -169,7 +177,7 @@ public class TournamentMemState {
         throw forbidden("You (" + uid + ") are not an administrator of " + tid);
     }
 
-    public CategoryLink getCategory(Cid cid) {
+    public CategoryMemState getCategory(Cid cid) {
         return ofNullable(categories.get(cid))
                 .orElseThrow(() -> internalError("No category " + cid + " in tid " + tid));
     }
@@ -222,7 +230,7 @@ public class TournamentMemState {
         return categories.values().stream()
                 .filter(category -> category.getName().equals(name))
                 .findAny()
-                .map(CategoryLink::getCid);
+                .map(CategoryMemState::getCid);
     }
 
     public GroupInfo getGroup(Gid gid) {

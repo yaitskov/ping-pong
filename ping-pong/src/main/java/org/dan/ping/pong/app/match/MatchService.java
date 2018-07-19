@@ -720,7 +720,7 @@ public class MatchService {
                                 .mid(m.getMid())
                                 .started(m.getStartedAt().get())
                                 .score(sports.calcWonSets(tournament, m).values().stream().collect(toList()))
-                                .category(tournament.getCategory(m.getCid()))
+                                .category(tournament.getCategory(m.getCid()).toLink())
                                 .table(tablesDiscovery.discover(m.getMid()).map(TableInfo::toLink))
                                 .type(m.getType())
                                 .participants(
@@ -885,7 +885,7 @@ public class MatchService {
                 .state(m.getState())
                 .type(m.getType())
                 .group(m.getGid().map(gid -> tournament.getGroups().get(gid).toLink()))
-                .category(tournament.getCategory(m.getCid()))
+                .category(tournament.getCategory(m.getCid()).toLink())
                 .tid(tournament.getTid())
                 .playedSets(m.playedSets())
                 .sport(tournament.selectMatchRule(m).toMyPendingMatchSport())

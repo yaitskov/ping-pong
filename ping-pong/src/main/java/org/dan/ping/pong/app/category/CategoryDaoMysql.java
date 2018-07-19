@@ -26,22 +26,24 @@ public class CategoryDaoMysql implements CategoryDao {
         batch.exec(DbUpdateSql.builder()
                 .query(jooq.insertInto(
                         CATEGORY, CATEGORY.NAME,
-                        CATEGORY.TID, CATEGORY.CID)
-                        .values(newCategory.getName(),
-                                newCategory.getTid(),
-                                newCategory.getCid()))
+                        CATEGORY.TID, CATEGORY.CID, CATEGORY.STATE)
+                                .values(newCategory.getName(),
+                                        newCategory.getTid(),
+                                        newCategory.getCid(),
+                                        CategoryState.Drt))
                 .build());
     }
 
     @Override
     @Transactional(readOnly = true, transactionManager = TRANSACTION_MANAGER)
-    public List<CategoryLink> listCategoriesByTid(Tid tid) {
-        return jooq.select(CATEGORY.CID, CATEGORY.NAME)
+    public List<CategoryMemState> listCategoriesByTid(Tid tid) {
+        return jooq.select(CATEGORY.CID, CATEGORY.NAME, CATEGORY.STATE)
                 .from(CATEGORY)
                 .where(CATEGORY.TID.eq(tid))
                 .fetch()
-                .map(r -> CategoryLink.builder()
+                .map(r -> CategoryMemState.builder()
                         .cid(r.get(CATEGORY.CID))
+                        .state(r.get(CATEGORY.STATE))
                         .name(r.get(CATEGORY.NAME))
                         .build());
     }
@@ -61,11 +63,14 @@ public class CategoryDaoMysql implements CategoryDao {
     @Override
     @Transactional(TRANSACTION_MANAGER)
     public void copy(Tid originTid, Tid tid) {
-        final List<CategoryLink> categories = listCategoriesByTid(originTid);
+        final List<CategoryMemState> categories = listCategoriesByTid(originTid);
         jooq.batch(
-                categories.stream().map(cinfo ->
-                        jooq.insertInto(CATEGORY, CATEGORY.NAME, CATEGORY.TID, CATEGORY.CID)
-                                .values(cinfo.getName(), tid, cinfo.getCid()))
+                categories.stream().map(cat ->
+                        jooq.insertInto(
+                                CATEGORY, CATEGORY.NAME, CATEGORY.TID,
+                                CATEGORY.CID, CATEGORY.STATE)
+                                .values(
+                                        cat.getName(), tid, cat.getCid(), cat.getState()))
                 .collect(toList()))
                 .execute();
     }

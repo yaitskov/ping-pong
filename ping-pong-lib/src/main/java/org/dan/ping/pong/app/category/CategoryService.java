@@ -57,9 +57,9 @@ public class CategoryService {
     public CategoryInfo categoryInfo(TournamentMemState tournament,
             Cid cid, Optional<Uid> ouid) {
         tournament.checkCategory(cid);
-        final CategoryLink cLink = tournament.getCategory(cid);
+        final CategoryMemState cLink = tournament.getCategory(cid);
         return CategoryInfo.builder()
-                .link(cLink)
+                .link(cLink.toLink())
                 .role(tournament.
                         detectRole(ouid))
                 .users(tournament.findBidsByCategory(cid)
@@ -81,8 +81,9 @@ public class CategoryService {
                         .cid(cid)
                         .build(),
                 batch);
-        tournament.getCategories().put(cid, CategoryLink.builder()
+        tournament.getCategories().put(cid, CategoryMemState.builder()
                 .name(name)
+                .state(CategoryState.Drt)
                 .cid(cid)
                 .build());
         return cid;

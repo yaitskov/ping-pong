@@ -37,7 +37,7 @@ public class TournamentMarshalingService {
                 .builder()
                 .exportedAt(clocker.get())
                 .tournament(
-                        ExportedTournamentJune_8th_2018
+                        ExportedTournamentJuly_19th_2018
                                 .builder()
                                 .name(tournament.getName())
                                 .type(tournament.getType())

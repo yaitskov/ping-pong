@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.dan.ping.pong.app.bid.Bid;
-import org.dan.ping.pong.app.category.CategoryLink;
+import org.dan.ping.pong.app.category.CategoryMemState;
 import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupInfo;
@@ -30,7 +30,7 @@ import java.util.Optional;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExportedTournamentJune_8th_2018 implements ExportedTournament {
+public class ExportedTournamentJuly_19th_2018 implements ExportedTournament {
     private SportType sport;
     private Tid tid;
     private String name;
@@ -38,7 +38,7 @@ public class ExportedTournamentJune_8th_2018 implements ExportedTournament {
     private Map<Bid, ParticipantMemState> participants;
     private Map<Mid, MatchInfo> matches;
     private Map<Gid, GroupInfo> groups;
-    private Map<Cid, CategoryLink> categories;
+    private Map<Cid, CategoryMemState> categories;
     private TournamentRules rule;
     private TournamentState state;
     private Optional<Instant> completeAt;

@@ -105,7 +105,8 @@ public class CastingLotsService {
         return gid;
     }
 
-    public void seed(TournamentMemState tournament, List<ParticipantMemState> readyBids, DbUpdater batch) {
+    public void seed(TournamentMemState tournament,
+            List<ParticipantMemState> readyBids, DbUpdater batch) {
         log.info("Begin seeding tournament {}", tournament.getTid());
         final TournamentRules rules = tournament.getRule();
 
@@ -199,7 +200,7 @@ public class CastingLotsService {
                 final Gid gid = groupService.createGroup(tournament, cid, batch);
                 final List<ParticipantMemState> groupBids = bidsByGroups.get(gi);
                 if (groupBids.size() < quits) {
-                    throw badRequest("Category should have more participants than quits from a group");
+                    throw badRequest("Group should have more participants than quits from a group");
                 }
                 groupBids.forEach(bid -> bid.setGid(Optional.of(gid)));
                 basePlayOffPriority = Math.max(

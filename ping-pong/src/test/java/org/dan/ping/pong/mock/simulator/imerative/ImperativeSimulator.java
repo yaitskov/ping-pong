@@ -29,6 +29,7 @@ import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_EXP
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_INVALIDATE_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESIGN;
 import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RESULT;
+import static org.dan.ping.pong.app.tournament.TournamentResource.TOURNAMENT_RULES;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.ConGru;
 import static org.dan.ping.pong.mock.simulator.imerative.SessionSource.Admin;
@@ -82,7 +83,9 @@ import org.dan.ping.pong.app.tournament.ExpelParticipant;
 import org.dan.ping.pong.app.tournament.MyTournamentInfo;
 import org.dan.ping.pong.app.tournament.ResignTournament;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.app.tournament.TidIdentifiedRules;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
+import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.tournament.console.CreateConsoleTournamentReq;
 import org.dan.ping.pong.app.tournament.console.TournamentRelationType;
@@ -658,5 +661,22 @@ public class ImperativeSimulator {
                         .expectedGid(sourceGid)
                         .targetGid(targetGid)
                         .build());
+    }
+
+    public ImperativeSimulator updateRules(Tid tid, TournamentRules rules) {
+        myRest.voidPost(TOURNAMENT_RULES, scenario.getTestAdmin(),
+                TidIdentifiedRules.builder()
+                        .tid(tid)
+                        .rules(rules)
+                        .build());
+        return this;
+    }
+
+    public ImperativeSimulator updateRules(TournamentRules rules) {
+        return updateRules(scenario.getTid(), rules);
+    }
+
+    public ImperativeSimulator updateConsoleRules(TournamentRules rules) {
+        return updateRules(consoleScenario.getTid(), rules);
     }
 }

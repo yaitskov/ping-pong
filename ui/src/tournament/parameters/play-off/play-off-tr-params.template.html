@@ -27,12 +27,16 @@
                        domain="['ml', 'il']"
                        label="Merge console layers"
                        ng-model="$ctrl.rules.playOff.lrPol"/>
-  <many-button-toggler ng-show="$ctrl.rules.casting.splitPolicy == 'cl' && $ctrl.tournament.master.type == 'ConGru'"
+  <many-button-toggler ng-show="$ctrl.rules.playOff.lrPol == 'ml' && $ctrl.tournament.master.type == 'ConGru'"
                        domain="['JL', 'AW3', 'AW2', 'AW1']"
                        label="Console guests"
                        ng-model="$ctrl.rules.playOff.conParts"/>
-  <many-button-toggler ng-show="$ctrl.tournament.master.type == 'ConOff'"
+  <many-button-toggler ng-show="$ctrl.tournament.master.type == 'ConOff' && ($ctrl.rules.casting.splitPolicy != 'cl' || $ctrl.rules.playOff.lrPol == 'ml')"
                        domain="['JL', 'LUTS', 'AHF', 'AW3', 'AW2', 'AW1']"
+                       label="Console guests"
+                       ng-model="$ctrl.rules.playOff.conParts"/>
+  <many-button-toggler ng-show="$ctrl.tournament.master.type == 'ConOff' && $ctrl.rules.playOff.lrPol == 'il')"
+                       domain="['JL', 'LUTS', 'AHF']"
                        label="Console guests"
                        ng-model="$ctrl.rules.playOff.conParts"/>
 </div>

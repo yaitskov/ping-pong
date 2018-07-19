@@ -78,7 +78,8 @@ public class TournamentRulesConst {
             .playOff(Optional.of(Losing1))
             .place(Optional.of(GLOBAL))
             .build();
-    public static final TournamentRules RULES_G2Q1_S1A2G11_NP = RULES_G2Q1_S1A2G11.withPlace(Optional.empty());
+    public static final TournamentRules RULES_G2Q1_S1A2G11_NP = RULES_G2Q1_S1A2G11
+            .withPlace(Optional.empty());
     public static final TournamentRules RULES_G2Q1_S1A2G11_PRNK = TournamentRules
             .builder()
             .match(S1A2G11)

@@ -20,7 +20,12 @@ export default class PlayOffParamsCtrl extends BaseTrParamsCtrl {
     watchForMatchRulesInPlayOff() {
         this.$scope.$watch('$ctrl.useCustomPlayOffMatchRules', (newValue) => {
             console.log(`useCustomPlayOffMatchRules change ${newValue}`);
-            this.rules.playOff.match = this.matchRulesInPlayOffBackup.map(newValue);
+            if (this.rules.playOff) {
+                this.rules.playOff.match = this.matchRulesInPlayOffBackup.map(newValue);
+                if (this.rules.playOff.match) {
+                    this.setCustomMatchRules();
+                }
+            }
         });
     }
 
@@ -32,8 +37,12 @@ export default class PlayOffParamsCtrl extends BaseTrParamsCtrl {
         if (this.usePlayOff) {
             this.useCustomPlayOffMatchRules = !!this.rules.playOff.match;
         }
+        this.setCustomMatchRules();
+    }
+
+    setCustomMatchRules() {
         this.MessageBus.broadcast(
-            HeadLessPlayOffMatchParamsCtrl.TopicLoad, tournament.rules.playOff);
+            HeadLessPlayOffMatchParamsCtrl.TopicLoad, this.rules.playOff);
     }
 
     constructor() {
@@ -41,7 +50,7 @@ export default class PlayOffParamsCtrl extends BaseTrParamsCtrl {
         this.playOffBackup = backedUpValue(defaultPlayOffRules, () => this.rules.playOff);
         this.matchRulesInPlayOffBackup = backedUpValue(
             () => Object.assign({}, this.rules.match),
-            () => this.rules.playOff.match);
+            () => (this.rules.playOff || {}).match);
         this.usePlayOff = false;
         this.scrollBottom = () => this.$timeout(() => window.scrollTo(0, document.body.scrollHeight), 100);
     }

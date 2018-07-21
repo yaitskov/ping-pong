@@ -3,12 +3,8 @@ package org.dan.ping.pong.app.castinglots;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.log;
 import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.MID0;
-import static org.dan.ping.pong.app.group.GroupSchedule.DEFAULT_SCHEDULE;
-import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
-import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.match.MatchType.POff;
 import static org.dan.ping.pong.jooq.Tables.BID;
 import static org.dan.ping.pong.jooq.Tables.USERS;
@@ -23,15 +19,10 @@ import org.dan.ping.pong.app.bid.ParticipantLink;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.rank.OrderDirection;
 import org.dan.ping.pong.app.category.Cid;
-import org.dan.ping.pong.app.group.Gid;
-import org.dan.ping.pong.app.group.GroupSchedule;
 import org.dan.ping.pong.app.match.MatchDaoServer;
-import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.playoff.PlayOffRule;
-import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.jooq.tables.records.BidRecord;
@@ -56,60 +47,6 @@ public class CastingLotsDao implements CastingLotsDaoIf {
 
     @Inject
     private MatchDaoServer matchDao;
-
-    private List<Integer> pickSchedule(TournamentMemState tournament,
-            List<ParticipantMemState> groupBids) {
-        final GroupSchedule groupSchedules = tournament.getRule().getGroup().get()
-                .getSchedule().orElse(DEFAULT_SCHEDULE);
-        return ofNullable(groupSchedules.getSize2Schedule().get(groupBids.size()))
-                .orElseGet(() -> ofNullable(DEFAULT_SCHEDULE.getSize2Schedule().get(groupBids.size()))
-                        .orElseThrow(() -> internalError("No schedule for group of " + groupBids.size())));
-    }
-
-    @Override
-    public int generateGroupMatches(DbUpdater batch, TournamentMemState tournament, Gid gid,
-            List<ParticipantMemState> groupBids, int priorityGroup,
-            Optional<MatchTag> tag) {
-        final Tid tid = tournament.getTid();
-        log.info("Generate matches for group {} in tournament {}", gid, tid);
-        final List<Integer> schedule = pickSchedule(tournament, groupBids);
-        for (int i = 0; i < schedule.size();) {
-            final int bidIdxA = schedule.get(i++);
-            final int bidIdxB = schedule.get(i++);
-            final ParticipantMemState bid1 = groupBids.get(bidIdxA);
-            final ParticipantMemState bid2 = groupBids.get(bidIdxB);
-            priorityGroup = addGroupMatch(batch, tournament, priorityGroup, bid1, bid2,
-                    Place, Optional.empty(), tag);
-        }
-        return priorityGroup;
-    }
-
-    public int addGroupMatch(DbUpdater batch,
-            TournamentMemState tournament, int priorityGroup,
-            ParticipantMemState bid1, ParticipantMemState bid2,
-            MatchState state, Optional<Bid> winnerId, Optional<MatchTag> tag) {
-        final Mid mid = tournament.getNextMatch().next();
-        matchDao.createGroupMatch(batch, mid, bid1.getTid(),
-                bid1.getGid().get(), bid1.getCid(), ++priorityGroup,
-                bid1.getBid(), bid2.getBid(), tag, Place);
-        tournament.getMatches().put(mid, MatchInfo.builder()
-                .tid(bid1.getTid())
-                .mid(mid)
-                .level(0)
-                .priority(priorityGroup)
-                .state(state)
-                .tag(tag)
-                .winnerId(winnerId)
-                .gid(bid1.getGid())
-                .participantIdScore(ImmutableMap.of(
-                        bid1.getBid(), new ArrayList<>(),
-                        bid2.getBid(), new ArrayList<>()))
-                .type(Grup)
-                .cid(bid1.getCid())
-                .build());
-        log.info("New match {} between {} and {}", mid, bid1.getUid(), bid2.getUid());
-        return priorityGroup;
-    }
 
     public Mid generatePlayOffMatches(DbUpdater batch, TournamentMemState tInfo, Cid cid,
             int playOffStartPositions, int basePlayOffPriority) {

@@ -22,7 +22,8 @@ public class DispatchingCategoryPlayOffBuilder implements CategoryPlayOffBuilder
     @Override
     public void build(TournamentMemState tournament, Cid cid,
             List<ParticipantMemState> bids, DbUpdater batch) {
-        if (tournament.getType() == Console && tournament.getRule().getCasting().getSplitPolicy() == ConsoleLayered) {
+        if (tournament.getType() == Console
+                && tournament.getRule().getCasting().getSplitPolicy() == ConsoleLayered) {
             layeredCategoryPlayOffBuilder.build(tournament, cid, bids, batch);
         } else {
             flatCategoryPlayOffBuilder.build(tournament, cid, bids, batch);

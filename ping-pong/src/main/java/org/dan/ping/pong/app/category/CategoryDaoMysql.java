@@ -6,6 +6,7 @@ import static org.dan.ping.pong.sys.db.DbContext.TRANSACTION_MANAGER;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.tournament.Tid;
+import org.dan.ping.pong.sys.db.DbUpdate;
 import org.dan.ping.pong.sys.db.DbUpdateSql;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.jooq.DSLContext;
@@ -73,5 +74,15 @@ public class CategoryDaoMysql implements CategoryDao {
                                         cat.getName(), tid, cat.getCid(), cat.getState()))
                 .collect(toList()))
                 .execute();
+    }
+
+    @Override
+    public void setState(Tid tid, Cid cid, CategoryState oldSt, CategoryState targetSt, DbUpdater batch) {
+        batch.exec(DbUpdateSql.builder()
+                .query(jooq.update(CATEGORY)
+                        .set(CATEGORY.STATE, targetSt)
+                        .where(CATEGORY.TID.eq(tid), CATEGORY.CID.eq(cid)))
+                .mustAffectRows(Optional.of(1))
+                .build());
     }
 }

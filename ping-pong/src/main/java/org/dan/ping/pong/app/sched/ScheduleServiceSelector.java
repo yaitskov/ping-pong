@@ -4,19 +4,19 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
-import static org.dan.ping.pong.app.bid.BidDao.TERMINAL_BID_STATES;
+import static org.dan.ping.pong.app.category.CategoryState.Ply;
+import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.place.ArenaDistributionPolicy.NO;
-import static org.dan.ping.pong.app.tournament.TournamentState.Open;
-import static org.dan.ping.pong.app.tournament.TournamentState.TERMINAL_STATE;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.RequiredArgsConstructor;
-import org.dan.ping.pong.app.bid.BidDao;
+import org.dan.ping.pong.app.category.CategoryMemState;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
+import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.place.ArenaDistributionPolicy;
 import org.dan.ping.pong.app.place.PlaceRules;
-import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentTerminator;
 import org.dan.ping.pong.sys.db.DbUpdater;
@@ -32,45 +32,48 @@ public class ScheduleServiceSelector implements ScheduleService {
     private final Map<ArenaDistributionPolicy, ScheduleService> schedulers;
     private final TournamentTerminator tournamentTerminator;
 
-    @Override
-    public void beginTournament(TournamentMemState tournament, DbUpdater batch, Instant now) {
-        if (!tournament.getGroups().isEmpty()) {
-            completeGroupsWithOneParticipant(tournament, batch);
-        }
-        if (!tournament.getRule().getPlayOff().isPresent()) {
-            completeLadderWithOneParticipant(tournament, batch);
-        }
-        if (tournament.getMatches().isEmpty() && tournament.getState() == Open) {
-            tournament.getCategories()
-                    .keySet()
-                    .forEach(cid -> tournamentTerminator.endOfTournamentCategory(
-                            tournament, cid, batch));
-            return;
-        }
-        dispatch(tournament).beginTournament(tournament, batch, now);
-        tournament.getCondActions().runSchedule(tournament.getTid());
-    }
-
-    private void completeLadderWithOneParticipant(TournamentMemState tournament, DbUpdater batch) {
-
-    }
-
     @Inject
     private MatchService matchService;
 
-    private void completeGroupsWithOneParticipant(
-            TournamentMemState tournament, DbUpdater batch) {
-        final Map<Gid, Long> group2LiveParticipants = tournament.getParticipants()
+    private void completeGroupsWithoutMatches(TournamentMemState tournament, DbUpdater batch) {
+        final Map<Gid, Long> gid2Matches = tournament.getMatches()
                 .values().stream()
-                .filter(p -> p.getGid().isPresent())
-                .filter(p -> !TERMINAL_BID_STATES.contains(p.getBidState()))
-                .collect(groupingBy(p -> p.getGid().get(), counting()));
+                .filter(m -> m.getState() != Over && m.getGid().isPresent())
+                .map(MatchInfo::groupId)
+                .collect(groupingBy(o -> o, counting()));
+        tournament.getGroups().forEach((gid, grp) -> {
+             final long notCompleteMatches = gid2Matches.getOrDefault(gid, 0L);
+             if (notCompleteMatches == 0) {
+                 matchService.tryToCompleteGroup(tournament, gid, batch);
+             }
+        });
+    }
 
-        tournament.getGroups().values().forEach((gInfo) -> {
-            if (group2LiveParticipants.getOrDefault(gInfo.getGid(), 0L) == 1L) {
-                matchService.tryToCompleteGroup(tournament, gInfo.getGid(), batch);
+    private void completeCategoriesWithoutMatches(TournamentMemState tournament, DbUpdater batch) {
+        final Map<Cid, CategoryMemState> playingCats = tournament.getCategories()
+                .values().stream()
+                .filter(c -> c.getState() == Ply)
+                .collect(toMap(CategoryMemState::getCid, c -> c));
+
+        final Map<Cid, Long> cid2Matches = tournament.getMatches()
+                .values().stream()
+                .filter(m -> m.getState() != Over)
+                .collect(groupingBy(MatchInfo::getCid, counting()));
+
+        playingCats.forEach((cid, cat) -> {
+            final long notCompleteMatches = cid2Matches.getOrDefault(cid, 0L);
+            if (notCompleteMatches == 0) {
+                tournamentTerminator.endOfTournamentCategory(tournament, cid, batch);
             }
         });
+    }
+
+    @Override
+    public void beginTournament(TournamentMemState tournament, DbUpdater batch, Instant now) {
+        completeGroupsWithoutMatches(tournament, batch);
+        completeCategoriesWithoutMatches(tournament, batch);
+        dispatch(tournament).beginTournament(tournament, batch, now);
+        tournament.getCondActions().runSchedule(tournament.getTid());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.category;
 
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.match.MatchState.Over;
@@ -11,9 +12,12 @@ import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupRemover;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -100,5 +104,19 @@ public class CategoryService {
         gidRemover.removeByCategory(tournament, cid, batch);
         categoryDao.delete(tournament.getTid(), cid, batch);
         tournament.getCategories().remove(cid);
+    }
+
+    public static Map<Cid, List<ParticipantMemState>> groupByCategories(
+            List<ParticipantMemState> bids) {
+        return bids.stream().collect(groupingBy(
+                ParticipantMemState::getCid, toList()));
+    }
+
+    public void setState(Tid tid, CategoryMemState catSt, CategoryState targetSt, DbUpdater batch) {
+        final CategoryState oldSt = catSt.getState();
+        if (oldSt != targetSt) {
+            catSt.setState(targetSt);
+            categoryDao.setState(tid, catSt.getCid(), oldSt,  targetSt, batch);
+        }
     }
 }

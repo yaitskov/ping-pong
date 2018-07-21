@@ -79,7 +79,7 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
 
     public static void validateBidsNumberInACategory(List<ParticipantMemState> bids) {
         if (bids.size() > 128) {
-            throw badRequest("Category has more than 128 participants");
+            throw badRequest("PlayOff has more than 128 participants");
         }
     }
 

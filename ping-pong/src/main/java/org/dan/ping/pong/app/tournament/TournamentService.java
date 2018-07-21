@@ -15,8 +15,14 @@ import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
+import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BalancedMix;
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.ConsoleLayered;
+import static org.dan.ping.pong.app.category.CategoryService.groupByCategories;
+import static org.dan.ping.pong.app.category.CategoryState.Drt;
+import static org.dan.ping.pong.app.category.CategoryState.End;
+import static org.dan.ping.pong.app.category.CategoryState.Ply;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
 import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.table.TableService.STATE;
@@ -24,6 +30,7 @@ import static org.dan.ping.pong.app.tournament.EnlistPolicy.ONCE_PER_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
+import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
@@ -36,6 +43,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
+import ch.qos.logback.core.db.DBAppenderBase;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -48,9 +56,11 @@ import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
-import org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.category.CategoryDao;
+import org.dan.ping.pong.app.category.CategoryMemState;
+import org.dan.ping.pong.app.category.CategoryService;
+import org.dan.ping.pong.app.category.CategoryState;
 import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupRemover;
@@ -70,6 +80,8 @@ import org.dan.ping.pong.app.suggestion.SuggestionService;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserLinkIf;
+import org.dan.ping.pong.jooq.tables.TournamentRelation;
+import org.dan.ping.pong.sys.db.DbUpdate;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.sys.error.PiPoEx;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
@@ -259,22 +271,39 @@ public class TournamentService {
         final List<ParticipantMemState> readyBids = castingLotsService
                 .findBidsReadyToPlay(tournament);
         castingLotsService.checkAllThatAllHere(readyBids);
-        if (readyBids.isEmpty()) {
-            tournament.setState(TournamentState.Close);
-            tournamentDao.setState(tournament, batch);
-            return;
-        } else if (readyBids.size() == 1) {
-            bidService.setBidState(readyBids.get(0), BidState.Win1,
-                    singletonList(readyBids.get(0).getBidState()), batch);
-            tournament.setState(TournamentState.Close);
-            tournamentDao.setState(tournament, batch);
-            return;
+        final Map<Cid, List<ParticipantMemState>> cid2Par = groupByCategories(readyBids);
+        tournament.getCategories().entrySet().stream()
+                .filter(e -> e.getValue().getState() == Drt)
+                .map(Map.Entry::getKey)
+                .forEach(cid -> beginCategory(tournament, batch, cid, cid2Par.get(cid)));
+    }
+
+    @Inject
+    private CategoryService categoryService;
+
+    private void beginCategory(TournamentMemState tournament, DbUpdater batch,
+            Cid cid, List<ParticipantMemState> bids) {
+        final CategoryMemState catSt = tournament.getCategory(cid);
+        log.info("Begin category {} of tournament {}", cid, tournament.getTid());
+        switch (bids.size()) {
+            case 1:
+                bidService.setBidState(bids.get(0), Win1,
+                        singletonList(bids.get(0).getBidState()), batch);
+            case 0:
+                categoryService.setState(tournament.getTid(), catSt, End, batch);
+                return;
+            default:
+                bids.forEach(bid ->
+                        bidService.setBidState(bid, BidState.Wait,
+                                singletonList(bid.getBidState()), batch));
+                castingLotsService.seedCategory(tournament, cid, bids, batch);
+                setState(tournament, Open, batch);
+                categoryService.setState(tournament.getTid(), catSt, Ply, batch);
         }
-        readyBids.forEach(bid ->
-                bidService.setBidState(bid, BidState.Wait,
-                        singletonList(bid.getBidState()), batch));
-        castingLotsService.seed(tournament, readyBids, batch);
-        tournament.setState(TournamentState.Open);
+    }
+
+    private void setState(TournamentMemState tournament, TournamentState targetSt, DbUpdater batch) {
+        tournament.setState(targetSt);
         tournamentDao.setState(tournament, batch);
     }
 

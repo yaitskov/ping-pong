@@ -13,4 +13,6 @@ public interface CategoryDao {
     void delete(Tid tid, Cid cid, DbUpdater batch);
 
     void copy(Tid originTid, Tid tid);
+
+    void setState(Tid tid, Cid cid, CategoryState oldSt, CategoryState targetSt, DbUpdater batch);
 }

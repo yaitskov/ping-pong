@@ -1,7 +1,5 @@
 package org.dan.ping.pong.app.group;
 
-import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
-
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
@@ -10,8 +8,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class GroupSizeCalculator {
-    public static final String GROUP_GETS_LESS_THAN_2_PARTICIPANT = "group gets less than 2 participant";
-
     private static final TreeMap<Integer, Integer> N2POWER = new TreeMap<>(
             ImmutableMap.<Integer, Integer>builder()
                     .put(1, 0)
@@ -34,9 +30,6 @@ public class GroupSizeCalculator {
                 : N2POWER.higherKey(groups);
 
         final int groupSize = bidsInCategory / normalizedGroups;
-        if (groupSize < 2) {
-            throw badRequest(GROUP_GETS_LESS_THAN_2_PARTICIPANT);
-        }
         final List<Integer> result = IntStream.range(0, normalizedGroups)
                 .mapToObj(i -> groupSize)
                 .collect(Collectors.toList());

@@ -18,8 +18,7 @@ public class ScheduleCtx {
             NoScheduleService noScheduleService,
             TournamentTerminator tournamentTerminator) {
         return new ScheduleServiceSelector(of(
-                GLOBAL, global,
-                NO, noScheduleService),
+
                 tournamentTerminator);
     }
 }

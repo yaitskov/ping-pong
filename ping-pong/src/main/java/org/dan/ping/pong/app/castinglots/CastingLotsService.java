@@ -61,17 +61,9 @@ import javax.inject.Named;
 
 @Slf4j
 public class CastingLotsService {
-    public static final String NOT_ENOUGH_PARTICIPANTS = "Not enough participants";
-    public static final String N = "n";
     private static final ImmutableSet<BidState> WANT_PAID_HERE = ImmutableSet.of(Want, Paid, Here);
     private static final ImmutableSet<BidState> WANT_PAID = ImmutableSet.of(Want, Paid);
     private static final ImmutableSet<BidState> QUIT_EXPELLED = ImmutableSet.of(Quit, Expl);
-
-    public static Map<Cid, List<ParticipantMemState>> groupByCategories(
-            List<ParticipantMemState> bids) {
-        return bids.stream().collect(groupingBy(
-                ParticipantMemState::getCid, toList()));
-    }
 
     @Inject
     private CastingLotsDao castingLotsDao;
@@ -105,18 +97,16 @@ public class CastingLotsService {
         return gid;
     }
 
-    public void seed(TournamentMemState tournament,
-            List<ParticipantMemState> readyBids, DbUpdater batch) {
-        log.info("Begin seeding tournament {}", tournament.getTid());
+    public void seedCategory(TournamentMemState tournament,
+            Cid cid, List<ParticipantMemState> readyCatBids, DbUpdater batch) {
+        log.info("Begin seeding category {} tournament {}", cid, tournament.getTid());
         final TournamentRules rules = tournament.getRule();
-
-        checkAtLeast(readyBids);
         if (!rules.getPlayOff().isPresent()) {
-            seedJustGroupTournament(rules, tournament, readyBids, batch);
+            seedJustTournamentOfOneGroup(rules, tournament, cid, readyCatBids, batch);
         } else if (!rules.getGroup().isPresent()) {
-            seedJustPlayOffTournament(tournament, readyBids, batch);
+            seedJustPlayOffTournament(tournament, cid, readyCatBids, batch);
         } else {
-            seedTournamentWithGroupsAndPlayOff(rules, tournament, readyBids, batch);
+            seedTournamentWithGroupsAndPlayOff(rules, cid, readyCatBids, tournament, batch);
         }
         log.info("Seeding for tid {} is complete", tournament.getTid());
     }
@@ -131,14 +121,10 @@ public class CastingLotsService {
     private DbUpdaterFactory dbUpdaterFactory;
 
     private void seedJustPlayOffTournament(TournamentMemState tournament,
-            List<ParticipantMemState> readyBids, DbUpdater batch) {
-        log.info("Seed tid {} as playoff", tournament.getTid());
-        groupByCategories(readyBids).forEach((Cid cid, List<ParticipantMemState> bids) -> {
-            if (oneParticipantInCategory(tournament, cid, bids, batch)) {
-                return;
-            }
-            categoryPlayOffBuilder.build(tournament, cid, bids, batch);
-        });
+            Cid cid, List<ParticipantMemState> bids, DbUpdater batch) {
+        log.info("Seed cid {} in tid {} as playoff", cid, tournament.getTid());
+        validateBidsNumberInACategory(bids);
+        categoryPlayOffBuilder.build(tournament, cid, bids, batch);
     }
 
     @Inject
@@ -152,72 +138,46 @@ public class CastingLotsService {
     @Inject
     private GroupService groupService;
 
-    private void seedJustGroupTournament(TournamentRules rules,
+    private void seedJustTournamentOfOneGroup(TournamentRules rules,
             TournamentMemState tournament,
-            List<ParticipantMemState> readyBids, DbUpdater batch) {
-        log.info("Seed tid {} as group", tournament.getTid());
-        final Tid tid = tournament.getTid();
-        groupByCategories(readyBids).forEach((Cid cid, List<ParticipantMemState> bids) -> {
-            validateBidsNumberInACategory(bids);
-            if (oneParticipantInCategory(tournament, cid, bids, batch)) {
-                return;
-            }
-            final List<ParticipantMemState> orderedBids = rankingService.sort(
-                    bids, rules.getCasting(), tournament);
-            final Gid gid = groupService.createGroup(tournament, cid, batch);
-            orderedBids.forEach(bid -> bid.setGid(Optional.of(gid)));
-            castingLotsDao.generateGroupMatches(batch, tournament, gid, orderedBids,
-                    0, Optional.empty());
-            bidDao.setGroupForUids(batch, gid, tid, orderedBids);
-        });
-    }
-
-    private boolean oneParticipantInCategory(TournamentMemState tournament,
             Cid cid, List<ParticipantMemState> bids, DbUpdater batch) {
-        if (bids.size() > 1) {
-            return false;
-        }
-        log.info("Autocomplete category {} in tid {} due it has 1 participant",
-                cid, tournament.getTid());
-        bidService.setBidState(bids.get(0), Win1, singleton(bids.get(0).state()), batch);
-        return true;
+        log.info("Seed cid {} tid {} as group", cid, tournament.getTid());
+        final Tid tid = tournament.getTid();
+        groupService.validateMaxGroupSize(bids.size());
+        final List<ParticipantMemState> orderedBids = rankingService.sort(
+                bids, rules.getCasting(), tournament);
+        final Gid gid = groupService.createGroup(tournament, cid, batch);
+        orderedBids.forEach(bid -> bid.setGid(Optional.of(gid)));
+        groupService.generateGroupMatches(batch, tournament, gid, orderedBids,
+                0, Optional.empty());
+        bidDao.setGroupForUids(batch, gid, tid, orderedBids);
     }
 
     private void seedTournamentWithGroupsAndPlayOff(TournamentRules rules,
-            TournamentMemState tournament, List<ParticipantMemState> readyBids, DbUpdater batch) {
+            Cid cid, List<ParticipantMemState> bids,
+            TournamentMemState tournament, DbUpdater batch) {
         final Tid tid = tournament.getTid();
         final int quits = rules.getGroup().get().getQuits();
-        groupByCategories(readyBids).forEach((Cid cid, List<ParticipantMemState> bids) -> {
-            validateBidsNumberInACategory(bids);
-            if (oneParticipantInCategory(tournament, cid, bids, batch)) {
-                return;
-            }
-            final Map<Integer, List<ParticipantMemState>> bidsByGroups = groupDivider.divide(
-                    rules.getCasting(), rules.getGroup().get(),
-                    rankingService.sort(bids, rules.getCasting(), tournament));
-            int basePlayOffPriority = 0;
-            for (int gi : bidsByGroups.keySet().stream().sorted().collect(toList())) {
-                final Gid gid = groupService.createGroup(tournament, cid, batch);
-                final List<ParticipantMemState> groupBids = bidsByGroups.get(gi);
-                if (groupBids.size() < quits) {
-                    throw badRequest("Group should have more participants than quits from a group");
-                }
-                groupBids.forEach(bid -> bid.setGid(Optional.of(gid)));
+        final Map<Integer, List<ParticipantMemState>> bidsByGroups = groupDivider.divide(
+                rules.getCasting(), rules.getGroup().get(),
+                rankingService.sort(bids, rules.getCasting(), tournament));
+        int basePlayOffPriority = 0;
+        for (int gi : bidsByGroups.keySet().stream().sorted().collect(toList())) {
+            final Gid gid = groupService.createGroup(tournament, cid, batch);
+            final List<ParticipantMemState> groupBids = bidsByGroups.get(gi);
+            groupBids.forEach(bid -> bid.setGid(Optional.of(gid)));
+            if (groupBids.size() > 1) {
                 basePlayOffPriority = Math.max(
-                        castingLotsDao.generateGroupMatches(batch, tournament, gid, groupBids,
+                        groupService.generateGroupMatches(batch, tournament, gid, groupBids,
                                 0, Optional.empty()),
                         basePlayOffPriority);
-                bidDao.setGroupForUids(batch, gid, tid, groupBids);
             }
+            bidDao.setGroupForUids(batch, gid, tid, groupBids);
+        }
+        final int playOffStartPositions = roundPlayOffBase(bidsByGroups.size() * quits);
+        if (playOffStartPositions > 1) {
             castingLotsDao.generatePlayOffMatches(batch, tournament, cid,
-                    roundPlayOffBase(bidsByGroups.size() * quits),
-                    basePlayOffPriority + 1);
-        });
-    }
-
-    private void checkAtLeast(List<ParticipantMemState> readyBids) {
-        if (readyBids.size() < 2) {
-            throw badRequest(NOT_ENOUGH_PARTICIPANTS, N, readyBids.size());
+                    playOffStartPositions, basePlayOffPriority + 1);
         }
     }
 
@@ -265,7 +225,7 @@ public class CastingLotsService {
                 .forEach(
                         p -> {
                             final boolean isDeadParticipant = QUIT_EXPELLED.contains(p.state());
-                            priority[0] = castingLotsDao.addGroupMatch(
+                            priority[0] = groupService.addGroupMatch(
                                     batch,
                                     tournament, priority[0], participant, p,
                                     isDeadParticipant

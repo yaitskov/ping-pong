@@ -12,13 +12,16 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
+import static org.dan.ping.pong.app.group.GroupSchedule.DEFAULT_SCHEDULE;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.Pending;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.Run;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.WalkOver;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.WalkWiner;
 import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchTag.DISAMBIGUATION;
 import static org.dan.ping.pong.app.match.MatchTag.ORIGIN;
+import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
 import static org.dan.ping.pong.app.match.rule.service.GroupRuleParams.ofParams;
 import static org.dan.ping.pong.app.match.rule.service.meta.UseDisambiguationMatchesDirectiveService.matchesInGroup;
@@ -26,6 +29,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -35,9 +39,12 @@ import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.CastingLotsDaoIf;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchParticipants;
+import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.match.MatchTag;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.NoDisambiguateMatchesException;
 import org.dan.ping.pong.app.match.rule.GroupParticipantOrder;
 import org.dan.ping.pong.app.match.rule.GroupParticipantOrderService;
@@ -45,6 +52,7 @@ import org.dan.ping.pong.app.match.rule.GroupPosition;
 import org.dan.ping.pong.app.match.rule.rules.meta.PreviewDisambiguationDirective;
 import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 import org.dan.ping.pong.app.tournament.TournamentRules;
@@ -420,5 +428,67 @@ public class GroupService {
             Gid gid, MatchParticipants mp) {
         createDisambiguateMatches(batch, tournament, gid,
                 asList(mp.getBidLess(), mp.getBidMore()));
+    }
+
+    public void validateMaxGroupSize(int size) {
+        if (size > 30) {
+            throw badRequest("Group has more than 30 participants");
+        }
+    }
+
+    private List<Integer> pickSchedule(TournamentMemState tournament,
+            List<ParticipantMemState> groupBids) {
+        final GroupSchedule groupSchedules = tournament.getRule().getGroup().get()
+                .getSchedule().orElse(DEFAULT_SCHEDULE);
+        return ofNullable(groupSchedules.getSize2Schedule().get(groupBids.size()))
+                .orElseGet(() -> ofNullable(DEFAULT_SCHEDULE.getSize2Schedule().get(groupBids.size()))
+                        .orElseThrow(() -> internalError("No schedule for group of " + groupBids.size())));
+    }
+
+    public int generateGroupMatches(DbUpdater batch, TournamentMemState tournament, Gid gid,
+            List<ParticipantMemState> groupBids, int priorityGroup,
+            Optional<MatchTag> tag) {
+        final Tid tid = tournament.getTid();
+        log.info("Generate matches for group {} in tournament {}", gid, tid);
+        final List<Integer> schedule = pickSchedule(tournament, groupBids);
+        for (int i = 0; i < schedule.size();) {
+            final int bidIdxA = schedule.get(i++);
+            final int bidIdxB = schedule.get(i++);
+            final ParticipantMemState bid1 = groupBids.get(bidIdxA);
+            final ParticipantMemState bid2 = groupBids.get(bidIdxB);
+            priorityGroup = addGroupMatch(batch, tournament, priorityGroup, bid1, bid2,
+                    Place, Optional.empty(), tag);
+        }
+        return priorityGroup;
+    }
+
+    @Inject
+    private MatchDao matchDao;
+
+    public int addGroupMatch(DbUpdater batch,
+            TournamentMemState tournament, int priorityGroup,
+            ParticipantMemState bid1, ParticipantMemState bid2,
+            MatchState state, Optional<Bid> winnerId, Optional<MatchTag> tag) {
+        final Mid mid = tournament.getNextMatch().next();
+        matchDao.createGroupMatch(batch, mid, bid1.getTid(),
+                bid1.getGid().get(), bid1.getCid(), ++priorityGroup,
+                bid1.getBid(), bid2.getBid(), tag, Place);
+        tournament.getMatches().put(mid, MatchInfo.builder()
+                .tid(bid1.getTid())
+                .mid(mid)
+                .level(0)
+                .priority(priorityGroup)
+                .state(state)
+                .tag(tag)
+                .winnerId(winnerId)
+                .gid(bid1.getGid())
+                .participantIdScore(ImmutableMap.of(
+                        bid1.getBid(), new ArrayList<>(),
+                        bid2.getBid(), new ArrayList<>()))
+                .type(Grup)
+                .cid(bid1.getCid())
+                .build());
+        log.info("New match {} between {} and {}", mid, bid1.getUid(), bid2.getUid());
+        return priorityGroup;
     }
 }

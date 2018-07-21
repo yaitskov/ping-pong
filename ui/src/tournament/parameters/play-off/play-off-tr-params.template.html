@@ -16,4 +16,18 @@
   <many-button-toggler id="third-place-match" ng-show="$ctrl.rules.playOff.losings == 1"
                        domain="[1, 0]" selected-class="['btn-primary', 'btn-danger']"
                        label="Match for 3rd place" ng-model="$ctrl.rules.playOff.tpm"/>
+  <div class="form-group toggle-btn" id="play-off-match-rules-toggler">
+    <label translate="custom-play-off-match-rules"/>
+    <input type="checkbox"
+           data-size="small"
+           bs-toggler-anchor="play-off-match-rules-toggler"
+           ng-model="$ctrl.useCustomPlayOffMatchRules"
+           bs-toggle-on="{{ 'yes-lbl' | translate }}"
+           bs-toggle-off="{{ 'no-lbl' | translate }}"
+           bs-toggle-target="#play-off-match-rules"
+           bs-toggle/>
+  </div>
+  <div id="play-off-match-rules" class="toggle-panel" ng-show="$ctrl.useCustomPlayOffMatchRules">
+    <head-less-play-off-match-params/>
+  </div>
 </div>

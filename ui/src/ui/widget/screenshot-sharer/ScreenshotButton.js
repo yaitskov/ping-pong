@@ -23,9 +23,13 @@ export default class ScreenshotButton extends AngularBean {
     shootAndShowShareDialog(targetAnchor) {
         console.log(`Shooting DOOM [${targetAnchor}]`);
         const dom = this.$window.document.getElementById(targetAnchor);
+        $(dom).css('position', 'fixed'); // mobile chrome hack for wide table
         Html2Canvas(dom).then(
-            (canvas) => this.MessageBus.broadcast(
-                           ScreenSharerDialog.TopicShow, canvas));
+            (canvas) => {
+                this.MessageBus.broadcast(
+                    ScreenSharerDialog.TopicShow, canvas);
+                $(dom).css('position', '');
+            });
     }
 
     link(scope, element, attrs) {

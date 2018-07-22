@@ -17,20 +17,17 @@ import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
-import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.BalancedMix;
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.ConsoleLayered;
 import static org.dan.ping.pong.app.category.CategoryService.groupByCategories;
 import static org.dan.ping.pong.app.category.CategoryState.Drt;
 import static org.dan.ping.pong.app.category.CategoryState.End;
 import static org.dan.ping.pong.app.category.CategoryState.Ply;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
-import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.table.TableService.STATE;
 import static org.dan.ping.pong.app.tournament.EnlistPolicy.ONCE_PER_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
-import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
@@ -43,7 +40,6 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import static org.dan.ping.pong.sys.error.PiPoEx.notFound;
 
-import ch.qos.logback.core.db.DBAppenderBase;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -60,7 +56,6 @@ import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryMemState;
 import org.dan.ping.pong.app.category.CategoryService;
-import org.dan.ping.pong.app.category.CategoryState;
 import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupRemover;
@@ -75,19 +70,16 @@ import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.playoff.PlayOffMatches;
 import org.dan.ping.pong.app.playoff.PlayOffResultEntries;
 import org.dan.ping.pong.app.playoff.PlayOffService;
-import org.dan.ping.pong.app.sched.ScheduleService;
+import org.dan.ping.pong.app.sched.ScheduleServiceSelector;
 import org.dan.ping.pong.app.suggestion.SuggestionService;
 import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserLinkIf;
-import org.dan.ping.pong.jooq.tables.TournamentRelation;
-import org.dan.ping.pong.sys.db.DbUpdate;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.sys.error.PiPoEx;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -259,10 +251,8 @@ public class TournamentService {
     @Inject
     private Clocker clocker;
 
-    @Lazy
     @Inject
-    @Named(SCHEDULE_SELECTOR)
-    private ScheduleService scheduleService;
+    private ScheduleServiceSelector scheduleService;
 
     public void begin(TournamentMemState tournament, DbUpdater batch) {
         if (tournament.getState() != TournamentState.Draft) {

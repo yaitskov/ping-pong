@@ -35,8 +35,6 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
-import org.dan.ping.pong.app.bid.Uid;
-import org.dan.ping.pong.app.castinglots.CastingLotsDaoIf;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.match.MatchDao;
@@ -397,9 +395,6 @@ public class GroupService {
                 .keySet();
     }
 
-    @Inject
-    private CastingLotsDaoIf castingLotsDao;
-
     public void createDisambiguateMatches(
             DbUpdater batch, NoDisambiguateMatchesException e,
             TournamentMemState tournament,
@@ -417,7 +412,7 @@ public class GroupService {
     public void createDisambiguateMatches(
             DbUpdater batch, TournamentMemState tournament,
             Gid gid, Collection<Bid> bids) {
-        castingLotsDao.generateGroupMatches(batch, tournament, gid,
+        generateGroupMatches(batch, tournament, gid,
                 bids.stream()
                         .map(tournament::getParticipant)
                         .collect(toList()), 0,

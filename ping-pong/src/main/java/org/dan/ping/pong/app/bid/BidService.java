@@ -19,7 +19,6 @@ import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.match.MatchState.INCOMPLETE_MATCH_STATES;
 import static org.dan.ping.pong.app.match.MatchState.Over;
-import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.EnlistPolicy.MULTIPLE_CATEGORY_ENLISTMENT;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
@@ -38,14 +37,13 @@ import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.match.Mid;
-import org.dan.ping.pong.app.sched.ScheduleService;
+import org.dan.ping.pong.app.sched.ScheduleServiceSelector;
 import org.dan.ping.pong.app.tournament.ChildTournamentProvider;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
-import org.springframework.context.annotation.Lazy;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -56,7 +54,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 @Slf4j
 public class BidService {
@@ -289,10 +286,8 @@ public class BidService {
         tryCompleteSourceGroup(tournament, req.getExpectedGid(), batch);
     }
 
-    @Lazy
     @Inject
-    @Named(SCHEDULE_SELECTOR)
-    private ScheduleService scheduleService;
+    private ScheduleServiceSelector scheduleService;
 
     @Inject
     private MatchService matchService;

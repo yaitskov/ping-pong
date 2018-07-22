@@ -4,7 +4,6 @@ import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.TERMINAL_STATE;
 import static org.dan.ping.pong.app.match.MatchState.Over;
-import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.ConGru;
 import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.ConOff;
@@ -17,7 +16,7 @@ import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
-import org.dan.ping.pong.app.sched.ScheduleService;
+import org.dan.ping.pong.app.sched.ScheduleServiceSelector;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.RelatedTids;
@@ -27,7 +26,6 @@ import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
-import org.springframework.context.annotation.Lazy;
 
 import java.util.Optional;
 import java.util.Set;
@@ -50,10 +48,8 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
     @Named(TOURNAMENT_RELATION_CACHE)
     public LoadingCache<Tid, RelatedTids> tournamentRelationCache;
 
-    @Lazy
     @Inject
-    @Named(SCHEDULE_SELECTOR)
-    private ScheduleService scheduleService;
+    private ScheduleServiceSelector scheduleService;
 
     @Inject
     private Clocker clocker;

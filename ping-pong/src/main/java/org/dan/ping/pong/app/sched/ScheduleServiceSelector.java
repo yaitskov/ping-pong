@@ -1,6 +1,5 @@
 package org.dan.ping.pong.app.sched;
 
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
@@ -9,7 +8,6 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.place.ArenaDistributionPolicy.NO;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
-import lombok.RequiredArgsConstructor;
 import org.dan.ping.pong.app.category.CategoryMemState;
 import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
@@ -27,15 +25,18 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
-@RequiredArgsConstructor
 public class ScheduleServiceSelector implements ScheduleService {
-    private final Map<ArenaDistributionPolicy, ScheduleService> schedulers;
-    private final TournamentTerminator tournamentTerminator;
-
+    @Inject
+    private TournamentTerminator tournamentTerminator;
+    @Inject
+    private GlobalScheduleService global;
+    @Inject
+    private NoScheduleService noScheduleService;
     @Inject
     private MatchService matchService;
 
-    private void completeGroupsWithoutMatches(TournamentMemState tournament, DbUpdater batch) {
+    private void completeGroupsWithoutMatches(
+            TournamentMemState tournament, DbUpdater batch) {
         final Map<Gid, Long> gid2Matches = tournament.getMatches()
                 .values().stream()
                 .filter(m -> m.getState() != Over && m.getGid().isPresent())
@@ -49,7 +50,8 @@ public class ScheduleServiceSelector implements ScheduleService {
         });
     }
 
-    private void completeCategoriesWithoutMatches(TournamentMemState tournament, DbUpdater batch) {
+    private void completeCategoriesWithoutMatches(
+            TournamentMemState tournament, DbUpdater batch) {
         final Map<Cid, CategoryMemState> playingCats = tournament.getCategories()
                 .values().stream()
                 .filter(c -> c.getState() == Ply)
@@ -69,7 +71,8 @@ public class ScheduleServiceSelector implements ScheduleService {
     }
 
     @Override
-    public void beginTournament(TournamentMemState tournament, DbUpdater batch, Instant now) {
+    public void beginTournament(
+            TournamentMemState tournament, DbUpdater batch, Instant now) {
         completeGroupsWithoutMatches(tournament, batch);
         completeCategoriesWithoutMatches(tournament, batch);
         dispatch(tournament).beginTournament(tournament, batch, now);
@@ -77,32 +80,42 @@ public class ScheduleServiceSelector implements ScheduleService {
     }
 
     @Override
-    public void cancelTournament(TournamentMemState tournament, DbUpdater batch, Instant now) {
+    public void cancelTournament(
+            TournamentMemState tournament, DbUpdater batch, Instant now) {
         dispatch(tournament).cancelTournament(tournament, batch, now);
         tournament.getCondActions().runSchedule(tournament.getTid());
     }
 
     @Override
-    public void participantLeave(TournamentMemState tournament, DbUpdater batch, Instant now) {
+    public void participantLeave(
+            TournamentMemState tournament, DbUpdater batch, Instant now) {
         dispatch(tournament).participantLeave(tournament, batch, now);
         tournament.getCondActions().runSchedule(tournament.getTid());
     }
 
     @Override
-    public void afterMatchComplete(TournamentMemState tournament, DbUpdater batch, Instant now) {
+    public void afterMatchComplete(
+            TournamentMemState tournament, DbUpdater batch, Instant now) {
         dispatch(tournament).afterMatchComplete(tournament, batch, now);
         tournament.getCondActions().runSchedule(tournament.getTid());
     }
 
     @Override
-    public <T> T withPlaceTables(TournamentMemState tournament, Function<TablesDiscovery, T> f) {
+    public <T> T withPlaceTables(
+            TournamentMemState tournament, Function<TablesDiscovery, T> f) {
         return dispatch(tournament).withPlaceTables(tournament, f);
     }
 
     private ScheduleService dispatch(TournamentMemState tournament) {
         final ArenaDistributionPolicy schedulerName = tournament.getRule()
                 .getPlace().map(PlaceRules::getArenaDistribution).orElse(NO);
-        return ofNullable(schedulers.get(schedulerName))
-                .orElseThrow(() -> internalError("no scheduler " + schedulerName));
+        switch (schedulerName) {
+            case NO:
+                return noScheduleService;
+            case GLOBAL:
+                return global;
+            default:
+                throw internalError("no scheduler " + schedulerName);
+        }
     }
 }

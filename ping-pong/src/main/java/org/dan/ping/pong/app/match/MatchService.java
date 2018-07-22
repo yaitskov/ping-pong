@@ -29,7 +29,6 @@ import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.place.ArenaDistributionPolicy.NO;
-import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.app.tournament.SetScoreResultName.MatchContinues;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
@@ -57,7 +56,7 @@ import org.dan.ping.pong.app.group.PlayOffMatcherFromGroup;
 import org.dan.ping.pong.app.place.PlaceRules;
 import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.playoff.PlayOffService;
-import org.dan.ping.pong.app.sched.ScheduleService;
+import org.dan.ping.pong.app.sched.ScheduleServiceSelector;
 import org.dan.ping.pong.app.sched.TablesDiscovery;
 import org.dan.ping.pong.app.sport.MatchRules;
 import org.dan.ping.pong.app.sport.Sports;
@@ -78,7 +77,6 @@ import org.dan.ping.pong.app.user.UserRole;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.TriFunc;
 import org.dan.ping.pong.util.time.Clocker;
-import org.springframework.context.annotation.Lazy;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -127,10 +125,8 @@ public class MatchService {
         return places;
     }
 
-    @Lazy
     @Inject
-    @Named(SCHEDULE_SELECTOR)
-    private ScheduleService scheduleService;
+    private ScheduleServiceSelector scheduleService;
 
     @Inject
     private Sports sports;

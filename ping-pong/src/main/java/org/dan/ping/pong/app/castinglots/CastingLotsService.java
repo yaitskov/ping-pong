@@ -1,7 +1,5 @@
 package org.dan.ping.pong.app.castinglots;
 
-import static java.util.Collections.singleton;
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -10,14 +8,12 @@ import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Want;
-import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.castinglots.FlatCategoryPlayOffBuilder.validateBidsNumberInACategory;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.FIRST_PLAY_OFF_MATCH_LEVEL;
 import static org.dan.ping.pong.app.match.MatchService.roundPlayOffBase;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.L1_3P;
-import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
@@ -39,7 +35,7 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.playoff.PlayOffService;
-import org.dan.ping.pong.app.sched.ScheduleService;
+import org.dan.ping.pong.app.sched.ScheduleServiceSelector;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
@@ -48,7 +44,6 @@ import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
-import org.springframework.context.annotation.Lazy;
 
 import java.util.Comparator;
 import java.util.List;
@@ -57,7 +52,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 @Slf4j
 public class CastingLotsService {
@@ -206,10 +200,8 @@ public class CastingLotsService {
         return castingLotsDao.loadManualBidsOrder(tid, cid);
     }
 
-    @Lazy
     @Inject
-    @Named(SCHEDULE_SELECTOR)
-    private ScheduleService scheduleService;
+    private ScheduleServiceSelector scheduleService;
 
     @Inject
     private Clocker clocker;

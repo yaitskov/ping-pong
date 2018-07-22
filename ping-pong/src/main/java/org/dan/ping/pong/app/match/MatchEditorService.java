@@ -14,7 +14,6 @@ import static org.dan.ping.pong.app.match.MatchState.Game;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.dispute.MatchSets.ofSets;
-import static org.dan.ping.pong.app.sched.ScheduleCtx.SCHEDULE_SELECTOR;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
@@ -28,7 +27,7 @@ import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.dispute.MatchSets;
 import org.dan.ping.pong.app.playoff.PlayOffService;
-import org.dan.ping.pong.app.sched.ScheduleService;
+import org.dan.ping.pong.app.sched.ScheduleServiceSelector;
 import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -37,13 +36,11 @@ import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.tournament.TournamentTerminator;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
-import org.springframework.context.annotation.Lazy;
 
 import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 @Slf4j
 public class MatchEditorService {
@@ -70,10 +67,8 @@ public class MatchEditorService {
     @Inject
     private Clocker clocker;
 
-    @Lazy
     @Inject
-    @Named(SCHEDULE_SELECTOR)
-    private ScheduleService scheduleService;
+    private ScheduleServiceSelector scheduleService;
 
     @Inject
     private TournamentService tournamentService;

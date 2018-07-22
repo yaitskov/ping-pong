@@ -48,6 +48,7 @@ module.exports = {
     'max-group-size-help': 'Maksymalna ilość uczestników w grupie.',
     'Match score': 'Ilość punktów',
     'match-score-help': 'Ile setów uczestnik musi zdobyć, żeby wygrać mecz.',
+    'custom-play-off-match-rules': 'Inny reguły dla meczi w PlayOffie',
     'Match for 3rd place': 'Mecz za 3 miejsce',
     'Match for 3rd place-1': 'tak',
     'Match for 3rd place-0': 'nie',

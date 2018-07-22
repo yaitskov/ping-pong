@@ -1,5 +1,5 @@
 <div class="form-group" id="supertie-break-games"
-     ng-show="$ctrl.rules.match['@type'] == 'TE'">
+     ng-show="$ctrl.rules.match['@type'] == 'TE' && $ctrl.rules.match.stw > 1">
   <label class="toggle-option" translate="Play super tie break"/>
   <div class="btn-toolbar">
     <a class="btn btn-default"
@@ -12,9 +12,8 @@
        ng-class="{'btn-danger': !$ctrl.rules.match.stbg}"/>
   </div>
 </div>
-</div>
 <div class="form-group" id="supertie-break-games" default-button-type
-     ng-show="$ctrl.rules.match['@type'] == 'TE' && $ctrl.rules.match.stbg">
+     ng-show="$ctrl.rules.match['@type'] == 'TE' && $ctrl.rules.match.stbg && $ctrl.rules.match.stw > 1">
   <label translate="Super tie break games"/>
   <div touch-spin options="$ctrl.sets" ng-model="$ctrl.rules.match.stbg"/>
   <p class="help-block" translate="super-time-break-games-help"/>

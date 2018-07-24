@@ -82,7 +82,7 @@ public class TournamentCopyJerseyTest extends AbstractSpringJerseyTest {
                             MY_TOURNAMENT + masterCopyInfo.getConsoleGroupTid().get(),
                             scenario.getTestAdmin(), MyTournamentInfo.class);
 
-                    assertThat(consoleCopyInfo.getMaster().get().getTid(),
+                    assertThat(consoleCopyInfo.getMaster().map(TidRelation::getTid),
                             is(Optional.of(copyMasterTid)));
                     assertThat(consoleCopyInfo.getPreviousTid(),
                             optionalWithValue(is(consoleOrigin.getScenario().getTid())));

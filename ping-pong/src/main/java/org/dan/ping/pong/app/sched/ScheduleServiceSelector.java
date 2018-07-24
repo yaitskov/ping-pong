@@ -45,7 +45,7 @@ public class ScheduleServiceSelector implements ScheduleService {
         tournament.getGroups().forEach((gid, grp) -> {
              final long notCompleteMatches = gid2Matches.getOrDefault(gid, 0L);
              if (notCompleteMatches == 0) {
-                 matchService.tryToCompleteGroup(tournament, gid, batch);
+                 matchService.completeGroupOf1(gid, tournament, batch);
              }
         });
     }

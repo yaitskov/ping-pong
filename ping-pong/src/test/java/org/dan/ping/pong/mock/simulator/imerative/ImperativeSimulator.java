@@ -63,6 +63,7 @@ import org.dan.ping.pong.app.bid.ParticipantState;
 import org.dan.ping.pong.app.bid.SetCategory;
 import org.dan.ping.pong.app.category.CategoryInfo;
 import org.dan.ping.pong.app.category.CategoryLink;
+import org.dan.ping.pong.app.category.CategoryMemState;
 import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupInfo;
@@ -177,8 +178,8 @@ public class ImperativeSimulator {
 
     public ImperativeSimulator resolveCategories() {
         final int tid = consoleScenario.getTid().getTid();
-        final List<CategoryLink> categories = myRest.get(CATEGORIES_BY_TID + tid,
-                new GenericType<List<CategoryLink>>(){});
+        final List<CategoryMemState> categories = myRest.get(CATEGORIES_BY_TID + tid,
+                new GenericType<List<CategoryMemState>>(){});
 
         categories.forEach(category -> {
             final CategoryInfo catInfo = myRest.get(

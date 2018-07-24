@@ -74,6 +74,7 @@ import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.app.tournament.TournamentTerminator;
 import org.dan.ping.pong.app.tournament.console.ConsoleStrategy;
 import org.dan.ping.pong.app.user.UserRole;
+import org.dan.ping.pong.jooq.tables.Tournament;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.TriFunc;
 import org.dan.ping.pong.util.time.Clocker;
@@ -423,6 +424,26 @@ public class MatchService {
         return orderedUids.stream()
                 .filter(uid -> !quitBids.contains(uid))
                 .collect(toSet());
+    }
+
+    public void completeGroupOf1(
+            Gid gid, TournamentMemState tournament,
+            DbUpdater batch) {
+        final GroupInfo iGru = tournament.getGroup(gid);
+        final List<Bid> gruMems = tournament
+                .groupBids(Optional.of(gid))
+                .map(ParticipantMemState::getBid)
+                .collect(toList());
+        if (gruMems.size() != 1) {
+            throw internalError("Group size expected to be 1 but " + gruMems.size());
+        }
+        final List<MatchInfo> playOffMatches = playOffMatches(tournament, iGru, empty());
+        if (playOffMatches.isEmpty()) {
+            throw internalError("No playOff matches");
+        }
+        final int quits = tournament.getRule().getGroup().get().getQuits();
+        distributeGroupQuittersBetweenPlayOffMatches(tournament, batch, quits,
+                gruMems, iGru, playOffMatches);
     }
 
     private List<MatchInfo> playOffMatches(TournamentMemState tournament, GroupInfo iGru,

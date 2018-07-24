@@ -210,9 +210,8 @@ public class CastingLotsService {
         final ParticipantMemState participant = tournament.getParticipant(bid);
         log.info("Add participant {} to group", bid, participant.getGid());
         int[] priority = new int[1];
-        tournament.getParticipants().values().stream()
-                .filter(p -> p.getGid().equals(participant.getGid())
-                        && !p.getUid().equals(participant.getUid()))
+        tournament.groupBids(participant.getGid())
+                .filter(p -> !p.getUid().equals(participant.getUid()))
                 .sorted(Comparator.comparingInt(p -> p.getUid().getId()))
                 .forEach(
                         p -> {

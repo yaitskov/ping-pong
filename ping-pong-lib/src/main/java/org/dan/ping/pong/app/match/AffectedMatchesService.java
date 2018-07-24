@@ -165,9 +165,8 @@ public class AffectedMatchesService {
         return (int) matches.stream().filter(MatchInfo::continues).count();
     }
 
-    private List<Bid> bidsByGroup(TournamentMemState tournament, Optional<Gid> ogid) {
-        return tournament.getParticipants().values().stream()
-                .filter(p -> p.getGid().equals(ogid))
+    private List<Bid> bidsByGroup(TournamentMemState tournament, Optional<Gid> oGid) {
+        return tournament.groupBids(oGid)
                 .map(ParticipantMemState::getBid)
                 .collect(toList());
     }

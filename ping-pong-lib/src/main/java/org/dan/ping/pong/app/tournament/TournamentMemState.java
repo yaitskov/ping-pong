@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -274,10 +275,7 @@ public class TournamentMemState {
     }
 
     public Set<Bid> bidsInGroup(Gid gid) {
-        final Optional<Gid> ogid = Optional.of(gid);
-        return participants.values().stream().filter(p -> p.getGid().equals(ogid))
-                .map(ParticipantMemState::getBid)
-                .collect(toSet());
+        return groupBids(of(gid)).map(ParticipantMemState::getBid).collect(toSet());
     }
 
     public Set<Bid> bidsInCategory(Cid cid) {
@@ -356,5 +354,13 @@ public class TournamentMemState {
 
     public String toString() {
         return "trMemSt id=" + tid + ", st=" + state + ", hc=" + hashCode();
+    }
+
+    public Stream<ParticipantMemState> groupBids(Optional<Gid>  oGid) {
+        return participants().filter(p -> p.getGid().equals(oGid));
+    }
+
+    public List<ParticipantMemState> findBidsByGroup(Gid gid) {
+        return groupBids(of(gid)).collect(toList());
     }
 }

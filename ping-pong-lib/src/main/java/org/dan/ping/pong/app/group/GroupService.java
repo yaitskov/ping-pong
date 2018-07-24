@@ -163,8 +163,7 @@ public class GroupService {
                 .gid(gid)
                 .name(groupInfo.getLabel())
                 .category(tournament.getCategory(groupInfo.getCid()).toLink())
-                .members(tournament.getParticipants().values().stream()
-                        .filter(p -> p.getGid().equals(of(gid)))
+                .members(tournament.groupBids(of(gid))
                         .map(ParticipantMemState::toBidLink)
                         .collect(toList()))
                 .build();
@@ -182,7 +181,7 @@ public class GroupService {
                         tournament.bidsInGroup(gid)));
 
         final List<ParticipantMemState> seedBidsOrder = rankingService
-                .sort(groupBids(tournament, gid), rules.getCasting(), tournament);
+                .sort(tournament.findBidsByGroup(gid), rules.getCasting(), tournament);
         final List<Bid> finalPositions = order.getPositions()
                 .values()
                 .stream()
@@ -244,11 +243,6 @@ public class GroupService {
                 .dmMatches(possibleDm ? new HashMap<>() : emptyMap())
                 .originMatches(new HashMap<>())
                 .build();
-    }
-
-    private List<ParticipantMemState> groupBids(TournamentMemState tournament, Gid gid) {
-        return tournament.getParticipants().values().stream()
-                .filter(bid -> bid.getGid().equals(of(gid))).collect(toList());
     }
 
     private GroupMatchResult matchResult(Bid bid, TournamentMemState tournament, MatchInfo m) {

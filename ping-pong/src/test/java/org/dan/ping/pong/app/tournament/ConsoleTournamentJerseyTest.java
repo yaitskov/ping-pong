@@ -538,9 +538,10 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                             .scoreSet(p4, 11, p5, 5)
                             .resolveCategories();
 
-                    console.checkTournament(Open, restState(Play))
+                    console.checkTournament(Open, restState(Play).bid(p2, Wait))
                             //.scoreSet(p2, 11, ?, 6)
                             .scoreSet(p3, 11, p5, 8)
+                            .reloadMatchMap()
                             // final
                             .scoreSet(p2, 11, p3, 8)
                             .checkResult(p2, p3, p5)
@@ -549,7 +550,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
 
                     master  // master play off
                             .scoreSet(p1, 11, p4, 4)
-                            .checkResult(p1, p4, p2, p3, p5)
+                            .checkResult(p1, p4, p2, p5, p3)
                             .checkTournamentComplete(restState(Lost).bid(p4, Win2).bid(p1, Win1));
                 });
     }

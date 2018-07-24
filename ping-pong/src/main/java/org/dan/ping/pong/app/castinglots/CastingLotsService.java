@@ -20,7 +20,6 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
-import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.ParticipantLink;
@@ -61,9 +60,6 @@ public class CastingLotsService {
 
     @Inject
     private CastingLotsDao castingLotsDao;
-
-    @Inject
-    private BidDao bidDao;
 
     @Inject
     private GroupDao groupDao;
@@ -141,10 +137,9 @@ public class CastingLotsService {
         final List<ParticipantMemState> orderedBids = rankingService.sort(
                 bids, rules.getCasting(), tournament);
         final Gid gid = groupService.createGroup(tournament, cid, batch);
-        orderedBids.forEach(bid -> bid.setGid(Optional.of(gid)));
+        bidService.setGroupForUids(batch, gid, tid, orderedBids);
         groupService.generateGroupMatches(batch, tournament, gid, orderedBids,
                 0, Optional.empty());
-        bidDao.setGroupForUids(batch, gid, tid, orderedBids);
     }
 
     private void seedTournamentWithGroupsAndPlayOff(TournamentRules rules,
@@ -159,14 +154,13 @@ public class CastingLotsService {
         for (int gi : bidsByGroups.keySet().stream().sorted().collect(toList())) {
             final Gid gid = groupService.createGroup(tournament, cid, batch);
             final List<ParticipantMemState> groupBids = bidsByGroups.get(gi);
-            groupBids.forEach(bid -> bid.setGid(Optional.of(gid)));
+            bidService.setGroupForUids(batch, gid, tid, groupBids);
             if (groupBids.size() > 1) {
                 basePlayOffPriority = Math.max(
                         groupService.generateGroupMatches(batch, tournament, gid, groupBids,
                                 0, Optional.empty()),
                         basePlayOffPriority);
             }
-            bidDao.setGroupForUids(batch, gid, tid, groupBids);
         }
         final int playOffStartPositions = roundPlayOffBase(bidsByGroups.size() * quits);
         if (playOffStartPositions > 1) {

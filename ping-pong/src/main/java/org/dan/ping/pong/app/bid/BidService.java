@@ -40,6 +40,7 @@ import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.sched.ScheduleServiceSelector;
 import org.dan.ping.pong.app.tournament.ChildTournamentProvider;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.sys.db.DbUpdater;
@@ -268,8 +269,7 @@ public class BidService {
                     throw badRequest("source group is complete");
                 });
 
-        bidDao.setGroupForUids(batch, targetGid, req.getTid(), singletonList(bid));
-        bid.setGid(Optional.of(targetGid));
+        setGroupForUids(batch, targetGid, req.getTid(), singletonList(bid));
         final GroupInfo targetGroup = tournament.getGroup(targetGid);
         final GroupInfo sourceGroup = tournament.getGroup(req.getExpectedGid());
 
@@ -341,5 +341,11 @@ public class BidService {
                 .stream()
                 .map(tournament::getParticipant)
                 .forEach(p -> p.setName(bidRename.getNewName()));
+    }
+
+    public void setGroupForUids(
+            DbUpdater batch, Gid gid, Tid tid, List<ParticipantMemState> orderedBids) {
+        orderedBids.forEach(bid -> bid.setGid(Optional.of(gid)));
+        bidDao.setGroupForUids(batch, gid, tid, orderedBids);
     }
 }

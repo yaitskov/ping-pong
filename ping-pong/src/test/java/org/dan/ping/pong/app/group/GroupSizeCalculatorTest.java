@@ -2,9 +2,10 @@ package org.dan.ping.pong.app.group;
 
 import static com.google.common.primitives.Ints.asList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
-import org.dan.ping.pong.sys.error.PiPoEx;
 import org.junit.Test;
 
 public class GroupSizeCalculatorTest {
@@ -14,9 +15,9 @@ public class GroupSizeCalculatorTest {
             .quits(1)
             .build();
 
-    @Test(expected = PiPoEx.class)
+    @Test
     public void split1Bid() {
-        sut.calcGroupSizes(rules, 1);
+        assertThat(sut.calcGroupSizes(rules, 1), is(singletonList(1)));
     }
 
     @Test

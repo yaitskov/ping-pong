@@ -83,6 +83,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -265,7 +266,9 @@ public class TournamentService {
         tournament.getCategories().entrySet().stream()
                 .filter(e -> e.getValue().getState() == Drt)
                 .map(Map.Entry::getKey)
-                .forEach(cid -> beginCategory(tournament, batch, cid, cid2Par.get(cid)));
+                .forEach(cid -> beginCategory(
+                        tournament, batch, cid, ofNullable(cid2Par.get(cid))
+                                .orElseGet(Collections::emptyList)));
     }
 
     @Inject
@@ -275,12 +278,19 @@ public class TournamentService {
             Cid cid, List<ParticipantMemState> bids) {
         final CategoryMemState catSt = tournament.getCategory(cid);
         log.info("Begin category {} of tournament {}", cid, tournament.getTid());
+        categoryService.setState(tournament.getTid(), catSt, Ply, batch);
         switch (bids.size()) {
             case 1:
+                tournament.getRule().getGroup()
+                        .ifPresent((gRu) ->
+                                bidService.setGroupForUids(
+                                        batch,
+                                        groupService.createGroup(tournament, cid, batch),
+                                        tournament.getTid(),
+                                        bids));
                 bidService.setBidState(bids.get(0), Win1,
                         singletonList(bids.get(0).getBidState()), batch);
             case 0:
-                categoryService.setState(tournament.getTid(), catSt, End, batch);
                 return;
             default:
                 bids.forEach(bid ->
@@ -288,7 +298,6 @@ public class TournamentService {
                                 singletonList(bid.getBidState()), batch));
                 castingLotsService.seedCategory(tournament, cid, bids, batch);
                 setState(tournament, Open, batch);
-                categoryService.setState(tournament.getTid(), catSt, Ply, batch);
         }
     }
 

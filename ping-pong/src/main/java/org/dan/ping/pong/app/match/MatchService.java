@@ -439,7 +439,13 @@ public class MatchService {
         }
         final List<MatchInfo> playOffMatches = playOffMatches(tournament, iGru, empty());
         if (playOffMatches.isEmpty()) {
-            throw internalError("No playOff matches");
+            if (tournament.findGroupsByCategory(iGru.getCid()).count() > 1L) {
+                throw internalError("No playOff matches");
+            } else {
+                log.info("No playOff matches in tid {} cid {}",
+                        tournament.getTid(), iGru.getCid());
+                return;
+            }
         }
         final int quits = tournament.getRule().getGroup().get().getQuits();
         distributeGroupQuittersBetweenPlayOffMatches(tournament, batch, quits,

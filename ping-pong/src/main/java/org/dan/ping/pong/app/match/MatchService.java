@@ -323,11 +323,10 @@ public class MatchService {
 
     private void enlistIf(TournamentMemState tournament, ParticipantMemState par,
             MatchInfo mInfo, PlayOffRule playOffRule, DbUpdater batch) {
-        if (playOffRule.getConsoleParticipants()
-                .orElseThrow(() -> badRequest("no console participant policy"))
-                .bidStateForConsole(par.getBidState(), mInfo.getType())) {
-            consoleStrategy.onParticipantLostPlayOff(tournament, par, batch);
-        }
+        playOffRule.getConsoleParticipants()
+                .map(cp -> cp.bidStateForConsole(par.getBidState(), mInfo.getType()))
+                .filter(r -> r)
+                .ifPresent((x) -> consoleStrategy.onParticipantLostPlayOff(tournament, par, batch));
     }
 
     @Inject

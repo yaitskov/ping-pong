@@ -114,7 +114,9 @@ public class TournamentRulesConst {
             .build();
     public static final TournamentRules RULES_JP_S3A2G11 = RULES_G8Q1_S3A2G11.withGroup(Optional.empty());
     public static final TournamentRules RULES_JP2_S3A2G11 = RULES_JP_S3A2G11.withPlayOff(Optional.of(Losing2));
+    public static final TournamentRules RULES_JP2_S1A2G11 = RULES_JP_S1A2G11.withPlayOff(Optional.of(Losing2));
     public static final TournamentRules RULES_JP2_S3A2G11_NP = RULES_JP2_S3A2G11.withPlace(Optional.empty());
+    public static final TournamentRules RULES_JP2_S1A2G11_NP = RULES_JP2_S1A2G11.withPlace(Optional.empty());
     public static final TournamentRules RULES_JP_S3A2G11_3P = RULES_JP_S3A2G11.withPlayOff(Optional.of(L1_3P));
     public static final TournamentRules RULES_JP_S3A2G11_NP = RULES_JP_S3A2G11.withPlace(Optional.empty());
     public static final TournamentRules RULES_JP_S3A2G11_NP_3P = RULES_JP_S3A2G11_NP.withPlayOff(Optional.of(L1_3P));

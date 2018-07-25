@@ -24,6 +24,8 @@ import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G3Q1_S
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S1A2G11_NP;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP2_S1A2G11_NP;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP2_S3A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_LC_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
@@ -617,8 +619,38 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
     }
 
 
-    // console for play off with play off up to 2 defeats
+    @Test
+    public void consolePlayOffWith2DefeatsForPlayOff() {
+        final TournamentScenario scenario = begin().name("consolePlayOff2Def")
+                .rules(RULES_JP_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4);
+        isf.create(scenario)
+                .run(master -> {
+                    master.beginTournament()
+                            .createConsoleTournament(ConOff)
+                            .updateConsoleRules(RULES_JP2_S1A2G11_NP.withPlayOff(
+                                    RULES_JP2_S1A2G11_NP.getPlayOff().map(
+                                            pr -> pr.withLayerPolicy(
+                                                    Optional.of(IndependentLayers)))));
 
+                    final ImperativeSimulator console = master // master groups
+                            .scoreSet(p1, 11, p4, 3)
+                            .scoreSet(p2, 11, p3, 5)
+                            .scoreSet(p1, 11, p2, 1)
+                            .checkResult(p1, p2, p3, p4)
+                            .checkTournamentComplete(
+                                    restState(Lost).bid(p2, Win2).bid(p1, Win1))
+                            .resolveCategories();
+
+                    console.checkTournament(Open, restState(Play))
+                            .scoreSet(p3, 11, p4, 7)
+                            .reloadMatchMap()
+                            .scoreSet(p4, 11, p3, 5)
+                            .checkResult(p4, p3)
+                            .checkTournamentComplete(
+                                    restState(Lost).bid(p3, Win2).bid(p4, Win1));
+                });
+    }
 
 
     // merged layered console for play off with losers

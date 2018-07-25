@@ -5,12 +5,15 @@ import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.TERMINAL_STATE;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.MasterOutcome;
 import static org.dan.ping.pong.app.group.ConsoleTournament.INDEPENDENT_RULES;
+import static org.dan.ping.pong.app.playoff.PlayOffGuests.JustLosers;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentType.Classic;
 import static org.dan.ping.pong.app.tournament.TournamentType.Console;
 import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.ConGru;
+import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.ConOff;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
+import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.cache.LoadingCache;
 import lombok.SneakyThrows;
@@ -20,6 +23,7 @@ import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchInfo;
+import org.dan.ping.pong.app.playoff.PlayOffGuests;
 import org.dan.ping.pong.app.tournament.CreateTournament;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
 import org.dan.ping.pong.app.tournament.RelatedTids;
@@ -108,10 +112,14 @@ public class ConsoleTournamentService {
             case ConOff:
                 masterTournament.setRule(masterTournament.getRule()
                         .withPlayOff(masterTournament.getRule().getPlayOff()
-                                .map(p -> p.withConsole(INDEPENDENT_RULES))));
+                                .map(p -> p
+                                        .withConsoleParticipants(
+                                                Optional.of(p.getConsoleParticipants()
+                                                        .orElse(JustLosers)))
+                                        .withConsole(INDEPENDENT_RULES))));
                 break;
             default:
-
+                throw internalError("Type " + type + " not supported");
         }
         tournamentDao.updateParams(masterTournament.getTid(), masterTournament.getRule(), batch);
 
@@ -130,8 +138,13 @@ public class ConsoleTournamentService {
                     + " does not support console tournaments");
         }
         if (type == ConGru && !masterTournament.getRule().getGroup().isPresent()) {
-            throw badRequest("Tournament " + masterTournament.getTid()
+            throw badRequest("Master tournament " + masterTournament.getTid()
                     + " has no groups");
+        }
+        if (type == ConOff && !masterTournament.getRule().getPlayOff().isPresent()) {
+            throw badRequest("Master tournament " + masterTournament.getTid()
+                    + " has no playOff");
+
         }
     }
 

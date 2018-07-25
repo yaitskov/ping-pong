@@ -22,6 +22,7 @@ import static org.dan.ping.pong.app.category.CategoryService.groupByCategories;
 import static org.dan.ping.pong.app.category.CategoryState.Drt;
 import static org.dan.ping.pong.app.category.CategoryState.End;
 import static org.dan.ping.pong.app.category.CategoryState.Ply;
+import static org.dan.ping.pong.app.group.ConsoleTournament.NO;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
 import static org.dan.ping.pong.app.table.TableService.STATE;
 import static org.dan.ping.pong.app.tournament.EnlistPolicy.ONCE_PER_TOURNAMENT;
@@ -478,8 +479,35 @@ public class TournamentService {
         tournamentDao.update(update, batch);
     }
 
+    private void validateRulesWithTournament(
+            TournamentMemState tournament, TournamentRules rules) {
+        switch (tournament.getType()) {
+            case Classic:
+                break; // ok
+            case Console:
+                rules.getGroup().ifPresent(gr -> {
+                    if (gr.getConsole() != NO) {
+                        throw badRequest("console group cannot have console tournament");
+                    }
+                });
+                rules.getPlayOff().ifPresent(pr -> {
+                    if (pr.getConsole() != NO) {
+                        throw badRequest("console playOff cannot have console tournament");
+                    }
+                    if (!pr.getLayerPolicy().isPresent()) {
+                        throw badRequest("tournament for console playOff must have layer policy");
+                    }
+                });
+                break;
+            default:
+                throw internalError(
+                        "Tournament type " + tournament.getType() + " not supported");
+        }
+    }
+
     public void updateTournamentParams(TournamentMemState tournament,
             TidIdentifiedRules parameters, DbUpdater batch) {
+        validateRulesWithTournament(tournament, parameters.getRules());
         if (!CONFIGURABLE_STATES.contains(tournament.getState())) {
             throw badRequest("Tournament cannot be modified in state",
                     ImmutableMap.of(TID, tournament.getTid(),
@@ -492,7 +520,7 @@ public class TournamentService {
         if (tournament.getType() == Console
                 && rules.getCasting().getSplitPolicy() == ConsoleLayered
                 && rules.getGroup().isPresent()) {
-            throw badRequest("layred console tournament cannot have groups");
+            throw badRequest("layered console tournament cannot have groups");
         }
         tournament.setRule(rules);
         tournamentDao.updateParams(tournament.getTid(), tournament.getRule(), batch);

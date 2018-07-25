@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.tournament.rules;
 
+import static org.dan.ping.pong.app.group.ConsoleTournament.NO;
 import static org.dan.ping.pong.app.tournament.rules.ValidationError.ofTemplate;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
@@ -36,6 +37,19 @@ public class TournamentRulesValidator {
         }
         rankValidator.validate(errors, rules.getCasting());
         sports.validateMatch(rules.getMatch().sport(), errors, rules.getMatch());
+    }
+
+    public void validateNew(TournamentRules rules) {
+        rules.getPlayOff()
+                .filter(pr -> pr.getConsole() != NO)
+                .ifPresent(pr -> {
+                    throw badRequest("new tournament cannot have console tournament for playoff");
+                });
+        rules.getGroup()
+                .filter(pr -> pr.getConsole() != NO)
+                .ifPresent(pr -> {
+                    throw badRequest("new tournament cannot have console tournament for group");
+                });
     }
 
     public void validate(TournamentRules rules) {

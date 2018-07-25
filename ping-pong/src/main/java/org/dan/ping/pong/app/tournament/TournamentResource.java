@@ -88,6 +88,7 @@ public class TournamentResource {
             CreateTournament newTournament) {
         newTournament.validateNew();
         rulesValidator.validate(newTournament.getRules());
+        rulesValidator.validateNew(newTournament.getRules());
         return tournamentService.create(
                 authService.userInfoBySession(session).getUid(),
                 newTournament);

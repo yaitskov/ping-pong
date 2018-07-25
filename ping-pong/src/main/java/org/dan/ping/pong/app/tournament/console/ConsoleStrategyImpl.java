@@ -76,7 +76,8 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
         begin(masterTournament, batch, conGruTour);
     }
 
-    public void begin(TournamentMemState masterTournament, DbUpdater batch, TournamentMemState conGruTour) {
+    public void begin(
+            TournamentMemState masterTournament, DbUpdater batch, TournamentMemState conGruTour) {
         tournamentService.begin(conGruTour, batch);
         masterTournament.getCondActions().getOnScheduleTables().add(
                 () -> {
@@ -125,7 +126,6 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
         final TournamentMemState conOffTour = findConTour(masterTournament.getTid(), ConOff);
         final Cid cid = categoryService.findCidOrCreate(
                 masterTournament, par.getCid(), conOffTour, batch);
-
         batch.onFailure(() -> tournamentCache.invalidate(conOffTour.getTid()));
         enlist(par, conOffTour, batch, cid);
     }

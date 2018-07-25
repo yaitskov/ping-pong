@@ -74,7 +74,6 @@ import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.app.tournament.TournamentTerminator;
 import org.dan.ping.pong.app.tournament.console.ConsoleStrategy;
 import org.dan.ping.pong.app.user.UserRole;
-import org.dan.ping.pong.jooq.tables.Tournament;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.TriFunc;
 import org.dan.ping.pong.util.time.Clocker;
@@ -289,8 +288,6 @@ public class MatchService {
     @Inject
     private TournamentTerminator tournamentTerminator;
 
-    private static Set<BidState> BID_STATES_ALLOWED_IN_CONSOLE = ImmutableSet.of(Lost);
-
     private void completePlayOffMatch(TournamentMemState tournament, MatchInfo mInfo,
             Bid winBid, DbUpdater batch) {
         final PlayOffRule playOffRule = tournament.getRule().getPlayOff().get();
@@ -307,19 +304,30 @@ public class MatchService {
         if (!isPyrrhic(lostParticipant)) {
             bidService.setBidState(lostParticipant,
                     playOffMatchLoserState(playOffRule, mInfo, lostParticipant), PLAY_WAIT, batch);
-            if (BID_STATES_ALLOWED_IN_CONSOLE.contains(lostParticipant.getBidState())) {
-                consoleStrategy.onParticipantLostPlayOff(tournament, lostParticipant, batch);
-            }
+            enlistIf(tournament, lostParticipant, mInfo, playOffRule, batch);
         } else if (lostParticipant.getBidState() == Quit && mInfo.getType() == Gold) {
             bidService.setBidState(lostParticipant, Win2,
                     singleton(lostParticipant.getBidState()), batch);
+            enlistIf(tournament, lostParticipant, mInfo, playOffRule, batch);
         }
         mInfo.getLoserMid().ifPresent(
                 lMid -> assignBidToMatch(tournament, lMid, lostBid, batch));
         if (mInfo.getWinnerMid().isPresent()) {
             return;
         }
+        if (!isPyrrhic(winParticipant)) {
+            enlistIf(tournament, winParticipant, mInfo, playOffRule, batch);
+        }
         tournamentTerminator.endOfTournamentCategory(tournament, mInfo.getCid(), batch);
+    }
+
+    private void enlistIf(TournamentMemState tournament, ParticipantMemState par,
+            MatchInfo mInfo, PlayOffRule playOffRule, DbUpdater batch) {
+        if (playOffRule.getConsoleParticipants()
+                .orElseThrow(() -> badRequest("no console participant policy"))
+                .bidStateForConsole(par.getBidState(), mInfo.getType())) {
+            consoleStrategy.onParticipantLostPlayOff(tournament, par, batch);
+        }
     }
 
     @Inject

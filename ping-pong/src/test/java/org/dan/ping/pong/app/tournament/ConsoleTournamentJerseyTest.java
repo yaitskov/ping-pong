@@ -11,11 +11,12 @@ import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.MasterOutcome;
+import static org.dan.ping.pong.app.group.ConsoleTournament.INDEPENDENT_RULES;
 import static org.dan.ping.pong.app.match.MatchResource.BID_PENDING_MATCHES;
 import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
 import static org.dan.ping.pong.app.playoff.ConsoleLayersPolicy.IndependentLayers;
+import static org.dan.ping.pong.app.playoff.PlayOffGuests.AndWinner2;
 import static org.dan.ping.pong.app.playoff.PlayOffGuests.JustLosers;
-import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing2;
 import static org.dan.ping.pong.app.tournament.TournamentResource.GET_TOURNAMENT_RULES;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G2Q1_S1A2G11_NP;
@@ -48,7 +49,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 
 import org.dan.ping.pong.JerseySpringTest;
-import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.match.MatchState;
 import org.dan.ping.pong.app.match.MyPendingMatchList;
 import org.dan.ping.pong.app.match.OpenMatchForJudgeList;
@@ -466,7 +466,12 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void layeredForGroup2Defeats() {
         final TournamentScenario scenario = begin().name("lrdForGroup2Def")
-                .rules(RULES_G2Q1_S1A2G11_NP)
+                .rules(RULES_G2Q1_S1A2G11_NP.withPlayOff(
+                        RULES_G2Q1_S1A2G11_NP.getPlayOff()
+                                .map(pr -> pr
+                                        .withConsole(INDEPENDENT_RULES)
+                                        .withConsoleParticipants(
+                                                Optional.of(JustLosers)))))
                 .category(c1, p1, p2, p3, p4, p5, p6, p7, p8);
         isf.create(scenario)
                 .run(c -> {
@@ -475,9 +480,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                             .updateConsoleRules(RULES_LC_S1A2G11_NP.withPlayOff(
                                     Optional.of(Losing2
                                             .withLayerPolicy(
-                                                    Optional.of(IndependentLayers))
-                                            .withConsoleParticipants(
-                                                    Optional.of(JustLosers)))));
+                                                    Optional.of(IndependentLayers)))));
 
                     final ImperativeSimulator console = c
                             .scoreSet(p1, 11, p2, 3)
@@ -524,11 +527,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                             .createConsoleGruTournament()
                             .updateConsoleRules(RULES_G2Q1_S1A2G11_NP
                                     .withCasting(RULES_G2Q1_S1A2G11_NP
-                                            .getCasting().withPolicy(MasterOutcome))
-                                    .withPlayOff(
-                                            Optional.of(Losing1
-                                                    .withConsoleParticipants(
-                                                            Optional.of(JustLosers)))));
+                                            .getCasting().withPolicy(MasterOutcome)));
 
                     final ImperativeSimulator console = master // master groups
                             .scoreSet(p1, 11, p2, 3)
@@ -555,7 +554,69 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 });
     }
 
-    // console for play off where all gets into 1 group and no play off
+    @Test
+    public void consolePlayOffInOneGroupLosers() {
+        final TournamentScenario scenario = begin().name("consolePlayOffInOneGroupL")
+                .rules(RULES_JP_S1A2G11_NP.withPlayOff(
+                        RULES_JP_S1A2G11_NP.getPlayOff()
+                                .map(r -> r.withConsoleParticipants(
+                                        Optional.of(JustLosers)))))
+                .category(c1, p1, p2, p3, p4);
+        isf.create(scenario)
+                .run(master -> {
+                    master.beginTournament()
+                            .createConsoleTournament(ConOff)
+                            .updateConsoleRules(RULES_G_S1A2G11_NP);
+
+                    final ImperativeSimulator console = master // master groups
+                            .scoreSet(p1, 11, p4, 3)
+                            .scoreSet(p2, 11, p3, 5)
+                            .scoreSet(p1, 11, p2, 1)
+                            .checkResult(p1, p2, p3, p4)
+                            .checkTournamentComplete(
+                                    restState(Lost).bid(p2, Win2).bid(p1, Win1))
+                            .resolveCategories();
+
+                    console.checkTournament(Open, restState(Play))
+                            .scoreSet(p3, 11, p4, 7)
+                            .checkResult(p3, p4)
+                            .checkTournamentComplete(restState(Lost).bid(p3, Win1));
+                });
+    }
+
+    @Test
+    public void consolePlayOffInOneGroupW2() {
+        final TournamentScenario scenario = begin().name("consolePlayOffInOneGroupW2")
+                .rules(RULES_JP_S1A2G11_NP.withPlayOff(
+                        RULES_JP_S1A2G11_NP.getPlayOff()
+                                .map(r -> r.withConsoleParticipants(
+                                        Optional.of(AndWinner2)))))
+                .category(c1, p1, p2, p3, p4);
+        isf.create(scenario)
+                .run(master -> {
+                    master.beginTournament()
+                            .createConsoleTournament(ConOff)
+                            .updateConsoleRules(RULES_G_S1A2G11_NP);
+
+                    final ImperativeSimulator console = master // master groups
+                            .scoreSet(p1, 11, p4, 3)
+                            .scoreSet(p2, 11, p3, 5)
+                            .scoreSet(p1, 11, p2, 1)
+                            .checkResult(p1, p2, p3, p4)
+                            .checkTournamentComplete(
+                                    restState(Lost).bid(p2, Win2).bid(p1, Win1))
+                            .resolveCategories();
+
+                    console.checkTournament(Open, restState(Play))
+                            .scoreSet(p3, 11, p4, 7)
+                            .scoreSet(p2, 11, p3, 5)
+                            .scoreSet(p2, 11, p4, 6)
+                            .checkResult(p2, p3, p4)
+                            .checkTournamentComplete(restState(Lost).bid(p2, Win1));
+                });
+    }
+
+
     // console for play off with play off up to 2 defeats
 
 

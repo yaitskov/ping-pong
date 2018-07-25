@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.playoff;
 
+import static org.dan.ping.pong.app.group.ConsoleTournament.NO;
 import static org.dan.ping.pong.app.tournament.rules.GroupRuleValidator.OUT_OF_RANGE;
 import static org.dan.ping.pong.app.tournament.rules.GroupRuleValidator.VALUE_NULL;
 import static org.dan.ping.pong.app.tournament.rules.ValidationError.ofTemplate;
@@ -30,6 +31,15 @@ public class PlayOffRuleValidator {
         }
         if (playOff.getThirdPlaceMatch() < 0 || playOff.getThirdPlaceMatch() > 1) {
             errors.put(THIRD_PLACE, ofTemplate(OUT_OF_RANGE));
+        }
+        if (playOff.getConsole() != NO) {
+            if (!playOff.getConsoleParticipants().isPresent()) {
+                errors.put("console-participant", ofTemplate("not-selected"));
+            }
+        } else {
+            if (playOff.getConsoleParticipants().isPresent()) {
+                errors.put("console-participant", ofTemplate("must-be-empty"));
+            }
         }
 
         playOff.getMatch().ifPresent(m -> {

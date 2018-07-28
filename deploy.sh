@@ -1,9 +1,11 @@
 #!/bin/bash
 
+. validate.sh
+
 WARDIR=bin/jetty-distribution-9.3.9.v20160517/base/webapps
 
-scp -r ui/dist  diaitskov@pp:~/ping-pong-ui-next-$$ && \
+scp -r ui/dist  $CLOUD_SPORT_ACCOUNT:~/ping-pong-ui-next-$$ && \
     scp ping-pong/target/ping-pong-1.0.0-SNAPSHOT.war \
-        diaitskov@pp:~/$WARDIR/../ROOT-next-$$.war || exit 1
+        $CLOUD_SPORT_ACCOUNT:~/$WARDIR/../ROOT-next-$$.war || exit 1
 
-ssh diaitskov@pp ./deploy.sh $$
+ssh $CLOUD_SPORT_ACCOUNT ./deploy.sh $$

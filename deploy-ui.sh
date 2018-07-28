@@ -1,5 +1,7 @@
 #!/bin/bash
 
-scp -r ui/dist  diaitskov@pp:~/ping-pong-ui-next-$$ || exit 1
+. validate.sh
 
-ssh diaitskov@pp ./deploy-ui.sh $$
+scp -r ui/dist  $CLOUD_SPORT_ACCOUNT:~/ping-pong-ui-next-$$ || exit 1
+
+ssh $CLOUD_SPORT_ACCOUNT ./deploy-ui.sh $$

@@ -1,8 +1,10 @@
 #!/bin/bash
 
+. validate.sh
+
 PORT=${PORT:-3307}
 DBHOST=${DBHOST:-localhost:3306}
-SSH=${SSH:-diaitskov@pp}
+SSH=${SSH:-$CLOUD_SPORT_ACCOUNT}
 
 if nmap localhost -p $PORT | grep $PORT | grep -q open ; then
     echo "port $PORT is busy"

@@ -68,27 +68,28 @@ public class PlayOffLayeredCategoryPlayOffBuilder implements CategoryPlayOffBuil
                         iLevel == maxLevel ? Gold : POff,
                         mergeTagO(finalLevel), batch));
             attachLevel(conTour, coCid, batch, bidsByLevels,
-                    --finalLevel, lastMergeMid.get(), iLevel);
+                    --finalLevel, lastMergeMid, iLevel);
         }
         attachLevel(conTour, coCid, batch, bidsByLevels,
-                finalLevel, lastMergeMid.get(), 1);
+                finalLevel, lastMergeMid, 1);
     }
 
     public void attachLevel(TournamentMemState conTour, Cid cid, DbUpdater batch,
             Map<Integer, List<Bid>> bidsByLevels,
-            int finalLevel, Mid lastMergeMid, int iLevel) {
+            int finalLevel, Optional<Mid> lastMergeMid, int iLevel) {
         final List<ParticipantMemState> levelBids = ofNullable(bidsByLevels.get(iLevel))
                 .map(lBids -> lBids.stream().map(conTour::getBid).collect(toList()))
                 .orElseThrow(() -> internalError("no bids on level "
                         + iLevel + " in tid " + conTour.getTid() + " cid " + cid));
         if (levelBids.size() == 1) {
             matchService.assignBidToMatch(
-                    conTour, lastMergeMid, levelBids.get(0).getBid(), batch);
+                    conTour, lastMergeMid.get(), levelBids.get(0).getBid(), batch);
         } else if (levelBids.size() > 1) {
             final PlayOffGenerator generator = castingLotsService.createPlayOffGen(
-                    batch, conTour, cid, consoleTagO(iLevel), finalLevel - 1, POff);
+                    batch, conTour, cid, consoleTagO(iLevel), finalLevel - 1,
+                    lastMergeMid.map(m -> POff).orElse(Gold));
             ladderBuilder.buildRanked(
-                    levelBids, Optional.of(lastMergeMid), finalLevel - 1, generator);
+                    levelBids, lastMergeMid, finalLevel - 1, generator);
         } else {
             throw internalError("empty level " + iLevel
                     + " in " + conTour.getTid() + " " + cid);

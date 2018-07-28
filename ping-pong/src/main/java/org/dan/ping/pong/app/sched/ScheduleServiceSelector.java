@@ -65,7 +65,7 @@ public class ScheduleServiceSelector implements ScheduleService {
         playingCats.forEach((cid, cat) -> {
             final long notCompleteMatches = cid2Matches.getOrDefault(cid, 0L);
             if (notCompleteMatches == 0) {
-                tournamentTerminator.endOfTournamentCategory(tournament, cid, batch);
+                tournamentTerminator.tryToEndOfTournamentCategory(tournament, cid, batch);
             }
         });
     }

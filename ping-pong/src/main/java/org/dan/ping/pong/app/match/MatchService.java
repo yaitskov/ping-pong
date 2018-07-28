@@ -313,7 +313,7 @@ public class MatchService implements MatchServiceIf {
         if (!isPyrrhic(winParticipant)) {
             enlistIf(tournament, winParticipant, mInfo, playOffRule, batch);
         }
-        tournamentTerminator.endOfTournamentCategory(tournament, mInfo.getCid(), batch);
+        tournamentTerminator.tryToEndOfTournamentCategory(tournament, mInfo.getCid(), batch);
     }
 
     private void enlistIf(TournamentMemState tournament, ParticipantMemState par,
@@ -398,7 +398,7 @@ public class MatchService implements MatchServiceIf {
                                 : Lost,
                         asList(Play, Wait, Quit, Lost, Rest), batch);
             }
-            tournamentTerminator.endOfTournamentCategory(tournament, iGru.getCid(), batch);
+            tournamentTerminator.tryToEndOfTournamentCategory(tournament, iGru.getCid(), batch);
         } else {
             throw internalError("Tournament " +
                     tournament.getTid() + " in category " + iGru.getCid()
@@ -527,7 +527,7 @@ public class MatchService implements MatchServiceIf {
             bidService.setBidState(participant,
                     stateF.apply(tournament.getRule().getPlayOff().get(), mInfo, participant),
                     singleton(participant.getBidState()), batch);
-            tournamentTerminator.endOfTournamentCategory(tournament, participant.getCid(), batch);
+            tournamentTerminator.tryToEndOfTournamentCategory(tournament, participant.getCid(), batch);
         }
     }
 
@@ -601,12 +601,12 @@ public class MatchService implements MatchServiceIf {
             case Brnz:
                 checkSinkMatch(mInfo);
                 bidService.setBidState(tournament.getBidOrQuit(winBid), Win3, asList(Play, Wait, Rest), batch);
-                tournamentTerminator.endOfTournamentCategory(tournament, mInfo.getCid(), batch);
+                tournamentTerminator.tryToEndOfTournamentCategory(tournament, mInfo.getCid(), batch);
                 break;
             case Gold:
                 checkSinkMatch(mInfo);
                 bidService.setBidState(tournament.getBidOrQuit(winBid), Win1, asList(Play, Wait, Rest), batch);
-                tournamentTerminator.endOfTournamentCategory(tournament, mInfo.getCid(), batch);
+                tournamentTerminator.tryToEndOfTournamentCategory(tournament, mInfo.getCid(), batch);
                 break;
             case POff:
                 mInfo.getWinnerMid()

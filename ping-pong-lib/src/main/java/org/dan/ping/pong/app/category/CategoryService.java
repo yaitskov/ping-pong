@@ -2,8 +2,7 @@ package org.dan.ping.pong.app.category;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-import static org.dan.ping.pong.app.match.MatchState.Over;
+import static org.dan.ping.pong.app.category.CategoryState.End;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import lombok.extern.slf4j.Slf4j;
@@ -14,12 +13,12 @@ import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
+import org.dan.ping.pong.app.tournament.console.ConsoleStrategy;
 import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -45,11 +44,11 @@ public class CategoryService {
         return createCategory(consoleTournament, categoryName, batch);
     }
 
-    public Set<Cid> findIncompleteCategories(TournamentMemState tournament) {
-        return tournament.getMatches().values().stream()
-                .filter(mInfo -> mInfo.getState() != Over)
-                .map(MatchInfo::getCid)
-                .collect(toSet());
+    public List<Cid> findIncompleteCategories(TournamentMemState tournament) {
+        return tournament.getCategories().values().stream()
+                .filter(c -> c.getState() != End)
+                .map(CategoryMemState::getCid)
+                .collect(toList());
     }
 
     public Stream<MatchInfo> findMatchesInCategoryStream(
@@ -118,5 +117,14 @@ public class CategoryService {
             catSt.setState(targetSt);
             categoryDao.setState(tid, catSt.getCid(), oldSt,  targetSt, batch);
         }
+    }
+
+    @Inject
+    private ConsoleStrategy consoleStrategy;
+
+    public void markComplete(TournamentMemState tournament, CategoryMemState cat, DbUpdater batch) {
+        setState(tournament.getTid(), cat, End, batch);
+        consoleStrategy.onPlayOffCategoryComplete(cat.getCid(), tournament, batch);
+
     }
 }

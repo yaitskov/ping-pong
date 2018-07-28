@@ -160,7 +160,7 @@ public class TableService {
                     + "Add tables to the place and schedule matches again.");
         }
         if (matches.isEmpty()) {
-            tournamentTerminator.endOfTournamentCategory(tournament, null, batch);
+            tournamentTerminator.completeAllOpenCategories(tournament, batch);
         }
         return tablesToAllocate;
     }

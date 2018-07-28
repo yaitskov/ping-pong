@@ -52,11 +52,7 @@ public class PlayOffLayeredCategoryPlayOffBuilder implements CategoryPlayOffBuil
     @Override
     public void build(TournamentMemState conTour, Cid coCid,
             List<ParticipantMemState> bids, DbUpdater batch) {
-        final Map<Integer, List<Bid>> bidsByLevels = findBidLevels(conTour, coCid);
-        final List<Integer> emptyLevels = bidsByLevels.entrySet().stream()
-                .filter(e -> e.getValue().isEmpty())
-                .map(Map.Entry::getKey).collect(toList());
-        emptyLevels.forEach(bidsByLevels::remove);
+        final Map<Integer, List<Bid>> bidsByLevels = compact(findBidLevels(conTour, coCid));
         final int maxLevel = bidsByLevels.keySet().stream().mapToInt(o -> o)
                 .max().orElseThrow(() -> internalError("no play off matches"));
         int finalLevel = roundAndFindLevels(bidsByLevels.get(1).size())
@@ -72,6 +68,14 @@ public class PlayOffLayeredCategoryPlayOffBuilder implements CategoryPlayOffBuil
         }
         attachLevel(conTour, coCid, batch, bidsByLevels,
                 finalLevel, lastMergeMid, 1);
+    }
+
+    private Map<Integer, List<Bid>> compact(Map<Integer, List<Bid>> bidsByLevels) {
+        final List<Integer> emptyLevels = bidsByLevels.entrySet().stream()
+                .filter(e -> e.getValue().isEmpty())
+                .map(Map.Entry::getKey).collect(toList());
+        emptyLevels.forEach(bidsByLevels::remove);
+        return makeKeysSequential(bidsByLevels);
     }
 
     public void attachLevel(TournamentMemState conTour, Cid cid, DbUpdater batch,
@@ -119,5 +123,18 @@ public class PlayOffLayeredCategoryPlayOffBuilder implements CategoryPlayOffBuil
                                 filtering(Optional::isPresent,
                                         mapping(Optional::get,
                                                 toList()))))));
+    }
+
+    private static <T> Map<Integer, T> makeKeysSequential(Map<Integer, T> m) {
+        final List<Integer> keys = m.keySet().stream().sorted().collect(toList());
+        int previousKey = 0;
+        int shift = 0;
+        for (int key : keys) {
+            int diff = key - previousKey - 1;
+            shift += diff;
+            previousKey = key - shift;
+            m.put(previousKey, m.remove(key));
+        }
+        return m;
     }
 }

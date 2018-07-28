@@ -724,23 +724,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                                                     pr -> pr.withLayerPolicy(
                                                             Optional.of(MergeLayers)))));
 
-                    final ImperativeSimulator console = master // master groups
-                            .scoreSet(p1, 11, p8, 7)
-                            .scoreSet(p2, 11, p7, 5)
-                            .scoreSet(p3, 11, p6, 3)
-                            .scoreSet(p4, 11, p5, 1)
-                            .reloadMatchMap()
-                            .scoreSet(p1, 11, p4, 3)
-                            .scoreSet(p2, 11, p3, 1)
-                            .reloadMatchMap()
-                            .scoreSet(p3, 11, p4, 7)
-
-                            .scoreSet(p1, 11, p2, 3)
-
-                            .checkResult(p1, p2, p3, p4, p8, p7, p6, p5)
-                            .checkTournamentComplete(
-                                    restState(Lost).bid(p3, Win3).bid(p2, Win2).bid(p1, Win1))
-                            .resolveCategories();
+                    final ImperativeSimulator console = masterPlay(master);
 
                     console.checkTournament(Open, restState(Play))
                             .scoreSet(p5, 11, p8, 3)
@@ -752,6 +736,60 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                                     restState(Lost).bid(p5, Win1).bid(p6, Win2));
                 });
     }
+
+    @Test
+    public void mergedLayeredConsoleForPlayOffP3() {
+        final TournamentScenario scenario = begin().name("mrgdLrdForPlayOffP3")
+                .rules(RULES_JP_S1A2G11_NP_3P)
+                .category(c1, p1, p2, p3, p4, p5, p6, p7, p8);
+        isf.create(scenario)
+                .run(master -> {
+                    master.beginTournament()
+                            .createConsoleTournament(ConOff)
+                            .updateConsoleRules(RULES_JP_S1A2G11_NP
+                                    .withCasting(
+                                            RULES_JP_S1A2G11_NP.getCasting()
+                                                    .withSplitPolicy(ConsoleLayered))
+                                    .withPlayOff(
+                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
+                                                    pr -> pr.withLayerPolicy(
+                                                            Optional.of(MergeLayers)))));
+
+                    final ImperativeSimulator console = masterPlay(master);
+
+                    console.checkTournament(Open, restState(Play).bid(p4, Wait))
+                            .scoreSet(p5, 11, p8, 3)
+                            .scoreSet(p6, 11, p7, 1)
+                            .reloadMatchMap()
+                            .scoreSet(p5, 11, p6, 1)
+                            .reloadMatchMap()
+                            .scoreSet(p4, 11, p5, 1)
+                            .checkResult(p4, p5, p6, p8, p7)
+                            .checkTournamentComplete(
+                                    restState(Lost).bid(p4, Win1).bid(p5, Win2));
+                });
+    }
+
+    private ImperativeSimulator masterPlay(ImperativeSimulator master) {
+        return master // master groups
+                .scoreSet(p1, 11, p8, 7)
+                .scoreSet(p2, 11, p7, 5)
+                .scoreSet(p3, 11, p6, 3)
+                .scoreSet(p4, 11, p5, 1)
+                .reloadMatchMap()
+                .scoreSet(p1, 11, p4, 3)
+                .scoreSet(p2, 11, p3, 1)
+                .reloadMatchMap()
+                .scoreSet(p3, 11, p4, 7)
+
+                .scoreSet(p1, 11, p2, 3)
+
+                .checkResult(p1, p2, p3, p4, p8, p7, p6, p5)
+                .checkTournamentComplete(
+                        restState(Lost).bid(p3, Win3).bid(p2, Win2).bid(p1, Win1))
+                .resolveCategories();
+    }
+
 
     // merged layered console for play off with semifinal looser (master tournament has 3rd place match)
     // merged layered console for play off with w3

@@ -1,6 +1,6 @@
 package org.dan.ping.pong.app.place;
 
-import static org.dan.ping.pong.app.place.PlaceCacheFactory.PLACE_CACHE;
+import static org.dan.ping.pong.app.place.PlaceMemState.PLACE_CACHE;
 
 import com.google.common.cache.LoadingCache;
 import lombok.SneakyThrows;

@@ -5,7 +5,7 @@ import static javax.ws.rs.core.Response.ok;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.app.match.MatchResource.TID_JP;
 import static org.dan.ping.pong.app.tournament.CreateTournament.ofImport;
-import static org.dan.ping.pong.app.tournament.TournamentService.TID;
+import static org.dan.ping.pong.app.tournament.TournamentMemState.TID;
 import static org.dan.ping.pong.app.tournament.marshaling.ContentDisposition.headerBody;
 
 import lombok.extern.slf4j.Slf4j;

@@ -108,6 +108,10 @@ public class ConsoleTournamentService {
                 masterTournament.setRule(masterTournament.getRule()
                         .withGroup(masterTournament.getRule().getGroup()
                                 .map(g -> g.withConsole(INDEPENDENT_RULES))));
+                masterTournament.getRule().getGroup().ifPresent(groupRules ->
+                        enlistPlayersFromCompleteGroups(masterTournament,
+                                tournamentCache.load(consoleTid),
+                                batch));
                 break;
             case ConOff:
                 masterTournament.setRule(masterTournament.getRule()
@@ -117,22 +121,19 @@ public class ConsoleTournamentService {
                                                 Optional.of(p.getConsoleParticipants()
                                                         .orElse(JustLosers)))
                                         .withConsole(INDEPENDENT_RULES))));
+                // enlist from complete ladders
                 break;
             default:
                 throw internalError("Type " + type + " not supported");
         }
-        tournamentDao.updateParams(masterTournament.getTid(), masterTournament.getRule(), batch);
-
-        masterTournament.getRule().getGroup().ifPresent(groupRules ->
-                enlistPlayersFromCompleteGroups(masterTournament,
-                        tournamentCache.load(consoleTid),
-                        batch));
+        tournamentDao.updateParams(
+                masterTournament.getTid(), masterTournament.getRule(), batch);
         tournamentRelations.invalidate(masterTournament.getTid());
-
         return consoleTid;
     }
 
-    private void validateCreation(TournamentMemState masterTournament, TournamentRelationType type) {
+    private void validateCreation(
+            TournamentMemState masterTournament, TournamentRelationType type) {
         if (masterTournament.getType() != Classic) {
             throw badRequest("Tournament " + masterTournament.getType()
                     + " does not support console tournaments");

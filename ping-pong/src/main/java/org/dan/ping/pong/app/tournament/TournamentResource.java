@@ -6,7 +6,7 @@ import static org.dan.ping.pong.app.category.CategoryResource.CID;
 import static org.dan.ping.pong.app.category.CategoryResource.CID_JP;
 import static org.dan.ping.pong.app.match.MatchResource.TID_JP;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_CACHE;
-import static org.dan.ping.pong.app.tournament.TournamentService.TID;
+import static org.dan.ping.pong.app.tournament.TournamentMemState.TID;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.forbidden;
 

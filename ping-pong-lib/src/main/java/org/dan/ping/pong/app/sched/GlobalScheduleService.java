@@ -1,15 +1,14 @@
 package org.dan.ping.pong.app.sched;
 
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
-import static org.dan.ping.pong.app.tournament.TournamentService.PLACE_IS_BUSY;
-import static org.dan.ping.pong.app.tournament.TournamentService.TID;
+import static org.dan.ping.pong.app.tournament.TournamentMemState.PLACE_IS_BUSY;
+import static org.dan.ping.pong.app.tournament.TournamentMemState.TID;
 import static org.dan.ping.pong.app.tournament.TournamentState.TERMINAL_STATE;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 
 import com.google.common.cache.LoadingCache;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.place.PlaceService;
 import org.dan.ping.pong.app.table.TableService;
 import org.dan.ping.pong.app.tournament.RelatedTids;
@@ -45,7 +44,7 @@ public class GlobalScheduleService implements ScheduleService {
     private boolean notParent(Tid busyTid, TournamentMemState tournament) {
         return !Optional.of(busyTid)
                 .equals(tournamentRelatedCache.get(tournament.getTid())
-                        .parentTid());
+                        .parentTidO());
     }
 
     @Override

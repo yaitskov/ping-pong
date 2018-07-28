@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Import;
         CastingLotsResource.class, ParticipantRankingService.class,
         CastingLotsRuleValidator.class, GroupDivider.class,
         GroupSizeCalculator.class, FlatCategoryPlayOffBuilder.class,
-        LayeredCategoryPlayOffBuilder.class,
+        GroupLayeredCategoryPlayOffBuilder.class,
+        PlayOffLayeredCategoryPlayOffBuilder.class,
         DispatchingCategoryPlayOffBuilder.class})
 public class CastingLotsCtx {
 }

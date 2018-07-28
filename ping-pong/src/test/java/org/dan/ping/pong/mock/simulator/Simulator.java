@@ -440,7 +440,7 @@ public class Simulator {
     }
 
     public void genCategories(TournamentScenario scenario, String prefix, Tid tid) {
-        int catId = 0;
+        int catId = 1;
         for (PlayerCategory category : scenario.getCategoryDbId().keySet()) {
             Cid cat = new Cid(++catId);
             daoGenerator.genCategory(prefix + " " + category, tid, cat);

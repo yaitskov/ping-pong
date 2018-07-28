@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.playoff;
 
+import static java.lang.Math.log;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -36,7 +37,6 @@ import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.RelatedTids;
 import org.dan.ping.pong.app.tournament.Tid;
-import org.dan.ping.pong.app.tournament.TidRelation;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentResultEntry;
 
@@ -54,6 +54,22 @@ import javax.inject.Named;
 
 @Slf4j
 public class PlayOffService {
+    public static int roundPlayOffBase(int bids) {
+        int places = 1;
+        while (places < bids) {
+            places *= 2;
+        }
+        return places;
+    }
+
+    public static int findLevels(int playOffStartPositions) {
+        return (int) (log(playOffStartPositions) / log(2));
+    }
+
+    public static int roundAndFindLevels(int bids) {
+        return findLevels(roundPlayOffBase(bids));
+    }
+
     public List<MatchInfo> findBaseMatches(TournamentMemState tournament,
             Cid cid, Optional<MatchTag> tag) {
         return findBaseMatches(findPlayOffMatches(tournament, cid, tag));
@@ -73,10 +89,9 @@ public class PlayOffService {
 
     public List<MatchInfo> findPlayOffMatches(
             TournamentMemState tournament, Cid cid, Optional<MatchTag> tag) {
-        return tournament.getMatches().values().stream()
-                .filter(matchInfo -> tag.map(t -> tag.equals(matchInfo.getTag())).orElse(true))
-                .filter(minfo -> minfo.getCid().equals(cid))
-                .filter(minfo -> !minfo.getGid().isPresent())
+        return tournament.findMatchesByCid(cid)
+                .filter(mInfo -> tag.map(t -> tag.equals(mInfo.getTag())).orElse(true))
+                .filter(mInfo -> !mInfo.getGid().isPresent())
                 .sorted(Comparator.comparing(MatchInfo::getMid))
                 .collect(toList());
     }
@@ -240,7 +255,7 @@ public class PlayOffService {
         return PlayOffMatches.builder()
                 .transitions(transitions)
                 .matches(matches)
-                .masterTid(relatedTids.parentTid())
+                .masterTid(relatedTids.parentTidO())
                 .consoleTid(ofNullable(relatedTids.getChildren().get(ConOff)))
                 .rootTaggedMatches(findRootMatches(tournament)
                         .values().stream()

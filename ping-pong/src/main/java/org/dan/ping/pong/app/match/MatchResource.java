@@ -4,7 +4,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
 import static org.dan.ping.pong.app.bid.BidResource.TID_SLASH_UID;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.BID;
-import static org.dan.ping.pong.app.tournament.TournamentService.TID;
+import static org.dan.ping.pong.app.tournament.TournamentMemState.TID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.auth.AuthService;

@@ -10,11 +10,13 @@ import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
+import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.ConsoleLayered;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.MasterOutcome;
 import static org.dan.ping.pong.app.group.ConsoleTournament.INDEPENDENT_RULES;
 import static org.dan.ping.pong.app.match.MatchResource.BID_PENDING_MATCHES;
 import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
 import static org.dan.ping.pong.app.playoff.ConsoleLayersPolicy.IndependentLayers;
+import static org.dan.ping.pong.app.playoff.ConsoleLayersPolicy.MergeLayers;
 import static org.dan.ping.pong.app.playoff.PlayOffGuests.AndWinner2;
 import static org.dan.ping.pong.app.playoff.PlayOffGuests.JustLosers;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing2;
@@ -25,7 +27,6 @@ import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G8Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP2_S1A2G11_NP;
-import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP2_S3A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_LC_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
@@ -652,8 +653,54 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 });
     }
 
+    @Test
+    public void mergedLayeredConsoleForPlayOffWithLosers() {
+        final TournamentScenario scenario = begin().name("mrgdLrdForPlayOff")
+                .rules(RULES_JP_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4, p5, p6, p7, p8);
+        isf.create(scenario)
+                .run(master -> {
+                    master.beginTournament()
+                            .createConsoleTournament(ConOff)
+                            .updateConsoleRules(RULES_JP_S1A2G11_NP
+                                    .withCasting(
+                                            RULES_JP_S1A2G11_NP.getCasting()
+                                                    .withSplitPolicy(ConsoleLayered))
+                                    .withPlayOff(
+                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
+                                                    pr -> pr.withLayerPolicy(
+                                                            Optional.of(MergeLayers)))));
 
-    // merged layered console for play off with losers
+                    final ImperativeSimulator console = master // master groups
+                            .scoreSet(p1, 11, p8, 7)
+                            .scoreSet(p2, 11, p7, 5)
+                            .scoreSet(p3, 11, p6, 3)
+                            .scoreSet(p4, 11, p5, 1)
+                            .reloadMatchMap()
+                            .scoreSet(p1, 11, p4, 3)
+                            .scoreSet(p2, 11, p3, 1)
+                            .reloadMatchMap()
+                            .scoreSet(p1, 11, p2, 3)
+
+                            .checkResult(p1, p2, p4, p3, p8, p7, p6, p5)
+                            .checkTournamentComplete(
+                                    restState(Lost).bid(p2, Win2).bid(p1, Win1))
+                            .resolveCategories();
+
+                    console.checkTournament(Open, restState(Play))
+                            .scoreSet(p5, 11, p8, 3)
+                            .scoreSet(p6, 11, p7, 1)
+                            .reloadMatchMap()
+                            .scoreSet(p5, 11, p6, 1)
+                            .scoreSet(p3, 11, p4, 7)
+                            .reloadMatchMap()
+                            .scoreSet(p3, 11, p5, 8)
+                            .checkResult(p3, p5, p6, p4, p8, p7)
+                            .checkTournamentComplete(
+                                    restState(Lost).bid(p5, Win2).bid(p3, Win1));
+                });
+    }
+
     // merged layered console for play off without semifinal looser
     // merged layered console for play off with semifinal looser (master tournament has 3rd place match)
     // merged layered console for play off with w3

@@ -28,6 +28,6 @@ public class TournamentAccessor extends SeqAccessor<Tid, TournamentMemState> {
     @Override
     @SneakyThrows
     protected Tid mapSyncKey(Tid key) {
-        return tournamentRelation.get(key).parentTid().orElse(key);
+        return tournamentRelation.get(key).parentTidO().orElse(key);
     }
 }

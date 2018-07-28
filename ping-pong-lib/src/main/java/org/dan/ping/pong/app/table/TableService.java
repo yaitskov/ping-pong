@@ -99,7 +99,7 @@ public class TableService {
     @SneakyThrows
     void freeTablesForCompleteMatches(TournamentMemState tournament, PlaceMemState place, DbUpdater batch) {
         final Set<Mid> parentMatches = tournamentRelatedCache.get(tournament.getTid())
-                .parentTid()
+                .parentTidO()
                 .map(ptid -> tournamentCache.load(ptid))
                 .map(parentTournament -> parentTournament.getMatches().keySet())
                 .orElseGet(Collections::emptySet);

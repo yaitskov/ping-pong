@@ -54,7 +54,11 @@ public class TournamentRules {
         return group.map(GroupRules::getConsole).orElse(NO) != NO;
     }
 
-    public GroupRules group() {
-        return group.orElseThrow(() -> internalError("tournament without groups"));
+    public GroupRules group(Tid tid) {
+        return group.orElseThrow(() -> internalError("tournament " + tid + " without groups"));
+    }
+
+    public PlayOffRule playOff(Tid tid) {
+        return playOff.orElseThrow(() -> internalError("tournament " + tid + " without playoff"));
     }
 }

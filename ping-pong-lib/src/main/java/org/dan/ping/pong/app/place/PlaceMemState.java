@@ -22,6 +22,7 @@ import java.util.Set;
 public class PlaceMemState {
     public static final String PID = "pid";
     public static final String NO_ADMIN_ACCESS_TO_PLACE = "no-admin-access-to-place";
+    public static final String PLACE_CACHE = "place-cache";
 
     private final Pid pid;
     private String name;

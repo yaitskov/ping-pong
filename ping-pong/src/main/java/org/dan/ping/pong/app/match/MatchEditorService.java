@@ -1,7 +1,7 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Collections.singleton;
-import static org.dan.ping.pong.app.bid.BidService.TERMINAL_RECOVERABLE_STATES;
+import static org.dan.ping.pong.app.bid.BidState.TERMINAL_RECOVERABLE_STATES;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Wait;

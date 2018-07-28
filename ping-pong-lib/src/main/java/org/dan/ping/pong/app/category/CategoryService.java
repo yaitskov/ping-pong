@@ -38,7 +38,7 @@ public class CategoryService {
     public Cid findCidOrCreate(TournamentMemState tournament, Cid masterCid,
             TournamentMemState consoleTournament, DbUpdater batch) {
         final String categoryName = tournament.getCategory(masterCid).getName();
-        final Optional<Cid> oCid = consoleTournament.findCidByName(categoryName);
+        final Optional<Cid> oCid = consoleTournament.findCidByNameO(categoryName);
         if (oCid.isPresent()) {
             return oCid.get();
         }

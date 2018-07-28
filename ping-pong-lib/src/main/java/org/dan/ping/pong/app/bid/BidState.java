@@ -1,7 +1,10 @@
 package org.dan.ping.pong.app.bid;
 
+import static java.util.Arrays.asList;
+
 import com.google.common.collect.ImmutableSet;
 
+import java.util.List;
 import java.util.Set;
 
 public enum BidState {
@@ -29,6 +32,10 @@ public enum BidState {
             return 1;
         }
     };
+    public static final Set<BidState> TERMINAL_RECOVERABLE_STATES
+            = ImmutableSet.of(Win1, Win2, Win3, Lost, Play);
+
+    public static final List<BidState> WIN_STATES = asList(Win1, Win2, Win3);
 
     public int score() {
         return 4;

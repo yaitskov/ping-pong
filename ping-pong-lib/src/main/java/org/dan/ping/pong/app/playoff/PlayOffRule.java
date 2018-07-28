@@ -1,7 +1,9 @@
 package org.dan.ping.pong.app.playoff;
 
 import static org.dan.ping.pong.app.group.ConsoleTournament.NO;
+import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,6 +38,11 @@ public class PlayOffRule {
     @JsonProperty("lrPol")
     private Optional<ConsoleLayersPolicy> layerPolicy = Optional.empty();
 
+    @JsonIgnore
+    public boolean is3rdPlaceMatch() {
+        return thirdPlaceMatch == 1;
+    }
+
     public static final PlayOffRule L1_3P = PlayOffRule.builder()
             .losings(1)
             .thirdPlaceMatch(1)
@@ -56,5 +63,9 @@ public class PlayOffRule {
         ConsoleTournament console = NO;
         Optional<PlayOffGuests> consoleParticipants = Optional.empty();
         Optional<ConsoleLayersPolicy> layerPolicy = Optional.empty();
+    }
+
+    public PlayOffGuests consoleParticipants() {
+        return consoleParticipants.orElseThrow(() -> internalError("no console participants"));
     }
 }

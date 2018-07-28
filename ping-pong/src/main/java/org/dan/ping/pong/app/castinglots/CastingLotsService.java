@@ -1,5 +1,7 @@
 package org.dan.ping.pong.app.castinglots;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -9,13 +11,17 @@ import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.castinglots.FlatCategoryPlayOffBuilder.validateBidsNumberInACategory;
-import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.FIRST_PLAY_OFF_MATCH_LEVEL;
-import static org.dan.ping.pong.app.match.MatchService.roundPlayOffBase;
+import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.MID0;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
+import static org.dan.ping.pong.app.match.MatchType.Gold;
+import static org.dan.ping.pong.app.match.MatchType.POff;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.L1_3P;
+import static org.dan.ping.pong.app.playoff.PlayOffService.findLevels;
+import static org.dan.ping.pong.app.playoff.PlayOffService.roundPlayOffBase;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
+import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +38,10 @@ import org.dan.ping.pong.app.group.PlayOffMatcherFromGroup;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
+import org.dan.ping.pong.app.match.MatchTag;
+import org.dan.ping.pong.app.match.MatchType;
 import org.dan.ping.pong.app.match.Mid;
+import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sched.ScheduleServiceSelector;
 import org.dan.ping.pong.app.tournament.DbUpdaterFactory;
@@ -164,7 +173,7 @@ public class CastingLotsService {
         }
         final int playOffStartPositions = roundPlayOffBase(bidsByGroups.size() * quits);
         if (playOffStartPositions > 1) {
-            castingLotsDao.generatePlayOffMatches(batch, tournament, cid,
+            generatePlayOffMatches(batch, tournament, cid,
                     playOffStartPositions, basePlayOffPriority + 1);
         }
     }
@@ -231,11 +240,11 @@ public class CastingLotsService {
         final int quits = tournament.getRule().getGroup().get().getQuits();
         final int quittersForRealGroups = tournament.getGroupsByCategory(cid).size() * quits;
         final int roundedQuitters = roundPlayOffBase(quittersForRealGroups);
-        castingLotsDao.generatePlayOffMatches(batch, tournament, cid,
+        generatePlayOffMatches(batch, tournament, cid,
                 roundedQuitters, basePriority);
         if (quittersForRealGroups < roundedQuitters) {
             final List<MatchInfo> playOffMatches = playOffService.findMatchesByLevelAndCid(
-                    FIRST_PLAY_OFF_MATCH_LEVEL, cid,
+                    1, cid,
                     tournament.getMatches().values().stream())
                     .sorted(Comparator.comparing(MatchInfo::getMid))
                     .collect(toList());
@@ -254,7 +263,8 @@ public class CastingLotsService {
         }
     }
 
-    private int removePlayOffMatchesInCategory(TournamentMemState tournament, Cid cid, DbUpdater batch) {
+    private int removePlayOffMatchesInCategory(
+            TournamentMemState tournament, Cid cid, DbUpdater batch) {
         log.info("Remove play of matches in category {}", cid);
         final List<MatchInfo> matchesToBeRemoved = tournament
                 .getMatches().values().stream()
@@ -265,7 +275,10 @@ public class CastingLotsService {
                 .map(MatchInfo::getMid).collect(toSet());
         filterMatches(tournament, midsForRemoval);
         matchDao.deleteByIds(tournament.getTid(), midsForRemoval, batch);
-        return matchesToBeRemoved.stream().map(MatchInfo::getPriority).min(Integer::compare).orElse(0);
+        return matchesToBeRemoved.stream()
+                .map(MatchInfo::getPriority)
+                .min(Integer::compare)
+                .orElse(0);
     }
 
     @Inject
@@ -277,5 +290,59 @@ public class CastingLotsService {
                 .stream()
                 .filter(m -> !midsForRemoval.contains(m.getMid()))
                 .collect(toMap(MatchInfo::getMid, m -> m)));
+    }
+
+    public Mid generatePlayOffMatches(DbUpdater batch, TournamentMemState tInfo, Cid cid,
+            int playOffStartPositions, int basePlayOffPriority) {
+        final PlayOffGenerator generator = createPlayOffGen(
+                batch, tInfo, cid, empty(), 0, Gold);
+        return generatePlayOffMatches(generator, playOffStartPositions,
+                basePlayOffPriority, empty(), 0);
+    }
+
+    public Mid generatePlayOffMatches(PlayOffGenerator generator,
+            int playOffStartPositions, int basePlayOffPriority,
+            Optional<Mid> parentMid, int baseLevel) {
+        final Tid tid = generator.getTournament().getTid();
+        log.info("Generate play off matches for {} bids in tid {}",
+                playOffStartPositions, tid);
+        if (playOffStartPositions == 1) {
+            log.info("Tournament {}:{} will be without play off",
+                    tid, generator.getCid());
+            return MID0;
+        } else {
+            checkArgument(playOffStartPositions > 0, "not enough groups %s",
+                    playOffStartPositions);
+            checkArgument(playOffStartPositions % 2 == 0, "odd number groups %s",
+                    playOffStartPositions);
+        }
+        final int levels = findLevels(playOffStartPositions) + baseLevel;
+        final int lowestPriority = basePlayOffPriority + levels;
+        final PlayOffRule playOffRule = generator.getTournament().getRule().getPlayOff()
+                .orElseThrow(() -> internalError("no play off rule in " + tid));
+        switch (playOffRule.getLosings()) {
+            case 1:
+                return generator.generateTree(levels, parentMid, lowestPriority,
+                        TypeChain.of(generator.getGoldType(), POff), empty()).get();
+            case 2:
+                return generator.generate2LossTree(2 * levels, lowestPriority, parentMid).get();
+            default:
+                throw internalError("unsupported number of losings "
+                        + playOffRule.getLosings() + " in " + tid + " ");
+        }
+    }
+
+    public PlayOffGenerator createPlayOffGen(DbUpdater batch, TournamentMemState tInfo,
+            Cid cid, Optional<MatchTag> tag, int baseLevel,
+            MatchType goldType) {
+        return PlayOffGenerator.builder()
+                .tournament(tInfo)
+                .cid(cid)
+                .batch(batch)
+                .matchService(matchService)
+                .goldType(goldType)
+                .tag(tag)
+                .finalLevel(1 + baseLevel)
+                .build();
     }
 }

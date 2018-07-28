@@ -20,7 +20,6 @@ import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.ConsoleLayered;
 import static org.dan.ping.pong.app.category.CategoryService.groupByCategories;
 import static org.dan.ping.pong.app.category.CategoryState.Drt;
-import static org.dan.ping.pong.app.category.CategoryState.End;
 import static org.dan.ping.pong.app.category.CategoryState.Ply;
 import static org.dan.ping.pong.app.group.ConsoleTournament.NO;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
@@ -99,8 +98,6 @@ public class TournamentService {
     private static final ImmutableSet<TournamentState> CONFIGURABLE_STATES = EDITABLE_STATES;
     private static final int DAYS_TO_SHOW_COMPLETE_BIDS = 30;
     public static final String UNKNOWN_PLACE = "unknown place";
-    public static final String TID = "tid";
-    public static final String PLACE_IS_BUSY = "place-is-busy";
     private static final List<BidState> VALID_ENLIST_BID_STATES = asList(Want, Paid, Here);
     public static final PlayOffResultEntries EMPTY_PLAYOFF = PlayOffResultEntries.builder().entries(emptyList()).build();
 
@@ -154,7 +151,7 @@ public class TournamentService {
     private PiPoEx notDraftError(TournamentMemState tournament) {
         return badRequest("tournament-not-in-draft",
                 ImmutableMap.of(STATE, tournament.getState(),
-                        TID, tournament.getTid()));
+                        TournamentMemState.TID, tournament.getTid()));
     }
 
     private void validateEnlist(TournamentMemState tournament, Enlist enlist, Uid uid) {
@@ -171,14 +168,14 @@ public class TournamentService {
         if (casting.getPolicy() == ParticipantRankingPolicy.ProvidedRating) {
             final int rank = enlist.getProvidedRank()
                     .orElseThrow(() -> badRequest("Ranking is required in",
-                            TID, tournament.getTid()));
+                            TournamentMemState.TID, tournament.getTid()));
             casting.getProvidedRankOptions()
                     .orElseThrow(() -> internalError("no rank options"))
                     .validate(rank);
         } else {
             if (enlist.getProvidedRank().isPresent()) {
                 throw badRequest("Provided ranking is not used",
-                        TID, tournament.getTid());
+                        TournamentMemState.TID, tournament.getTid());
             }
         }
     }
@@ -510,7 +507,7 @@ public class TournamentService {
         validateRulesWithTournament(tournament, parameters.getRules());
         if (!CONFIGURABLE_STATES.contains(tournament.getState())) {
             throw badRequest("Tournament cannot be modified in state",
-                    ImmutableMap.of(TID, tournament.getTid(),
+                    ImmutableMap.of(TournamentMemState.TID, tournament.getTid(),
                             "state", tournament.getState()));
         }
         final TournamentRules rules = parameters.getRules();

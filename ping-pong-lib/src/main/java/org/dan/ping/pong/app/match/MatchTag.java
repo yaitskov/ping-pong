@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Optional;
+
 @Getter
 @Setter
 @Builder
@@ -19,6 +21,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor(access = PRIVATE)
 public class MatchTag {
+    public static final String MERGE_CONSOLE_LEVELS = "M";
     public static final String CONSOLE_LEVEL = "L";
     public static final String DISAMBIGUATION = "D";
     public static final String ORIGIN = "O";
@@ -46,5 +49,18 @@ public class MatchTag {
                 .prefix(s.substring(0, 1))
                 .number(Integer.parseInt(s.substring(1)))
                 .build();
+    }
+
+    public static Optional<MatchTag> consoleTagO(int level) {
+        return Optional.of(matchTag(level, CONSOLE_LEVEL));
+    }
+
+    private static MatchTag matchTag(int level, String prefix) {
+        return builder().prefix(prefix)
+                .number(level).build();
+    }
+
+    public static Optional<MatchTag> mergeTagO(int level) {
+        return Optional.of(matchTag(level, MERGE_CONSOLE_LEVELS));
     }
 }

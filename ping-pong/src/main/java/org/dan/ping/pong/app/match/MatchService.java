@@ -9,7 +9,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
-import static org.dan.ping.pong.app.bid.BidService.WIN_STATES;
+import static org.dan.ping.pong.app.bid.BidState.WIN_STATES;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
@@ -29,6 +29,7 @@ import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
 import static org.dan.ping.pong.app.match.MatchType.Grup;
 import static org.dan.ping.pong.app.place.ArenaDistributionPolicy.NO;
+import static org.dan.ping.pong.app.playoff.PlayOffService.roundPlayOffBase;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.app.tournament.SetScoreResultName.MatchContinues;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
@@ -48,6 +49,7 @@ import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
@@ -82,6 +84,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -92,7 +95,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 @Slf4j
-public class MatchService {
+public class MatchService implements MatchServiceIf {
     private static final Comparator<MatchInfo> PARTICIPANT_MATCH_COMPARATOR = Comparator
             .comparing(MatchInfo::getState).reversed()
             .thenComparing(MatchInfo::getPriority)
@@ -116,14 +119,6 @@ public class MatchService {
 
     @Inject
     private Clocker clocker;
-
-    public static int roundPlayOffBase(int bids) {
-        int places = 1;
-        while (places < bids) {
-            places *= 2;
-        }
-        return places;
-    }
 
     @Inject
     private ScheduleServiceSelector scheduleService;
@@ -513,7 +508,8 @@ public class MatchService {
                 || quitOrExpl.contains(bid.state());
     }
 
-    private void nextMatch(MatchInfo mInfo, TournamentMemState tournament, DbUpdater batch, Bid bid) {
+    private void nextMatch(
+            MatchInfo mInfo, TournamentMemState tournament, DbUpdater batch, Bid bid) {
         if (mInfo.hasParticipant(bid)) {
             bidRewalksLadder(tournament, mInfo, batch, bid);
         } else {
@@ -963,5 +959,33 @@ public class MatchService {
                 .filter(m -> m.hasParticipant(bid1) && m.hasParticipant(bid2))
                 .map(MatchInfo::getMid)
                 .collect(toList());
+    }
+
+    public Mid createPlayOffMatch(TournamentMemState tournament, Cid cid,
+            Optional<Mid> winMid, Optional<Mid> loserMid,
+            int priority, int level, MatchType type,
+            Optional<MatchTag> oTag, DbUpdater batch) {
+        final Mid mid = tournament.getNextMatch().next();
+
+        matchDao.createPlayOffMatch(
+                batch, mid, tournament.getTid(), cid, winMid, loserMid,
+                priority, level, type, oTag, Draft);
+        tournament.getMatches().put(mid, MatchInfo.builder()
+                .tid(tournament.getTid())
+                .mid(mid)
+                .state(MatchState.Draft)
+                .priority(priority)
+                .level(level)
+                .gid(Optional.empty())
+                .participantIdScore(new HashMap<>())
+                .type(type)
+                .tag(oTag)
+                .winnerMid(winMid)
+                .loserMid(loserMid)
+                .cid(cid)
+                .build());
+        log.info("playoff {} mid {} of tid {} in cid {}",
+                type, mid, tournament.getTid(), cid);
+        return mid;
     }
 }

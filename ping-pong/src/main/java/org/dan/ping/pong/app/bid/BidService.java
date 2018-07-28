@@ -10,13 +10,9 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.dan.ping.pong.app.bid.BidState.Here;
-import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Want;
-import static org.dan.ping.pong.app.bid.BidState.Win1;
-import static org.dan.ping.pong.app.bid.BidState.Win2;
-import static org.dan.ping.pong.app.bid.BidState.Win3;
 import static org.dan.ping.pong.app.match.MatchState.INCOMPLETE_MATCH_STATES;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.tournament.EnlistPolicy.MULTIPLE_CATEGORY_ENLISTMENT;
@@ -26,7 +22,6 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
 import org.dan.ping.pong.app.category.Cid;
@@ -58,10 +53,6 @@ import javax.inject.Inject;
 
 @Slf4j
 public class BidService {
-    public static final List<BidState> WIN_STATES = asList(Win1, Win2, Win3);
-    public static final Set<BidState> TERMINAL_RECOVERABLE_STATES
-            = ImmutableSet.of(Win1, Win2, Win3, Lost, Play);
-
     @Inject
     private BidDao bidDao;
 

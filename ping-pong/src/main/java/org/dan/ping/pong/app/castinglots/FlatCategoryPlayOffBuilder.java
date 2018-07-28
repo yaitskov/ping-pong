@@ -5,7 +5,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.PLAY_OFF_SEEDS;
-import static org.dan.ping.pong.app.match.MatchService.roundPlayOffBase;
+import static org.dan.ping.pong.app.playoff.PlayOffService.roundPlayOffBase;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
@@ -17,6 +17,8 @@ import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.match.MatchTag;
+import org.dan.ping.pong.app.match.MatchType;
+import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
@@ -31,7 +33,7 @@ import javax.inject.Inject;
 @Slf4j
 public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
     @Inject
-    private CastingLotsDao castingLotsDao;
+    private CastingLotsService castingLotsService;
 
     @Inject
     private ParticipantRankingService rankingService;
@@ -39,11 +41,19 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
     @Override
     public void build(TournamentMemState tournament, Cid cid,
             List<ParticipantMemState> bids, DbUpdater batch) {
-        log.info("Flat casting in tournament {} in cid {}", tournament.getTid(), cid);
+        final PlayOffGenerator generator = castingLotsService.createPlayOffGen(
+                batch, tournament, cid, Optional.empty(), 0, MatchType.Gold);
+        buildRanked(bids, Optional.empty(), 0, generator);
+    }
+
+    public Optional<Mid> buildRanked(List<ParticipantMemState> bids,
+            Optional<Mid> mergeMid, int baseLevel, PlayOffGenerator generator) {
+        log.info("Flat casting in tournament {} in cid {}",
+                generator.getTournament().getTid(), generator.getCid());
         validateBidsNumberInACategory(bids);
         final List<ParticipantMemState> orderedBids = rankingService.sort(bids,
-                tournament.getRule().getCasting(), tournament);
-        build(tournament, cid, orderedBids, batch, Optional.empty());
+                generator.getTournament().getRule().getCasting(), generator.getTournament());
+        return build(orderedBids, mergeMid, baseLevel, generator);
     }
 
     @Inject
@@ -60,15 +70,22 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
         return true;
     }
 
-    public void build(TournamentMemState tournament, Cid cid,
-            List<ParticipantMemState> orderedBids, DbUpdater batch, Optional<MatchTag> tag) {
+    public Optional<Mid> build(List<ParticipantMemState> orderedBids,
+            Optional<Mid> mergeMid, int baseLevel,
+            PlayOffGenerator generator) {
         validateBidsNumberInACategory(orderedBids);
-        if (oneParticipantInCategory(tournament, cid, orderedBids, batch, tag)) {
-            return;
+        if (oneParticipantInCategory(generator.getTournament(), generator.getCid(),
+                orderedBids, generator.getBatch(), generator.getTag())) {
+            return Optional.empty();
         }
-        final int basePositions = roundPlayOffBase(orderedBids.size());
-        castingLotsDao.generatePlayOffMatches(batch, tournament, cid, basePositions, 1, tag);
-        assignBidsToBaseMatches(cid, basePositions, orderedBids, tournament, batch, tag);
+        final int roundedBasePositions = roundPlayOffBase(orderedBids.size());
+        final Mid subRootMid = castingLotsService.generatePlayOffMatches(
+                generator, roundedBasePositions, 1, mergeMid, baseLevel);
+        assignBidsToBaseMatches(
+                generator.getCid(), roundedBasePositions, orderedBids,
+                generator.getTournament(), generator.getBatch(),
+                generator.getTag());
+        return Optional.of(subRootMid);
     }
 
     @Inject
@@ -108,10 +125,12 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
                     strongBid.getBid(), batch);
 
             if (iWeakBid >= orderedBids.size()) {
-                matchService.assignBidToMatch(tournament, match.getMid(), FILLER_LOSER_BID, batch);
+                matchService.assignBidToMatch(
+                        tournament, match.getMid(), FILLER_LOSER_BID, batch);
             } else {
                 final ParticipantMemState weakBid = orderedBids.get(iWeakBid);
-                matchService.assignBidToMatch(tournament, match.getMid(), weakBid.getBid(), batch);
+                matchService.assignBidToMatch(
+                        tournament, match.getMid(), weakBid.getBid(), batch);
             }
         }
     }

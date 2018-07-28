@@ -40,6 +40,7 @@ import org.dan.ping.pong.app.category.CategoryMemState;
 import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupInfo;
+import org.dan.ping.pong.app.group.GroupRules;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.Mid;
 import org.dan.ping.pong.app.match.dispute.DisputeMemState;
@@ -47,6 +48,7 @@ import org.dan.ping.pong.app.match.rule.OrderRuleName;
 import org.dan.ping.pong.app.match.rule.rules.GroupOrderRule;
 import org.dan.ping.pong.app.match.rule.rules.meta.UseDisambiguationMatchesDirective;
 import org.dan.ping.pong.app.place.Pid;
+import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.playoff.PowerRange;
 import org.dan.ping.pong.app.sport.MatchRules;
 import org.dan.ping.pong.app.sport.SportType;
@@ -74,6 +76,7 @@ public class TournamentMemState {
     public static final String EXPECTED_TOURNAMENT_STATE = "expected_state";
     public static final String TOURNAMENT_STATE = "state";
     public static final String TID = "tid";
+    public static final String PLACE_IS_BUSY = "place-is-busy";
 
     private SportType sport;
     private Tid tid;
@@ -142,7 +145,12 @@ public class TournamentMemState {
     }
 
     public ParticipantMemState getBid(Bid bid) {
-        return participants.get(bid);
+        final ParticipantMemState result = participants.get(bid);
+        if (result == null) {
+            throw internalError("User " + bid
+                    + " does participate in the tournament " + tid);
+        }
+        return result;
     }
 
     public ParticipantMemState getBidOrQuit(Bid uid) {
@@ -223,11 +231,13 @@ public class TournamentMemState {
         return ouid.map(uid -> isAdminOf(uid) ? Admin : Spectator).orElse(Spectator);
     }
 
-    public RewardRules rewards() {
-        return getRule().getRewards().orElse(RewardRules.defaultRewards);
+    public Cid findCidByName(CategoryMemState state) {
+        return findCidByNameO(state.getName()).orElseThrow(
+                () -> internalError("tournament " + tid + " has no category ["
+                        + state.getName()));
     }
 
-    public Optional<Cid> findCidByName(String name) {
+    public Optional<Cid> findCidByNameO(String name) {
         return categories.values().stream()
                 .filter(category -> category.getName().equals(name))
                 .findAny()
@@ -265,7 +275,15 @@ public class TournamentMemState {
     }
 
     public List<GroupOrderRule> orderRules() {
-        return rule.group().getOrderRules();
+        return rule.group(tid).getOrderRules();
+    }
+
+    public GroupRules groupRules() {
+        return rule.group(tid);
+    }
+
+    public PlayOffRule playOffRules() {
+        return rule.playOff(tid);
     }
 
     public List<MatchInfo> findGroupMatchesByCategory(Cid cid) {

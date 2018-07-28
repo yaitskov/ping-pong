@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.castinglots.rank;
 
 import static java.util.Comparator.comparing;
-import static java.util.Comparator.comparingInt;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -72,7 +71,7 @@ public class ParticipantRankingService {
                     + " is " + tournament.getType());
         }
         final RelatedTids relatedTids = tournamentRelationCache.get(tournament.getTid());
-        final Tid masterTid = relatedTids.parentTid()
+        final Tid masterTid = relatedTids.parentTidO()
                 .orElseThrow(() -> internalError("tid "
                         + tournament.getTid() + " has no master tournament"));
 

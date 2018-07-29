@@ -35,6 +35,7 @@ import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_JP_S1A
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_LC_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
+import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.ConGru;
 import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.ConOff;
 import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
@@ -956,7 +957,42 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 });
     }
 
-    // merged layered console for group with JL
+    @Test
+    public void consoleGroupAsOneGroup() {
+        final TournamentScenario scenario = begin().name("conGroupAs1G")
+                .rules(RULES_G3Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4, p5);
+        isf.create(scenario)
+                .run(master -> {
+                    master.beginTournament()
+                            .createConsoleTournament(ConGru)
+                            .updateConsoleRules(RULES_G_S1A2G11_NP);
+
+                    final ImperativeSimulator console = master
+                            .scoreSet(p1, 11, p2, 3)
+                            .scoreSet(p1, 11, p3, 4)
+                            .scoreSet(p2, 11, p3, 5)
+
+                            .scoreSet(p4, 11, p5, 9)
+
+                            .reloadMatchMap()
+                            .scoreSet(p1, 11, p4, 5)
+                            .checkResult(p1, p4, p2, p5, p3)
+                            .checkTournamentComplete(
+                                    restState(Lost).bid(p1, Win1).bid(p4, Win2))
+                            .resolveCategories();
+
+                    console.checkTournament(Open, restState(Play))
+                            .scoreSet(p2, 11, p3, 5)
+                            .scoreSet(p2, 11, p5, 7)
+                            .scoreSet(p3, 11, p5, 8)
+                            .checkResult(p2, p3, p5)
+                            .checkTournamentComplete(restState(Lost).bid(p2, Win1));
+                });
+    }
+
+    // console group as group with group and play off
+
     // merged layered console for group with w3
     // merged layered console for group with w2
     // merged layered console for group with w1

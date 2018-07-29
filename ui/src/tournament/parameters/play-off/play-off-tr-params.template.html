@@ -32,11 +32,11 @@
                        label="Console guests"
                        ng-model="$ctrl.rules.playOff.conParts"/>
   <many-button-toggler ng-show="$ctrl.tournament.master.type == 'ConOff' && ($ctrl.rules.casting.splitPolicy != 'cl' || $ctrl.rules.playOff.lrPol == 'ml')"
-                       domain="['JL', 'LUTS', 'AHF', 'AW3', 'AW2', 'AW1']"
+                       domain="['JL', 'LUTS', 'AW3', 'AW2', 'AW1']"
                        label="Console guests"
                        ng-model="$ctrl.rules.playOff.conParts"/>
   <many-button-toggler ng-show="$ctrl.tournament.master.type == 'ConOff' && $ctrl.rules.playOff.lrPol == 'il')"
-                       domain="['JL', 'LUTS', 'AHF']"
+                       domain="['JL', 'LUTS', 'AW3']"
                        label="Console guests"
                        ng-model="$ctrl.rules.playOff.conParts"/>
   <div class="form-group toggle-btn" id="play-off-match-rules-toggler">

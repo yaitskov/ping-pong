@@ -1,6 +1,7 @@
 package org.dan.ping.pong.app.tournament;
 
 import static org.dan.ping.pong.app.category.CategoryState.Ply;
+import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.tournament.TournamentState.Close;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
@@ -40,8 +41,12 @@ public class TournamentTerminator {
                     + " in tid " + tournament.getTid()
                     + " not in play but " + cat.getState());
         }
-        categoryService.markComplete(tournament, cat, batch);
         final Tid tid = tournament.getTid();
+        if (tournament.findMatchesByCid(cid).anyMatch(m -> m.getState() != Over)) {
+            log.info("Cid {} in tid {} still has open matches", cid, tid);
+            return;
+        }
+        categoryService.markComplete(tournament, cat, batch);
         log.info("Tid {} complete in cid {}", tid, cid);
         final List<Cid> incompleteCids = categoryService.findIncompleteCategories(tournament);
         if (incompleteCids.isEmpty()) {

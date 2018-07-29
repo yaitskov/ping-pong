@@ -218,7 +218,7 @@ public class MatchInfo {
                         ImmutableMap.of(BID, bid, MID, mid)));
     }
 
-    public Optional<Bid> getOpponentBid() {
+    public Optional<Bid> loserBid() {
         return winnerId.flatMap(this::getOpponentBid);
     }
 

@@ -298,7 +298,8 @@ public class TournamentService {
         }
     }
 
-    private void setState(TournamentMemState tournament, TournamentState targetSt, DbUpdater batch) {
+    private void setState(
+            TournamentMemState tournament, TournamentState targetSt, DbUpdater batch) {
         tournament.setState(targetSt);
         tournamentDao.setState(tournament, batch);
     }
@@ -338,7 +339,9 @@ public class TournamentService {
                                         .stream()
                                         .collect(toMap(
                                                 Map.Entry::getKey,
-                                                e -> tournament.getParticipant(e.getValue()).getBidState())))
+                                                e -> tournament
+                                                        .getParticipant(e.getValue())
+                                                        .getBidState())))
                                 .orElse(emptyMap()))
                         .iAmAdmin(userId.filter(tournament::isAdminOf).isPresent())
                         .rules(tournament.getRule())

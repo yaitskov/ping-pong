@@ -791,7 +791,6 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 .resolveCategories();
     }
 
-    // merged layered console for play off with w3
     @Test
     public void mergedLayeredConsoleForPlayOffW3() {
         final TournamentScenario scenario = begin().name("mrgdLrdForPlayOffW3")

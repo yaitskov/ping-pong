@@ -31,15 +31,6 @@ public enum PlayOffGuests {
         }
     },
     /**
-     * Losers from semifinals
-     */
-    @JsonProperty("AHF")
-    AndHalfFinal {
-        public boolean bidStateForConsole(BidState state, MatchType mt) {
-            return state == Lost || state == Win3;
-        }
-    }, // participants fighting for 3 and 4 places
-    /**
      * losers and Win3 (have sense for group)
      */
     @JsonProperty("AW3")

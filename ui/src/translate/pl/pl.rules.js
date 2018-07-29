@@ -12,7 +12,6 @@ module.exports = {
     'Console guests': 'UczestnikiGości poczieszenia',
     'Console guests-JL': 'Tylko przegrani',
     'Console guests-LUTS': 'Przegrani do półfinału',
-    'Console guests-AHF': 'Przegrani do finału',
     'Console guests-AW3': 'Loosers and 3rd place',
     'Console guests-AW2': 'Loosers and 2nd and 3rd places',
     'Console guests-AW1': 'Loosers and 1, 2, and 3rd place'

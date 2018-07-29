@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
+import static org.dan.ping.pong.app.group.GroupInfo.groupOf;
 import static org.dan.ping.pong.app.group.GroupSchedule.DEFAULT_SCHEDULE;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.Pending;
 import static org.dan.ping.pong.app.group.ParticipantMatchState.Run;
@@ -37,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.category.SelectedCid;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchParticipants;
@@ -367,17 +369,17 @@ public class GroupService {
     @Inject
     private GroupDao groupDao;
 
-    public Gid createGroup(TournamentMemState tournament, Cid cid, DbUpdater batch) {
-        final Gid gid = tournament.getNextGroup().next();
+    public Gid createGroup(SelectedCid sCid) {
+        final TournamentMemState tournament = sCid.tournament();
+        final Gid gid = sCid.tournament().getNextGroup().next();
         final String label = sortToLabel(gid);
-        final int ordNumber = (int) tournament.findGroupsByCategory(cid).count();
-        groupDao.createGroup(gid, batch,
-                tournament.getTid(), cid, label,
+        final int ordNumber = (int) tournament.findGroupsByCategory(sCid.cid()).count();
+        groupDao.createGroup(gid, sCid.batch(),
+                 tournament.getTid(), sCid.cid(), label,
                 tournament.getRule().getGroup().get().getQuits(), ordNumber);
         log.info("New group {}/{} is created in tid/cid {}/{}",
-                gid, label, tournament.getTid(), cid);
-        tournament.getGroups().put(gid, GroupInfo.builder().gid(gid).cid(cid)
-                .ordNumber(ordNumber).label(label).build());
+                gid, label, tournament.getTid(), sCid.cid());
+        tournament.getGroups().put(gid, groupOf(gid, sCid.cid(), ordNumber, label));
         return gid;
     }
 

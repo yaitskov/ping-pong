@@ -35,6 +35,7 @@ import lombok.Setter;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
+import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.category.CategoryLink;
 import org.dan.ping.pong.app.category.CategoryMemState;
 import org.dan.ping.pong.app.category.Cid;
@@ -380,5 +381,9 @@ public class TournamentMemState {
 
     public List<ParticipantMemState> findBidsByGroup(Gid gid) {
         return groupBids(of(gid)).collect(toList());
+    }
+
+    public CastingLotsRule casting() {
+        return rule.getCasting();
     }
 }

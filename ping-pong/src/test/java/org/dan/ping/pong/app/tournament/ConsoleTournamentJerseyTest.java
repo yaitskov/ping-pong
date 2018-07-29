@@ -18,6 +18,7 @@ import static org.dan.ping.pong.app.match.MatchResource.OPEN_MATCHES_FOR_JUDGE;
 import static org.dan.ping.pong.app.playoff.ConsoleLayersPolicy.IndependentLayers;
 import static org.dan.ping.pong.app.playoff.ConsoleLayersPolicy.MergeLayers;
 import static org.dan.ping.pong.app.playoff.PlayOffGuests.AndWinner2;
+import static org.dan.ping.pong.app.playoff.PlayOffGuests.AndWinner3;
 import static org.dan.ping.pong.app.playoff.PlayOffGuests.JustLosers;
 import static org.dan.ping.pong.app.playoff.PlayOffGuests.LosersUpToSemifinals;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing2;
@@ -790,9 +791,46 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 .resolveCategories();
     }
 
-
-    // merged layered console for play off with semifinal looser (master tournament has 3rd place match)
     // merged layered console for play off with w3
+    @Test
+    public void mergedLayeredConsoleForPlayOffW3() {
+        final TournamentScenario scenario = begin().name("mrgdLrdForPlayOffW3")
+                .rules(RULES_JP_S1A2G11_NP_3P.withPlayOff(
+                        RULES_JP_S1A2G11_NP_3P.getPlayOff()
+                                .map(pr -> pr.withConsoleParticipants(
+                                        Optional.of(AndWinner3)))))
+                .category(c1, p1, p2, p3, p4, p5, p6, p7, p8);
+        isf.create(scenario)
+                .run(master -> {
+                    master.beginTournament()
+                            .createConsoleTournament(ConOff)
+                            .updateConsoleRules(RULES_JP_S1A2G11_NP
+                                    .withCasting(
+                                            RULES_JP_S1A2G11_NP.getCasting()
+                                                    .withSplitPolicy(ConsoleLayered))
+                                    .withPlayOff(
+                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
+                                                    pr -> pr.withLayerPolicy(
+                                                            Optional.of(MergeLayers)))));
+
+                    final ImperativeSimulator console = masterPlay(master);
+
+                    console.checkTournament(Open, restState(Play).bid(p4, Wait).bid(p3, Wait))
+                            .scoreSet(p5, 11, p8, 3)
+                            .scoreSet(p6, 11, p7, 1)
+                            .reloadMatchMap()
+                            .scoreSet(p5, 11, p6, 1)
+                            .reloadMatchMap()
+                            .scoreSet(p4, 11, p5, 9)
+                            .reloadMatchMap()
+                            .scoreSet(p3, 11, p4, 7)
+
+                            .checkResult(p3, p4, p5, p6, p8, p7)
+                            .checkTournamentComplete(
+                                    restState(Lost).bid(p3, Win1).bid(p4, Win2));
+                });
+    }
+
     // merged layered console for play off with w2
     // merged layered console for play off with w1
 

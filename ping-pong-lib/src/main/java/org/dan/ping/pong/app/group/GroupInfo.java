@@ -23,4 +23,13 @@ public class GroupInfo {
     public GroupLink toLink() {
         return GroupLink.builder().label(label).gid(gid).build();
     }
+
+    public static GroupInfo groupOf(Gid gid, Cid cid, int ordNumber, String label) {
+        return GroupInfo.builder()
+                .gid(gid)
+                .cid(cid)
+                .ordNumber(ordNumber)
+                .label(label)
+                .build();
+    }
 }

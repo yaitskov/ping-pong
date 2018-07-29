@@ -7,6 +7,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.category.SelectedCid;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.console.TournamentRelationType;
@@ -33,25 +34,24 @@ public class DispatchingCategoryPlayOffBuilder implements CategoryPlayOffBuilder
 
     @Override
     @SneakyThrows
-    public void build(TournamentMemState conTour, Cid cid,
-            List<ParticipantMemState> bids, DbUpdater batch) {
-        if (conTour.getType() == Console
-                && conTour.getRule().getCasting().getSplitPolicy() == ConsoleLayered) {
-            log.info("Layered console casting for tid {} cid {}", conTour.getTid(), cid);
+    public void build(SelectedCid sCid, List<ParticipantMemState> bids) {
+        if (sCid.tourType() == Console
+                && sCid.casting().getSplitPolicy() == ConsoleLayered) {
+            log.info("Layered console casting for tid {} cid {}", sCid.tid(), sCid.cid());
             final TournamentRelationType relType = relatedTournaments
-                    .findRelationTypeWithParent(conTour.getTid());
+                    .findRelationTypeWithParent(sCid.tid());
             switch (relType) {
                 case ConGru:
-                    groupLayeredCategoryPlayOffBuilder.build(conTour, cid, bids, batch);
+                    groupLayeredCategoryPlayOffBuilder.build(sCid, bids);
                     return;
                 case ConOff:
-                    playOffLayeredCategoryPlayOffBuilder.build(conTour, cid, bids, batch);
+                    playOffLayeredCategoryPlayOffBuilder.build(sCid, bids);
                     return;
                 default:
                     throw internalError("not supported relation type " + relType);
             }
         } else {
-            flatCategoryPlayOffBuilder.build(conTour, cid, bids, batch);
+            flatCategoryPlayOffBuilder.build(sCid, bids);
         }
     }
 }

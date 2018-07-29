@@ -13,6 +13,7 @@ import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Want;
+import static org.dan.ping.pong.app.category.SelectedCid.selectCid;
 import static org.dan.ping.pong.app.match.MatchState.INCOMPLETE_MATCH_STATES;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.tournament.EnlistPolicy.MULTIPLE_CATEGORY_ENLISTMENT;
@@ -178,6 +179,14 @@ public class BidService {
                 singletonList(setState.getExpected()), batch);
     }
 
+    public void setBidState(SelectedBid sBid, BidState target) {
+        setBidState(sBid.getBid(), target, singleton(sBid.bidState()), sBid.getBatch());
+    }
+
+    public void setBidState(ParticipantMemState bid, BidState target, DbUpdater batch) {
+        setBidState(bid, target, singleton(bid.getBidState()), batch);
+    }
+
     public void setBidState(ParticipantMemState bid, BidState target,
             Collection<BidState> expected, DbUpdater batch) {
         if (FILLER_LOSER_BID.equals(bid.getBid()) || bid.state() == target) {
@@ -254,7 +263,8 @@ public class BidService {
                     throw badRequest("target group is complete");
                 }));
         final Gid targetGid = req.getTargetGid()
-                .orElseGet(() ->  castingLotsService.addGroup(tournament, batch, bid.getCid()));
+                .orElseGet(() ->  castingLotsService.addGroup(
+                        selectCid(bid.getCid(), tournament, batch)));
         groupService.checkGroupComplete(tournament, req.getExpectedGid())
                 .ifPresent(matches -> {
                     throw badRequest("source group is complete");

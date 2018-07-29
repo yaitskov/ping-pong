@@ -21,6 +21,7 @@ import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.ConsoleLay
 import static org.dan.ping.pong.app.category.CategoryService.groupByCategories;
 import static org.dan.ping.pong.app.category.CategoryState.Drt;
 import static org.dan.ping.pong.app.category.CategoryState.Ply;
+import static org.dan.ping.pong.app.category.SelectedCid.selectCid;
 import static org.dan.ping.pong.app.group.ConsoleTournament.NO;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
 import static org.dan.ping.pong.app.table.TableService.STATE;
@@ -49,6 +50,7 @@ import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidDao;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.bid.SelectedBid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
@@ -57,6 +59,7 @@ import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryMemState;
 import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.category.SelectedCid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupRemover;
 import org.dan.ping.pong.app.group.GroupService;
@@ -265,37 +268,33 @@ public class TournamentService {
                 .filter(e -> e.getValue().getState() == Drt)
                 .map(Map.Entry::getKey)
                 .forEach(cid -> beginCategory(
-                        tournament, batch, cid, ofNullable(cid2Par.get(cid))
+                        selectCid(cid, tournament, batch),
+                        ofNullable(cid2Par.get(cid))
                                 .orElseGet(Collections::emptyList)));
     }
 
     @Inject
     private CategoryService categoryService;
 
-    private void beginCategory(TournamentMemState tournament, DbUpdater batch,
-            Cid cid, List<ParticipantMemState> bids) {
-        final CategoryMemState catSt = tournament.getCategory(cid);
-        log.info("Begin category {} of tournament {}", cid, tournament.getTid());
-        categoryService.setState(tournament.getTid(), catSt, Ply, batch);
+    private void beginCategory(SelectedCid sCid, List<ParticipantMemState> bids) {
+        log.info("Begin category {} of tournament {}", sCid.cid(), sCid.tid());
+        categoryService.setState(sCid.tid(), sCid.category(), Ply, sCid.batch());
         switch (bids.size()) {
             case 1:
-                tournament.getRule().getGroup()
+                sCid.rules().getGroup()
                         .ifPresent((gRu) ->
                                 bidService.setGroupForUids(
-                                        batch,
-                                        groupService.createGroup(tournament, cid, batch),
-                                        tournament.getTid(),
+                                        sCid.batch(),
+                                        groupService.createGroup(sCid),
+                                        sCid.tid(),
                                         bids));
-                bidService.setBidState(bids.get(0), Win1,
-                        singletonList(bids.get(0).getBidState()), batch);
+                bidService.setBidState(bids.get(0), Win1, sCid.batch());
             case 0:
                 return;
             default:
-                bids.forEach(bid ->
-                        bidService.setBidState(bid, BidState.Wait,
-                                singletonList(bid.getBidState()), batch));
-                castingLotsService.seedCategory(tournament, cid, bids, batch);
-                setState(tournament, Open, batch);
+                bids.forEach(bid -> bidService.setBidState(bid, Wait, sCid.batch()));
+                castingLotsService.seedCategory(sCid, bids);
+                setState(sCid.tournament(), Open, sCid.batch());
         }
     }
 
@@ -366,39 +365,34 @@ public class TournamentService {
                         .build());
     }
 
-    public void leaveTournament(ParticipantMemState bid, TournamentMemState tournament,
-            BidState targetState, DbUpdater batch) {
-        final Tid tid = tournament.getTid();
-        log.info("User {} leaves tournament {} as {}", bid.getUid(), tid, targetState);
-        final TournamentState state = tournament.getState();
-        switch (state) {
+    public void leaveTournament(SelectedBid sBid, BidState targetState) {
+        log.info("User {} leaves tournament {} as {}",
+                sBid.uid(), sBid.tid(), targetState);
+        switch (sBid.tidState()) {
             case Close:
             case Canceled:
             case Replaced:
                 throw badRequest("Tournament is complete");
             case Open:
-                leaveOpenTournament(bid, tournament, targetState, batch);
+                leaveOpenTournament(sBid, targetState);
                 break;
             case Hidden:
             case Announce:
             case Draft:
-                bidService.setBidState(bid, targetState,
-                        singletonList(bid.getBidState()), batch);
+                bidService.setBidState(sBid, targetState);
                 break;
             default:
-                throw internalError("State " + state + " is not supported");
+                throw internalError("State " + sBid.tidState() + " is not supported");
         }
     }
 
-    private void leaveOpenTournament(ParticipantMemState bid, TournamentMemState tournament,
-            BidState targetState, DbUpdater batch) {
-        final Tid tid = tournament.getTid();
-        log.info("User {} leaves open tournament {}", bid.getUid(), tid);
-        switch (bid.getBidState()) {
+    private void leaveOpenTournament(SelectedBid sBid, BidState targetState) {
+        log.info("User {} leaves open tournament {}", sBid.uid(), sBid.tid());
+        switch (sBid.bidState()) {
             case Play:
             case Rest:
             case Wait:
-                activeParticipantLeave(bid, tournament, clocker.get(), targetState, batch);
+                activeParticipantLeave(sBid, clocker.get(), targetState);
                 break;
             case Win1:
             case Win2:
@@ -409,11 +403,11 @@ public class TournamentService {
             case Want:
             case Paid:
             case Here:
-                bidService.setBidState(bid, targetState,
-                        singletonList(bid.getBidState()), batch);
+                bidService.setBidState(sBid.getBid(), targetState,
+                        singletonList(sBid.bidState()), sBid.getBatch());
                 break;
             default:
-                throw internalError("Unknown state " + bid.getBidState());
+                throw internalError("Unknown state " + sBid.bidState());
         }
     }
 
@@ -426,27 +420,23 @@ public class TournamentService {
     @Value("${match.score.timeout}")
     private int matchScoreTimeout;
 
-    public void activeParticipantLeave(ParticipantMemState participant,
-            TournamentMemState tournament,
-            Instant now, BidState target, DbUpdater batch) {
-        final Bid bid = participant.getBid();
+    public void activeParticipantLeave(SelectedBid sBid, Instant now, BidState target) {
+        final Bid bid = sBid.bid();
         final List<MatchInfo> incompleteMy = matchService
-                .bidIncompleteGroupMatches(bid, tournament);
+                .bidIncompleteGroupMatches(bid, sBid.getTournament());
         log.info("activeParticipantLeave bid {} incomplete {}", bid, incompleteMy.size());
         if (incompleteMy.isEmpty()) {
-            matchService.leaveFromPlayOff(participant, tournament, batch);
+            matchService.leaveFromPlayOff(sBid);
         } else {
-            bidService.setBidState(participant, target,
-                    singletonList(participant.getBidState()), batch);
+            bidService.setBidState(sBid, target);
             for (MatchInfo match : incompleteMy) {
-                matchService.walkOver(tournament, bid, match, batch);
+                matchService.walkOver(sBid.getTournament(), bid, match, sBid.getBatch());
             }
         }
-        if (participant.getBidState() != Win2 || target == Expl) {
-            bidService.setBidState(participant, target,
-                    singletonList(participant.getBidState()), batch);
+        if (sBid.bidState() != Win2 || target == Expl) {
+            bidService.setBidState(sBid, target);
         }
-        scheduleService.participantLeave(tournament, batch, now);
+        scheduleService.participantLeave(sBid.getTournament(), sBid.getBatch(), now);
     }
 
     public List<OpenTournamentDigest> findRunning(int completeInLastDays) {
@@ -465,7 +455,8 @@ public class TournamentService {
     }
 
     @Transactional(TRANSACTION_MANAGER)
-    public void update(TournamentMemState tournament, TournamentUpdate update, DbUpdater batch) {
+    public void update(
+            TournamentMemState tournament, TournamentUpdate update, DbUpdater batch) {
         if (!EDITABLE_STATES.contains(tournament.getState())) {
             throw badRequest("Tournament could be modified until it's open");
         }
@@ -625,7 +616,8 @@ public class TournamentService {
         final Instant now = clocker.get();
         if (tournament.getState() == Open && !enlistment.getGroupId().isPresent()) {
             enlistment.setGroupId(Optional.of(
-                    castingLotsService.addGroup(tournament, batch, enlistment.getCid())));
+                    castingLotsService.addGroup(
+                            selectCid(enlistment.getCid(), tournament, batch))));
         }
         tournament.registerParticipant(
                 ParticipantMemState.builder()

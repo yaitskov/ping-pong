@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.category.SelectedCid;
 import org.dan.ping.pong.app.match.MatchServiceIf;
 import org.dan.ping.pong.app.match.MatchTag;
 import org.dan.ping.pong.app.match.MatchType;
@@ -67,25 +68,32 @@ public class PlayOffGenerator {
             .build();
     public static final Mid MID0 = new Mid(0);
 
-    @Getter
-    private final TournamentMemState tournament;
-    @Getter
-    private final Cid cid;
+    private final SelectedCid sCid;
     private final MatchServiceIf matchService;
     @Getter
     private final Optional<MatchTag> tag;
-    @Getter
-    private final DbUpdater batch;
     private final int finalLevel;
     @Getter
     private final MatchType goldType;
+
+    public  TournamentMemState getTournament() {
+        return sCid.tournament();
+    }
+
+    public Cid getCid() {
+        return sCid.cid();
+    }
+
+    public DbUpdater getBatch() {
+        return sCid.batch();
+    }
 
     public Optional<Mid> generateTree(int level, Optional<Mid> parentMid,
             int priority, TypeChain types, Optional<Mid> loserMid) {
         if (level < finalLevel) {
             return Optional.empty();
         }
-        final boolean bronzeMatch = tournament.playOffRules().is3rdPlaceMatch()
+        final boolean bronzeMatch = sCid.tournament().playOffRules().is3rdPlaceMatch()
                 && types.getType() == goldType
                 && level > 1;
         final Optional<Mid> omid = createMatch(parentMid, loserMid,
@@ -105,8 +113,7 @@ public class PlayOffGenerator {
     private Optional<Mid> createMatch(Optional<Mid> winMid, Optional<Mid> loserMid,
             int priority, int level, MatchType type) {
         return Optional.of(matchService.createPlayOffMatch(
-                tournament, cid, winMid, loserMid,
-                priority, level, type, tag, batch));
+                sCid, winMid, loserMid, priority, level, type, tag));
     }
 
     public Optional<Mid> generate2LossTree(

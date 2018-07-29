@@ -1,10 +1,12 @@
 package org.dan.ping.pong.app.castinglots;
 
 import static java.util.Collections.singleton;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.PLAY_OFF_SEEDS;
+import static org.dan.ping.pong.app.match.MatchType.Gold;
 import static org.dan.ping.pong.app.playoff.PlayOffService.roundPlayOffBase;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
 import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
@@ -14,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingService;
 import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.category.SelectedCid;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
 import org.dan.ping.pong.app.match.MatchTag;
@@ -39,11 +42,10 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
     private ParticipantRankingService rankingService;
 
     @Override
-    public void build(TournamentMemState tournament, Cid cid,
-            List<ParticipantMemState> bids, DbUpdater batch) {
-        final PlayOffGenerator generator = castingLotsService.createPlayOffGen(
-                batch, tournament, cid, Optional.empty(), 0, MatchType.Gold);
-        buildRanked(bids, Optional.empty(), 0, generator);
+    public void build(SelectedCid sCid, List<ParticipantMemState> bids) {
+        final PlayOffGenerator generator = castingLotsService
+                .createPlayOffGen(sCid, empty(), 0, Gold);
+        buildRanked(bids, empty(), 0, generator);
     }
 
     public Optional<Mid> buildRanked(List<ParticipantMemState> bids,
@@ -76,7 +78,7 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
         validateBidsNumberInACategory(orderedBids);
         if (oneParticipantInCategory(generator.getTournament(), generator.getCid(),
                 orderedBids, generator.getBatch(), generator.getTag())) {
-            return Optional.empty();
+            return empty();
         }
         final int roundedBasePositions = roundPlayOffBase(orderedBids.size());
         final Mid subRootMid = castingLotsService.generatePlayOffMatches(

@@ -48,8 +48,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.bid.SelectedBid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.category.SelectedCid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupInfo;
@@ -703,15 +705,16 @@ public class MatchService implements MatchServiceIf {
                 .collect(toList());
     }
 
-    public void leaveFromPlayOff(ParticipantMemState bid, TournamentMemState tournament, DbUpdater batch) {
-        playOffMatchForResign(bid.getBid(), tournament)
+    public void leaveFromPlayOff(SelectedBid sBid) {
+        playOffMatchForResign(sBid.bid(), sBid.getTournament())
                 .ifPresent(match -> {
-                    walkOver(tournament, bid.getBid(), match, batch);
-                    leaveFromPlayOff(bid, tournament, batch);
+                    walkOver(sBid.getTournament(), sBid.bid(), match, sBid.getBatch());
+                    leaveFromPlayOff(sBid);
                 });
     }
 
-    public void walkOver(TournamentMemState tournament, Bid walkoverBid, MatchInfo mInfo, DbUpdater batch) {
+    public void walkOver(TournamentMemState tournament, Bid walkoverBid,
+            MatchInfo mInfo, DbUpdater batch) {
         log.info("Uid {} walkovers mid {}", walkoverBid, mInfo.getMid());
         Optional<Bid> winBid = mInfo.getOpponentBid(walkoverBid);
         if (winBid.isPresent()) {
@@ -961,14 +964,15 @@ public class MatchService implements MatchServiceIf {
                 .collect(toList());
     }
 
-    public Mid createPlayOffMatch(TournamentMemState tournament, Cid cid,
+    public Mid createPlayOffMatch(SelectedCid sCid,
             Optional<Mid> winMid, Optional<Mid> loserMid,
             int priority, int level, MatchType type,
-            Optional<MatchTag> oTag, DbUpdater batch) {
+            Optional<MatchTag> oTag) {
+        final TournamentMemState tournament = sCid.tournament();
         final Mid mid = tournament.getNextMatch().next();
 
         matchDao.createPlayOffMatch(
-                batch, mid, tournament.getTid(), cid, winMid, loserMid,
+                sCid.batch(), mid, sCid.tid(), sCid.cid(), winMid, loserMid,
                 priority, level, type, oTag, Draft);
         tournament.getMatches().put(mid, MatchInfo.builder()
                 .tid(tournament.getTid())
@@ -982,10 +986,10 @@ public class MatchService implements MatchServiceIf {
                 .tag(oTag)
                 .winnerMid(winMid)
                 .loserMid(loserMid)
-                .cid(cid)
+                .cid(sCid.cid())
                 .build());
         log.info("playoff {} mid {} of tid {} in cid {}",
-                type, mid, tournament.getTid(), cid);
+                type, mid, tournament.getTid(), sCid.cid());
         return mid;
     }
 }

@@ -2,6 +2,8 @@ package org.dan.ping.pong.app.tournament;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dan.ping.pong.app.auth.AuthService.SESSION;
+import static org.dan.ping.pong.app.bid.BidState.Quit;
+import static org.dan.ping.pong.app.bid.SelectedBid.selectBid;
 import static org.dan.ping.pong.app.category.CategoryResource.CID;
 import static org.dan.ping.pong.app.category.CategoryResource.CID_JP;
 import static org.dan.ping.pong.app.match.MatchResource.TID_JP;
@@ -225,7 +227,7 @@ public class TournamentResource {
                     .filter(p -> resign.getCid()
                             .map(cid -> cid.equals(p.getCid())).orElse(true))
                     .forEach(bid -> tournamentService.leaveTournament(
-                            bid, tournament, BidState.Quit, batch));
+                            selectBid(tournament, bid, batch), Quit));
         });
     }
 
@@ -233,7 +235,7 @@ public class TournamentResource {
     private TournamentAccessor tournamentAccessor;
 
     private static final Set<BidState> acceptableBidExpelTargetStates
-            = ImmutableSet.of(BidState.Expl, BidState.Quit);
+            = ImmutableSet.of(BidState.Expl, Quit);
 
     @POST
     @Path(TOURNAMENT_EXPEL)
@@ -249,8 +251,8 @@ public class TournamentResource {
         tournamentAccessor.update(expelParticipant.getTid(), response, (tournament, batch) -> {
             tournament.checkAdmin(uid);
             tournamentService.leaveTournament(
-                    tournament.getParticipant(expelParticipant.getBid()),
-                    tournament, expelParticipant.getTargetBidState(), batch);
+                    selectBid(tournament, expelParticipant.getBid(), batch),
+                    expelParticipant.getTargetBidState());
         });
     }
 

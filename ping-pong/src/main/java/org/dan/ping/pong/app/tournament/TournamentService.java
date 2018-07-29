@@ -427,16 +427,13 @@ public class TournamentService {
         final List<MatchInfo> incompleteMy = matchService
                 .bidIncompleteGroupMatches(bid, sBid.getTournament());
         log.info("activeParticipantLeave bid {} incomplete {}", bid, incompleteMy.size());
+        bidService.setBidState(sBid, target);
         if (incompleteMy.isEmpty()) {
             matchService.leaveFromPlayOff(sBid);
         } else {
-            bidService.setBidState(sBid, target);
             for (MatchInfo match : incompleteMy) {
                 matchService.walkOver(sBid.getTournament(), bid, match, sBid.getBatch());
             }
-        }
-        if (sBid.bidState() != Win2 || target == Expl) {
-            bidService.setBidState(sBid, target);
         }
         scheduleService.participantLeave(sBid.getTournament(), sBid.getBatch(), now);
     }

@@ -303,8 +303,7 @@ public class MatchService implements MatchServiceIf {
                     playOffMatchLoserState(playOffRule, mInfo, lostParticipant), PLAY_WAIT, batch);
             enlistIf(tournament, lostParticipant, mInfo, playOffRule, batch);
         } else if (lostParticipant.getBidState() == Quit && mInfo.getType() == Gold) {
-            bidService.setBidState(lostParticipant, Win2,
-                    singleton(lostParticipant.getBidState()), batch);
+            bidService.setBidState(lostParticipant, Win2, batch);
             enlistIf(tournament, lostParticipant, mInfo, playOffRule, batch);
         }
         mInfo.getLoserMid().ifPresent(

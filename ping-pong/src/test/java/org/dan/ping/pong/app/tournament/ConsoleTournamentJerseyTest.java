@@ -917,6 +917,45 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 });
     }
 
+    @Test
+    public void consolePlayOffAsOneGroupWithW3() {
+        final TournamentScenario scenario = begin().name("conPlayOff1GW3")
+                .rules(RULES_JP_S1A2G11_NP_3P.withPlayOff(
+                        RULES_JP_S1A2G11_NP_3P.getPlayOff()
+                                .map(pr -> pr.withConsoleParticipants(
+                                        Optional.of(AndWinner3)))))
+                .category(c1, p1, p2, p3, p4, p5);
+        isf.create(scenario)
+                .run(master -> {
+                        master.beginTournament()
+                                .createConsoleTournament(ConOff)
+                                .updateConsoleRules(RULES_G_S1A2G11_NP);
+
+                    final ImperativeSimulator console = master
+                            //bye .scoreSet(p1, 11, p8, 7)
+                            //bye .scoreSet(p2, 11, p7, 5)
+                            //bye .scoreSet(p3, 11, p6, 3)
+                            .scoreSet(p4, 11, p5, 1)
+                            .reloadMatchMap()
+                            .scoreSet(p1, 11, p4, 3)
+                            .scoreSet(p2, 11, p3, 1)
+                            .reloadMatchMap()
+                            .scoreSet(p3, 11, p4, 7)
+                            .scoreSet(p1, 11, p2, 3)
+                            .checkResult(p1, p2, p3, p4, p5)
+                            .checkTournamentComplete(
+                                    restState(Lost).bid(p3, Win3).bid(p2, Win2).bid(p1, Win1))
+                            .resolveCategories();
+
+                    console.checkTournament(Open, restState(Play))
+                            .scoreSet(p3, 11, p4, 7)
+                            .scoreSet(p3, 11, p5, 8)
+                            .scoreSet(p4, 11, p5, 9)
+                            .checkResult(p3, p4, p5)
+                            .checkTournamentComplete(restState(Lost).bid(p3, Win1));
+                });
+    }
+
     // merged layered console for group with JL
     // merged layered console for group with w3
     // merged layered console for group with w2

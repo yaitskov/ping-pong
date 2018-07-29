@@ -56,7 +56,6 @@ import org.dan.ping.pong.app.castinglots.CastingLotsService;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.category.CategoryDao;
-import org.dan.ping.pong.app.category.CategoryMemState;
 import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.category.SelectedCid;
@@ -457,7 +456,6 @@ public class TournamentService {
         return tournamentDao.findMyRecentJudgedTournaments(clocker.get(), uid);
     }
 
-    @Transactional(TRANSACTION_MANAGER)
     public void update(
             TournamentMemState tournament, TournamentUpdate update, DbUpdater batch) {
         if (!EDITABLE_STATES.contains(tournament.getState())) {
@@ -476,24 +474,30 @@ public class TournamentService {
             case Classic:
                 break; // ok
             case Console:
-                rules.getGroup().ifPresent(gr -> {
-                    if (gr.getConsole() != NO) {
-                        throw badRequest("console group cannot have console tournament");
-                    }
-                });
-                rules.getPlayOff().ifPresent(pr -> {
-                    if (pr.getConsole() != NO) {
-                        throw badRequest("console playOff cannot have console tournament");
-                    }
-                    if (!pr.getLayerPolicy().isPresent()) {
-                        throw badRequest("tournament for console playOff must have layer policy");
-                    }
-                });
+                validateRulesOfConsoleTournament(tournament, rules);
                 break;
             default:
                 throw internalError(
                         "Tournament type " + tournament.getType() + " not supported");
         }
+    }
+
+    @SneakyThrows
+    private void validateRulesOfConsoleTournament(
+            TournamentMemState conTour, TournamentRules rules) {
+        rules.getGroup().ifPresent(gr -> {
+            if (gr.getConsole() != NO) {
+                throw badRequest("console group cannot have console tournament");
+            }
+        });
+        rules.getPlayOff().ifPresent(pr -> {
+            if (pr.getConsole() != NO) {
+                throw badRequest("console playOff cannot have console tournament");
+            }
+            if (!pr.getLayerPolicy().isPresent()) {
+                throw badRequest("tournament for console playOff must have layer policy");
+            }
+        });
     }
 
     public void updateTournamentParams(TournamentMemState tournament,

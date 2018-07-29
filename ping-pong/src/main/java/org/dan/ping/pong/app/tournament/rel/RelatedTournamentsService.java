@@ -35,7 +35,17 @@ public class RelatedTournamentsService {
 
     @SneakyThrows
     public TournamentRelationType findRelationTypeWithParent(Tid childTid) {
-        final Tid masterTid = tournamentRelationCache.get(childTid).parentTid();
+        final Tid masterTid = masterTid(childTid);
+        return getRelType(childTid, masterTid);
+    }
+
+    @SneakyThrows
+    public TournamentRelationType getRelType(Tid childTid, Tid masterTid) {
         return tournamentRelationCache.get(masterTid).findRelTypeByTid(childTid);
+    }
+
+    @SneakyThrows
+    public Tid masterTid(Tid childTid) {
+        return tournamentRelationCache.get(childTid).parentTid();
     }
 }

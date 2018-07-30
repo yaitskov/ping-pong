@@ -395,18 +395,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                             .createConsoleGruTournament()
                             .updateConsoleRules(RULES_LC_S1A2G11_NP);
 
-                    final ImperativeSimulator console = c
-                            .scoreSet(p1, 11, p3, 4)
-                            .scoreSet(p2, 11, p3, 5)
-                            .scoreSet(p1, 11, p2, 3)
-
-                            .scoreSet(p4, 11, p6, 2)
-                            .scoreSet(p5, 11, p6, 1)
-                            .scoreSet(p4, 11, p5, 9)
-                            .reloadMatchMap()
-                            .scoreSet(p1, 11, p4, 5)
-                            .checkTournamentComplete(restState(Lost).bid(p4, Win2).bid(p1, Win1))
-                            .resolveCategories();
+                    final ImperativeSimulator console = playMasterG3Q1(c);
 
                     console.checkTournament(Open, restState(Play))
                             .reloadMatchMap()
@@ -416,6 +405,21 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                                     .bid(p6, Win2).bid(p3, Win1)
                                     .bid(p5, Win2).bid(p2, Win1));
                 });
+    }
+
+    public ImperativeSimulator playMasterG3Q1(ImperativeSimulator c) {
+        return c
+                .scoreSet(p1, 11, p3, 4)
+                .scoreSet(p2, 11, p3, 5)
+                .scoreSet(p1, 11, p2, 3)
+
+                .scoreSet(p4, 11, p6, 2)
+                .scoreSet(p5, 11, p6, 1)
+                .scoreSet(p4, 11, p5, 9)
+                .reloadMatchMap()
+                .scoreSet(p1, 11, p4, 5)
+                .checkTournamentComplete(restState(Lost).bid(p4, Win2).bid(p1, Win1))
+                .resolveCategories();
     }
 
     @Test
@@ -1046,11 +1050,38 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 });
     }
 
-    // console group as group with group and play off
+    @Test
+    public void mergedLayeredConForGroup() {
+        final TournamentScenario scenario = begin().name("mrgdLrdForGrp")
+                .rules(RULES_G3Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4, p5, p6);
+        isf.create(scenario)
+                .run(master -> {
+                    master.beginTournament()
+                            .createConsoleTournament(ConGru)
+                            .updateConsoleRules(RULES_JP_S1A2G11_NP
+                                    .withCasting(
+                                            RULES_JP_S1A2G11_NP.getCasting()
+                                                    .withPolicy(MasterOutcome)
+                                                    .withSplitPolicy(ConsoleLayered))
+                                    .withPlayOff(
+                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
+                                                    pr -> pr.withLayerPolicy(
+                                                            Optional.of(MergeLayers)))));
 
-    // merged layered console for group with w3
-    // merged layered console for group with w2
-    // merged layered console for group with w1
+                    final ImperativeSimulator console = playMasterG3Q1(master);
+
+                    console.checkTournament(Open, restState(Play))
+                            .scoreSet(p2, 11, p5, 8)
+                            .scoreSet(p3, 11, p6, 9)
+                            .reloadMatchMap()
+                            .scoreSet(p2, 11, p3, 1)
+                            .checkResult(p2, p3, p5, p6)
+                            .checkTournamentComplete(
+                                    restState(Lost)
+                                            .bid(p3, Win2).bid(p1, Win1));
+                });
+    }
 
     // create play off console after master tournament started
     // create play off console after master tournament complete

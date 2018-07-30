@@ -15,12 +15,6 @@ import org.dan.ping.pong.app.castinglots.rank.ProvidedRankOptions;
 import java.util.Optional;
 
 public class CastingLotsRulesConst {
-    public static final CastingLotsRule CONSOLE_CASTING
-            = CastingLotsRule.builder()
-            .policy(MasterOutcome)
-            .direction(OrderDirection.Increase)
-            .splitPolicy(BalancedMix)
-            .build();
     public static final CastingLotsRule LAYERED_CONSOLE_CASTING
             = CastingLotsRule.builder()
             .policy(MasterOutcome)

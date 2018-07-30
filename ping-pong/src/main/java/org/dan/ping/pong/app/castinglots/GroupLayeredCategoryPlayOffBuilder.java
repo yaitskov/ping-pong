@@ -43,22 +43,8 @@ public class GroupLayeredCategoryPlayOffBuilder implements CategoryPlayOffBuilde
         validateBidsNumberInACategory(bids);
         final TournamentMemState masterTournament = relatedTournaments.findParent(sCid.tid());
 
-        final Cid masterCid = masterTournament.getParticipant(bids.get(0).getBid()).getCid();
-        final List<GroupInfo> orderedGroups = masterTournament.getGroupsByCategory(masterCid);
-        orderedGroups.sort(Comparator.comparing(GroupInfo::getOrdNumber));
-        final ArrayListMultimap<Integer, Bid> bidsByFinalGroupPosition = create();
-
-        orderedGroups.forEach(groupInfo -> {
-            final List<Bid> orderedBids = groupService.orderBidsInGroup(
-                    groupInfo.getGid(), masterTournament,
-                    groupService.findAllMatchesInGroup(masterTournament, groupInfo.getGid()));
-            for (int i = 0; i < orderedBids.size(); ++i) {
-                bidsByFinalGroupPosition.put(i, orderedBids.get(i));
-            }
-        });
-        log.info("Found {} layers in {} groups in cid {}",
-                bidsByFinalGroupPosition.keySet().size(),
-                orderedGroups.size(), masterCid);
+        final ArrayListMultimap<Integer, Bid> bidsByFinalGroupPosition = findFinalPositions(
+                masterTournament, bids);
 
         for (int i = masterTournament.groupRules().getQuits();
              i < bidsByFinalGroupPosition.keySet().size(); ++i) {
@@ -72,5 +58,27 @@ public class GroupLayeredCategoryPlayOffBuilder implements CategoryPlayOffBuilde
                     .createPlayOffGen(sCid, tag, 0, Gold);
             flatCategoryPlayOffBuilder.build(bidsInTag, Optional.empty(), 0, generator);
         }
+    }
+
+    private ArrayListMultimap<Integer, Bid> findFinalPositions(
+            TournamentMemState mTour, List<ParticipantMemState> bids) {
+        final Cid masterCid = mTour.getParticipant(bids.get(0).getBid()).getCid();
+        final List<GroupInfo> orderedGroups = mTour.getGroupsByCategory(masterCid);
+        orderedGroups.sort(Comparator.comparing(GroupInfo::getOrdNumber));
+        final ArrayListMultimap<Integer, Bid> bidsByFinalGroupPosition = create();
+
+        orderedGroups.forEach(groupInfo -> {
+            final List<Bid> orderedBids = groupService.orderBidsInGroup(
+                    groupInfo.getGid(), mTour,
+                    groupService.findAllMatchesInGroup(mTour, groupInfo.getGid()));
+            for (int i = 0; i < orderedBids.size(); ++i) {
+                bidsByFinalGroupPosition.put(i, orderedBids.get(i));
+            }
+        });
+        log.info("Found {} layers in {} groups in cid {}",
+                bidsByFinalGroupPosition.keySet().size(),
+                orderedGroups.size(), masterCid);
+
+        return bidsByFinalGroupPosition;
     }
 }

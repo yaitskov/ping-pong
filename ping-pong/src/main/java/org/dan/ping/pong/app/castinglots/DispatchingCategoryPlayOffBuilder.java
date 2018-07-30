@@ -6,13 +6,10 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.category.SelectedCid;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
-import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.console.TournamentRelationType;
 import org.dan.ping.pong.app.tournament.rel.RelatedTournamentsService;
-import org.dan.ping.pong.sys.db.DbUpdater;
 
 import java.util.List;
 

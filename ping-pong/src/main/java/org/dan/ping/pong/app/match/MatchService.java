@@ -9,12 +9,12 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
-import static org.dan.ping.pong.app.bid.BidState.WIN_STATES;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Rest;
+import static org.dan.ping.pong.app.bid.BidState.WIN_STATES;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
@@ -50,7 +50,6 @@ import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.SelectedBid;
 import org.dan.ping.pong.app.bid.Uid;
-import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.category.SelectedCid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupDao;
@@ -103,7 +102,8 @@ public class MatchService implements MatchServiceIf {
             .thenComparing(MatchInfo::getPriority)
             .thenComparing(MatchInfo::getMid);
 
-    static final ImmutableSet<MatchState> EXPECTED_MATCH_STATES = ImmutableSet.of(Draft, Game, Place, Auto);
+    static final ImmutableSet<MatchState> EXPECTED_MATCH_STATES = ImmutableSet
+            .of(Draft, Game, Place, Auto);
     private static final Set<BidState> PLAY_WAIT = ImmutableSet.of(Play, Wait);
 
     private static Comparator<MatchInfo> noTablesParticipantMatchComparator(
@@ -250,7 +250,8 @@ public class MatchService implements MatchServiceIf {
                     case 2:
                         return Wait;
                     default:
-                        throw internalError("unsupported number of losing " + playOff.getLosings());
+                        throw internalError("unsupported number of losing "
+                                + playOff.getLosings());
                 }
             case POff:
                 return Wait;
@@ -259,7 +260,8 @@ public class MatchService implements MatchServiceIf {
         }
     }
 
-    private BidState playOffMatchLoserState(PlayOffRule playOff, MatchInfo mInfo, ParticipantMemState bid) {
+    private BidState playOffMatchLoserState(
+            PlayOffRule playOff, MatchInfo mInfo, ParticipantMemState bid) {
         switch (mInfo.getType()) {
             case Gold:
                 if (bid.getBidState() == Expl) {
@@ -273,7 +275,8 @@ public class MatchService implements MatchServiceIf {
                     case 2:
                         return Win3;
                     default:
-                        throw internalError("unsupported number of losing " + playOff.getLosings());
+                        throw internalError("unsupported number of losing "
+                                + playOff.getLosings());
                 }
             case POff:
                 return mInfo.getLoserMid().map(lMid -> Wait).orElse(Lost);

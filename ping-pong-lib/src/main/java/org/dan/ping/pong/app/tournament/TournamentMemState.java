@@ -146,12 +146,7 @@ public class TournamentMemState {
     }
 
     public ParticipantMemState getBid(Bid bid) {
-        final ParticipantMemState result = participants.get(bid);
-        if (result == null) {
-            throw internalError("User " + bid
-                    + " does participate in the tournament " + tid);
-        }
-        return result;
+        return participants.get(bid);
     }
 
     public ParticipantMemState getBidOrQuit(Bid uid) {

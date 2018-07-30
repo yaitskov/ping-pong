@@ -1076,14 +1076,13 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                             .scoreSet(p3, 11, p6, 9)
                             .reloadMatchMap()
                             .scoreSet(p2, 11, p3, 1)
-                            .checkResult(p2, p3, p5, p6)
+                            .checkResult(p2, p3, p6, p5)
                             .checkTournamentComplete(
                                     restState(Lost)
-                                            .bid(p3, Win2).bid(p1, Win1));
+                                            .bid(p3, Win2).bid(p2, Win1));
                 });
     }
 
     // create play off console after master tournament started
     // create play off console after master tournament complete
-
 }

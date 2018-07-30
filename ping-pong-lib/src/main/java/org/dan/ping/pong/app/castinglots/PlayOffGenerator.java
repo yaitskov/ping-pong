@@ -68,6 +68,7 @@ public class PlayOffGenerator {
             .build();
     public static final Mid MID0 = new Mid(0);
 
+    @Getter
     private final SelectedCid sCid;
     private final MatchServiceIf matchService;
     @Getter

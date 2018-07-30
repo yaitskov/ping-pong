@@ -301,9 +301,8 @@ public class CastingLotsService {
         log.info("Generate play off matches for {} bids in tid {}",
                 playOffStartPositions, tid);
         if (playOffStartPositions == 1) {
-            log.info("Tournament {}:{} will be without play off",
-                    tid, generator.getCid());
-            return MID0;
+            throw internalError("Tournament " + tid + ":" + generator.getCid()
+                    + " will be without play off");
         } else {
             checkArgument(playOffStartPositions > 0, "not enough groups %s",
                     playOffStartPositions);

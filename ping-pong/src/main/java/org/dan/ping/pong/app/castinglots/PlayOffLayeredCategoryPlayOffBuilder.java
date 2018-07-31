@@ -21,6 +21,7 @@ import static org.dan.ping.pong.util.collection.FilterCollector.filtering;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.category.SelectedCid;
 import org.dan.ping.pong.app.match.MatchInfo;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 @Slf4j
-public class PlayOffLayeredCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
+public class PlayOffLayeredCategoryPlayOffBuilder {
     @Inject
     private FlatCategoryPlayOffBuilder ladderBuilder;
 
@@ -59,8 +60,10 @@ public class PlayOffLayeredCategoryPlayOffBuilder implements CategoryPlayOffBuil
     @Inject
     private CastingLotsService castingLotsService;
 
-    @Override
-    public void build(SelectedCid sCid, List<ParticipantMemState> bids) {
+    @Inject
+    private BidService bidService;
+
+    public void buildMerged(SelectedCid sCid) {
         final Map<Integer, List<Bid>> bidsByLevels = compact(findBidLevels(sCid));
         final int maxLevel = bidsByLevels.keySet().stream().mapToInt(o -> o)
                 .max().orElseThrow(() -> internalError("no play off matches"));
@@ -77,6 +80,22 @@ public class PlayOffLayeredCategoryPlayOffBuilder implements CategoryPlayOffBuil
         attachLevel(sCid, bidsByLevels, finalLevel, lastMergeMid, 1);
     }
 
+    public void buildIndependent(SelectedCid sCid) {
+        final Map<Integer, List<Bid>> bidsByLevels = compact(findBidLevels(sCid));
+        bidsByLevels.forEach((iLevel, bids) -> {
+            final List<ParticipantMemState> levelBids = consoleParticipantsOnLevel(
+                    sCid, bidsByLevels, iLevel);
+            if (levelBids.size() == 1) {
+                bidService.setBidState(levelBids.get(0), Win1, sCid.batch());
+            } else if (levelBids.size() > 1) {
+                buildForManyBids(sCid, 1, Optional.empty(), iLevel, levelBids);
+            } else {
+                throw internalError("empty level " + iLevel
+                        + " in " + sCid.tid() + " " + sCid.cid());
+            }
+        });
+    }
+
     private Map<Integer, List<Bid>> compact(Map<Integer, List<Bid>> bidsByLevels) {
         final List<Integer> emptyLevels = bidsByLevels.entrySet().stream()
                 .filter(e -> e.getValue().isEmpty())
@@ -87,23 +106,35 @@ public class PlayOffLayeredCategoryPlayOffBuilder implements CategoryPlayOffBuil
 
     public void attachLevel(SelectedCid sCid, Map<Integer, List<Bid>> bidsByLevels,
             int finalLevel, Optional<Mid> lastMergeMid, int iLevel) {
-        final List<ParticipantMemState> levelBids = ofNullable(bidsByLevels.get(iLevel))
-                .map(lBids -> lBids.stream().map(sCid::getBid).collect(toList()))
-                .orElseThrow(() -> internalError("no bids on level "
-                        + iLevel + " in tid " + sCid.tid() + " cid " + sCid.cid()));
+        final List<ParticipantMemState> levelBids = consoleParticipantsOnLevel(
+                sCid, bidsByLevels, iLevel);
         if (levelBids.size() == 1) {
             matchService.assignBidToMatch(sCid.tournament(), lastMergeMid.get(),
                     levelBids.get(0).getBid(), sCid.batch());
         } else if (levelBids.size() > 1) {
-            final PlayOffGenerator generator = castingLotsService.createPlayOffGen(
-                    sCid, consoleTagO(iLevel), finalLevel - 1,
-                    lastMergeMid.map(m -> POff).orElse(Gold));
-            ladderBuilder.buildRanked(
-                    levelBids, lastMergeMid, finalLevel - 1, generator);
+            buildForManyBids(sCid, finalLevel, lastMergeMid, iLevel, levelBids);
         } else {
             throw internalError("empty level " + iLevel
                     + " in " + sCid.tid() + " " + sCid.cid());
         }
+    }
+
+    public List<ParticipantMemState> consoleParticipantsOnLevel(
+            SelectedCid sCid, Map<Integer, List<Bid>> bidsByLevels, int iLevel) {
+        return ofNullable(bidsByLevels.get(iLevel))
+                .map(lBids -> lBids.stream().map(sCid::getBid).collect(toList()))
+                .orElseThrow(() -> internalError("no bids on level "
+                        + iLevel + " in tid " + sCid.tid() + " cid " + sCid.cid()));
+    }
+
+    private void buildForManyBids(
+            SelectedCid sCid, int finalLevel, Optional<Mid> lastMergeMid,
+            int iLevel, List<ParticipantMemState> levelBids) {
+        final PlayOffGenerator generator = castingLotsService.createPlayOffGen(
+                sCid, consoleTagO(iLevel), finalLevel - 1,
+                lastMergeMid.map(m -> POff).orElse(Gold));
+        ladderBuilder.buildRanked(
+                levelBids, lastMergeMid, finalLevel - 1, generator);
     }
 
     private static final Map<MatchType, BidState> WIN_MATCH = ImmutableMap.of(

@@ -778,22 +778,27 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
     }
 
     private ImperativeSimulator masterPlay(ImperativeSimulator master) {
-        return master // master groups
+        return masterPlay(master, true);
+    }
+
+    private ImperativeSimulator masterPlay(ImperativeSimulator master, boolean t3rd) {
+        master // master groups
                 .scoreSet(p1, 11, p8, 7)
                 .scoreSet(p2, 11, p7, 5)
                 .scoreSet(p3, 11, p6, 3)
                 .scoreSet(p4, 11, p5, 1)
                 .reloadMatchMap()
                 .scoreSet(p1, 11, p4, 3)
-                .scoreSet(p2, 11, p3, 1)
+                .scoreSet(p2, 11, p3, 5)
                 .reloadMatchMap()
-                .scoreSet(p3, 11, p4, 7)
-
-                .scoreSet(p1, 11, p2, 3)
-
-                .checkResult(p1, p2, p3, p4, p8, p7, p6, p5)
+                .scoreSet(p1, 11, p2, 3);
+        if (t3rd) {
+            master.scoreSet(p3, 11, p4, 7);
+        }
+        return master.checkResult(p1, p2, p3, p4, p8, p7, p6, p5)
                 .checkTournamentComplete(
-                        restState(Lost).bid(p3, Win3).bid(p2, Win2).bid(p1, Win1))
+                        restState(Lost).bid(p3, t3rd ? Win3 : Lost)
+                                .bid(p2, Win2).bid(p1, Win1))
                 .resolveCategories();
     }
 
@@ -1083,6 +1088,41 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 });
     }
 
+    @Test
+    public void notMergedLayeredPlayOffConsoleTournament() {
+        final TournamentScenario scenario = begin().name("layeredConsoleTour2Tags")
+                .rules(RULES_JP_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4, p5, p6, p7, p8);
+        isf.create(scenario)
+                .run(master -> {
+                    master.beginTournament()
+                            .createConsoleTournament(ConOff)
+                            .updateConsoleRules(RULES_JP_S1A2G11_NP
+                                    .withCasting(
+                                            RULES_JP_S1A2G11_NP.getCasting()
+                                                    .withSplitPolicy(ConsoleLayered))
+                                    .withPlayOff(
+                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
+                                                    pr -> pr.withLayerPolicy(
+                                                            Optional.of(IndependentLayers)))));
+
+                    final ImperativeSimulator console = masterPlay(master, false);
+
+                    console.checkTournament(Open, restState(Play))
+                            .scoreSet(p5, 11, p8, 3)
+                            .scoreSet(p6, 11, p7, 1)
+                            .reloadMatchMap()
+                            .scoreSet(p5, 11, p6, 1)
+                            // another layer
+                            .scoreSet(p3, 11, p4, 7)
+                            .checkTournamentComplete(restState(Lost)
+                                    .bid(p5, Win1).bid(p6, Win2)
+                                    .bid(p3, Win1).bid(p4, Win2));
+                });
+    }
+
     // create play off console after master tournament started
     // create play off console after master tournament complete
+
+    // rescore match in master tournament which affects participants in merged console
 }

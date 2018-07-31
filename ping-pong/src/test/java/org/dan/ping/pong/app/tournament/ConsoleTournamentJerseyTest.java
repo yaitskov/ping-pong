@@ -1121,6 +1121,37 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 });
     }
 
+    @Test
+    public void notMergedLayeredPlayOffConsoleTournament3P() {
+        final TournamentScenario scenario = begin().name("lrdConTour2Tags3P")
+                .rules(RULES_JP_S1A2G11_NP_3P)
+                .category(c1, p1, p2, p3, p4, p5, p6, p7, p8);
+        isf.create(scenario)
+                .run(master -> {
+                    master.beginTournament()
+                            .createConsoleTournament(ConOff)
+                            .updateConsoleRules(RULES_JP_S1A2G11_NP
+                                    .withCasting(
+                                            RULES_JP_S1A2G11_NP.getCasting()
+                                                    .withSplitPolicy(ConsoleLayered))
+                                    .withPlayOff(
+                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
+                                                    pr -> pr.withLayerPolicy(
+                                                            Optional.of(IndependentLayers)))));
+
+                    final ImperativeSimulator console = masterPlay(master);
+
+                    console.checkTournament(Open, restState(Play).bid(p4, Win1))
+                            .scoreSet(p5, 11, p8, 3)
+                            .scoreSet(p6, 11, p7, 1)
+                            .reloadMatchMap()
+                            .scoreSet(p5, 11, p6, 1)
+                            .checkTournamentComplete(restState(Lost)
+                                    .bid(p5, Win1).bid(p6, Win2)
+                                    .bid(p4, Win1));
+                });
+    }
+
     // create play off console after master tournament started
     // create play off console after master tournament complete
 

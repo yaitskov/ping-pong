@@ -381,4 +381,9 @@ public class TournamentMemState {
     public CastingLotsRule casting() {
         return rule.getCasting();
     }
+
+    public ParticipantMemState getBidOrEx(Bid bid) {
+        return ofNullable(getBid(bid))
+                .orElseThrow(() -> internalError("No bid " + bid + " in tid " + tid));
+    }
 }

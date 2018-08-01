@@ -1,8 +1,11 @@
 package org.dan.ping.pong.app.tournament.console;
 
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.TERMINAL_STATE;
+import static org.dan.ping.pong.app.castinglots.PlayOffLoserSelector.selectLosersForConsole;
 import static org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy.MasterOutcome;
 import static org.dan.ping.pong.app.group.ConsoleTournament.INDEPENDENT_RULES;
 import static org.dan.ping.pong.app.playoff.PlayOffGuests.JustLosers;
@@ -23,7 +26,6 @@ import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.MatchInfo;
-import org.dan.ping.pong.app.playoff.PlayOffGuests;
 import org.dan.ping.pong.app.tournament.CreateTournament;
 import org.dan.ping.pong.app.tournament.EnlistTournament;
 import org.dan.ping.pong.app.tournament.RelatedTids;
@@ -121,7 +123,9 @@ public class ConsoleTournamentService {
                                                 Optional.of(p.getConsoleParticipants()
                                                         .orElse(JustLosers)))
                                         .withConsole(INDEPENDENT_RULES))));
-                // enlist from complete ladders
+                masterTournament.getRule().getPlayOff().ifPresent(playOffRules ->
+                        enlistPlayersFromCompleteCategories(masterTournament,
+                                tournamentCache.load(consoleTid), batch));
                 break;
             default:
                 throw internalError("Type " + type + " not supported");
@@ -145,26 +149,46 @@ public class ConsoleTournamentService {
         if (type == ConOff && !masterTournament.getRule().getPlayOff().isPresent()) {
             throw badRequest("Master tournament " + masterTournament.getTid()
                     + " has no playOff");
-
         }
     }
 
-    private void enlistPlayersFromCompleteGroups(TournamentMemState masterTournament,
-            TournamentMemState consoleTournament, DbUpdater batch) {
+    private void enlistPlayersFromCompleteCategories(TournamentMemState mTour,
+            TournamentMemState conTour, DbUpdater batch) {
+        mTour.matches()
+                .filter(m -> !m.getGid().isPresent())
+                .collect(groupingBy(MatchInfo::getCid, toList()))
+                .forEach((mCid, mPlayOffBids) -> {
+                    final Cid conCid = categoryService.findCidOrCreate(mTour, mCid, conTour, batch);
+                    selectLosersForConsole(mTour, mPlayOffBids.stream())
+                            .forEach((level, consoleBids) ->
+                                    consoleBids.stream().map(mTour::getBidOrEx).forEach(par ->
+                                            tournamentService.enlistToConsole(
+                                                    par.getBid(),
+                                                    EnlistTournament.builder()
+                                                            .categoryId(conCid)
+                                                            .bidState(Here)
+                                                            .providedRank(Optional.empty())
+                                                            .build(),
+                                                    conTour, par, batch)));
+                });
+    }
+
+    private void enlistPlayersFromCompleteGroups(TournamentMemState mTour,
+            TournamentMemState conTour, DbUpdater batch) {
         final Map<Gid, List<MatchInfo>> matchesByGroup = groupService
-                .groupMatchesByGroup(masterTournament);
-        final Set<Gid> incompleteGroups = groupService.findIncompleteGroups(masterTournament);
+                .groupMatchesByGroup(mTour);
+        final Set<Gid> incompleteGroups = groupService.findIncompleteGroups(mTour);
         incompleteGroups.forEach(matchesByGroup::remove);
 
         matchesByGroup.forEach((gid, groupMatches) -> {
-            final int quitsGroup = masterTournament.getRule().getGroup().get().getQuits();
+            final int quitsGroup = mTour.getRule().getGroup().get().getQuits();
             final List<Bid> orderedGroupUids = groupService.orderBidsInGroup(
-                    gid, masterTournament, groupMatches);
+                    gid, mTour, groupMatches);
             final Cid consoleCid = categoryService.findCidOrCreate(
-                    masterTournament, gid, consoleTournament, batch);
+                    mTour, gid, conTour, batch);
 
             orderedGroupUids.stream().skip(quitsGroup)
-                    .map(masterTournament::getBidOrQuit)
+                    .map(mTour::getBidOrQuit)
                     .forEach(bid ->
                             tournamentService.enlistToConsole(
                                     bid.getBid(),
@@ -176,7 +200,7 @@ public class ConsoleTournamentService {
                                                             : Here)
                                             .providedRank(Optional.empty())
                                             .build(),
-                                    consoleTournament, bid, batch));
+                                    conTour, bid, batch));
         });
     }
 }

@@ -76,6 +76,23 @@ import javax.inject.Inject;
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = JerseyWithSimulator.class)
 public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
+    private static final TournamentRules RULES_JP_CON_INDEPENDENT = RULES_JP_S1A2G11_NP
+            .withCasting(
+                    RULES_JP_S1A2G11_NP.getCasting()
+                            .withSplitPolicy(ConsoleLayered))
+            .withPlayOff(
+                    RULES_JP_S1A2G11_NP.getPlayOff().map(
+                            pr -> pr.withLayerPolicy(
+                                    Optional.of(IndependentLayers))));
+
+    private static final TournamentRules RULES_JP_CON_MERGED = RULES_JP_S1A2G11_NP
+            .withCasting(
+                    RULES_JP_S1A2G11_NP.getCasting()
+                            .withSplitPolicy(ConsoleLayered))
+            .withPlayOff(
+                    RULES_JP_S1A2G11_NP.getPlayOff().map(
+                            pr -> pr.withLayerPolicy(
+                                    Optional.of(MergeLayers))));
     @Inject
     private ImperativeSimulatorFactory isf;
 
@@ -671,14 +688,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 .run(master -> {
                     master.beginTournament()
                             .createConsoleTournament(ConOff)
-                            .updateConsoleRules(RULES_JP_S1A2G11_NP
-                                    .withCasting(
-                                            RULES_JP_S1A2G11_NP.getCasting()
-                                                    .withSplitPolicy(ConsoleLayered))
-                                    .withPlayOff(
-                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
-                                                    pr -> pr.withLayerPolicy(
-                                                            Optional.of(MergeLayers)))));
+                            .updateConsoleRules(RULES_JP_CON_MERGED);
 
                     final ImperativeSimulator console = master // master groups
                             .scoreSet(p1, 11, p8, 7)
@@ -722,14 +732,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 .run(master -> {
                     master.beginTournament()
                             .createConsoleTournament(ConOff)
-                            .updateConsoleRules(RULES_JP_S1A2G11_NP
-                                    .withCasting(
-                                            RULES_JP_S1A2G11_NP.getCasting()
-                                                    .withSplitPolicy(ConsoleLayered))
-                                    .withPlayOff(
-                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
-                                                    pr -> pr.withLayerPolicy(
-                                                            Optional.of(MergeLayers)))));
+                            .updateConsoleRules(RULES_JP_CON_MERGED);
 
                     final ImperativeSimulator console = masterPlay(master);
 
@@ -753,14 +756,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 .run(master -> {
                     master.beginTournament()
                             .createConsoleTournament(ConOff)
-                            .updateConsoleRules(RULES_JP_S1A2G11_NP
-                                    .withCasting(
-                                            RULES_JP_S1A2G11_NP.getCasting()
-                                                    .withSplitPolicy(ConsoleLayered))
-                                    .withPlayOff(
-                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
-                                                    pr -> pr.withLayerPolicy(
-                                                            Optional.of(MergeLayers)))));
+                            .updateConsoleRules(RULES_JP_CON_MERGED);
 
                     final ImperativeSimulator console = masterPlay(master);
 
@@ -814,14 +810,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 .run(master -> {
                     master.beginTournament()
                             .createConsoleTournament(ConOff)
-                            .updateConsoleRules(RULES_JP_S1A2G11_NP
-                                    .withCasting(
-                                            RULES_JP_S1A2G11_NP.getCasting()
-                                                    .withSplitPolicy(ConsoleLayered))
-                                    .withPlayOff(
-                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
-                                                    pr -> pr.withLayerPolicy(
-                                                            Optional.of(MergeLayers)))));
+                            .updateConsoleRules(RULES_JP_CON_MERGED);
 
                     final ImperativeSimulator console = masterPlay(master);
 
@@ -853,14 +842,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 .run(master -> {
                     master.beginTournament()
                             .createConsoleTournament(ConOff)
-                            .updateConsoleRules(RULES_JP_S1A2G11_NP
-                                    .withCasting(
-                                            RULES_JP_S1A2G11_NP.getCasting()
-                                                    .withSplitPolicy(ConsoleLayered))
-                                    .withPlayOff(
-                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
-                                                    pr -> pr.withLayerPolicy(
-                                                            Optional.of(MergeLayers)))));
+                            .updateConsoleRules(RULES_JP_CON_MERGED);
 
                     final ImperativeSimulator console = masterPlay(master);
 
@@ -895,14 +877,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 .run(master -> {
                     master.beginTournament()
                             .createConsoleTournament(ConOff)
-                            .updateConsoleRules(RULES_JP_S1A2G11_NP
-                                    .withCasting(
-                                            RULES_JP_S1A2G11_NP.getCasting()
-                                                    .withSplitPolicy(ConsoleLayered))
-                                    .withPlayOff(
-                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
-                                                    pr -> pr.withLayerPolicy(
-                                                            Optional.of(MergeLayers)))));
+                            .updateConsoleRules(RULES_JP_CON_MERGED);
 
                     final ImperativeSimulator console = masterPlay(master);
 
@@ -1012,14 +987,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 .run(master -> {
                     master.beginTournament()
                             .createConsoleTournament(ConOff)
-                            .updateConsoleRules(RULES_JP_S1A2G11_NP
-                                    .withCasting(
-                                            RULES_JP_S1A2G11_NP.getCasting()
-                                                    .withSplitPolicy(ConsoleLayered))
-                                    .withPlayOff(
-                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
-                                                    pr -> pr.withLayerPolicy(
-                                                            Optional.of(MergeLayers)))));
+                            .updateConsoleRules(RULES_JP_CON_MERGED);
 
                     final ImperativeSimulator console = master // master groups
                             .scoreSet(p1, 11, p8, 7)
@@ -1097,14 +1065,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 .run(master -> {
                     master.beginTournament()
                             .createConsoleTournament(ConOff)
-                            .updateConsoleRules(RULES_JP_S1A2G11_NP
-                                    .withCasting(
-                                            RULES_JP_S1A2G11_NP.getCasting()
-                                                    .withSplitPolicy(ConsoleLayered))
-                                    .withPlayOff(
-                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
-                                                    pr -> pr.withLayerPolicy(
-                                                            Optional.of(IndependentLayers)))));
+                            .updateConsoleRules(RULES_JP_CON_INDEPENDENT);
 
                     final ImperativeSimulator console = masterPlay(master, false);
 
@@ -1130,14 +1091,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 .run(master -> {
                     master.beginTournament()
                             .createConsoleTournament(ConOff)
-                            .updateConsoleRules(RULES_JP_S1A2G11_NP
-                                    .withCasting(
-                                            RULES_JP_S1A2G11_NP.getCasting()
-                                                    .withSplitPolicy(ConsoleLayered))
-                                    .withPlayOff(
-                                            RULES_JP_S1A2G11_NP.getPlayOff().map(
-                                                    pr -> pr.withLayerPolicy(
-                                                            Optional.of(IndependentLayers)))));
+                            .updateConsoleRules(RULES_JP_CON_INDEPENDENT);
 
                     final ImperativeSimulator console = masterPlay(master);
 
@@ -1152,8 +1106,31 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 });
     }
 
-    // create play off console after master tournament started
-    // create play off console after master tournament complete
+    @Test
+    public void createMrdLrdConPlayOffTourAfterMasterStarted() {
+        final TournamentScenario scenario = begin().name("mrdLrdConPlayOffAfterMaster")
+                .rules(RULES_JP_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4);
+        isf.create(scenario)
+                .run(c -> c.beginTournament()
+                        .scoreSet(p1, 11, p4, 3)
+                        .scoreSet(p2, 11, p3, 1)
+                        .scoreSet(p1, 11, p2, 2)
+                        .checkTournamentComplete(restState(Lost).bid(p2, Win2).bid(p1, Win1))
+                        .createConsoleTournament(ConOff)
+                        .resolveCategories()
+                        .updateRules(RULES_JP_CON_MERGED)
+                        .beginTournament()
+                        .checkTournament(Open, restState(Want).bid(p3, Play).bid(p4, Play))
+                        .reloadMatchMap()
+                        .scoreSet(p3, 11, p4, 7)
+                        .checkTournamentComplete(restState(Lost)
+                                .bid(p3, Win1).bid(p4, Win2)));
+    }
+
+    // create play off merged console after master tournament complete
 
     // rescore match in master tournament which affects participants in merged console
+
+    // con tour trigger policy - manually | auto (m tour complete, m tour category complete, asap)
 }

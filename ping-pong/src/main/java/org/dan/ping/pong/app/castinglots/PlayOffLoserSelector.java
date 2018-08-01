@@ -39,6 +39,7 @@ public class PlayOffLoserSelector {
         final Map<BidState, Bid> winState2Bid = new HashMap<>(2);
 
         final Map<Integer, List<Bid>> result = matches
+                .filter(MatchInfo::isOver)
                 .peek(m -> maxLevel.accept(m.getLevel()))
                 .peek(m ->
                         ofNullable(WIN_MATCH.get(m.getType())).ifPresent(

@@ -12,6 +12,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.badRequest;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
@@ -173,6 +174,11 @@ public class MatchInfo {
 
     public Gid groupId() {
         return gid.orElseThrow(() -> internalError("Match is not in a group", MID, mid));
+    }
+
+    @JsonIgnore
+    public boolean isOver() {
+        return winnerId.isPresent();
     }
 
     public static class MatchInfoBuilder {

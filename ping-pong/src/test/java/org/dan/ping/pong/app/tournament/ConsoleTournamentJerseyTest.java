@@ -1107,8 +1107,8 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
     }
 
     @Test
-    public void createMrdLrdConPlayOffTourAfterMasterStarted() {
-        final TournamentScenario scenario = begin().name("mrdLrdConPlayOffAfterMaster")
+    public void createMrdLrdConPlayOffTourAfterMasterComplete() {
+        final TournamentScenario scenario = begin().name("mrdLrdConPlayOffAfterMasterE")
                 .rules(RULES_JP_S1A2G11_NP)
                 .category(c1, p1, p2, p3, p4);
         isf.create(scenario)
@@ -1128,7 +1128,30 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                                 .bid(p3, Win1).bid(p4, Win2)));
     }
 
-    // create play off merged console after master tournament complete
+    @Test
+    public void createMrdLrdConPlayOffTourAfterMasterStarted() {
+        final TournamentScenario scenario = begin().name("mrdLrdConPlayOffAfterMasterS")
+                .rules(RULES_JP_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4);
+        isf.create(scenario)
+                .run(c -> {
+                    final ImperativeSimulator console = c.beginTournament()
+                            .scoreSet(p1, 11, p4, 3)
+                            .createConsoleTournament(ConOff)
+                            .resolveCategories()
+                            .updateRules(RULES_JP_CON_MERGED);
+                    c
+                            .scoreSet(p2, 11, p3, 1)
+                            .scoreSet(p1, 11, p2, 2)
+                            .checkTournamentComplete(restState(Lost).bid(p2, Win2).bid(p1, Win1));
+                    console
+                            .checkTournament(Open, restState(Want).bid(p3, Play).bid(p4, Play))
+                            .reloadMatchMap()
+                            .scoreSet(p3, 11, p4, 7)
+                            .checkTournamentComplete(restState(Lost)
+                                    .bid(p3, Win1).bid(p4, Win2));
+                });
+    }
 
     // rescore match in master tournament which affects participants in merged console
 

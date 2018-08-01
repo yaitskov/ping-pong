@@ -8,6 +8,7 @@ import static org.dan.ping.pong.app.group.GroupRulesConst.G8Q2;
 import static org.dan.ping.pong.app.match.MatchRulesConst.S1A2G11;
 import static org.dan.ping.pong.app.match.MatchRulesConst.S2A2G11;
 import static org.dan.ping.pong.app.match.MatchRulesConst.S3A2G11;
+import static org.dan.ping.pong.app.playoff.ConsoleLayersPolicy.IndependentLayers;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.L1_3P;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing1;
 import static org.dan.ping.pong.app.playoff.PlayOffRule.Losing2;
@@ -18,6 +19,7 @@ import static org.dan.ping.pong.app.tournament.CastingLotsRulesConst.LAYERED_CON
 
 import org.dan.ping.pong.app.place.ArenaDistributionPolicy;
 import org.dan.ping.pong.app.place.PlaceRules;
+import org.dan.ping.pong.app.playoff.ConsoleLayersPolicy;
 
 import java.util.Optional;
 
@@ -128,7 +130,8 @@ public class TournamentRulesConst {
             .match(S1A2G11)
             .group(Optional.empty())
             .casting(LAYERED_CONSOLE_CASTING)
-            .playOff(Optional.of(Losing1))
+            .playOff(Optional.of(Losing1.withLayerPolicy(
+                    Optional.of(IndependentLayers))))
             .place(Optional.empty())
             .build();
 }

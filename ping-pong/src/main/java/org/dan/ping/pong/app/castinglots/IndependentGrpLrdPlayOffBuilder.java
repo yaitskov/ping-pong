@@ -4,6 +4,7 @@ import static java.util.Optional.empty;
 import static org.dan.ping.pong.app.castinglots.FlatCategoryPlayOffBuilder.validateBidsNumberInACategory;
 import static org.dan.ping.pong.app.match.MatchTag.consoleTagO;
 import static org.dan.ping.pong.app.match.MatchType.Gold;
+import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import org.dan.ping.pong.app.category.SelectedCid;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
@@ -32,8 +33,12 @@ public class IndependentGrpLrdPlayOffBuilder extends GroupLayeredCategoryPlayOff
         final Map<Integer, List<ParticipantMemState>> bidsByFinalGroupPosition
                 = findFinalPositions(sCid.tournament(), masterTournament, bids);
 
+        final int limit = bidsByFinalGroupPosition.keySet().stream()
+                .mapToInt(o -> o + 1).max()
+                .orElseThrow(() -> internalError("No Levels in groups of cid "
+                        + sCid.cid() + " tid " + sCid.tid()));
         for (int iLevel = masterTournament.groupRules().getQuits();
-             iLevel < bidsByFinalGroupPosition.size(); ++iLevel) {
+             iLevel < limit; ++iLevel) {
             final PlayOffGenerator generator = castingLotsService
                     .createPlayOffGen(sCid, consoleTagO(iLevel), 0, Gold);
 

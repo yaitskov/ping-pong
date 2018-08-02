@@ -9,6 +9,7 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static org.dan.ping.pong.app.match.AffectedMatches.NO_AFFECTED_MATCHES;
 import static org.dan.ping.pong.app.match.AffectedMatches.ofResets;
+import static org.dan.ping.pong.app.match.MatchBid.matchBidOf;
 import static org.dan.ping.pong.app.match.MatchInfo.MID;
 import static org.dan.ping.pong.app.match.MatchState.Auto;
 import static org.dan.ping.pong.app.match.rule.service.GroupRuleParams.ofParams;
@@ -74,6 +75,9 @@ public class AffectedMatchesService {
         throw badRequest(effectedMatches.createError(tournament, expectedEffectHash));
     }
 
+    @Inject
+    private AffectedConsoleMatchesService affectedConMatches;
+
     public AffectedMatches findEffectedMatches(
             TournamentMemState tournament, MatchInfo rescoringMatch,
             MatchSets newSets) {
@@ -92,7 +96,7 @@ public class AffectedMatchesService {
         matches.stream()
                 .filter(m -> m.getParticipantIdScore().containsKey(bid))
                 .forEach(m -> {
-                    result.add(MatchBid.builder().bid(bid).mid(m.getMid()).build());
+                    result.add(matchBidOf(m.getMid(), bid));
                     m.getWinnerId().ifPresent(wUid -> {
                         if (wUid.equals(bid)) {
                             m.getWinnerMid().ifPresent(wMid ->
@@ -138,26 +142,24 @@ public class AffectedMatchesService {
     }
 
     private AffectedMatches findAffectedByDisambiguationMatch(TournamentMemState tournament,
-            MatchInfo gmiNewScore, List<MatchInfo> allGroupMatches) {
-        final List<MatchInfo> newAllGroupMatches = replaceMatch(gmiNewScore, allGroupMatches);
+            MatchInfo newMatch, List<MatchInfo> allGroupMatches) {
+        final List<MatchInfo> newAllGroupMatches = replaceMatch(newMatch, allGroupMatches);
         return AffectedMatches.builder()
-                .toBeCreated(emptySet())
-                .toBeRemoved(emptySet())
                 .toBeReset(playOffMatchesAffectedByGroupWithPossibleDm(tournament,
                         allGroupMatches, newAllGroupMatches))
                 .build();
     }
 
     private AffectedMatches findEffectMatchesByMatchInGroup(
-            TournamentMemState tournament, MatchInfo gmi,
+            TournamentMemState tournament, MatchInfo oldMatch,
             MatchSets newSets) {
-        final MatchInfo gmiNewScore = sports.alternativeSets(tournament, gmi, newSets);
+        final MatchInfo newMatch = sports.alternativeSets(tournament, oldMatch, newSets);
         final List<MatchInfo> allGroupMatches = groupService.findAllMatchesInGroup(
-                tournament, gmi.groupId());
-        if (gmi.disambiguationP() || tournament.disambiguationMatchNotPossible()) {
-            return findAffectedByDisambiguationMatch(tournament, gmiNewScore, allGroupMatches);
+                tournament, oldMatch.groupId());
+        if (oldMatch.disambiguationP() || tournament.disambiguationMatchNotPossible()) {
+            return findAffectedByDisambiguationMatch(tournament, newMatch, allGroupMatches);
         } else {
-            return findAffectedByOriginMatch(tournament, gmi, gmiNewScore, allGroupMatches);
+            return findAffectedByOriginMatch(tournament, oldMatch, newMatch, allGroupMatches);
         }
     }
 
@@ -207,8 +209,8 @@ public class AffectedMatchesService {
 
             if (newIncompleteOriginMatches > 0) {
                 return AffectedMatches.builder()
-                        .toBeCreated(emptySet())
-                        .toBeRemoved(presentDmMatches.stream()
+                        .toBeCreatedDm(emptySet())
+                        .toBeRemovedDm(presentDmMatches.stream()
                                 .map(MatchInfo::getMid).collect(toSet()))
                         .toBeReset(playOffMatchesAffectedByUids(tournament,
                                 bidsByGroup(tournament, ogmi.getGid())))
@@ -225,7 +227,7 @@ public class AffectedMatchesService {
             List<MatchInfo> newOriginMatches, List<MatchInfo> presentDmMatches) {
         final Set<MatchParticipants> newDmMatchesToGenerate
                 = findPossibleDisambiguationMatchesToGenerate(tournament, newOriginMatches)
-                .getToBeCreated();
+                .getToBeCreatedDm();
         final Set<MatchParticipants> uidsOfPresentDmMatches = uidsOfMatches(presentDmMatches);
         final Set<Mid> midsToBeRemoved = presentDmMatches.stream()
                 .filter(m2 -> newDmMatchesToGenerate.stream()
@@ -235,8 +237,8 @@ public class AffectedMatchesService {
         final SetView<MatchParticipants> toBeCreated = difference(
                 newDmMatchesToGenerate, uidsOfPresentDmMatches);
         return AffectedMatches.builder()
-                .toBeCreated(toBeCreated)
-                .toBeRemoved(midsToBeRemoved)
+                .toBeCreatedDm(toBeCreated)
+                .toBeRemovedDm(midsToBeRemoved)
                 .toBeReset(playOffMatchesAffectedByGroupWithPossibleDm(tournament,
                         allGroupMatches,
                         concat(
@@ -253,20 +255,20 @@ public class AffectedMatchesService {
 
     private List<MatchBid> playOffMatchesAffectedByGroupWithPossibleDm(
             TournamentMemState tournament,
-            List<MatchInfo> allGroupMatches,
-            List<MatchInfo> allNewGroupMatches) {
-        final Gid gid = allGroupMatches.get(0).groupId();
+            List<MatchInfo> oldGroupMatches,
+            List<MatchInfo> newGroupMatches) {
+        final Gid gid = oldGroupMatches.get(0).groupId();
         final Set<Bid> groupBids = tournament.bidsInGroup(gid);
-        final GroupParticipantOrder order = groupParticipantOrderService
-                .findOrder(ofParams(Optional.of(gid), tournament, allGroupMatches,
+        final GroupParticipantOrder oldOrder = groupParticipantOrderService
+                .findOrder(ofParams(Optional.of(gid), tournament, oldGroupMatches,
                         tournament.orderRules(),
                         new HashSet<>(groupBids)));
         final GroupParticipantOrder newOrder = groupParticipantOrderService
-                .findOrder(ofParams(Optional.of(gid), tournament, allNewGroupMatches,
+                .findOrder(ofParams(Optional.of(gid), tournament, newGroupMatches,
                         tournament.orderRules(),
                         groupBids));
 
-        final List<Bid> wasDeterminedBids = order.determinedBids();
+        final List<Bid> wasDeterminedBids = oldOrder.determinedBids();
         final List<Bid> newDeterminedBids = newOrder.determinedBids();
         final List<Bid> affectedBids = new ArrayList<>();
         for (int i = 0; i < wasDeterminedBids.size(); ++i) {
@@ -315,8 +317,8 @@ public class AffectedMatchesService {
 
         return AffectedMatches.builder()
                 .toBeReset(emptyList())
-                .toBeRemoved(emptySet())
-                .toBeCreated(disambiguationMatches)
+                .toBeRemovedDm(emptySet())
+                .toBeCreatedDm(disambiguationMatches)
                 .build();
     }
 

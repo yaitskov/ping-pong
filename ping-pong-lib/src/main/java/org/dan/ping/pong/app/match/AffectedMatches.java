@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.match;
 
+import static java.util.Collections.emptyEnumeration;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
@@ -10,6 +11,7 @@ import static org.dan.ping.pong.app.match.NewEffectedMatch.toNewDisambiguationMa
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.sys.hash.HashAggregator;
 import org.dan.ping.pong.sys.hash.Hashable;
@@ -23,27 +25,28 @@ import java.util.Set;
 @Setter
 @Builder
 public class AffectedMatches implements Hashable {
+    private final Tid tid;
+    // replacement in console tournaments
+    private List<ParticipantReplace> toBeReplacedInCon;
     // play off matches
     private List<MatchBid> toBeReset;
     // disambiguation matches only
-    private Set<Mid> toBeRemoved;
+    private Set<Mid> toBeRemovedDm;
     // disambiguation matches only
-    private Set<MatchParticipants> toBeCreated;
+    private Set<MatchParticipants> toBeCreatedDm;
+
+    public static class AffectedMatchesBuilder {
+        List<ParticipantReplace> toBeReplacedInCon = emptyList();
+        List<MatchBid> toBeReset = emptyList();
+        Set<Mid> toBeRemovedDm = emptySet();
+        Set<MatchParticipants> toBeCreatedDm = emptySet();
+    }
 
     public static final AffectedMatches NO_AFFECTED_MATCHES = AffectedMatches
-            .builder()
-            .toBeReset(emptyList())
-            .toBeRemoved(emptySet())
-            .toBeCreated(emptySet())
-            .build();
+            .builder().build();
 
     public static AffectedMatches ofResets(List<MatchBid> toBeReset) {
-        return AffectedMatches
-                .builder()
-                .toBeReset(toBeReset)
-                .toBeRemoved(emptySet())
-                .toBeCreated(emptySet())
-                .build();
+        return AffectedMatches.builder().toBeReset(toBeReset).build();
     }
 
     public AffectedMatches deduplicate() {
@@ -57,19 +60,21 @@ public class AffectedMatches implements Hashable {
 
     @Override
     public void hashTo(HashAggregator sink) {
+        sink.section("tid").hash(tid).section("replace");
+        toBeReplacedInCon.stream().sorted().forEach(sink::hash);
         sink.section("reset");
         toBeReset.stream().sorted().forEach(sink::hash);
         sink.section("remove");
-        toBeRemoved.stream().sorted().forEach(sink::hash);
+        toBeRemovedDm.stream().sorted().forEach(sink::hash);
         sink.section("create");
-        toBeCreated.stream().sorted().forEach(sink::hash);
+        toBeCreatedDm.stream().sorted().forEach(sink::hash);
     }
 
     public EffectHashMismatchError createError(
             TournamentMemState tournament, Optional<String> expectedEffectHash) {
         return new EffectHashMismatchError(expectedEffectHash,
                 toEffectedMatchesByReset(tournament, toBeReset),
-                toNewDisambiguationMatches(tournament, toBeCreated),
-                toEffectedMatchesByRemove(tournament, toBeRemoved));
+                toNewDisambiguationMatches(tournament, toBeCreatedDm),
+                toEffectedMatchesByRemove(tournament, toBeRemovedDm));
     }
 }

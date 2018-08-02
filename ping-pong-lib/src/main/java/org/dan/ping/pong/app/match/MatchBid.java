@@ -4,7 +4,6 @@ import static java.util.stream.Collectors.toList;
 import static org.dan.ping.pong.app.match.EffectedMatch.ofMatchInfo;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +20,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@Builder
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
@@ -33,6 +31,10 @@ public class MatchBid implements Comparable<MatchBid>, Hashable {
 
     private Mid mid;
     private Bid bid;
+
+    public static MatchBid matchBidOf(Mid mid, Bid bid) {
+        return new MatchBid(mid, bid);
+    }
 
     @Override
     public int compareTo(MatchBid o) {

@@ -5,6 +5,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toMap;
 import static org.dan.ping.pong.app.match.MatchTag.DISAMBIGUATION;
+import static org.dan.ping.pong.app.match.TidMid.tidMidOf;
 import static org.dan.ping.pong.app.match.dispute.MatchSets.ofSets;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.BID;
 import static org.dan.ping.pong.app.tournament.ParticipantMemState.FILLER_LOSER_BID;
@@ -269,5 +270,9 @@ public class MatchInfo {
 
     boolean continues() {
         return !winnerId.isPresent();
+    }
+
+    public TidMid toTidMid() {
+        return tidMidOf(tid, mid);
     }
 }

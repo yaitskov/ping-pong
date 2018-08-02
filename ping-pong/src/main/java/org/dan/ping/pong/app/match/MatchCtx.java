@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Import;
         MatchDisputeCtx.class, MatchEditorService.class,
         PlayOffService.class, PlayOffRuleValidator.class,
         AffectedMatchesService.class,
+        AffectedConsoleMatchesService.class,
         GroupOrderRuleServiceCtx.class})
 public class MatchCtx {
 }

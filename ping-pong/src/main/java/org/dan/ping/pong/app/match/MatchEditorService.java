@@ -34,6 +34,8 @@ import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.tournament.TournamentTerminator;
+import org.dan.ping.pong.app.tournament.rel.RelatedTournamentsService;
+import org.dan.ping.pong.app.tournament.rel.TournamentGroup;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
@@ -172,7 +174,7 @@ public class MatchEditorService {
     private void reopenTournamentIfOpenMatch(TournamentMemState tournament, DbUpdater batch,
             AffectedMatches affectedMatches, Optional<Bid> newWinner) {
         if (tournament.getState() == Close) {
-            if (!affectedMatches.getToBeCreated().isEmpty()
+            if (!affectedMatches.getToBeCreatedDm().isEmpty()
                     || !affectedMatches.getToBeReset().isEmpty()
                     || !newWinner.isPresent()) {
                 tournamentTerminator.setTournamentState(tournament, Open, batch);
@@ -207,7 +209,8 @@ public class MatchEditorService {
                 sports.calcWonSets(tournament, mInfoExpectedAfter));
     }
 
-    public void resetMatchScore(TournamentMemState tournament, ResetSetScore reset, DbUpdater batch) {
+    public void resetMatchScore(
+            TournamentMemState tournament, ResetSetScore reset, DbUpdater batch) {
         final MatchInfo mInfo = tournament.getMatchById(reset.getMid());
         final int numberOfSets = mInfo.playedSets();
         if (numberOfSets < reset.getSetNumber()) {
@@ -221,6 +224,16 @@ public class MatchEditorService {
             return;
         }
 
+        resetScoreOfCompleteMatch(tournament, reset, batch, mInfo);
+    }
+
+    @Inject
+    private RelatedTournamentsService relatedTournaments;
+
+    public void resetScoreOfCompleteMatch(
+            TournamentMemState tournament, ResetSetScore reset,
+            DbUpdater batch, MatchInfo mInfo) {
+        final TournamentGroup tourGroup = relatedTournaments.groupOfConTours(tournament);
         final MatchSets newSets = mInfo.sliceFirstSets(reset.getSetNumber());
         final AffectedMatches affectedMatches = affectedMatchesService
                 .findEffectedMatches(tournament, mInfo, newSets);
@@ -244,9 +257,9 @@ public class MatchEditorService {
                         tournament, batch,
                         tournament.getMatchById(aMatch.getMid()),
                         aMatch.getBid()));
-        matchRemover.deleteByMids(tournament, batch, affectedMatches.getToBeRemoved());
+        matchRemover.deleteByMids(tournament, batch, affectedMatches.getToBeRemovedDm());
 
-        affectedMatches.getToBeCreated().forEach(
+        affectedMatches.getToBeCreatedDm().forEach(
                 mp -> groupService.createDisambiguateMatches(batch, tournament,
                         tournament.getParticipant(mp.getBidLess()).gid(), mp));
     }

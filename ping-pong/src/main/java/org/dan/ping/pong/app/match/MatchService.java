@@ -815,9 +815,10 @@ public class MatchService implements MatchServiceIf {
                                 .collect(toList()))
                         .showTables(tournament.getRule().arenaDistribution() != NO)
                         .progress(tournamentProgress(tournament, bid))
-                        .bidState(ImmutableMap.of(
+                        .bidState(ImmutableMap.of(tournament.getTid(),
+                                ImmutableMap.of(
                                 tournament.getParticipant(bid).getCid(),
-                                tournament.getParticipant(bid).state()))
+                                tournament.getParticipant(bid).state())))
                         .build());
     }
 

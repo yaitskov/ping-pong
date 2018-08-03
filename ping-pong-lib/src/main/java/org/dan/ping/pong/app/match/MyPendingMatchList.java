@@ -12,7 +12,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.category.Cid;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentProgress;
+import org.dan.ping.pong.util.collection.MapUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +28,7 @@ public class MyPendingMatchList {
     private List<MyPendingMatch> matches = emptyList();
     private TournamentProgress progress;
     private boolean showTables;
-    private Map<Cid, BidState> bidState;
+    private Map<Tid, Map<Cid, BidState>> bidState;
 
     public static class MyPendingMatchListBuilder {
         List<MyPendingMatch> matches = emptyList();
@@ -42,11 +44,12 @@ public class MyPendingMatchList {
                         .addAll(matches)
                         .addAll(b.matches)
                         .build())
-                .bidState(ImmutableMap
-                        .<Cid, BidState>builder()
-                        .putAll(bidState)
-                        .putAll(b.bidState)
-                        .build())
+                .bidState(MapUtils.merge(bidState, b.bidState,
+                        (cid2StateOld, cid2StateNew) -> ImmutableMap
+                                .<Cid, BidState>builder()
+                                .putAll(cid2StateOld)
+                                .putAll(cid2StateNew)
+                                .build()))
                 .build();
     }
 }

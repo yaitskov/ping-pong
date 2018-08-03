@@ -50,7 +50,8 @@ public class FindOpenMatchesByUidJerseyTest extends AbstractSpringJerseyTest {
                         MyPendingMatchList.class);
         assertThat(matches.isShowTables(), is(false));
         assertThat(matches.getBidState(),
-                is(ImmutableMap.of(scenario.getCategoryDbId().get(c1), Play)));
+                is(ImmutableMap.of(scenario.getTid(),
+                        ImmutableMap.of(scenario.getCategoryDbId().get(c1), Play))));
         assertThat(
                 matches.getMatches().stream()
                         .map(MyPendingMatch::getEnemy)

@@ -492,12 +492,15 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
                 });
     }
 
+    private static TournamentRules withConsole(TournamentRules rules) {
+        return rules.withGroup(rules.getGroup()
+                .map(gr -> gr.withConsole(INDEPENDENT_RULES)));
+    }
+
     @Test
     public void layeredForGroup2Defeats() {
         final TournamentScenario scenario = begin().name("lrdForGroup2Def")
-                .rules(RULES_G2Q1_S1A2G11_NP.withGroup(
-                        RULES_G2Q1_S1A2G11_NP.getGroup()
-                                .map(gr -> gr.withConsole(INDEPENDENT_RULES))))
+                .rules(withConsole(RULES_G2Q1_S1A2G11_NP))
                 .category(c1, p1, p2, p3, p4, p5, p6, p7, p8);
         isf.create(scenario)
                 .run(c -> {
@@ -545,12 +548,12 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void consoleForGroupWithGroupAndPlayOff() {
         final TournamentScenario scenario = begin().name("conForGrpWithGrpAndPlayOff")
-                .rules(RULES_G3Q1_S1A2G11_NP)
+                .rules(withConsole(RULES_G3Q1_S1A2G11_NP))
                 .category(c1, p1, p2, p3, p4, p5);
         isf.create(scenario)
                 .run(master -> {
-                    master.beginTournament()
-                            .createConsoleGruTournament()
+                    master.createConsoleGruTournament()
+                            .beginTournament()
                             .updateConsoleRules(RULES_G2Q1_S1A2G11_NP
                                     .withCasting(RULES_G2Q1_S1A2G11_NP
                                             .getCasting().withPolicy(MasterOutcome)));

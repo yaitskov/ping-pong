@@ -5,6 +5,7 @@ import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
+import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.ConsoleLayered;
 import static org.dan.ping.pong.app.group.ConsoleTournament.NO;
 import static org.dan.ping.pong.app.table.TableService.STATE;
 import static org.dan.ping.pong.app.tournament.EnlistPolicy.ONCE_PER_TOURNAMENT;
@@ -24,6 +25,7 @@ import lombok.SneakyThrows;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
+import org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy;
 import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.group.ConsoleTournament;
 import org.dan.ping.pong.app.group.Gid;
@@ -160,8 +162,10 @@ public class TournamentValidationService {
             if (pr.getConsole() != NO) {
                 throw badRequest("console playOff cannot have console tournament");
             }
-            if (!pr.getLayerPolicy().isPresent()) {
-                throw badRequest("tournament for console playOff must have layer policy");
+            if (rules.getCasting().getSplitPolicy() == ConsoleLayered) {
+                if (!pr.getLayerPolicy().isPresent()) {
+                    throw badRequest("tournament for console layered playOff must have layer policy");
+                }
             }
         });
     }

@@ -1,5 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
+import static java.util.Optional.ofNullable;
 import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 
 import lombok.Builder;
@@ -30,5 +31,14 @@ public class RelatedTids {
                 .map(Map.Entry::getKey)
                 .findAny()
                 .orElseThrow(() -> internalError("tid " + tid + " is not child of"));
+    }
+
+    public Optional<Tid> childO(TournamentRelationType type) {
+        return ofNullable(children.get(type));
+    }
+
+    public Tid child(TournamentRelationType type) {
+        return childO(type).orElseThrow(
+                () -> internalError("Tournament has no child of type " + type));
     }
 }

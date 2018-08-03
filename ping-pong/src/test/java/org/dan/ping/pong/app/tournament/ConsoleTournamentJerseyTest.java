@@ -495,17 +495,14 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
     @Test
     public void layeredForGroup2Defeats() {
         final TournamentScenario scenario = begin().name("lrdForGroup2Def")
-                .rules(RULES_G2Q1_S1A2G11_NP.withPlayOff(
-                        RULES_G2Q1_S1A2G11_NP.getPlayOff()
-                                .map(pr -> pr
-                                        .withConsole(INDEPENDENT_RULES)
-                                        .withConsoleParticipants(
-                                                Optional.of(JustLosers)))))
+                .rules(RULES_G2Q1_S1A2G11_NP.withGroup(
+                        RULES_G2Q1_S1A2G11_NP.getGroup()
+                                .map(gr -> gr.withConsole(INDEPENDENT_RULES))))
                 .category(c1, p1, p2, p3, p4, p5, p6, p7, p8);
         isf.create(scenario)
                 .run(c -> {
-                    c.beginTournament()
-                            .createConsoleGruTournament()
+                    c.createConsoleGruTournament()
+                            .beginTournament()
                             .updateConsoleRules(RULES_LC_S1A2G11_NP.withPlayOff(
                                     Optional.of(Losing2
                                             .withLayerPolicy(

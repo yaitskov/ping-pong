@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Import;
         TournamentMarshalingCtx.class,
         ConsoleTournamentService.class,
         RelatedTournamentsService.class,
+        TournamentValidationService.class,
         TournamentService.class})
 public class TournamentCtx {
 }

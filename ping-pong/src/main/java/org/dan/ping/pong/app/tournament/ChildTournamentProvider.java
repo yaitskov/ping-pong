@@ -8,9 +8,9 @@ import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.Co
 import com.google.common.cache.LoadingCache;
 import lombok.SneakyThrows;
 import org.dan.ping.pong.app.group.ConsoleTournament;
-import org.dan.ping.pong.app.group.GroupRules;
-import org.dan.ping.pong.app.playoff.PlayOffRule;
+import org.dan.ping.pong.app.tournament.console.TournamentRelationType;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -25,30 +25,20 @@ public class ChildTournamentProvider {
     private TournamentCache tournamentCache;
 
     public Stream<TournamentMemState> getChildren(TournamentMemState parentTournament) {
-        final ConsoleTournament group = parentTournament.getRule()
-                .getGroup()
-                .map(GroupRules::getConsole)
-                .orElse(NO);
-        final ConsoleTournament playOff = parentTournament.getRule()
-                .getPlayOff()
-                .map(PlayOffRule::getConsole)
-                .orElse(NO);
+        final ConsoleTournament group = parentTournament.getRule().consoleGroup();
+        final ConsoleTournament playOff = parentTournament.getRule().consolePlayOff();
         if (group == NO && playOff == NO) {
             return Stream.empty();
         }
-        final RelatedTids relatedTids = loadRelations(parentTournament.getTid());
-        if (group == NO) {
-            return Stream.of(tournamentCache.load(
-                    relatedTids.getChildren().get(ConOff)));
-        } else if (playOff == NO) {
-            return Stream.of(tournamentCache.load(
-                    relatedTids.getChildren().get(ConGru)));
-        }
-        return Stream.of(
-                tournamentCache.load(
-                        relatedTids.getChildren().get(ConGru)),
-                tournamentCache.load(
-                        relatedTids.getChildren().get(ConOff)));
+        return childStream(loadRelations(parentTournament.getTid()), ConGru, ConOff);
+    }
+
+    public Stream<TournamentMemState> childStream(
+            RelatedTids relatedTids, TournamentRelationType... types) {
+        return Stream.of(types).map(relatedTids::childO)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(tournamentCache::load);
     }
 
     @SneakyThrows

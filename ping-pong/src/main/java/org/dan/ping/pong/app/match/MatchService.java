@@ -794,8 +794,7 @@ public class MatchService implements MatchServiceIf {
                 MyPendingMatchList.builder()
                         .matches(tournament.participantMatches(bid)
                                 .filter(m -> INCOMPLETE_MATCH_STATES.contains(m.getState()))
-                                .sorted(tournament.getRule().getPlace()
-                                        .map(PlaceRules::getArenaDistribution).orElse(NO) == NO
+                                .sorted(tournament.getRule().arenaDistribution() == NO
                                         ? noTablesParticipantMatchComparator(tournament, bid)
                                         : PARTICIPANT_MATCH_COMPARATOR)
                                 .map(m -> MyPendingMatch.builder()
@@ -814,8 +813,7 @@ public class MatchService implements MatchServiceIf {
                                                 .map(ParticipantMemState::toBidLink))
                                         .build())
                                 .collect(toList()))
-                        .showTables(tournament.getRule().getPlace().map(PlaceRules::getArenaDistribution)
-                                .orElse(NO) != NO)
+                        .showTables(tournament.getRule().arenaDistribution() != NO)
                         .progress(tournamentProgress(tournament, bid))
                         .bidState(ImmutableMap.of(
                                 tournament.getParticipant(bid).getCid(),

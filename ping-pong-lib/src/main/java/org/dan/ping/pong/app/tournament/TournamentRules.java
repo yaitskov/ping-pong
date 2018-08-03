@@ -13,7 +13,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Wither;
 import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
+import org.dan.ping.pong.app.group.ConsoleTournament;
 import org.dan.ping.pong.app.group.GroupRules;
+import org.dan.ping.pong.app.place.ArenaDistributionPolicy;
 import org.dan.ping.pong.app.place.PlaceRules;
 import org.dan.ping.pong.app.playoff.PlayOffRule;
 import org.dan.ping.pong.app.sport.MatchRules;
@@ -60,5 +62,20 @@ public class TournamentRules {
 
     public PlayOffRule playOff(Tid tid) {
         return playOff.orElseThrow(() -> internalError("tournament " + tid + " without playoff"));
+    }
+
+    public ArenaDistributionPolicy arenaDistribution() {
+        return place.map(PlaceRules::getArenaDistribution)
+                .orElse(ArenaDistributionPolicy.NO);
+    }
+
+    public ConsoleTournament consoleGroup() {
+        return group.map(GroupRules::getConsole)
+                .orElse(NO);
+    }
+
+    public ConsoleTournament consolePlayOff() {
+        return playOff.map(PlayOffRule::getConsole)
+                .orElse(NO);
     }
 }

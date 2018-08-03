@@ -1,7 +1,6 @@
 package org.dan.ping.pong.app.tournament;
 
 import static java.time.temporal.ChronoUnit.DAYS;
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
@@ -9,30 +8,22 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
-import static org.dan.ping.pong.app.bid.BidState.Expl;
-import static org.dan.ping.pong.app.bid.BidState.Here;
-import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
-import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.ConsoleLayered;
 import static org.dan.ping.pong.app.category.CategoryService.groupByCategories;
 import static org.dan.ping.pong.app.category.CategoryState.Drt;
 import static org.dan.ping.pong.app.category.CategoryState.Ply;
 import static org.dan.ping.pong.app.category.SelectedCid.selectCid;
-import static org.dan.ping.pong.app.group.ConsoleTournament.NO;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
-import static org.dan.ping.pong.app.table.TableService.STATE;
-import static org.dan.ping.pong.app.tournament.EnlistPolicy.ONCE_PER_TOURNAMENT;
 import static org.dan.ping.pong.app.tournament.TournamentCache.TOURNAMENT_RELATION_CACHE;
 import static org.dan.ping.pong.app.tournament.TournamentState.Announce;
 import static org.dan.ping.pong.app.tournament.TournamentState.Canceled;
 import static org.dan.ping.pong.app.tournament.TournamentState.Draft;
 import static org.dan.ping.pong.app.tournament.TournamentState.Hidden;
 import static org.dan.ping.pong.app.tournament.TournamentState.Open;
-import static org.dan.ping.pong.app.tournament.TournamentType.Classic;
 import static org.dan.ping.pong.app.tournament.TournamentType.Console;
 import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.ConGru;
 import static org.dan.ping.pong.app.tournament.console.TournamentRelationType.ConOff;
@@ -53,8 +44,6 @@ import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.bid.SelectedBid;
 import org.dan.ping.pong.app.bid.Uid;
 import org.dan.ping.pong.app.castinglots.CastingLotsService;
-import org.dan.ping.pong.app.castinglots.rank.CastingLotsRule;
-import org.dan.ping.pong.app.castinglots.rank.ParticipantRankingPolicy;
 import org.dan.ping.pong.app.category.CategoryDao;
 import org.dan.ping.pong.app.category.CategoryService;
 import org.dan.ping.pong.app.category.Cid;
@@ -78,7 +67,6 @@ import org.dan.ping.pong.app.user.UserDao;
 import org.dan.ping.pong.app.user.UserInfo;
 import org.dan.ping.pong.app.user.UserLinkIf;
 import org.dan.ping.pong.sys.db.DbUpdater;
-import org.dan.ping.pong.sys.error.PiPoEx;
 import org.dan.ping.pong.sys.seqex.SequentialExecutor;
 import org.dan.ping.pong.util.time.Clocker;
 import org.springframework.beans.factory.annotation.Value;
@@ -100,7 +88,6 @@ public class TournamentService {
     private static final ImmutableSet<TournamentState> CONFIGURABLE_STATES = EDITABLE_STATES;
     private static final int DAYS_TO_SHOW_COMPLETE_BIDS = 30;
     public static final String UNKNOWN_PLACE = "unknown place";
-    private static final List<BidState> VALID_ENLIST_BID_STATES = asList(Want, Paid, Here);
     public static final PlayOffResultEntries EMPTY_PLAYOFF = PlayOffResultEntries.builder().entries(emptyList()).build();
 
     @Inject
@@ -117,74 +104,9 @@ public class TournamentService {
         return tournamentDao.create(uid, newTournament);
     }
 
-    private void validateEnlistOnline(TournamentMemState tournament, Enlist enlist, Uid uid) {
-        if (tournament.getState() != Draft) {
-            throw notDraftError(tournament);
-        }
-        validateEnlist(tournament, enlist, uid);
-    }
-
-    private void validateEnlistOffline(TournamentMemState tournament, EnlistOffline enlist) {
-        if (tournament.getState() == Draft) {
-            if (!VALID_ENLIST_BID_STATES.contains(enlist.getBidState())) {
-                throw badRequest("Bid state could be "
-                        + VALID_ENLIST_BID_STATES + " but " + enlist.getBidState());
-            }
-            enlist.getGroupId()
-                    .ifPresent(gid -> { throw badRequest("group is not expected"); });
-        } else if (tournament.getState() == Open) {
-            if (enlist.getBidState() != Wait) {
-                throw badRequest("Bid state should be Wait");
-            }
-            final Optional<Gid> ogid = enlist.getGroupId();
-            if (ogid.isPresent()) {
-                if (!groupService.isNotCompleteGroup(tournament, ogid.get())) {
-                    throw badRequest("group is complete");
-                }
-            } else {
-                groupService.ensureThatNewGroupCouldBeAdded(tournament, enlist.getCid());
-            }
-        } else {
-            throw notDraftError(tournament);
-        }
-        validateEnlist(tournament, enlist, enlist.getUid());
-    }
-
-    private PiPoEx notDraftError(TournamentMemState tournament) {
-        return badRequest("tournament-not-in-draft",
-                ImmutableMap.of(STATE, tournament.getState(),
-                        TournamentMemState.TID, tournament.getTid()));
-    }
-
-    private void validateEnlist(TournamentMemState tournament, Enlist enlist, Uid uid) {
-        if (tournament.getType() != Classic) {
-            throw badRequest("Tournament does not allow direct enlistment");
-        }
-
-        tournament.getRule().getEnlist()
-                .orElse(ONCE_PER_TOURNAMENT)
-                .validate(tournament, enlist.getCid(), uid);
-
-        tournament.checkCategory(enlist.getCid());
-        final CastingLotsRule casting = tournament.getRule().getCasting();
-        if (casting.getPolicy() == ParticipantRankingPolicy.ProvidedRating) {
-            final int rank = enlist.getProvidedRank()
-                    .orElseThrow(() -> badRequest("Ranking is required in",
-                            TournamentMemState.TID, tournament.getTid()));
-            casting.getProvidedRankOptions()
-                    .orElseThrow(() -> internalError("no rank options"))
-                    .validate(rank);
-        } else {
-            if (enlist.getProvidedRank().isPresent()) {
-                throw badRequest("Provided ranking is not used",
-                        TournamentMemState.TID, tournament.getTid());
-            }
-        }
-    }
-
     public Bid enlistOnline(EnlistTournament enlistment,
             TournamentMemState tournament, UserLinkIf user, DbUpdater batch) {
-        validateEnlistOnline(tournament, enlistment, user.getUid());
+        validationService.validateEnlistOnline(tournament, enlistment, user.getUid());
         return enlistOnlineWithoutValidation(enlistment, tournament, user, batch);
     }
 
@@ -255,10 +177,11 @@ public class TournamentService {
     @Inject
     private ScheduleServiceSelector scheduleService;
 
+    @Inject
+    private TournamentValidationService validationService;
+
     public void begin(TournamentMemState tournament, DbUpdater batch) {
-        if (tournament.getState() != TournamentState.Draft) {
-            throw notDraftError(tournament);
-        }
+        validationService.validateBeginning(tournament);
         final List<ParticipantMemState> readyBids = castingLotsService
                 .findBidsReadyToPlay(tournament);
         castingLotsService.checkAllThatAllHere(readyBids);
@@ -465,41 +388,9 @@ public class TournamentService {
         tournamentDao.update(update, batch);
     }
 
-    private void validateRulesWithTournament(
-            TournamentMemState tournament, TournamentRules rules) {
-        switch (tournament.getType()) {
-            case Classic:
-                break; // ok
-            case Console:
-                validateRulesOfConsoleTournament(tournament, rules);
-                break;
-            default:
-                throw internalError(
-                        "Tournament type " + tournament.getType() + " not supported");
-        }
-    }
-
-    @SneakyThrows
-    private void validateRulesOfConsoleTournament(
-            TournamentMemState conTour, TournamentRules rules) {
-        rules.getGroup().ifPresent(gr -> {
-            if (gr.getConsole() != NO) {
-                throw badRequest("console group cannot have console tournament");
-            }
-        });
-        rules.getPlayOff().ifPresent(pr -> {
-            if (pr.getConsole() != NO) {
-                throw badRequest("console playOff cannot have console tournament");
-            }
-            if (!pr.getLayerPolicy().isPresent()) {
-                throw badRequest("tournament for console playOff must have layer policy");
-            }
-        });
-    }
-
     public void updateTournamentParams(TournamentMemState tournament,
             TidIdentifiedRules parameters, DbUpdater batch) {
-        validateRulesWithTournament(tournament, parameters.getRules());
+        validationService.validateRulesWithTournament(tournament, parameters.getRules());
         if (!CONFIGURABLE_STATES.contains(tournament.getState())) {
             throw badRequest("Tournament cannot be modified in state",
                     ImmutableMap.of(TournamentMemState.TID, tournament.getTid(),
@@ -547,7 +438,8 @@ public class TournamentService {
     @Inject
     private GroupService groupService;
 
-    public List<TournamentResultEntry> tournamentResult(TournamentMemState tournament, Cid cid) {
+    public List<TournamentResultEntry> tournamentResult(
+            TournamentMemState tournament, Cid cid) {
         final List<TournamentResultEntry> groupOrdered = tournament.getRule().getGroup()
                 .map(gr -> groupService.resultOfAllGroupsInCategory(tournament, cid))
                 .orElse(emptyList());
@@ -611,7 +503,7 @@ public class TournamentService {
 
     public Bid enlistOffline(Uid adminUid, TournamentMemState tournament,
             EnlistOffline enlistment, DbUpdater batch) {
-        validateEnlistOffline(tournament, enlistment);
+        validationService.validateEnlistOffline(tournament, enlistment);
         final UserInfo uInfo = userDao.getUserByUid(enlistment.getUid())
                 .orElseThrow(() -> notFound("user not found"));
         final Bid participantId = tournament.allocateBidFor(

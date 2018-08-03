@@ -1,13 +1,15 @@
 package org.dan.ping.pong.app.match;
 
 import static java.util.Collections.singleton;
-import static org.dan.ping.pong.app.bid.BidState.TERMINAL_RECOVERABLE_STATES;
 import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
+import static org.dan.ping.pong.app.bid.BidState.TERMINAL_RECOVERABLE_STATES;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
 import static org.dan.ping.pong.app.bid.BidState.Win3;
+import static org.dan.ping.pong.app.category.CategoryState.End;
+import static org.dan.ping.pong.app.category.CategoryState.Ply;
 import static org.dan.ping.pong.app.match.MatchState.Auto;
 import static org.dan.ping.pong.app.match.MatchState.Draft;
 import static org.dan.ping.pong.app.match.MatchState.Game;
@@ -24,6 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
+import org.dan.ping.pong.app.category.CategoryMemState;
+import org.dan.ping.pong.app.category.CategoryService;
+import org.dan.ping.pong.app.category.Cid;
 import org.dan.ping.pong.app.group.GroupService;
 import org.dan.ping.pong.app.match.dispute.MatchSets;
 import org.dan.ping.pong.app.playoff.PlayOffService;
@@ -83,9 +88,11 @@ public class MatchEditorService {
                 .findEffectedMatches(tournament, rescoringMatch, newSets);
         affectedMatchesService.validateEffectHash(tournament, rescore, affectedMatches);
 
-        final Optional<Bid> newWinner = sports.findNewWinnerBid(tournament, newSets, rescoringMatch);
+        final Optional<Bid> newWinner = sports.findNewWinnerBid(
+                tournament, newSets, rescoringMatch);
         log.info("New winner {} in mid {}", newWinner, rescoringMatch.getMid());
-        reopenTournamentIfOpenMatch(tournament, batch, affectedMatches, newWinner);
+        reopenTournamentIfOpenMatch(
+                tournament, batch, affectedMatches, newWinner, rescoringMatch.getCid());
         overrideMatchSets(batch, rescoringMatch, newSets);
 
         if (newWinner.isPresent()) {
@@ -171,13 +178,20 @@ public class MatchEditorService {
     @Inject
     private TournamentTerminator tournamentTerminator;
 
+    @Inject
+    private CategoryService categoryService;
+
     private void reopenTournamentIfOpenMatch(TournamentMemState tournament, DbUpdater batch,
-            AffectedMatches affectedMatches, Optional<Bid> newWinner) {
-        if (tournament.getState() == Close) {
+            AffectedMatches affectedMatches, Optional<Bid> newWinner, Cid cid) {
+        final CategoryMemState cat = tournament.getCategory(cid);
+        if (cat.getState() == End) {
             if (!affectedMatches.getToBeCreatedDm().isEmpty()
                     || !affectedMatches.getToBeReset().isEmpty()
                     || !newWinner.isPresent()) {
-                tournamentTerminator.setTournamentState(tournament, Open, batch);
+                categoryService.setState(tournament.getTid(), cat, Ply, batch);
+                if (tournament.getState() == Close) {
+                    tournamentTerminator.setTournamentState(tournament, Open, batch);
+                }
             }
         }
     }
@@ -243,7 +257,8 @@ public class MatchEditorService {
 
         resetMatches(tournament, batch, affectedMatches);
 
-        reopenTournamentIfOpenMatch(tournament, batch, affectedMatches, Optional.empty());
+        reopenTournamentIfOpenMatch(tournament, batch, affectedMatches,
+                Optional.empty(), mInfo.getCid());
         scheduleService.afterMatchComplete(tournament, batch, clocker.get());
     }
 

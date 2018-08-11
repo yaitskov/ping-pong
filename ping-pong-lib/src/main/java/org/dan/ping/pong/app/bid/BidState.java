@@ -17,6 +17,7 @@ public enum BidState {
     Expl, // disqualified out of tournament due rule breaking, etc...
     Quit, // resigned during or before tournament on a free will
     Lost, // lost tournament battle in a group or playoff game
+    Arch, // archived quit/expelled before start - haven't been considered during seeding
     Win3 { // won 3rd place
         public int score() {
             return 3;

@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.dan.ping.pong.app.tournament.RelatedTids;
 import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
+import org.dan.ping.pong.app.tournament.console.TournamentRelationType;
 
 import java.util.Map;
 
@@ -22,5 +23,9 @@ public class TournamentGroup {
         return ofNullable(tournamentMap.get(tid)).orElseThrow(
                 () -> internalError("Tournament  " + tid
                         + " is not in the group of " + masterTid));
+    }
+
+    public TournamentMemState tourByType(TournamentRelationType type) {
+        return tour(relatedTids.child(type));
     }
 }

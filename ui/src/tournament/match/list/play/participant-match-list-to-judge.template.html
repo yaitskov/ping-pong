@@ -2,7 +2,7 @@
 <div class="container">
   <div ng-repeat="cat in $ctrl.categories">
     <h3 ng-show="cat.name">{{cat.name}}:</h3>
-    <div class="alert alert-info" ng-switch="$ctrl.matches.bidState[cat.cid]">
+    <div class="alert alert-info" ng-switch="$ctrl.matches.bidState[$ctrl.tournamentId][cat.cid]">
       <div ng-switch-when="Win1"
            translate="congrat-1st-place",
            translate-values="{url: '#!/tournament/result/' + $ctrl.tournamentId}">

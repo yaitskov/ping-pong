@@ -24,6 +24,7 @@ import static org.dan.ping.pong.sys.error.PiPoEx.internalError;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.dan.ping.pong.app.bid.Bid;
+import org.dan.ping.pong.app.bid.BidRemover;
 import org.dan.ping.pong.app.bid.BidService;
 import org.dan.ping.pong.app.bid.BidState;
 import org.dan.ping.pong.app.category.CategoryMemState;
@@ -40,7 +41,6 @@ import org.dan.ping.pong.app.tournament.TournamentService;
 import org.dan.ping.pong.app.tournament.TournamentState;
 import org.dan.ping.pong.app.tournament.TournamentTerminator;
 import org.dan.ping.pong.app.tournament.rel.RelatedTournamentsService;
-import org.dan.ping.pong.app.tournament.rel.TournamentGroup;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
 
@@ -115,7 +115,7 @@ public class MatchEditorService {
             log.info("Mid {} stays open", mInfo.getMid());
         } else { // request table scheduling
             removeWinnerUidIf(batch, mInfo);
-            resetMatches(tournament, batch, affectedMatches);
+            applyAffects(tournament, batch, affectedMatches);
             log.info("Rescored mid {} returns to game", mInfo.getMid());
             mInfo.participants()
                     .map(tournament::getBidOrQuit)
@@ -148,7 +148,7 @@ public class MatchEditorService {
             MatchInfo mInfo, Optional<Bid> newWinner, AffectedMatches affectedMatches) {
         if (matchHadWinner(mInfo)) {
             removeWinnerUidIf(batch, mInfo);
-            resetMatches(tournament, batch, affectedMatches);
+            applyAffects(tournament, batch, affectedMatches);
             makeParticipantPlaying(tournament, batch, mInfo);
             resetBidStatesForRestGroupParticipants(tournament, mInfo, batch);
             matchService.matchWinnerDetermined(
@@ -247,15 +247,14 @@ public class MatchEditorService {
     public void resetScoreOfCompleteMatch(
             TournamentMemState tournament, ResetSetScore reset,
             DbUpdater batch, MatchInfo mInfo) {
-        final TournamentGroup tourGroup = relatedTournaments.groupOfConTours(tournament);
         final MatchSets newSets = mInfo.sliceFirstSets(reset.getSetNumber());
         final AffectedMatches affectedMatches = affectedMatchesService
                 .findEffectedMatches(tournament, mInfo, newSets);
         truncateSets(batch, mInfo, reset.getSetNumber());
-        resetMatches(tournament, batch, affectedMatches);
+        applyAffects(tournament, batch, affectedMatches);
         matchService.changeStatus(batch, mInfo, Game);
 
-        resetMatches(tournament, batch, affectedMatches);
+        applyAffects(tournament, batch, affectedMatches);
 
         reopenTournamentIfOpenMatch(tournament, batch, affectedMatches,
                 Optional.empty(), mInfo.getCid());
@@ -265,7 +264,10 @@ public class MatchEditorService {
     @Inject
     private MatchRemover matchRemover;
 
-    private void resetMatches(TournamentMemState tournament, DbUpdater batch,
+    @Inject
+    private BidRemover bidRemover;
+
+    private void applyAffects(TournamentMemState tournament, DbUpdater batch,
             AffectedMatches affectedMatches) {
         affectedMatches.getToBeReset().forEach(
                 aMatch -> removeParticipant(
@@ -277,6 +279,15 @@ public class MatchEditorService {
         affectedMatches.getToBeCreatedDm().forEach(
                 mp -> groupService.createDisambiguateMatches(batch, tournament,
                         tournament.getParticipant(mp.getBidLess()).gid(), mp));
+
+        affectedMatches.getLineUpDiff().ifPresent(lud ->
+                bidRemover.removeByBids(tournament, batch, lud.toBeUnlisted()));
+
+        affectedMatches.getConsoleAffect().forEach((conTid, affect) -> {
+            log.info("Apply affects on console tournament {} of {}",
+                    conTid, tournament.getTid());
+            applyAffects(relatedTournaments.loadTournament(conTid), batch, affect);
+        });
     }
 
     private void removeParticipant(TournamentMemState tournament,

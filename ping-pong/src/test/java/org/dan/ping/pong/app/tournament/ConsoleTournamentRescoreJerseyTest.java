@@ -22,6 +22,7 @@ import org.dan.ping.pong.JerseySpringTest;
 import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulator;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
+import org.dan.ping.pong.test.AbstractSpringJerseyTest;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -31,33 +32,33 @@ import javax.inject.Inject;
 
 @Category(JerseySpringTest.class)
 @ContextConfiguration(classes = JerseyWithSimulator.class)
-public class ConsoleTournamentRescoreJerseyTest {
+public class ConsoleTournamentRescoreJerseyTest extends AbstractSpringJerseyTest {
     @Inject
     private ImperativeSimulatorFactory isf;
 
     @Test
-    @Ignore
-    public void rescoreMasterMatchAffectingConGrpLrd() {
-        final TournamentScenario scenario = begin().name("rescoreConGrpLrd")
+    public void rescoreGrpMasterMatchAffectingConGrpLrd() {
+        final TournamentScenario scenario = begin().name("rescoreGrpMsMtConGrpLrd")
                 .rules(RULES_G3Q1_S1A2G11_NP)
                 .category(c1, p1, p2, p3, p4, p5, p6);
         isf.create(scenario)
-                .run(c -> {
-                    c.beginTournament()
+                .run(master -> {
+                    master.beginTournament()
                             .createConsoleGruTournament()
                             .updateConsoleRules(RULES_LC_S1A2G11_NP);
 
-                    final ImperativeSimulator console = playMasterG3Q1(c);
+                    final ImperativeSimulator console = playMasterG3Q1(master);
 
                     console.checkTournament(Open, restState(Play))
                             .reloadMatchMap()
                             .scoreSet(p2, 11, p5, 7)
                             .scoreSet(p3, 11, p6, 9);
 
-                    c.rescoreMatch(p5, p4, 11, 9)
+                    master.rescoreMatch(p5, p4, 11, 9)
                             .reloadMatchMap()
                             .scoreSet(p1, 11, p5, 5)
-                            .checkTournamentComplete(restState(Lost).bid(p5, Win2).bid(p1, Win1));
+                            .checkTournamentComplete(
+                                    restState(Lost).bid(p5, Win2).bid(p1, Win1));
 
                     console
                             .scoreSet(p2, 11, p4, 6)
@@ -66,6 +67,9 @@ public class ConsoleTournamentRescoreJerseyTest {
                                     .bid(p4, Win2).bid(p2, Win1));
                 });
     }
+
+    // rescore master match in group as complete to generate DM matches
+    //    -> should remove master matches in playoff and all matches in group console
 
     // rescore master match to affect group console merged layered matches
     // rescore master match to affect play off console merged layered special guess (w1, w2, w3)

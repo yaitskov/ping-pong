@@ -21,7 +21,7 @@ import javax.inject.Inject;
 @Slf4j
 public class DispatchingCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
     @Inject
-    private IndependentGrpLrdPlayOffBuilder indepGroupLayeredCategoryPlayOffBuilder;
+    private IndependentGrpLrdPlayOffDispatcher indepGroupLayeredCategoryPlayOffBuilder;
 
     @Inject
     private MergedGrpLrdPlayOffBuilder mergedGrpLrdPlayOffBuilder;

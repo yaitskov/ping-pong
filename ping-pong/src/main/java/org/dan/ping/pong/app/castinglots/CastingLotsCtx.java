@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Import;
         CastingLotsRuleValidator.class, GroupDivider.class,
         GroupSizeCalculator.class, FlatCategoryPlayOffBuilder.class,
         IndependentGrpLrdPlayOffBuilder.class,
+        IndependentGrpLrdPlayOffRebuilder.class,
+        IndependentGrpLrdPlayOffDispatcher.class,
         MergedGrpLrdPlayOffBuilder.class,
         PlayOffLayeredCategoryPlayOffBuilder.class,
         AssignBidsToBaseMatches.class,

@@ -5,13 +5,13 @@ import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.dan.ping.pong.app.bid.BidState.Arch;
 import static org.dan.ping.pong.app.bid.BidState.Expl;
 import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Paid;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Want;
 import static org.dan.ping.pong.app.castinglots.FlatCategoryPlayOffBuilder.validateBidsNumberInACategory;
-import static org.dan.ping.pong.app.castinglots.PlayOffGenerator.MID0;
 import static org.dan.ping.pong.app.group.PlayOffMatcherFromGroup.find;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
@@ -36,7 +36,6 @@ import org.dan.ping.pong.app.category.SelectedCid;
 import org.dan.ping.pong.app.group.Gid;
 import org.dan.ping.pong.app.group.GroupDao;
 import org.dan.ping.pong.app.group.GroupService;
-import org.dan.ping.pong.app.group.PlayOffMatcherFromGroup;
 import org.dan.ping.pong.app.match.MatchDao;
 import org.dan.ping.pong.app.match.MatchInfo;
 import org.dan.ping.pong.app.match.MatchService;
@@ -54,7 +53,6 @@ import org.dan.ping.pong.app.tournament.TournamentMemState;
 import org.dan.ping.pong.app.tournament.TournamentRules;
 import org.dan.ping.pong.sys.db.DbUpdater;
 import org.dan.ping.pong.util.time.Clocker;
-import org.jooq.Select;
 
 import java.util.Comparator;
 import java.util.List;
@@ -110,6 +108,19 @@ public class CastingLotsService {
             seedTournamentWithGroupsAndPlayOff(rules, sCid, readyCatBids);
         }
         log.info("Seeding for tid {} is complete", sCid.tid());
+    }
+
+    public void reseedCategory(SelectedCid sCid, List<ParticipantMemState> readyCatBids) {
+        log.info("Reseeding category {} tournament {}", sCid.cid(), sCid.tid());
+        final TournamentRules rules = sCid.tournament().getRule();
+        if (!rules.getPlayOff().isPresent()) {
+            seedJustTournamentOfOneGroup(sCid, readyCatBids);
+        } else if (!rules.getGroup().isPresent()) {
+            seedJustPlayOffTournament(sCid, readyCatBids);
+        } else {
+            seedTournamentWithGroupsAndPlayOff(rules, sCid, readyCatBids);
+        }
+        log.info("Reseeding for tid {} is complete", sCid.tid());
     }
 
     @Inject
@@ -176,6 +187,12 @@ public class CastingLotsService {
     public List<ParticipantMemState> findBidsReadyToPlay(TournamentMemState tournament) {
         return tournament.getParticipants().values().stream()
                 .filter(bid -> WANT_PAID_HERE.contains(bid.getBidState()))
+                .collect(toList());
+    }
+
+    public List<ParticipantMemState> findNotArchivedBids(TournamentMemState tournament) {
+        return tournament.getParticipants().values().stream()
+                .filter(bid -> Arch != bid.getBidState())
                 .collect(toList());
     }
 

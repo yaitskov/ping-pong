@@ -30,11 +30,14 @@ import org.dan.ping.pong.app.match.rule.GroupPositionIdx;
 import org.dan.ping.pong.app.playoff.PlayOffService;
 import org.dan.ping.pong.app.sport.Sports;
 import org.dan.ping.pong.app.tournament.ParticipantMemState;
+import org.dan.ping.pong.app.tournament.Tid;
 import org.dan.ping.pong.app.tournament.TournamentMemState;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -144,9 +147,11 @@ public class AffectedMatchesService {
     private AffectedMatches findAffectedByDisambiguationMatch(TournamentMemState tournament,
             MatchInfo newMatch, List<MatchInfo> allGroupMatches) {
         final List<MatchInfo> newAllGroupMatches = replaceMatch(newMatch, allGroupMatches);
+        final ChildrenAffectedTournaments conAff = affectedConMatches.create();
         return AffectedMatches.builder()
+                .consoleAffect(conAff.getAffects())
                 .toBeReset(playOffMatchesAffectedByGroupWithPossibleDm(tournament,
-                        allGroupMatches, newAllGroupMatches))
+                        allGroupMatches, newAllGroupMatches, conAff))
                 .build();
     }
 
@@ -190,10 +195,15 @@ public class AffectedMatchesService {
         return matches.stream().map(MatchParticipants::create).collect(toSet());
     }
 
+    private static List<MatchInfo> filterOrigin(List<MatchInfo> groupMatches) {
+        return groupMatches.stream()
+                .filter(m -> !m.getTag().isPresent())
+                .collect(toList());
+    }
+
     private AffectedMatches findAffectedByOriginMatch(TournamentMemState tournament,
             MatchInfo ogmi, MatchInfo gmiNewScore, List<MatchInfo> allGroupMatches) {
-        final List<MatchInfo> originMatches = allGroupMatches.stream()
-                .filter(m -> !m.getTag().isPresent()).collect(toList());
+        final List<MatchInfo> originMatches = filterOrigin(allGroupMatches);
         final int incompleteOriginMatches = countIncompleteMatches(originMatches);
         final List<MatchInfo> newOriginMatches = replaceMatch(gmiNewScore, originMatches);
         final int newIncompleteOriginMatches = countIncompleteMatches(newOriginMatches);
@@ -208,18 +218,27 @@ public class AffectedMatchesService {
             final List<MatchInfo> presentDmMatches = findDisambiguationMatchSet(allGroupMatches);
 
             if (newIncompleteOriginMatches > 0) {
-                return AffectedMatches.builder()
-                        .toBeCreatedDm(emptySet())
-                        .toBeRemovedDm(presentDmMatches.stream()
-                                .map(MatchInfo::getMid).collect(toSet()))
-                        .toBeReset(playOffMatchesAffectedByUids(tournament,
-                                bidsByGroup(tournament, ogmi.getGid())))
-                        .build();
+                return findAffectedMatchesIfAppearsIncompleteMatch(
+                        tournament, ogmi, presentDmMatches);
             } else {
                 return findAffectedMatchesIfOriginMatchesStayComplete(tournament,
                         allGroupMatches, newOriginMatches, presentDmMatches);
             }
         }
+    }
+
+    private AffectedMatches findAffectedMatchesIfAppearsIncompleteMatch(
+            TournamentMemState tournament, MatchInfo ogmi,
+            List<MatchInfo> presentDmMatches) {
+        return AffectedMatches.builder()
+                .toBeCreatedDm(emptySet())
+                .toBeRemovedDm(presentDmMatches.stream()
+                        .map(MatchInfo::getMid).collect(toSet()))
+                .toBeReset(playOffMatchesAffectedByUids(tournament,
+                        bidsByGroup(tournament, ogmi.getGid())))
+                .consoleAffect(affectedConMatches.unlistEverybodyInCategory(
+                        ogmi.getCid(), tournament))
+                .build();
     }
 
     private AffectedMatches findAffectedMatchesIfOriginMatchesStayComplete(
@@ -236,9 +255,11 @@ public class AffectedMatchesService {
                 .collect(toSet());
         final SetView<MatchParticipants> toBeCreated = difference(
                 newDmMatchesToGenerate, uidsOfPresentDmMatches);
+        final ChildrenAffectedTournaments conAff = affectedConMatches.create();
         return AffectedMatches.builder()
                 .toBeCreatedDm(toBeCreated)
                 .toBeRemovedDm(midsToBeRemoved)
+                .consoleAffect(conAff.getAffects())
                 .toBeReset(playOffMatchesAffectedByGroupWithPossibleDm(tournament,
                         allGroupMatches,
                         concat(
@@ -249,14 +270,14 @@ public class AffectedMatchesService {
                                 newDmMatchesToGenerate.stream()
                                         .filter(m2 -> !presentDmMatches.contains(m2))
                                         .map(MatchParticipants::toFakeMatch))
-                                .collect(toList())))
+                                .collect(toList()), conAff))
                 .build();
     }
 
     private List<MatchBid> playOffMatchesAffectedByGroupWithPossibleDm(
             TournamentMemState tournament,
             List<MatchInfo> oldGroupMatches,
-            List<MatchInfo> newGroupMatches) {
+            List<MatchInfo> newGroupMatches, ChildrenAffectedTournaments conAff) {
         final Gid gid = oldGroupMatches.get(0).groupId();
         final Set<Bid> groupBids = tournament.bidsInGroup(gid);
         final GroupParticipantOrder oldOrder = groupParticipantOrderService
@@ -283,6 +304,8 @@ public class AffectedMatchesService {
         if (affectedBids.isEmpty()) {
             return emptyList();
         }
+        affectedConMatches.affectedByGroup(
+                tournament, conAff, wasDeterminedBids, newDeterminedBids);
         return playOffMatchesAffectedByUids(tournament, affectedBids);
     }
 
@@ -316,9 +339,9 @@ public class AffectedMatchesService {
         }
 
         return AffectedMatches.builder()
-                .toBeReset(emptyList())
-                .toBeRemovedDm(emptySet())
                 .toBeCreatedDm(disambiguationMatches)
+                // why not remove play off matches in master tournament
+                // because group becomes incomplete!
                 .build();
     }
 

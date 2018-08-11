@@ -67,7 +67,7 @@ public class RelatedTournamentsService {
     }
 
     @SneakyThrows
-    private TournamentMemState loadTournament(Tid tid) {
+    public TournamentMemState loadTournament(Tid tid) {
         return tournamentCache.get(tid);
     }
 }

@@ -8,6 +8,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.dan.ping.pong.app.bid.BidState.Here;
 import static org.dan.ping.pong.app.bid.BidState.Quit;
 import static org.dan.ping.pong.app.bid.BidState.Wait;
 import static org.dan.ping.pong.app.bid.BidState.Want;
@@ -15,6 +16,7 @@ import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.castinglots.rank.GroupSplitPolicy.ConsoleLayered;
 import static org.dan.ping.pong.app.category.CategoryService.groupByCategories;
 import static org.dan.ping.pong.app.category.CategoryState.Drt;
+import static org.dan.ping.pong.app.category.CategoryState.End;
 import static org.dan.ping.pong.app.category.CategoryState.Ply;
 import static org.dan.ping.pong.app.category.SelectedCid.selectCid;
 import static org.dan.ping.pong.app.place.PlaceMemState.PID;
@@ -195,12 +197,21 @@ public class TournamentService {
                                 .orElseGet(Collections::emptyList)));
     }
 
+    public void beginConCategory(Cid cid, TournamentMemState tournament, DbUpdater batch) {
+        final List<ParticipantMemState> readyBids = castingLotsService
+                .findNotArchivedBids(tournament);
+        final Map<Cid, List<ParticipantMemState>> cid2Par = groupByCategories(readyBids);
+        beginCategory(
+                selectCid(cid, tournament, batch),
+                ofNullable(cid2Par.get(cid))
+                        .orElseGet(Collections::emptyList));
+    }
+
     @Inject
     private CategoryService categoryService;
 
     private void beginCategory(SelectedCid sCid, List<ParticipantMemState> bids) {
         log.info("Begin category {} of tournament {}", sCid.cid(), sCid.tid());
-        categoryService.setState(sCid.tid(), sCid.category(), Ply, sCid.batch());
         switch (bids.size()) {
             case 1:
                 sCid.rules().getGroup()
@@ -214,10 +225,12 @@ public class TournamentService {
             case 0:
                 return;
             default:
-                bids.forEach(bid -> bidService.setBidState(bid, Wait, sCid.batch()));
+                bids.stream().filter(bid -> bid.getBidState() == Here)
+                        .forEach(bid -> bidService.setBidState(bid, Wait, sCid.batch()));
                 castingLotsService.seedCategory(sCid, bids);
                 setState(sCid.tournament(), Open, sCid.batch());
         }
+        categoryService.setState(sCid.tid(), sCid.category(), Ply, sCid.batch());
     }
 
     private void setState(

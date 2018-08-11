@@ -15,6 +15,7 @@ import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.MatchState.Place;
 import static org.dan.ping.pong.app.sport.SportType.Tennis;
 import static org.dan.ping.pong.app.sport.tennis.TennisSportTest.CLASSIC_TENNIS_RULES;
+import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G3Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S1A2G11;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G_S2A2G11_NP;
@@ -36,6 +37,8 @@ import static org.dan.ping.pong.mock.simulator.Player.p1;
 import static org.dan.ping.pong.mock.simulator.Player.p2;
 import static org.dan.ping.pong.mock.simulator.Player.p3;
 import static org.dan.ping.pong.mock.simulator.Player.p4;
+import static org.dan.ping.pong.mock.simulator.Player.p5;
+import static org.dan.ping.pong.mock.simulator.Player.p6;
 import static org.dan.ping.pong.mock.simulator.PlayerCategory.c1;
 import static org.dan.ping.pong.mock.simulator.TournamentScenario.begin;
 import static org.dan.ping.pong.mock.simulator.imerative.BidStatesDesc.restState;
@@ -907,4 +910,26 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .checkResult(p1, p3, p2)
                         .checkTournamentComplete(restState(Win2).bid(p1, Win1).bid(p3, Expl)));
     }
+
+    @Test
+    public void rescoreEndedGroupMatchToOpen() {
+        isf.create(begin()
+                .sport(Tennis)
+                .name("rescoreEndedGroupMatchToOpen")
+                .rules(RULES_G3Q1_S1A2G11_NP)
+                .category(c1, p1, p2, p3, p4, p5, p6))
+                .run(c -> c.beginTournament()
+                        .scoreSet(0, p1, 6, p2, 4)
+                        .scoreSet(1, p1, 6, p2, 3)
+                        .scoreSet(0, p2, 6, p3, 3)
+                        .scoreSet(1, p2, 6, p3, 2)
+                        .expelPlayer(p3)
+                        //.scoreSet(0, p1, 2, p3, 6)
+                        //.scoreSet(1, p1, 1, p3, 6)
+                        .checkTournamentComplete(restState(Expl).bid(p1, Win1).bid(p2, Win2))
+                        .rescoreMatch(p3, p2, 6, 2, 6, 1)
+                        .checkResult(p1, p3, p2)
+                        .checkTournamentComplete(restState(Win2).bid(p1, Win1).bid(p3, Expl)));
+    }
+
 }

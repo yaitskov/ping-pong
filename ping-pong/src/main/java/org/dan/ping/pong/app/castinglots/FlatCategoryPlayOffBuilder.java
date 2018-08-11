@@ -84,6 +84,17 @@ public class FlatCategoryPlayOffBuilder implements CategoryPlayOffBuilder {
         return Optional.of(subRootMid);
     }
 
+    public void rebuild(SelectedCid sCid,
+            List<ParticipantMemState> orderedBids, Optional<MatchTag> matchTag) {
+        validateBidsNumberInACategory(orderedBids);
+        if (oneParticipantInCategory(sCid.tournament(), sCid.cid(),
+                orderedBids, sCid.batch(), matchTag)) {
+            return;
+        }
+        final int roundedBasePositions = roundPlayOffBase(orderedBids.size());
+        assignBidsToBaseMatches(sCid, roundedBasePositions, orderedBids, matchTag);
+    }
+
     @Inject
     private MatchService matchService;
 

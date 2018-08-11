@@ -73,12 +73,13 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
         }
         log.info("All group matches of tid {} are over, so begin console tournament {}",
                 masterTournament.getTid(), conGruTour.getTid());
-        begin(masterTournament, batch, conGruTour);
+        beginConCategory(masterTournament, batch, conGruTour, cid);
     }
 
-    public void begin(
-            TournamentMemState masterTournament, DbUpdater batch, TournamentMemState conGruTour) {
-        tournamentService.begin(conGruTour, batch);
+    public void beginConCategory(
+            TournamentMemState masterTournament, DbUpdater batch,
+            TournamentMemState conGruTour, Cid cid) {
+        tournamentService.beginConCategory(cid, conGruTour, batch);
         masterTournament.getCondActions().getOnScheduleTables().add(
                 () -> {
                     log.info("Begin console tournament {}", conGruTour.getTid());
@@ -107,7 +108,7 @@ public class ConsoleStrategyImpl implements ConsoleStrategy {
         final TournamentMemState conOffTour = findConTour(masterTournament.getTid(), ConOff);
         log.info("All play off matches of tid {} are over, so begin console tournament {}",
                 masterTournament.getTid(), conOffTour.getTid());
-        begin(masterTournament, batch, conOffTour);
+        beginConCategory(masterTournament, batch, conOffTour, cid);
     }
 
     @SneakyThrows

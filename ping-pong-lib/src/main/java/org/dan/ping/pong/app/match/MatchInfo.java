@@ -94,7 +94,8 @@ public class MatchInfo {
 
     public void checkParticipantSpace() {
         if (getParticipantIdScore().size() == 2 || losersMeet) {
-            throw internalError("Match " + mid + " gets 3rd participant");
+            throw internalError(
+                    "Match " + tid + ":" + mid + " gets 3rd participant");
         }
     }
 

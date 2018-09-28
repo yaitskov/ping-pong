@@ -7,6 +7,7 @@ import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.group.GroupResource.CID;
 import static org.dan.ping.pong.app.group.GroupResource.GROUP_POPULATIONS;
+import static org.dan.ping.pong.app.group.GroupRulesConst.DM_ORDER_RULES_PUNKTS;
 import static org.dan.ping.pong.app.match.MatchState.Over;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.F2F;
 import static org.dan.ping.pong.app.match.rule.OrderRuleName.UseDisambiguationMatches;
@@ -226,10 +227,11 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
     }
 
     public static TournamentScenario ambigousScenario(String name) {
-        return ambigousScenario(name, GroupRulesConst.DM_ORDER_RULES_PUNKTS);
+        return ambigousScenario(name, DM_ORDER_RULES_PUNKTS);
     }
 
-    private static TournamentScenario ambigousScenario(String name, List<GroupOrderRule> rules) {
+    private static TournamentScenario ambigousScenario(
+            String name, List<GroupOrderRule> rules) {
         return TournamentScenario.begin()
                 .name(name)
                 .rules(RULES_G_S1A2G11_NP.withGroup(
@@ -238,18 +240,24 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
                 .category(c1, p1, p2, p3);
     }
 
-    private TournamentScenario ambigousScenario(String name, TournamentRules rules) {
+    public static TournamentScenario ambigousScenario(
+            String name, TournamentRules rules, List<GroupOrderRule> groupRules) {
         return TournamentScenario.begin()
                 .name(name)
                 .rules(rules.withGroup(
                         rules.getGroup()
-                                .map(g -> g.withOrderRules(GroupRulesConst.DM_ORDER_RULES_PUNKTS))))
+                                .map(g -> g.withOrderRules(groupRules))));
+    }
+
+    public static TournamentScenario ambigousScenario3Bids(
+            String name, TournamentRules rules) {
+        return ambigousScenario(name, rules, DM_ORDER_RULES_PUNKTS)
                 .category(c1, p1, p2, p3);
     }
 
     @Test
     public void rescoreOriginMatchRemovingAmbiguatyMakeOpen() {
-        final TournamentScenario scenario = ambigousScenario(
+        final TournamentScenario scenario = ambigousScenario3Bids(
                 "rescoreOriginMakeOpen", RULES_G_S2A2G11_NP);
         final ImperativeSimulator simulator = isf.create(scenario);
         final Map<Set<Player>, Mid> originMatchMap = new HashMap<>();
@@ -328,7 +336,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void rescoreOpenDmMatchKeep() {
-        final TournamentScenario scenario = ambigousScenario(
+        final TournamentScenario scenario = ambigousScenario3Bids(
                 "rescoreOpenDmMatchKeep", RULES_G_S2A2G11_NP);
         final ImperativeSimulator simulator = isf.create(scenario);
         simulator.run(c -> makeGroupAmbigous2(c)
@@ -345,7 +353,7 @@ public class DisambiguationMatchJerseyTest extends AbstractSpringJerseyTest {
 
     @Test
     public void rescoreOpenDmMatchComplete() {
-        final TournamentScenario scenario = ambigousScenario(
+        final TournamentScenario scenario = ambigousScenario3Bids(
                 "rescoreOpenDmMatchComplete", RULES_G_S2A2G11_NP);
         final ImperativeSimulator simulator = isf.create(scenario);
         simulator.run(c -> makeGroupAmbigous2(c)

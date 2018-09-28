@@ -315,8 +315,9 @@ public class AffectedMatchesService {
     private AffectedMatches findPossibleDisambiguationMatchesToGenerate(
             TournamentMemState tournament, List<MatchInfo> originMatches) {
         final Gid gid = originMatches.get(0).groupId();
+        final Optional<Gid> oGid = Optional.of(gid);
         final GroupParticipantOrder order = groupParticipantOrderService
-                .findOrder(ofParams(Optional.of(gid),
+                .findOrder(ofParams(oGid,
                         tournament, originMatches, tournament.orderRules(),
                         tournament.bidsInGroup(gid)));
 
@@ -340,8 +341,10 @@ public class AffectedMatchesService {
 
         return AffectedMatches.builder()
                 .toBeCreatedDm(disambiguationMatches)
-                // why not remove play off matches in master tournament
-                // because group becomes incomplete!
+                .toBeReset(playOffMatchesAffectedByUids(tournament,
+                        bidsByGroup(tournament, oGid)))
+                .consoleAffect(affectedConMatches.unlistEverybodyInCategory(
+                        originMatches.get(0).getCid(), tournament))
                 .build();
     }
 
@@ -362,6 +365,7 @@ public class AffectedMatchesService {
                         tournament, uid, singletonList(mInfo), result));
         return ofResets(result.stream()
                 .filter(m -> !m.getMid().equals(mInfo.getMid()))
+                .mapToInt()
                 .collect(toList())).deduplicate();
     }
 }

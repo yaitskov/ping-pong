@@ -4,6 +4,8 @@ import static org.dan.ping.pong.app.bid.BidState.Lost;
 import static org.dan.ping.pong.app.bid.BidState.Play;
 import static org.dan.ping.pong.app.bid.BidState.Win1;
 import static org.dan.ping.pong.app.bid.BidState.Win2;
+import static org.dan.ping.pong.app.group.DisambiguationMatchJerseyTest.ambigousScenario;
+import static org.dan.ping.pong.app.group.GroupRulesConst.DM_ORDER_RULES_S2A2G11;
 import static org.dan.ping.pong.app.tournament.ConsoleTournamentJerseyTest.playMasterG3Q1;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_G3Q1_S1A2G11_NP;
 import static org.dan.ping.pong.app.tournament.TournamentRulesConst.RULES_LC_S1A2G11_NP;
@@ -23,7 +25,6 @@ import org.dan.ping.pong.mock.simulator.TournamentScenario;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulator;
 import org.dan.ping.pong.mock.simulator.imerative.ImperativeSimulatorFactory;
 import org.dan.ping.pong.test.AbstractSpringJerseyTest;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.test.context.ContextConfiguration;
@@ -68,8 +69,42 @@ public class ConsoleTournamentRescoreJerseyTest extends AbstractSpringJerseyTest
                 });
     }
 
-    // rescore master match in group as complete to generate DM matches
-    //    -> should remove master matches in playoff and all matches in group console
+    @Test
+    public void rescoreGrpMasterMatchGenDmShouldRemovePlayOffAndConsoleMatches() {
+        final TournamentScenario scenario = ambigousScenario(
+                "rscrGrpMsMtGenDmRstConMtchs", RULES_G3Q1_S1A2G11_NP, DM_ORDER_RULES_S2A2G11)
+                .category(c1, p1, p2, p3, p4, p5, p6);
+        isf.create(scenario)
+                .run(master -> {
+                    master.beginTournament()
+                            .createConsoleGruTournament()
+                            .updateConsoleRules(RULES_LC_S1A2G11_NP);
+
+                    final ImperativeSimulator console = playMasterG3Q1(master);
+
+                    console.checkTournament(Open, restState(Play))
+                            .reloadMatchMap()
+                            .scoreSet(p2, 11, p5, 7)
+                            .scoreSet(p3, 11, p6, 9);
+
+                    master.rescoreMatch(p6, p4, 11, 2)
+                            .reloadMatchMap() // dm matches
+                            .scoreSet2(p6, 11, p4, 8)
+                            .scoreSet2(p6, 11, p5, 3)
+                            .scoreSet2(p4, 11, p5, 1)
+                            .reloadMatchMap() // alternative play off
+                            .scoreSet(p1, 11, p6, 5)
+                            .checkTournamentComplete(
+                                    restState(Lost).bid(p6, Win2).bid(p1, Win1));
+
+                    console
+                            .scoreSet(p5, 11, p2, 7)
+                            .scoreSet(p6, 11, p3, 9)
+                            .checkTournamentComplete(restState(Lost)
+                                    .bid(p6, Win1).bid(p3, Win2)
+                                    .bid(p4, Win1).bid(p2, Win2));
+                });
+    }
 
     // rescore master match to affect group console merged layered matches
     // rescore master match to affect play off console merged layered special guess (w1, w2, w3)

@@ -19,7 +19,6 @@ import static org.dan.ping.pong.app.tournament.CastingLotsRulesConst.LAYERED_CON
 
 import org.dan.ping.pong.app.place.ArenaDistributionPolicy;
 import org.dan.ping.pong.app.place.PlaceRules;
-import org.dan.ping.pong.app.playoff.ConsoleLayersPolicy;
 
 import java.util.Optional;
 
@@ -117,7 +116,6 @@ public class TournamentRulesConst {
     public static final TournamentRules RULES_JP_S3A2G11 = RULES_G8Q1_S3A2G11.withGroup(Optional.empty());
     public static final TournamentRules RULES_JP2_S3A2G11 = RULES_JP_S3A2G11.withPlayOff(Optional.of(Losing2));
     public static final TournamentRules RULES_JP2_S1A2G11 = RULES_JP_S1A2G11.withPlayOff(Optional.of(Losing2));
-    public static final TournamentRules RULES_JP2_S3A2G11_NP = RULES_JP2_S3A2G11.withPlace(Optional.empty());
     public static final TournamentRules RULES_JP2_S1A2G11_NP = RULES_JP2_S1A2G11.withPlace(Optional.empty());
     public static final TournamentRules RULES_JP_S3A2G11_3P = RULES_JP_S3A2G11.withPlayOff(Optional.of(L1_3P));
     public static final TournamentRules RULES_JP_S3A2G11_NP = RULES_JP_S3A2G11.withPlace(Optional.empty());

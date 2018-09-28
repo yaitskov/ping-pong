@@ -272,7 +272,7 @@ public class ConsoleTournamentJerseyTest extends AbstractSpringJerseyTest {
 
                     console.checkTournament(Open, restState(Play).bid(p4, Expl))
                             .scoreSet(p2, 11, p3, 5)
-                            .checkResult(p2, p3)
+                            .checkResult(p2, p3, p4)
                             .checkTournamentComplete(restState(Expl).bid(p2, Win1).bid(p3, Win2));
                 });
     }

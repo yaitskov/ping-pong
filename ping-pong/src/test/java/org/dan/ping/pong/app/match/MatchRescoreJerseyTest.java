@@ -916,7 +916,7 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
         isf.create(begin()
                 .sport(Tennis)
                 .name("rescoreEndedGroupMatchToOpen")
-                .rules(RULES_G3Q1_S1A2G11_NP)
+                .rules(RULES_G3Q1_S1A2G11_NP.withMatch(CLASSIC_TENNIS_RULES))
                 .category(c1, p1, p2, p3, p4, p5, p6))
                 .run(c -> c.beginTournament()
                         .scoreSet(0, p1, 6, p2, 4)
@@ -926,10 +926,14 @@ public class MatchRescoreJerseyTest extends AbstractSpringJerseyTest {
                         .expelPlayer(p3)
                         //.scoreSet(0, p1, 2, p3, 6)
                         //.scoreSet(1, p1, 1, p3, 6)
-                        .checkTournamentComplete(restState(Expl).bid(p1, Win1).bid(p2, Win2))
+                        .checkTournament(Open, restState(Play).bid(p2, Lost).bid(p1, Wait).bid(p3, Expl))
                         .rescoreMatch(p3, p2, 6, 2, 6, 1)
-                        .checkResult(p1, p3, p2)
-                        .checkTournamentComplete(restState(Win2).bid(p1, Win1).bid(p3, Expl)));
+                        .scoreSet2(p4, 6, p5, 3)
+                        .scoreSet2(p5, 6, p6, 2)
+                        .scoreSet2(p4, 6, p6, 1)
+                        // play off
+                        .scoreSet2(p1, 6, p4, 2)
+                        .checkResult(p1, p4, p3, p5, p2, p6)
+                        .checkTournamentComplete(restState(Lost).bid(p1, Win1).bid(p4, Win2).bid(p3, Expl)));
     }
-
 }

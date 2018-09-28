@@ -223,7 +223,7 @@ public class TournamentService {
                                         bids));
                 bidService.setBidState(bids.get(0), Win1, sCid.batch());
             case 0:
-                return;
+                break;
             default:
                 bids.stream().filter(bid -> bid.getBidState() == Here)
                         .forEach(bid -> bidService.setBidState(bid, Wait, sCid.batch()));

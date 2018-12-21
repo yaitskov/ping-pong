@@ -204,6 +204,9 @@ public class TournamentService {
         beginCategory(
                 selectCid(cid, tournament, batch),
                 ofNullable(cid2Par.get(cid))
+                        .map(bids -> bids.stream()
+                                .filter(bid -> bid.getBidState() == Here)
+                                .collect(toList()))
                         .orElseGet(Collections::emptyList));
     }
 
@@ -225,8 +228,7 @@ public class TournamentService {
             case 0:
                 break;
             default:
-                bids.stream().filter(bid -> bid.getBidState() == Here)
-                        .forEach(bid -> bidService.setBidState(bid, Wait, sCid.batch()));
+                bids.forEach(bid -> bidService.setBidState(bid, Wait, sCid.batch()));
                 castingLotsService.seedCategory(sCid, bids);
                 setState(sCid.tournament(), Open, sCid.batch());
         }

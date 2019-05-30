@@ -11,7 +11,7 @@
   "author": "Daneel Yaitskov",
   "license": "MIT",
   "dependencies": {
-    "angular": "^1.6.8",
+    "angular": "1.6.7",
     "angular-flatpickr": "2.4.0",
     "angular-moment": "1.0.1",
     "angular-resource": "^1.6.4",
@@ -38,9 +38,9 @@
   },
   "devDependencies": {
     "ajv": "^5.2.2",
-    "angular-mocks": "^1.6.8",
-    "angular-sanitize": "^1.6.10",
-    "angular-translate": "^2.15.2",
+    "angular-mocks": "1.6.7",
+    "angular-sanitize": "1.6.7",
+    "angular-translate": "2.15.2",
     "babel-cli": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-source-map-support": "^1.0.0",

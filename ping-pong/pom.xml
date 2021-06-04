@@ -16,7 +16,7 @@
     <url>http://maven.apache.org</url>
     <properties>
         <skip.jooq>false</skip.jooq>
-        <httpcomponents.version>4.5.2</httpcomponents.version>
+        <httpcomponents.version>4.5.13</httpcomponents.version>
         <jooq.version>3.8.4</jooq.version>
         <aspectj.version>1.8.8</aspectj.version>
         <jersey.version>2.22.2</jersey.version>
